@@ -25,19 +25,18 @@ namespace Element {
 
 static CodeEditorComponent::ColourScheme luaColors()
 {
-    static const CodeEditorComponent::ColourScheme::TokenType types[] =
-    {
-         { "Error",          Colour (0xffcc0000) },
-         { "Comment",        Colour (0xff6a9955) },
-         { "Keyword",        Colour (0xff569cd6) },
-         { "Operator",       Colour (0xffb3b3b3) },
-         { "Identifier",     Colour (0xffc5c5c5) },
-         { "Integer",        Colour (0xffb5cea8) },
-         { "Float",          Colour (0xffb5cea8) },
-         { "String",         Colour (0xffce9178) },
-         { "Bracket",        Colour (0xffd4d4d4) },
-         { "Punctuation",    Colour (0xffb3b3b3) },
-         { "Preprocessor Text", Colour (0xffc586c0) } // used for control statements
+    static const CodeEditorComponent::ColourScheme::TokenType types[] = {
+        { "Error", Colour (0xffcc0000) },
+        { "Comment", Colour (0xff6a9955) },
+        { "Keyword", Colour (0xff569cd6) },
+        { "Operator", Colour (0xffb3b3b3) },
+        { "Identifier", Colour (0xffc5c5c5) },
+        { "Integer", Colour (0xffb5cea8) },
+        { "Float", Colour (0xffb5cea8) },
+        { "String", Colour (0xffce9178) },
+        { "Bracket", Colour (0xffd4d4d4) },
+        { "Punctuation", Colour (0xffb3b3b3) },
+        { "Preprocessor Text", Colour (0xffc586c0) } // used for control statements
     };
 
     CodeEditorComponent::ColourScheme cs;
@@ -69,20 +68,17 @@ public:
         slider.setSkewFactor (1.0, false);
         slider.setSliderStyle (Slider::LinearBar);
 
-        slider.onDragStart = [this]()
-        {
+        slider.onDragStart = [this]() {
             dragging = true;
             param->beginChangeGesture();
         };
 
-        slider.onDragEnd = [this]()
-        {
+        slider.onDragEnd = [this]() {
             dragging = false;
             param->endChangeGesture();
         };
 
-        slider.onValueChange = [this]
-        {
+        slider.onValueChange = [this] {
             auto newValue = (float) slider.getValue();
             if (param->getValue() != newValue)
             {
@@ -96,15 +92,13 @@ public:
             }
         };
 
-        slider.valueFromTextFunction = [this](const String& text) -> double
-        {
-             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
+        slider.valueFromTextFunction = [this] (const String& text) -> double {
+            if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
                 return (double) cp->convertTo0to1 (text.getFloatValue());
             return text.getDoubleValue();
         };
 
-        slider.textFromValueFunction = [this](double value) -> String
-        {
+        slider.textFromValueFunction = [this] (double value) -> String {
             String text;
             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
                 return cp->getText (static_cast<float> (value), 1024);
@@ -138,7 +132,7 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
     lua = getNodeObjectOfType<LuaNode>();
-    jassert(lua);
+    jassert (lua);
 
     setOpaque (true);
     editor.reset (new CodeEditorComponent (document, &tokens));
@@ -147,11 +141,10 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
     editor->setFont (editor->getFont().withHeight (15));
     editor->loadContent (lua->getDraftScript());
     editor->setColourScheme (luaColors());
-    
+
     addAndMakeVisible (compileButton);
     compileButton.setButtonText ("Compile");
-    compileButton.onClick = [this]()
-    {
+    compileButton.onClick = [this]() {
         if (auto* const lua = getNodeObjectOfType<LuaNode>())
         {
             const auto script = document.getAllContent();
@@ -159,7 +152,8 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
             if (! result.wasOk())
             {
                 AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                    "Script Error", result.getErrorMessage());
+                                                  "Script Error",
+                                                  result.getErrorMessage());
             }
         }
     };
@@ -167,8 +161,7 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
     addAndMakeVisible (editorButton);
     editorButton.setButtonText ("Params");
     editorButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    editorButton.onClick = [this]()
-    {
+    editorButton.onClick = [this]() {
         editorButton.setToggleState (! editorButton.getToggleState(), dontSendNotification);
         props.setVisible (editorButton.getToggleState());
         resized();
@@ -228,7 +221,7 @@ void LuaNodeEditor::resized()
 {
     auto r1 = getLocalBounds().reduced (4);
     auto r2 = r1.removeFromTop (22);
-    
+
     compileButton.changeWidthToFitText (r2.getHeight());
     compileButton.setBounds (r2.removeFromLeft (compileButton.getWidth()));
     editorButton.changeWidthToFitText (r2.getHeight());
@@ -244,4 +237,4 @@ void LuaNodeEditor::resized()
     editor->setBounds (r1);
 }
 
-}
+} // namespace Element

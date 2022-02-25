@@ -22,43 +22,33 @@
 #include "Globals.h"
 #include "gui/views/KeymapEditorView.h"
 
-namespace Element  {
+namespace Element {
 
 class KeymapEditor : public KeyMappingEditorComponent
 {
 public:
     KeymapEditor (KeyPressMappingSet& s) : KeyMappingEditorComponent (s, true)
     {
-        disallow.addArray ({
-            Commands::exportAudio, Commands::exportMidi,
-            Commands::mediaClose, Commands::mediaNew, Commands::mediaOpen, 
-            Commands::mediaSave, Commands::mediaSaveAs,
-            Commands::sessionInsertPlugin,
-            Commands::signIn, Commands::signOut,
-            Commands::workspaceClassic, Commands::workspaceEditing,
-            Commands::workspaceOpen, Commands::workspaceResetActive,
-            Commands::workspaceSave, Commands::workspaceSaveActive
-        });
+        disallow.addArray ({ Commands::exportAudio, Commands::exportMidi, Commands::mediaClose, Commands::mediaNew, Commands::mediaOpen, Commands::mediaSave, Commands::mediaSaveAs, Commands::sessionInsertPlugin, Commands::signIn, Commands::signOut, Commands::workspaceClassic, Commands::workspaceEditing, Commands::workspaceOpen, Commands::workspaceResetActive, Commands::workspaceSave, Commands::workspaceSaveActive });
 
-        readOnly.addArray ({
-            Commands::copy, Commands::paste, 
-            Commands::undo, Commands::redo
-        });
+        readOnly.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
     }
 
-    ~KeymapEditor() { }
+    ~KeymapEditor() {}
 
     bool shouldCommandBeIncluded (CommandID commandID) override
     {
         return (allow.size() > 0) ? allow.contains (commandID)
-                                  : !disallow.contains (commandID);
+                                  : ! disallow.contains (commandID);
     }
 
-    bool isCommandReadOnly (CommandID commandID) override {
+    bool isCommandReadOnly (CommandID commandID) override
+    {
         return readOnly.contains (commandID);
     }
 
-    String getDescriptionForKeyPress (const KeyPress &key) override {
+    String getDescriptionForKeyPress (const KeyPress& key) override
+    {
         return KeyMappingEditorComponent::getDescriptionForKeyPress (key);
     }
 
@@ -69,7 +59,7 @@ private:
 };
 
 KeymapEditorView::KeymapEditorView()
-{ 
+{
     setName ("KeymapEditorView");
     addAndMakeVisible (closeButton);
     closeButton.setButtonText (TRANS ("Close"));
@@ -98,10 +88,10 @@ void KeymapEditorView::stabilizeContent()
 void KeymapEditorView::resized()
 {
     Rectangle<int> r (getLocalBounds().reduced (2));
-    auto r2 = r.removeFromTop(24).reduced (0, 2);
+    auto r2 = r.removeFromTop (24).reduced (0, 2);
     r2.removeFromRight (4);
     closeButton.changeWidthToFitText();
-    const auto idealBtnW = jmax (closeButton.getBestWidthForHeight(24), closeButton.getWidth());
+    const auto idealBtnW = jmax (closeButton.getBestWidthForHeight (24), closeButton.getWidth());
     closeButton.setBounds (r2.removeFromRight (idealBtnW));
     r.removeFromTop (3);
     if (editor != nullptr)
@@ -117,4 +107,4 @@ void KeymapEditorView::saveMappings()
                     "keymappings", xml.get());
 }
 
-}
+} // namespace Element

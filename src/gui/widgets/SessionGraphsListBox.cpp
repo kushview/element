@@ -28,7 +28,7 @@ SessionGraphsListBox::SessionGraphsListBox (Session* s)
     setModel (this);
     updateContent();
 }
-    
+
 SessionGraphsListBox::~SessionGraphsListBox()
 {
     setModel (nullptr);
@@ -39,9 +39,8 @@ int SessionGraphsListBox::getNumRows()
 {
     return (session) ? session->getNumGraphs() : 0;
 }
-    
-void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
-                                             bool rowIsSelected)
+
+void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected)
 {
     if (! session)
         return;
@@ -49,4 +48,4 @@ void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int wid
     ViewHelpers::drawBasicTextRow ("  " + node.getName(), g, width, height, rowIsSelected);
 }
 
-}
+} // namespace Element

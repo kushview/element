@@ -24,7 +24,7 @@ namespace Element {
 
 class Globals;
 
-class Settings :  public ApplicationProperties
+class Settings : public ApplicationProperties
 {
 public:
     Settings();
@@ -118,7 +118,7 @@ public:
 
     bool isSystrayEnabled() const;
     void setSystrayEnabled (bool);
-    
+
     double getMidiOutLatency() const;
     void setMidiOutLatency (double latencyMs);
 
@@ -132,4 +132,4 @@ private:
     PropertiesFile* getProps() const;
 };
 
-}
+} // namespace Element

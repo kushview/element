@@ -23,11 +23,11 @@
 namespace Element {
 
 MidiBlinker::MidiBlinker()
-{ 
+{
     setTooltip ("Blinks when MIDI is sent or received from MIDI devices.");
 }
 
-MidiBlinker::~MidiBlinker() { }
+MidiBlinker::~MidiBlinker() {}
 
 void MidiBlinker::paint (Graphics& g)
 {
@@ -62,10 +62,8 @@ void MidiBlinker::triggerSent()
     startTimer (holdMillis);
 }
 
-
 void MidiBlinker::resized()
 {
-
 }
 
 void MidiBlinker::timerCallback()
@@ -75,4 +73,4 @@ void MidiBlinker::timerCallback()
     repaint();
 }
 
-}
+} // namespace Element

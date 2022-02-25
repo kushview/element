@@ -27,9 +27,9 @@ namespace Element {
 class PluginManager;
 
 class PluginsPanelView : public ContentView,
-                            public ChangeListener,
-                            public TextEditor::Listener,
-                            public Timer
+                         public ChangeListener,
+                         public TextEditor::Listener,
+                         public Timer
 {
 public:
     PluginsPanelView (PluginManager& pm);
@@ -37,7 +37,7 @@ public:
 
     void resized() override;
     void paint (Graphics&) override;
-    
+
     /** Returns the text in the search box */
     String getSearchText() { return search.getText(); }
 
@@ -46,6 +46,7 @@ public:
     void textEditorReturnKeyPressed (TextEditor&) override;
     void changeListenerCallback (ChangeBroadcaster*) override;
     void timerCallback() override;
+
 private:
     PluginManager& plugins;
     TreeView tree;
@@ -53,9 +54,9 @@ private:
 
     void updateTreeView();
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginsPanelView);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginsPanelView);
 };
 
-}
+} // namespace Element
 
-#endif  // EL_PLUGINS_PANEL_VIEW_H
+#endif // EL_PLUGINS_PANEL_VIEW_H

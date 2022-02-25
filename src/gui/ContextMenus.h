@@ -26,22 +26,20 @@
 
 namespace Element {
 
-inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput,
-                                         const int offset = 80000)
+inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput, const int offset = 80000)
 {
     jassert (offset > 0);
     const StringArray devices = isInput ? MidiInput::getDevices() : MidiOutput::getDevices();
     for (int i = 0; i < devices.size(); ++i)
-        menu.addItem (i + offset, devices [i], true, false);
+        menu.addItem (i + offset, devices[i], true, false);
 }
 
-inline static String getMidiDeviceForMenuResult (const int result, const bool isInput,
-                                                 const int offset = 80000)
+inline static String getMidiDeviceForMenuResult (const int result, const bool isInput, const int offset = 80000)
 {
     jassert (offset > 0 && result >= offset);
     const int index = result - offset;
     const StringArray devices = isInput ? MidiInput::getDevices() : MidiOutput::getDevices();
-    return isPositiveAndBelow (index, devices.size()) ? devices [index] : String();
+    return isPositiveAndBelow (index, devices.size()) ? devices[index] : String();
 }
 
 class PluginsPopupMenu : public PopupMenu
@@ -56,13 +54,12 @@ public:
         jassert (plugins != nullptr);
         available = plugins->getKnownPlugins().getTypes();
     }
-    
+
     bool isPluginResultCode (const int resultCode)
     {
-        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) ||
-               (isPositiveAndBelow (int(resultCode - 20000), unverified.size()));
+        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) || (isPositiveAndBelow (int (resultCode - 20000), unverified.size()));
     }
-    
+
     PluginDescription getPluginDescription (int resultCode, bool& verified)
     {
         jassert (plugins != nullptr);
@@ -72,13 +69,14 @@ public:
             verified = true;
             return available.getReference (index);
         }
-        
+
         verified = false;
         index = resultCode - 20000;
-        return isPositiveAndBelow (index, unverified.size()) 
-            ? *unverified.getUnchecked (index) : PluginDescription();
+        return isPositiveAndBelow (index, unverified.size())
+                   ? *unverified.getUnchecked (index)
+                   : PluginDescription();
     }
-    
+
     void addPluginItems()
     {
         if (hasAddedPlugins)
@@ -95,12 +93,11 @@ public:
             plugins->getUnverifiedPlugins (name, unverified);
             if (auto* format = plugins->getAudioPluginFormat (name))
                 for (int i = lastSize; i < unverified.size(); ++i)
-                    menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (
-                        unverified.getUnchecked(i)->fileOrIdentifier));
+                    menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (unverified.getUnchecked (i)->fileOrIdentifier));
             if (menu.getNumItems() > 0)
                 unvMenu.addSubMenu (name, menu);
         }
-        
+
         if (unvMenu.getNumItems() > 0)
         {
             addSeparator();
@@ -130,11 +127,11 @@ public:
         DisconnectMidi,
         LastItem
     };
-    
+
     typedef std::initializer_list<ItemIds> ItemList;
-    
-    explicit NodePopupMenu() { }
-    
+
+    explicit NodePopupMenu() {}
+
     NodePopupMenu (const Node& n, std::function<void (NodePopupMenu&)> beforeMainItems = nullptr)
         : node (n)
     {
@@ -145,14 +142,14 @@ public:
         }
         addMainItems (false);
     }
-    
+
     NodePopupMenu (const Node& n, const Port& p)
         : node (n), port (p)
     {
         addMainItems (false);
         NodeArray siblings;
         addSeparator();
-        
+
         if (port.isInput())
         {
             PopupMenu items;
@@ -168,7 +165,7 @@ public:
                     addItemInternal (srcMenu, p.getName(), new SingleConnectOp (src, p, node, port));
                 items.addSubMenu (src.getName(), srcMenu);
             }
-            
+
             addSubMenu ("Sources", items);
         }
         else
@@ -186,11 +183,11 @@ public:
                     addItemInternal (srcMenu, p.getName(), new SingleConnectOp (node, port, dst, p));
                 items.addSubMenu (dst.getName(), srcMenu);
             }
-            
+
             addSubMenu ("Destinations", items);
         }
     }
-    
+
     ~NodePopupMenu()
     {
         reset();
@@ -222,7 +219,7 @@ public:
         osMenu.addItem (index++, "2x", true, ptr->getOversamplingFactor() == 2);
         osMenu.addItem (index++, "4x", true, ptr->getOversamplingFactor() == 4);
         osMenu.addItem (index++, "8x", true, ptr->getOversamplingFactor() == 8);
-                                                      
+
         menuToAddTo.addSubMenu ("Oversample", osMenu);
     }
 
@@ -230,33 +227,33 @@ public:
     {
         PopupMenu menu;
         plugins.getKnownPlugins()
-            .addToMenu (menu, KnownPluginList::sortByCategory, 
-                        node.getFileOrIdentifier().toString());
+            .addToMenu (menu, KnownPluginList::sortByCategory, node.getFileOrIdentifier().toString());
         addSubMenu ("Replace", menu);
     }
 
     inline void addProgramsMenu (const String& subMenuName = "Factory Presets")
     {
-        PopupMenu programs; getProgramsMenu (programs);
+        PopupMenu programs;
+        getProgramsMenu (programs);
         addSubMenu (subMenuName, programs);
     }
-    
+
     inline void addPresetsMenu (PresetCollection& collection, const String& subMenuName = "Presets")
     {
         PopupMenu presets;
         getPresetsMenu (collection, presets);
         addSubMenu (subMenuName, presets);
     }
-    
+
     inline void getPresetsMenu (PresetCollection& collection, PopupMenu& menu)
     {
-       #if EL_USE_PRESETS
+#if EL_USE_PRESETS
         const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
         const String format = node.getProperty (Tags::format).toString();
         addItemInternal (menu, "Add Preset", new AddPresetOp (node));
-        
+
         menu.addSeparator();
 
         {
@@ -264,7 +261,7 @@ public:
             getProgramsMenu (progs);
             menu.addSubMenu ("Factory Presets", progs);
         }
-        
+
         if (format == "VST")
         {
             PopupMenu native;
@@ -272,33 +269,34 @@ public:
             addItemInternal (native, "Load FXB/FXP", new FXBPresetOp (node, true));
             menu.addSubMenu ("Native Presets", native);
         }
-        
-        auto identifier = node.getProperty(Tags::identifier).toString();
+
+        auto identifier = node.getProperty (Tags::identifier).toString();
         if (identifier.isEmpty())
             identifier = node.getProperty (Tags::file);
-        
+
         presetItems.clear();
         collection.getPresetsFor (node, presetItems);
-       
+
         menu.addSeparator();
-        
+
         if (presetItems.size() <= 0)
             menu.addItem (offset, "(none)", false);
-        
+
         for (int i = 0; i < presetItems.size(); ++i)
             menu.addItem (offset + i, presetItems[i]->name);
-       #endif
+#endif
     }
-    
+
     inline void getProgramsMenu (PopupMenu& menu)
     {
         const int offset = 10000;
         const int current = node.getCurrentProgram();
-        for (int i = 0; i < node.getNumPrograms(); ++i) {
+        for (int i = 0; i < node.getNumPrograms(); ++i)
+        {
             menu.addItem (offset + i, node.getProgramName (i), true, i == current);
         }
     }
-    
+
     Message* createMessageForResultCode (const int result)
     {
         if (result == RemoveNode)
@@ -313,7 +311,7 @@ public:
             return new DisconnectNodeMessage (node, false, true);
         else if (result == DisconnectMidi)
             return new DisconnectNodeMessage (node, true, true, false, true);
-        else if (auto* op = resultMap [result])
+        else if (auto* op = resultMap[result])
         {
             if (auto* const msg = op->createMessage())
                 return msg;
@@ -321,18 +319,18 @@ public:
         }
         else if (result >= 10000 && result < 20000)
         {
-            Node(node).setCurrentProgram (result - 10000);
+            Node (node).setCurrentProgram (result - 10000);
         }
         else if (result >= 20000 && result < 30000)
         {
             Node n (node);
             const int index = result - 20000;
-            if (auto* const item = presetItems [index])
+            if (auto* const item = presetItems[index])
             {
                 const auto data = Node::parse (item->file);
                 if (n.isValid() && data.isValid() && data.hasProperty (Tags::state))
                 {
-                    const String state = data.getProperty(Tags::state).toString();
+                    const String state = data.getProperty (Tags::state).toString();
                     n.getValueTree().setProperty (Tags::state, state, 0);
                     if (data.hasProperty (Tags::programState))
                         n.getValueTree().setProperty (Tags::programState, data.getProperty (Tags::programState), 0);
@@ -358,7 +356,7 @@ public:
         }
         else if (result >= 40000 && result < 50000)
         {
-            const int osFactor = (int) powf(2, float (result - 40000));
+            const int osFactor = (int) powf (2, float (result - 40000));
             if (auto gNode = node.getObject())
             {
                 // FIXME:
@@ -372,15 +370,15 @@ public:
                 // graph->suspendProcessing (wasSuspended);
             }
         }
-        
+
         return nullptr;
     }
-    
+
     Message* showAndCreateMessage()
     {
         return createMessageForResultCode (this->show());
     }
-    
+
     void reset()
     {
         this->clear();
@@ -404,23 +402,23 @@ private:
     Port port;
     const int firstResultOpId = 1024;
     int currentResultOpId = 1024;
-    
+
     struct ResultOp
     {
-        ResultOp() { }
-        virtual ~ResultOp () { }
+        ResultOp() {}
+        virtual ~ResultOp() {}
         virtual bool isActive() { return true; }
         virtual bool isTicked() { return false; }
         virtual Message* createMessage() { return nullptr; }
         virtual bool perform() { return false; }
-        
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResultOp);
     };
-    
+
     struct EnableNodeOp : public ResultOp
     {
         const Node node;
-        EnableNodeOp (const Node& n) : node (n) { }
+        EnableNodeOp (const Node& n) : node (n) {}
         bool isTicked() override { return false; }
         bool perform() override
         {
@@ -439,30 +437,32 @@ private:
     struct SingleConnectOp : public ResultOp
     {
         SingleConnectOp (const Node& sn, const Port& sp, const Node& dn, const Port& dp)
-            : sourceNode(sn), destNode(dn),  sourcePort (sp), destPort (dp)
-        { }
-        
+            : sourceNode (sn), destNode (dn), sourcePort (sp), destPort (dp)
+        {
+        }
+
         const Node sourceNode, destNode;
         const Port sourcePort, destPort;
-        
+
         bool isTicked()
         {
             return Node::connectionExists (sourceNode.getParentArcsNode(),
-                                           sourceNode.getNodeId(), sourcePort.getIndex(),
-                                           destNode.getNodeId(), destPort.getIndex());
+                                           sourceNode.getNodeId(),
+                                           sourcePort.getIndex(),
+                                           destNode.getNodeId(),
+                                           destPort.getIndex());
         }
-        
+
         Message* createMessage()
         {
-            return new AddConnectionMessage (sourceNode.getNodeId(), sourcePort.getIndex(),
-                                             destNode.getNodeId(), destPort.getIndex());
+            return new AddConnectionMessage (sourceNode.getNodeId(), sourcePort.getIndex(), destNode.getNodeId(), destPort.getIndex());
         }
     };
-    
+
     struct AddPresetOp : public ResultOp
     {
         AddPresetOp (const Node& n)
-            : node (n) { }
+            : node (n) {}
         const Node node;
         Message* createMessage()
         {
@@ -473,16 +473,16 @@ private:
     struct FXBPresetOp : public ResultOp
     {
         FXBPresetOp (const Node& n, const bool isLoad)
-            : node (n), load (isLoad) { }
+            : node (n), load (isLoad) {}
         const Node node;
         const bool load;
         bool perform() override
         {
-           #if JUCE_PLUGINHOST_VST
-            const auto format = node.getProperty(Tags::format).toString();
+#if JUCE_PLUGINHOST_VST
+            const auto format = node.getProperty (Tags::format).toString();
             if (format != "VST")
                 return false;
-            
+
             auto gn = node.getObject();
             auto* const proc = (gn) ? gn->getAudioPluginInstance() : nullptr;
 
@@ -492,7 +492,7 @@ private:
             if (load)
             {
                 DataPath dataPath;
-                const auto file = dataPath.getRootDir().getChildFile("Presets");
+                const auto file = dataPath.getRootDir().getChildFile ("Presets");
                 FileChooser chooser ("Open FXB/FXP Preset", File(), "*.fxb;*.fxp", true);
                 bool wasOk = true;
                 if (chooser.browseForFileToOpen())
@@ -512,9 +512,9 @@ private:
             else
             {
                 DataPath dataPath;
-                String path = "Presets/"; path << proc->getName();
-                const auto file = dataPath.getRootDir().getChildFile(path)
-                    .withFileExtension("fxp").getNonexistentSibling();
+                String path = "Presets/";
+                path << proc->getName();
+                const auto file = dataPath.getRootDir().getChildFile (path).withFileExtension ("fxp").getNonexistentSibling();
                 FileChooser chooser ("Save FXB/FXP Preset", file, "*.fxb;*.fxp", true);
                 if (chooser.browseForFileToSave (true))
                 {
@@ -534,11 +534,11 @@ private:
             }
 
             return true;
-            
-           #else
-            DBG("[EL] FXB/FXP presets not yet supported on this platform.");
+
+#else
+            DBG ("[EL] FXB/FXP presets not yet supported on this platform.");
             return true;
-           #endif
+#endif
         }
     };
 
@@ -549,8 +549,7 @@ private:
         Node node;
         bool perform() override
         {
-            AlertWindow win ("Rename Node", "Enter a new node name:", 
-                             AlertWindow::NoIcon, nullptr);
+            AlertWindow win ("Rename Node", "Enter a new node name:", AlertWindow::NoIcon, nullptr);
             win.addTextEditor ("name", node.getName(), "", false);
             win.addButton ("Rename", 1, KeyPress (KeyPress::returnKey));
             win.addButton ("Cancel", 0, KeyPress (KeyPress::escapeKey));
@@ -561,14 +560,14 @@ private:
                     if (ed->getText().isNotEmpty())
                         node.setProperty (Tags::name, ed->getText());
             }
-            
+
             return true;
         }
     };
 
     HashMap<int, ResultOp*> resultMap;
     OwnedArray<ResultOp> deleter;
-    
+
     void addMainItems (const bool showHeader)
     {
         if (showHeader)
@@ -588,29 +587,37 @@ private:
             addSubMenu ("Disconnect", disconnect);
         }
 
-        addItem (Duplicate, getNameForItem (Duplicate), !node.isIONode());
+        addItem (Duplicate, getNameForItem (Duplicate), ! node.isIONode());
         addSeparator();
         addItem (RemoveNode, getNameForItem (RemoveNode));
     }
-    
+
     void addItemInternal (PopupMenu& menu, const String& name, ResultOp* op)
     {
         menu.addItem (currentResultOpId, name, op->isActive(), op->isTicked());
         resultMap.set (currentResultOpId, deleter.add (op));
         ++currentResultOpId;
     }
-    
+
     String getNameForItem (ItemIds item)
     {
         switch (item)
         {
-            case Disconnect: return "Disconnect"; break;
-            case Duplicate:  return "Duplicate"; break;
-            case RemoveNode: return "Remove"; break;
-            default: jassertfalse; break;
+            case Disconnect:
+                return "Disconnect";
+                break;
+            case Duplicate:
+                return "Duplicate";
+                break;
+            case RemoveNode:
+                return "Remove";
+                break;
+            default:
+                jassertfalse;
+                break;
         }
         return "Unknown Item";
     }
 };
 
-}
+} // namespace Element

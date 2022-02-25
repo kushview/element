@@ -27,16 +27,17 @@ namespace Element {
 class TrackModel
 {
 public:
-
     explicit TrackModel (const Identifier& valueType = "track")
         : trackData (valueType)
-    { }
+    {
+    }
 
     TrackModel (const ValueTree& data)
         : trackData (data)
-    { }
+    {
+    }
 
-    virtual ~TrackModel() { }
+    virtual ~TrackModel() {}
 
     /** Test if the track is valid
         If you need additional tests for validity, override this method
@@ -50,23 +51,22 @@ public:
 
         The easiest thing to do is ensure the parent only contains 'tracks'
     */
-    inline virtual int32 index()  const { return trackData.getParent().indexOf (trackData); }
+    inline virtual int32 index() const { return trackData.getParent().indexOf (trackData); }
 
-    Value armedValue()  { return trackData.getPropertyAsValue ("armed", nullptr); }
-    Value mutedValue()  { return trackData.getPropertyAsValue ("mute", nullptr); }
+    Value armedValue() { return trackData.getPropertyAsValue ("armed", nullptr); }
+    Value mutedValue() { return trackData.getPropertyAsValue ("mute", nullptr); }
     Value soloedValue() { return trackData.getPropertyAsValue ("solo", nullptr); }
     Value volumeValue() { return trackData.getPropertyAsValue ("volume", nullptr); }
 
-    void setArmed  (bool arm)   { armedValue() = arm; }
-    void setMuted  (bool mute)  { mutedValue() = mute; }
-    void setSoloed (bool solo)  { soloedValue() = solo; }
+    void setArmed (bool arm) { armedValue() = arm; }
+    void setMuted (bool mute) { mutedValue() = mute; }
+    void setSoloed (bool solo) { soloedValue() = solo; }
     void setVolume (double vol) { volumeValue() = vol; }
 
     Identifier treeType() const { return trackData.getType(); }
     ValueTree state() const { return trackData; }
 
 protected:
-
     ValueTree trackData;
     inline void setMissingProperties()
     {
@@ -79,8 +79,7 @@ protected:
         if (! trackData.hasProperty ("volume"))
             trackData.setProperty ("volume", (double) 1.0f, nullptr);
     }
-
 };
-}
+} // namespace Element
 
 #endif // EL_TRACK_MODEL_H

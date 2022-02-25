@@ -49,7 +49,7 @@ NodeFactory::NodeFactory()
     add<GraphNode> (EL_INTERNAL_ID_GRAPH);
 }
 
-NodeFactory::~NodeFactory() 
+NodeFactory::~NodeFactory()
 {
     knownIDs.clearQuick();
     providers.clearQuick (true);
@@ -90,7 +90,10 @@ NodeObject* NodeFactory::instantiate (const String& identifier)
     NodeObject* node = nullptr;
     for (const auto& f : providers)
         if (auto* const n = f->create (identifier))
-            { node = n; break; }
+        {
+            node = n;
+            break;
+        }
 
     if (node)
     {
@@ -113,4 +116,4 @@ NodeObject* NodeFactory::wrap (AudioProcessor* processor)
     return node.release();
 }
 
-}
+} // namespace Element

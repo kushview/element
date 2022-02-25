@@ -27,32 +27,34 @@ struct Style
 {
     enum ColorID
     {
-        backgroundColorId               = 0x30000000,
+        backgroundColorId = 0x30000000,
         backgroundHighlightColorId,
 
         contentBackgroundColorId,
 
-        widgetBackgroundColorId,       
+        widgetBackgroundColorId,
         textColorId,
         textActiveColorId,
         textBoldColorId,
     };
 };
 
-struct Colors : kv::Colors { };
+struct Colors : kv::Colors
+{
+};
 
 class LookAndFeel : public LookAndFeel_KV1
 {
 public:
     LookAndFeel();
     ~LookAndFeel() {}
-    
+
     Typeface::Ptr getTypefaceForFont (const Font&) override;
 
     int getDefaultScrollbarWidth() override;
 
     //==============================================================================
-   #if 0
+#if 0
     AlertWindow* createAlertWindow (const String& title, const String& message,
                                     const String& button1,
                                     const String& button2,
@@ -65,22 +67,16 @@ public:
     Font getAlertWindowTitleFont() override;
     Font getAlertWindowMessageFont() override;
     Font getAlertWindowFont() override;
-   #endif
+#endif
 
     // rotary slider
-    void drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
-                           const float rotaryStartAngle, const float rotaryEndAngle, 
-                           Slider& slider) override;
+    void drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider) override;
 
-    void drawProgressBar (Graphics& g, ProgressBar& progressBar,
-                          int width, int height, double progress, 
-                          const String& textToShow) override;
-    
+    void drawProgressBar (Graphics& g, ProgressBar& progressBar, int width, int height, double progress, const String& textToShow) override;
+
     // MARK: Concertina Panel
-    void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area,
-                                    bool isMouseOver, bool isMouseDown,
-                                    ConcertinaPanel&, Component&) override;
-    
+    void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area, bool isMouseOver, bool isMouseDown, ConcertinaPanel&, Component&) override;
+
     // MARK: ComboBox
     Font getComboBoxFont (ComboBox& box) override;
 
@@ -94,22 +90,16 @@ public:
     void drawPropertyComponentBackground (Graphics&, int width, int height, PropertyComponent&) override;
     void drawPropertyComponentLabel (Graphics&, int width, int height, PropertyComponent&) override;
     Rectangle<int> getPropertyComponentContentPosition (PropertyComponent&) override;
-    
+
     // MARK: Toggle buttons
 
     Path getTickShape (float height) override;
     Path getCrossShape (float height) override;
-    void drawToggleButton (Graphics&, ToggleButton&,
-                           bool shouldDrawButtonAsHighlighted, 
-                           bool shouldDrawButtonAsDown) override;
-    void drawTickBox (Graphics&, Component&,
-                      float x, float y, float w, float h,
-                      bool ticked, bool isEnabled,
-                      bool shouldDrawButtonAsHighlighted, 
-                      bool shouldDrawButtonAsDown) override;
+    void drawToggleButton (Graphics&, ToggleButton&, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+    void drawTickBox (Graphics&, Component&, float x, float y, float w, float h, bool ticked, bool isEnabled, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
     void changeToggleButtonWidthToFitText (ToggleButton&) override;
-    
+
     // slider
     Label* createSliderTextBox (Slider& slider) override
     {
@@ -119,11 +109,11 @@ public:
     }
 
     // MARK: Treeview
-    void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float> &area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
+    void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float>& area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
 
 private:
     String defaultSansSerifName,
-           defaultMonospaceName;
+        defaultMonospaceName;
 };
 
-}
+} // namespace Element

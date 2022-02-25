@@ -50,7 +50,7 @@ void OSCSenderNode::setState (const void* data, int size)
     if (newHostName != currentHostName || newPortNumber != currentPortNumber)
         disconnect();
     if (newConnected)
-        connect(newHostName, newPortNumber);
+        connect (newHostName, newPortNumber);
 
     currentHostName = newHostName;
     currentPortNumber = newPortNumber;
@@ -76,7 +76,7 @@ void OSCSenderNode::getState (MemoryBlock& block)
     }
 }
 
-void OSCSenderNode::run ()
+void OSCSenderNode::run()
 {
     while (! threadShouldExit())
     {
@@ -101,22 +101,22 @@ void OSCSenderNode::run ()
         while (iter1.getNextEvent (msg, frame))
         {
             OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
-            oscSender.send ( oscMsg );
+            oscSender.send (oscMsg);
 
             if (! msg.isMidiClock())
             {
-                oscMessagesToLog.push_back ( oscMsg );
+                oscMessagesToLog.push_back (oscMsg);
             }
         }
 
         while (oscMessagesToLog.size() > (size_t) maxOscMessages)
-            oscMessagesToLog.erase ( oscMessagesToLog.begin() );
+            oscMessagesToLog.erase (oscMessagesToLog.begin());
     }
 
-    DBG("[EL] OSCSenderNode: OSC -> MIDI processing thread exited");
+    DBG ("[EL] OSCSenderNode: OSC -> MIDI processing thread exited");
 }
 
-void OSCSenderNode::stop ()
+void OSCSenderNode::stop()
 {
     if (isThreadRunning())
     {
@@ -139,8 +139,10 @@ inline void OSCSenderNode::refreshPorts()
     setPorts (newPorts);
 }
 
-void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize) {
-    if (! midiMessageQueueInitDone) {
+void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize)
+{
+    if (! midiMessageQueueInitDone)
+    {
         midiMessageQueue.reset (sampleRate);
         currentSampleRate = sampleRate;
         midiMessageQueueInitDone = true;
@@ -152,7 +154,8 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     const auto nframes = audio.getNumSamples();
     auto* const midiIn = midi.getWriteBuffer (0);
 
-    if (nframes == 0 || !connected || paused) {
+    if (nframes == 0 || ! connected || paused)
+    {
         midiIn->clear();
         return;
     }
@@ -164,8 +167,8 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     while (iter1.getNextEvent (msg, frame))
     {
-        msg.setTimeStamp ( timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)) );
-        midiMessageQueue.addMessageToQueue ( msg );
+        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)));
+        midiMessageQueue.addMessageToQueue (msg);
     }
 
     numSamples += nframes;
@@ -177,7 +180,7 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 bool OSCSenderNode::connect (String hostName, int portNumber)
 {
-   if (connected && currentPortNumber == portNumber)
+    if (connected && currentPortNumber == portNumber)
         return connected;
 
     currentHostName = hostName;
@@ -187,37 +190,37 @@ bool OSCSenderNode::connect (String hostName, int portNumber)
     return connected;
 }
 
-bool OSCSenderNode::disconnect ()
+bool OSCSenderNode::disconnect()
 {
-   if (!connected)
+    if (! connected)
         return true;
     connected = false;
     return oscSender.disconnect();
 }
 
-bool OSCSenderNode::isConnected ()
+bool OSCSenderNode::isConnected()
 {
     return connected;
 }
 
-void OSCSenderNode::pause ()
+void OSCSenderNode::pause()
 {
     paused = true;
 }
 
-void OSCSenderNode::resume ()
+void OSCSenderNode::resume()
 {
     paused = false;
 }
 
-bool OSCSenderNode::isPaused ()
+bool OSCSenderNode::isPaused()
 {
     return paused;
 }
 
-bool OSCSenderNode::togglePause ()
+bool OSCSenderNode::togglePause()
 {
-    if ( paused )
+    if (paused)
         resume();
     else
         pause();
@@ -225,12 +228,12 @@ bool OSCSenderNode::togglePause ()
     return paused;
 }
 
-int OSCSenderNode::getCurrentPortNumber ()
+int OSCSenderNode::getCurrentPortNumber()
 {
     return currentPortNumber;
 }
 
-String OSCSenderNode::getCurrentHostName ()
+String OSCSenderNode::getCurrentHostName()
 {
     return currentHostName;
 }
@@ -251,11 +254,11 @@ std::vector<OSCMessage> OSCSenderNode::getOscMessages()
 
     {
         ScopedLock sl (lock);
-        std::copy ( oscMessagesToLog.begin(), oscMessagesToLog.end(), std::back_inserter( copied ) );
+        std::copy (oscMessagesToLog.begin(), oscMessagesToLog.end(), std::back_inserter (copied));
         oscMessagesToLog.clear();
     }
 
     return copied;
 }
 
-}
+} // namespace Element

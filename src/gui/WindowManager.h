@@ -46,10 +46,10 @@ public:
             w->setVisible (false);
             w->removeFromDesktop();
         }
-        
+
         activeWindows.clear (true);
         activeDialogs.clear (true);
-        
+
         closeAllPluginWindows (true);
     }
 
@@ -81,7 +81,7 @@ public:
     }
 
     /** Show and manage a dialog window */
-        
+
     inline void push (DialogWindow* dialog, const bool alwaysOnTop = false)
     {
         jassert (nullptr != dialog);
@@ -95,30 +95,36 @@ public:
     }
 
     // MARK: Plugin Windows
-    
+
     inline int getNumPluginWindows() const { return activePluginWindows.size(); }
-    
+
     inline PluginWindow* getPluginWindow (const int window) const
     {
-        return activePluginWindows [window];
+        return activePluginWindows[window];
     }
-    
+
     void closeOpenPluginWindowsFor (GraphNode& proc, const bool windowVisible);
-    
+
     void closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible);
-    
+
     inline void closeOpenPluginWindowsFor (const uint32 nodeId, const bool windowVisible)
     {
         for (int i = activePluginWindows.size(); --i >= 0;)
-            if (activePluginWindows.getUnchecked(i)->owner->nodeId == nodeId)
-                { deletePluginWindow (i, windowVisible); break; }
+            if (activePluginWindows.getUnchecked (i)->owner->nodeId == nodeId)
+            {
+                deletePluginWindow (i, windowVisible);
+                break;
+            }
     }
-    
+
     inline void closeOpenPluginWindowsFor (const Node& node, const bool windowVisible)
     {
         for (int i = activePluginWindows.size(); --i >= 0;)
-            if (activePluginWindows.getUnchecked(i)->node == node)
-                { deletePluginWindow (i, windowVisible); break; }
+            if (activePluginWindows.getUnchecked (i)->node == node)
+            {
+                deletePluginWindow (i, windowVisible);
+                break;
+            }
     }
 
     inline void closeAllPluginWindows (const bool windowVisible)
@@ -130,20 +136,20 @@ public:
             MessageManager::getInstance()->runDispatchLoopUntil (50);
         }
     }
-    
+
     inline void closePluginWindow (PluginWindow* win)
     {
         deletePluginWindow (win, false);
     }
-    
+
     inline PluginWindow* getPluginWindowFor (NodeObject* node)
     {
         for (auto* const window : activePluginWindows)
             if (window->owner == node)
-               return window;
+                return window;
         return nullptr;
     }
-    
+
     inline PluginWindow* getPluginWindowFor (const Node& node)
     {
         return getPluginWindowFor (node.getObject());
@@ -157,10 +163,10 @@ private:
     OwnedArray<Window> activeWindows;
     OwnedArray<DialogWindow> activeDialogs;
     void onWindowClosed (Window* c);
-    
+
     void deletePluginWindow (PluginWindow* window, const bool windowVisible);
     void deletePluginWindow (const int index, const bool windowVisible);
     PluginWindow* createPluginWindowFor (const Node& n, Component* e);
 };
 
-}
+} // namespace Element

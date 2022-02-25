@@ -50,4 +50,4 @@ private:
     std::unique_ptr<Content> content;
 };
 
-}
+} // namespace Element

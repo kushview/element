@@ -27,12 +27,12 @@
 namespace Element {
 
 class BarLabel;
-class TransportBar  : public Component,
-                      public Button::Listener,
-                      private Timer
+class TransportBar : public Component,
+                     public Button::Listener,
+                     private Timer
 {
 public:
-    TransportBar ();
+    TransportBar();
     ~TransportBar();
 
     void setBeatTime (const float t);
@@ -54,14 +54,14 @@ private:
     ScopedPointer<DragableIntLabel> barLabel;
     ScopedPointer<DragableIntLabel> beatLabel;
     ScopedPointer<DragableIntLabel> subLabel;
-    
+
     friend class BarLabel;
     friend class Timer;
     void timerCallback() override;
-    
+
     bool checkForMonitor();
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransportBar)
 };
 
-} /* namespace element */
+} // namespace Element

@@ -33,8 +33,8 @@ class GraphManager : public ChangeBroadcaster,
                      public Controller
 {
 public:
-    static const uint32 invalidNodeId   = KV_INVALID_PORT;
-    static const int invalidChannel     = -1;
+    static const uint32 invalidNodeId = KV_INVALID_PORT;
+    static const int invalidChannel = -1;
 
     GraphManager (GraphNode&, PluginManager&);
     ~GraphManager();
@@ -56,7 +56,7 @@ public:
 
     /** Returns a node model by Node ID */
     const Node getNodeModelForId (const uint32 nodeId) const noexcept;
-    
+
     /** Find a graph manager (recursive) */
     GraphManager* findGraphManagerForGraph (const Node& graph) const noexcept;
 
@@ -73,8 +73,7 @@ public:
     void removeNode (const uint32 nodeId);
 
     /** Disconnect a node from other nodes */
-    void disconnectNode (const uint32 nodeId, const bool inputs = true, const bool outputs = true,
-                                              const bool audio = true, const bool midi = true);
+    void disconnectNode (const uint32 nodeId, const bool inputs = true, const bool outputs = true, const bool audio = true, const bool midi = true);
 
     /** Returns the number of connections on the graph
         DOES NOT include connections tagged as "missing"
@@ -83,19 +82,15 @@ public:
     const GraphNode::Connection* getConnection (const int index) const noexcept;
 
     const GraphNode::Connection*
-    getConnectionBetween (uint32 sourceNode, int sourcePort,
-                          uint32 destNode, int destPort) const noexcept;
+        getConnectionBetween (uint32 sourceNode, int sourcePort, uint32 destNode, int destPort) const noexcept;
 
-    bool canConnect (uint32 sourceFilterUID, int sourceFilterChannel,
-                     uint32 destFilterUID, int destFilterChannel) const noexcept;
+    bool canConnect (uint32 sourceFilterUID, int sourceFilterChannel, uint32 destFilterUID, int destFilterChannel) const noexcept;
 
-    bool addConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                        uint32 destFilterUID, int destFilterChannel);
+    bool addConnection (uint32 sourceFilterUID, int sourceFilterChannel, uint32 destFilterUID, int destFilterChannel);
 
     void removeConnection (const int index);
 
-    void removeConnection (uint32 sourceNode, uint32 sourcePort,
-                           uint32 destNode, uint32 destPort);
+    void removeConnection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort);
 
     void removeIllegalConnections();
 
@@ -103,16 +98,16 @@ public:
 
     void setNodeModel (const Node& node);
     inline Node getGraphModel() const { return Node (graph, false); }
-    
+
     void savePluginStates();
-    
+
     /** Rebuilds the arcs model according to the GraphNode */
     inline void syncArcsModel()
     {
         processor.removeIllegalConnections();
         processorArcsChanged();
     }
-    
+
     inline bool isLoaded() const { return loaded; }
 
 private:
@@ -120,33 +115,34 @@ private:
     GraphNode& processor;
     ValueTree graph, arcs, nodes;
     bool loaded = false;
-    
+
     uint32 lastUID;
 
-    class Binding; friend class Binding;
+    class Binding;
+    friend class Binding;
     OwnedArray<Binding> bindings;
 
     uint32 getNextUID() noexcept;
     inline void changed() { sendChangeMessage(); }
-    NodeObject* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
-                             uint32 nodeId = 0);
+    NodeObject* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
     NodeObject* createPlaceholder (const Node& node);
 
     void setupNode (const ValueTree& data, NodeObjectPtr object);
-    
+
     void processorArcsChanged();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphManager)
 };
-    
-class RootGraphManager : public GraphManager {
+
+class RootGraphManager : public GraphManager
+{
 public:
     RootGraphManager (RootGraph& graph, PluginManager& plugins);
     ~RootGraphManager();
-    
+
     /** REturn the underlying RootGraph processor */
     RootGraph& getRootGraph() const { return root; }
-    
+
     /** Unload graph nodes without clearing the model */
     void unloadGraph();
 
@@ -154,4 +150,4 @@ private:
     RootGraph& root;
 };
 
-}
+} // namespace Element

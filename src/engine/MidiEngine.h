@@ -87,7 +87,7 @@ public:
 
     /** Returns the number of enabled midi inputs */
     int getNumActiveMidiInputs() const;
-    
+
     //==============================================================================
     /** Sets a midi output device to use as the default.
 
@@ -106,13 +106,13 @@ public:
     /** Returns the name of the default midi output.
         @see setDefaultMidiOutput, getDefaultMidiOutput
      */
-    const String& getDefaultMidiOutputName() const noexcept         { return defaultMidiOutputName; }
+    const String& getDefaultMidiOutputName() const noexcept { return defaultMidiOutputName; }
 
     /** Returns the current default midi output device.
         If no device has been selected, or the device can't be opened, this will return nullptr.
         @see getDefaultMidiOutputName
     */
-    MidiOutput* getDefaultMidiOutput() const noexcept               { return defaultMidiOutput.get(); }
+    MidiOutput* getDefaultMidiOutput() const noexcept { return defaultMidiOutput.get(); }
 
     void processMidiBuffer (const MidiBuffer& buffer, int nframes, double sampleRate);
 
@@ -135,10 +135,10 @@ private:
     struct MidiInputHolder : public MidiInputCallback
     {
         MidiInputHolder (MidiEngine& e)
-            : engine (e) { }
+            : engine (e) {}
 
         std::unique_ptr<MidiInput> input;
-        bool active = false;  // if true, then will feed to audio engine
+        bool active = false; // if true, then will feed to audio engine
 
         void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message) override;
 
@@ -161,4 +161,4 @@ private:
     void handleIncomingMidiMessageInt (MidiInput*, const MidiMessage&);
 };
 
-}
+} // namespace Element

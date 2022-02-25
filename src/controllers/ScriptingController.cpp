@@ -26,4 +26,4 @@ ScriptingController::~ScriptingController() {}
 void ScriptingController::activate() {}
 void ScriptingController::deactivate() {}
 
-}
+} // namespace Element

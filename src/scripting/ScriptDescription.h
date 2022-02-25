@@ -35,14 +35,14 @@ struct ScriptDescription final
     ScriptDescription() = default;
     ScriptDescription (const ScriptDescription& o) { operator= (o); }
     ~ScriptDescription() = default;
-    
+
     ScriptDescription& operator= (const ScriptDescription& o)
     {
-        this->name          = o.name;
-        this->type          = o.type;
-        this->author        = o.author;
-        this->description   = o.description;
-        this->source        = o.source;
+        this->name = o.name;
+        this->type = o.type;
+        this->author = o.author;
+        this->description = o.description;
+        this->source = o.source;
         return *this;
     }
 
@@ -56,4 +56,4 @@ struct ScriptDescription final
     bool isValid() const { return name.isNotEmpty(); }
 };
 
-}
+} // namespace Element

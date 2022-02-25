@@ -28,17 +28,17 @@ class ScriptInstance
 public:
     ScriptInstance() = default;
     virtual ~ScriptInstance() = default;
-    
+
     void cleanup()
     {
         if (! object.valid())
             return;
 
-        switch (object.get_type()) {
-            case sol::type::table:
-            {
+        switch (object.get_type())
+        {
+            case sol::type::table: {
                 auto tbl = object.as<sol::table>();
-                if (sol::function f = tbl ["cleanup"])
+                if (sol::function f = tbl["cleanup"])
                     f (object);
                 break;
             }
@@ -51,4 +51,4 @@ private:
     sol::object object;
 };
 
-}
+} // namespace Element

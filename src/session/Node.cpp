@@ -28,11 +28,10 @@ namespace Element {
 //==============================================================================
 struct NameSorter
 {
-    NameSorter() { }
+    NameSorter() {}
     int compareElements (const Node& lhs, const Node& rhs)
     {
-        return lhs.getName() < rhs.getName() ? -1 :
-        lhs.getName() == rhs.getName() ? 0 : 1;
+        return lhs.getName() < rhs.getName() ? -1 : lhs.getName() == rhs.getName() ? 0 : 1;
     }
     friend class NodeArray;
 };
@@ -66,7 +65,7 @@ static ValueTree getBlockValueTree (const Node& node)
 static StringArray getHiddenPortsProperty (const Node& node)
 {
     const auto bv = getBlockValueTree (node);
-    auto result = StringArray::fromTokens (bv.getProperty("hiddenPorts").toString(), ",", "\"\'");
+    auto result = StringArray::fromTokens (bv.getProperty ("hiddenPorts").toString(), ",", "\"\'");
     result.trim();
     return result;
 }
@@ -95,13 +94,13 @@ void Port::setHiddenOnBlock (bool hidden)
 {
     // if (hidden == isHiddenOnBlock())
     //     return;
-    
+
     const auto node (getNode());
     auto symbols = getHiddenPortsProperty (node);
 
     if (hidden)
     {
-        symbols.addIfNotAlreadyThere (getSymbol());        
+        symbols.addIfNotAlreadyThere (getSymbol());
     }
     else
     {
@@ -114,7 +113,8 @@ void Port::setHiddenOnBlock (bool hidden)
 bool Port::isHiddenOnBlock() const
 {
     const auto parent (getNode());
-    if (! parent.isValid()) {
+    if (! parent.isValid())
+    {
         return true;
     }
 
@@ -124,7 +124,7 @@ bool Port::isHiddenOnBlock() const
 
 //==============================================================================
 Node::Node() : ObjectModel() {}
-    
+
 Node::Node (const ValueTree& data, const bool setMissing)
     : ObjectModel (data)
 {
@@ -162,17 +162,17 @@ Node Node::createDefaultGraph (const String& name)
         int portIdx = 0;
 
         ioNode.setProperty (Tags::id, static_cast<int64> (nodeId++), 0)
-                .setProperty (Tags::type, "plugin", 0)
-                .setProperty (Tags::format, "Internal", 0)
-                .setProperty (Tags::identifier, t, 0)
-                .setProperty (Tags::name, names [types.indexOf (t)], 0);
+            .setProperty (Tags::type, "plugin", 0)
+            .setProperty (Tags::format, "Internal", 0)
+            .setProperty (Tags::identifier, t, 0)
+            .setProperty (Tags::name, names[types.indexOf (t)], 0);
 
         if (t == "audio.input")
         {
             ioNode.setProperty (Tags::relativeX, 0.25f, 0)
-                   .setProperty (Tags::relativeY, 0.25f, 0)
-                   .setProperty ("numAudioIns", 0, 0)
-                   .setProperty ("numAudioOuts", 2, 0);
+                .setProperty (Tags::relativeY, 0.25f, 0)
+                .setProperty ("numAudioIns", 0, 0)
+                .setProperty ("numAudioOuts", 2, 0);
 
             ValueTree port (Tags::port);
             port.setProperty ("name", "Port", 0)
@@ -186,15 +186,15 @@ Node Node::createDefaultGraph (const String& name)
                 .setProperty ("index", portIdx++, 0)
                 .setProperty ("type", "audio", 0)
                 .setProperty ("flow", "output", 0);
-            ports.addChild (port, -1, 0);   
+            ports.addChild (port, -1, 0);
         }
         else if (t == "audio.output")
         {
             ioNode.setProperty (Tags::relativeX, 0.25f, 0)
-                    .setProperty (Tags::relativeY, 0.75f, 0)
-                    .setProperty ("numAudioIns", 2, 0)
-                    .setProperty ("numAudioOuts", 0, 0);
-            
+                .setProperty (Tags::relativeY, 0.75f, 0)
+                .setProperty ("numAudioIns", 2, 0)
+                .setProperty ("numAudioOuts", 0, 0);
+
             ValueTree port (Tags::port);
             port.setProperty ("name", "Port", 0)
                 .setProperty ("index", portIdx++, 0)
@@ -207,14 +207,14 @@ Node Node::createDefaultGraph (const String& name)
                 .setProperty ("index", portIdx++, 0)
                 .setProperty ("type", "audio", 0)
                 .setProperty ("flow", "input", 0);
-            ports.addChild (port, -1, 0);                
+            ports.addChild (port, -1, 0);
         }
         else if (t == "midi.input")
         {
             ioNode.setProperty (Tags::relativeX, 0.75f, 0)
-                    .setProperty (Tags::relativeY, 0.25f, 0)
-                    .setProperty ("numAudioIns", 0, 0)
-                    .setProperty ("numAudioOuts", 0, 0);
+                .setProperty (Tags::relativeY, 0.25f, 0)
+                .setProperty ("numAudioIns", 0, 0)
+                .setProperty ("numAudioOuts", 0, 0);
             ValueTree port (Tags::port);
             port.setProperty ("name", "Port", 0)
                 .setProperty ("index", portIdx++, 0)
@@ -225,9 +225,9 @@ Node Node::createDefaultGraph (const String& name)
         else if (t == "midi.output")
         {
             ioNode.setProperty (Tags::relativeX, 0.75f, 0)
-                    .setProperty (Tags::relativeY, 0.75f, 0)
-                    .setProperty ("numAudioIns", 0, 0)
-                    .setProperty ("numAudioOuts", 0, 0);
+                .setProperty (Tags::relativeY, 0.75f, 0)
+                .setProperty ("numAudioIns", 0, 0)
+                .setProperty ("numAudioOuts", 0, 0);
             ValueTree port (Tags::port);
             port.setProperty ("name", "Port", 0)
                 .setProperty ("index", portIdx++, 0)
@@ -252,15 +252,14 @@ const String Node::getPluginName() const
 
 bool Node::isProbablyGraphNode (const ValueTree& data)
 {
-    return data.hasType (Tags::node) &&
-        Tags::graph.toString() == data.getProperty(Tags::type).toString();
+    return data.hasType (Tags::node) && Tags::graph.toString() == data.getProperty (Tags::type).toString();
 }
 
 ValueTree Node::resetIds (const ValueTree& data)
 {
     ValueTree result = data;
-    jassert (result.hasType (Tags::node));      // must be a node
-    jassert (! result.getParent().isValid());   // cannot be part of another object tree
+    jassert (result.hasType (Tags::node)); // must be a node
+    jassert (! result.getParent().isValid()); // cannot be part of another object tree
     if (result.getParent().isValid())
         return result;
     result.removeProperty (Tags::id, nullptr);
@@ -280,7 +279,7 @@ ValueTree Node::parse (const File& file)
 
     ValueTree data;
     ValueTree nodeData;
-    
+
     if (auto e = XmlDocument::parse (file))
     {
         data = ValueTree::fromXml (*e);
@@ -290,7 +289,7 @@ ValueTree Node::parse (const File& file)
         FileInputStream input (file);
         data = ValueTree::readFromStream (input);
     }
-    
+
     if (data.hasType (Tags::node))
     {
         nodeData = data;
@@ -300,39 +299,40 @@ ValueTree Node::parse (const File& file)
         nodeData = data.getChildWithName (Tags::node);
         // Rename the node appropriately
         if (data.hasProperty (Tags::name))
-            nodeData.setProperty (Tags::name, data.getProperty(Tags::name), 0);
+            nodeData.setProperty (Tags::name, data.getProperty (Tags::name), 0);
         else
             nodeData.setProperty (Tags::name, file.getFileNameWithoutExtension(), 0);
     }
-    
+
     if (nodeData.isValid() && nodeData.hasType (Tags::node))
     {
         if (data.indexOf (nodeData) >= 0)
             data.removeChild (nodeData, 0);
-        
+
         Node::sanitizeProperties (nodeData);
         return nodeData;
     }
-    
+
     return ValueTree();
 }
 
 void Node::sanitizeProperties (ValueTree node, const bool recursive)
 {
     node.removeProperty (Tags::updater, nullptr);
-    node.removeProperty (Tags::object,  nullptr);
-    
+    node.removeProperty (Tags::object, nullptr);
+
     if (node.hasType (Tags::node))
     {
-        Array<Identifier> properties ({ Tags::offline, 
-            Tags::placeholder, Tags::missing });
+        Array<Identifier> properties ({ Tags::offline,
+                                        Tags::placeholder,
+                                        Tags::missing });
         for (const auto& property : properties)
             node.removeProperty (property, nullptr);
     }
 
     if (recursive)
         for (int i = 0; i < node.getNumChildren(); ++i)
-            sanitizeProperties (node.getChild(i), recursive);
+            sanitizeProperties (node.getChild (i), recursive);
 }
 
 void Node::sanitizeRuntimeProperties (ValueTree node, const bool recursive)
@@ -344,8 +344,8 @@ bool Node::writeToFile (const File& targetFile) const
 {
     ValueTree data = objectData.createCopy();
     sanitizeProperties (data, true);
-    
-    #if EL_SAVE_BINARY_FORMAT
+
+#if EL_SAVE_BINARY_FORMAT
     TemporaryFile tempFile (targetFile);
     if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
     {
@@ -353,10 +353,10 @@ bool Node::writeToFile (const File& targetFile) const
         out.reset();
         return tempFile.overwriteTargetFileWithTemporary();
     }
-    #else
+#else
     if (auto e = data.createXml())
         return e->writeToFile (targetFile, String());
-    #endif
+#endif
 
     return false;
 }
@@ -365,30 +365,30 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
 {
     {
         // hack: ensure the plugin's state info is up-to-date
-        Node(*this).savePluginState();
+        Node (*this).savePluginState();
     }
-    
+
     ValueTree preset (Tags::preset);
     ValueTree data = objectData.createCopy();
     sanitizeProperties (data, true);
     preset.addChild (data, -1, 0);
-    
+
     const auto targetFile = path.createNewPresetFile (*this, name);
     data.setProperty (Tags::name, targetFile.getFileNameWithoutExtension(), 0);
     data.setProperty (Tags::type, Tags::node.toString(), 0);
-    
-    #if EL_SAVE_BINARY_FORMAT
-    TemporaryFile tempFile(targetFile);
-    if (auto out = std::unique_ptr<FileOutputStream>(tempFile.getFile().createOutputStream()))
+
+#if EL_SAVE_BINARY_FORMAT
+    TemporaryFile tempFile (targetFile);
+    if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
     {
-        data.writeToStream(*out);
+        data.writeToStream (*out);
         out.reset();
         return tempFile.overwriteTargetFileWithTemporary();
     }
-    #else
+#else
     if (auto e = preset.createXml())
         return e->writeToFile (targetFile, String());
-    #endif
+#endif
     return false;
 }
 
@@ -407,8 +407,8 @@ ValueTree Node::makeArc (const Arc& arc)
     ValueTree model (Tags::arc);
     model.setProperty (Tags::sourceNode, (int) arc.sourceNode, nullptr);
     model.setProperty (Tags::sourcePort, (int) arc.sourcePort, nullptr);
-    model.setProperty (Tags::destNode,   (int) arc.destNode, nullptr);
-    model.setProperty (Tags::destPort,   (int) arc.destPort, nullptr);
+    model.setProperty (Tags::destNode, (int) arc.destNode, nullptr);
+    model.setProperty (Tags::destPort, (int) arc.destPort, nullptr);
     return model;
 }
 
@@ -418,18 +418,18 @@ const bool Node::canConnectTo (const Node& o) const
     {
         return false;
     }
-    
+
     return true;
 }
 
 ValueTree Node::getParentArcsNode() const
 {
     ValueTree arcs = objectData.getParent();
-    if (arcs.hasType(Tags::nodes))
+    if (arcs.hasType (Tags::nodes))
         arcs = arcs.getParent();
     if (! arcs.isValid())
         return ValueTree();
-    
+
     jassert (arcs.hasType (Tags::node));
     return arcs.getOrCreateChildWithName (Tags::arcs, nullptr);
 }
@@ -460,9 +460,9 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::transpose, 0);
     stabilizeProperty (Tags::delayCompensation, 0);
 
-   #if ! defined (EL_PRO)
+#if ! defined(EL_PRO)
     stabilizeProperty (Tags::tempo, (double) 120.0);
-   #endif
+#endif
     objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
     objectData.getOrCreateChildWithName (Tags::ports, nullptr);
     objectData.getOrCreateChildWithName (Tags::ui, nullptr);
@@ -503,32 +503,32 @@ void Node::getPorts (PortArray& ins, PortArray& outs, PortType type) const
     }
 }
 
-void Node::getAudioInputs (PortArray& ports) const {
+void Node::getAudioInputs (PortArray& ports) const
+{
     getPorts (ports, PortType::Audio, true);
 }
 
-void Node::getAudioOutputs (PortArray& ports) const {
+void Node::getAudioOutputs (PortArray& ports) const
+{
     getPorts (ports, PortType::Audio, false);
 }
 
 //==============================================================================
 bool Node::isMidiInputDevice() const
 {
-    return objectData.getProperty(Tags::format) == "Element" &&
-            objectData.getProperty(Tags::identifier) == EL_INTERNAL_ID_MIDI_INPUT_DEVICE;
+    return objectData.getProperty (Tags::format) == "Element" && objectData.getProperty (Tags::identifier) == EL_INTERNAL_ID_MIDI_INPUT_DEVICE;
 }
 
 bool Node::isMidiOutputDevice() const
 {
-    return objectData.getProperty(Tags::format) == "Element" &&
-            objectData.getProperty(Tags::identifier) == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE;
+    return objectData.getProperty (Tags::format) == "Element" && objectData.getProperty (Tags::identifier) == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE;
 }
 
 //==============================================================================
 void Node::resetPorts()
 {
     if (NodeObjectPtr ptr = getObject())
-    {        
+    {
         ptr->refreshPorts();
         ValueTree newPorts = ptr->createPortsData();
         ValueTree ports = getPortsValueTree();
@@ -542,7 +542,7 @@ void Node::getPossibleSources (NodeArray& a) const
     ValueTree nodes = objectData.getParent();
     if (! nodes.hasType (Tags::nodes))
         return;
-    
+
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
         const Node child (nodes.getChild (i));
@@ -570,15 +570,15 @@ void Node::getPossibleDestinations (NodeArray& a) const
 
 Arc Node::arcFromValueTree (const ValueTree& data)
 {
-    Arc arc ((uint32)(int) data.getProperty (Tags::sourceNode, (int) KV_INVALID_NODE),
-                (uint32)(int) data.getProperty (Tags::sourcePort, (int) KV_INVALID_PORT),
-                (uint32)(int) data.getProperty (Tags::destNode, (int) KV_INVALID_NODE),
-                (uint32)(int) data.getProperty (Tags::destPort, (int) KV_INVALID_PORT));
+    Arc arc ((uint32) (int) data.getProperty (Tags::sourceNode, (int) KV_INVALID_NODE),
+             (uint32) (int) data.getProperty (Tags::sourcePort, (int) KV_INVALID_PORT),
+             (uint32) (int) data.getProperty (Tags::destNode, (int) KV_INVALID_NODE),
+             (uint32) (int) data.getProperty (Tags::destPort, (int) KV_INVALID_PORT));
     return arc;
 }
 
-int Node::getNumConnections() const     { return getArcsValueTree().getNumChildren(); }
-ValueTree Node::getConnectionValueTree (const int index) const { return getArcsValueTree().getChild (index);  }
+int Node::getNumConnections() const { return getArcsValueTree().getNumChildren(); }
+ValueTree Node::getConnectionValueTree (const int index) const { return getArcsValueTree().getChild (index); }
 
 void NodeArray::sortByName()
 {
@@ -587,22 +587,21 @@ void NodeArray::sortByName()
 }
 
 bool Node::connectionExists (const ValueTree& arcs,
-                                const uint32 sourceNode, const uint32 sourcePort,
-                                const uint32 destNode, const uint32 destPort,
-                                const bool checkMissing)
+                             const uint32 sourceNode,
+                             const uint32 sourcePort,
+                             const uint32 destNode,
+                             const uint32 destPort,
+                             const bool checkMissing)
 {
     for (int i = arcs.getNumChildren(); --i >= 0;)
     {
         const ValueTree arc (arcs.getChild (i));
-        if (static_cast<int> (sourceNode) == (int) arc.getProperty (Tags::sourceNode) &&
-            static_cast<int> (sourcePort) == (int) arc.getProperty (Tags::sourcePort) &&
-            static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) &&
-            static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
+        if (static_cast<int> (sourceNode) == (int) arc.getProperty (Tags::sourceNode) && static_cast<int> (sourcePort) == (int) arc.getProperty (Tags::sourcePort) && static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) && static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
         {
-            return (checkMissing) ? !arc.getProperty (Tags::missing, false) : true;
+            return (checkMissing) ? ! arc.getProperty (Tags::missing, false) : true;
         }
     }
-    
+
     return false;
 }
 
@@ -646,14 +645,13 @@ Port Node::getPort (const int index) const
     return port;
 }
 
-bool Node::canConnect (const uint32 sourceNode, const uint32 sourcePort,
-                        const uint32 destNode, const uint32 destPort) const
+bool Node::canConnect (const uint32 sourceNode, const uint32 sourcePort, const uint32 destNode, const uint32 destPort) const
 {
     const Node sn (getNodeById (sourceNode));
     const Node dn (getNodeById (destNode));
-    if (!sn.isValid() || !dn.isValid())
+    if (! sn.isValid() || ! dn.isValid())
         return false;
-    
+
     const Port dp (dn.getPort ((int) destPort));
     const Port sp (sn.getPort ((int) sourcePort));
     return sp.getType().canConnect (dp.getType());
@@ -691,14 +689,14 @@ void Node::setPosition (double x, double y)
 Node Node::getParentGraph() const
 {
     ValueTree parent = objectData.getParent();
-    
+
     while (! isProbablyGraphNode (parent))
     {
         if (! parent.isValid())
             break;
         parent = parent.getParent();
     }
-    
+
     return isProbablyGraphNode (parent) ? Node (parent, false)
                                         : Node();
 }
@@ -724,17 +722,18 @@ bool Node::isChildOfRootGraph() const
 kv::MidiChannels Node::getMidiChannels() const
 {
     kv::MidiChannels chans;
-    #ifndef EL_FREE
+#ifndef EL_FREE
     if (objectData.hasProperty (Tags::midiChannels))
     {
-        if (auto* const block = objectData.getProperty(Tags::midiChannels).getBinaryData())
+        if (auto* const block = objectData.getProperty (Tags::midiChannels).getBinaryData())
         {
-            BigInteger data; data.loadFromMemoryBlock (*block);
+            BigInteger data;
+            data.loadFromMemoryBlock (*block);
             chans.setChannels (data);
         }
     }
     else
-    #endif
+#endif
     {
         const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
         if (channel > 0)
@@ -749,18 +748,17 @@ void Node::restorePluginState()
 {
     if (! isValid())
         return;
-    
+
     if (NodeObjectPtr obj = getObject())
     {
         if (auto* const proc = obj->getAudioProcessor())
         {
             const int wantedProgram = objectData.getProperty (Tags::program, -1);
-            const bool shouldSetProgram = proc->getNumPrograms() > 0 && 
-                isPositiveAndBelow (wantedProgram, proc->getNumPrograms());
+            const bool shouldSetProgram = proc->getNumPrograms() > 0 && isPositiveAndBelow (wantedProgram, proc->getNumPrograms());
             if (shouldSetProgram)
                 proc->setCurrentProgram (wantedProgram);
 
-            auto data = getProperty(Tags::state).toString().trim();
+            auto data = getProperty (Tags::state).toString().trim();
             if (data.isNotEmpty())
             {
                 MemoryBlock state;
@@ -770,27 +768,27 @@ void Node::restorePluginState()
                     proc->setStateInformation (state.getData(), (int) state.getSize());
                 }
             }
-            
-            data = getProperty(Tags::programState).toString().trim();
+
+            data = getProperty (Tags::programState).toString().trim();
             if (shouldSetProgram && data.isNotEmpty())
             {
-                MemoryBlock state; state.fromBase64Encoding (data);
+                MemoryBlock state;
+                state.fromBase64Encoding (data);
                 if (state.getSize() > 0)
                 {
                     proc->setCurrentProgramStateInformation (state.getData(),
-                        (int) state.getSize());
+                                                             (int) state.getSize());
                 }
             }
         }
         else
         {
             const int wantedProgram = objectData.getProperty (Tags::program, -1);
-            const bool shouldSetProgram = obj->getNumPrograms() > 0 && 
-                isPositiveAndBelow (wantedProgram, obj->getNumPrograms());
+            const bool shouldSetProgram = obj->getNumPrograms() > 0 && isPositiveAndBelow (wantedProgram, obj->getNumPrograms());
             if (shouldSetProgram)
                 obj->setCurrentProgram (wantedProgram);
 
-            auto data = getProperty(Tags::state).toString().trim();
+            auto data = getProperty (Tags::state).toString().trim();
             if (data.isNotEmpty())
             {
                 MemoryBlock state;
@@ -834,7 +832,7 @@ void Node::restorePluginState()
         }
 
         if (hasProperty (Tags::midiProgramsEnabled))
-            obj->setMidiProgramsEnabled ((bool) getProperty (Tags::midiProgramsEnabled, true));        
+            obj->setMidiProgramsEnabled ((bool) getProperty (Tags::midiProgramsEnabled, true));
         obj->setUseGlobalMidiPrograms ((bool) getProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms()));
         if (hasProperty (Tags::midiProgramsState))
             obj->setMidiProgramsState (getProperty (Tags::midiProgramsState).toString().trim());
@@ -844,7 +842,7 @@ void Node::restorePluginState()
 
         if (hasProperty (Tags::transpose))
             obj->setTransposeOffset (getProperty (Tags::transpose));
-        
+
         obj->setOversamplingFactor (jmax (1, (int) getProperty (Tags::oversamplingFactor, 1)));
         obj->setDelayCompensation (getProperty (Tags::delayCompensation, 0.0));
     }
@@ -857,19 +855,19 @@ void Node::restorePluginState()
         objectData.removeProperty (Tags::state, 0);
 
     for (int i = 0; i < getNumNodes(); ++i)
-        getNode(i).restorePluginState();
+        getNode (i).restorePluginState();
 }
 
 void Node::savePluginState()
 {
     if (! isValid())
         return;
-    
+
     NodeObjectPtr obj = getObject();
     if (obj && obj->isPrepared)
     {
         MemoryBlock state;
-        
+
         if (auto* proc = obj->getAudioProcessor())
         {
             proc->getStateInformation (state);
@@ -906,14 +904,15 @@ void Node::savePluginState()
         setProperty (Tags::midiProgramsEnabled, obj->areMidiProgramsEnabled());
         setProperty (Tags::mute, obj->isMuted());
         setProperty ("muteInput", obj->isMutingInputs());
-        String mps; obj->getMidiProgramsState (mps);
+        String mps;
+        obj->getMidiProgramsState (mps);
         setProperty (Tags::midiProgramsState, mps);
         setProperty (Tags::oversamplingFactor, obj->getOversamplingFactor());
         setProperty (Tags::delayCompensation, obj->getDelayCompensation());
     }
 
     for (int i = 0; i < getNumNodes(); ++i)
-        getNode(i).savePluginState();
+        getNode (i).savePluginState();
 }
 
 void Node::setMuted (bool shouldBeMuted)
@@ -988,16 +987,12 @@ void ConnectionBuilder::addConnections (GraphManager& controller, const uint32 t
             if (pc->isInput)
             {
                 anythingAdded |= controller.addConnection (
-                    tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput),
-                    ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput)
-                );
+                    tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput), ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput));
             }
             else
             {
                 anythingAdded |= controller.addConnection (
-                    ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput),
-                    tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput)
-                );
+                    ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput), tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput));
             }
         }
 
@@ -1022,12 +1017,12 @@ void Node::getArcs (OwnedArray<Arc>& results) const
     }
 }
 
-void Node::forEach (std::function<void(const ValueTree& tree)> handler) const
+void Node::forEach (std::function<void (const ValueTree& tree)> handler) const
 {
     forEach (objectData, handler);
 }
 
-void Node::forEach (const ValueTree tree, std::function<void(const ValueTree& tree)> handler) const
+void Node::forEach (const ValueTree tree, std::function<void (const ValueTree& tree)> handler) const
 {
     handler (tree);
     for (int i = 0; i < tree.getNumChildren(); ++i)
@@ -1035,7 +1030,7 @@ void Node::forEach (const ValueTree tree, std::function<void(const ValueTree& tr
 }
 
 // default value here must match that as defined in NodeObject.h
-bool Node::useGlobalMidiPrograms() const    { return (bool) getProperty (Tags::globalMidiPrograms, false); }
+bool Node::useGlobalMidiPrograms() const { return (bool) getProperty (Tags::globalMidiPrograms, false); }
 void Node::setUseGlobalMidiPrograms (bool useGlobal)
 {
     if (NodeObjectPtr obj = getObject())
@@ -1048,7 +1043,7 @@ void Node::setUseGlobalMidiPrograms (bool useGlobal)
 }
 
 // default value here must match that as defined in NodeObject.h
-bool Node::areMidiProgramsEnabled() const   { return (bool) getProperty (Tags::midiProgramsEnabled, false); }
+bool Node::areMidiProgramsEnabled() const { return (bool) getProperty (Tags::midiProgramsEnabled, false); }
 void Node::setMidiProgramsEnabled (bool useMidiPrograms)
 {
     if (NodeObjectPtr obj = getObject())
@@ -1115,7 +1110,7 @@ void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier
     NodeObjectPtr obj = node.getObject();
     if (tree != data || frozen || obj == nullptr)
         return;
-        
+
     if (property == Tags::midiChannels)
     {
         auto chans = node.getMidiChannels();
@@ -1125,25 +1120,26 @@ void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier
     {
         ScopedFlag sf (frozen, true);
         auto start = roundToInt ((double) tree.getProperty (property));
-        auto end   = roundToInt ((double) tree.getProperty (Tags::keyEnd));
-        if (end < start) {
+        auto end = roundToInt ((double) tree.getProperty (Tags::keyEnd));
+        if (end < start)
+        {
             end = start;
             tree.setProperty (Tags::keyEnd, end, nullptr);
         }
 
-        obj->setKeyRange (Range<int>(start, end));
+        obj->setKeyRange (Range<int> (start, end));
     }
     else if (property == Tags::keyEnd)
     {
         ScopedFlag sf (frozen, true);
-        auto end   = roundToInt ((double) tree.getProperty (property));
+        auto end = roundToInt ((double) tree.getProperty (property));
         auto start = roundToInt ((double) tree.getProperty (Tags::keyStart));
         if (start > end)
         {
             start = end;
             tree.setProperty (Tags::keyStart, start, nullptr);
         }
-        
+
         obj->setKeyRange (Range<int> (start, end));
     }
     else if (property == Tags::transpose)
@@ -1186,4 +1182,4 @@ void NodeObjectSync::valueTreeRedirected (ValueTree& tree)
     ignoreUnused (tree);
 }
 
-}
+} // namespace Element

@@ -23,25 +23,25 @@
 #include "session/Session.h"
 
 namespace Element {
-    class SessionDocument :  public FileBasedDocument,
-                             public ChangeListener
-    {
-    public:
-        SessionDocument (SessionPtr);
-        ~SessionDocument();
+class SessionDocument : public FileBasedDocument,
+                        public ChangeListener
+{
+public:
+    SessionDocument (SessionPtr);
+    ~SessionDocument();
 
-        String getDocumentTitle() override;
-        Result loadDocument (const File& file) override;
-        Result saveDocument (const File& file) override;
-        File getLastDocumentOpened() override;
-        void setLastDocumentOpened (const File& file) override;
-        
-        void changeListenerCallback (ChangeBroadcaster*) override;
+    String getDocumentTitle() override;
+    Result loadDocument (const File& file) override;
+    Result saveDocument (const File& file) override;
+    File getLastDocumentOpened() override;
+    void setLastDocumentOpened (const File& file) override;
 
-    private:
-        SessionPtr session;
-        File lastSession;
-        friend class Session;
-        void onSessionChanged();
-    };
-}
+    void changeListenerCallback (ChangeBroadcaster*) override;
+
+private:
+    SessionPtr session;
+    File lastSession;
+    friend class Session;
+    void onSessionChanged();
+};
+} // namespace Element

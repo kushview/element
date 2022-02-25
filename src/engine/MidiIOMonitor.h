@@ -28,7 +28,7 @@ namespace Element {
 class MidiIOMonitor : public ReferenceCountedObject
 {
 public:
-    MidiIOMonitor() { }
+    MidiIOMonitor() {}
 
     ~MidiIOMonitor()
     {
@@ -47,7 +47,7 @@ public:
 
     inline void notify()
     {
-        jassert(MessageManager::getInstance()->isThisTheMessageThread());
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
         if (midiInputCount.get() > 0)
             midiReceived();
         if (midiOutputCount.get() > 0)

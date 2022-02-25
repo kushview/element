@@ -28,11 +28,11 @@ Parameter::Parameter() noexcept {}
 
 Parameter::~Parameter()
 {
-   #if JUCE_DEBUG && ! JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING
+#if JUCE_DEBUG && ! JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING
     // This will fail if you've called beginChangeGesture() without having made
     // a corresponding call to endChangeGesture...
     jassert (! isPerformingGesture);
-   #endif
+#endif
 }
 
 void Parameter::setValueNotifyingHost (float newValue)
@@ -46,13 +46,13 @@ void Parameter::beginChangeGesture()
     // This method can't be used until the parameter has been attached to a processor!
     jassert (parameterIndex >= 0);
 
-   #if JUCE_DEBUG && ! JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING
+#if JUCE_DEBUG && ! JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING
     // This means you've called beginChangeGesture twice in succession without
     // a matching call to endChangeGesture. That might be fine in most hosts,
     // but it would be better to avoid doing it.
     jassert (! isPerformingGesture);
     isPerformingGesture = true;
-   #endif
+#endif
 
     sendGestureChangedMessageToListeners (true);
 }
@@ -62,13 +62,13 @@ void Parameter::endChangeGesture()
     // This method can't be used until the parameter has been attached to a processor!
     jassert (parameterIndex >= 0);
 
-   #if JUCE_DEBUG && ! JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING
+#if JUCE_DEBUG && ! JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING
     // This means you've called endChangeGesture without having previously
     // called beginChangeGesture. That might be fine in most hosts, but it
     // would be better to keep the calls matched correctly.
     jassert (isPerformingGesture);
     isPerformingGesture = false;
-   #endif
+#endif
 
     sendGestureChangedMessageToListeners (false);
 }
@@ -77,7 +77,7 @@ void Parameter::sendValueChangedMessageToListeners (float newValue)
 {
     ScopedLock lock (listenerLock);
     for (int i = listeners.size(); --i >= 0;)
-        if (auto* l = listeners [i])
+        if (auto* l = listeners[i])
             l->controlValueChanged (getParameterIndex(), newValue);
 }
 
@@ -85,18 +85,17 @@ void Parameter::sendGestureChangedMessageToListeners (bool touched)
 {
     ScopedLock lock (listenerLock);
     for (int i = listeners.size(); --i >= 0;)
-        if (auto* l = listeners [i])
+        if (auto* l = listeners[i])
             l->controlTouched (getParameterIndex(), touched);
 }
 
-
-bool Parameter::isOrientationInverted() const                      { return false; }
-bool Parameter::isAutomatable() const                              { return true; }
-bool Parameter::isMetaParameter() const                            { return false; }
-Parameter::Category Parameter::getCategory() const             { return genericParameter; }
-int Parameter::getNumSteps() const                                 { return defaultNumSteps(); }
-bool Parameter::isDiscrete() const                                 { return false; }
-bool Parameter::isBoolean() const                                  { return false; }
+bool Parameter::isOrientationInverted() const { return false; }
+bool Parameter::isAutomatable() const { return true; }
+bool Parameter::isMetaParameter() const { return false; }
+Parameter::Category Parameter::getCategory() const { return genericParameter; }
+int Parameter::getNumSteps() const { return defaultNumSteps(); }
+bool Parameter::isDiscrete() const { return false; }
+bool Parameter::isBoolean() const { return false; }
 
 String Parameter::getText (float value, int) const
 {
@@ -148,9 +147,9 @@ String ControlPortParameter::getText (float normalisedValue, int /*maxLength*/) 
 
 void ControlPortParameter::setPort (const kv::PortDescription& newPort, bool preserveValue)
 {
-    port        = newPort;
+    port = newPort;
     range.start = port.minValue;
-    range.end   = port.maxValue;
+    range.end = port.maxValue;
     if (preserveValue)
     {
         operator= (jlimit (range.start, range.end, value));
@@ -168,4 +167,4 @@ ControlPortParameter& ControlPortParameter::operator= (float newValue)
     return *this;
 }
 
-}
+} // namespace Element

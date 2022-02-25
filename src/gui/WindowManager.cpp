@@ -27,7 +27,7 @@
 
 namespace Element {
 
-WindowManager::WindowManager (GuiController& g) : gui(g) { }
+WindowManager::WindowManager (GuiController& g) : gui (g) {}
 
 void WindowManager::onWindowClosed (Window* c)
 {
@@ -41,17 +41,23 @@ void WindowManager::closeOpenPluginWindowsFor (GraphNode& proc, const bool windo
     for (int i = 0; i < proc.getNumNodes(); ++i)
         if (auto node = proc.getNode (i))
             for (int j = activePluginWindows.size(); --j >= 0;)
-                if (activePluginWindows.getUnchecked(j)->owner == node)
-                    { deletePluginWindow (j, windowVisible); break; }
+                if (activePluginWindows.getUnchecked (j)->owner == node)
+                {
+                    deletePluginWindow (j, windowVisible);
+                    break;
+                }
 }
-    
+
 void WindowManager::closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible)
 {
     if (! node)
         return;
     for (int i = activePluginWindows.size(); --i >= 0;)
-        if (activePluginWindows.getUnchecked(i)->owner == node)
-            { deletePluginWindow (i, windowVisible); break; }
+        if (activePluginWindows.getUnchecked (i)->owner == node)
+        {
+            deletePluginWindow (i, windowVisible);
+            break;
+        }
 }
 
 void WindowManager::deletePluginWindow (PluginWindow* window, const bool windowVisible)
@@ -88,5 +94,4 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
     return (editor != nullptr) ? createPluginWindowFor (node, editor.release()) : nullptr;
 }
 
-}
-
+} // namespace Element

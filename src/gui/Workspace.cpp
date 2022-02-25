@@ -27,7 +27,8 @@ namespace Element {
 
 WorkspaceState::WorkspaceState()
     : ObjectModel()
-{ }
+{
+}
 
 WorkspaceState::WorkspaceState (Workspace& w, const String& name)
     : ObjectModel (Tags::workspace)
@@ -44,7 +45,7 @@ bool WorkspaceState::writeToFile (const File& file) const
 {
     TemporaryFile tempFile (file);
     bool succeded = false;
-    
+
     if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
     {
         {
@@ -79,8 +80,8 @@ bool WorkspaceState::writeToXmlFile (const File& file) const
 WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
 {
     WorkspaceState state;
-    jassert(! state.isValid());
-    DBG("[EL] workspace loading: " << file.getFileName());
+    jassert (! state.isValid());
+    DBG ("[EL] workspace loading: " << file.getFileName());
 
     if (tryXml)
     {
@@ -109,11 +110,11 @@ WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
 WorkspaceState WorkspaceState::fromXmlFile (const File& file)
 {
     WorkspaceState state;
-    DBG("[EL] workspace loading: " << file.getFileName());
+    DBG ("[EL] workspace loading: " << file.getFileName());
 
     if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
         state.objectData = ValueTree::fromXml (*xml);
-    
+
     if (state.isValid())
     {
         state.objectData.setProperty (
@@ -126,11 +127,11 @@ WorkspaceState WorkspaceState::fromXmlFile (const File& file)
 WorkspaceState WorkspaceState::loadByName (const String& name)
 {
     WorkspaceState state;
-    DBG("[EL] workspace loading: " << name);
+    DBG ("[EL] workspace loading: " << name);
     if (name == "Classic")
     {
         if (auto xml = XmlDocument::parse (String::fromUTF8 (
-            BinaryData::Classic_elw, BinaryData::Classic_elwSize)))
+                BinaryData::Classic_elw, BinaryData::Classic_elwSize)))
         {
             state.objectData = ValueTree::fromXml (*xml);
         }
@@ -138,12 +139,12 @@ WorkspaceState WorkspaceState::loadByName (const String& name)
     else if (name == "Editing")
     {
         if (auto xml = XmlDocument::parse (String::fromUTF8 (
-            BinaryData::Editing_elw, BinaryData::Editing_elwSize)))
+                BinaryData::Editing_elw, BinaryData::Editing_elwSize)))
         {
             state.objectData = ValueTree::fromXml (*xml);
         }
     }
-    
+
     if (state.isValid())
         state.objectData.setProperty (Tags::name, name, nullptr);
 
@@ -169,9 +170,8 @@ Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
 {
     dock.registerPanelType (new GenericPanelType());
     dock.registerPanelType (new ApplicationPanelType());
-    
-    dock.onPanelAdded = [this](DockPanel* panel)
-    {
+
+    dock.onPanelAdded = [this] (DockPanel* panel) {
         if (auto* const wp = dynamic_cast<WorkspacePanel*> (panel))
         {
             wp->initializeView (app);
@@ -203,7 +203,7 @@ void Workspace::applyState (const WorkspaceState& state)
     {
         state.applyTo (dock);
         setName (state.getName());
-        DBG("[EL] workspace loaded: " << getName());
+        DBG ("[EL] workspace loaded: " << getName());
     }
 }
 
@@ -217,4 +217,4 @@ void Workspace::resized()
     dock.setBounds (getLocalBounds());
 }
 
-}
+} // namespace Element

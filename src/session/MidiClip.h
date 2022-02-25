@@ -23,16 +23,16 @@
 #include "session/ClipModel.h"
 
 namespace Element {
-    
+
 class MidiClip : public ClipModel
 {
 public:
     MidiClip();
     ~MidiClip();
-    
+
     void addNotesTo (MidiMessageSequence&) const;
 };
 
-}
+} // namespace Element
 
-#endif  // EL_MIDI_CLIP_H
+#endif // EL_MIDI_CLIP_H

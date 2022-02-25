@@ -31,7 +31,7 @@ Script::Script (lua_State* state)
     sol::state_view view (L);
 
     if (ownedstate)
-    {  
+    {
         Lua::initializeState (view);
     }
 }
@@ -66,7 +66,7 @@ Script::~Script()
 bool Script::load (File file)
 {
     bool res = load (file.loadFileAsString());
-    info.source = URL(file).toString(false);
+    info.source = URL (file).toString (false);
     return res;
 }
 
@@ -75,13 +75,14 @@ bool Script::load (const String& buffer)
     jassert (L != nullptr);
     if (L == nullptr)
         return false;
-    
+
     sol::state_view view (L);
     info = ScriptDescription::parse (buffer);
     std::string chunk = info.name.isNotEmpty() ? info.name.toStdString() : "script=";
     error = "";
 
-    try {
+    try
+    {
         loaded = view.load_buffer (buffer.toRawUTF8(), (size_t) buffer.length(), chunk);
         switch (loaded.status())
         {
@@ -104,12 +105,13 @@ bool Script::load (const String& buffer)
                 error = "Unknown error";
                 break;
         }
-    } catch (const std::exception& e) {
-        error = String("exception: ") + e.what();
+    } catch (const std::exception& e)
+    {
+        error = String ("exception: ") + e.what();
     }
 
     hasloaded = error.isEmpty();
     return hasloaded;
 }
 
-}
+} // namespace Element

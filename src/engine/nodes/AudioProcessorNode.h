@@ -30,27 +30,27 @@ class AudioProcessorNode : public NodeObject
 public:
     AudioProcessorNode (uint32 nodeId, AudioProcessor* processor);
     AudioProcessorNode (AudioProcessor*);
-    
+
     virtual ~AudioProcessorNode();
 
     /** Returns the processor as an AudioProcessor */
     AudioProcessor* getAudioProcessor() const noexcept override { return proc.get(); }
     void setPlayHead (AudioPlayHead* playhead) override
     {
-        if (auto* p = proc.get()) 
-            p->setPlayHead (playhead); 
+        if (auto* p = proc.get())
+            p->setPlayHead (playhead);
     }
 
     void getState (MemoryBlock&) override;
     void setState (const void*, int) override;
-    
+
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
     void refreshPorts() override;
 
 protected:
     Parameter::Ptr getParameter (const PortDescription& port) override;
-    
+
 private:
     std::unique_ptr<AudioProcessor> proc;
     Atomic<int> enabled { 1 };
@@ -59,8 +59,8 @@ private:
 
     struct EnablementUpdater : public AsyncUpdater
     {
-        EnablementUpdater (AudioProcessorNode& n) : node (n) { }
-        ~EnablementUpdater() { }
+        EnablementUpdater (AudioProcessorNode& n) : node (n) {}
+        ~EnablementUpdater() {}
         void handleAsyncUpdate() override;
         AudioProcessorNode& node;
     } enablement;
@@ -68,4 +68,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioProcessorNode);
 };
 
-}
+} // namespace Element

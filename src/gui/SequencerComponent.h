@@ -25,58 +25,58 @@
 
 namespace Element {
 
-    class GuiApp;
-    class SequencerClipItem;
+class GuiApp;
+class SequencerClipItem;
 
-    class SequencerComponent : public TimelineComponent,
-                               public DragAndDropTarget,
-                               public ValueTree::Listener
-    {
-    public:
-        SequencerComponent (GuiApp& gui);
-        ~SequencerComponent();
+class SequencerComponent : public TimelineComponent,
+                           public DragAndDropTarget,
+                           public ValueTree::Listener
+{
+public:
+    SequencerComponent (GuiApp& gui);
+    ~SequencerComponent();
 
-        int getNumTracks() const;
+    int getNumTracks() const;
 
-        void paintTrackHeader (Graphics &g, int track, const Rectangle<int> &area);
-        void paintTrackLane (Graphics &g, int track, const Rectangle<int> &area);
+    void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area);
+    void paintTrackLane (Graphics& g, int track, const Rectangle<int>& area);
 
-        bool isInterestedInDragSource (const SourceDetails& details);
-        void itemDragEnter (const SourceDetails& details);
-        void itemDragMove (const SourceDetails& details);
-        void itemDragExit (const SourceDetails& details);
-        void itemDropped (const SourceDetails& details);
-        bool shouldDrawDragImageWhenOver() { return false; }
+    bool isInterestedInDragSource (const SourceDetails& details);
+    void itemDragEnter (const SourceDetails& details);
+    void itemDragMove (const SourceDetails& details);
+    void itemDragExit (const SourceDetails& details);
+    void itemDropped (const SourceDetails& details);
+    bool shouldDrawDragImageWhenOver() { return false; }
 
-    protected:
-        void timerCallback();
+protected:
+    void timerCallback();
 
-        void clipClicked (TimelineClip *clip, const MouseEvent &clipEvent);
-        void clipDoubleClicked (TimelineClip *clip, const MouseEvent &clipEvent);
-        void timelineBodyClicked (const MouseEvent &ev, int track);
-        void timelineTrackHeadersClicked (const MouseEvent &ev, int track);
+    void clipClicked (TimelineClip* clip, const MouseEvent& clipEvent);
+    void clipDoubleClicked (TimelineClip* clip, const MouseEvent& clipEvent);
+    void timelineBodyClicked (const MouseEvent& ev, int track);
+    void timelineTrackHeadersClicked (const MouseEvent& ev, int track);
 
-    private:
-        GuiApp& gui;
-        SessionRef session;
-        ValueTree state;
+private:
+    GuiApp& gui;
+    SessionRef session;
+    ValueTree state;
 
-        Array<SequencerClipItem*> clipList;
+    Array<SequencerClipItem*> clipList;
 
-        Shared<Monitor> pos;
-        int dropTrack;
+    Shared<Monitor> pos;
+    int dropTrack;
 
-        friend class ValueTree;
-        void valueTreePropertyChanged (ValueTree& tree, const Identifier& property);
-        void valueTreeChildAdded (ValueTree& parent, ValueTree& child);
-        void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int);
-        void valueTreeChildOrderChanged (ValueTree& parent, int, int);
-        void valueTreeParentChanged (ValueTree& tree);
-        void valueTreeRedirected (ValueTree &tree);
+    friend class ValueTree;
+    void valueTreePropertyChanged (ValueTree& tree, const Identifier& property);
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child);
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int);
+    void valueTreeChildOrderChanged (ValueTree& parent, int, int);
+    void valueTreeParentChanged (ValueTree& tree);
+    void valueTreeRedirected (ValueTree& tree);
 
-        void recycleSequencerClip (SequencerClipItem* clip);
-    };
+    void recycleSequencerClip (SequencerClipItem* clip);
+};
 
-}
+} // namespace Element
 
 #endif /* ELEMENT_SEQUENCER_COMPONENT_H */

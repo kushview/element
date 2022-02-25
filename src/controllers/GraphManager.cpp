@@ -68,9 +68,9 @@ struct IONodeEnforcer
     IONodeEnforcer (GraphManager& m)
         : manager (m)
     {
-        addMissingIONodes(); 
+        addMissingIONodes();
     }
-    
+
 private:
     GraphManager& manager;
     void addMissingIONodes()
@@ -78,36 +78,47 @@ private:
         auto& graph (manager.getGraph());
         const Node model (manager.getGraphModel());
 
-        const bool wantsAudioIn  = graph.getNumPorts (PortType::Audio, true) > 0 && model.hasAudioInputNode();
+        const bool wantsAudioIn = graph.getNumPorts (PortType::Audio, true) > 0 && model.hasAudioInputNode();
         const bool wantsAudioOut = graph.getNumPorts (PortType::Audio, false) > 0 && model.hasAudioOutputNode();
-        const bool wantsMidiIn   = graph.getNumPorts (PortType::Midi, true) > 0 && model.hasMidiInputNode();
-        const bool wantsMidiOut  = graph.getNumPorts (PortType::Midi, false) > 0 && model.hasMidiOutputNode();
-        
-        NodeObjectPtr ioNodes [IONode::numDeviceTypes];
+        const bool wantsMidiIn = graph.getNumPorts (PortType::Midi, true) > 0 && model.hasMidiInputNode();
+        const bool wantsMidiOut = graph.getNumPorts (PortType::Midi, false) > 0 && model.hasMidiOutputNode();
+
+        NodeObjectPtr ioNodes[IONode::numDeviceTypes];
         for (int i = 0; i < manager.getNumNodes(); ++i)
         {
             NodeObjectPtr node = manager.getNode (i);
             if (auto* ioProc = dynamic_cast<IONode*> (node.get()))
-                ioNodes [ioProc->getType()] = node;
+                ioNodes[ioProc->getType()] = node;
         }
-        
+
         Array<uint32> nodesToRemove;
 
         for (int t = 0; t < IONode::numDeviceTypes; ++t)
         {
-            if (nullptr != ioNodes [t])
+            if (nullptr != ioNodes[t])
             {
-                if (t == IONode::audioInputNode    && !wantsAudioIn)   nodesToRemove.add (ioNodes[t]->nodeId);
-                if (t == IONode::audioOutputNode   && !wantsAudioOut)  nodesToRemove.add (ioNodes[t]->nodeId);;
-                if (t == IONode::midiInputNode     && !wantsMidiIn)    nodesToRemove.add (ioNodes[t]->nodeId);;
-                if (t == IONode::midiOutputNode    && !wantsMidiOut)   nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IONode::audioInputNode && ! wantsAudioIn)
+                    nodesToRemove.add (ioNodes[t]->nodeId);
+                if (t == IONode::audioOutputNode && ! wantsAudioOut)
+                    nodesToRemove.add (ioNodes[t]->nodeId);
+                ;
+                if (t == IONode::midiInputNode && ! wantsMidiIn)
+                    nodesToRemove.add (ioNodes[t]->nodeId);
+                ;
+                if (t == IONode::midiOutputNode && ! wantsMidiOut)
+                    nodesToRemove.add (ioNodes[t]->nodeId);
+                ;
                 continue;
             }
 
-            if (t == IONode::audioInputNode    && !wantsAudioIn)   continue;
-            if (t == IONode::audioOutputNode   && !wantsAudioOut)  continue;
-            if (t == IONode::midiInputNode     && !wantsMidiIn)    continue;
-            if (t == IONode::midiOutputNode    && !wantsMidiOut)   continue;
+            if (t == IONode::audioInputNode && ! wantsAudioIn)
+                continue;
+            if (t == IONode::audioOutputNode && ! wantsAudioOut)
+                continue;
+            if (t == IONode::midiInputNode && ! wantsMidiIn)
+                continue;
+            if (t == IONode::midiOutputNode && ! wantsMidiOut)
+                continue;
 
             PluginDescription desc;
             desc.pluginFormatName = "Internal";
@@ -135,10 +146,10 @@ private:
                     ry = .75;
                     break;
             }
-            
+
             auto nodeId = manager.addNode (&desc, rx, ry);
             ioNodes[t] = manager.getNodeForId (nodeId);
-            jassert(ioNodes[t] != nullptr);
+            jassert (ioNodes[t] != nullptr);
         }
 
         for (const auto& nodeId : nodesToRemove)
@@ -178,7 +189,7 @@ private:
                 data.removeChild (index, nullptr);
             else
                 index = -1;
-            
+
             data.addChild (newPorts, index, nullptr);
             manager.removeIllegalConnections();
         }
@@ -201,7 +212,7 @@ public:
     {
         data = node.getValueTree();
         setDataProperties();
-        
+
         if (node.getNodeType() == Tags::graph && object && object->isGraph())
         {
             auto sub = dynamic_cast<GraphNode*> (object.get());
@@ -213,9 +224,13 @@ public:
         else
         {
             if (node.getNodeType() != Tags::graph)
-                { DBG("data type is not a graph"); }
-            if (object && !object->isGraph())
-                { DBG("object is not a graph type"); }
+            {
+                DBG ("data type is not a graph");
+            }
+            if (object && ! object->isGraph())
+            {
+                DBG ("object is not a graph type");
+            }
         }
     }
 
@@ -256,7 +271,8 @@ private:
 //==============================================================================
 GraphManager::GraphManager (GraphNode& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
-{ }
+{
+}
 
 GraphManager::~GraphManager()
 {
@@ -301,7 +317,8 @@ GraphManager* GraphManager::findGraphManagerForGraph (const Node& graph) const n
     return nullptr;
 }
 
-bool GraphManager::contains (const uint32 nodeId) const {
+bool GraphManager::contains (const uint32 nodeId) const
+{
     return processor.getNodeForId (nodeId) != nullptr;
 }
 
@@ -313,16 +330,16 @@ NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x,
 
     if (errorMessage.isNotEmpty())
     {
-        DBG("[EL] error creating audio plugin: " << errorMessage);
+        DBG ("[EL] error creating audio plugin: " << errorMessage);
         jassert (node == nullptr);
     }
-    
+
     if (node == nullptr && errorMessage.isEmpty())
     {
         jassertfalse;
         errorMessage = "Could not find node";
     }
- 
+
     return node != nullptr ? processor.addNode (node.release(), nodeId) : nullptr;
 }
 
@@ -338,19 +355,17 @@ uint32 GraphManager::addNode (const Node& newNode)
 {
     if (! newNode.isValid())
     {
-        AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create Node"),
-                                     "Cannot instantiate node without a description");
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create Node"), "Cannot instantiate node without a description");
         return KV_INVALID_NODE;
     }
-    
-    DBG("GraphManager::addNode (const Node&):");
-    DBG("  name=" << newNode.getName());
-    DBG("  identifier=" << newNode.getIdentifier().toString());
+
+    DBG ("GraphManager::addNode (const Node&):");
+    DBG ("  name=" << newNode.getName());
+    DBG ("  identifier=" << newNode.getIdentifier().toString());
 
     uint32 nodeId = KV_INVALID_NODE;
     const PluginDescription desc (pluginManager.findDescriptionFor (newNode));
-    if (auto* node = createFilter (&desc, 0, 0,
-        newNode.hasProperty(Tags::id) ? newNode.getNodeId() : 0))
+    if (auto* node = createFilter (&desc, 0, 0, newNode.hasProperty (Tags::id) ? newNode.getNodeId() : 0))
     {
         nodeId = node->nodeId;
         ValueTree data = newNode.getValueTree().createCopy();
@@ -361,7 +376,7 @@ uint32 GraphManager::addNode (const Node& newNode)
             .setProperty (Tags::object, node, nullptr)
             .setProperty (Tags::type, node->getTypeString(), nullptr)
             .setProperty (Tags::pluginIdentifierString, desc.createIdentifierString(), nullptr);
-        
+
         setupNode (data, node);
 
         nodes.addChild (data, -1, nullptr);
@@ -370,13 +385,12 @@ uint32 GraphManager::addNode (const Node& newNode)
     else
     {
         nodeId = KV_INVALID_NODE;
-        AlertWindow::showMessageBox (AlertWindow::WarningIcon, "Couldn't create filter",
-                                     "The plugin could not be instantiated");
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon, "Couldn't create filter", "The plugin could not be instantiated");
     }
-    
+
     return nodeId;
 }
-    
+
 uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double ry, uint32 nodeId)
 {
     if (! desc)
@@ -391,19 +405,20 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
     {
         nodeId = object->nodeId;
         ValueTree data (Tags::node);
-        
-        data .setProperty (Tags::id,            static_cast<int64> (nodeId), nullptr)
-             .setProperty (Tags::format,        desc->pluginFormatName, nullptr)
-             .setProperty (Tags::identifier,    desc->fileOrIdentifier, nullptr)
-             .setProperty (Tags::type,          object->getTypeString(), nullptr)
-             .setProperty (Tags::name,          desc->name, nullptr)
-             .setProperty (Tags::object,        object, nullptr)
-             .setProperty (Tags::updater,       new NodeModelUpdater (*this, data, object), nullptr)
-             .setProperty (Tags::relativeX,     rx, nullptr)
-             .setProperty (Tags::relativeY,     ry, nullptr)
-             .setProperty (Tags::pluginIdentifierString,
-                           desc->createIdentifierString(), nullptr);
-        
+
+        data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
+            .setProperty (Tags::format, desc->pluginFormatName, nullptr)
+            .setProperty (Tags::identifier, desc->fileOrIdentifier, nullptr)
+            .setProperty (Tags::type, object->getTypeString(), nullptr)
+            .setProperty (Tags::name, desc->name, nullptr)
+            .setProperty (Tags::object, object, nullptr)
+            .setProperty (Tags::updater, new NodeModelUpdater (*this, data, object), nullptr)
+            .setProperty (Tags::relativeX, rx, nullptr)
+            .setProperty (Tags::relativeY, ry, nullptr)
+            .setProperty (Tags::pluginIdentifierString,
+                          desc->createIdentifierString(),
+                          nullptr);
+
         Node node (data, true);
         jassert (node.getFormat().toString().isNotEmpty());
         jassert (node.getIdentifier().toString().isNotEmpty());
@@ -412,7 +427,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
         {
             bindings.add (new Binding (*this, object, node));
         }
-        
+
         if (auto* const proc = object->getAudioProcessor())
         {
             // try to use stereo by default on newly added plugins
@@ -424,15 +439,11 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
             AudioProcessor::BusesLayout* tryStereo = nullptr;
             const auto oldLayout = proc->getBusesLayout();
 
-            if (proc->getTotalNumInputChannels() == 1 &&
-                proc->getTotalNumOutputChannels() == 1 &&
-                proc->checkBusesLayoutSupported (stereoInOut))
+            if (proc->getTotalNumInputChannels() == 1 && proc->getTotalNumOutputChannels() == 1 && proc->checkBusesLayoutSupported (stereoInOut))
             {
                 tryStereo = &stereoInOut;
             }
-            else if (proc->getTotalNumInputChannels() == 0 &&
-                proc->getTotalNumOutputChannels() == 1 &&
-                proc->checkBusesLayoutSupported (stereoOut))
+            else if (proc->getTotalNumInputChannels() == 0 && proc->getTotalNumOutputChannels() == 1 && proc->checkBusesLayoutSupported (stereoOut))
             {
                 tryStereo = &stereoOut;
             }
@@ -496,14 +507,13 @@ void GraphManager::removeNode (const uint32 uid)
             obj = nullptr;
         }
     }
-    
-    jassert(nodes.getNumChildren() == getNumNodes());
+
+    jassert (nodes.getNumChildren() == getNumNodes());
     processorArcsChanged();
 }
 
 //==============================================================================
-void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const bool outputs,
-                                                             const bool audio, const bool midi)
+void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const bool outputs, const bool audio, const bool midi)
 {
     jassert (inputs || outputs);
     bool doneAnything = false;
@@ -511,14 +521,12 @@ void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const
     for (int i = getNumConnections(); --i >= 0;)
     {
         const auto* const c = processor.getConnection (i);
-        if ((outputs && c->sourceNode == nodeId) || 
-            (inputs && c->destNode == nodeId))
+        if ((outputs && c->sourceNode == nodeId) || (inputs && c->destNode == nodeId))
         {
             NodeObjectPtr src = processor.getNodeForId (c->sourceNode);
             NodeObjectPtr dst = processor.getNodeForId (c->destNode);
 
-            if ((audio && src->getPortType(c->sourcePort) == PortType::Audio && dst->getPortType(c->destPort) == PortType::Audio) ||
-                (midi && src->getPortType(c->sourcePort) == PortType::Midi && dst->getPortType(c->destPort) == PortType::Midi))
+            if ((audio && src->getPortType (c->sourcePort) == PortType::Audio && dst->getPortType (c->destPort) == PortType::Audio) || (midi && src->getPortType (c->sourcePort) == PortType::Midi && dst->getPortType (c->destPort) == PortType::Midi))
             {
                 removeConnection (i);
                 doneAnything = true;
@@ -538,7 +546,7 @@ void GraphManager::removeIllegalConnections()
 
 int GraphManager::getNumConnections() const noexcept
 {
-    jassert(arcs.getNumChildren() == processor.getNumConnections());
+    jassert (arcs.getNumChildren() == processor.getNumConnections());
     return processor.getNumConnections();
 }
 
@@ -547,25 +555,19 @@ const GraphNode::Connection* GraphManager::getConnection (const int index) const
     return processor.getConnection (index);
 }
 
-const GraphNode::Connection* GraphManager::getConnectionBetween (uint32 sourceFilterUID, int sourceFilterChannel,
-                                                                          uint32 destFilterUID, int destFilterChannel) const noexcept
+const GraphNode::Connection* GraphManager::getConnectionBetween (uint32 sourceFilterUID, int sourceFilterChannel, uint32 destFilterUID, int destFilterChannel) const noexcept
 {
-    return processor.getConnectionBetween (sourceFilterUID, sourceFilterChannel,
-                                           destFilterUID, destFilterChannel);
+    return processor.getConnectionBetween (sourceFilterUID, sourceFilterChannel, destFilterUID, destFilterChannel);
 }
 
-bool GraphManager::canConnect (uint32 sourceFilterUID, int sourceFilterChannel,
-                               uint32 destFilterUID, int destFilterChannel) const noexcept
+bool GraphManager::canConnect (uint32 sourceFilterUID, int sourceFilterChannel, uint32 destFilterUID, int destFilterChannel) const noexcept
 {
-    return processor.canConnect (sourceFilterUID, sourceFilterChannel,
-                                 destFilterUID, destFilterChannel);
+    return processor.canConnect (sourceFilterUID, sourceFilterChannel, destFilterUID, destFilterChannel);
 }
 
-bool GraphManager::addConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                                  uint32 destFilterUID, int destFilterChannel)
+bool GraphManager::addConnection (uint32 sourceFilterUID, int sourceFilterChannel, uint32 destFilterUID, int destFilterChannel)
 {
-    const bool result = processor.addConnection (sourceFilterUID, (uint32)sourceFilterChannel,
-                                                 destFilterUID, (uint32)destFilterChannel);
+    const bool result = processor.addConnection (sourceFilterUID, (uint32) sourceFilterChannel, destFilterUID, (uint32) destFilterChannel);
     if (result)
         processorArcsChanged();
 
@@ -578,8 +580,7 @@ void GraphManager::removeConnection (const int index)
     processorArcsChanged();
 }
 
-void GraphManager::removeConnection (uint32 sourceNode, uint32 sourcePort,
-                                     uint32 destNode, uint32 destPort)
+void GraphManager::removeConnection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort)
 {
     if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort))
         processorArcsChanged();
@@ -590,10 +591,10 @@ void GraphManager::setNodeModel (const Node& node)
     loaded = false;
 
     processor.clear();
-    graph   = node.getValueTree();
-    arcs    = node.getArcsValueTree();
-    nodes   = node.getNodesValueTree();
-    
+    graph = node.getValueTree();
+    arcs = node.getArcsValueTree();
+    nodes = node.getNodesValueTree();
+
     Array<ValueTree> failed;
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
@@ -607,13 +608,13 @@ void GraphManager::setNodeModel (const Node& node)
         }
         else if (NodeObjectPtr ph = createPlaceholder (node))
         {
-            DBG("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
+            DBG ("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
             node.getValueTree().setProperty (Tags::missing, true, nullptr);
         }
         else
         {
-            DBG("[EL] couldn't create node: " << node.getName());
+            DBG ("[EL] couldn't create node: " << node.getName());
             failed.add (node.getValueTree());
         }
     }
@@ -627,7 +628,7 @@ void GraphManager::setNodeModel (const Node& node)
 
     // If you hit this, then failed nodes didn't get handled properly
     jassert (nodes.getNumChildren() == processor.getNumNodes());
-    
+
     // Cheap way to refresh engine-side nodes
     processor.triggerAsyncUpdate();
     processor.handleUpdateNowIfNeeded();
@@ -635,29 +636,27 @@ void GraphManager::setNodeModel (const Node& node)
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         ValueTree arc (arcs.getChild (i));
-        const auto sourceNode = (uint32)(int) arc.getProperty (Tags::sourceNode);
-        const auto destNode = (uint32)(int) arc.getProperty (Tags::destNode);
-        bool worked = processor.addConnection (sourceNode, (uint32)(int) arc.getProperty (Tags::sourcePort),
-                                               destNode, (uint32)(int) arc.getProperty (Tags::destPort));
+        const auto sourceNode = (uint32) (int) arc.getProperty (Tags::sourceNode);
+        const auto destNode = (uint32) (int) arc.getProperty (Tags::destNode);
+        bool worked = processor.addConnection (sourceNode, (uint32) (int) arc.getProperty (Tags::sourcePort), destNode, (uint32) (int) arc.getProperty (Tags::destPort));
         if (worked)
         {
             arc.removeProperty (Tags::missing, 0);
         }
         else
         {
-            DBG("[EL] failed creating connection: ");
+            DBG ("[EL] failed creating connection: ");
             const Node graphObject (graph, false);
 
-            if (graphObject.getNodeById(sourceNode).isValid() &&
-                graphObject.getNodeById(destNode).isValid())
+            if (graphObject.getNodeById (sourceNode).isValid() && graphObject.getNodeById (destNode).isValid())
             {
-                DBG("[EL] set missing connection");
+                DBG ("[EL] set missing connection");
                 // if the nodes are valid then preserve it
                 arc.setProperty (Tags::missing, true, 0);
             }
             else
             {
-                DBG("[EL] purge failed arc");
+                DBG ("[EL] purge failed arc");
                 failed.add (arc);
             }
         }
@@ -699,7 +698,7 @@ void GraphManager::clear()
         graph.addChild (nodes, -1, nullptr);
         graph.addChild (arcs, -1, nullptr);
     }
-    
+
     processor.clear();
     changed();
 }
@@ -713,14 +712,14 @@ void GraphManager::processorArcsChanged()
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         const ValueTree arc (arcs.getChild (i));
-        if (true == (bool) arc [Tags::missing])
-        {   
+        if (true == (bool) arc[Tags::missing])
+        {
             ValueTree missingArc = arc.createCopy();
             if (processor.addConnection (
-                (uint32)(int) missingArc[Tags::sourceNode],
-                (uint32)(int) missingArc[Tags::sourcePort],
-                (uint32)(int) missingArc[Tags::destNode],
-                (uint32)(int) missingArc[Tags::destPort]))
+                    (uint32) (int) missingArc[Tags::sourceNode],
+                    (uint32) (int) missingArc[Tags::sourcePort],
+                    (uint32) (int) missingArc[Tags::destNode],
+                    (uint32) (int) missingArc[Tags::destPort]))
             {
                 missingArc.removeProperty (Tags::missing, 0);
             }
@@ -750,13 +749,12 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
     if (auto* const proc = obj->getAudioProcessor())
     {
         // try to match ports
-        if (proc->getTotalNumInputChannels() != ins.size() ||
-            proc->getTotalNumOutputChannels() != outs.size())
+        if (proc->getTotalNumInputChannels() != ins.size() || proc->getTotalNumOutputChannels() != outs.size())
         {
             AudioProcessor::BusesLayout layout;
             layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
             layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
-            
+
             if (proc->checkBusesLayoutSupported (layout))
             {
                 proc->suspendProcessing (true);
@@ -765,11 +763,11 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
                 proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
                 proc->suspendProcessing (false);
             }
-            
+
             resetPorts = true;
         }
     }
-    
+
     if (obj->isSubGraph())
     {
         bindings.add (new Binding (*this, obj, node));
@@ -784,14 +782,15 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 // MARK: Root Graph Controller
 RootGraphManager::RootGraphManager (RootGraph& graph, PluginManager& plugins)
     : GraphManager (graph, plugins),
-        root (graph)
-{ }
+      root (graph)
+{
+}
 
-RootGraphManager::~RootGraphManager() { }
+RootGraphManager::~RootGraphManager() {}
 
 void RootGraphManager::unloadGraph()
 {
     getRootGraph().clear();
 }
 
-}
+} // namespace Element

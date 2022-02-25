@@ -26,21 +26,22 @@ namespace Element {
 class BarLabel : public DragableIntLabel
 {
 public:
-    BarLabel (TransportBar& t) : owner(t)
+    BarLabel (TransportBar& t) : owner (t)
     {
         setDragable (false);
     }
-    
+
     void settingLabelDoubleClicked() override
     {
         if (auto e = owner.engine)
             e->seekToAudioFrame (0);
     }
-    
+
     TransportBar& owner;
 };
 
-class BeatLabel : public DragableIntLabel {
+class BeatLabel : public DragableIntLabel
+{
 public:
     BeatLabel()
     {
@@ -48,29 +49,30 @@ public:
     }
 };
 
-class SubBeatLabel : public DragableIntLabel {
+class SubBeatLabel : public DragableIntLabel
+{
 public:
     SubBeatLabel()
     {
         setDragable (false);
     }
 };
-    
-TransportBar::TransportBar ()
+
+TransportBar::TransportBar()
 {
-    addAndMakeVisible (play = new SettingButton ());
+    addAndMakeVisible (play = new SettingButton());
     play->setPath (getIcons().fasPlay, 4.4);
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     play->addListener (this);
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
     play->setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
 
-    addAndMakeVisible (stop = new SettingButton ());
+    addAndMakeVisible (stop = new SettingButton());
     stop->setPath (getIcons().fasStop, 4.4);
     stop->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stop->addListener (this);
 
-    addAndMakeVisible (record = new SettingButton ());
+    addAndMakeVisible (record = new SettingButton());
     record->setPath (getIcons().fasCircle, 4.4);
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
@@ -88,7 +90,7 @@ TransportBar::TransportBar ()
     setBeatTime (0.f);
     setSize (260, 16);
     updateWidth();
-    
+
     startTimer (88);
 }
 
@@ -108,12 +110,12 @@ bool TransportBar::checkForMonitor()
     {
         if (auto* w = ViewHelpers::getGlobals (this))
         {
-            engine  = w->getAudioEngine();
+            engine = w->getAudioEngine();
             monitor = engine->getTransportMonitor();
             session = w->getSession();
         }
     }
-    
+
     return monitor != nullptr;
 }
 
@@ -132,7 +134,6 @@ void TransportBar::timerCallback()
 
 void TransportBar::paint (Graphics& g)
 {
-    
 }
 
 void TransportBar::resized()
@@ -140,7 +141,7 @@ void TransportBar::resized()
     play->setBounds (80, 0, 20, 16);
     stop->setBounds (102, 0, 20, 16);
     record->setBounds (124, 0, 20, 16);
-    
+
     barLabel->setBounds (0, 0, 24, 16);
     beatLabel->setBounds (26, 0, 24, 16);
     subLabel->setBounds (52, 0, 24, 16);
@@ -150,7 +151,7 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
 {
     if (! checkForMonitor())
         return;
-    
+
     if (buttonThatWasClicked == play)
     {
         if (monitor->playing.get())
@@ -173,7 +174,6 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
 
 void TransportBar::setBeatTime (const float t)
 {
-    
 }
 
 void TransportBar::stabilize()
@@ -182,9 +182,9 @@ void TransportBar::stabilize()
     {
         int bars = 0, beats = 0, sub = 0;
         monitor->getBarsAndBeats (bars, beats, sub);
-        barLabel->tempoValue  = bars + 1;
+        barLabel->tempoValue = bars + 1;
         beatLabel->tempoValue = beats + 1;
-        subLabel->tempoValue  = sub + 1;
+        subLabel->tempoValue = sub + 1;
         for (auto* c : { barLabel.get(), beatLabel.get(), subLabel.get() })
             c->repaint();
     }
@@ -195,4 +195,4 @@ void TransportBar::updateWidth()
     setSize (record->getRight(), getHeight());
 }
 
-} /* namespace element */
+} // namespace Element

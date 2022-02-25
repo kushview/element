@@ -23,11 +23,12 @@ namespace Element {
 
 GraphDocument::GraphDocument()
     : FileBasedDocument (".elg", "*.elg", "Open Graph", "Save Graph")
-{ }
+{
+}
 
 GraphDocument::~GraphDocument()
 {
-    graph = { };
+    graph = {};
 }
 
 String GraphDocument::getDocumentTitle()
@@ -37,23 +38,23 @@ String GraphDocument::getDocumentTitle()
 
 Result GraphDocument::loadDocument (const File& file)
 {
-    jassert(session != nullptr);
+    jassert (session != nullptr);
     if (! session)
         return Result::fail ("Cannot load graph");
-    
+
     auto newData = Session::readFromFile (file);
     if (newData.isValid() && newData.hasType (Tags::session))
     {
         if (! session->loadData (newData))
             return Result::fail ("Cannot load malformed graph");
 
-        session->forEach ([](const ValueTree& tree) {
+        session->forEach ([] (const ValueTree& tree) {
             if (! tree.hasType (Tags::node))
                 return;
             Node addMising (tree, true);
             ignoreUnused (addMising);
         });
-        
+
         bindChangeHandlers();
         return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
     }
@@ -67,8 +68,8 @@ Result GraphDocument::loadDocument (const File& file)
 
 Result GraphDocument::saveDocument (const File& file)
 {
-    jassert(session && session->containsGraph (graph));
-    if (!session || !session->containsGraph (graph))
+    jassert (session && session->containsGraph (graph));
+    if (! session || ! session->containsGraph (graph))
         return Result::fail ("No graph data present");
 
     if (! graph.isGraph())
@@ -77,7 +78,7 @@ Result GraphDocument::saveDocument (const File& file)
     }
 
     session->saveGraphState();
-    
+
     if (session->writeToFile (file))
         return Result::ok();
 
@@ -94,4 +95,4 @@ void GraphDocument::setLastDocumentOpened (const File& file)
     lastGraph = file;
 }
 
-}
+} // namespace Element

@@ -24,8 +24,7 @@ struct AssetItemSorterAlphabetical
 {
     static int compareElements (const ValueTree& first, const ValueTree& second)
     {
-        return first [Slugs::name].toString().
-        compareIgnoreCase (second [Slugs::name].toString());
+        return first[Slugs::name].toString().compareIgnoreCase (second[Slugs::name].toString());
     }
 };
 
@@ -35,38 +34,35 @@ struct AssetItemSorterWithGroupsAtStart
     {
         const bool firstIsGroup = first.hasType (Slugs::group);
         const bool secondIsGroup = second.hasType (Slugs::group);
-        
+
         if (firstIsGroup == secondIsGroup)
-            return first [Slugs::name].toString().compareIgnoreCase (second [Slugs::name].toString());
-        
+            return first[Slugs::name].toString().compareIgnoreCase (second[Slugs::name].toString());
+
         return firstIsGroup ? -1 : 1;
     }
 };
 
-void
-AssetTree::Item::addChild (const Item& newChild, int insertIndex)
+void AssetTree::Item::addChild (const Item& newChild, int insertIndex)
 {
     data.addChild (newChild.data, insertIndex, nullptr);
 }
 
-void
-AssetTree::Item::removeFromTree()
+void AssetTree::Item::removeFromTree()
 {
     data.getParent().removeChild (data, nullptr);
 }
 
-bool
-AssetTree::Item::addFile (const File& file, int insertIndex, const bool shouldCompile)
+bool AssetTree::Item::addFile (const File& file, int insertIndex, const bool shouldCompile)
 {
     if (! file.exists() || file.isHidden() || file.getFileName().startsWithChar ('.'))
         return false;
-    
+
     if (file.isDirectory())
     {
         Item group (addNewSubGroup (file.getFileNameWithoutExtension(), insertIndex));
         for (DirectoryIterator iter (file, false, "*", File::findFilesAndDirectories); iter.next();)
             group.addFile (iter.getFile(), -1, shouldCompile);
-        
+
         // xxx ! doesn't work // group.sortAlphabetically (false);
     }
     else if (file.existsAsFile())
@@ -78,7 +74,7 @@ AssetTree::Item::addFile (const File& file, int insertIndex, const bool shouldCo
     {
         jassertfalse;
     }
-    
+
     return true;
 }
 
@@ -86,34 +82,33 @@ File AssetTree::Item::determineGroupFolder() const
 {
     jassert (isGroup());
     File f;
-    
+
     for (int i = 0; i < getNumChildren(); ++i)
     {
-        f = getChild(i).getFile();
-        
+        f = getChild (i).getFile();
+
         if (f.exists())
             return f.getParentDirectory();
     }
-    
+
     Item parent (getParent());
     if (parent != *this)
     {
         f = parent.determineGroupFolder();
-        
+
         if (f.getChildFile (getName()).isDirectory())
             f = f.getChildFile (getName());
     }
     else
     {
         f = tree.getFile().getParentDirectory();
-        
+
         if (f.getChildFile ("Source").isDirectory())
             f = f.getChildFile ("Source");
     }
-    
+
     return f;
 }
-
 
 AssetTree::Item AssetTree::Item::getParent() const
 {
@@ -125,7 +120,7 @@ void AssetTree::Item::addFileUnchecked (const File& file, int insertIndex, const
     Item item (tree, ValueTree (Slugs::file));
     item.setMissingProperties();
     item.getNameValue() = file.getFileName();
-    
+
     if (canContain (item))
     {
         item.setFile (file);
@@ -136,13 +131,13 @@ void AssetTree::Item::addFileUnchecked (const File& file, int insertIndex, const
 AssetTree::Item AssetTree::Item::addNewSubGroup (const String& name, int insertIndex)
 {
     String newID (Utility::createGUID (getId() + name + String (getNumChildren())));
-    
+
     int n = 0;
     while (tree.root().findItemForId (newID).isValid())
         newID = Utility::createGUID (newID + String (++n));
-    
+
     Item group (createGroup (tree, name, newID));
-    
+
     jassert (canContain (group));
     addChild (group, insertIndex);
     return group;
@@ -152,10 +147,10 @@ bool AssetTree::Item::canContain (const Item& child) const
 {
     if (isFile())
         return false;
-    
+
     if (isGroup())
         return child.isFile() || child.isGroup();
-    
+
     jassertfalse;
     return false;
 }
@@ -172,16 +167,16 @@ AssetTree::Item AssetTree::Item::createGroup (AssetTree& tree, const String& nam
 String AssetTree::Item::getFilePath() const
 {
     if (isFile())
-        return data.getProperty(Slugs::path).toString();
-    
+        return data.getProperty (Slugs::path).toString();
+
     return String();
 }
 
 File AssetTree::Item::getFile() const
 {
     if (isFile())
-        return tree.resolveFilename (data.getProperty(Slugs::path).toString());
-    
+        return tree.resolveFilename (data.getProperty (Slugs::path).toString());
+
     return File();
 }
 
@@ -189,38 +184,37 @@ AssetTree::Item AssetTree::Item::findItemForFile (const File& file) const
 {
     if (getFile() == file)
         return *this;
-    
+
     if (isGroup())
     {
         for (int i = getNumChildren(); --i >= 0;)
         {
-            Item found (getChild(i).findItemForFile (file));
+            Item found (getChild (i).findItemForFile (file));
             if (found.isValid())
                 return found;
         }
     }
-    
+
     return AssetTree::Item (tree, ValueTree());
 }
 
-
-AssetTree::Item AssetTree::Item::findItemForId (const String &targetId) const
+AssetTree::Item AssetTree::Item::findItemForId (const String& targetId) const
 {
-    
-    if (data [Slugs::id] == targetId) {
+    if (data[Slugs::id] == targetId)
+    {
         return *this;
     }
-    
+
     if (isGroup())
     {
         for (int i = getNumChildren(); --i >= 0;)
         {
-            Item found (getChild(i).findItemForId (targetId));
+            Item found (getChild (i).findItemForId (targetId));
             if (found.isValid())
                 return found;
         }
     }
-    
+
     return AssetTree::Item (tree, ValueTree());
 }
 
@@ -257,28 +251,25 @@ void AssetTree::Item::setMissingProperties()
     if (isFile() && ! data.hasProperty (Slugs::id))
     {
         String id (Utility::createAlphaNumericUID());
-        while (tree.root().findItemForId(id).isValid())
+        while (tree.root().findItemForId (id).isValid())
             id = Utility::createAlphaNumericUID();
-        
+
         setId (id);
     }
 }
 
-
-
-AssetTree::AssetTree (const ValueTree& parent, const String& rootName,
-                      const String& rootValType, UndoManager* u)
-: undo (u),
-assets (rootValType),
-rootValueType (rootValType)
+AssetTree::AssetTree (const ValueTree& parent, const String& rootName, const String& rootValType, UndoManager* u)
+    : undo (u),
+      assets (rootValType),
+      rootValueType (rootValType)
 
 {
     assets.setProperty ("name", rootName, nullptr);
-    
-    ValueTree(parent).addChild (assets, -1, nullptr);
-    
+
+    ValueTree (parent).addChild (assets, -1, nullptr);
+
     root().setId (Utility::createGUID (rootName + rootValType));
-    assets.addListener(this);
+    assets.addListener (this);
 }
 
 AssetTree::AssetTree (const String& rootName, const String& rootValType, UndoManager* u)
@@ -295,7 +286,7 @@ AssetTree::AssetTree (const AssetTree& other)
     : undo (other.undo),
       assets (other.assets)
 {
-    assets.addListener(this);
+    assets.addListener (this);
 }
 
 AssetTree::~AssetTree() { assets.removeListener (this); }
@@ -305,29 +296,26 @@ void AssetTree::addChildInternal (ValueTree& parent, ValueTree& child)
     parent.addChild (child, -1, undo);
 }
 
-
-
 AssetTree::Item AssetTree::addGroup (const String& name)
 {
     Item item (createItem ("group"));
     item.getNameValue() = name;
-    item.setId (Utility::createAlphaNumericUID ());
+    item.setId (Utility::createAlphaNumericUID());
     addChildInternal (assets, item.data);
-    
+
     return item;
 }
 
 void AssetTree::addGroups (const StringArray& groups, Array<Item>& result)
 {
-	for (int i = 0; i < groups.size(); ++i)
-        result.add (addGroup (groups [i]));
+    for (int i = 0; i < groups.size(); ++i)
+        result.add (addGroup (groups[i]));
 }
 
 void AssetTree::clear()
 {
     assets.removeAllChildren (undo);
 }
-
 
 AssetTree::Item AssetTree::createItem (const Identifier& type)
 {
@@ -345,41 +333,39 @@ AssetTree::Item AssetTree::findGroup (const String& name, bool recursive, bool c
             Item item (*this, vt);
             if (! item.isGroup())
                 continue;
-            
+
             if (name == item.getName())
                 return item;
         }
     }
-    
+
     if (createIt)
         return addGroup (name);
-    
-    return Item  (*this, ValueTree());
-    
-}
 
+    return Item (*this, ValueTree());
+}
 
 String AssetTree::getRelativePathForFile (const File& file) const
 {
     String filename (file.getFullPathName());
-    
+
     File relativePathBase (getFile().getParentDirectory());
-    
+
     String p1 (relativePathBase.getFullPathName());
     String p2 (file.getFullPathName());
-    
+
     while (p1.startsWithChar (File::getSeparatorChar()))
         p1 = p1.substring (1);
-    
+
     while (p2.startsWithChar (File::getSeparatorChar()))
         p2 = p2.substring (1);
-    
+
     if (p1.upToFirstOccurrenceOf (File::getSeparatorString(), true, false)
-        .equalsIgnoreCase (p2.upToFirstOccurrenceOf (File::getSeparatorString(), true, false)))
+            .equalsIgnoreCase (p2.upToFirstOccurrenceOf (File::getSeparatorString(), true, false)))
     {
         filename = FileHelpers::getRelativePathFrom (file, relativePathBase);
     }
-    
+
     return filename;
 }
 
@@ -425,7 +411,7 @@ File AssetTree::resolveFilename (const String& filename)
 {
     if (filename.isEmpty())
         return File();
-    
+
     return getFile().getSiblingFile (FileHelpers::currentOSStylePath (filename));
 }
 
@@ -465,7 +451,7 @@ void AssetTree::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (parent != assets)
         return;
-    
+
     Item item (*this, child);
     assetAdded (item);
 }
@@ -474,14 +460,14 @@ void AssetTree::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int 
 {
     if (parent != assets)
         return;
-    
+
     Item item (*this, child);
     assetRemoved (item);
 }
 
-void AssetTree::valueTreeChildOrderChanged (ValueTree& /*parent*/, int /*oldIndex*/, int /*newIndex*/) { }
-void AssetTree::valueTreeParentChanged (ValueTree& /* child */) { }
-void AssetTree::valueTreePropertyChanged (ValueTree& /* tree */, const Identifier& /* property */) { }
+void AssetTree::valueTreeChildOrderChanged (ValueTree& /*parent*/, int /*oldIndex*/, int /*newIndex*/) {}
+void AssetTree::valueTreeParentChanged (ValueTree& /* child */) {}
+void AssetTree::valueTreePropertyChanged (ValueTree& /* tree */, const Identifier& /* property */) {}
 
 std::unique_ptr<XmlElement> AssetTree::createXml() const
 {
@@ -493,4 +479,4 @@ void AssetTree::loadFromXml (const XmlElement& xml)
     this->assets = ValueTree::fromXml (xml);
 }
 
-}
+} // namespace Element

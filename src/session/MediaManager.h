@@ -26,10 +26,11 @@ namespace Element {
 
 class Session;
 
-class MediaType {
+class MediaType
+{
 public:
-
-    enum ID {
+    enum ID
+    {
         Audio,
         MidiFile,
         PatternFile,
@@ -44,16 +45,14 @@ private:
 class MediaManager
 {
 public:
-
     MediaManager();
     virtual ~MediaManager();
 
     class Document
     {
     public:
-
-        inline Document() { }
-        virtual ~Document() { }
+        inline Document() {}
+        virtual ~Document() {}
         virtual MediaPtr getMediaObject() = 0;
         virtual void fileHasBeenRenamed (const File& newFile) = 0;
         virtual File getFile() const = 0;
@@ -100,8 +99,8 @@ public:
     class DocumentCloseListener
     {
     public:
-        DocumentCloseListener() { }
-        virtual ~DocumentCloseListener() { }
+        DocumentCloseListener() {}
+        virtual ~DocumentCloseListener() {}
         virtual void documentAboutToClose (Document* document) = 0;
     };
 
@@ -111,28 +110,23 @@ public:
     class DocumentType
     {
     public:
-
-        DocumentType() { }
-        virtual ~DocumentType() { }
+        DocumentType() {}
+        virtual ~DocumentType() {}
         virtual bool canOpenFile (const File& file) = 0;
         virtual Document* openFile (Session* session, const File& file) = 0;
-
     };
 
     void registerType (DocumentType* type);
 
 private:
-
-    OwnedArray <Document> documents;
-    OwnedArray <DocumentType> types;
-    Array <DocumentCloseListener*> listeners;
-
+    OwnedArray<Document> documents;
+    OwnedArray<DocumentType> types;
+    Array<DocumentCloseListener*> listeners;
 };
 
-class RecentDocumentList    : private MediaManager::DocumentCloseListener
+class RecentDocumentList : private MediaManager::DocumentCloseListener
 {
 public:
-
     RecentDocumentList();
     ~RecentDocumentList();
 
@@ -140,7 +134,7 @@ public:
 
     void newDocumentOpened (MediaManager::Document* document);
 
-    MediaManager::Document* getCurrentDocument() const       { return previousDocs.getLast(); }
+    MediaManager::Document* getCurrentDocument() const { return previousDocs.getLast(); }
 
     bool canGoToPrevious() const;
     bool canGoToNext() const;
@@ -155,9 +149,9 @@ public:
 
 private:
     void documentAboutToClose (MediaManager::Document*);
-    Array <MediaManager::Document*> previousDocs, nextDocs;
+    Array<MediaManager::Document*> previousDocs, nextDocs;
 };
 
-}
+} // namespace Element
 
 #endif /* ELEMENT_MEDIA_MANAGER_H */

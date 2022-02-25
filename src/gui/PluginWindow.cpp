@@ -26,17 +26,18 @@
 #include "session/Presets.h"
 
 namespace Element {
-static Array <PluginWindow*> activePluginWindows;
+static Array<PluginWindow*> activePluginWindows;
 
 class PluginWindowToolbar : public Toolbar
 {
 public:
-    enum Items {
+    enum Items
+    {
         BypassPlugin = 1
     };
-    
-    PluginWindowToolbar() { }
-    ~PluginWindowToolbar() { }
+
+    PluginWindowToolbar() {}
+    ~PluginWindowToolbar() {}
 };
 
 class PluginWindowContent : public Component,
@@ -45,22 +46,21 @@ class PluginWindowContent : public Component,
 {
 public:
     PluginWindowContent (Component* const _editor, const Node& _node)
-        : editor (_editor), object(_node.getObject()), node(_node)
+        : editor (_editor), object (_node.getObject()), node (_node)
     {
-        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) &&
-            nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
+        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) && nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
 
         addAndMakeVisible (toolbar = new PluginWindowToolbar());
         toolbar->setBounds (0, 0, getWidth(), 24);
-        
+
         addAndMakeVisible (editor);
         editor->addComponentListener (this);
-        
+
         addAndMakeVisible (nodeButton);
         nodeButton.setButtonText ("n");
         nodeButton.setColour (TextButton::buttonOnColourId, Colours::red);
         nodeButton.addListener (this);
-        
+
         addAndMakeVisible (powerButton);
         powerButton.setColour (SettingButton::backgroundOnColourId,
                                findColour (SettingButton::backgroundColourId));
@@ -80,50 +80,50 @@ public:
         muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
         muteButton.setClickingTogglesState (true);
         muteButton.addListener (this);
-        
+
         updateSize();
     }
-    
+
     ~PluginWindowContent() noexcept
     {
         powerButton.removeListener (this);
-        
+
         if (object && editor)
         {
             if (auto* proc = object->getAudioProcessor())
                 if (auto* const e = dynamic_cast<AudioProcessorEditor*> (editor.get()))
                     proc->editorBeingDeleted (e);
         }
-        
-        editor      = nullptr;
-        toolbar     = nullptr;
-        leftPanel   = nullptr;
-        rightPanel  = nullptr;
+
+        editor = nullptr;
+        toolbar = nullptr;
+        leftPanel = nullptr;
+        rightPanel = nullptr;
     }
-    
+
     void updateSize()
     {
         const int height = jmax (editor->getHeight(), 100) + toolbar->getHeight();
         setSize (editor->getWidth(), height + 4);
         resized();
     }
-    
+
     void resized() override
     {
         editor->removeComponentListener (this);
         auto r (getLocalBounds().reduced (2));
-        
+
         if (toolbar->getThickness())
         {
             auto r2 = r.removeFromTop (toolbar->getThickness());
             toolbar->setBounds (r2);
-            
+
             auto r3 = r2.withSizeKeepingCentre (r2.getWidth(), 16);
             r3.removeFromRight (4);
-            
+
             nodeButton.setBounds (r3.removeFromRight (16));
             r3.removeFromRight (4);
-            
+
             powerButton.setBounds (r3.removeFromLeft (16));
 
             r3.removeFromLeft (4);
@@ -131,7 +131,7 @@ public:
 
             r3.removeFromRight (4);
         }
-        
+
         if (nativeEditor)
         {
             editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
@@ -140,7 +140,7 @@ public:
         {
             editor->setBounds (0, r.getY(), getWidth(), getHeight() - r.getY());
         }
-        
+
         editor->addComponentListener (this);
     }
 
@@ -177,7 +177,7 @@ public:
 
         stabilizeComponents();
     }
-    
+
     void componentMovedOrResized (Component& c, bool wasMoved, bool wasResized) override
     {
         if (editor && editor != &c)
@@ -186,7 +186,7 @@ public:
             updateSize();
         ignoreUnused (wasMoved);
     }
-    
+
     Toolbar* getToolbar() const { return toolbar.get(); }
 
     void stabilizeComponents()
@@ -203,7 +203,7 @@ public:
     }
 
 private:
-    JUCE_DECLARE_WEAK_REFERENCEABLE(PluginWindowContent);
+    JUCE_DECLARE_WEAK_REFERENCEABLE (PluginWindowContent);
     ScopedPointer<PluginWindowToolbar> toolbar;
     SettingButton nodeButton;
     PowerButton powerButton;
@@ -215,11 +215,13 @@ private:
     NodeObjectPtr object;
     Node node;
 
-    class MenuCallback : public ModalComponentManager::Callback {
+    class MenuCallback : public ModalComponentManager::Callback
+    {
     public:
         MenuCallback (PluginWindowContent* c, const Node& n)
             : content (c), menu (n)
-        { }
+        {
+        }
 
         void modalStateFinished (int returnValue) override
         {
@@ -236,29 +238,30 @@ private:
 };
 
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
-    : DocumentWindow (n.getName(), LookAndFeel::backgroundColor,
-                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
-      gui (g), owner (n.getObject()), node (n)
+    : DocumentWindow (n.getName(), LookAndFeel::backgroundColor, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
+      gui (g),
+      owner (n.getObject()),
+      node (n)
 {
     setLookAndFeel (&g.getLookAndFeel());
     setUsingNativeTitleBar (true);
     setSize (400, 300);
-    
+
     name = node.getPropertyAsValue (Tags::name);
     name.addListener (this);
     setName (node.getDisplayName());
-    
+
     if (node.isValid())
     {
         setTopLeftPosition (node.getValueTree().getProperty (Tags::windowX, Random::getSystemRandom().nextInt (500)),
                             node.getValueTree().getProperty (Tags::windowY, Random::getSystemRandom().nextInt (500)));
         node.getValueTree().setProperty (Tags::windowVisible, true, 0);
     }
-    
-	if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
-	{
-		setResizable (false, false);
-	}
+
+    if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
+    {
+        setResizable (false, false);
+    }
     else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
         setResizable (ed->isResizable(), false);
@@ -272,7 +275,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     {
         setResizable (true, false);
     }
-    
+
     const bool defaultOnTop = g.getWorld().getSettings().pluginWindowsOnTop();
     setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, defaultOnTop));
 
@@ -308,7 +311,8 @@ void PluginWindow::restoreAlwaysOnTopState()
     {
         const auto shouldBeOnTop = (bool) node.getProperty (Tags::windowOnTop);
         setAlwaysOnTop (shouldBeOnTop);
-        if (shouldBeOnTop) toFront (false);
+        if (shouldBeOnTop)
+            toFront (false);
     }
 }
 
@@ -333,13 +337,13 @@ void PluginWindow::activeWindowStatusChanged()
         app->checkForegroundStatus();
 }
 
-void PluginWindow::updateGraphNode (NodeObject *newNode, Component *newEditor)
+void PluginWindow::updateGraphNode (NodeObject* newNode, Component* newEditor)
 {
-    jassert(nullptr != newNode && nullptr != newEditor);
+    jassert (nullptr != newNode && nullptr != newEditor);
     owner = newNode;
     setContentOwned (newEditor, true);
 }
-    
+
 void PluginWindow::moved()
 {
     node.setProperty (Tags::windowX, getX());
@@ -351,4 +355,4 @@ void PluginWindow::closeButtonPressed()
     gui.closePluginWindow (this);
 }
 
-}
+} // namespace Element

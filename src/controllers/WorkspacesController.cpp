@@ -61,14 +61,13 @@ ApplicationCommandTarget* WorkspacesController::getNextCommandTarget() { return 
 void WorkspacesController::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
-      
+
         Commands::workspaceSave,
         Commands::workspaceOpen,
         Commands::workspaceResetActive,
         Commands::workspaceSaveActive,
         Commands::workspaceClassic,
-        Commands::workspaceEditing
-    });
+        Commands::workspaceEditing });
 }
 
 void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
@@ -81,35 +80,32 @@ void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommand
         case Commands::workspaceOpen:
             result.setInfo ("Open Workspace", "Open a saved workspace", Commands::Categories::UserInterface, 0);
             break;
-        case Commands::workspaceResetActive:
-        {
+        case Commands::workspaceResetActive: {
             result.addDefaultKeypress ('0', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
             result.addDefaultKeypress (')', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Reset Workspace", "Reset the active workspace to it's default state.", Commands::Categories::UserInterface, 0);
-        } break;
-        case Commands::workspaceSaveActive:
-        {
-            result.setInfo ("Save Active Workspace", "Save the current workspace to disk.", 
-                Commands::Categories::UserInterface, 0);
-        } break;
-        case Commands::workspaceClassic:
-        {
-            result.setInfo ("Classic Workspace", "Open the classic workspace", 
-                Commands::Categories::UserInterface, 0);
+        }
+        break;
+        case Commands::workspaceSaveActive: {
+            result.setInfo ("Save Active Workspace", "Save the current workspace to disk.", Commands::Categories::UserInterface, 0);
+        }
+        break;
+        case Commands::workspaceClassic: {
+            result.setInfo ("Classic Workspace", "Open the classic workspace", Commands::Categories::UserInterface, 0);
             if (content)
                 result.setTicked (content->getWorkspaceName() == "Classic");
             result.addDefaultKeypress ('1', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
             result.addDefaultKeypress ('!', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
-        } break;
-        case Commands::workspaceEditing: 
-        {
-            result.setInfo ("Editing Workspace", "Open the editing workspace", 
-                Commands::Categories::UserInterface, 0);
+        }
+        break;
+        case Commands::workspaceEditing: {
+            result.setInfo ("Editing Workspace", "Open the editing workspace", Commands::Categories::UserInterface, 0);
             if (content)
                 result.setTicked (content->getWorkspaceName() == "Editing");
             result.addDefaultKeypress ('2', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
             result.addDefaultKeypress ('@', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
-        } break;
+        }
+        break;
     }
 }
 
@@ -118,8 +114,7 @@ bool WorkspacesController::perform (const InvocationInfo& info)
     bool handled = true;
     switch (info.commandID)
     {
-        case Commands::workspaceSave:
-        {
+        case Commands::workspaceSave: {
             const auto state = content->getWorkspaceState();
             FileChooser chooser ("Save Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToSave (true))
@@ -127,41 +122,42 @@ bool WorkspacesController::perform (const InvocationInfo& info)
                 const auto state = content->getWorkspaceState();
                 state.writeToXmlFile (chooser.getResult());
             }
-        } break;
+        }
+        break;
 
-        case Commands::workspaceOpen:
-        {
+        case Commands::workspaceOpen: {
             FileChooser chooser ("Load Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToOpen())
             {
                 getAppController().postMessage (
                     new WorkspaceOpenFileMessage (chooser.getResult()));
             }
-        } break;
+        }
+        break;
 
-        case Commands::workspaceResetActive:
-        {
+        case Commands::workspaceResetActive: {
             auto state = WorkspaceState::loadByName (content->getWorkspaceName());
             if (state.isValid() && content)
                 content->applyWorkspaceState (state);
-        } break;
+        }
+        break;
 
-        case Commands::workspaceSaveActive:
-        {
+        case Commands::workspaceSaveActive: {
             saveCurrentWorkspace();
-        } break;
+        }
+        break;
 
-        case Commands::workspaceClassic:
-        {
+        case Commands::workspaceClassic: {
             saveCurrentAndLoadWorkspace ("Classic");
-        } break;
+        }
+        break;
 
-        case Commands::workspaceEditing:
-        {
+        case Commands::workspaceEditing: {
             saveCurrentAndLoadWorkspace ("Editing");
-        } break;
+        }
+        break;
 
-        default: 
+        default:
             handled = false;
             break;
     }
@@ -195,4 +191,4 @@ void WorkspacesController::saveCurrentAndLoadWorkspace (const String& name)
         content->applyWorkspaceState (state);
 }
 
-}
+} // namespace Element

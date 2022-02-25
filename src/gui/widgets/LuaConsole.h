@@ -30,7 +30,7 @@ class LuaConsole : public Console,
 public:
     LuaConsole();
     virtual ~LuaConsole();
-    
+
     void textEntered (const String&) override;
     void setEnvironment (const sol::environment& e);
 
@@ -45,4 +45,4 @@ private:
     void timerCallback() override;
 };
 
-}
+} // namespace Element

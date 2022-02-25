@@ -41,4 +41,4 @@ private:
     std::unique_ptr<PluginsPanelView> view;
 };
 
-}
+} // namespace Element

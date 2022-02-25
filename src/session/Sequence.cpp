@@ -25,77 +25,77 @@
 #include "MediaManager.h"
 #include "Globals.h"
 
-
 namespace Element {
-    
-    class Sequence::Private
+
+class Sequence::Private
+{
+public:
+    Private (Sequence& s, Globals& g)
+        : session (s)
     {
-    public:
-        Private (Sequence& s, Globals& g)
-            : session (s)
-        {
-            engine = g.getAudioEngine();
-            jassert (engine != nullptr);
-            playMonitor = nullptr;
-        }
-
-        ~Private() { }
-
-        void buildObjectMap() { }
-
-        void clearSessionMedia()
-        {
-            session.media().clear();
-        }
-
-        void removeBogusTracks()
-        {
-            Array<int> removal;
-            for (int track = session.numTracks(); --track >= 0;)
-                if (! session.getTrack (track).isValid())
-                    removal.add (track);
-
-            for (int i = 0; i < removal.size(); ++i)
-                session.sequenceNode().removeChild (i, nullptr);
-        }
-
-        void connectPattern (const AssetTree::Item& item) { }
-
-        void setMissingProperties() {
-        }
-
-    private:
-        friend class Sequence;
-        Sequence&               session;
-        AudioEnginePtr          engine;
-        Shared<EngineControl>   graph;
-        Shared<PlaybackMonitor> playMonitor;
-    };
-
-    Sequence::Sequence (Globals& g)
-        : ObjectModel (Slugs::sequence),
-          owner (g)
-    {
-        refs.store (0);
-
-        setMissingProperties (true);
-        priv = new Private (*this, g);
-        projectState = node();
-        projectState.addListener (this);
-
-        startTimer (63);
+        engine = g.getAudioEngine();
+        jassert (engine != nullptr);
+        playMonitor = nullptr;
     }
 
-    Sequence::~Sequence()
-    {
-        projectState.removeListener (this);
-        clear();
+    ~Private() {}
 
-        priv = nullptr;
+    void buildObjectMap() {}
+
+    void clearSessionMedia()
+    {
+        session.media().clear();
     }
 
-    void Sequence::appendTrack (const String& mediaType)
+    void removeBogusTracks()
     {
+        Array<int> removal;
+        for (int track = session.numTracks(); --track >= 0;)
+            if (! session.getTrack (track).isValid())
+                removal.add (track);
+
+        for (int i = 0; i < removal.size(); ++i)
+            session.sequenceNode().removeChild (i, nullptr);
+    }
+
+    void connectPattern (const AssetTree::Item& item) {}
+
+    void setMissingProperties()
+    {
+    }
+
+private:
+    friend class Sequence;
+    Sequence& session;
+    AudioEnginePtr engine;
+    Shared<EngineControl> graph;
+    Shared<PlaybackMonitor> playMonitor;
+};
+
+Sequence::Sequence (Globals& g)
+    : ObjectModel (Slugs::sequence),
+      owner (g)
+{
+    refs.store (0);
+
+    setMissingProperties (true);
+    priv = new Private (*this, g);
+    projectState = node();
+    projectState.addListener (this);
+
+    startTimer (63);
+}
+
+Sequence::~Sequence()
+{
+    projectState.removeListener (this);
+    clear();
+
+    priv = nullptr;
+}
+
+void Sequence::appendTrack (const String& mediaType)
+{
 #if 0
         const int index = numTracks();
         const Track end (getTrack (index - 1));
@@ -114,68 +114,66 @@ namespace Element {
 
         assert (index == numTracks() - 1);
 #endif
-    }
+}
 
-    int Sequence::numTracks() const
+int Sequence::numTracks() const
+{
+    ValueTree seq (sequenceNode());
+    return seq.isValid() ? seq.getNumChildren() : 0;
+}
+
+Sequence::Track Sequence::getTrack (int index)
+{
+    ValueTree track;
+
+    if (isPositiveAndBelow (index, numTracks()))
+        track = trackNode (index);
+
+    return Track (this, track);
+}
+
+Shared<PlaybackMonitor> Sequence::playbackMonitor() { return priv->playMonitor; }
+
+void Sequence::clear()
+{
+    clearTracks();
+    close();
+    priv->clearSessionMedia();
+    setMissingProperties (true);
+}
+
+void Sequence::clearTracks()
+{
+    sequenceNode().removeAllChildren (undoManager());
+}
+
+void Sequence::close()
+{
+    Track t (getTrack (0));
+    while (t.isValid())
     {
-        ValueTree seq (sequenceNode());
-        return seq.isValid() ? seq.getNumChildren() : 0;
+        t.state().removeProperty ("node", nullptr);
+        t = t.next();
     }
+}
 
-    Sequence::Track Sequence::getTrack (int index)
-    {
-        ValueTree track;
+Shared<EngineControl> Sequence::controller()
+{
+    return priv->graph;
+}
 
-        if (isPositiveAndBelow (index, numTracks()))
-            track = trackNode (index);
+MediaManager& Sequence::media()
+{
+    return globals().getMediaManager();
+}
 
-        return Track (this, track);
-    }
+Globals& Sequence::globals()
+{
+    return owner;
+}
 
-    Shared<PlaybackMonitor> Sequence::playbackMonitor() { return priv->playMonitor; }
-
-    void Sequence::clear()
-    {
-        clearTracks();
-        close();
-        priv->clearSessionMedia();
-        setMissingProperties (true);
-    }
-
-    void Sequence::clearTracks()
-    {
-        sequenceNode().removeAllChildren (undoManager());
-    }
-
-    void Sequence::close()
-    {
-        Track t (getTrack (0));
-        while (t.isValid())
-        {
-            t.state().removeProperty ("node", nullptr);
-            t = t.next();
-        }
-    }
-
-    Shared<EngineControl> Sequence::controller()
-    {
-        return priv->graph;
-    }
-
-    MediaManager& Sequence::media()
-    {
-        return globals().getMediaManager();
-    }
-
-
-    Globals& Sequence::globals()
-    {
-        return owner;
-    }
-
-
-    bool Sequence::loadData (const ValueTree &data)
-    {
+bool Sequence::loadData (const ValueTree& data)
+{
 #if 0
         clear();
         projectState = ObjectModel::setData (data);
@@ -189,21 +187,21 @@ namespace Element {
 
         open();
 #endif
-        return true;
-    }
+    return true;
+}
 
-    std::unique_ptr<XmlElement> Sequence::createXml()
-    {
-        auto e = getValueTree().createXml();
-        if (nullptr != e)
-            polishXml (*e);
+std::unique_ptr<XmlElement> Sequence::createXml()
+{
+    auto e = getValueTree().createXml();
+    if (nullptr != e)
+        polishXml (*e);
 
-        return e;
-    }
+    return e;
+}
 
-    void Sequence::open()
-    {
-        close();
+void Sequence::open()
+{
+    close();
 #if 0
         Shared<EngineControl> c (controller());
         c->setTempo (node().getProperty (Slugs::tempo, 120.0f));
@@ -212,112 +210,111 @@ namespace Element {
             Logger::writeToLog ("SESSION: could not open the graph engine");
         }
 #endif
-    }
+}
 
-    void Sequence::testSetTempo (double tempo)
+void Sequence::testSetTempo (double tempo)
+{
+    setProperty ("tempo", tempo);
+}
+
+void Sequence::testSetPlaying (bool isPlaying)
+{
+    Shared<EngineControl> c (controller());
+}
+
+void Sequence::testSetRecording (bool isRecording)
+{
+    Shared<EngineControl> c (controller());
+}
+
+void Sequence::testPrintXml()
+{
+    std::clog << node().toXmlString() << std::endl;
+}
+
+void Sequence::polishXml (XmlElement& e)
+{
+    // remove generated properties from the engine
+    const char* sa[] = { "node", "block", nullptr };
+    StringArray trackAtts (sa);
+
+    forEachXmlChildElementWithTagName (e, s, "sequence")
+        forEachXmlChildElementWithTagName (*s, t, "track") for (const auto& a : trackAtts)
+            t->removeAttribute (a);
+}
+
+void Sequence::setMissingProperties (bool resetExisting)
+{
+    if (! node().hasProperty (Slugs::name) || resetExisting)
+        setProperty (Slugs::name, "Untited Session");
+
+    if (! node().hasProperty ("tempo") || resetExisting)
+        setProperty ("tempo", (double) 120.f);
+
+    ValueTree graph = node().getOrCreateChildWithName (Slugs::graph, nullptr);
+    ValueTree seq = node().getOrCreateChildWithName (Slugs::sequence, nullptr);
+
+    if (resetExisting)
     {
-        setProperty ("tempo", tempo);
-    }
-
-    void Sequence::testSetPlaying (bool isPlaying)
-    {
-        Shared<EngineControl> c (controller());
-    }
-
-    void Sequence::testSetRecording (bool isRecording)
-    {
-        Shared<EngineControl> c (controller());
-    }
-
-    void Sequence::testPrintXml()
-    {
-        std::clog << node().toXmlString() << std::endl;
-    }
-
-    void Sequence::polishXml (XmlElement &e)
-    {
-        // remove generated properties from the engine
-        const char* sa[] = { "node", "block", nullptr };
-        StringArray trackAtts (sa);
-
-        forEachXmlChildElementWithTagName (e, s, "sequence")
-            forEachXmlChildElementWithTagName (*s, t, "track")
-                for (const auto& a : trackAtts)
-                    t->removeAttribute (a);
-    }
-
-    void Sequence::setMissingProperties (bool resetExisting)
-    {
-        if (! node().hasProperty (Slugs::name) || resetExisting)
-            setProperty (Slugs::name, "Untited Session");
-
-        if (! node().hasProperty ("tempo") || resetExisting)
-            setProperty ("tempo", (double) 120.f);
-
-        ValueTree graph = node().getOrCreateChildWithName (Slugs::graph, nullptr);
-        ValueTree seq   = node().getOrCreateChildWithName (Slugs::sequence, nullptr);
-
-        if (resetExisting) {
-            graph.removeAllChildren(nullptr);
-            seq.removeAllChildren (nullptr);
-        }
-    }
-
-    void Sequence::timerCallback()
-    {
-
-    }
-
-    void Sequence::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
-    {
-        if (tree != projectState)
-            return;
-
-        if (property == Slugs::tempo)
-        {
-            notifyChanged();
-        }
-    }
-
-    void Sequence::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
-    {
-        notifyChanged();
-    }
-
-    void Sequence::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
-    {
-        notifyChanged();
-    }
-
-    void Sequence::valueTreeChildOrderChanged (ValueTree& parent, int, int)
-    {
-        notifyChanged();
-    }
-
-    void Sequence::valueTreeParentChanged (ValueTree& tree)
-    {
-        notifyChanged();
-    }
-
-    void Sequence::valueTreeRedirected (ValueTree& tree)
-    {
-        if (tree != projectState)
-            return;
-
-        Logger::writeToLog ("Session redirected");
-        notifyChanged();
-    }
-
-    ValueTree Sequence::sequenceNode() const
-    {
-        return node().getChildWithName (Slugs::sequence);
-    }
-
-    ValueTree Sequence::trackNode (int trackIndex) const
-    {
-        if (isPositiveAndBelow (trackIndex, numTracks()))
-            return sequenceNode().getChild (trackIndex);
-
-        return ValueTree();
+        graph.removeAllChildren (nullptr);
+        seq.removeAllChildren (nullptr);
     }
 }
+
+void Sequence::timerCallback()
+{
+}
+
+void Sequence::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
+{
+    if (tree != projectState)
+        return;
+
+    if (property == Slugs::tempo)
+    {
+        notifyChanged();
+    }
+}
+
+void Sequence::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
+{
+    notifyChanged();
+}
+
+void Sequence::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
+{
+    notifyChanged();
+}
+
+void Sequence::valueTreeChildOrderChanged (ValueTree& parent, int, int)
+{
+    notifyChanged();
+}
+
+void Sequence::valueTreeParentChanged (ValueTree& tree)
+{
+    notifyChanged();
+}
+
+void Sequence::valueTreeRedirected (ValueTree& tree)
+{
+    if (tree != projectState)
+        return;
+
+    Logger::writeToLog ("Session redirected");
+    notifyChanged();
+}
+
+ValueTree Sequence::sequenceNode() const
+{
+    return node().getChildWithName (Slugs::sequence);
+}
+
+ValueTree Sequence::trackNode (int trackIndex) const
+{
+    if (isPositiveAndBelow (trackIndex, numTracks()))
+        return sequenceNode().getChild (trackIndex);
+
+    return ValueTree();
+}
+} // namespace Element

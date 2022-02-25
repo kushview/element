@@ -26,25 +26,24 @@ namespace Element {
 
 class SequencerComponent;
 
-class SequencerClipItem :  public TimelineClip
+class SequencerClipItem : public TimelineClip
 {
 public:
-
     SequencerClipItem (SequencerComponent& owner, const ClipModel& clipData);
-    virtual ~SequencerClipItem() { }
-    
-    void paint (Graphics &g);
+    virtual ~SequencerClipItem() {}
+
+    void paint (Graphics& g);
 
     virtual void getTime (Range<double>& time) const;
     virtual void setTime (const Range<double>& time);
 
-    int trackRequested (const int &track);
+    int trackRequested (const int& track);
 
     void setModel (const ClipModel& clip);
     void reset();
 
     void
-    mouseDoubleClick (const MouseEvent &event)
+        mouseDoubleClick (const MouseEvent& event)
     {
         TimelineClip::mouseDoubleClick (event);
     }
@@ -69,17 +68,14 @@ public:
     }
 
 protected:
-
     SequencerComponent& sequence;
     ClipModel model;
 
 private:
-
     friend class SequencerComponent;
     Range<double> timespan;
-
 };
 
-}
+} // namespace Element
 
 #endif /* ELEMENT_SEQUENCER_CLIP_ITEM_H */

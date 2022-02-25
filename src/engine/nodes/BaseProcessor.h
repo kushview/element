@@ -27,10 +27,10 @@ namespace Element {
 class BaseProcessor : public AudioPluginInstance
 {
 public:
-    BaseProcessor() : AudioPluginInstance() { }
+    BaseProcessor() : AudioPluginInstance() {}
     BaseProcessor (const BusesProperties& ioLayouts)
-        : AudioPluginInstance (ioLayouts) { }
-    virtual ~BaseProcessor() { }
+        : AudioPluginInstance (ioLayouts) {}
+    virtual ~BaseProcessor() {}
 
 #if 0
     // Audio Processor Template
@@ -88,9 +88,9 @@ protected:
     virtual bool canApplyBusesLayout (const BusesLayout& layouts) const     { return isBusesLayoutSupported (layouts); }
     virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
 #endif
-    
+
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
 
-}
+} // namespace Element

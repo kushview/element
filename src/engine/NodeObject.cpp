@@ -55,8 +55,10 @@ NodeObject::NodeObject (const uint32 nodeId_) noexcept
       portResetter (*this)
 {
     parent = nullptr;
-    gain.set(1.0f); lastGain.set (1.0f);
-    inputGain.set(1.0f); lastInputGain.set (1.0f);
+    gain.set (1.0f);
+    lastGain.set (1.0f);
+    inputGain.set (1.0f);
+    lastInputGain.set (1.0f);
     oversampler = std::make_unique<Oversampler<float>>();
 }
 
@@ -70,15 +72,15 @@ NodeObject::~NodeObject()
 void NodeObject::setRenderDetails (double newSampleRate, int newBlockSize)
 {
     sampleRate = newSampleRate;
-    blockSize  = newBlockSize;
+    blockSize = newBlockSize;
 }
 
 void NodeObject::clearParameters()
 {
-   #if JUCE_DEBUG
+#if JUCE_DEBUG
     for (const auto* param : parameters)
-        jassert(param->getReferenceCount() == 1);
-   #endif
+        jassert (param->getReferenceCount() == 1);
+#endif
     parameters.clear();
 }
 
@@ -93,33 +95,42 @@ String NodeObject::getSpecialParameterName (int parameter)
 
     switch (parameter)
     {
-        case NoParameter:       name = "None"; break;
-        case EnabledParameter:  name = "Enable/Disable"; break;
-        case BypassParameter:   name = "Bypass"; break;
-        case MuteParameter:     name = "Mute"; break;
+        case NoParameter:
+            name = "None";
+            break;
+        case EnabledParameter:
+            name = "Enable/Disable";
+            break;
+        case BypassParameter:
+            name = "Bypass";
+            break;
+        case MuteParameter:
+            name = "Mute";
+            break;
     }
 
     return name;
 }
 
 const String& NodeObject::getTypeString() const
-{ 
+{
     return isA<GraphNode>() ? Tags::graph.toString() : Tags::plugin.toString();
 }
 
 bool NodeObject::containsParameter (const int index) const
 {
     const auto numParams = getNumPorts (PortType::Control, true);
-    return (index >= SpecialParameterBegin && index < SpecialParameterEnd) ||
-        (isPositiveAndBelow (index, numParams));
+    return (index >= SpecialParameterBegin && index < SpecialParameterEnd) || (isPositiveAndBelow (index, numParams));
 }
 
-void NodeObject::setInputGain (const float f) {
-    inputGain.set(f);
+void NodeObject::setInputGain (const float f)
+{
+    inputGain.set (f);
 }
 
-void NodeObject::setGain (const float f) {
-    gain.set(f);
+void NodeObject::setGain (const float f)
+{
+    gain.set (f);
 }
 
 void NodeObject::getPluginDescription (PluginDescription& desc) const
@@ -150,8 +161,7 @@ void NodeObject::connectAudioTo (const NodeObject* other)
     for (int chan = 0; chan < totalChans; ++chan)
     {
         if (! graph.addConnection (
-            this->nodeId, getPortForChannel (PortType::Audio, chan, false),
-            other->nodeId, other->getPortForChannel (PortType::Audio, chan, true)))
+                this->nodeId, getPortForChannel (PortType::Audio, chan, false), other->nodeId, other->getPortForChannel (PortType::Audio, chan, true)))
         {
             ++failed;
         }
@@ -159,7 +169,7 @@ void NodeObject::connectAudioTo (const NodeObject* other)
 
     if (failed > 0)
     {
-        DBG("[EL] failed connecting audio from " << src->getName() << " to " << dst->getName());
+        DBG ("[EL] failed connecting audio from " << src->getName() << " to " << dst->getName());
     }
 }
 
@@ -182,7 +192,7 @@ bool NodeObject::isAudioIONode() const
     return isAudioInputNode() || isAudioOutputNode();
 }
 
-bool NodeObject::isMidiIONode() const 
+bool NodeObject::isMidiIONode() const
 {
     if (auto* iop = dynamic_cast<const IONode*> (this))
         return iop->getType() == IONode::midiInputNode || iop->getType() == IONode::midiOutputNode;
@@ -194,19 +204,19 @@ bool NodeObject::isMidiDeviceNode() const
     return nullptr != dynamic_cast<MidiDeviceProcessor*> (getAudioProcessor());
 }
 
-int NodeObject::getNumAudioInputs()      const { return ports.size (PortType::Audio, true); }
-int NodeObject::getNumAudioOutputs()     const { return ports.size (PortType::Audio, false); }
+int NodeObject::getNumAudioInputs() const { return ports.size (PortType::Audio, true); }
+int NodeObject::getNumAudioOutputs() const { return ports.size (PortType::Audio, false); }
 
 void NodeObject::setInputRMS (int chan, float val)
 {
     if (chan < inRMS.size())
-        inRMS.getUnchecked(chan)->set(val);
+        inRMS.getUnchecked (chan)->set (val);
 }
 
 void NodeObject::setOutputRMS (int chan, float val)
 {
     if (chan < outRMS.size())
-        outRMS.getUnchecked(chan)->set(val);
+        outRMS.getUnchecked (chan)->set (val);
 }
 
 bool NodeObject::isSuspended() const
@@ -236,9 +246,9 @@ void NodeObject::suspendProcessing (const bool shouldBeSuspended)
         bypassChanged (this);
 }
 
-bool NodeObject::isGraph() const noexcept        { return isA<GraphNode>(); }
-bool NodeObject::isRootGraph() const noexcept    { return isA<RootGraph>(); }
-bool NodeObject::isSubGraph() const noexcept     { return isGraph() && !isRootGraph(); }
+bool NodeObject::isGraph() const noexcept { return isA<GraphNode>(); }
+bool NodeObject::isRootGraph() const noexcept { return isA<RootGraph>(); }
+bool NodeObject::isSubGraph() const noexcept { return isGraph() && ! isRootGraph(); }
 
 PortType NodeObject::getPortType (const uint32 port) const
 {
@@ -256,10 +266,10 @@ PortDescription NodeObject::getPort (int index) const
     return port;
 }
 
-bool NodeObject::isPortInput (const uint32 port)  const 
+bool NodeObject::isPortInput (const uint32 port) const
 {
     jassert (port < getNumPorts());
-    return ports.isInput (static_cast<int> (port), false); 
+    return ports.isInput (static_cast<int> (port), false);
 }
 
 bool NodeObject::isPortOutput (const uint32 port) const
@@ -281,28 +291,29 @@ int NodeObject::getChannelPort (const uint32 port) const
 int NodeObject::getNthPort (const PortType type, const int index, bool isInput, bool oneBased) const
 {
     int count = oneBased ? 0 : -1;
-    
+
     jassert (getNumPorts() >= 0);
     uint32 nports = getNumPorts();
-    
+
     for (uint32 port = 0; port < nports; ++port)
     {
         if (type == getPortType (port) && isInput == isPortInput (port))
         {
-            if (++count == index) {
+            if (++count == index)
+            {
                 return port;
             }
         }
     }
-    
+
     jassertfalse;
     return KV_INVALID_PORT;
 }
 
-uint32 NodeObject::getMidiInputPort()  const { return getPortForChannel (PortType::Midi, 0, true); }
+uint32 NodeObject::getMidiInputPort() const { return getPortForChannel (PortType::Midi, 0, true); }
 uint32 NodeObject::getMidiOutputPort() const { return getPortForChannel (PortType::Midi, 0, false); }
 
-void NodeObject::prepare (const double newSampleRate, 
+void NodeObject::prepare (const double newSampleRate,
                           const int newBlockSize,
                           GraphNode* const parentGraph,
                           bool willBeEnabled)
@@ -311,14 +322,14 @@ void NodeObject::prepare (const double newSampleRate,
     blockSize = newBlockSize;
     parent = parentGraph;
 
-    if ((willBeEnabled || enabled.get() == 1) && !isPrepared)
+    if ((willBeEnabled || enabled.get() == 1) && ! isPrepared)
     {
         isPrepared = true;
         setParentGraph (parentGraph); //<< ensures io nodes get setup
 
-        oversampler->prepare (jmax (getNumPorts (PortType::Audio, true), 
-                                    getNumPorts (PortType::Audio, false)), 
-                                    blockSize);
+        oversampler->prepare (jmax (getNumPorts (PortType::Audio, true),
+                                    getNumPorts (PortType::Audio, false)),
+                              blockSize);
         const int osFactor = jmax (1, getOversamplingFactor());
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
@@ -332,7 +343,7 @@ void NodeObject::prepare (const double newSampleRate,
         for (int i = 0; i < getNumAudioInputs(); ++i)
         {
             AtomicValue<float>* avf = new AtomicValue<float>();
-            avf->set(0);
+            avf->set (0);
             inRMS.add (avf);
         }
 
@@ -340,8 +351,8 @@ void NodeObject::prepare (const double newSampleRate,
         for (int i = 0; i < getNumAudioOutputs(); ++i)
         {
             AtomicValue<float>* avf = new AtomicValue<float>();
-            avf->set(0);
-            outRMS.add(avf);
+            avf->set (0);
+            outRMS.add (avf);
         }
     }
 }
@@ -424,7 +435,7 @@ File NodeObject::getMidiProgramFile (int program) const
     }
 
     std::stringstream stream;
-    stream << uids.toStdString() << "_" << std::setfill('0') << std::setw(3) << program << ".eln";
+    stream << uids.toStdString() << "_" << std::setfill ('0') << std::setw (3) << program << ".eln";
     String fileName = stream.str();
     const File file (DataPath::defaultGlobalMidiProgramsDir().getChildFile (fileName));
     if (! file.getParentDirectory().exists())
@@ -436,7 +447,7 @@ void NodeObject::saveMidiProgram()
 {
     if (useGlobalMidiPrograms())
         return; // don't save global programs here.
-    
+
     int progamNumber = midiProgram.get();
     if (! isPositiveAndBelow (progamNumber, 128))
         return;
@@ -451,7 +462,7 @@ void NodeObject::removeMidiProgram (int program, bool global)
 {
     if (! isPositiveAndBelow (program, 128))
         return;
-    
+
     if (global)
     {
         const auto file = getMidiProgramFile (program);
@@ -476,7 +487,7 @@ NodeObject::MidiProgram* NodeObject::getMidiProgram (int program) const
     for (auto* const p : midiPrograms)
         if (p->program == program)
             return p;
-    auto* const ret = midiPrograms.add (new NodeObject::MidiProgram ());
+    auto* const ret = midiPrograms.add (new NodeObject::MidiProgram());
     ret->program = program;
     return ret;
 }
@@ -486,20 +497,20 @@ void NodeObject::MidiProgramLoader::handleAsyncUpdate()
     const File programFile = node.getMidiProgramFile();
     const bool globalPrograms = node.useGlobalMidiPrograms();
     const auto requestedProgram = node.getMidiProgram();
-   #if 0
+#if 0
     if (node.lastMidiProgram.get() == requestedProgram)
     {
         DBG("[EL] same program, not loading.");
         return;
     }
-   #endif
+#endif
 
     if (globalPrograms)
     {
         if (programFile.existsAsFile())
         {
             const auto programData = Node::parse (programFile);
-            auto data = programData.getProperty(Tags::state).toString().trim();
+            auto data = programData.getProperty (Tags::state).toString().trim();
             if (data.isNotEmpty())
             {
                 MemoryBlock state;
@@ -508,31 +519,31 @@ void NodeObject::MidiProgramLoader::handleAsyncUpdate()
                 {
                     node.lastMidiProgram.set (requestedProgram);
                     node.setState (state.getData(), (int) state.getSize());
-                    DBG("[EL] loaded program: " << requestedProgram);
+                    DBG ("[EL] loaded program: " << requestedProgram);
                 }
             }
         }
         else
         {
-            DBG("[EL] Program file doesn't exist: " << node.getMidiProgramFile().getFileName());
+            DBG ("[EL] Program file doesn't exist: " << node.getMidiProgramFile().getFileName());
         }
     }
     else
     {
         if (auto* const program = node.getMidiProgram (requestedProgram))
         {
-            node.setState (program->state.getData(), 
+            node.setState (program->state.getData(),
                            static_cast<int> (program->state.getSize()));
         }
         else
         {
-            DBG("[EL] program has no data");
+            DBG ("[EL] program has no data");
         }
     }
 
     node.midiProgramChanged(); // always notify the program # changed even if not loaded.
-                               // do this because there may not be data for the program but
-                               // the property is still relavent.
+        // do this because there may not be data for the program but
+        // the property is still relavent.
 }
 
 void NodeObject::setMidiProgram (const int program)
@@ -542,11 +553,11 @@ void NodeObject::setMidiProgram (const int program)
         jassertfalse; // out of range
         return;
     }
-    
+
     midiProgram.set (program);
 }
 
-void NodeObject::setMidiProgramName (const int program, const String& name) 
+void NodeObject::setMidiProgramName (const int program, const String& name)
 {
     if (useGlobalMidiPrograms())
         return; // names not supported with global programs yet.
@@ -602,15 +613,15 @@ void NodeObject::setMidiProgramsState (const String& state)
     MemoryBlock mb;
     mb.fromBase64Encoding (state);
     const ValueTree tree = (mb.getSize() > 0)
-        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
-        : ValueTree();
-    
+                               ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+                               : ValueTree();
+
     for (int i = 0; i < tree.getNumChildren(); ++i)
     {
         const auto data = tree.getChild (i);
         std::unique_ptr<NodeObject::MidiProgram> program;
         program.reset (new NodeObject::MidiProgram());
-        program->program = (int) data [Tags::program];
+        program->program = (int) data[Tags::program];
         program->name = data[Tags::name].toString();
         const auto state = data.getProperty (Tags::state).toString().trim();
         if (state.isNotEmpty() && isPositiveAndBelow (program->program, 128))
@@ -633,13 +644,9 @@ void NodeObject::setPorts (const PortList& newPorts)
 {
     ports = newPorts;
 
-    if (ports.size (PortType::Midi, true) <= 0 &&
-        !isMidiIONode() && !isAudioIONode() && !isMidiDeviceNode())
+    if (ports.size (PortType::Midi, true) <= 0 && ! isMidiIONode() && ! isAudioIONode() && ! isMidiDeviceNode())
     {
-        ports.add (PortType::Midi, ports.size(), 0,
-                   "element_midi_input",
-                   "MIDI In",
-                   true);
+        ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
     }
 
     ParameterArray newParams;
@@ -648,9 +655,11 @@ void NodeObject::setPorts (const PortList& newPorts)
         if (port->input && port->type == PortType::Control)
             newParams.add (getOrCreateParameter (*port));
     }
-    
-    struct SortByArrayIndex {
-        int compareElements (Parameter* lhs, Parameter* rhs) {
+
+    struct SortByArrayIndex
+    {
+        int compareElements (Parameter* lhs, Parameter* rhs)
+        {
             return lhs->getParameterIndex() < rhs->getParameterIndex() ? -1 : 1;
         }
     };
@@ -663,16 +672,16 @@ void NodeObject::setPorts (const PortList& newPorts)
 ValueTree NodeObject::createPortsData() const
 {
     ValueTree portList (Tags::ports);
-    
+
     for (int i = 0; i < ports.size(); ++i)
     {
         ValueTree port = ports.createValueTree (i);
-        port.setProperty (Tags::flow, ports.isInput(i) ? "input" : "output", nullptr);
+        port.setProperty (Tags::flow, ports.isInput (i) ? "input" : "output", nullptr);
         port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
         portList.addChild (port, -1, 0);
-        jassert (isPositiveAndBelow ((int)port.getProperty(Tags::index), ports.size()));
+        jassert (isPositiveAndBelow ((int) port.getProperty (Tags::index), ports.size()));
     }
-    
+
     return portList;
 }
 
@@ -739,7 +748,7 @@ int NodeObject::getOversamplingFactor()
         if (auto* osProc = getOversamplingProcessor())
             return static_cast<int> (osProc->getOversamplingFactor());
     }
-    
+
     return 1;
 }
 
@@ -753,14 +762,14 @@ void NodeObject::setDelayCompensation (double delayMs)
     delayCompSamples = roundToInt (delayCompMillis * 0.001 * sampleRate);
 }
 
-double NodeObject::getDelayCompensation()        const { return delayCompMillis; }
-int NodeObject::getDelayCompensationSamples()    const { return delayCompSamples; }
+double NodeObject::getDelayCompensation() const { return delayCompMillis; }
+int NodeObject::getDelayCompensationSamples() const { return delayCompSamples; }
 
 //=========================================================================
 struct ChannelConnectionMap
 {
-    ChannelConnectionMap() { }
-    ~ChannelConnectionMap() { }
+    ChannelConnectionMap() {}
+    ~ChannelConnectionMap() {}
 
     int channel;
     PortType type { PortType::Unknown };
@@ -799,14 +808,14 @@ void NodeObject::PortResetter::handleAsyncUpdate()
     node.refreshPorts();
 
     // Re-apply connections by channel
-    for (const auto* ccs : sources) {
-        graph->addConnection (ccs->otherNodeId, ccs->otherNodePort, node.nodeId,
-                              node.getPortForChannel (ccs->type, ccs->channel, true));
+    for (const auto* ccs : sources)
+    {
+        graph->addConnection (ccs->otherNodeId, ccs->otherNodePort, node.nodeId, node.getPortForChannel (ccs->type, ccs->channel, true));
     }
 
-    for (const auto* dss : destinations) {
-        graph->addConnection (node.nodeId, node.getPortForChannel (dss->type, dss->channel, false),
-                              dss->otherNodeId, dss->otherNodePort);
+    for (const auto* dss : destinations)
+    {
+        graph->addConnection (node.nodeId, node.getPortForChannel (dss->type, dss->channel, false), dss->otherNodeId, dss->otherNodePort);
     }
     graph->removeIllegalConnections();
 
@@ -839,9 +848,9 @@ Parameter::Ptr NodeObject::getOrCreateParameter (const PortDescription& port)
     jassert (port.type == PortType::Control && port.input == true);
     if (port.type != PortType::Control && port.input != true)
         return nullptr;
-    
+
     auto param = getParameter (port);
-    
+
     if (param == nullptr)
     {
         param = new ControlPortParameter (port);
@@ -852,8 +861,8 @@ Parameter::Ptr NodeObject::getOrCreateParameter (const PortDescription& port)
         param->parameterIndex = port.channel;
     }
 
-    jassert(param != nullptr);
+    jassert (param != nullptr);
     return param;
 }
 
-}
+} // namespace Element

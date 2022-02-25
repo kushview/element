@@ -30,4 +30,4 @@ public:
     virtual ~ControllerMapsView();
 };
 
-}
+} // namespace Element

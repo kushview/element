@@ -21,8 +21,8 @@
 #include "gui/widgets/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
 
-#define EL_FADER_MIN_DB     -90.0
-#define EL_FADER_MAX_DB     12.0
+#define EL_FADER_MIN_DB -90.0
+#define EL_FADER_MAX_DB 12.0
 
 namespace Element {
 
@@ -32,7 +32,7 @@ class AudioMixerEditor : public AudioProcessorEditor,
                          private Timer
 {
 public:
-    AudioMixerEditor (AudioMixerProcessor& p) 
+    AudioMixerEditor (AudioMixerProcessor& p)
         : AudioProcessorEditor (&p),
           owner (p),
           channels (*this)
@@ -43,9 +43,9 @@ public:
         startTimerHz (24);
     }
 
-    ~AudioMixerEditor() noexcept { }
+    ~AudioMixerEditor() noexcept {}
 
-    void paint (Graphics& g) override 
+    void paint (Graphics& g) override
     {
         g.fillAll (Colours::black);
     }
@@ -61,7 +61,7 @@ public:
         }
 
         channels.setBounds (r);
-        
+
         if (auto* hs = channels.getHorizontalScrollBar())
         {
             if (masterStrip && hs->isShowing())
@@ -94,8 +94,7 @@ private:
     {
     public:
         ChannelStrip (AudioMixerEditor& ed, AudioMixerProcessor::Monitor* mon)
-            : editor (ed), monitor (mon),
-              meter (mon->getNumChannels())
+            : editor (ed), monitor (mon), meter (mon->getNumChannels())
         {
             addAndMakeVisible (fader);
             fader.setSliderStyle (Slider::LinearBarVertical);
@@ -105,13 +104,13 @@ private:
             fader.setSkewFactor (2);
             fader.setDoubleClickReturnValue (true, 0.0);
             fader.addListener (this);
-            
+
             addAndMakeVisible (meter);
 
-            addAndMakeVisible (name); 
+            addAndMakeVisible (name);
             name.setFont (name.getFont().withHeight (14));
             name.setJustificationType (Justification::centred);
-            setTrackName (monitor->getTrackId() >= 0 ? "Track " + String(monitor->getTrackId() + 1)
+            setTrackName (monitor->getTrackId() >= 0 ? "Track " + String (monitor->getTrackId() + 1)
                                                      : "Master");
 
             addAndMakeVisible (mute);
@@ -127,7 +126,7 @@ private:
 
             editor.strips.add (this);
         }
-        
+
         ~ChannelStrip() { editor.strips.removeFirstMatchingValue (this); }
 
         void setTrackName (const String& n)
@@ -151,11 +150,11 @@ private:
         {
             auto r = getLocalBounds();
             name.setBounds (r.removeFromTop (18));
-            
+
             volume.setBounds (r.removeFromBottom (18));
             auto r2 = r.removeFromBottom (18);
             mute.setBounds (r2.removeFromRight (getWidth() / 3));
-            
+
             fader.setBounds (r.removeFromRight (getWidth() / 2));
             meter.setBounds (r);
         }
@@ -235,16 +234,14 @@ private:
         {
             setModel (nullptr);
         }
-        
+
         int getNumRows() override { return owner.monitors.size(); }
 
-        void paintListBoxItem (int rowNumber, Graphics& g,
-                               int width, int height, bool rowIsSelected) override { }
-        
-        Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
-                                           Component* existingComponentToUpdate) override
+        void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override {}
+
+        Component* refreshComponentForRow (int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override
         {
-            if (auto monitor = owner.monitors [rowNumber])
+            if (auto monitor = owner.monitors[rowNumber])
             {
                 ChannelStrip* strip = dynamic_cast<ChannelStrip*> (existingComponentToUpdate);
                 if (nullptr == strip)
@@ -261,7 +258,7 @@ private:
             return nullptr;
         }
 
-       #if 0
+#if 0
         /** This can be overridden to react to the user clicking on a row.
             @see listBoxItemDoubleClicked
         */
@@ -333,7 +330,7 @@ private:
 
         /** You can override this to return a custom mouse cursor for each row. */
         virtual MouseCursor getMouseCursorForRow (int row);
-       #endif
+#endif
 
     private:
         friend class AudioMixerEditor;
@@ -381,7 +378,7 @@ AudioMixerProcessor::MonitorPtr AudioMixerProcessor::getMonitor (const int track
     ScopedLock sl (getCallbackLock());
     if (! isPositiveAndBelow (track, tracks.size()))
         return nullptr;
-    return tracks.getUnchecked(track)->monitor;
+    return tracks.getUnchecked (track)->monitor;
 }
 
 void AudioMixerProcessor::addMonoTrack()
@@ -404,21 +401,21 @@ void AudioMixerProcessor::addStereoTrack()
 
     bool wasAdded = false;
     auto* const input = getBus (true, getBusCount (true) - 1);
-    
+
     if (input != nullptr)
         wasAdded = true;
 
     if (wasAdded)
     {
-        auto* const track   = new Track();
-        track->index        = tracks.size();
-        track->busIdx       = input->getBusIndex();
-        track->numInputs    = input->getNumberOfChannels();
-        track->numOutputs   = input->getNumberOfChannels();
-        track->lastGain     = 1.0;
-        track->gain         = 1.0;
-        track->mute         = false;
-        track->monitor      = new Monitor (track->index, track->numOutputs);
+        auto* const track = new Track();
+        track->index = tracks.size();
+        track->busIdx = input->getBusIndex();
+        track->numInputs = input->getNumberOfChannels();
+        track->numOutputs = input->getNumberOfChannels();
+        track->lastGain = 1.0;
+        track->gain = 1.0;
+        track->mute = false;
+        track->monitor = new Monitor (track->index, track->numOutputs);
 
         ScopedLock sl (getCallbackLock());
         tracks.add (track);
@@ -426,7 +423,7 @@ void AudioMixerProcessor::addStereoTrack()
     }
     else
     {
-        DBG("[EL] AudioMixerProcessor: could not add new track");
+        DBG ("[EL] AudioMixerProcessor: could not add new track");
     }
 }
 
@@ -470,15 +467,14 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
         if (track->mute)
         {
             for (int c = 0; c < track->numInputs; ++c)
-                rms.getReference(c).set (0.0);
+                rms.getReference (c).set (0.0);
         }
         else
         {
             for (int c = 0; c < track->numInputs; ++c)
             {
-                rms.getReference(c).set (track->gain * input.getRMSLevel (c, 0, numSamples));
-                tempBuffer.addFromWithRamp (c, 0, input.getReadPointer(c), numSamples,
-                                            track->lastGain, track->gain);
+                rms.getReference (c).set (track->gain * input.getRMSLevel (c, 0, numSamples));
+                tempBuffer.addFromWithRamp (c, 0, input.getReadPointer (c), numSamples, track->lastGain, track->gain);
             }
         }
 
@@ -494,11 +490,10 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
     }
 
     output.clear (0, numSamples);
-    const float gain = Decibels::decibelsToGain ((float)*masterVolume, (float) EL_FADER_MIN_DB);
+    const float gain = Decibels::decibelsToGain ((float) *masterVolume, (float) EL_FADER_MIN_DB);
     if (! *masterMute)
         for (int c = 0; c < output.getNumChannels(); ++c)
-            output.copyFromWithRamp (c, 0, tempBuffer.getReadPointer(c), numSamples,
-                                     lastGain, gain);
+            output.copyFromWithRamp (c, 0, tempBuffer.getReadPointer (c), numSamples, lastGain, gain);
 
     if (gain != masterMonitor->nextGain.get())
         *masterVolume = Decibels::gainToDecibels (masterMonitor->nextGain.get(), (float) EL_FADER_MIN_DB);
@@ -509,7 +504,7 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
     masterMonitor->gain.set (gain);
 
     for (int i = 0; i < 2; ++i)
-        masterMonitor->rms.getReference(i).set (
+        masterMonitor->rms.getReference (i).set (
             output.getRMSLevel (i, 0, numSamples));
 
     lastGain = gain;
@@ -520,21 +515,22 @@ void AudioMixerProcessor::releaseResources()
     tempBuffer.setSize (1, 1, false, false, false);
 }
 
-bool AudioMixerProcessor::canApplyBusCountChange (bool isInput, bool isAdding,
-                                                  AudioProcessor::BusProperties& outProperties)
+bool AudioMixerProcessor::canApplyBusCountChange (bool isInput, bool isAdding, AudioProcessor::BusProperties& outProperties)
 {
-    if (  isAdding && ! canAddBus    (isInput)) return false;
-    if (! isAdding && ! canRemoveBus (isInput)) return false;
+    if (isAdding && ! canAddBus (isInput))
+        return false;
+    if (! isAdding && ! canRemoveBus (isInput))
+        return false;
 
     auto num = getBusCount (isInput);
     auto* const main = getBus (false, 0);
     if (! main)
         return false;
-    
+
     if (isAdding)
     {
         outProperties.busName = String (isInput ? "Input #" : "Output #") + String (getBusCount (isInput));
-        outProperties.defaultLayout = (num > 0 ? getBus (isInput, num - 1)->getDefaultLayout() 
+        outProperties.defaultLayout = (num > 0 ? getBus (isInput, num - 1)->getDefaultLayout()
                                                : main->getDefaultLayout());
         outProperties.isActivatedByDefault = true;
     }
@@ -547,14 +543,15 @@ void AudioMixerProcessor::setTrackGain (const int track, const float gain)
     if (! isPositiveAndBelow (track, numTracks))
         return;
     ScopedLock sl (getCallbackLock());
-    tracks.getUnchecked(track)->gain = gain;
+    tracks.getUnchecked (track)->gain = gain;
 }
 
-void AudioMixerProcessor::setTrackMuted (const int track, const bool mute) {
+void AudioMixerProcessor::setTrackMuted (const int track, const bool mute)
+{
     if (! isPositiveAndBelow (track, numTracks))
         return;
     ScopedLock sl (getCallbackLock());
-    tracks.getUnchecked(track)->mute = mute;
+    tracks.getUnchecked (track)->mute = mute;
 }
 
 bool AudioMixerProcessor::isTrackMuted (const int track) const
@@ -562,7 +559,7 @@ bool AudioMixerProcessor::isTrackMuted (const int track) const
     if (! isPositiveAndBelow (track, numTracks))
         return false;
     ScopedLock sl (getCallbackLock());
-    return tracks.getUnchecked(track)->mute;
+    return tracks.getUnchecked (track)->mute;
 }
 
 float AudioMixerProcessor::getTrackGain (const int track) const
@@ -570,7 +567,7 @@ float AudioMixerProcessor::getTrackGain (const int track) const
     if (! isPositiveAndBelow (track, numTracks))
         return 1.f;
     ScopedLock sl (getCallbackLock());
-    return tracks.getUnchecked(track)->gain;
+    return tracks.getUnchecked (track)->gain;
 }
 
 void AudioMixerProcessor::getStateInformation (juce::MemoryBlock& block)
@@ -583,24 +580,24 @@ void AudioMixerProcessor::getStateInformation (juce::MemoryBlock& block)
     {
         ScopedLock sl (getCallbackLock());
         for (int i = 0; i < numTracks; ++i)
-            t.getUnchecked(i)->update (tracks.getUnchecked (i));
+            t.getUnchecked (i)->update (tracks.getUnchecked (i));
         volume = *masterVolume;
         mute = *masterMute;
     }
 
     ValueTree state ("audiomixer");
     state.setProperty (Tags::volume, volume, 0)
-         .setProperty ("mute", mute, 0);
+        .setProperty ("mute", mute, 0);
     for (int i = 0; i < numTracks; ++i)
     {
         ValueTree trk ("track");
         auto* const track = t.getUnchecked (i);
-        trk.setProperty ("index",       track->index, 0)
-           .setProperty ("busIdx",      track->busIdx, 0)
-           .setProperty ("numInputs",   track->numInputs, 0)
-           .setProperty ("numOutputs",  track->numOutputs, 0)
-           .setProperty ("gain",        track->gain, 0)
-           .setProperty ("mute",        track->mute, 0);
+        trk.setProperty ("index", track->index, 0)
+            .setProperty ("busIdx", track->busIdx, 0)
+            .setProperty ("numInputs", track->numInputs, 0)
+            .setProperty ("numOutputs", track->numOutputs, 0)
+            .setProperty ("gain", track->gain, 0)
+            .setProperty ("mute", track->mute, 0);
         state.addChild (trk, -1, 0);
     }
 
@@ -625,21 +622,21 @@ void AudioMixerProcessor::setStateInformation (const void* data, int size)
     for (int i = 0; i < state.getNumChildren(); ++i)
     {
         const ValueTree trk (state.getChild (i));
-        auto* const track   = new Track();
-        track->index        = trk.getProperty ("index", i);
-        track->busIdx       = trk.getProperty ("busIdx", i);
-        track->numInputs    = trk.getProperty ("numInputs", 2);
-        track->numOutputs   = trk.getProperty ("numOutputs", 2);
-        track->gain         = trk.getProperty ("gain", 1.f);
-        track->lastGain     = track->gain;
-        track->mute         = (bool) trk.getProperty ("mute", false);
+        auto* const track = new Track();
+        track->index = trk.getProperty ("index", i);
+        track->busIdx = trk.getProperty ("busIdx", i);
+        track->numInputs = trk.getProperty ("numInputs", 2);
+        track->numOutputs = trk.getProperty ("numOutputs", 2);
+        track->gain = trk.getProperty ("gain", 1.f);
+        track->lastGain = track->gain;
+        track->mute = (bool) trk.getProperty ("mute", false);
 
         track->monitor = new Monitor (track->index, track->numInputs);
         track->monitor->gain.set (track->gain);
         track->monitor->nextGain.set (track->gain);
         track->monitor->muted.set (track->mute ? 1 : 0);
         track->monitor->nextMute.set (track->mute ? 1 : 0);
-        
+
         newTracks.add (track);
     }
 
@@ -647,7 +644,7 @@ void AudioMixerProcessor::setStateInformation (const void* data, int size)
         ScopedLock sl (getCallbackLock());
         *masterVolume = (float) state.getProperty (Tags::volume, 0.0);
         *masterMute = (bool) state.getProperty ("mute", false);
-        masterMonitor->nextGain.set (Decibels::decibelsToGain ((float)*masterVolume, (float)EL_FADER_MIN_DB));
+        masterMonitor->nextGain.set (Decibels::decibelsToGain ((float) *masterVolume, (float) EL_FADER_MIN_DB));
         masterMonitor->gain.set (masterMonitor->nextGain.get());
         masterMonitor->nextMute.set (*masterMute ? 1 : 0);
         masterMonitor->muted.set (masterMonitor->nextMute.get());
@@ -660,4 +657,4 @@ void AudioMixerProcessor::setStateInformation (const void* data, int size)
     newTracks.clear();
 }
 
-}
+} // namespace Element

@@ -22,27 +22,28 @@
 namespace Element {
 namespace Util {
 
-StringArray getSupportedAudioPluginFormats()
-{
-    StringArray fmts;
+    StringArray getSupportedAudioPluginFormats()
+    {
+        StringArray fmts;
 
-   #if JUCE_MAC && JUCE_PLUGINHOST_AU
-    fmts.add ("AudioUnit");
-   #endif
-   #if JUCE_PLUGINHOST_VST
-    fmts.add ("VST");
-   #endif
-   #if JUCE_PLUGINHOST_VST3
-    fmts.add ("VST3");
-   #endif
-   #if JUCE_PLUGINHOST_LADSPA
-    fmts.add ("LADSPA");
-   #endif
-   #if JLV2_PLUGINHOST_LV2
-    fmts.add ("LV2");
-   #endif
+#if JUCE_MAC && JUCE_PLUGINHOST_AU
+        fmts.add ("AudioUnit");
+#endif
+#if JUCE_PLUGINHOST_VST
+        fmts.add ("VST");
+#endif
+#if JUCE_PLUGINHOST_VST3
+        fmts.add ("VST3");
+#endif
+#if JUCE_PLUGINHOST_LADSPA
+        fmts.add ("LADSPA");
+#endif
+#if JLV2_PLUGINHOST_LV2
+        fmts.add ("LV2");
+#endif
 
-    return fmts;
-}
+        return fmts;
+    }
 
-}}
+} // namespace Util
+} // namespace Element

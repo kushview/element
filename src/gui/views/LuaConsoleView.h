@@ -43,13 +43,14 @@ public:
     {
         console.grabKeyboardFocus();
     }
-    
+
     void resized() override
     {
         console.setBounds (getLocalBounds().reduced (2));
     }
 
-    void messageLogged (const String& msg) override {
+    void messageLogged (const String& msg) override
+    {
         console.addText (msg, false);
     }
 
@@ -58,4 +59,4 @@ private:
     Log* log = nullptr;
 };
 
-}
+} // namespace Element

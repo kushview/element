@@ -31,11 +31,11 @@ class PortComponent;
 class PluginWindow;
 
 /** A panel that displays and edits a Graph. */
-class GraphEditorComponent   : public Component,
-                               public ChangeListener,
-                               public DragAndDropTarget,
-                               private ValueTree::Listener,
-                               public ViewHelperMixin
+class GraphEditorComponent : public Component,
+                             public ChangeListener,
+                             public DragAndDropTarget,
+                             private ValueTree::Listener,
+                             public ViewHelperMixin
 {
 public:
     GraphEditorComponent();
@@ -46,14 +46,14 @@ public:
 
     /** Returns the displayed graph */
     Node getGraph() const { return graph; }
-    
+
     //=========================================================================
     /** Selects the given node */
     void selectNode (const Node& n);
 
-    /** Removes the selected nodes */    
+    /** Removes the selected nodes */
     void deleteSelectedNodes();
-    
+
     //=========================================================================
     void setZoomScale (float scale);
     float getZoomScale() const noexcept { return zoomScale; }
@@ -81,7 +81,7 @@ public:
         if (resizePositionsFrozen == shouldBeFrozen)
             return;
         resizePositionsFrozen = shouldBeFrozen;
-        if (graph.isValid ())
+        if (graph.isValid())
             graph.setProperty (Tags::staticPos, resizePositionsFrozen);
     }
 
@@ -97,13 +97,13 @@ public:
     bool shouldDrawDragImageWhenOver() override { return true; }
 
     //=========================================================================
-    std::function<void(BlockComponent&)> onBlockMoved;
+    std::function<void (BlockComponent&)> onBlockMoved;
     std::function<void()> onZoomChanged;
 
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, NodeObjectPtr editorNode);
     void createNewPlugin (const PluginDescription* desc, int x, int y);
-    
+
 private:
     friend class ConnectorComponent;
     friend class BlockComponent;
@@ -120,7 +120,7 @@ private:
     std::unique_ptr<BlockFactory> factory;
 
     bool verticalLayout = true;
-    
+
     SelectedItemSet<uint32> selectedNodes;
     bool ignoreNodeSelected = false;
 
@@ -131,34 +131,32 @@ private:
     Component* createContainerForNode (NodeObjectPtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (NodeObjectPtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (NodeObjectPtr f, bool useGeneric);
-    
+
     void updateBlockComponents (const bool doPosition = true);
     void updateConnectorComponents();
-    
-    void beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
-                             const uint32 destFilterID, const int destFilterChannel,
-                             const MouseEvent& e);
+
+    void beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel, const uint32 destFilterID, const int destFilterChannel, const MouseEvent& e);
     void dragConnector (const MouseEvent& e);
     void endDraggingConnector (const MouseEvent& e);
-    
+
     BlockComponent* createBlock (const Node&);
 
     BlockComponent* getComponentForFilter (const uint32 filterID) const;
     ConnectorComponent* getComponentForConnection (const Arc& conn) const;
     PortComponent* findPinAt (const int x, const int y) const;
-    
+
     void updateSelection();
-    
-    void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override { }
+
+    void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override {}
     void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
-    void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved,
-                                                       int indexFromWhichChildWasRemoved) override { }
+    void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override {}
     void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                             int oldIndex, int newIndex) override { }
-    void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override { }
-    void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override { }
-    
+                                     int oldIndex,
+                                     int newIndex) override {}
+    void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override {}
+    void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override {}
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorComponent)
 };
 
-}
+} // namespace Element

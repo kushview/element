@@ -52,7 +52,7 @@ void GraphController::openDefaultGraph()
     GraphDocument::ScopedChangeStopper freeze (document, false);
     if (auto* gc = findSibling<GuiController>())
         gc->closeAllPluginWindows();
-    
+
     auto newGraph = Node::createDefaultGraph();
     document.setGraph (newGraph);
     graphChanged();
@@ -73,7 +73,7 @@ void GraphController::openGraph (const File& file)
     }
 
     auto result = document.loadFrom (file, true);
-    
+
     if (result.wasOk())
     {
         auto& gui = *findSibling<GuiController>();
@@ -83,7 +83,7 @@ void GraphController::openGraph (const File& file)
         refreshOtherControllers();
 
         auto session = getWorld().getSession();
-        
+
         if (auto* const cc = gui.getContentComponent())
         {
             auto ui = session->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
@@ -115,12 +115,10 @@ void GraphController::newGraph()
     // - 2 if the middle button was pressed ('no')
     int res = 2;
     if (document.hasChangedSinceSaved())
-        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon, "Save Graph?",
-                                               "The current graph has changes. Would you like to save it?",
-                                               "Save Graph", "Don't Save", "Cancel");
+        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon, "Save Graph?", "The current graph has changes. Would you like to save it?", "Save Graph", "Don't Save", "Cancel");
     if (res == 1)
         document.save (true, true);
-    
+
     if (res == 1 || res == 2)
     {
         GraphDocument::ScopedChangeStopper freeze (document, false);
@@ -144,20 +142,24 @@ void GraphController::saveGraph (const bool saveAs)
 
     if (auto* const cc = gui.getContentComponent())
     {
-        String state; cc->getSessionState (state);
+        String state;
+        cc->getSessionState (state);
         auto ui = session->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
         ui.setProperty ("content", state, nullptr);
     }
 
-    if (saveAs) {
+    if (saveAs)
+    {
         result = document.saveAs (File(), true, true, true);
-    } else {
+    }
+    else
+    {
         result = document.save (true, true);
     }
 
     if (result == FileBasedDocument::userCancelledSave)
         return;
-    
+
     if (result == FileBasedDocument::savedOk)
     {
         // ensure change messages are flushed so the changed flag doesn't reset
@@ -174,4 +176,4 @@ void GraphController::refreshOtherControllers()
     findSibling<PresetsController>()->refresh();
 }
 
-}
+} // namespace Element

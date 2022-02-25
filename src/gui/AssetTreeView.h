@@ -25,8 +25,8 @@
 
 namespace Element {
 
-class AssetTreeViewItem :  public TreeItemBase,
-                           public ValueTree::Listener
+class AssetTreeViewItem : public TreeItemBase,
+                          public ValueTree::Listener
 {
 public:
     AssetTreeViewItem (const AssetTree::Item& item);
@@ -54,7 +54,6 @@ public:
         if (item.isFile())
             return item.getFile();
 
-
         return TreeItemBase::getDraggableFile();
     }
 
@@ -68,32 +67,28 @@ public:
     AssetTree::Item item;
 
 protected:
-
     void addSubItems() override;
     virtual AssetTreeViewItem* createAssetSubItem (const AssetTree::Item&) { return nullptr; }
     virtual void treeChildrenChanged (const ValueTree& parentTree);
     virtual void triggerAsyncAssetRename (const AssetTree::Item& item);
-
 };
 
-class PlainTextFileTreeViewItem   : public AssetTreeViewItem
+class PlainTextFileTreeViewItem : public AssetTreeViewItem
 {
 public:
-
     PlainTextFileTreeViewItem (const AssetTree::Item& item);
     ~PlainTextFileTreeViewItem();
     bool acceptsFileDrop (const StringArray&) const { return false; }
-    bool acceptsDragItems (const OwnedArray <AssetTree::Item>&) { return false; }
+    bool acceptsDragItems (const OwnedArray<AssetTree::Item>&) { return false; }
     AssetTreeViewItem* createAssetSubItem (const AssetTree::Item& child);
     void showDocument();
     void showPopupMenu();
     void handlePopupMenuResult (int resultCode);
     String getDisplayName() const;
     void setName (const String& newName);
-
 };
 
-class GroupTreeViewItem   : public AssetTreeViewItem
+class GroupTreeViewItem : public AssetTreeViewItem
 {
 public:
     GroupTreeViewItem (const AssetTree::Item& item);
@@ -101,9 +96,9 @@ public:
 
     bool isRootAsset() const { return item.isRoot(); }
     bool acceptsFileDrop (const StringArray&) const { return true; }
-    bool acceptsDragItems (const OwnedArray <AssetTree::Item>& selectedNodes);
+    bool acceptsDragItems (const OwnedArray<AssetTree::Item>& selectedNodes);
     void checkFileStatus();
-    void moveSelectedItemsTo (OwnedArray <AssetTree::Item>& selectedNodes, int insertIndex);
+    void moveSelectedItemsTo (OwnedArray<AssetTree::Item>& selectedNodes, int insertIndex);
 
     virtual void showDocument();
     virtual void showPopupMenu();
@@ -121,12 +116,12 @@ protected:
     AssetTreeViewItem* createAssetSubItem (const AssetTree::Item& child);
 };
 
-class AssetTreeView :  public TreePanelBase
+class AssetTreeView : public TreePanelBase
 {
 public:
     AssetTreeView (const AssetTree::Item& root);
-    ~AssetTreeView() { }
+    ~AssetTreeView() {}
 };
 
-}
-#endif   // ELEMENT_TREEVIEW_TYPES_H
+} // namespace Element
+#endif // ELEMENT_TREEVIEW_TYPES_H

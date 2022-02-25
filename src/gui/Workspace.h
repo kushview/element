@@ -21,9 +21,9 @@
 
 #include "ElementApp.h"
 
-#define EL_WORKSPACE_CLASSIC    "Classic"
-#define EL_WORKSPACE_EDITING    "Editing"
-#define EL_WORKSPACE_MIXING     "Mixing"
+#define EL_WORKSPACE_CLASSIC "Classic"
+#define EL_WORKSPACE_EDITING "Editing"
+#define EL_WORKSPACE_MIXING "Mixing"
 
 namespace Element {
 
@@ -40,7 +40,7 @@ public:
     WorkspaceState (Workspace&, const String& name = String());
     ~WorkspaceState() = default;
 
-    inline String getName() const { return getProperty(Tags::name).toString(); }
+    inline String getName() const { return getProperty (Tags::name).toString(); }
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::workspace); }
     inline void applyTo (Dock& dock) const
     {
@@ -96,4 +96,4 @@ private:
     GuiController& gui;
 };
 
-}
+} // namespace Element

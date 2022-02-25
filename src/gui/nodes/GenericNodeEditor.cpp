@@ -24,17 +24,17 @@ namespace Element {
 
 namespace GenericEditorHelpers {
 
-static AudioProcessor* getAudioProcessor (const Node& node)
-{
-    if (auto* obj = node.getObject())
-        return obj->getAudioProcessor();
-    return nullptr;
-}
+    static AudioProcessor* getAudioProcessor (const Node& node)
+    {
+        if (auto* obj = node.getObject())
+            return obj->getAudioProcessor();
+        return nullptr;
+    }
 
-}
+} // namespace GenericEditorHelpers
 
-class BooleanParameterComponent final   : public Component,
-                                          private ParameterListener
+class BooleanParameterComponent final : public Component,
+                                        private ParameterListener
 {
 public:
     BooleanParameterComponent (Parameter* param)
@@ -84,14 +84,14 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BooleanParameterComponent)
 };
 
-class SwitchParameterComponent final   : public Component,
-                                         private ParameterListener
+class SwitchParameterComponent final : public Component,
+                                       private ParameterListener
 {
 public:
     SwitchParameterComponent (Parameter* param)
         : ParameterListener (param)
     {
-        auto* leftButton  = buttons.add (new TextButton());
+        auto* leftButton = buttons.add (new TextButton());
         auto* rightButton = buttons.add (new TextButton());
 
         for (auto* button : buttons)
@@ -100,10 +100,10 @@ public:
             button->setClickingTogglesState (true);
         }
 
-        leftButton ->setButtonText (getParameter()->getText (0.0f, 16));
+        leftButton->setButtonText (getParameter()->getText (0.0f, 16));
         rightButton->setButtonText (getParameter()->getText (1.0f, 16));
 
-        leftButton ->setConnectedEdges (Button::ConnectedOnRight);
+        leftButton->setConnectedEdges (Button::ConnectedOnRight);
         rightButton->setConnectedEdges (Button::ConnectedOnLeft);
 
         // Set the initial value.
@@ -134,7 +134,7 @@ private:
 
         if (buttons[1]->getToggleState() != newState)
         {
-            buttons[1]->setToggleState (newState,   dontSendNotification);
+            buttons[1]->setToggleState (newState, dontSendNotification);
             buttons[0]->setToggleState (! newState, dontSendNotification);
         }
     }
@@ -171,8 +171,7 @@ private:
         if (getParameter()->getValueStrings().isEmpty())
             return getParameter()->getValue() > 0.5f;
 
-        auto index = getParameter()->getValueStrings()
-            .indexOf (getParameter()->getCurrentValueAsText());
+        auto index = getParameter()->getValueStrings().indexOf (getParameter()->getCurrentValueAsText());
 
         if (index < 0)
         {
@@ -189,8 +188,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SwitchParameterComponent)
 };
 
-class ChoiceParameterComponent final   : public Component,
-                                         private ParameterListener
+class ChoiceParameterComponent final : public Component,
+                                       private ParameterListener
 {
 public:
     ChoiceParameterComponent (Parameter* param)
@@ -251,8 +250,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameterComponent)
 };
 
-class SliderParameterComponent final   : public Component,
-                                         private ParameterListener
+class SliderParameterComponent final : public Component,
+                                       private ParameterListener
 {
 public:
     SliderParameterComponent (Parameter* param)
@@ -276,8 +275,8 @@ public:
         handleNewParameterValue();
 
         slider.onValueChange = [this]() { sliderValueChanged(); };
-        slider.onDragStart   = [this]() { sliderStartedDragging(); };
-        slider.onDragEnd     = [this]() { sliderStoppedDragging(); };
+        slider.onDragStart = [this]() { sliderStartedDragging(); };
+        slider.onDragEnd = [this]() { sliderStoppedDragging(); };
     }
 
     void paint (Graphics&) override {}
@@ -295,13 +294,13 @@ public:
 private:
     void updateTextDisplay()
     {
-        jassert(MessageManager::getInstance()->isThisTheMessageThread());
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
         valueLabel.setText (getParameter()->getCurrentValueAsText(), dontSendNotification);
     }
 
     void handleNewParameterValue() override
     {
-        jassert(MessageManager::getInstance()->isThisTheMessageThread());
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
         if (! isDragging)
         {
             slider.setValue (getParameter()->getValue(), dontSendNotification);
@@ -345,7 +344,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SliderParameterComponent)
 };
 
-class ParameterDisplayComponent   : public Component
+class ParameterDisplayComponent : public Component
 {
 public:
     ParameterDisplayComponent (Parameter* param)
@@ -407,7 +406,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterDisplayComponent)
 };
 
-class ParametersPanel   : public Component
+class ParametersPanel : public Component
 {
 public:
     ParametersPanel (const ParameterArray& params)
@@ -416,13 +415,13 @@ public:
             if (param->isAutomatable())
                 addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (param)));
 
-        if (auto* comp = paramComponents [0])
+        if (auto* comp = paramComponents[0])
             setSize (comp->getWidth(), comp->getHeight() * paramComponents.size());
         else
             setSize (400, 100);
     }
 
-    void paint (Graphics& g) override { }
+    void paint (Graphics& g) override {}
 
     void resized() override
     {
@@ -459,15 +458,15 @@ struct GenericNodeEditor::Pimpl
 GenericNodeEditor::GenericNodeEditor (const Node& node)
     : NodeEditorComponent (node), pimpl (new Pimpl (*this))
 {
-    jassert (nullptr != GenericEditorHelpers::getAudioProcessor (node));  // only nodes with real parameters are supported
+    jassert (nullptr != GenericEditorHelpers::getAudioProcessor (node)); // only nodes with real parameters are supported
     setSize (pimpl->view.getViewedComponent()->getWidth() + pimpl->view.getVerticalScrollBar().getWidth(),
              jmin (pimpl->view.getViewedComponent()->getHeight(), 400));
 }
 
-GenericNodeEditor::~GenericNodeEditor() { }
+GenericNodeEditor::~GenericNodeEditor() {}
 
 void GenericNodeEditor::paint (Graphics& g)
-{ 
+{
     g.fillAll (Element::LookAndFeel::backgroundColor);
 }
 
@@ -478,4 +477,4 @@ void GenericNodeEditor::resized()
     pimpl->view.setBounds (getLocalBounds());
 }
 
-}
+} // namespace Element

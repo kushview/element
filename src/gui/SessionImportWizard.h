@@ -38,7 +38,8 @@ public:
     void resized() override;
 
 private:
-    class Content; std::unique_ptr<Content> content;
+    class Content;
+    std::unique_ptr<Content> content;
     SessionPtr session;
 };
 
@@ -51,10 +52,10 @@ public:
     bool escapeKeyPressed() override;
     void closeButtonPressed() override;
 
-    std::function<void(const Node&)> onGraphChosen;
+    std::function<void (const Node&)> onGraphChosen;
 
 private:
     std::unique_ptr<Component>& holder;
 };
 
-}
+} // namespace Element

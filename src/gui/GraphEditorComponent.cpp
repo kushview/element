@@ -48,41 +48,40 @@ namespace Element {
 static bool elNodeIsAudioMixer (const Node& node)
 {
     return node.getFormat().toString() == "Element"
-        && node.getIdentifier().toString() == "element.audioMixer";
+           && node.getIdentifier().toString() == "element.audioMixer";
 }
 
 static bool elNodeIsMidiDevice (const Node& node)
 {
     return node.getFormat().toString() == "Internal"
-        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
-             node.getIdentifier().toString() == "element.midiOutputDevice" );
+           && (node.getIdentifier().toString() == "element.midiInputDevice" || node.getIdentifier().toString() == "element.midiOutputDevice");
 }
 
 static bool elNodeCanChangeIO (const Node& node)
 {
-    return !node.isIONode()
-        && !node.isGraph()
-        && !elNodeIsAudioMixer (node)
-        && !elNodeIsMidiDevice (node);
+    return ! node.isIONode()
+           && ! node.isGraph()
+           && ! elNodeIsAudioMixer (node)
+           && ! elNodeIsMidiDevice (node);
 }
 
 class DefaultBlockFactory : public BlockFactory
 {
 public:
     DefaultBlockFactory (GraphEditorComponent& e)
-        : editor (e) { }
+        : editor (e) {}
 
     BlockComponent* createBlockComponent (AppController& app, const Node& node) override
     {
         ignoreUnused (app);
         auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
-        
+
         if (node.isIONode() || node.isRootGraph())
         {
             block->setMuteButtonVisible (false);
             block->setPowerButtonVisible (false);
         }
-        
+
         if (! elNodeCanChangeIO (node))
         {
             block->setConfigButtonVisible (false);
@@ -96,19 +95,16 @@ private:
 };
 
 //=============================================================================
-class ConnectorComponent   : public Component,
-                             public SettableTooltipClient
+class ConnectorComponent : public Component,
+                           public SettableTooltipClient
 {
 public:
     ConnectorComponent (const Node& g)
-        : sourceFilterID (0), destFilterID (0),
-          sourceFilterChannel (0), destFilterChannel (0),
-          graph (g),
-          lastInputX (0), lastInputY (0),
-          lastOutputX (0), lastOutputY (0)
-    { }
+        : sourceFilterID (0), destFilterID (0), sourceFilterChannel (0), destFilterChannel (0), graph (g), lastInputX (0), lastInputY (0), lastOutputX (0), lastOutputY (0)
+    {
+    }
 
-    ~ConnectorComponent() { }
+    ~ConnectorComponent() {}
 
     bool isDragging() const { return dragging; }
     void setGraph (const Node& g) { graph = g; }
@@ -153,9 +149,9 @@ public:
         getPoints (x1, y1, x2, y2);
 
         if (lastInputX != x1
-             || lastInputY != y1
-             || lastOutputX != x2
-             || lastOutputY != y2)
+            || lastInputY != y1
+            || lastOutputX != x2
+            || lastOutputY != y2)
         {
             resizeToFit();
         }
@@ -254,14 +250,9 @@ public:
             double distanceFromStart, distanceFromEnd;
             getDistancesFromEnds (e.x, e.y, distanceFromStart, distanceFromEnd);
             const bool isNearerSource = (distanceFromStart < distanceFromEnd);
-            ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
-                    sourceFilterID, (uint32)sourceFilterChannel,
-                    destFilterID, (uint32)destFilterChannel, graph));
-                
-            getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID, sourceFilterChannel,
-                                                    isNearerSource ? destFilterID : 0,
-                                                    destFilterChannel,
-                                                    e);
+            ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (sourceFilterID, (uint32) sourceFilterChannel, destFilterID, (uint32) destFilterChannel, graph));
+
+            getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID, sourceFilterChannel, isNearerSource ? destFilterID : 0, destFilterChannel, e);
         }
         else if (dragging)
         {
@@ -282,8 +273,8 @@ public:
         float x1, y1, x2, y2;
         getPoints (x1, y1, x2, y2);
 
-        lastInputX  = x1;
-        lastInputY  = y1;
+        lastInputX = x1;
+        lastInputY = y1;
         lastOutputX = x2;
         lastOutputY = y2;
 
@@ -295,20 +286,16 @@ public:
         linePath.clear();
         linePath.startNewSubPath (x1, y1);
         const bool vertical = getGraphPanel()->isLayoutVertical();
-        
+
         if (vertical)
         {
-            linePath.cubicTo (x1, y1 + (y2 - y1) * 0.33f,
-                              x2, y1 + (y2 - y1) * 0.66f,
-                              x2, y2);
+            linePath.cubicTo (x1, y1 + (y2 - y1) * 0.33f, x2, y1 + (y2 - y1) * 0.66f, x2, y2);
         }
         else
         {
-            linePath.cubicTo (x1 + (x2 - x1) * 0.33f, y1,
-                              x1 + (x2 - x1) * 0.66f, y2,
-                              x2, y2);
+            linePath.cubicTo (x1 + (x2 - x1) * 0.33f, y1, x1 + (x2 - x1) * 0.66f, y2, x2, y2);
         }
-        
+
         PathStrokeType wideStroke (8.0f);
         wideStroke.createStrokedPath (hitPath, linePath);
 
@@ -316,21 +303,19 @@ public:
         stroke.createStrokedPath (linePath, linePath);
 
         const bool showArrow = false;
-        
+
         if (showArrow)
         {
             const float arrowW = 5.0f;
             const float arrowL = 4.0f;
 
             Path arrow;
-            arrow.addTriangle (-arrowL, arrowW,
-                               -arrowL, -arrowW,
-                               arrowL, 0.0f);
+            arrow.addTriangle (-arrowL, arrowW, -arrowL, -arrowW, arrowL, 0.0f);
 
             arrow.applyTransform (AffineTransform()
-                                    .rotated (float_Pi * 0.5f - (float) atan2 (x2 - x1, y2 - y1))
-                                    .translated ((x1 + x2) * 0.5f,
-                                                 (y1 + y2) * 0.5f));
+                                      .rotated (float_Pi * 0.5f - (float) atan2 (x2 - x1, y2 - y1))
+                                      .translated ((x1 + x2) * 0.5f,
+                                                   (y1 + y2) * 0.5f));
 
             linePath.addPath (arrow);
         }
@@ -338,8 +323,8 @@ public:
         linePath.setUsingNonZeroWinding (true);
     }
 
-    uint32 sourceFilterID { KV_INVALID_PORT }, 
-           destFilterID   { KV_INVALID_PORT };
+    uint32 sourceFilterID { KV_INVALID_PORT },
+        destFilterID { KV_INVALID_PORT };
     int sourceFilterChannel, destFilterChannel;
 
 private:
@@ -391,11 +376,11 @@ void GraphEditorComponent::setNode (const Node& n)
 {
     bool isGraph = n.isGraph();
     bool isValid = n.isValid();
-    graph = isValid && isGraph ? n : Node(Tags::graph);
-    
+    graph = isValid && isGraph ? n : Node (Tags::graph);
+
     data.removeListener (this);
     data = graph.getValueTree();
-    
+
     verticalLayout = graph.getProperty (Tags::vertical, true);
     resizePositionsFrozen = (bool) graph.getProperty (Tags::staticPos, false);
 
@@ -405,7 +390,7 @@ void GraphEditorComponent::setNode (const Node& n)
     updateComponents();
     if (draggingConnector)
         addAndMakeVisible (draggingConnector.get());
-    
+
     data.addListener (this);
 }
 
@@ -414,10 +399,10 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
     if (verticalLayout == isVertical)
         return;
     verticalLayout = isVertical;
-    
+
     if (graph.isValid() && graph.isGraph())
         graph.setProperty ("vertical", verticalLayout);
-    
+
     draggingConnector = nullptr;
     deleteAllChildren();
     updateComponents();
@@ -425,7 +410,7 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
 
 void GraphEditorComponent::paint (Graphics& g)
 {
-   g.fillAll (findColour (Style::contentBackgroundColorId));
+    g.fillAll (findColour (Style::contentBackgroundColorId));
 }
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
@@ -445,27 +430,27 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         if (graph.isGraph())
         {
             menu.addSectionHeader ("Graph I/O");
-            menu.addItem (1, "Audio Inputs",    true, graph.hasAudioInputNode());
-            menu.addItem (2, "Audio Outputs",   true, graph.hasAudioOutputNode());
-            menu.addItem (3, "MIDI Input",      true, graph.hasMidiInputNode());
-            menu.addItem (4, "MIDI Output",     true, graph.hasMidiOutputNode());
+            menu.addItem (1, "Audio Inputs", true, graph.hasAudioInputNode());
+            menu.addItem (2, "Audio Outputs", true, graph.hasAudioOutputNode());
+            menu.addItem (3, "MIDI Input", true, graph.hasMidiInputNode());
+            menu.addItem (4, "MIDI Output", true, graph.hasMidiOutputNode());
             menu.addSeparator();
-            
-           #ifndef EL_FREE
+
+#ifndef EL_FREE
             PopupMenu submenu;
             addMidiDevicesToMenu (submenu, true, 80000);
             menu.addSubMenu ("MIDI Input Device", submenu);
             submenu.clear();
             addMidiDevicesToMenu (submenu, false, 90000);
             menu.addSubMenu ("MIDI Output Device", submenu);
-           #endif
+#endif
         }
-        
+
         menu.addSeparator();
         PopupMenu zoomMenu;
         // zoomMenu.addItem (50, "25%",  true, getZoomScale() == 0.25);
         // zoomMenu.addItem (51, "50%",  true, getZoomScale() == 0.50);
-        zoomMenu.addItem (52, "75%",  true, getZoomScale() == 0.75);
+        zoomMenu.addItem (52, "75%", true, getZoomScale() == 0.75);
         zoomMenu.addItem (53, "100%", true, getZoomScale() == 1.00);
         zoomMenu.addItem (54, "125%", true, getZoomScale() == 1.25);
         zoomMenu.addItem (55, "150%", true, getZoomScale() == 1.50);
@@ -475,15 +460,15 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 
         menu.addItem (5, "Change orientation...");
         menu.addItem (7, "Gather nodes...");
-       #if JUCE_DEBUG
+#if JUCE_DEBUG
         menu.addItem (100, "Misc testing item...");
-       #endif
+#endif
         menu.addSeparator();
-        
+
         menu.addSectionHeader ("Plugins");
         menu.addPluginItems();
         const int result = menu.show();
-        
+
         if (menu.isPluginResultCode (result))
         {
             bool verified = false;
@@ -493,13 +478,13 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         }
         else if (result >= 80000 && result < 90000)
         {
-            ViewHelpers::postMessageFor (this, 
-                new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, true), true));
+            ViewHelpers::postMessageFor (this,
+                                         new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, true), true));
         }
         else if (result >= 90000 && result < 100000)
         {
-            ViewHelpers::postMessageFor (this, 
-                new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, false, 90000), false));
+            ViewHelpers::postMessageFor (this,
+                                         new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, false, 90000), false));
         }
         else
         {
@@ -530,10 +515,9 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                     setVerticalLayout (! isLayoutVertical());
                     return;
                     break;
-                
-                case 7:
-                {
-                    int width  = getWidth();
+
+                case 7: {
+                    int width = getWidth();
                     int height = getHeight();
                     int numChanges = 0;
                     int numEditorChanges = 0;
@@ -585,38 +569,57 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                     if (numEditorChanges > 0)
                         setSize (width, height);
                     return;
-                } break;
-                
+                }
+                break;
+
                 // Zoom options (commented don't look right yet)
                 // case 50: setZoomScale (0.25); return; break;
                 // case 51: setZoomScale (0.50); return; break;
-                case 52: setZoomScale (0.75); return; break;
-                case 53: setZoomScale (1.00); return; break;
-                case 54: setZoomScale (1.25); return; break;
-                case 55: setZoomScale (1.50); return; break;
-                case 56: setZoomScale (1.75); return; break;
-                case 57: setZoomScale (2.00); return; break;
+                case 52:
+                    setZoomScale (0.75);
+                    return;
+                    break;
+                case 53:
+                    setZoomScale (1.00);
+                    return;
+                    break;
+                case 54:
+                    setZoomScale (1.25);
+                    return;
+                    break;
+                case 55:
+                    setZoomScale (1.50);
+                    return;
+                    break;
+                case 56:
+                    setZoomScale (1.75);
+                    return;
+                    break;
+                case 57:
+                    setZoomScale (2.00);
+                    return;
+                    break;
 
-                case 100:
-                {
+                case 100: {
                     updateBlockComponents (true);
                     updateConnectorComponents();
                     return;
-                } break;
+                }
+                break;
 
                 default:
                     failure = true;
                     break;
             }
-            
+
             if (failure)
             {
-                DBG("[EL] unkown menu result: " << result);
+                DBG ("[EL] unkown menu result: " << result);
             }
             else if (hasRequestedType)
             {
                 const ValueTree requestedNode = graph.getNodesValueTree()
-                  .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
+                                                    .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
                 const Node model (requestedNode, false);
                 ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
             }
@@ -630,14 +633,14 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 
 void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
 {
-    DBG("[EL] GraphEditorComponent::createNewPlugin(...)");
+    DBG ("[EL] GraphEditorComponent::createNewPlugin(...)");
 }
 
 BlockComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (BlockComponent* const block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
+        if (BlockComponent* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
             if (block->filterID == filterID)
                 return block;
     }
@@ -649,11 +652,11 @@ ConnectorComponent* GraphEditorComponent::getComponentForConnection (const Arc& 
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (ConnectorComponent* const c = dynamic_cast <ConnectorComponent*> (getChildComponent (i)))
+        if (ConnectorComponent* const c = dynamic_cast<ConnectorComponent*> (getChildComponent (i)))
             if (c->sourceFilterID == arc.sourceNode
-                 && c->destFilterID == arc.destNode
-                 && c->sourceFilterChannel == arc.sourcePort
-                 && c->destFilterChannel == arc.destPort)
+                && c->destFilterID == arc.destNode
+                && c->sourceFilterChannel == arc.sourcePort
+                && c->destFilterChannel == arc.destPort)
                 return c;
     }
 
@@ -664,10 +667,10 @@ PortComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (BlockComponent* block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
+        if (BlockComponent* block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
         {
-            if (PortComponent* pin = dynamic_cast <PortComponent*> (block->getComponentAt (x - block->getX(),
-                                                                                      y - block->getY())))
+            if (PortComponent* pin = dynamic_cast<PortComponent*> (block->getComponentAt (x - block->getX(),
+                                                                                          y - block->getY())))
                 return pin;
         }
     }
@@ -691,19 +694,17 @@ void GraphEditorComponent::updateConnectorComponents()
     const ValueTree arcs = graph.getArcsValueTree();
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
+        ConnectorComponent* const cc = dynamic_cast<ConnectorComponent*> (getChildComponent (i));
         if (cc != nullptr && cc != draggingConnector.get())
         {
-            if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel, 
-                                                cc->destFilterID, (uint32) cc->destFilterChannel,
-                                                true))
+            if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel, cc->destFilterID, (uint32) cc->destFilterChannel, true))
             {
                 delete cc;
             }
             else
             {
                 // update cable or remove if can't get coordinates
-                float x1,y1,x2,y2;
+                float x1, y1, x2, y2;
                 if (cc->getPoints (x1, y1, x2, y2))
                     cc->update();
                 else
@@ -717,14 +718,19 @@ void GraphEditorComponent::updateBlockComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
         if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-            { block->update (doPosition); }
+        {
+            block->update (doPosition);
+        }
 }
 
 void GraphEditorComponent::stabilizeNodes()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
         if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-            { block->update (false); block->repaint(); }
+        {
+            block->update (false);
+            block->repaint();
+        }
 }
 
 void GraphEditorComponent::updateComponents (const bool doNodePositions)
@@ -734,18 +740,18 @@ void GraphEditorComponent::updateComponents (const bool doNodePositions)
         const ValueTree c = graph.getConnectionValueTree (i);
         const Arc arc (Node::arcFromValueTree (c));
         ConnectorComponent* connector = getComponentForConnection (arc);
-        
+
         if (connector == nullptr)
         {
             connector = new ConnectorComponent (graph);
             addAndMakeVisible (connector, i);
         }
-        
+
         connector->setGraph (this->graph);
         connector->setInput (arc.sourceNode, arc.sourcePort);
         connector->setOutput (arc.destNode, arc.destPort);
     }
-    
+
     for (int i = graph.getNumNodes(); --i >= 0;)
     {
         const Node node (graph.getNode (i));
@@ -770,7 +776,7 @@ Rectangle<int> GraphEditorComponent::getRequiredSpace() const
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-        { 
+        {
             if (block->getRight() > r.getWidth())
                 r.setWidth (block->getRight());
             if (block->getBottom() > r.getHeight())
@@ -780,11 +786,9 @@ Rectangle<int> GraphEditorComponent::getRequiredSpace() const
     return r;
 }
 
-void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel,
-                                               const uint32 destNode, const int destFilterChannel,
-                                               const MouseEvent& e)
+void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel, const uint32 destNode, const int destFilterChannel, const MouseEvent& e)
 {
-    draggingConnector.reset (dynamic_cast <ConnectorComponent*> (e.originalComponent));
+    draggingConnector.reset (dynamic_cast<ConnectorComponent*> (e.originalComponent));
     if (draggingConnector == nullptr)
         draggingConnector.reset (new ConnectorComponent (graph));
 
@@ -812,9 +816,9 @@ void GraphEditorComponent::dragConnector (const MouseEvent& e)
         if (PortComponent* const pin = findPinAt (x, y))
         {
             uint32 srcFilter = draggingConnector->sourceFilterID;
-            int srcChannel   = draggingConnector->sourceFilterChannel;
+            int srcChannel = draggingConnector->sourceFilterChannel;
             uint32 dstFilter = draggingConnector->destFilterID;
-            int dstChannel   = draggingConnector->destFilterChannel;
+            int dstChannel = draggingConnector->destFilterChannel;
 
             if (srcFilter == 0 && ! pin->isInput())
             {
@@ -826,7 +830,7 @@ void GraphEditorComponent::dragConnector (const MouseEvent& e)
                 dstFilter = pin->getNodeId();
                 dstChannel = pin->getPortIndex();
             }
-            
+
             if (graph.canConnect (srcFilter, srcChannel, dstFilter, dstChannel))
             {
                 x = pin->getParentComponent()->getX() + pin->getX() + pin->getWidth() / 2;
@@ -851,23 +855,23 @@ Component* GraphEditorComponent::createContainerForNode (NodeObjectPtr node, boo
     return nullptr;
 }
 
-Component* GraphEditorComponent::wrapAudioProcessorEditor(AudioProcessorEditor* ed, NodeObjectPtr) { return ed; }
+Component* GraphEditorComponent::wrapAudioProcessorEditor (AudioProcessorEditor* ed, NodeObjectPtr) { return ed; }
 
 AudioProcessorEditor* GraphEditorComponent::createEditorForNode (NodeObjectPtr node, bool useGenericEditor)
 {
     std::unique_ptr<AudioProcessorEditor> ui = nullptr;
-    
+
     if (! useGenericEditor)
-    {   
+    {
         if (auto* proc = node->getAudioProcessor())
             ui.reset (proc->createEditorIfNeeded());
         if (ui == nullptr)
             useGenericEditor = true;
     }
-    
+
     if (useGenericEditor)
         ui.reset (new GenericAudioProcessorEditor (node->getAudioProcessor()));
-    
+
     return (nullptr != ui) ? ui.release() : nullptr;
 }
 
@@ -881,9 +885,9 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
     const MouseEvent e2 (e.getEventRelativeTo (this));
 
     uint32 srcFilter = draggingConnector->sourceFilterID;
-    int srcChannel   = draggingConnector->sourceFilterChannel;
+    int srcChannel = draggingConnector->sourceFilterChannel;
     uint32 dstFilter = draggingConnector->destFilterID;
-    int dstChannel   = draggingConnector->destFilterChannel;
+    int dstChannel = draggingConnector->destFilterChannel;
 
     draggingConnector = nullptr;
 
@@ -894,7 +898,7 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
             if (pin->isInput())
                 return;
 
-            srcFilter  = pin->getNodeId();
+            srcFilter = pin->getNodeId();
             srcChannel = pin->getPortIndex();
         }
         else
@@ -902,12 +906,11 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
             if (! pin->isInput())
                 return;
 
-            dstFilter   = pin->getNodeId();
-            dstChannel  = pin->getPortIndex();
+            dstFilter = pin->getNodeId();
+            dstChannel = pin->getPortIndex();
         }
-        
-        connectPorts (graph, srcFilter, (uint32)srcChannel,
-                             dstFilter, (uint32)dstChannel);
+
+        connectPorts (graph, srcFilter, (uint32) srcChannel, dstFilter, (uint32) dstChannel);
     }
 }
 
@@ -915,49 +918,49 @@ bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& detail
 {
     if (details.description.toString() == "ccNavConcertinaPanel")
         return true;
-    
+
     if (! details.description.isArray())
         return false;
-    
+
     if (auto* a = details.description.getArray())
     {
         const var type (a->getFirst());
         return type == var ("plugin");
     }
-    
+
     return false;
 }
 
 void GraphEditorComponent::itemDropped (const SourceDetails& details)
 {
-    lastDropX = (float)details.localPosition.x / (float)getWidth();
-    lastDropY = (float)details.localPosition.y / (float)getHeight();
-    
+    lastDropX = (float) details.localPosition.x / (float) getWidth();
+    lastDropY = (float) details.localPosition.y / (float) getHeight();
+
     if (const auto* a = details.description.getArray())
     {
-        auto& plugs (ViewHelpers::getGlobals(this)->getPluginManager());
-        
-        if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
+        auto& plugs (ViewHelpers::getGlobals (this)->getPluginManager());
+
+        if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString (a->getUnchecked (1).toString()))
         {
             ScopedPointer<AddPluginMessage> message = new AddPluginMessage (graph, *t);
             auto& builder (message->builder);
-            
+
             if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
             {
                 const auto audioInputNode = graph.getIONode (PortType::Audio, true);
-                const auto midiInputNode  = graph.getIONode (PortType::Midi, true);
+                const auto midiInputNode = graph.getIONode (PortType::Midi, true);
                 builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
                 builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
-                builder.addChannel (midiInputNode,  PortType::Midi,  0, 0, false);
+                builder.addChannel (midiInputNode, PortType::Midi, 0, 0, false);
             }
-            
+
             if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
             {
                 const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
-                const auto midiOutNode     = graph.getIONode (PortType::Midi, false);
+                const auto midiOutNode = graph.getIONode (PortType::Midi, false);
                 builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
                 builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
-                builder.addChannel (midiOutNode,     PortType::Midi,  0, 0, true);
+                builder.addChannel (midiOutNode, PortType::Midi, 0, 0, true);
             }
 
             postMessage (message.release());
@@ -971,17 +974,16 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
             File file = panel->getSelectedFile();
             if (file.hasFileExtension ("els"))
             {
-               #if defined (EL_PRO)
+#if defined(EL_PRO)
                 postMessage (new OpenSessionMessage (file));
-               #endif
+#endif
             }
-            else if (file.hasFileExtension ("elg") ||
-                     file.hasFileExtension ("elpreset"))
+            else if (file.hasFileExtension ("elg") || file.hasFileExtension ("elpreset"))
             {
                 const Node node (Node::parse (file));
                 bool wasHandled = false;
 
-               #if defined (EL_SOLO) || defined (EL_FREE)
+#if defined(EL_SOLO) || defined(EL_FREE)
                 // SE and LT Should just open graphs instead of trying to embed them
                 if (file.hasFileExtension (".elg"))
                 {
@@ -990,29 +992,29 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
                             gc->openGraph (file);
                     wasHandled = true;
                 }
-               #endif
+#endif
 
                 if (! wasHandled && node.isValid())
                 {
                     std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph, file));
-                    
+
                     auto& builder (message->builder);
                     if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
                     {
                         const auto audioInputNode = graph.getIONode (PortType::Audio, true);
-                        const auto midiInputNode  = graph.getIONode (PortType::Midi, true);
+                        const auto midiInputNode = graph.getIONode (PortType::Midi, true);
                         builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
                         builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
-                        builder.addChannel (midiInputNode,  PortType::Midi,  0, 0, false);
+                        builder.addChannel (midiInputNode, PortType::Midi, 0, 0, false);
                     }
-                    
+
                     if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
                     {
                         const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
-                        const auto midiOutNode     = graph.getIONode (PortType::Midi, false);
+                        const auto midiOutNode = graph.getIONode (PortType::Midi, false);
                         builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
                         builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
-                        builder.addChannel (midiOutNode,     PortType::Midi,  0, 0, true);
+                        builder.addChannel (midiOutNode, PortType::Midi, 0, 0, true);
                     }
                     postMessage (message.release());
                 }
@@ -1031,8 +1033,7 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
         addAndMakeVisible (comp, 20000);
         comp->update();
     }
-    else if (child.hasType (Tags::arc) || child.hasType (Tags::nodes) ||
-             child.hasType (Tags::arcs))
+    else if (child.hasType (Tags::arc) || child.hasType (Tags::nodes) || child.hasType (Tags::arcs))
     {
         updateComponents();
     }
@@ -1050,7 +1051,7 @@ void GraphEditorComponent::selectNode (const Node& nodeToSelect)
 {
     if (ignoreNodeSelected)
         return;
-    
+
     for (int i = 0; i < graph.getNumNodes(); ++i)
     {
         auto node = graph.getNode (i);
@@ -1087,7 +1088,7 @@ void GraphEditorComponent::setZoomScale (float scale)
 {
     if (scale == zoomScale)
         return;
-    
+
     zoomScale = scale;
     updateComponents();
     if (onZoomChanged)
@@ -1097,7 +1098,7 @@ void GraphEditorComponent::setZoomScale (float scale)
 void GraphEditorComponent::updateSelection()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-        if (auto* const block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
+        if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
             block->repaint();
 }
 
@@ -1109,4 +1110,4 @@ BlockComponent* GraphEditorComponent::createBlock (const Node& node)
     return nullptr;
 }
 
-}
+} // namespace Element

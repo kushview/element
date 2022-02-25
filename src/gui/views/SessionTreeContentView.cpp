@@ -36,7 +36,6 @@ SessionTreeContentView::~SessionTreeContentView()
 
 void SessionTreeContentView::didBecomeActive()
 {
-
 }
 
 void SessionTreeContentView::stabilizeContent()
@@ -52,4 +51,4 @@ void SessionTreeContentView::resized()
     tree->setBounds (getLocalBounds());
 }
 
-}
+} // namespace Element

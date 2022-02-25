@@ -32,7 +32,7 @@ namespace kv {
 
     @tags{GUI}
 */
-class JUCE_API  LuaTokeniser   : public CodeTokeniser
+class JUCE_API LuaTokeniser : public CodeTokeniser
 {
 public:
     //==============================================================================

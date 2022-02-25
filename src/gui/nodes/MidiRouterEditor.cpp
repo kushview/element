@@ -32,38 +32,34 @@ public:
         : editor (ed)
     {
         setMatrixCellSize (48);
-        setSize (getRowThickness() * 4, 
+        setSize (getRowThickness() * 4,
                  getColumnThickness() * 4);
         setRepaintsOnMouseActivity (true);
     }
 
-    int getNumColumns() override    { return editor.getMatrixState().getNumColumns(); }
-    int getNumRows() override       { return editor.getMatrixState().getNumRows(); }
+    int getNumColumns() override { return editor.getMatrixState().getNumColumns(); }
+    int getNumRows() override { return editor.getMatrixState().getNumRows(); }
 
-    void paintMatrixCell (Graphics& g, const int width, const int height,
-                                       const int row, const int column) override
+    void paintMatrixCell (Graphics& g, const int width, const int height, const int row, const int column) override
     {
         auto& matrix = editor.getMatrixState();
         const int gridPadding = 1;
         bool useHighlighting = true;
 
-        if (useHighlighting &&
-                (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
+        if (useHighlighting && (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
         {
             g.setColour (Colors::elemental.withAlpha (0.4f));
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }
-        else if ((mouseIsOverRow(row) || mouseIsOverColumn(column)) && !matrix.connected (row, column))
+        else if ((mouseIsOverRow (row) || mouseIsOverColumn (column)) && ! matrix.connected (row, column))
         {
             g.setColour (Colors::elemental.withAlpha (0.3f));
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }
         else
         {
-            g.setColour (matrix.connected (row, column) ?
-                            Colour (kv::Colors::elemental.brighter()) :
-                            Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
-    
+            g.setColour (matrix.connected (row, column) ? Colour (kv::Colors::elemental.brighter()) : Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
+
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }
     }
@@ -77,10 +73,9 @@ public:
         repaint();
     }
 
-    void matrixBackgroundClicked (const MouseEvent& ev) override { }
+    void matrixBackgroundClicked (const MouseEvent& ev) override {}
 
-    void matrixHoveredCellChanged (const int prevRow, const int prevCol,
-                                   const int newRow,  const int newCol) override
+    void matrixHoveredCellChanged (const int prevRow, const int prevCol, const int newRow, const int newCol) override
     {
         ignoreUnused (prevRow, prevCol, newRow, newCol);
         repaint();
@@ -95,6 +90,7 @@ class MidiRouterEditor::Content : public Component
     int padding = 10;
     int labelWidth = 60;
     Rectangle<int> matrixArea;
+
 public:
     Content (MidiRouterEditor& o)
         : owner (o)
@@ -108,9 +104,9 @@ public:
         slider.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
         slider.setRange (0.001, 2.0);
 
-        slider.onValueChange = [this] { };
+        slider.onValueChange = [this] {};
 
-        setSize (padding + labelWidth + matrix->getWidth(), 
+        setSize (padding + labelWidth + matrix->getWidth(),
                  padding + labelWidth + matrix->getHeight());
         matrixArea = { labelWidth, padding, matrix->getWidth(), matrix->getHeight() };
     }
@@ -119,16 +115,13 @@ public:
     {
         slider.onValueChange = nullptr;
     }
-    
+
     void resized() override
     {
-        auto size = jlimit (24, 36, 
-            roundToInt ((double)(getWidth() - labelWidth - 32) / (double)matrix->getNumRows()));
+        auto size = jlimit (24, 36, roundToInt ((double) (getWidth() - labelWidth - 32) / (double) matrix->getNumRows()));
         matrix->setMatrixCellSize (size, size);
 
-        matrixArea = { labelWidth, padding, 
-                matrix->getRowThickness() * matrix->getNumRows(), 
-                matrix->getColumnThickness() * matrix->getNumColumns() };
+        matrixArea = { labelWidth, padding, matrix->getRowThickness() * matrix->getNumRows(), matrix->getColumnThickness() * matrix->getNumColumns() };
 
         matrix->setBounds (matrixArea);
         if (slider.isVisible())
@@ -144,17 +137,15 @@ public:
 
         g.setColour (LookAndFeel::textColor);
         for (int row = 0; row < owner.getMatrixState().getNumRows(); ++row)
-            g.drawText (String("Ch. ") + String(row + 1), box.removeFromTop(rowThickness),
-                Justification::centredRight, false);
+            g.drawText (String ("Ch. ") + String (row + 1), box.removeFromTop (rowThickness), Justification::centredRight, false);
 
         box = { matrix->getX(), matrix->getBottom() + 10, matrix->getWidth(), 50 };
-        
+
         for (int col = 0; col < owner.getMatrixState().getNumColumns(); ++col)
         {
-            auto r  = box.removeFromLeft (colThickness);
-            g.setColour(LookAndFeel::textColor);
-            Artist::drawVerticalText (g, String("Ch. ") + String(col + 1), r,
-                                         Justification::centredRight);
+            auto r = box.removeFromLeft (colThickness);
+            g.setColour (LookAndFeel::textColor);
+            Artist::drawVerticalText (g, String ("Ch. ") + String (col + 1), r, Justification::centredRight);
         }
     }
 
@@ -212,4 +203,4 @@ void MidiRouterEditor::paint (Graphics& g)
     g.fillAll (Colours::black);
 }
 
-}
+} // namespace Element

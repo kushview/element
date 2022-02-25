@@ -33,7 +33,7 @@ public:
 
     void scanDefaultLocation();
     void scanDirectory (const File&);
-    
+
     int getNumScripts() const;
     ScriptDescription getScript (int) const;
 
@@ -61,4 +61,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptManager);
 };
 
-}
+} // namespace Element

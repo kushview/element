@@ -37,7 +37,7 @@ public:
         configButton.setTooltip ("Show graph settings");
         configButton.addListener (this);
         configButton.setVisible (false);
-        
+
         addAndMakeVisible (sessionConfigButton);
         sessionConfigButton.setTooltip ("Show session settings");
         sessionConfigButton.addListener (this);
@@ -51,8 +51,9 @@ public:
 
     inline void buttonClicked (Button* b) override
     {
-        auto* const world = ViewHelpers::getGlobals(this);
-        if (! world) return;
+        auto* const world = ViewHelpers::getGlobals (this);
+        if (! world)
+            return;
         if (b == &configButton)
         {
             world->getCommandManager().invokeDirectly (Commands::showGraphConfig, true);
@@ -84,22 +85,22 @@ public:
     inline void setNode (const Node& n)
     {
         Node newGraph = n.isGraph() ? n : n.getParentGraph();
-        Node newNode  = n.isGraph() ? Node() : n;
+        Node newNode = n.isGraph() ? Node() : n;
 
         if (newGraph != graph || newNode != node)
         {
             graphNodeWillChange();
 
             graph = newGraph;
-            node  = newNode;
-            
+            node = newNode;
+
             if (node.isValid())
                 breadcrumb.setNode (node);
             else if (graph.isValid())
                 breadcrumb.setNode (graph);
             else
                 breadcrumb.setNode (Node());
-            
+
             graphNodeChanged (graph, node);
         }
     }
@@ -112,25 +113,25 @@ public:
         graphDisplayResized (r);
 
         const int configButtonSize = 14;
-        r = getLocalBounds().reduced(4);
+        r = getLocalBounds().reduced (4);
         r = r.removeFromTop (configButtonSize);
-        
+
         if (sessionConfigButton.isVisible())
         {
             sessionConfigButton.setBounds (r.removeFromRight (configButtonSize));
             r.removeFromRight (2);
         }
 
-        configButton.setBounds (r.removeFromRight (configButtonSize));        
+        configButton.setBounds (r.removeFromRight (configButtonSize));
     }
 
     Node getGraph() const { return graph; }
-    Node getNode()  const { return node; }
+    Node getNode() const { return node; }
 
 protected:
-    virtual void graphDisplayResized (const Rectangle<int>& area) =0;
-    virtual void graphNodeWillChange() { }
-    virtual void graphNodeChanged (const Node&, const Node&) { }
+    virtual void graphDisplayResized (const Rectangle<int>& area) = 0;
+    virtual void graphNodeWillChange() {}
+    virtual void graphNodeChanged (const Node&, const Node&) {}
 
 private:
     Node graph, node;
@@ -138,4 +139,4 @@ private:
     ConfigButton configButton, sessionConfigButton;
 };
 
-}
+} // namespace Element

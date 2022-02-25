@@ -34,16 +34,16 @@ class MainMenu : public MenuBarModel,
 public:
     enum RootNames
     {
-         File, 
-         Edit, 
-         View, 
-         Options,
-         Window,
-        #if JUCE_DEBUG
-         DebugItem,
-        #endif
-         Help, 
-         NumMenus
+        File,
+        Edit,
+        View,
+        Options,
+        Window,
+#if JUCE_DEBUG
+        DebugItem,
+#endif
+        Help,
+        NumMenus
     };
 
     MainMenu (MainWindow& parent, CommandManager& c);
@@ -62,11 +62,11 @@ public:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int index, const String& name) override;
     void menuItemSelected (int index, int menu) override;
-    
+
     // Command Target
     ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; /* &owner.app(); */ }
-    void getAllCommands (Array <CommandID>&) override { }
-    void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+    void getAllCommands (Array<CommandID>&) override {}
+    void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
     bool perform (const InvocationInfo& info) override { return false; }
 
 private:
@@ -75,7 +75,7 @@ private:
     CommandManager& cmd;
     ScopedPointer<PopupMenu> macMenu;
     const int recentMenuOffset = 20000;
-    
+
     void buildFileMenu (PopupMenu& menu);
     void buildEditMenu (PopupMenu& menu);
     void buildViewMenu (PopupMenu& menu);
@@ -88,4 +88,4 @@ private:
     void addRecentFiles (PopupMenu& menu);
 };
 
-}
+} // namespace Element

@@ -28,11 +28,11 @@ class MidiChannelMap
 public:
     MidiChannelMap()
     {
-        tempMidi.ensureSize (sizeof(uint8) * 3 * 16);
+        tempMidi.ensureSize (sizeof (uint8) * 3 * 16);
         reset();
     }
 
-    ~MidiChannelMap() { }
+    ~MidiChannelMap() {}
 
     inline void reset()
     {
@@ -40,7 +40,7 @@ public:
             while (channelMap.size() <= 16)
                 channelMap.add (0);
         for (int ch = 0; ch <= 16; ++ch)
-            channelMap.getReference(ch) = ch;
+            channelMap.getReference (ch) = ch;
     }
 
     inline void set (const int outputChan) noexcept
@@ -52,8 +52,7 @@ public:
 
     inline void set (const int inputChan, const int outputChan) noexcept
     {
-        jassert (inputChan >= 1 && inputChan <= 16 &&
-                 outputChan >= 1 && outputChan <= 16);
+        jassert (inputChan >= 1 && inputChan <= 16 && outputChan >= 1 && outputChan <= 16);
         channelMap.getReference (inputChan) = outputChan;
     }
 
@@ -72,8 +71,9 @@ public:
     inline void render (MidiBuffer& midi)
     {
         MidiBuffer::Iterator iter (midi);
-        MidiMessage msg; int frame = 0;
-        
+        MidiMessage msg;
+        int frame = 0;
+
         while (iter.getNextEvent (msg, frame))
         {
             process (msg);
@@ -89,8 +89,8 @@ public:
 private:
     // TODO: optimize: use plain C array
     Array<int> channelMap;
-    int channels [17];
+    int channels[17];
     MidiBuffer tempMidi;
 };
 
-}
+} // namespace Element

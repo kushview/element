@@ -23,11 +23,11 @@
 
 namespace Element {
 
-struct Spinner  : public Component,
-                  private Timer
+struct Spinner : public Component,
+                 private Timer
 {
-    Spinner()                       { startTimer (1000 / 50); }
-    void timerCallback() override   { repaint(); }
+    Spinner() { startTimer (1000 / 50); }
+    void timerCallback() override { repaint(); }
     void paint (Graphics& g) override
     {
         getLookAndFeel().drawSpinningWaitAnimation (
@@ -35,4 +35,4 @@ struct Spinner  : public Component,
     }
 };
 
-}
+} // namespace Element

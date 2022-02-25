@@ -22,10 +22,9 @@
 #include "session/Note.h"
 
 namespace Element {
-class NoteClipItem :  public TimelineClip
+class NoteClipItem : public TimelineClip
 {
 public:
-
     typedef std::pair<MidiMessage, MidiMessage> MsgPair;
 
     NoteClipItem (TimelineComponent& owner, const Note& m)
@@ -40,26 +39,28 @@ public:
         trackRequested (127 - model.keyId());
     }
 
-    virtual ~NoteClipItem() { }
+    virtual ~NoteClipItem() {}
 
-    inline void setModel (const Note& n) {
+    inline void setModel (const Note& n)
+    {
         model = n;
     }
 
-    inline void reset() {
+    inline void reset()
+    {
         Note null (Note::make (ValueTree()));
         setModel (null);
     }
 
     inline void
-    getTime (Range<double> &time) const
+        getTime (Range<double>& time) const
     {
         time.setStart (model.tickStart());
         time.setEnd (model.tickEnd());
     }
 
     inline void
-    setTime (const Range<double> &time)
+        setTime (const Range<double>& time)
     {
         model.move (deltas, (time.getStart()));
         model.resize (deltas, (time.getLength()));
@@ -69,7 +70,7 @@ public:
     inline TimeUnit getTimeUnit() const { return TimeUnit::Ticks; }
 
     inline void
-    paint (Graphics &g)
+        paint (Graphics& g)
     {
         if (! isSelected())
             g.setColour (fillColor (model.velocity()));
@@ -83,13 +84,15 @@ public:
 
         if (model.isValid())
             g.drawFittedText (String (model.keyId()),
-                              getLocalBounds(), Justification::centred, 1);
+                              getLocalBounds(),
+                              Justification::centred,
+                              1);
     }
 
     inline int32 trackIndex() const { return 127 - model.keyId(); }
 
     inline int32
-    trackRequested (const int32 track)
+        trackRequested (const int32 track)
     {
         if (! isPositiveAndBelow (track, 128))
             return trackIndex();
@@ -131,4 +134,4 @@ private:
         return colour.getColourAtPosition (velocity);
     }
 };
-}
+} // namespace Element

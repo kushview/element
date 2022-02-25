@@ -33,10 +33,7 @@ class PortComponent : public Component,
 {
 public:
     PortComponent() = delete;
-    PortComponent (const Node& graph, const Node& node,
-                   const uint32 nodeId, const uint32 index, 
-                   const bool isInput, const PortType type, 
-                   const bool vertical);
+    PortComponent (const Node& graph, const Node& node, const uint32 nodeId, const uint32 index, const bool isInput, const PortType type, const bool vertical);
     virtual ~PortComponent();
 
     /** Returns true if this is for an input port */
@@ -57,13 +54,13 @@ public:
     void mouseUp (const MouseEvent& e) override;
 
 private:
-    Node      graph;
-    Node      node;
-    uint32    nodeID    { 0 };
-    uint32    port      { 0 };
-    PortType  type      { PortType::Unknown };
-    bool      input     { true };
-    bool      vertical  { false };
+    Node graph;
+    Node node;
+    uint32 nodeID { 0 };
+    uint32 port { 0 };
+    PortType type { PortType::Unknown };
+    bool input { true };
+    bool vertical { false };
 
     GraphEditorComponent* getGraphEditor() const noexcept;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PortComponent)
@@ -85,23 +82,23 @@ public:
 
     /** Change the power button's visibility */
     void setPowerButtonVisible (bool);
-    
+
     /** Returns the power button */
-    SettingButton& getPowerButton()         { return powerButton; }
+    SettingButton& getPowerButton() { return powerButton; }
 
     //=========================================================================
     /** Change the config button's visibility */
     void setConfigButtonVisible (bool);
 
     /** Returns the config button */
-    SettingButton& getConfigButton()        { return configButton; }
+    SettingButton& getConfigButton() { return configButton; }
 
     //=========================================================================
-    /** Change the mute button's visibility */ 
+    /** Change the mute button's visibility */
     void setMuteButtonVisible (bool);
 
     /** Returns the config button */
-    SettingButton& getMuteButton()          { return muteButton; }
+    SettingButton& getMuteButton() { return muteButton; }
 
     //=========================================================================
     /** Gets the coordinate of the port index 
@@ -144,9 +141,9 @@ private:
     double relativeX = 0.5f;
     double relativeY = 0.5f;
 
-    int pinSize = 9;    
+    int pinSize = 9;
     Font font;
-    
+
     Point<int> originalPos;
     bool selectionMouseDownResult = false;
     bool vertical = true;
@@ -171,7 +168,7 @@ private:
     void setButtonVisible (Button&, bool);
     void setNodePosition (const int x, const int y);
 
-    template<typename T>
+    template <typename T>
     void setNodePosition (const Point<T>& pt)
     {
         const auto pti = pt.toInt();
@@ -183,7 +180,7 @@ private:
     void update (const bool doPosition = true, const bool forcePins = false);
     void handleAsyncUpdate() override;
     void valueChanged (Value& value) override;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlockComponent);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent);
 };
 
 //=============================================================================
@@ -197,4 +194,4 @@ protected:
     BlockFactory() = default;
 };
 
-}
+} // namespace Element

@@ -49,7 +49,7 @@ void OSCReceiverNode::setState (const void* data, int size)
     if (newHostName != currentHostName || newPortNumber != currentPortNumber)
         disconnect();
     if (newConnected)
-        connect(newPortNumber);
+        connect (newPortNumber);
 
     currentHostName = newHostName;
     currentPortNumber = newPortNumber;
@@ -91,7 +91,8 @@ inline void OSCReceiverNode::refreshPorts()
 
 void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
-    if (! outputMidiMessagesInitDone) {
+    if (! outputMidiMessagesInitDone)
+    {
         outputMidiMessages.reset (sampleRate);
         currentSampleRate = sampleRate;
         outputMidiMessagesInitDone = true;
@@ -123,9 +124,7 @@ void OSCReceiverNode::oscMessageReceived (const OSCMessage& message)
     outputMidiMessages.addMessageToQueue (midiMsg);
 };
 
-void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
-{
-};
+void OSCReceiverNode::oscBundleReceived (const OSCBundle& bundle) {};
 
 /** For node editor */
 
@@ -140,37 +139,37 @@ bool OSCReceiverNode::connect (int portNumber)
     return connected;
 }
 
-bool OSCReceiverNode::disconnect ()
+bool OSCReceiverNode::disconnect()
 {
-    if (!connected)
+    if (! connected)
         return true;
     connected = false;
     return oscReceiver.disconnect();
 }
 
-bool OSCReceiverNode::isConnected ()
+bool OSCReceiverNode::isConnected()
 {
     return connected;
 }
 
-void OSCReceiverNode::pause ()
+void OSCReceiverNode::pause()
 {
     paused = true;
 }
 
-void OSCReceiverNode::resume ()
+void OSCReceiverNode::resume()
 {
     paused = false;
 }
 
-bool OSCReceiverNode::isPaused ()
+bool OSCReceiverNode::isPaused()
 {
     return paused;
 }
 
-bool OSCReceiverNode::togglePause ()
+bool OSCReceiverNode::togglePause()
 {
-    if ( paused )
+    if (paused)
         resume();
     else
         pause();
@@ -178,12 +177,12 @@ bool OSCReceiverNode::togglePause ()
     return paused;
 }
 
-int OSCReceiverNode::getCurrentPortNumber ()
+int OSCReceiverNode::getCurrentPortNumber()
 {
     return currentPortNumber;
 }
 
-String OSCReceiverNode::getCurrentHostName ()
+String OSCReceiverNode::getCurrentHostName()
 {
     if (currentHostName == "")
         currentHostName = IPAddress::getLocalAddress().toString();
@@ -212,4 +211,4 @@ void OSCReceiverNode::removeMessageLoopListener (OSCReceiver::Listener<OSCReceiv
     oscReceiver.removeListener (callback);
 }
 
-}
+} // namespace Element

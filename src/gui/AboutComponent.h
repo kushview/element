@@ -38,8 +38,8 @@ public:
 
 private:
     Label titleLabel { "title", Util::appName().toUpperCase() },
-          versionLabel { "version" },
-          copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2019 Kushview, LLC.") };
+        versionLabel { "version" },
+        copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2019 Kushview, LLC.") };
     HyperlinkButton aboutButton { "About Us", URL ("https://kushview.net") };
     Rectangle<float> elementLogoBounds;
     std::unique_ptr<Drawable> elementLogo;
@@ -51,9 +51,10 @@ class AboutDialog : public DialogWindow
 {
 public:
     AboutDialog (GuiController& g)
-        : DialogWindow ("About Element", 
-            g.getLookAndFeel().findColour (DocumentWindow::backgroundColourId),
-            true, false),
+        : DialogWindow ("About Element",
+                        g.getLookAndFeel().findColour (DocumentWindow::backgroundColourId),
+                        true,
+                        false),
           gui (g)
     {
         setUsingNativeTitleBar (true);
@@ -70,4 +71,4 @@ private:
     GuiController& gui;
 };
 
-}
+} // namespace Element

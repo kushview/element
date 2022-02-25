@@ -38,7 +38,7 @@ class ElementsNavigationPanel : public SessionGraphsListBox
 {
 public:
     ElementsNavigationPanel() { setRowHeight (20); }
-    
+
     bool keyPressed (const KeyPress& kp) override
     {
         // Allows menu command to pass through, maybe a better way
@@ -47,177 +47,188 @@ public:
             return Component::keyPressed (kp);
         return ListBox::keyPressed (kp);
     }
-    
-    void paintListBoxItem (int, Graphics&, int, int, bool) override { }
-    
+
+    void paintListBoxItem (int, Graphics&, int, int, bool) override {}
+
     void listBoxItemClicked (int row, const MouseEvent& ev) override
     {
         const Node graph (getSelectedGraph());
-        
+
         if (auto* cc = ViewHelpers::findContentComponent (this))
         {
             auto session (cc->getSession());
             if (row != session->getActiveGraphIndex())
             {
                 auto graphs = graph.getValueTree().getParent();
-                graphs.setProperty (Tags::active, graphs.indexOf(graph.node()), nullptr);
+                graphs.setProperty (Tags::active, graphs.indexOf (graph.node()), nullptr);
                 if (auto* ec = cc->getAppController().findChild<EngineController>())
                     ec->setRootNode (graph);
                 cc->stabilize();
             }
         }
     }
-    
+
     Component* refreshComponentForRow (int row, bool isSelected, Component* c) override
     {
         Row* r = (nullptr == c) ? new Row (*this) : dynamic_cast<Row*> (c);
-        jassert(r);
-        r->updateContent (getGraph(row), row, isSelected);
+        jassert (r);
+        r->updateContent (getGraph (row), row, isSelected);
         return r;
     }
-        
-    private:
-        class Row : public Component,
-                    public Label::Listener,
-                    public Button::Listener
+
+private:
+    class Row : public Component,
+                public Label::Listener,
+                public Button::Listener
+    {
+    public:
+        Row (ElementsNavigationPanel& _owner) : owner (_owner)
         {
-        public:
-            Row (ElementsNavigationPanel& _owner) : owner (_owner)
+            addAndMakeVisible (text);
+            text.setJustificationType (Justification::centredLeft);
+            text.setInterceptsMouseClicks (false, false);
+            text.setColour (Label::textWhenEditingColourId, LookAndFeel::textColor.darker());
+            text.setColour (Label::backgroundWhenEditingColourId, Colours::black);
+            text.addListener (this);
+
+            // TODO: conf button
+            // addAndMakeVisible (conf);
+            conf.setButtonText ("=");
+            conf.addListener (this);
+        }
+
+        ~Row() noexcept
+        {
+            text.removeListener (this);
+        }
+
+        void updateContent (const Node& _node, int _row, bool _selected)
+        {
+            node = _node;
+            row = _row;
+            selected = _selected;
+            if (node.isValid())
+                text.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+        }
+
+        void mouseDown (const MouseEvent& ev) override
+        {
+            owner.selectRow (row);
+
+            if (ev.mods.isPopupMenu() && ! text.isBeingEdited())
             {
-                addAndMakeVisible (text);
-                text.setJustificationType (Justification::centredLeft);
-                text.setInterceptsMouseClicks (false, false);
-                text.setColour (Label::textWhenEditingColourId, LookAndFeel::textColor.darker());
-                text.setColour (Label::backgroundWhenEditingColourId, Colours::black);
-                text.addListener (this);
-                
-                // TODO: conf button
-                // addAndMakeVisible (conf);
-                conf.setButtonText ("=");
-                conf.addListener (this);
+                owner.listBoxItemClicked (row, ev);
+
+                PopupMenu menu;
+                menu.addItem (2, "Rename");
+                menu.addItem (6, "Duplicate");
+                menu.addItem (3, "Delete");
+                menu.addSeparator();
+                menu.addItem (4, "Edit...");
+                menu.addItem (5, "Settings...");
+
+                const auto res = menu.show();
+
+                switch (res)
+                {
+                    case 0:
+                        break;
+                    case 2:
+                        text.showEditor();
+                        break;
+                    case 3:
+                        ViewHelpers::invokeDirectly (this, Commands::sessionDeleteGraph, true);
+                        break;
+                    case 4:
+                        ViewHelpers::invokeDirectly (this, Commands::showGraphEditor, true);
+                        break;
+                    case 5:
+                        ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, true);
+                        break;
+                    case 6:
+                        ViewHelpers::invokeDirectly (this, Commands::sessionDuplicateGraph, true);
+                        break;
+                }
             }
-            
-            ~Row() noexcept 
+            else if (ev.getNumberOfClicks() == 2)
             {
-                text.removeListener (this);
+                if (! text.isBeingEdited())
+                {
+                    text.showEditor();
+                }
             }
-            
-            void updateContent (const Node& _node, int _row, bool _selected)
+            else
             {
-                node        = _node;
-                row         = _row;
-                selected    = _selected;
-                if (node.isValid())
-                    text.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
-            }
-            
-            void mouseDown (const MouseEvent& ev) override
-            {
-                owner.selectRow (row);
-                
-                if (ev.mods.isPopupMenu() && !text.isBeingEdited())
+                if (! text.isBeingEdited())
                 {
                     owner.listBoxItemClicked (row, ev);
+                }
+            }
+        }
 
-                    PopupMenu menu;
-                    menu.addItem (2, "Rename");
-                    menu.addItem (6, "Duplicate");
-                    menu.addItem (3, "Delete");
-                    menu.addSeparator();
-                    menu.addItem (4, "Edit...");
-                    menu.addItem (5, "Settings...");
-                    
-                    const auto res = menu.show();
-                    
-                    switch (res)
-                    {
-                        case 0: break;
-                        case 2: text.showEditor(); break;
-                        case 3: ViewHelpers::invokeDirectly (this, Commands::sessionDeleteGraph, true); break;
-                        case 4: ViewHelpers::invokeDirectly (this, Commands::showGraphEditor, true); break;
-                        case 5: ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, true); break;
-                        case 6: ViewHelpers::invokeDirectly (this, Commands::sessionDuplicateGraph, true); break;
-                    }
-                }
-                else if (ev.getNumberOfClicks() == 2)
-                {
-                    if (! text.isBeingEdited())
-                    {
-                        text.showEditor();
-                    }
-                }
-                else
-                {
-                    if (! text.isBeingEdited())
-                    {
-                        owner.listBoxItemClicked (row, ev);
-                    }
-                }
-            }
-            
-            void paint (Graphics& g) override
+        void paint (Graphics& g) override
+        {
+            if (text.isBeingEdited())
+                g.fillAll (Colours::black);
+            else
+                ViewHelpers::drawBasicTextRow ("", g, getWidth(), getHeight(), selected);
+
+            if (node.isRootGraph())
             {
-                if (text.isBeingEdited())
-                    g.fillAll (Colours::black);
-                else
-                    ViewHelpers::drawBasicTextRow ("", g, getWidth(), getHeight(), selected);
-                
-                if (node.isRootGraph())
-                {
-                    const auto h = getHeight();
-                    const auto w = h;
-                    const int p = 1 + (int) node.getProperty (Tags::midiProgram, -1);
-                    if (p > 0)
-                        g.drawText (String (p), getWidth() - h, 0, w, h, Justification::centred);
-                }
+                const auto h = getHeight();
+                const auto w = h;
+                const int p = 1 + (int) node.getProperty (Tags::midiProgram, -1);
+                if (p > 0)
+                    g.drawText (String (p), getWidth() - h, 0, w, h, Justification::centred);
             }
-            
-            void resized() override
+        }
+
+        void resized() override
+        {
+            auto r (getLocalBounds());
+            r.removeFromRight (4);
+
+            if (conf.isVisible())
             {
-                auto r (getLocalBounds());
+                conf.setBounds (r.removeFromRight (20).withSizeKeepingCentre (16, 16));
                 r.removeFromRight (4);
-                
-                if (conf.isVisible())
-                {
-                    conf.setBounds (r.removeFromRight (20).withSizeKeepingCentre (16, 16));
-                    r.removeFromRight (4);
-                }
-                
-                r.removeFromLeft (10);
-                text.setBounds (r);
             }
-            
-            void labelTextChanged (Label*) override {}
-            void editorShown (Label*, TextEditor&) override
-            {
-                savedText = text.getText();
-                text.setInterceptsMouseClicks (true, true);
-                repaint();
-            }
-            
-            void editorHidden (Label*, TextEditor&) override
-            {
-                if (text.getText().isEmpty())
-                    text.setText (savedText.isNotEmpty() ? savedText : "Untitled", dontSendNotification);
-                text.setInterceptsMouseClicks (false, false);
-                repaint (0, 0, 20, getHeight());
-            }
-            
-            void buttonClicked (Button*) override
-            {
-                owner.selectRow (row);
-                ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, false);
-            }
-            
-        private:
-            ElementsNavigationPanel& owner;
-            Node node;
-            Label text;
-            String savedText;
-            SettingButton conf;
-            int row = 0;
-            bool selected = false;
-        };
+
+            r.removeFromLeft (10);
+            text.setBounds (r);
+        }
+
+        void labelTextChanged (Label*) override {}
+        void editorShown (Label*, TextEditor&) override
+        {
+            savedText = text.getText();
+            text.setInterceptsMouseClicks (true, true);
+            repaint();
+        }
+
+        void editorHidden (Label*, TextEditor&) override
+        {
+            if (text.getText().isEmpty())
+                text.setText (savedText.isNotEmpty() ? savedText : "Untitled", dontSendNotification);
+            text.setInterceptsMouseClicks (false, false);
+            repaint (0, 0, 20, getHeight());
+        }
+
+        void buttonClicked (Button*) override
+        {
+            owner.selectRow (row);
+            ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, false);
+        }
+
+    private:
+        ElementsNavigationPanel& owner;
+        Node node;
+        Label text;
+        String savedText;
+        SettingButton conf;
+        int row = 0;
+        bool selected = false;
+    };
 };
 #endif
 
@@ -240,10 +251,10 @@ public:
         tree->setItemHeight (20);
         tree->setIndentSize (10);
 
-        renameWindow.addButton (TRANS ("Save"),   1, KeyPress (KeyPress::returnKey));
+        renameWindow.addButton (TRANS ("Save"), 1, KeyPress (KeyPress::returnKey));
         renameWindow.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         renameWindow.addTextEditor ("filename", "", "Filename");
-        
+
         setSize (300, 800);
     }
 
@@ -257,13 +268,17 @@ public:
 
     void resized() override
     {
-        tree->setBounds (getLocalBounds().reduced(2));
+        tree->setBounds (getLocalBounds().reduced (2));
     }
-    
-    FileTreeComponent& getFileTreeComponent() {  jassert(tree != nullptr); return *tree; }
+
+    FileTreeComponent& getFileTreeComponent()
+    {
+        jassert (tree != nullptr);
+        return *tree;
+    }
     File getSelectedFile() { return getFileTreeComponent().getSelectedFile(); }
     File getDirectory() { return (list) ? list->getDirectory() : File(); }
-    
+
     void refresh()
     {
         auto state = tree->getOpennessState (true);
@@ -272,14 +287,14 @@ public:
             tree->restoreOpennessState (*state, true);
     }
 
-    virtual void selectionChanged() override { }
+    virtual void selectionChanged() override {}
 
     virtual void fileClicked (const File& file, const MouseEvent& e) override
     {
         if (e.mods.isPopupMenu() && ! file.isDirectory())
             runFileMenu (file);
     }
-    
+
     void fileDoubleClicked (const File& file) override
     {
         auto session = ViewHelpers::getSession (this);
@@ -287,8 +302,7 @@ public:
 
         if (session && cc)
         {
-            if (file.getFileExtension().toLowerCase() == ".elg" ||
-                file.getFileExtension().toLowerCase() == ".els")
+            if (file.getFileExtension().toLowerCase() == ".elg" || file.getFileExtension().toLowerCase() == ".els")
             {
                 cc->post (new OpenSessionMessage (file));
             }
@@ -302,9 +316,10 @@ public:
     }
 
     virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
-    
+
 private:
-    class Filter : public FileFilter {
+    class Filter : public FileFilter
+    {
     public:
         Filter() : FileFilter ("UserDataPath") {}
 
@@ -320,66 +335,72 @@ private:
     std::unique_ptr<FileTreeComponent> tree;
     std::unique_ptr<DirectoryContentsList> list;
     TimeSliceThread thread;
-    
+
     AlertWindow renameWindow;
-    
+
     friend class Timer;
-    void timerCallback() override { }
-    
+    void timerCallback() override {}
+
     void deleteSelectedFile()
     {
         const auto file (getSelectedFile());
         if (! file.existsAsFile())
             return;
-        
-        #if JUCE_WINDOWS
+
+#if JUCE_WINDOWS
         String message ("Would you like to move this file to the Recycle Bin?\n");
-        #else
+#else
         String message ("Would you like to move this file to the trash?\n\n");
-        #endif
-        
+#endif
+
         message << file.getFullPathName();
         if (! AlertWindow::showOkCancelBox (AlertWindow::QuestionIcon, "Delete file", message))
             return;
-        
-        if (! file.deleteFile()) {
+
+        if (! file.deleteFile())
+        {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Delete file", "Could not delete");
-        } else {
+        }
+        else
+        {
             refresh();
         }
     }
-    
+
     void renameSelectedFile()
     {
         const auto file (getSelectedFile());
-        renameWindow.getTextEditor("filename")->setText(getSelectedFile().getFileNameWithoutExtension());
+        renameWindow.getTextEditor ("filename")->setText (getSelectedFile().getFileNameWithoutExtension());
         renameWindow.setAlwaysOnTop (true);
-        renameWindow.centreAroundComponent (ViewHelpers::findContentComponent(this),
-                                            renameWindow.getWidth(), renameWindow.getHeight());
-        renameWindow.enterModalState (true, ModalCallbackFunction::forComponent (renameFileCallback, this),
-                                      false);
+        renameWindow.centreAroundComponent (ViewHelpers::findContentComponent (this),
+                                            renameWindow.getWidth(),
+                                            renameWindow.getHeight());
+        renameWindow.enterModalState (true, ModalCallbackFunction::forComponent (renameFileCallback, this), false);
     }
-    
+
     void closeRenameWindow()
     {
         if (renameWindow.isCurrentlyModal())
             renameWindow.exitModalState (0);
         renameWindow.setVisible (false);
     }
-    
-    static void renameFileCallback (const int res, DataPathTreeComponent* t) { if (t) t->handleRenameFile (res); }
+
+    static void renameFileCallback (const int res, DataPathTreeComponent* t)
+    {
+        if (t)
+            t->handleRenameFile (res);
+    }
     void handleRenameFile (const int result)
     {
         const String newBaseName = renameWindow.getTextEditorContents ("filename");
-        
+
         if (result == 0)
         {
-        
         }
         else
         {
             auto file = getSelectedFile();
-            auto newFile = file.getParentDirectory().getChildFile(newBaseName).withFileExtension(file.getFileExtension());
+            auto newFile = file.getParentDirectory().getChildFile (newBaseName).withFileExtension (file.getFileExtension());
             if (file.moveFileTo (newFile))
             {
                 refresh();
@@ -390,22 +411,30 @@ private:
                 AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "File rename", "Could not rename this file.");
             }
         }
-        
+
         closeRenameWindow();
     }
-    
-    static void fileMenuCallback (const int res, DataPathTreeComponent* t) { if (t) t->handleFileMenu (res); }
+
+    static void fileMenuCallback (const int res, DataPathTreeComponent* t)
+    {
+        if (t)
+            t->handleFileMenu (res);
+    }
     void handleFileMenu (const int res)
     {
         switch (res)
         {
-            case 0: break;
-            case 1: renameSelectedFile(); break;
-            case 2: deleteSelectedFile(); break;
+            case 0:
+                break;
+            case 1:
+                renameSelectedFile();
+                break;
+            case 2:
+                deleteSelectedFile();
+                break;
         }
     }
-    
-    
+
     void runFileMenu (const File& file)
     {
         PopupMenu menu;
@@ -421,23 +450,22 @@ class NavigationConcertinaPanel : public ConcertinaPanel
 {
 public:
     NavigationConcertinaPanel (Globals& g)
-        : globals (g), headerHeight (30),
-          defaultPanelHeight (80)
+        : globals (g), headerHeight (30), defaultPanelHeight (80)
     {
         setLookAndFeel (&lookAndFeel);
     }
-    
+
     ~NavigationConcertinaPanel()
     {
-		clearPanels();
+        clearPanels();
         setLookAndFeel (nullptr);
     }
-    
+
     inline Component* findPanelByName (const String& name)
     {
         for (int i = 0; i < getNumPanels(); ++i)
-            if (getPanel(i)->getName() == name)
-                return getPanel(i);
+            if (getPanel (i)->getName() == name)
+                return getPanel (i);
         return 0;
     }
 
@@ -451,7 +479,7 @@ public:
             auto* const panel = getPanel (i);
             item.setProperty ("index", i, 0)
                 .setProperty ("name", panel->getName(), 0)
-                .setProperty ("h",  panel->getHeight(), 0);
+                .setProperty ("h", panel->getHeight(), 0);
 
             if (auto* ned = dynamic_cast<NodeEditorContentView*> (panel))
                 item.setProperty ("sticky", ned->isSticky(), nullptr);
@@ -462,7 +490,7 @@ public:
         if (auto xml = state.createXml())
             props->setValue ("ccNavPanel", xml.get());
     }
-    
+
     void restoreState (PropertiesFile* props)
     {
         if (auto xml = props->getXmlValue ("ccNavPanel"))
@@ -473,14 +501,14 @@ public:
                 auto item (state.getChild (i));
                 if (auto* c = findPanelByName (item["name"].toString().trim()))
                 {
-                    setPanelSize (c, jmax (10, (int)item["h"]), false);
+                    setPanelSize (c, jmax (10, (int) item["h"]), false);
                     if (auto* ned = dynamic_cast<NodeEditorContentView*> (c))
                         ned->setSticky ((bool) item.getProperty ("sticky", ned->isSticky()));
                 }
             }
         }
     }
-    
+
     int getIndexOfPanel (Component* panel)
     {
         if (nullptr == panel)
@@ -491,32 +519,33 @@ public:
                     return i;
         return -1;
     }
-    
-    template<class T> T* findPanel()
+
+    template <class T>
+    T* findPanel()
     {
         for (int i = getNumPanels(); --i >= 0;)
             if (T* panel = dynamic_cast<T*> (getPanel (i)))
                 return panel;
         return nullptr;
     }
-    
+
     void clearPanels()
     {
         for (int i = 0; i < comps.size(); ++i)
             removePanel (comps.getUnchecked (i));
         comps.clearQuick (true);
     }
-    
+
     void updateContent()
     {
         clearPanels();
 
-       #ifdef EL_PRO
+#ifdef EL_PRO
         auto* sess = new SessionTreePanel();
         sess->setName ("Session");
         sess->setComponentID ("Session");
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
-       #endif
+#endif
 
         auto* gv = new GraphSettingsView();
         gv->setName ("Graph");
@@ -526,7 +555,7 @@ public:
         gv->setPropertyPanelHeaderVisible (false);
         addPanelInternal (-1, gv, "Graph", nullptr);
 
-       #ifndef EL_FREE
+#ifndef EL_FREE
         auto* nv = new NodeEditorContentView();
         nv->setName ("Node");
         nv->setComponentID ("Node");
@@ -536,28 +565,28 @@ public:
         mv->setName ("MIDI");
         mv->setComponentID ("MIDI");
         addPanelInternal (-1, mv, "MIDI", nullptr);
-       #endif
-       
-        auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
+#endif
+
+        auto* pv = new PluginsPanelView (ViewHelpers::getGlobals (this)->getPluginManager());
         pv->setName ("Plugins");
         pv->setComponentID ("Plugins");
         addPanelInternal (-1, pv, "Plugins", 0);
-        
-        auto * dp = new DataPathTreeComponent();
+
+        auto* dp = new DataPathTreeComponent();
         dp->setName ("UserDataPath");
         dp->setComponentID ("UserDataPath");
         dp->getFileTreeComponent().setDragAndDropDescription ("ccNavConcertinaPanel");
         addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
     }
-    
-    AudioIOPanelView* getAudioIOPanel()             { return findPanel<AudioIOPanelView>(); }
-    PluginsPanelView* getPluginsPanel()             { return findPanel<PluginsPanelView>(); }
-    DataPathTreeComponent* getUserDataPathPanel()   { return findPanel<DataPathTreeComponent>(); }
-    SessionTreePanel* getSessionPanel()             { return findPanel<SessionTreePanel>(); }
-    
+
+    AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
+    PluginsPanelView* getPluginsPanel() { return findPanel<PluginsPanelView>(); }
+    DataPathTreeComponent* getUserDataPathPanel() { return findPanel<DataPathTreeComponent>(); }
+    SessionTreePanel* getSessionPanel() { return findPanel<SessionTreePanel>(); }
+
     const StringArray& getNames() const { return names; }
     const int getHeaderHeight() const { return headerHeight; }
-    
+
     void setHeaderHeight (const int newHeight)
     {
         if (newHeight == headerHeight)
@@ -567,60 +596,59 @@ public:
         for (auto* c : comps)
             setPanelHeaderSize (c, headerHeight);
     }
-    
+
 private:
     typedef Element::LookAndFeel ELF;
     Globals& globals;
     int headerHeight;
     int defaultPanelHeight;
-    
+
     StringArray names;
     OwnedArray<Component> comps;
-    void addPanelInternal (const int index, Component* comp, const String& name = String(),
-                           Component* header = nullptr)
+    void addPanelInternal (const int index, Component* comp, const String& name = String(), Component* header = nullptr)
     {
-        jassert(comp);
+        jassert (comp);
         if (name.isNotEmpty())
             comp->setName (name);
-        addPanel (index, comps.insert(index, comp), false);
+        addPanel (index, comps.insert (index, comp), false);
         setPanelHeaderSize (comp, headerHeight);
-        
+
         if (nullptr == header)
             header = new Header (*this, *comp);
         setCustomPanelHeader (comp, header, true);
     }
-    
+
     class Header : public Component
     {
     public:
         Header (NavigationConcertinaPanel& _parent, Component& _panel)
-        : parent(_parent), panel(_panel)
+            : parent (_parent), panel (_panel)
         {
             setInterceptsMouseClicks (false, true);
             addAndMakeVisible (text);
             text.setColour (Label::textColourId, ELF::textColor);
             text.setInterceptsMouseClicks (false, true);
         }
-        
-        virtual ~Header() { }
-        
+
+        virtual ~Header() {}
+
         virtual void resized() override
         {
             text.setBounds (4, 1, 100, getHeight() - 2);
         }
-        
+
         virtual void paint (Graphics& g) override
         {
             getLookAndFeel().drawConcertinaPanelHeader (
-                                                        g, getLocalBounds(), false, false, parent, panel);
+                g, getLocalBounds(), false, false, parent, panel);
         }
-        
+
     protected:
         NavigationConcertinaPanel& parent;
         Component& panel;
         Label text;
     };
-    
+
     class ElementsHeader : public Header,
                            public Button::Listener
     {
@@ -634,15 +662,17 @@ private:
             addButton.addListener (this);
             setInterceptsMouseClicks (false, true);
         }
-        
+
         void resized() override
         {
             const int padding = 5;
             const int buttonSize = getHeight() - (padding * 2);
             addButton.setBounds (getWidth() - padding - buttonSize,
-                                 padding, buttonSize, buttonSize);
+                                 padding,
+                                 buttonSize,
+                                 buttonSize);
         }
-        
+
         static void menuInvocationCallback (int chosenItemID, ElementsHeader* header)
         {
             if (chosenItemID > 0 && header)
@@ -670,13 +700,13 @@ private:
             menu.addSeparator();
             menu.addItem (2, "Add Graph");
             menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&addButton),
-                ModalCallbackFunction::forComponent (menuInvocationCallback, this));
+                                ModalCallbackFunction::forComponent (menuInvocationCallback, this));
         }
-        
+
     private:
         IconButton addButton;
     };
-    
+
     class UserDataPathHeader : public Header,
                                public Button::Listener
     {
@@ -690,25 +720,27 @@ private:
             addButton.setTriggeredOnMouseDown (true);
             setInterceptsMouseClicks (false, true);
         }
-        
+
         void resized() override
         {
             const int padding = 4;
             const int buttonSize = getHeight() - (padding * 2);
             addButton.setBounds (getWidth() - padding - buttonSize,
-                                 padding, buttonSize, buttonSize);
+                                 padding,
+                                 buttonSize,
+                                 buttonSize);
         }
-        
+
         void buttonClicked (Button*) override
         {
             PopupMenu menu;
             menu.addItem (1, "Refresh...");
             menu.addSeparator();
-           #if JUCE_MAC
+#if JUCE_MAC
             String name = "Show in Finder";
-           #else
-			String name = "Show in Explorer";
-           #endif
+#else
+            String name = "Show in Explorer";
+#endif
             menu.addItem (2, name);
             const int res = menu.show();
             if (res == 1)
@@ -726,28 +758,25 @@ private:
                     file.revealToUser();
             }
         }
-        
+
     private:
         DataPathTreeComponent& tree;
         TextButton addButton;
     };
-    
+
     class LookAndFeel : public Element::LookAndFeel
     {
     public:
-        LookAndFeel() { }
-        ~LookAndFeel() { }
-        
-        void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
-                                        bool isMouseOver, bool isMouseDown,
-                                        ConcertinaPanel& panel, Component& comp)
+        LookAndFeel() {}
+        ~LookAndFeel() {}
+
+        void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area, bool isMouseOver, bool isMouseDown, ConcertinaPanel& panel, Component& comp)
         {
             ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
             g.setColour (Colours::white);
             Rectangle<int> r (area.withTrimmedLeft (20));
-            g.drawText (comp.getName(), 20, 0, r.getWidth(), r.getHeight(),
-                        Justification::centredLeft);
+            g.drawText (comp.getName(), 20, 0, r.getWidth(), r.getHeight(), Justification::centredLeft);
         }
     } lookAndFeel;
 };
-}
+} // namespace Element

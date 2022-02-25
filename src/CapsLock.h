@@ -23,4 +23,4 @@ namespace Element {
 /** Returns true if caps lock is currently down */
 bool isCapsLockOn();
 
-}
+} // namespace Element

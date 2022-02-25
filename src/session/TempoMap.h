@@ -21,16 +21,15 @@
 #define EL_TEMPO_MAP_H
 
 namespace Element {
-class TempoMap :  public ObjectModel
+class TempoMap : public ObjectModel
 {
 public:
-    TempoMap ()
-        : ObjectModel ()
+    TempoMap()
+        : ObjectModel()
     {
-
     }
 };
 
-}
+} // namespace Element
 
-#endif  /* EL_TEMPO_MAP_H */
+#endif /* EL_TEMPO_MAP_H */

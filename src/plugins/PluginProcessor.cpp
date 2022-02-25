@@ -44,10 +44,9 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
         const Node node (tree, true);
         ignoreUnused (node);
     }
-    else if (tree.hasType (Tags::controller) ||
-             tree.hasType (Tags::control))
+    else if (tree.hasType (Tags::controller) || tree.hasType (Tags::control))
     {
-        PLUGIN_DBG("[EL] set missing for: " << tree.getProperty(Tags::name).toString());
+        PLUGIN_DBG ("[EL] set missing for: " << tree.getProperty (Tags::name).toString());
     }
 }
 
@@ -64,7 +63,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
       variant (instanceType)
 {
     setRateAndBufferSizeDetails (sampleRate, bufferSize);
-    numIns  = getTotalNumInputChannels();
+    numIns = getTotalNumInputChannels();
     numOuts = getTotalNumOutputChannels();
 
     for (int i = 0; i < 8; ++i)
@@ -92,18 +91,16 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     // time. plugins are handled different by each one, so it's best to keep
     // our engine running at all times to reduce massive plugin unloads and
     // re-loads back to back.
-    engine->prepareExternalPlayback (sampleRate, bufferSize,
-                                     getTotalNumInputChannels(),
-                                     getTotalNumOutputChannels());
+    engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
     session->clear();
     if (MessageManager::getInstance()->isThisTheMessageThread())
     {
         session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
-        PLUGIN_DBG("[EL] default graph created");
+        PLUGIN_DBG ("[EL] default graph created");
     }
     else
     {
-        PLUGIN_DBG("[EL] couldn't create default graph");
+        PLUGIN_DBG ("[EL] couldn't create default graph");
     }
 
     controller.reset (new AppController (*world, RunMode::Plugin));
@@ -144,29 +141,40 @@ const String PluginProcessor::getName() const
 {
     switch (variant)
     {
-        case Instrument:    return "Element"; break;
-        case Effect:        return "Element FX"; break;
-        case MidiEffect:    return "Element MFX"; break;
-        default: break;
+        case Instrument:
+            return "Element";
+            break;
+        case Effect:
+            return "Element FX";
+            break;
+        case MidiEffect:
+            return "Element MFX";
+            break;
+        default:
+            break;
     }
 
     jassertfalse;
     return "Element";
 }
 
-bool PluginProcessor::acceptsMidi() const   { return true; }
-bool PluginProcessor::producesMidi() const  { return true; }
-bool PluginProcessor::isMidiEffect() const  { return variant == MidiEffect; }
+bool PluginProcessor::acceptsMidi() const { return true; }
+bool PluginProcessor::producesMidi() const { return true; }
+bool PluginProcessor::isMidiEffect() const { return variant == MidiEffect; }
 
 double PluginProcessor::getTailLengthSeconds() const { return 0.0; }
 
-int PluginProcessor::getNumPrograms()       { return 1; }
-int PluginProcessor::getCurrentProgram()    { return 0; }
+int PluginProcessor::getNumPrograms() { return 1; }
+int PluginProcessor::getCurrentProgram() { return 0; }
 void PluginProcessor::setCurrentProgram (int index) { ignoreUnused (index); }
-const String PluginProcessor::getProgramName (int index) { ignoreUnused (index); return { "Default" }; }
+const String PluginProcessor::getProgramName (int index)
+{
+    ignoreUnused (index);
+    return { "Default" };
+}
 void PluginProcessor::changeProgramName (int index, const String& newName) { ignoreUnused (index, newName); }
 
-void PluginProcessor::prepareToPlay(double sr, int bs)
+void PluginProcessor::prepareToPlay (double sr, int bs)
 {
     if (! MessageManager::getInstance()->isThisTheMessageThread())
     {
@@ -175,20 +183,16 @@ void PluginProcessor::prepareToPlay(double sr, int bs)
         return;
     }
 
-    PLUGIN_DBG("[EL] prepare to play: prepared=" << (int) prepared <<
-        " sampleRate: " << sampleRate <<
-        " buff: " << bufferSize <<
-		" numIns: " << numIns <<
-        " numOuts: " << numOuts);
-    
+    PLUGIN_DBG ("[EL] prepare to play: prepared=" << (int) prepared << " sampleRate: " << sampleRate << " buff: " << bufferSize << " numIns: " << numIns << " numOuts: " << numOuts);
+
     const bool channelCountsChanged = numIns != getTotalNumInputChannels()
-                                  || numOuts != getTotalNumOutputChannels();
+                                      || numOuts != getTotalNumOutputChannels();
     const bool detailsChanged = sampleRate != sr || bufferSize != bs || channelCountsChanged;
-    
-	numIns		= getTotalNumInputChannels();
-	numOuts		= getTotalNumOutputChannels();
-	sampleRate	= sr;
-	bufferSize	= bs;
+
+    numIns = getTotalNumInputChannels();
+    numOuts = getTotalNumOutputChannels();
+    sampleRate = sr;
+    bufferSize = bs;
 
     if (! prepared || detailsChanged)
     {
@@ -196,21 +200,18 @@ void PluginProcessor::prepareToPlay(double sr, int bs)
 
         auto& plugins (world->getPluginManager());
         plugins.setPlayConfig (sampleRate, bufferSize);
-        
+
         if (detailsChanged)
         {
-            PLUGIN_DBG("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " <<
-                 getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
-            
+            PLUGIN_DBG ("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
+
             if (channelCountsChanged) // && preparedCount <= 0)
             {
                 engine->releaseExternalResources();
-                engine->prepareExternalPlayback (sampleRate, bufferSize,
-                                                 getTotalNumInputChannels(),
-                                                 getTotalNumOutputChannels());
+                engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
                 updateLatencySamples();
             }
-            
+
             triggerAsyncUpdate();
             preparedCount++;
         }
@@ -225,7 +226,7 @@ void PluginProcessor::prepareToPlay(double sr, int bs)
 
 void PluginProcessor::releaseResources()
 {
-    PLUGIN_DBG("[EL] release resources: " << (int) prepared);
+    PLUGIN_DBG ("[EL] release resources: " << (int) prepared);
     if (engine)
         engine->sampleLatencyChanged.disconnect_all_slots();
     if (prepared)
@@ -236,7 +237,7 @@ void PluginProcessor::releaseResources()
 
 void PluginProcessor::reloadEngine()
 {
-    jassert(MessageManager::getInstance()->isThisTheMessageThread());
+    jassert (MessageManager::getInstance()->isThisTheMessageThread());
 
     const bool wasSuspended = isSuspended();
     suspendProcessing (true);
@@ -244,9 +245,7 @@ void PluginProcessor::reloadEngine()
     auto session = world->getSession();
     session->saveGraphState();
     engine->releaseExternalResources();
-    engine->prepareExternalPlayback (sampleRate, bufferSize,
-                                     getTotalNumInputChannels(),
-                                     getTotalNumOutputChannels());
+    engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
     updateLatencySamples();
 
     session->restoreGraphState();
@@ -254,13 +253,13 @@ void PluginProcessor::reloadEngine()
     enginectl->syncModels();
     guictl->stabilizeContent();
     devsctl->refresh();
-    
+
     suspendProcessing (wasSuspended);
 }
 
 void PluginProcessor::reset()
 {
-    PLUGIN_DBG("[EL] plugin reset");
+    PLUGIN_DBG ("[EL] plugin reset");
 }
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -270,16 +269,12 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
     {
         case Instrument:
             // require at least a main output bus
-            supported = layouts.outputBuses.size() > 0 &&
-                        layouts.getNumChannels (false, 0) > 0;
+            supported = layouts.outputBuses.size() > 0 && layouts.getNumChannels (false, 0) > 0;
             break;
 
         case Effect:
             // require at least a main input and output bus
-            supported = layouts.inputBuses.size() > 0 &&
-                        layouts.getNumChannels (true, 0) > 0 &&
-                        layouts.outputBuses.size() > 0 &&
-                        layouts.getNumChannels (false, 0) > 0;
+            supported = layouts.inputBuses.size() > 0 && layouts.getNumChannels (true, 0) > 0 && layouts.outputBuses.size() > 0 && layouts.getNumChannels (false, 0) > 0;
             break;
 
         case MidiEffect:
@@ -306,7 +301,7 @@ void PluginProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi)
     if (auto* playhead = getPlayHead())
         if (engine->isUsingExternalClock())
             engine->processExternalPlayhead (playhead, buffer.getNumSamples());
-    
+
     // clear garbage in extra output channels.
     for (int i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
@@ -352,90 +347,89 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    PLUGIN_DBG("[EL] restore state: prepared: " << (int) prepared);
-    
+    PLUGIN_DBG ("[EL] restore state: prepared: " << (int) prepared);
+
     auto session = world->getSession();
     if (! session || ! shouldProcess.get())
         return;
-    
+
     mapsctl->learn (false);
-    
+
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
     {
         String error;
         ValueTree newData = ValueTree::fromXml (*xml);
-        if (!newData.isValid() || !newData.hasType (Tags::session))
+        if (! newData.isValid() || ! newData.hasType (Tags::session))
             error = "Invalid session state information provided.";
-        if (error.isEmpty() && !session->loadData (newData))
+        if (error.isEmpty() && ! session->loadData (newData))
             error = "Could not load session data.";
-        
+
         if (error.isNotEmpty())
         {
-            PLUGIN_DBG("[EL] plugin failed restoring state: " << error);
+            PLUGIN_DBG ("[EL] plugin failed restoring state: " << error);
         }
         else
         {
             typedef Rectangle<int> RI;
             editorBounds = RI::fromString (session->getProperty (
-                "pluginEditorBounds", RI().toString()).toString());
+                                                      "pluginEditorBounds", RI().toString())
+                                               .toString());
             editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
-            setForceZeroLatency ((bool)session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
+            setForceZeroLatency ((bool) session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
             session->forEach (setPluginMissingNodeProperties);
             for (auto* const param : perfparams)
                 param->clearNode();
         }
-        
+
         triggerAsyncUpdate();
-        
+
         if (prepared)
         {
-            PLUGIN_DBG("[EL] plugin restored state while already prepared");
+            PLUGIN_DBG ("[EL] plugin restored state while already prepared");
         }
         else
         {
-            PLUGIN_DBG("[EL] plugin tried to restore state when not prepared");
+            PLUGIN_DBG ("[EL] plugin tried to restore state when not prepared");
         }
     }
 }
 
 void PluginProcessor::numChannelsChanged()
 {
-    PLUGIN_DBG("[EL] num channels changed: " <<
-        getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
+    PLUGIN_DBG ("[EL] num channels changed: " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
 }
 
 void PluginProcessor::numBusesChanged()
 {
-    PLUGIN_DBG("[EL] num buses changed: " <<
-        getBusCount (true) << "/" << getBusCount (false));
+    PLUGIN_DBG ("[EL] num buses changed: " << getBusCount (true) << "/" << getBusCount (false));
 }
 
 void PluginProcessor::processorLayoutsChanged()
 {
-    PLUGIN_DBG("[EL] layout changed: prepared: " << (int) prepared);
+    PLUGIN_DBG ("[EL] layout changed: prepared: " << (int) prepared);
     triggerAsyncUpdate();
 }
 
 void PluginProcessor::handleAsyncUpdate()
 {
-    PLUGIN_DBG("[EL] handle async update");
+    PLUGIN_DBG ("[EL] handle async update");
     reloadEngine();
-    
+
     auto session = world->getSession();
     const auto ppData = session->getValueTree().getChildWithName ("perfParams");
-    
+
     for (int i = 0; i < ppData.getNumChildren(); ++i)
     {
         const auto data = ppData.getChild (i);
-        const int index         = (int) data [Tags::index];
+        const int index = (int) data[Tags::index];
         if (! isPositiveAndBelow (index, 8))
             continue;
-        const int parameter     = (int) data [Tags::parameter];
-        const String uuid       = data[Tags::node].toString();
+        const int parameter = (int) data[Tags::parameter];
+        const String uuid = data[Tags::node].toString();
         if (uuid.isEmpty())
             continue;
-        const Node node         = session->findNodeById (Uuid (uuid));
-        auto* const param       = perfparams [index];
+        const Node node = session->findNodeById (Uuid (uuid));
+        auto* const param = perfparams[index];
         if (param != nullptr && node.isValid())
             param->bindToNode (node, parameter);
     }
@@ -454,8 +448,8 @@ bool PluginProcessor::isNodeBoundToAnyPerformanceParameter (const Node& boundNod
 }
 
 PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
-{ 
-    auto* const paramObj = perfparams [perfParam];
+{
+    auto* const paramObj = perfparams[perfParam];
     if (nullptr == paramObj)
         return PopupMenu();
 
@@ -477,18 +471,18 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
             auto* proc = ptr->getAudioProcessor();
             if (proc == nullptr)
                 continue;
-            
+
             for (int k = 0; k < proc->getParameters().size(); ++k)
             {
                 auto* const param = proc->getParameters()[k];
                 if (! param->isAutomatable())
                     continue;
-                
-                const bool isMine  = paramObj->getNode() == node && k == paramObj->getBoundParameter();
-                const bool isBound = isNodeBoundToAnyPerformanceParameter (node, k);
-                submenu.addItem (++menuIdx, param->getName (100), !isBound || isMine, isMine);
 
-                auto* const item = menuMap.add (new PerfParamMenuItem ());
+                const bool isMine = paramObj->getNode() == node && k == paramObj->getBoundParameter();
+                const bool isBound = isNodeBoundToAnyPerformanceParameter (node, k);
+                submenu.addItem (++menuIdx, param->getName (100), ! isBound || isMine, isMine);
+
+                auto* const item = menuMap.add (new PerfParamMenuItem());
                 item->node = node;
                 item->parameter = k;
             }
@@ -498,12 +492,11 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
         }
     }
 
-    if (menu.getNumItems() > 0 &&
-        isNodeBoundToAnyPerformanceParameter (paramObj->getNode(), paramObj->getBoundParameter()))
+    if (menu.getNumItems() > 0 && isNodeBoundToAnyPerformanceParameter (paramObj->getNode(), paramObj->getBoundParameter()))
     {
         menu.addSeparator();
         menu.addItem (++menuIdx, "Unlink");
-        auto* const item = menuMap.add (new PerfParamMenuItem ());
+        auto* const item = menuMap.add (new PerfParamMenuItem());
         item->node = paramObj->getNode();
         item->parameter = paramObj->getBoundParameter();
         item->unlink = true;
@@ -514,11 +507,11 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
 
 void PluginProcessor::handlePerformanceParameterResult (int result, int perfParam)
 {
-    auto* const param = perfparams [perfParam];
+    auto* const param = perfparams[perfParam];
     if (! param)
         return;
-    
-    if (auto* item = menuMap [result - 1])
+
+    if (auto* item = menuMap[result - 1])
     {
         if (item->unlink)
         {
@@ -526,9 +519,7 @@ void PluginProcessor::handlePerformanceParameterResult (int result, int perfPara
         }
         else
         {
-            const bool wasAlreadyBound = param->haveNode() && 
-                param->getNode() == item->node && 
-                param->getBoundParameter() == item->parameter;
+            const bool wasAlreadyBound = param->haveNode() && param->getNode() == item->node && param->getBoundParameter() == item->parameter;
             param->clearNode();
             if (! wasAlreadyBound)
                 param->bindToNode (item->node, item->parameter);
@@ -536,7 +527,7 @@ void PluginProcessor::handlePerformanceParameterResult (int result, int perfPara
 
         param->updateValue();
     }
-    
+
     onPerfParamsChanged();
     menuMap.clearQuick (true);
 }
@@ -567,20 +558,21 @@ AudioProcessor::BusesProperties PluginProcessor::createDefaultBuses (PluginProce
 {
     if (variant == PluginProcessor::MidiEffect)
         return {};
-    
+
     const auto stereo = AudioChannelSet::stereo();
 
     AudioProcessor::BusesProperties buses;
-    buses.addBus (true,  "Main", stereo, variant == PluginProcessor::Effect);
+    buses.addBus (true, "Main", stereo, variant == PluginProcessor::Effect);
     buses.addBus (false, "Main", stereo, true);
     for (int i = 0; i < numAux; ++i)
     {
-        String name = "Aux "; name << String (i + 1);
-        buses.addBus (true,  name, stereo, false);
+        String name = "Aux ";
+        name << String (i + 1);
+        buses.addBus (true, name, stereo, false);
         buses.addBus (false, name, stereo, false);
     }
-    
+
     return buses;
 }
 
-}
+} // namespace Element

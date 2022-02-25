@@ -14,9 +14,9 @@ void NodePropertyPanel::initialize()
 void NodePropertyPanel::addProperties (const Node& node, int extraSpace)
 {
     sync.reset (nullptr);
-    
+
     clear();
-    
+
     if (node.isValid())
     {
         NodeProperties props (node, NodeProperties::General);
@@ -31,4 +31,4 @@ void NodePropertyPanel::addProperties (const Node& node, int extraSpace)
     refreshAll();
 }
 
-}
+} // namespace Element

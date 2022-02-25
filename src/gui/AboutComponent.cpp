@@ -20,34 +20,34 @@
 #include "gui/AboutComponent.h"
 #include "Version.h"
 
-#define EL_LICENSE_TEXT \
-"Copyright (C) 2014-%YEAR%  Kushview, LLC.  All rights reserved.\r\n\r\n" \
-\
-"This program is free software; you can redistribute it and/or modify\r\n" \
-"it under the terms of the GNU General Public License as published by\r\n" \
-"the Free Software Foundation; either version 3 of the License, or\r\n" \
-"(at your option) any later version.\r\n\r\n" \
-\
-"This program is distributed in the hope that it will be useful,\r\n" \
-"but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n" \
-"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n" \
-"GNU General Public License for more details.\r\n\r\n" \
-\
-"You should have received a copy of the GNU General Public License\r\n" \
-"along with this program; if not, write to the Free Software\r\n" \
-"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\r\n"
+#define EL_LICENSE_TEXT                                                        \
+    "Copyright (C) 2014-%YEAR%  Kushview, LLC.  All rights reserved.\r\n\r\n"  \
+                                                                               \
+    "This program is free software; you can redistribute it and/or modify\r\n" \
+    "it under the terms of the GNU General Public License as published by\r\n" \
+    "the Free Software Foundation; either version 3 of the License, or\r\n"    \
+    "(at your option) any later version.\r\n\r\n"                              \
+                                                                               \
+    "This program is distributed in the hope that it will be useful,\r\n"      \
+    "but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n"       \
+    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n"        \
+    "GNU General Public License for more details.\r\n\r\n"                     \
+                                                                               \
+    "You should have received a copy of the GNU General Public License\r\n"    \
+    "along with this program; if not, write to the Free Software\r\n"          \
+    "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\r\n"
 
 namespace Element {
 namespace About {
 
-static StringArray getDevelopers() 
-{
-    const auto str = String(BinaryData::developers_txt, BinaryData::developers_txtSize);
-    StringArray devs;
-    devs.addTokens(str, "\n", {});
-    return devs;
-}
-}
+    static StringArray getDevelopers()
+    {
+        const auto str = String (BinaryData::developers_txt, BinaryData::developers_txtSize);
+        StringArray devs;
+        devs.addTokens (str, "\n", {});
+        return devs;
+    }
+} // namespace About
 
 class AboutCreditsPanel : public Component
 {
@@ -56,7 +56,7 @@ public:
     {
         setSize (100, 24);
     }
-    
+
     void addSection (const String& title, const StringArray& names)
     {
         auto* section = sections.add (new Section());
@@ -103,7 +103,10 @@ private:
         auto size = sections.size() * titleHeight;
         for (auto* section : sections)
             for (auto* name : section->names)
-                { size += nameHeight; ignoreUnused (name); }
+            {
+                size += nameHeight;
+                ignoreUnused (name);
+            }
         return size;
     }
 };
@@ -141,7 +144,7 @@ public:
         text.setCaretVisible (false);
         text.setMultiLine (true, false);
         text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
-        text.setText (String(EL_LICENSE_TEXT).replace ("%YEAR%", String (Time::getCurrentTime().getYear())));
+        text.setText (String (EL_LICENSE_TEXT).replace ("%YEAR%", String (Time::getCurrentTime().getYear())));
         text.setReadOnly (true);
     }
 
@@ -191,11 +194,11 @@ AboutComponent::AboutComponent()
 
     auto buildDate = Time::getCompilationDate();
     addAndMakeVisible (versionLabel);
-    versionLabel.setText (String("Version: ") + Version::withGitHash()
-                            + "\nBuild date: " + String (buildDate.getDayOfMonth())
-                                                + " " + Time::getMonthName (buildDate.getMonth(), true)
-                                                + " " + String (buildDate.getYear()),
-                            dontSendNotification);
+    versionLabel.setText (String ("Version: ") + Version::withGitHash()
+                              + "\nBuild date: " + String (buildDate.getDayOfMonth())
+                              + " " + Time::getMonthName (buildDate.getMonth(), true)
+                              + " " + String (buildDate.getYear()),
+                          dontSendNotification);
 
     versionLabel.setJustificationType (Justification::centred);
     versionLabel.setFont (Font (13.f));
@@ -204,7 +207,7 @@ AboutComponent::AboutComponent()
     copyrightLabel.setJustificationType (Justification::centred);
     copyrightLabel.setFont (Font (13.f));
     String copyrightText = "Copyright ";
-    copyrightText << String(CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
+    copyrightText << String (CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
     copyrightLabel.setText (copyrightText.replace ("XXX", String (buildDate.getYear())),
                             dontSendNotification);
 
@@ -226,14 +229,9 @@ AboutComponent::AboutComponent()
     // donors->getPanel().addSection ("Gold Sponsors", { "None" });
     // donors->getPanel().addSection ("Silver Sponsors", { "None" });
     // donors->getPanel().addSection ("Gold Backers", { "None" });
-    donors->getPanel().addSection ("Sponsors", {
-        "Davide Anselmi",
-        "Greg Gibbs",
-        "Kent Kingery",
-        "Michael Kıral"
-    });
+    donors->getPanel().addSection ("Sponsors", { "Davide Anselmi", "Greg Gibbs", "Kent Kingery", "Michael Kıral" });
 
-    tabs.addTab ("Donors",  tabc, donors, true);
+    tabs.addTab ("Donors", tabc, donors, true);
     tabs.addTab ("License", tabc, new LicenseTextComponent(), true);
     tabs.addTab ("Credits", tabc, new AckTextComponent(), true);
     setSize (510, 330);
@@ -260,4 +258,4 @@ void AboutComponent::paint (Graphics& g)
         elementLogo->drawWithin (g, elementLogoBounds, RectanglePlacement::centred, 1.0);
 }
 
-}
+} // namespace Element

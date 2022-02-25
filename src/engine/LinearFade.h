@@ -21,8 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element
-{
+namespace Element {
 
 class LinearFade
 {
@@ -108,7 +107,11 @@ private:
         fadeRate = (length > 0.0f ? static_cast<float> (1.0f / (length * sr)) : -1.0f);
     }
 
-    enum State { Idle, Fading };
+    enum State
+    {
+        Idle,
+        Fading
+    };
     State state = Idle;
     double sr { 0.0 };
     bool fadesIn { true };
@@ -117,4 +120,4 @@ private:
     float fadeRate { 0.f };
 };
 
-}
+} // namespace Element

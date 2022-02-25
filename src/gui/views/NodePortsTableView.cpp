@@ -9,12 +9,9 @@ NodePortsTable::NodePortsTable()
 {
     setModel (this);
     auto& header = getHeader();
-    header.addColumn ("",     VisibleColumn, 30, 30, 30, 
-        TableHeaderComponent::defaultFlags);
-    header.addColumn ("Name", NameColumn,    100, 30, -1,
-        TableHeaderComponent::defaultFlags);
-    header.addColumn ("Type", TypeColumn,    100, 30, -1,
-        TableHeaderComponent::defaultFlags);
+    header.addColumn ("", VisibleColumn, 30, 30, 30, TableHeaderComponent::defaultFlags);
+    header.addColumn ("Name", NameColumn, 100, 30, -1, TableHeaderComponent::defaultFlags);
+    header.addColumn ("Type", TypeColumn, 100, 30, -1, TableHeaderComponent::defaultFlags);
     setSize (320, 280);
 }
 
@@ -49,22 +46,17 @@ void NodePortsTable::paintCell (Graphics& g, int rowNumber, int columnId, int wi
             Rectangle<float> r (0.0, 0.0, sz, sz);
             r.reduce (3, 3);
             getLookAndFeel().drawTickBox (
-                g, *this, 
-                r.getX(), r.getY(), 
-                r.getWidth(), r.getHeight(),
-                !port.isHiddenOnBlock(), 
-                true, false, false
-            );
+                g, *this, r.getX(), r.getY(), r.getWidth(), r.getHeight(), ! port.isHiddenOnBlock(), true, false, false);
             break;
         }
 
         case NameColumn: {
-            text = port.getName() ; 
+            text = port.getName();
             break;
         }
 
         case TypeColumn: {
-            text = port.getType().getName() + String (port.isInput() ? " In" : " Out"); 
+            text = port.getType().getName() + String (port.isInput() ? " In" : " Out");
             break;
         }
     }
@@ -103,6 +95,6 @@ NodePortsTableView::NodePortsTableView()
 NodePortsTableView::~NodePortsTableView()
 {
     content.reset();
-}  
-
 }
+
+} // namespace Element

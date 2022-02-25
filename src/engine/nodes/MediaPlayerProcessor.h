@@ -27,9 +27,14 @@ class MediaPlayerProcessor : public BaseProcessor,
                              public AudioProcessorParameter::Listener
 {
 public:
-    enum Parameters { Playing = 0, Slave, Volume };
+    enum Parameters
+    {
+        Playing = 0,
+        Slave,
+        Volume
+    };
 
-    MediaPlayerProcessor ();
+    MediaPlayerProcessor();
     virtual ~MediaPlayerProcessor();
 
     void openFile (const File& file);
@@ -43,22 +48,34 @@ public:
     void releaseResources() override;
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
-    bool canAddBus (bool isInput) const override                     { ignoreUnused (isInput); return false; }
-    bool canRemoveBus (bool isInput) const override                  { ignoreUnused (isInput); return false; }
+    bool canAddBus (bool isInput) const override
+    {
+        ignoreUnused (isInput);
+        return false;
+    }
+    bool canRemoveBus (bool isInput) const override
+    {
+        ignoreUnused (isInput);
+        return false;
+    }
 
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    double getTailLengthSeconds() const override        { return 0.0; }
-    bool acceptsMidi() const override                   { return false; }
-    bool producesMidi() const override                  { return false; }
-    bool supportsMPE() const override                   { return false; }
-    bool isMidiEffect() const override                  { return false; }
+    double getTailLengthSeconds() const override { return 0.0; }
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
+    bool supportsMPE() const override { return false; }
+    bool isMidiEffect() const override { return false; }
 
-    int getNumPrograms() override                       { return 1; };
-    int getCurrentProgram() override                    { return 0; };
-    void setCurrentProgram (int index) override         { ignoreUnused (index); };
-    const String getProgramName (int index) override    { ignoreUnused (index); return getName(); }
+    int getNumPrograms() override { return 1; };
+    int getCurrentProgram() override { return 0; };
+    void setCurrentProgram (int index) override { ignoreUnused (index); };
+    const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return getName();
+    }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
     void getStateInformation (juce::MemoryBlock& destData) override;
@@ -68,10 +85,10 @@ public:
     void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
 
     AudioTransportSource& getPlayer() { return player; }
-    
+
 protected:
     bool isBusesLayoutSupported (const BusesLayout&) const override;
-    
+
 #if 0
     // Audio Processor Template
     
@@ -109,9 +126,9 @@ private:
     AudioFormatManager formats;
     AudioTransportSource player;
 
-    AudioParameterBool* slave       { nullptr };
-    AudioParameterBool* playing     { nullptr };
-    AudioParameterFloat* volume     { nullptr };
+    AudioParameterBool* slave { nullptr };
+    AudioParameterBool* playing { nullptr };
+    AudioParameterFloat* volume { nullptr };
 
     File audioFile;
 
@@ -119,4 +136,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MediaPlayerProcessor)
 };
 
-}
+} // namespace Element

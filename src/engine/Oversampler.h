@@ -28,23 +28,26 @@ class Oversampler final
 {
 public:
     using ProcessorType = juce::dsp::Oversampling<SampleType>;
-    
+
     Oversampler() = default;
     ~Oversampler();
 
-    int getNumProcessors()                      const { return processors.size(); }
-    ProcessorType* getProcessor (int index)     const { return processors [index]; }
-    
+    int getNumProcessors() const { return processors.size(); }
+    ProcessorType* getProcessor (int index) const { return processors[index]; }
+
     float getLatencySamples (int index) const;
     int getFactor (int index) const;
     void prepare (int numChannels, int blockSize);
     void reset();
 
 private:
-    enum { maxProc = 3 };
+    enum
+    {
+        maxProc = 3
+    };
     int channels = 0,
         buffer = 0;
     OwnedArray<ProcessorType> processors;
 };
 
-}
+} // namespace Element

@@ -57,15 +57,15 @@ struct RootGraphRender : public AsyncUpdater
     const int getCurrentGraphIndex() const { return currentGraph; }
 
     RootGraph* getCurrentGraph() const
-    { 
-        return isPositiveAndBelow (currentGraph, graphs.size()) ? graphs.getUnchecked(currentGraph) 
-                                                                : nullptr; 
+    {
+        return isPositiveAndBelow (currentGraph, graphs.size()) ? graphs.getUnchecked (currentGraph)
+                                                                : nullptr;
     }
 
     void prepareBuffers (const int numIns, const int numOuts, const int numSamples)
     {
-        numInputChans   = numIns;
-        numOutputChans  = numOuts;
+        numInputChans = numIns;
+        numOutputChans = numOuts;
         audioTemp.setSize (jmax (numIns, numOuts), numSamples);
         audioOut.setSize (audioTemp.getNumChannels(), audioTemp.getNumSamples());
     }
@@ -78,9 +78,9 @@ struct RootGraphRender : public AsyncUpdater
         audioTemp.setSize (1, 1);
         audioOut.setSize (1, 1);
     }
-    
-    void dumpGraphs() {
-        
+
+    void dumpGraphs()
+    {
     }
 
     void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
@@ -93,9 +93,9 @@ struct RootGraphRender : public AsyncUpdater
             program.reset();
         }
 
-        auto* const current  = getCurrentGraph();
-        auto* const last     = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph(lastGraph) : nullptr;
-        
+        auto* const current = getCurrentGraph();
+        auto* const last = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph (lastGraph) : nullptr;
+
         if (current == nullptr || last == nullptr)
         {
             buffer.clear();
@@ -104,7 +104,7 @@ struct RootGraphRender : public AsyncUpdater
         }
 
         const int numSamples = buffer.getNumSamples();
-        const int numChans   = buffer.getNumChannels();
+        const int numChans = buffer.getNumChannels();
         const bool graphChanged = lastGraph != currentGraph;
         const bool shouldProcess = true;
         const RootGraph::RenderMode mode = current->getRenderMode();
@@ -112,16 +112,14 @@ struct RootGraphRender : public AsyncUpdater
 
         if (shouldProcess)
         {
-			audioOut.setSize (buffer.getNumChannels(), buffer.getNumSamples(),
-							  false, false, true);
-			audioTemp.setSize (buffer.getNumChannels(), buffer.getNumSamples(),
-							  false, false, true);
+            audioOut.setSize (buffer.getNumChannels(), buffer.getNumSamples(), false, false, true);
+            audioTemp.setSize (buffer.getNumChannels(), buffer.getNumSamples(), false, false, true);
 
             // clear the mixing area
             for (int i = numChans; --i >= 0;)
                 audioOut.clear (i, 0, numSamples);
             midiOut.clear();
-            
+
             for (auto* const graph : graphs)
             {
                 // copy inputs, clear outs if more than input count
@@ -129,11 +127,11 @@ struct RootGraphRender : public AsyncUpdater
                     audioTemp.copyFrom (i, 0, buffer, i, 0, numSamples);
                 for (int i = numInputChans; i < numChans; ++i)
                     audioTemp.clear (i, 0, numSamples);
-                
-                // clear so messages: avoids feedback loop when IO node ins are 
+
+                // clear so messages: avoids feedback loop when IO node ins are
                 // connected to IO node outs
                 midiTemp.clear (0, numSamples);
-                
+
                 if ((last == graph && graphChanged && last->isSingle())
                     || (graphChanged && current != nullptr && current->isSingle() && graph != current))
                 {
@@ -151,8 +149,8 @@ struct RootGraphRender : public AsyncUpdater
                         midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
                     }
                 }
-                else if ((current == graph && graph->isSingle()) 
-                            || (current != nullptr && !current->isSingle() && !graph->isSingle()))
+                else if ((current == graph && graph->isSingle())
+                         || (current != nullptr && ! current->isSingle() && ! graph->isSingle()))
                 {
                     // current single graph or parallel graphs get MIDI always
                     midiTemp.addEvents (midi, 0, numSamples, 0);
@@ -172,34 +170,29 @@ struct RootGraphRender : public AsyncUpdater
                         graph->render (audioTemp, midiPipe);
                     }
                 }
-                
-                if (graphChanged && ((current->isSingle() && current != graph) ||
-                                     (modeChanged && !current->isSingle() && graph->isSingle())))
-                                     
+
+                if (graphChanged && ((current->isSingle() && current != graph) || (modeChanged && ! current->isSingle() && graph->isSingle())))
+
                 {
                     // DBG("  FADE OUT LAST GRAPH: " << graph->engineIndex);
                     for (int i = 0; i < numOutputChans; ++i)
-                            audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), 
-                                                      numSamples, 1.f, 0.f);
+                        audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), numSamples, 1.f, 0.f);
                 }
-                else if ((graph == current && graph->isSingle()) ||
-                         (!graph->isSingle() && (current != nullptr) && !current->isSingle()))
+                else if ((graph == current && graph->isSingle()) || (! graph->isSingle() && (current != nullptr) && ! current->isSingle()))
                 {
                     // if it's the current single graph or both are parallel...
-                    if (graphChanged && (graph->isSingle() || 
-                                        (modeChanged && !graph->isSingle() && !current->isSingle())))
+                    if (graphChanged && (graph->isSingle() || (modeChanged && ! graph->isSingle() && ! current->isSingle())))
                     {
                         // DBG("  FADE IN NEW GRAPH: " << graph->engineIndex);
                         for (int i = 0; i < numOutputChans; ++i)
-                            audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), 
-                                                      numSamples, 0.f, 1.f);
+                            audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), numSamples, 0.f, 1.f);
                     }
                     else
                     {
                         for (int i = 0; i < numOutputChans; ++i)
                             audioOut.addFrom (i, 0, audioTemp, i, 0, numSamples);
                     }
-                    
+
                     midiOut.addEvents (midiTemp, 0, numSamples, 0);
                 }
             }
@@ -208,8 +201,9 @@ struct RootGraphRender : public AsyncUpdater
                 buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
 
             MidiBuffer::Iterator iter (midi);
-            MidiMessage msg; int frame = 0;
-            
+            MidiMessage msg;
+            int frame = 0;
+
             // setup a program change if present
             while (iter.getNextEvent (msg, frame) && frame < numSamples)
             {
@@ -226,12 +220,12 @@ struct RootGraphRender : public AsyncUpdater
         {
             midi.clear();
             for (int i = 0; i < buffer.getNumChannels(); ++i)
-                zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
+                zeromem (buffer.getWritePointer (i), sizeof (float) * (size_t) numSamples);
         }
 
         lastGraph = currentGraph;
     }
-    
+
     /** not realtime safe! */
     bool addGraph (RootGraph* graph)
     {
@@ -243,7 +237,7 @@ struct RootGraphRender : public AsyncUpdater
             setCurrentGraph (0);
             lastGraph = 0;
         }
-        
+
         return true;
     }
 
@@ -268,13 +262,13 @@ struct RootGraphRender : public AsyncUpdater
 
 private:
     Array<RootGraph*> graphs;
-    int currentGraph        = -1;
-    int lastGraph           = -1;
+    int currentGraph = -1;
+    int lastGraph = -1;
 
     struct ProgramRequest
     {
-        int program      = -1;
-        int channel      = -1;
+        int program = -1;
+        int channel = -1;
 
         const bool wasRequested() const { return program >= 0; }
         void reset()
@@ -284,16 +278,16 @@ private:
 
     } program;
 
-    int numInputChans       = -1;
-    int numOutputChans      = -1;
-    AudioSampleBuffer   audioOut, audioTemp;
+    int numInputChans = -1;
+    int numOutputChans = -1;
+    AudioSampleBuffer audioOut, audioTemp;
 
     MidiBuffer midiOut, midiTemp;
 
     void updateIndexes()
     {
-        for (int i = 0 ; i < graphs.size(); ++i)
-            graphs.getUnchecked(i)->engineIndex = i;
+        for (int i = 0; i < graphs.size(); ++i)
+            graphs.getUnchecked (i)->engineIndex = i;
     }
 
     int findGraphForProgram (const ProgramRequest& r) const
@@ -320,11 +314,11 @@ class AudioEngine::Private : public AudioIODeviceCallback,
 {
 public:
     Private (AudioEngine& e)
-        : engine (e), 
-          sampleRate (0), 
-          blockSize (0), 
+        : engine (e),
+          sampleRate (0),
+          blockSize (0),
           isPrepared (false),
-          numInputChans (0), 
+          numInputChans (0),
           numOutputChans (0),
           tempBuffer (1, 1)
     {
@@ -345,7 +339,7 @@ public:
         midiClock.removeListener (this);
         tempoValue.removeListener (this);
         externalClockValue.removeListener (this);
-        
+
         if (isPrepared)
         {
             jassertfalse;
@@ -353,14 +347,14 @@ public:
             isPrepared = false;
         }
     }
-    
+
     void timerCallback() override
     {
         midiIOMonitor->notify();
     }
 
     RootGraph* getCurrentGraph() const { return graphs.getCurrentGraph(); }
-    
+
     void onCurrentGraphChanged()
     {
         int currentGraph = -1;
@@ -379,10 +373,8 @@ public:
             graphs.setProperty (Tags::active, currentGraph, nullptr);
         }
     }
-    
-    void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
-                                float** const outputChannelData, const int numOutputChannels,
-                                const int numSamples) override
+
+    void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels, float** const outputChannelData, const int numOutputChannels, const int numSamples) override
     {
         jassert (sampleRate > 0 && blockSize > 0);
         int totalNumChans = 0;
@@ -392,16 +384,15 @@ public:
             // if there aren't enough output channels for the number of
             // inputs, we need to create some temporary extra ones (can't
             // use the input data in case it gets written to)
-            tempBuffer.setSize (numInputChannels - numOutputChannels, numSamples,
-                                false, false, true);
-            
+            tempBuffer.setSize (numInputChannels - numOutputChannels, numSamples, false, false, true);
+
             for (int i = 0; i < numOutputChannels; ++i)
             {
                 channels[totalNumChans] = outputChannelData[i];
                 memcpy (channels[totalNumChans], inputChannelData[i], sizeof (float) * (size_t) numSamples);
                 ++totalNumChans;
             }
-            
+
             for (int i = numOutputChannels; i < numInputChannels; ++i)
             {
                 channels[totalNumChans] = tempBuffer.getWritePointer (i - numOutputChannels, 0);
@@ -417,7 +408,7 @@ public:
                 memcpy (channels[totalNumChans], inputChannelData[i], sizeof (float) * (size_t) numSamples);
                 ++totalNumChans;
             }
-            
+
             for (int i = numInputChannels; i < numOutputChannels; ++i)
             {
                 channels[totalNumChans] = outputChannelData[i];
@@ -440,8 +431,10 @@ public:
                     {
                         if (transport.isPlaying())
                         {
-                            incomingMidi.addEvent (transport.getPositionFrames() <= 0 
-                                ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                            incomingMidi.addEvent (transport.getPositionFrames() <= 0
+                                                       ? MidiMessage::midiStart()
+                                                       : MidiMessage::midiContinue(),
+                                                   0);
                         }
                         else
                         {
@@ -461,15 +454,15 @@ public:
                 }
             }
         }
-        
+
         incomingMidi.clear();
     }
-    
+
     void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
     {
         const int numSamples = buffer.getNumSamples();
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
-        
+
         const ScopedLock sl (lock);
         const bool shouldProcess = shouldBeLocked.get() == 0;
         const bool wasPlaying = transport.isPlaying();
@@ -483,8 +476,10 @@ public:
                 {
                     if (transport.isPlaying())
                     {
-                        midi.addEvent (transport.getPositionFrames() <= 0 
-                            ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                        midi.addEvent (transport.getPositionFrames() <= 0
+                                           ? MidiMessage::midiStart()
+                                           : MidiMessage::midiContinue(),
+                                       0);
                     }
                     else
                     {
@@ -497,52 +492,51 @@ public:
 
             if (currentGraph.get() != graphs.getCurrentGraphIndex())
                 graphs.setCurrentGraph (currentGraph.get());
-            graphs.renderGraphs (buffer, midi);  // user requested index can be cancelled by program changed
+            graphs.renderGraphs (buffer, midi); // user requested index can be cancelled by program changed
             currentGraph.set (graphs.getCurrentGraphIndex());
         }
         else
         {
             for (int i = 0; i < buffer.getNumChannels(); ++i)
-                zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
+                zeromem (buffer.getWritePointer (i), sizeof (float) * (size_t) numSamples);
         }
 
         if (transport.isPlaying())
             transport.advance (numSamples);
-        
+
         transport.postProcess (numSamples);
     }
-    
+
     bool isTimeMaster() const
     {
         if (engine.getRunMode() == RunMode::Plugin)
             return sessionWantsExternalClock.get() == 0;
         return processMidiClock.get() == 0 && sessionWantsExternalClock.get() == 0;
     }
-    
+
     void audioDeviceAboutToStart (AudioIODevice* const device) override
     {
         const double newSampleRate = device->getCurrentSampleRate();
-        const int newBlockSize     = device->getCurrentBufferSizeSamples();
-        const int numChansIn       = device->getActiveInputChannels().countNumberOfSetBits();
-        const int numChansOut      = device->getActiveOutputChannels().countNumberOfSetBits();
+        const int newBlockSize = device->getCurrentBufferSizeSamples();
+        const int numChansIn = device->getActiveInputChannels().countNumberOfSetBits();
+        const int numChansOut = device->getActiveOutputChannels().countNumberOfSetBits();
         audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
     }
-    
-    void audioAboutToStart (const double newSampleRate, const int newBlockSize,
-                            const int numChansIn, const int numChansOut)
+
+    void audioAboutToStart (const double newSampleRate, const int newBlockSize, const int numChansIn, const int numChansOut)
     {
         const ScopedLock sl (lock);
-        
-        sampleRate      = newSampleRate;
-        blockSize       = newBlockSize;
-        numInputChans   = numChansIn;
-        numOutputChans  = numChansOut;
-        
+
+        sampleRate = newSampleRate;
+        blockSize = newBlockSize;
+        numInputChans = numChansIn;
+        numOutputChans = numChansOut;
+
         midiClock.reset (sampleRate, blockSize);
         messageCollector.reset (sampleRate);
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
-        
+
         graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
 
         if (isPrepared)
@@ -554,25 +548,25 @@ public:
         prepareToPlay (sampleRate, blockSize);
         isPrepared = true;
     }
-    
+
     void audioDeviceStopped() override
     {
         audioStopped();
     }
-    
+
     void audioStopped()
     {
         const ScopedLock sl (lock);
         keyboardState.removeListener (&messageCollector);
         if (isPrepared)
             releaseResources();
-        isPrepared  = false;
-        sampleRate  = 0.0;
-        blockSize   = 0;
+        isPrepared = false;
+        sampleRate = 0.0;
+        blockSize = 0;
         tempBuffer.setSize (1, 1);
         graphs.releaseBuffers();
     }
-    
+
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
         if (! message.isActiveSense() && ! message.isMidiClock())
@@ -595,9 +589,9 @@ public:
         else if (clockWanted && message.isMidiContinue())
         {
             transport.requestPlayState (true);
-        }   
+        }
     }
-    
+
     void addGraph (RootGraph* graph)
     {
         jassert (graph);
@@ -610,19 +604,19 @@ public:
                 std::bind (&AudioEngine::updateExternalLatencySamples, &engine));
         }
     }
-    
+
     void removeGraph (RootGraph* graph)
     {
         {
             ScopedLock sl (lock);
             graphs.removeGraph (graph);
         }
-        
+
         graph->renderingSequenceChanged.disconnect_all_slots();
         if (isPrepared)
             graph->releaseResources();
     }
-    
+
     void connectSessionValues()
     {
         if (session)
@@ -638,13 +632,13 @@ public:
             externalClockValue = externalClockValue.getValue();
         }
     }
-    
+
     void setSession (SessionPtr s)
     {
         session = s;
         connectSessionValues();
     }
-    
+
     void valueChanged (Value& value) override
     {
         if (tempoValue.refersToSameSourceAs (value))
@@ -655,7 +649,7 @@ public:
         }
         else if (externalClockValue.refersToSameSourceAs (value))
         {
-            const bool wantsClock = (bool)value.getValue();
+            const bool wantsClock = (bool) value.getValue();
             if (wantsClock)
             {
                 resetMidiClock();
@@ -664,46 +658,46 @@ public:
             {
                 transport.requestTempo ((float) tempoValue.getValue());
             }
-            
+
             sessionWantsExternalClock.set (wantsClock ? 1 : 0);
         }
     }
-    
+
     void resetMidiClock()
     {
         midiClock.reset (sampleRate, blockSize);
     }
-    
+
     void midiClockTempoChanged (const float bpm) override
     {
         if (sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0)
             transport.requestTempo (bpm);
     }
-    
-    void midiClockSignalAcquired()  override { }
-    void midiClockSignalDropped()   override { }
-    
+
+    void midiClockSignalAcquired() override {}
+    void midiClockSignalDropped() override {}
+
     bool isUsingExternalClock() const
     {
         if (engine.getRunMode() == RunMode::Plugin)
             return sessionWantsExternalClock.get() > 0;
         return sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0;
     }
-    
+
 private:
     friend class AudioEngine;
-    AudioEngine&        engine;
-    Transport           transport;
-    RootGraphRender     graphs;
-    SessionPtr          session;
-    
+    AudioEngine& engine;
+    Transport transport;
+    RootGraphRender graphs;
+    SessionPtr session;
+
     Value tempoValue;
     Atomic<float> nextTempo;
-    
-    CriticalSection     lock;
-    double sampleRate   = 0.0;
-    int blockSize       = 0;
-    bool isPrepared     = false;
+
+    CriticalSection lock;
+    double sampleRate = 0.0;
+    int blockSize = 0;
+    bool isPrepared = false;
     Atomic<int> currentGraph;
 
     int numInputChans, numOutputChans;
@@ -724,11 +718,11 @@ private:
 
     MidiClock midiClock;
     MidiClockMaster midiClockMaster;
-    
+
     AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
-    
+
     int latencySamples = 0;
-   
+
     // GraphRender::locked must match this default value
     Atomic<int> shouldBeLocked { 0 };
 
@@ -742,21 +736,21 @@ private:
         graph->setPlayHead (&transport);
         graph->prepareToRender (sampleRate, estimatedBlockSize);
     }
-    
+
     void prepareToPlay (double sampleRate, int estimatedBlockSize)
     {
         midiClockMaster.setSampleRate (sampleRate);
         midiClockMaster.setTempo (transport.getTempo());
         for (int i = 0; i < graphs.size(); ++i)
-            prepareGraph (graphs.getGraph(i), sampleRate, estimatedBlockSize);
+            prepareGraph (graphs.getGraph (i), sampleRate, estimatedBlockSize);
     }
-    
+
     void releaseResources()
     {
         for (int i = 0; i < graphs.size(); ++i)
-            graphs.getGraph(i)->releaseResources();
+            graphs.getGraph (i)->releaseResources();
     }
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Private)
 };
 
@@ -790,8 +784,16 @@ void AudioEngine::deactivate()
     }
 }
 
-AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (priv != nullptr); return *priv; }
-MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (priv != nullptr); return *priv; }
+AudioIODeviceCallback& AudioEngine::getAudioIODeviceCallback()
+{
+    jassert (priv != nullptr);
+    return *priv;
+}
+MidiInputCallback& AudioEngine::getMidiInputCallback()
+{
+    jassert (priv != nullptr);
+    return *priv;
+}
 
 bool AudioEngine::addGraph (RootGraph* graph)
 {
@@ -802,7 +804,7 @@ bool AudioEngine::addGraph (RootGraph* graph)
 
 void AudioEngine::applySettings (Settings& settings)
 {
-    const bool useMidiClock = settings.getUserSettings()->getValue("clockSource") == "midiClock";
+    const bool useMidiClock = settings.getUserSettings()->getValue ("clockSource") == "midiClock";
     if (useMidiClock)
         priv->resetMidiClock();
     priv->processMidiClock.set (useMidiClock ? 1 : 0);
@@ -859,10 +861,10 @@ void AudioEngine::refreshSession()
 
 MidiKeyboardState& AudioEngine::getKeyboardState()
 {
-    jassert(priv);
+    jassert (priv);
     return priv->keyboardState;
 }
-    
+
 Transport::MonitorPtr AudioEngine::getTransportMonitor() const
 {
     return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
@@ -898,8 +900,7 @@ void AudioEngine::seekToAudioFrame (const int64 frame)
     transport.requestAudioFrame (frame);
 }
 
-void AudioEngine::prepareExternalPlayback (const double sampleRate, const int blockSize,
-                                           const int numIns, const int numOuts)
+void AudioEngine::prepareExternalPlayback (const double sampleRate, const int blockSize, const int numIns, const int numOuts)
 {
     if (priv)
         priv->audioAboutToStart (sampleRate, blockSize, numIns, numOuts);
@@ -915,7 +916,8 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
     }
 }
 
-bool AudioEngine::isUsingExternalClock() const {
+bool AudioEngine::isUsingExternalClock() const
+{
     return priv && priv->isUsingExternalClock();
 }
 
@@ -930,7 +932,7 @@ void AudioEngine::processExternalPlayhead (AudioPlayHead* playhead, const int nf
     transport.requestRecordState (pos.isRecording);
     if (transport.getPositionFrames() != pos.timeInSamples)
         transport.requestAudioFrame (pos.timeInSamples);
-    
+
     transport.preProcess (0);
     transport.postProcess (0);
 }
@@ -951,8 +953,9 @@ void AudioEngine::updateExternalLatencySamples()
         ScopedLock sl (priv->lock);
 
         auto* current = priv->getCurrentGraph();
-        if (nullptr == current) return;
-    
+        if (nullptr == current)
+            return;
+
         if (current->getRenderMode() == RootGraph::SingleGraph)
         {
             latencySamples = current->getLatencySamples();
@@ -979,4 +982,4 @@ MidiIOMonitorPtr AudioEngine::getMidiIOMonitor() const
     return priv != nullptr ? priv->midiIOMonitor : nullptr;
 }
 
-}
+} // namespace Element

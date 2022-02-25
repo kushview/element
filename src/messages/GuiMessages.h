@@ -26,18 +26,18 @@ class ContentView;
 struct WorkspaceOpenFileMessage : public AppMessage
 {
     WorkspaceOpenFileMessage (const File& f) : file (f) {}
-    ~WorkspaceOpenFileMessage() noexcept { }
+    ~WorkspaceOpenFileMessage() noexcept {}
     const File file;
 };
 
 struct ReloadMainContentMessage : public AppMessage
 {
-    explicit ReloadMainContentMessage (const String& t = String())  : type (t) {}
-    ~ReloadMainContentMessage() noexcept { }
+    explicit ReloadMainContentMessage (const String& t = String()) : type (t) {}
+    ~ReloadMainContentMessage() noexcept {}
     const String type;
 };
 
-struct PresentViewMessage  : public AppMessage
+struct PresentViewMessage : public AppMessage
 {
     using Factory = std::function<ContentView*()>;
     PresentViewMessage (Factory f) : create (f) {}
@@ -45,4 +45,4 @@ struct PresentViewMessage  : public AppMessage
     Factory create;
 };
 
-}
+} // namespace Element

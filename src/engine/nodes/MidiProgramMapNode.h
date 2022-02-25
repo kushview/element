@@ -27,8 +27,8 @@
 namespace Element {
 
 class MidiProgramMapNode : public MidiFilterNode,
-                             public AsyncUpdater,
-                             public ChangeBroadcaster
+                           public AsyncUpdater,
+                           public ChangeBroadcaster
 {
 public:
     struct ProgramEntry
@@ -37,27 +37,27 @@ public:
         int in;
         int out;
     };
-    
+
     MidiProgramMapNode();
     virtual ~MidiProgramMapNode();
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
-        desc.name               = "MIDI Program Map";
-        desc.descriptiveName    = "Filter MIDI Program Changes";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.fileOrIdentifier = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
+        desc.name = "MIDI Program Map";
+        desc.descriptiveName = "Filter MIDI Program Changes";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
-        desc.uniqueId                = EL_INTERNAL_UID_MIDI_PROGRAM_MAP;
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
+        desc.uniqueId = EL_INTERNAL_UID_MIDI_PROGRAM_MAP;
     }
 
     void clear();
-    
+
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
 
@@ -74,7 +74,7 @@ public:
 
     inline void setSize (int w, int h)
     {
-        width  = jmax (w, (int) 1);
+        width = jmax (w, (int) 1);
         height = jmax (h, (int) 1);
     }
 
@@ -99,22 +99,22 @@ public:
         clear();
 
         fontSize = jlimit (9.f, 72.f, (float) tree.getProperty ("fontSize", 15.f));
-        width    = jmax (10, (int) tree.getProperty ("width", 360));
-        height   = jmax (10, (int) tree.getProperty ("height", 540));
-        
+        width = jmax (10, (int) tree.getProperty ("width", 360));
+        height = jmax (10, (int) tree.getProperty ("height", 540));
+
         for (int i = 0; i < tree.getNumChildren(); ++i)
         {
             const auto e = tree.getChild (i);
             auto* const entry = entries.add (new ProgramEntry());
             entry->name = e["name"].toString();
-            entry->in   = (int) e ["in"];
-            entry->out  = (int) e ["out"];
+            entry->in = (int) e["in"];
+            entry->out = (int) e["out"];
         }
-        
+
         {
             ScopedLock sl (lock);
             for (const auto* const entry : entries)
-                programMap [entry->in] = entry->out;
+                programMap[entry->in] = entry->out;
         }
 
         sendChangeMessage();
@@ -130,8 +130,8 @@ public:
         {
             ValueTree e ("entry");
             e.setProperty ("name", entry->name, nullptr)
-             .setProperty ("in",   entry->in,   nullptr)
-             .setProperty ("out",  entry->out,  nullptr);
+                .setProperty ("in", entry->in, nullptr)
+                .setProperty ("out", entry->out, nullptr);
             tree.appendChild (e, nullptr);
         }
 
@@ -149,11 +149,11 @@ public:
 protected:
     CriticalSection lock;
     OwnedArray<ProgramEntry> entries;
-    int programMap [128];
+    int programMap[128];
 
     bool assertedLowChannels = false;
     bool createdPorts = false;
-    MidiBuffer* buffers [16];
+    MidiBuffer* buffers[16];
     MidiBuffer tempMidi;
     MidiBuffer toSendMidi;
 
@@ -175,4 +175,4 @@ protected:
     }
 };
 
-}
+} // namespace Element

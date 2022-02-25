@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-#define EL_PLUGIN_SCANNER_PROCESS_ID    "pspelbg"
+#define EL_PLUGIN_SCANNER_PROCESS_ID "pspelbg"
 
 namespace Element {
 
@@ -57,12 +57,12 @@ public:
 
     /** Returns true if an audio plugin format is supported */
     bool isAudioPluginFormatSupported (const String&) const;
-    
+
     /** Returns an audio plugin format by name */
     AudioPluginFormat* getAudioPluginFormat (const String& formatName) const;
-    
+
     /** Returns an audio plugin format by type */
-    template<class FormatType>
+    template <class FormatType>
     inline FormatType* format()
     {
         auto& f (getAudioPluginFormats());
@@ -71,32 +71,32 @@ public:
                 return fmt;
         return nullptr;
     }
-    
+
     /** creates a child process slave used in start up */
     kv::ChildProcessSlave* createAudioPluginScannerSlave();
-    
+
     /** creates a new plugin scanner for use by a third party, e.g. plugin manager UI */
     PluginScanner* createAudioPluginScanner();
-    
+
     /** gets the internal plugins scanner used for background scanning */
     PluginScanner* getBackgroundAudioPluginScanner();
-    
+
     /** Scans for all audio plugin types using a child process */
     void scanAudioPlugins (const StringArray& formats = StringArray());
-    
+
     /** Returns true if a scan is in progress using the child process */
     bool isScanningAudioPlugins();
-    
-	/** Returns the name of the currently scanned plugin. This value
+
+    /** Returns the name of the currently scanned plugin. This value
 	    is not suitable for use in loading plugins */
-	String getCurrentlyScannedPluginName() const;
+    String getCurrentlyScannedPluginName() const;
 
     /** Looks for new or updated internal/element plugins */
     void scanInternalPlugins();
-    
+
     /** Save the known plugins to user settings */
     void saveUserPlugins (ApplicationProperties&);
-    
+
     /** Restore user plugins. Will also scan internal plugins so they don't get removed
         by accident */
     void restoreUserPlugins (ApplicationProperties&);
@@ -113,13 +113,13 @@ public:
 
     /** Give a properties file to be used when settings aren't available. FIXME */
     void setPropertiesFile (PropertiesFile* pf) { props = pf; }
-    
+
     /** Search for unverified plugins in background thread */
     void searchUnverifiedPlugins();
 
     /** This will get a possible list of plugins. Trying to load this might fail */
     void getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins);
-    
+
     /** Restore User Plugins From a file */
     void restoreAudioPlugins (const File&);
 
@@ -130,10 +130,10 @@ private:
     PropertiesFile* props = nullptr;
     class Private;
     std::unique_ptr<Private> priv;
-    
+
     friend class PluginScannerMaster;
     void scanFinished();
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager);
 };
 
@@ -142,38 +142,38 @@ class PluginScanner : private Timer
 public:
     PluginScanner (KnownPluginList&);
     ~PluginScanner();
-    
+
     class Listener
     {
     public:
-        Listener () { }
-        virtual ~Listener() { }
-        
-        virtual void audioPluginScanFinished() { }
+        Listener() {}
+        virtual ~Listener() {}
+
+        virtual void audioPluginScanFinished() {}
         virtual void audioPluginScanProgress (const float progress) { ignoreUnused (progress); }
-        virtual void audioPluginScanStarted (const String& name) { }
+        virtual void audioPluginScanStarted (const String& name) {}
     };
-    
+
     static const File& getSlavePluginListFile();
-    
+
     /** scan for plugins of type */
     void scanForAudioPlugins (const String& formatName);
-    
+
     /** Scan for plugins of multiple types */
     void scanForAudioPlugins (const StringArray& formats);
-    
+
     /** Cancels the current scan operation */
     void cancel();
 
     /** is scanning */
     bool isScanning() const;
-    
+
     /** Add a listener */
-    void addListener (Listener* listener)       { listeners.add (listener); }
+    void addListener (Listener* listener) { listeners.add (listener); }
 
     /** Remove a listener */
-    void removeListener (Listener* listener)    { listeners.remove (listener); }
-    
+    void removeListener (Listener* listener) { listeners.remove (listener); }
+
     /** Returns a list of plugins that failed to load */
     const StringArray& getFailedFiles() const { return failedIdentifiers; }
 
@@ -187,4 +187,4 @@ private:
     void timerCallback() override;
 };
 
-}
+} // namespace Element

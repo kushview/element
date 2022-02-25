@@ -96,7 +96,9 @@ def configure (conf):
 
     conf.find_projucer (mandatory=False)
     conf.find_program ('convert', mandatory=False)
-    
+    conf.find_program ('clang-format', uselib_store='CLANG_FORMAT', mandatory=False)
+    conf.find_program ('clang-format-all', uselib_store='CLANG_FORMAT_ALL', mandatory=False)
+
     conf.check_common()
     if conf.env.HOST_PLATFORM == 'win32': conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
@@ -609,6 +611,8 @@ def resave (ctx):
     import projects
     ctx.add_pre_fun (projects.resave)
 
+
+
 from waflib.Build import BuildContext
 
 class ResaveBuildContext (BuildContext):
@@ -622,3 +626,14 @@ class DocsBuildContext (BuildContext):
 class VersionBumpContext (BuildContext):
     cmd = 'versionbump'
     fun = 'versionbump'
+
+class FormatContext (BuildContext):
+    cmd = 'format'
+    fun = 'format'
+
+def format (ctx):
+    from subprocess import call
+    if not bool(ctx.env.CLANG_FORMAT_ALL) or not bool(ctx.env.CLANG_FORMAT):
+        ctx.fatal("formatting requires clang-format + clang-format-all")
+    cmd = ctx.env.CLANG_FORMAT_ALL + './src'.split()
+    call (cmd)

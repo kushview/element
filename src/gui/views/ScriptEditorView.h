@@ -56,7 +56,7 @@ public:
     /** @internal */
     void initializeView (AppController&) override;
 
-   #if 0
+#if 0
     virtual void willBeRemoved() { }
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
@@ -73,10 +73,10 @@ public:
 
     /** Apply state attached to session */
     virtual void setState (const String&) {}
-   #endif
+#endif
 
 protected:
-    virtual String getScriptContent() const =0;
+    virtual String getScriptContent() const = 0;
 
 private:
     std::unique_ptr<ScriptEditorComponent> editor;
@@ -104,4 +104,4 @@ private:
     TextButton applyButton;
 };
 
-}
+} // namespace Element

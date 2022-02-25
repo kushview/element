@@ -37,8 +37,9 @@ public:
     void add (const Node& Node, const String& presetName = String());
 
 private:
-    friend struct Pimpl; struct Pimpl;
+    friend struct Pimpl;
+    struct Pimpl;
     std::unique_ptr<Pimpl> pimpl;
 };
 
-}
+} // namespace Element

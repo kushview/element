@@ -30,21 +30,22 @@ class MidiChannelSelectComponent : public Component
 public:
     MidiChannelSelectComponent()
         : Component (TRANS ("MIDI Channel")),
-            matrix_2x8 (*this),
-            matrix_1x16 (*this),
-            layout (*this)
+          matrix_2x8 (*this),
+          matrix_1x16 (*this),
+          layout (*this)
     {
         addAndMakeVisible (layout);
     }
-    
-    virtual ~MidiChannelSelectComponent() noexcept { }
-    
+
+    virtual ~MidiChannelSelectComponent() noexcept {}
+
     inline virtual void refresh()
     {
         resized();
     }
-    
-    inline int getSuggestedHeight (const int width) const {
+
+    inline int getSuggestedHeight (const int width) const
+    {
         return jmax (10, layout.preferedHeight) * (width <= 600 ? 3 : 2);
     }
 
@@ -86,13 +87,13 @@ private:
         if (onChanged)
             onChanged();
     }
-    
+
     void updateMatrixState (kv::MatrixState& state)
     {
-        layout.omni.setToggleState (channels [0], dontSendNotification);
+        layout.omni.setToggleState (channels[0], dontSendNotification);
         for (int r = 0; r < state.getNumRows(); ++r)
             for (int c = 0; c < state.getNumColumns(); ++c)
-                state.set (r, c, channels [1 + state.getIndexForCell (r, c)]);
+                state.set (r, c, channels[1 + state.getIndexForCell (r, c)]);
     }
 
     void updateChannels (const kv::MatrixState& state)
@@ -109,22 +110,21 @@ private:
     {
     public:
         MatrixBase (MidiChannelSelectComponent& o, const int r, const int c)
-            : owner(o), state (r, c)
+            : owner (o), state (r, c)
         {
             setMatrixCellSize (25, 25);
         }
 
-        virtual ~MatrixBase() noexcept { }
-        
+        virtual ~MatrixBase() noexcept {}
+
         int getNumRows() override { return state.getNumRows(); }
         int getNumColumns() override { return state.getNumColumns(); }
-        
-        void paintMatrixCell (Graphics& g, const int width, const int height,
-                              const int row, const int col) override
+
+        void paintMatrixCell (Graphics& g, const int width, const int height, const int row, const int col) override
         {
             if (state.connected (row, col))
             {
-                if (owner.layout.omni.getToggleState() || !isEnabled())
+                if (owner.layout.omni.getToggleState() || ! isEnabled())
                     g.setColour (LookAndFeel::widgetBackgroundColor.darker (0.1));
                 else
                     g.setColour (Colors::toggleGreen);
@@ -133,50 +133,54 @@ private:
             {
                 g.setColour (LookAndFeel::widgetBackgroundColor.brighter());
             }
-            
+
             g.fillRect (1, 1, width - 2, height - 2);
             g.setColour (isEnabled() ? Colours::black : Colours::darkgrey);
             g.setFont (12.f);
-            g.drawText (var (state.getIndexForCell (row, col) + 1).toString(), 
-                        0, 0, width, height, Justification::centred);
+            g.drawText (var (state.getIndexForCell (row, col) + 1).toString(),
+                        0,
+                        0,
+                        width,
+                        height,
+                        Justification::centred);
         }
-        
+
         void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override
         {
-            if (owner.layout.omni.getToggleState() || !isEnabled())
+            if (owner.layout.omni.getToggleState() || ! isEnabled())
                 return;
             state.toggleCell (row, col);
             owner.updateChannels (state);
             repaint();
         }
-        
+
         MidiChannelSelectComponent& owner;
         kv::MatrixState state;
     };
-    
+
     class Matrix_2x8 : public MatrixBase
     {
     public:
-        Matrix_2x8 (MidiChannelSelectComponent& o) : MatrixBase (o, 2, 8) { }
+        Matrix_2x8 (MidiChannelSelectComponent& o) : MatrixBase (o, 2, 8) {}
     } matrix_2x8;
-    
+
     class Matrix_1x16 : public MatrixBase
     {
     public:
-        Matrix_1x16 (MidiChannelSelectComponent& o) : MatrixBase (o, 1, 16) { }
+        Matrix_1x16 (MidiChannelSelectComponent& o) : MatrixBase (o, 1, 16) {}
     } matrix_1x16;
-    
+
     class Layout : public Component,
                    public Button::Listener
     {
     public:
         Layout (MidiChannelSelectComponent& o)
-            : owner(o), matrix116(o), matrix28(o)
+            : owner (o), matrix116 (o), matrix28 (o)
         {
             addAndMakeVisible (omni);
             omni.addListener (this);
             omni.setButtonText ("Omni");
-            omni.setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen.withAlpha(0.9f));
+            omni.setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen.withAlpha (0.9f));
             addAndMakeVisible (matrix116);
             addAndMakeVisible (matrix28);
         }
@@ -188,7 +192,7 @@ private:
 
         MidiChannelSelectComponent& owner;
         Matrix_1x16 matrix116;
-        Matrix_2x8  matrix28;
+        Matrix_2x8 matrix28;
         SettingButton omni;
         int preferedHeight = 16;
 
@@ -198,7 +202,7 @@ private:
             owner.channels.setBit (0, omni.getToggleState());
             owner.channelsValue.setValue (owner.channels.toMemoryBlock());
             owner.sendChanged();
-            
+
             if (matrix116.isVisible())
                 matrix116.repaint();
             if (matrix28.isVisible())
@@ -211,13 +215,13 @@ private:
             matrix28.setVisible (false);
             owner.updateMatrixState (matrix116.state);
             owner.updateMatrixState (matrix28.state);
-            
+
             if (owner.getWidth() <= 600)
             {
                 matrix28.setVisible (true);
                 matrix28.setMatrixCellSize (jmax (10, getWidth() / 8), preferedHeight);
-            } 
-            else 
+            }
+            else
             {
                 matrix116.setVisible (true);
                 matrix116.setMatrixCellSize (jmax (10, getWidth() / 16), preferedHeight);
@@ -233,11 +237,11 @@ private:
             omni.setBounds (r.removeFromTop (jmax (10, preferedHeight)).reduced (1));
             r.removeFromTop (2);
             if (matrix28.isVisible())
-                matrix28.setBounds(r);
+                matrix28.setBounds (r);
             else
-                matrix116.setBounds(r);
+                matrix116.setBounds (r);
         }
     } layout;
 };
 
-}
+} // namespace Element

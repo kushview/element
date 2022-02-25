@@ -36,4 +36,4 @@ private:
     std::unique_ptr<Pimpl> pimpl;
 };
 
-}
+} // namespace Element

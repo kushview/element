@@ -23,18 +23,18 @@
 
 namespace Element {
 
-class MediaModel :  public ObjectModel
+class MediaModel : public ObjectModel
 {
 public:
-    inline MediaModel() : ObjectModel() { }
-    inline MediaModel (const Identifier& type) : ObjectModel (type) { }
-    inline MediaModel (const ValueTree& data) : ObjectModel (data) { }
+    inline MediaModel() : ObjectModel() {}
+    inline MediaModel (const Identifier& type) : ObjectModel (type) {}
+    inline MediaModel (const ValueTree& data) : ObjectModel (data) {}
 
-    virtual void setFile (const File&) { }
+    virtual void setFile (const File&) {}
     virtual File getFile() const { return File(); }
-    virtual void getRelatedFiles (Array<File>&) { }
+    virtual void getRelatedFiles (Array<File>&) {}
 };
 
 typedef Shared<MediaModel> MediaPtr;
 
-}
+} // namespace Element

@@ -26,4 +26,4 @@ Database::~Database() {}
 
 void Database::exec (const String& sql) {}
 
-}
+} // namespace Element

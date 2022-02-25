@@ -30,30 +30,31 @@ public:
     virtual ~ScriptSource() = default;
 
     /** Returns the script text */
-    virtual String getCode() const =0;
+    virtual String getCode() const = 0;
 
     /** Updates the script text */
-    virtual void setCode (const String& code) =0;
+    virtual void setCode (const String& code) = 0;
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScriptSource);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptSource);
 };
 
 /** A script source for a value tree */
 class ValueTreeScriptSource : public ScriptSource
 {
 public:
-    ValueTreeScriptSource (const ValueTree& tree) : data(tree) {}
+    ValueTreeScriptSource (const ValueTree& tree) : data (tree) {}
     ValueTreeScriptSource (const ValueTree& tree, const Identifier& dataKey)
-        : data (tree), 
+        : data (tree),
           key (dataKey)
-    { }
+    {
+    }
 
     String getCode() const override
-    { 
+    {
         return data.isValid() && data.hasProperty (key)
-            ? gzip::decode (data.getProperty(key).toString())
-            : String();
+                   ? gzip::decode (data.getProperty (key).toString())
+                   : String();
     }
 
     void setCode (const String& code) override
@@ -66,4 +67,4 @@ private:
     Identifier key { "data" };
 };
 
-}
+} // namespace Element

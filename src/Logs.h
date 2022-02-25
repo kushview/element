@@ -40,14 +40,14 @@ public:
     public:
         Listener() = default;
         virtual ~Listener() = default;
-        virtual void messageLogged (const String& msg) =0;
+        virtual void messageLogged (const String& msg) = 0;
     };
 
     /** Returns the relative path in the system log directory */
-    static String getSubPath()      { return "Element/log"; }
+    static String getSubPath() { return "Element/log"; }
 
     /** Returns the absolute path to the log directory */
-    static File getTopDir()         { return FileLogger::getSystemLogFileFolder().getChildFile (getSubPath()); }
+    static File getTopDir() { return FileLogger::getSystemLogFileFolder().getChildFile (getSubPath()); }
 
     /** Add a listener to receive callbacks */
     void addListener (Listener* listener) { listeners.add (listener); }
@@ -61,7 +61,7 @@ public:
         ScopedLock sl (lock);
         return history;
     }
-    
+
     /** Flush message history */
     void flushHistory()
     {
@@ -80,8 +80,8 @@ public:
         history.add (message);
         if (history.size() > maxLines)
             history.remove (0);
-        
-        listeners.call ([this, &message](Listener& l) {
+
+        listeners.call ([this, &message] (Listener& l) {
             l.messageLogged (message);
         });
     }
@@ -94,4 +94,4 @@ private:
     ListenerList<Listener> listeners;
 };
 
-}
+} // namespace Element

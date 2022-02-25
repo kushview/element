@@ -25,15 +25,16 @@
 #include "Settings.h"
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
-#define EL_OSC_ADDRESS_ENGINE  "/element/engine"
+#define EL_OSC_ADDRESS_ENGINE "/element/engine"
 
 namespace Element {
 
 struct CommandOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
-{       
+{
     CommandOSCListener (Globals& w)
-        : world (w) 
-    { }
+        : world (w)
+    {
+    }
 
     void oscMessageReceived (const OSCMessage& message) override
     {
@@ -55,10 +56,11 @@ private:
 
 //=============================================================================
 struct EngineOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
-{       
+{
     EngineOSCListener (Globals& g)
         : globals (g)
-    { }
+    {
+    }
 
     void oscMessageReceived (const OSCMessage& message) override
     {
@@ -91,7 +93,7 @@ private:
 
         if (sampleRate <= 0.0)
             return;
-        
+
         auto& devs = globals.getDeviceManager();
         auto setup = devs.getAudioDeviceSetup();
         if (sampleRate != setup.sampleRate)
@@ -106,7 +108,7 @@ private:
 class OSCController::Impl
 {
 public:
-    Impl (OSCController& o) 
+    Impl (OSCController& o)
         : owner (o) {}
     ~Impl() {}
 
@@ -145,7 +147,7 @@ public:
     {
         if (listenersReady == true)
             return;
-        
+
         application.reset (new CommandOSCListener (owner.getWorld()));
         receiver.addListener (application.get(), EL_OSC_ADDRESS_COMMAND);
 
@@ -200,14 +202,16 @@ void OSCController::refreshWithSettings (bool alertOnFail)
     auto& settings = getWorld().getSettings();
     impl->stopServer();
     impl->setServerPort (settings.getOscHostPort());
-    
+
     if (settings.isOscHostEnabled())
     {
         if (! impl->startServer() && alertOnFail)
         {
-            String msg = "Could not start OSC host on port "; msg << impl->getHostPort();
+            String msg = "Could not start OSC host on port ";
+            msg << impl->getHostPort();
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                "OSC Host", msg);
+                                              "OSC Host",
+                                              msg);
         }
     }
 }
@@ -224,4 +228,4 @@ void OSCController::deactivate()
     impl->shutdown();
 }
 
-}
+} // namespace Element

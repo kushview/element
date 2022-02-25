@@ -28,8 +28,8 @@ namespace Element {
 class DevicesController::Impl
 {
 public:
-    Impl (DevicesController& o) : owner (o) { }
-    ~Impl() { }
+    Impl (DevicesController& o) : owner (o) {}
+    ~Impl() {}
 
 private:
     DevicesController& owner;
@@ -63,7 +63,8 @@ void DevicesController::add (const ControllerDevice& device)
         return;
 
     auto session = getWorld().getSession();
-    if (! session) return;
+    if (! session)
+        return;
     auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
     if (controllers.indexOf (device.getValueTree()) < 0)
     {
@@ -83,7 +84,7 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
     }
     else
     {
-        DBG(String("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
+        DBG (String ("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
 }
 
@@ -92,25 +93,23 @@ void DevicesController::add (const File& file)
     ValueTree data;
     if (auto xml = XmlDocument::parse (file))
         data = ValueTree::fromXml (*xml);
-    
+
     if (data.isValid() && data.hasType (Tags::controller))
     {
         // Avoid UUID conflicts by replacing all
         data.setProperty (Tags::uuid, Uuid().toString(), 0);
         for (int i = 0; i < data.getNumChildren(); ++i)
-            data.getChild(i).setProperty (Tags::uuid, Uuid().toString(), 0);
+            data.getChild (i).setProperty (Tags::uuid, Uuid().toString(), 0);
 
         if (auto s = getWorld().getSession())
         {
-            s->getValueTree().getChildWithName (Tags::controllers)
-                .addChild (data, -1, 0);
+            s->getValueTree().getChildWithName (Tags::controllers).addChild (data, -1, 0);
             refresh();
         }
     }
     else
     {
-        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Open Controller Device",
-            "Could not open the controller device file.");
+        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Open Controller Device", "Could not open the controller device file.");
     }
 }
 
@@ -120,8 +119,7 @@ void DevicesController::remove (const ControllerDevice& device)
     if (! mapping.removeInput (device))
         return;
     if (auto session = getWorld().getSession())
-        session->getValueTree().getChildWithName (Tags::controllers)
-            .removeChild (device.getValueTree(), nullptr);
+        session->getValueTree().getChildWithName (Tags::controllers).removeChild (device.getValueTree(), nullptr);
 }
 
 void DevicesController::remove (const ControllerDevice& device, const ControllerDevice::Control& control)
@@ -135,7 +133,7 @@ void DevicesController::remove (const ControllerDevice& device, const Controller
     }
     else
     {
-        DBG(String("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
+        DBG (String ("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
 }
 
@@ -143,7 +141,7 @@ void DevicesController::refresh (const ControllerDevice& device)
 {
     refresh();
     return;
-   #if 0
+#if 0
     // TODO: handle individual re-build of device handlers and state
     // Saved for reference.
     auto session = getWorld().getSession();
@@ -161,7 +159,7 @@ void DevicesController::refresh (const ControllerDevice& device)
             DBG("[EL] added handler in refresh: " << objects.control.getName().toString());
         }
     }
-   #endif
+#endif
 }
 
 void DevicesController::refresh()
@@ -183,18 +181,18 @@ void DevicesController::refresh()
             Uuid (child.getProperty (Tags::controller).toString()));
         ControllerDevice::Control control = device.findControlById (
             Uuid (child.getProperty (Tags::control).toString()));
-                
+
         if (mapping.addHandler (control, node, parameter))
         {
-            DBG("[EL] added handler in refresh: " << control.getName().toString());
+            DBG ("[EL] added handler in refresh: " << control.getName().toString());
         }
         else
         {
-            DBG("[EL] failed adding handler: " << control.getName().toString());
+            DBG ("[EL] failed adding handler: " << control.getName().toString());
         }
     }
 
     mapping.startMapping();
 }
 
-}
+} // namespace Element

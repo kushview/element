@@ -31,15 +31,13 @@ class ContentComponentPro::Impl
 {
 public:
     Impl (ContentComponentPro& o, AppController& a)
-        : app (a), owner (o),
-          workspace (a.getGlobals(), a, *a.findChild<GuiController>())
+        : app (a), owner (o), workspace (a.getGlobals(), a, *a.findChild<GuiController>())
     {
         owner.addAndMakeVisible (workspace);
     }
-    
+
     ~Impl()
     {
-
     }
 
     Dock& getDock() { return workspace.getDock(); }
@@ -68,7 +66,7 @@ public:
 
 ContentComponentPro::ContentComponentPro (AppController& controller)
     : ContentComponent (controller)
-{ 
+{
     impl.reset (new Impl (*this, controller));
 }
 
@@ -116,7 +114,8 @@ void ContentComponentPro::addWorkspaceItemsToMenu (PopupMenu& menu)
     int index = 0;
     for (const auto* const desc : dock.getPanelDescriptions())
     {
-        if (! desc->showInMenu) {
+        if (! desc->showInMenu)
+        {
             ++index; // need to do this so result still matches the description
             continue;
         }
@@ -129,7 +128,7 @@ void ContentComponentPro::handleWorkspaceMenuResult (int result)
     auto& dock = impl->getDock();
     const int index = result - 100000;
     const auto& descs = dock.getPanelDescriptions();
-    
+
     if (isPositiveAndBelow (index, descs.size()))
     {
         const auto panelId = descs[index]->identifier;
@@ -146,25 +145,20 @@ void ContentComponentPro::handleWorkspaceMenuResult (int result)
     }
 }
 
-
 void ContentComponentPro::saveState (PropertiesFile*)
 {
-
 }
 
 void ContentComponentPro::restoreState (PropertiesFile*)
 {
-
 }
 
 void ContentComponentPro::getSessionState (String&)
 {
-
 }
 
 void ContentComponentPro::applySessionState (const String&)
 {
-    
 }
 
-}
+} // namespace Element

@@ -19,141 +19,137 @@
 #include "DataPath.h"
 #include "session/Node.h"
 
-namespace Element
+namespace Element {
+namespace DataPathHelpers {
+    StringArray getSubDirs()
+    {
+        auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts" });
+#if defined(EL_PRO)
+        dirs.add ("Sessions");
+#endif
+        return dirs;
+    }
+
+    void initializeUserLibrary (const File& path)
+    {
+        for (const auto& d : getSubDirs())
+        {
+            const auto subdir = path.getChildFile (d);
+            if (subdir.existsAsFile())
+                subdir.deleteFile();
+            subdir.createDirectory();
+        }
+    }
+} // namespace DataPathHelpers
+
+DataPath::DataPath()
 {
-    namespace DataPathHelpers
+    root = defaultUserDataPath();
+    DataPathHelpers::initializeUserLibrary (root);
+}
+
+DataPath::~DataPath() {}
+
+const File DataPath::applicationDataDir()
+{
+#if JUCE_MAC
+    return File::getSpecialLocation (File::userApplicationDataDirectory)
+        .getChildFile ("Application Support/Element");
+#else
+    return File::getSpecialLocation (File::userApplicationDataDirectory)
+        .getChildFile ("Element");
+#endif
+}
+
+const File DataPath::defaultUserDataPath()
+{
+    return File::getSpecialLocation (File::userMusicDirectory)
+        .getChildFile ("Element");
+}
+
+const File DataPath::defaultSettingsFile()
+{
+#if JUCE_DEBUG
+    return applicationDataDir().getChildFile ("ElementDebug.conf");
+#else
+    return applicationDataDir().getChildFile ("Element.conf");
+#endif
+}
+
+const File DataPath::defaultLocation() { return defaultUserDataPath(); }
+
+const File DataPath::defaultGlobalMidiProgramsDir()
+{
+    return defaultUserDataPath().getChildFile ("Cache/MIDI/Programs");
+}
+
+const File DataPath::defaultScriptsDir() { return defaultUserDataPath().getChildFile ("Scripts"); }
+const File DataPath::defaultSessionDir() { return defaultUserDataPath().getChildFile ("Sessions"); }
+const File DataPath::defaultGraphDir() { return defaultUserDataPath().getChildFile ("Graphs"); }
+const File DataPath::defaultControllersDir() { return defaultUserDataPath().getChildFile ("Controllers"); }
+
+File DataPath::createNewPresetFile (const Node& node, const String& name) const
+{
+    String path = "Presets/";
+    if (name.isNotEmpty())
+        path << name;
+    else
+        path << String (node.getName().isNotEmpty() ? node.getName() : "New Preset");
+    path << ".elpreset";
+    return getRootDir().getChildFile (path).getNonexistentSibling();
+}
+
+void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const
+{
+    const auto presetsDir = getRootDir().getChildFile ("Presets");
+    if (! presetsDir.exists() || ! presetsDir.isDirectory())
+        return;
+
+    DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
+    while (iter.next())
     {
-        StringArray getSubDirs()
+        Node node (Node::parse (iter.getFile()));
+        if (node.isValid() && node.getFileOrIdentifier() == identifier && node.getFormat() == format)
         {
-            auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts" });
-           #if defined(EL_PRO)
-            dirs.add ("Sessions");
-           #endif
-            return dirs;
+            nodes.add (node);
         }
-        
-        void initializeUserLibrary (const File& path)
-        {
-            for (const auto& d : getSubDirs())
-            {
-                const auto subdir = path.getChildFile (d);
-                if (subdir.existsAsFile())
-                    subdir.deleteFile();
-                subdir.createDirectory();
-            }
-        }
-    }
-    
-    DataPath::DataPath()
-    {
-        root = defaultUserDataPath();
-        DataPathHelpers::initializeUserLibrary (root);
-    }
-    
-    DataPath::~DataPath() {}
-    
-    const File DataPath::applicationDataDir()
-    {
-       #if JUCE_MAC
-        return File::getSpecialLocation (File::userApplicationDataDirectory)
-            .getChildFile ("Application Support/Element");
-       #else
-        return File::getSpecialLocation (File::userApplicationDataDirectory)
-            .getChildFile ("Element");
-       #endif
-    }
-    
-    const File DataPath::defaultUserDataPath()
-    {
-        return File::getSpecialLocation(File::userMusicDirectory)
-            .getChildFile("Element");
-    }
-
-    const File DataPath::defaultSettingsFile()
-    {
-       #if JUCE_DEBUG
-        return applicationDataDir().getChildFile ("ElementDebug.conf");
-       #else
-        return applicationDataDir().getChildFile ("Element.conf");
-       #endif
-    }
-    
-    const File DataPath::defaultLocation()          { return defaultUserDataPath(); }
-    
-    const File DataPath::defaultGlobalMidiProgramsDir()
-    {    
-        return defaultUserDataPath().getChildFile ("Cache/MIDI/Programs");
-    }
-
-    const File DataPath::defaultScriptsDir()        { return defaultUserDataPath().getChildFile ("Scripts"); }
-    const File DataPath::defaultSessionDir()        { return defaultUserDataPath().getChildFile ("Sessions"); }
-    const File DataPath::defaultGraphDir()          { return defaultUserDataPath().getChildFile ("Graphs"); }
-    const File DataPath::defaultControllersDir()    { return defaultUserDataPath().getChildFile ("Controllers"); }
-
-    File DataPath::createNewPresetFile (const Node& node, const String& name) const
-    {
-        String path = "Presets/";
-        if (name.isNotEmpty())
-            path << name;
-        else
-            path << String (node.getName().isNotEmpty() ? node.getName() : "New Preset");
-        path << ".elpreset";
-        return getRootDir().getChildFile(path).getNonexistentSibling();
-    }
-    
-    void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const
-    {
-        const auto presetsDir = getRootDir().getChildFile ("Presets");
-        if (! presetsDir.exists() || ! presetsDir.isDirectory())
-            return;
-
-        DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
-        while (iter.next())
-        {
-            Node node (Node::parse (iter.getFile()));
-            if (node.isValid() && 
-                node.getFileOrIdentifier() == identifier && 
-                node.getFormat() == format)
-            {
-                nodes.add (node);
-            }
-        }
-    }
-
-    void DataPath::findPresetFiles (StringArray& results) const
-    {
-        const auto presetsDir = getRootDir().getChildFile ("Presets");
-        if (! presetsDir.exists() || ! presetsDir.isDirectory())
-            return;
-        DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
-        while (iter.next())
-            results.add (iter.getFile().getFullPathName());
-    }
-
-    const File DataPath::workspacesDir()
-    {
-        const auto dir = applicationDataDir().getChildFile("Workspaces");
-        if (dir.existsAsFile())
-            dir.deleteFile();
-        if (! dir.exists())
-            dir.createDirectory();
-        return dir;
-    }
-
-    const File DataPath::installDir()
-    {
-        File dir;
-
-       #if JUCE_WINDOWS
-        const auto installDir = WindowsRegistry::getValue (
-            "HKEY_LOCAL_MACHINE\\Software\\Kushview\\Element\\InstallDir", "")
-            .unquoted();
-        if (File::isAbsolutePath (installDir))
-            dir = File (installDir);
-       #elif JUCE_MAC
-        dir = File ("/Applications");
-       #endif
-
-        return dir;
     }
 }
+
+void DataPath::findPresetFiles (StringArray& results) const
+{
+    const auto presetsDir = getRootDir().getChildFile ("Presets");
+    if (! presetsDir.exists() || ! presetsDir.isDirectory())
+        return;
+    DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
+    while (iter.next())
+        results.add (iter.getFile().getFullPathName());
+}
+
+const File DataPath::workspacesDir()
+{
+    const auto dir = applicationDataDir().getChildFile ("Workspaces");
+    if (dir.existsAsFile())
+        dir.deleteFile();
+    if (! dir.exists())
+        dir.createDirectory();
+    return dir;
+}
+
+const File DataPath::installDir()
+{
+    File dir;
+
+#if JUCE_WINDOWS
+    const auto installDir = WindowsRegistry::getValue (
+                                "HKEY_LOCAL_MACHINE\\Software\\Kushview\\Element\\InstallDir", "")
+                                .unquoted();
+    if (File::isAbsolutePath (installDir))
+        dir = File (installDir);
+#elif JUCE_MAC
+    dir = File ("/Applications");
+#endif
+
+    return dir;
+}
+} // namespace Element

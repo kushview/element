@@ -25,10 +25,9 @@ namespace Element {
 class AddPluginAction : public UndoableAction
 {
 public:
-    AddPluginAction (AppController& _app, const AddPluginMessage& msg) 
-        : app (_app), graph (msg.graph), description (msg.description),
-            builder (msg.builder), verified (msg.verified) { }
-    ~AddPluginAction () noexcept { }
+    AddPluginAction (AppController& _app, const AddPluginMessage& msg)
+        : app (_app), graph (msg.graph), description (msg.description), builder (msg.builder), verified (msg.verified) {}
+    ~AddPluginAction() noexcept {}
 
     bool perform() override
     {
@@ -67,7 +66,7 @@ class RemoveNodeAction : public UndoableAction
 {
 public:
     explicit RemoveNodeAction (AppController& a, const Node& node)
-        : app(a), targetGraph (node.getParentGraph()), nodeUuid (node.getUuid())
+        : app (a), targetGraph (node.getParentGraph()), nodeUuid (node.getUuid())
     {
         node.getArcs (arcs);
         Node mutableNode (node);
@@ -76,14 +75,14 @@ public:
         nodeData = node.getValueTree().createCopy();
         Node::sanitizeRuntimeProperties (nodeData);
     }
-    
+
     bool perform() override
     {
         auto& ec = *app.findChild<EngineController>();
         ec.removeNode (nodeUuid);
         return true;
     }
-    
+
     bool undo() override
     {
         auto& ec = *app.findChild<EngineController>();
@@ -94,8 +93,7 @@ public:
         createdNode.setRelativePosition (x, y); // TODO: GraphManager should handle this
 
         for (const auto* arc : arcs)
-            ec.addConnection (arc->sourceNode, arc->sourcePort,
-                arc->destNode, arc->destPort, targetGraph);
+            ec.addConnection (arc->sourceNode, arc->sourcePort, arc->destNode, arc->destPort, targetGraph);
 
         return handled;
     }
@@ -109,19 +107,19 @@ private:
     OwnedArray<Arc> arcs;
     double x = 0.5;
     double y = 0.5;
-    bool isDataValid() const {
-        return targetGraph.isGraph() && !nodeUuid.isNull() && nodeData.isValid();
+    bool isDataValid() const
+    {
+        return targetGraph.isGraph() && ! nodeUuid.isNull() && nodeData.isValid();
     }
 };
 
 class AddConnectionAction : public UndoableAction
 {
 public:
-    AddConnectionAction (AppController& a, const Node& targetGraph,
-                                           const uint32 sn, const uint32 sp,
-                                           const uint32 dn, const uint32 dp)
+    AddConnectionAction (AppController& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
         : app (a), graph (targetGraph), arc (sn, sp, dn, dp)
-    { }
+    {
+    }
 
     bool perform() override
     {
@@ -152,11 +150,10 @@ private:
 class RemoveConnectionAction : public UndoableAction
 {
 public:
-    RemoveConnectionAction (AppController& a, const Node& targetGraph,
-                                              const uint32 sn, const uint32 sp,
-                                              const uint32 dn, const uint32 dp)
+    RemoveConnectionAction (AppController& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
         : app (a), graph (targetGraph), arc (sn, sp, dn, dp)
-    { }
+    {
+    }
 
     bool perform() override
     {
@@ -211,4 +208,4 @@ void RemoveConnectionMessage::createActions (AppController& app, OwnedArray<Undo
     actions.add (new RemoveConnectionAction (app, target, sourceNode, sourcePort, destNode, destPort));
 }
 
-}
+} // namespace Element

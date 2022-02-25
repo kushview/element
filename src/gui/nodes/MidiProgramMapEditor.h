@@ -28,7 +28,6 @@ class MidiProgramMapEditor : public NodeEditorComponent,
                              public ChangeListener
 {
 public:
-
     MidiProgramMapEditor (const Node& node);
     virtual ~MidiProgramMapEditor();
 
@@ -52,12 +51,13 @@ public:
     void setStoreSize (const bool storeSize);
 
     void changeListenerCallback (ChangeBroadcaster*) override;
-    
+
     bool keyPressed (const KeyPress&) override;
-    
+
 private:
     Node node;
-    class TableModel; friend class TableModel;
+    class TableModel;
+    friend class TableModel;
     std::unique_ptr<TableModel> model;
     TableListBox table;
     TextButton addButton;
@@ -69,4 +69,4 @@ private:
     void selectLastProgram();
 };
 
-}
+} // namespace Element

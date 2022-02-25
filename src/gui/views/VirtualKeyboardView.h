@@ -21,14 +21,13 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element
-{
+namespace Element {
 
-class VirtualKeyboardComponent : public MidiKeyboardComponent 
+class VirtualKeyboardComponent : public MidiKeyboardComponent
 {
 public:
     VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o);
-    ~VirtualKeyboardComponent() { }
+    ~VirtualKeyboardComponent() {}
 
     void setKeypressOctaveOffset (int offset);
     int getKeypressOctaveOffset() const { return keypressOctaveOffset; }
@@ -44,9 +43,13 @@ class VirtualKeyboardView : public ContentView
 public:
     VirtualKeyboardView();
     virtual ~VirtualKeyboardView();
-    
+
     void didBecomeActive() override;
-    void stabilizeContent() override { didBecomeActive(); resized(); }
+    void stabilizeContent() override
+    {
+        didBecomeActive();
+        resized();
+    }
 
     void saveState (PropertiesFile*) override;
     void restoreState (PropertiesFile*) override;
@@ -60,7 +63,7 @@ private:
     ScopedPointer<VirtualKeyboardComponent> keyboard;
     MidiKeyboardState internalState;
     int keyWidth = 16;
-    
+
     Label midiChannelLabel;
     Slider midiChannel;
     Label midiProgramLabel;
@@ -76,4 +79,4 @@ private:
     void stabilizeWidthControls();
 };
 
-}
+} // namespace Element

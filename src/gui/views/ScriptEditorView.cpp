@@ -95,15 +95,15 @@ public:
 
 private:
     ScriptNodeEditor& owner;
-   #if JUCE_MAC
+#if JUCE_MAC
     static constexpr float defaultFontHeight = 14.5f;
-   #elif JUCE_WINDOWS
+#elif JUCE_WINDOWS
     static constexpr float defaultFontHeight = 13.f;
-   #elif JUCE_LINUX
+#elif JUCE_LINUX
     static constexpr float defaultFontHeight = 16.f;
-   #else
+#else
     static constexpr float defaultFontHeight = 15.f;
-   #endif
+#endif
 };
 #endif
 
@@ -151,11 +151,11 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (const Node& n, bool edit
 {
     setName ("ScriptNodeScriptEditorView");
 
-    applyButton.setButtonText (editingUI ? TRANS("Apply") : TRANS("Apply"));
+    applyButton.setButtonText (editingUI ? TRANS ("Apply") : TRANS ("Apply"));
     addAndMakeVisible (applyButton);
     applyButton.onClick = [this]() {
         Result r = Result::ok();
-        
+
         if (ScriptNode::Ptr sn = dynamic_cast<ScriptNode*> (node.getObject()))
         {
             auto& doc = sn->getCodeDocument (isEditingUI());
@@ -174,7 +174,8 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (const Node& n, bool edit
         if (! r.wasOk())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                "Script Error", r.getErrorMessage());
+                                              "Script Error",
+                                              r.getErrorMessage());
         }
     };
 }
@@ -182,7 +183,7 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (const Node& n, bool edit
 String ScriptNodeScriptEditorView::getScriptContent() const
 {
     if (ScriptNode::Ptr sn = dynamic_cast<ScriptNode*> (node.getObject()))
-        return sn->getCodeDocument(editingUI).getAllContent();
+        return sn->getCodeDocument (editingUI).getAllContent();
     return {};
 }
 
@@ -194,8 +195,7 @@ void ScriptNodeScriptEditorView::resized()
         getWidth() - 16 - applyButton.getWidth(),
         4,
         applyButton.getWidth(),
-        applyButton.getHeight()
-    );
+        applyButton.getHeight());
 }
 
-}
+} // namespace Element

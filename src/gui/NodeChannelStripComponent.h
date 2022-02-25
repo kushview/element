@@ -43,8 +43,7 @@ public:
         nodeName.setJustificationType (Justification::centredBottom);
         nodeName.setEditable (false, true, false);
         nodeName.setFont (10.f);
-        nodeName.onTextChange = [this]
-        {
+        nodeName.onTextChange = [this] {
             if (node.isValid())
                 node.setProperty (Tags::name, nodeName.getText());
         };
@@ -64,7 +63,7 @@ public:
     }
 
     ChannelStripComponent& getChannelStrip() { return channelStrip; }
-    
+
     void setVolumeMinMax (double minDb, double maxDb, double skew = 2.0)
     {
         channelStrip.setMinMaxDecibels (minDb, maxDb);
@@ -103,13 +102,13 @@ public:
     void resized() override
     {
         auto r (getLocalBounds());
-        nodeName.setBounds (r.removeFromTop(22).reduced (2));
+        nodeName.setBounds (r.removeFromTop (22).reduced (2));
         r.removeFromTop (10); // padding between strip title and IO boxes
 
         auto r2 = r.removeFromBottom (jmin (268, r.getHeight()));
         int boxSize = r2.getWidth() - 8;
         flowBox.setBounds (r2.removeFromTop (16).withSizeKeepingCentre (boxSize, 14));
-        channelBox.setBounds (r2.removeFromTop(16).withSizeKeepingCentre (boxSize, 14));
+        channelBox.setBounds (r2.removeFromTop (16).withSizeKeepingCentre (boxSize, 14));
         channelStrip.setBounds (r2);
     }
 
@@ -150,7 +149,7 @@ public:
             const auto cv = getCurrentVolume();
             if (static_cast<float> (channelStrip.getVolume()) != cv)
                 channelStrip.setVolume (cv, dontSendNotification);
-            
+
             channelStrip.setPower (! ptr->isSuspended(), false);
             if (channelStrip.isMuted() != ptr->isMuted())
                 channelStrip.setMuted (ptr->isMuted(), false);
@@ -199,8 +198,9 @@ public:
         stopTimer();
         node = newNode;
         isAudioOutNode = node.isAudioOutputNode();
-        isAudioInNode  = node.isAudioInputNode();
-        audioIns.clearQuick(); audioOuts.clearQuick();
+        isAudioInNode = node.isAudioInputNode();
+        audioIns.clearQuick();
+        audioOuts.clearQuick();
         node.getPorts (audioIns, audioOuts, PortType::Audio);
         displayName.referTo (node.getPropertyAsValue (Tags::name));
         stabilizeContent();
@@ -211,7 +211,7 @@ public:
     }
 
     inline Node getNode() const { return node; }
-    
+
     inline void setComboBoxesVisible (bool showChannelBox = true, bool showFlowBox = true)
     {
         useChannelBox = showChannelBox;
@@ -222,7 +222,7 @@ public:
 
     /** @internal */
     inline void comboBoxChanged (ComboBox* box) override
-    {    
+    {
         if (box == &flowBox)
         {
             updateComboBoxes (false, true);
@@ -232,7 +232,7 @@ public:
 
     /** Called when the volume slider changes. If this is set, you probably
         also want to override getCurrentVolume() */
-    std::function<void(double)> onVolumeChanged;
+    std::function<void (double)> onVolumeChanged;
 
 protected:
     /** Override this to return volume from the backend/model layer. The
@@ -256,14 +256,14 @@ private:
     ComboBox channelBox, flowBox;
     ChannelStripComponent channelStrip;
     bool listenForNodeSelected;
-    
+
     bool useFlowBox = true;
     bool useChannelBox = true;
 
-    int meterSpeedHz    = 15;
+    int meterSpeedHz = 15;
     bool isAudioOutNode = false;
-    bool isAudioInNode  = false;
-    bool monoMeter      = false;
+    bool isAudioInNode = false;
+    bool monoMeter = false;
 
     Value displayName;
 
@@ -273,7 +273,7 @@ private:
     SignalConnection volumeDoubleClickedConnection;
     SignalConnection muteChangedConnection;
 
-    inline bool isMonitoringInputs() const  { return flowBox.getSelectedId() == 1; }
+    inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
     inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 2; }
 
     void valueChanged (Value& value) override
@@ -303,13 +303,13 @@ private:
                 flowId = 2;
             flowBox.clear();
             flowBox.setTooltip ("Signal flow to monitor");
-            
+
             if (audioIns.size() > 0)
                 flowBox.addItem ("Input", 1);
             if (audioOuts.size() > 0)
                 flowBox.addItem ("Output", 2);
-        
-            if (flowBox.getNumItems() > 0 && !isAudioInNode && !isAudioOutNode)
+
+            if (flowBox.getNumItems() > 0 && ! isAudioInNode && ! isAudioOutNode)
             {
                 flowBox.setVisible (useFlowBox);
                 flowBox.setSelectedId (flowId, false);
@@ -328,12 +328,11 @@ private:
             channelBox.clear();
 
             // audio out node ports flipped until more robust
-            auto& ports = isAudioOutNode ? audioIns :        
-                    isMonitoringInputs() ? audioIns : audioOuts;
-            
+            auto& ports = isAudioOutNode ? audioIns : isMonitoringInputs() ? audioIns : audioOuts;
+
             const bool monoPorts = ports.size() % 2 != 0;
             const int step = monoPorts ? 1 : 2;
-            
+
             for (int i = 0; i < ports.size(); i += step)
             {
                 String text (int (i + 1));
@@ -371,14 +370,13 @@ private:
     {
         if (onVolumeChanged != nullptr)
             return onVolumeChanged (value);
-        
+
         if (NodeObjectPtr object = node.getObject())
         {
             auto gain = Decibels::decibelsToGain (value, -60.0);
             if (isAudioOutNode || isMonitoringInputs())
             {
-                if (gain != (double) node.getProperty ("inputGain", gain) ||
-                    gain != (double) object->getInputGain())
+                if (gain != (double) node.getProperty ("inputGain", gain) || gain != (double) object->getInputGain())
                 {
                     node.setProperty ("inputGain", gain);
                     object->setInputGain (static_cast<float> (gain));
@@ -386,8 +384,7 @@ private:
             }
             else
             {
-                if (gain != (double) node.getProperty ("gain", gain) ||
-                    gain != (double) object->getGain())
+                if (gain != (double) node.getProperty ("gain", gain) || gain != (double) object->getGain())
                 {
                     node.setProperty ("gain", gain);
                     object->setGain (static_cast<float> (gain));
@@ -410,4 +407,4 @@ private:
     }
 };
 
-}
+} // namespace Element

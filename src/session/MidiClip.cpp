@@ -30,7 +30,7 @@ MidiClip::MidiClip()
     NoteSequence notes (objectData.getOrCreateChildWithName ("notes", nullptr));
 }
 
-MidiClip::~MidiClip() { }
+MidiClip::~MidiClip() {}
 
 void MidiClip::addNotesTo (MidiMessageSequence& seq) const
 {
@@ -40,10 +40,10 @@ void MidiClip::addNotesTo (MidiMessageSequence& seq) const
         const Note note (notes.getChild (i));
         MidiMessage on, off;
         note.getMidi (on, off);
-        seq.addEvent(on);
-        seq.addEvent(off);
+        seq.addEvent (on);
+        seq.addEvent (off);
         seq.updateMatchedPairs();
     }
 }
 
-}
+} // namespace Element

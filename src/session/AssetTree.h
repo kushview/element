@@ -22,24 +22,24 @@
 #include "ElementApp.h"
 
 namespace Element {
-    
 
-class AssetTree :  private ValueTree::Listener
+class AssetTree : private ValueTree::Listener
 {
 public:
-
-    class Item {
+    class Item
+    {
     public:
-
         Item (AssetTree& parent, const ValueTree& d)
             : data (d),
               tree (parent)
-        { }
+        {
+        }
 
         Item (const Item& other)
             : data (other.data),
               tree (other.tree)
-        { }
+        {
+        }
 
         inline bool operator== (const Item& other) const { return data == other.data && &tree == &other.tree; }
         bool operator!= (const Item& other) const { return ! operator== (other); }
@@ -47,13 +47,13 @@ public:
         static Item createGroup (AssetTree& tree, const String& name, const String& uid);
         static Item touchFile (AssetTree& tree, const String& path, const String& uid);
 
-        inline bool isFile()  const { return data.hasType ("file"); }
+        inline bool isFile() const { return data.hasType ("file"); }
         inline bool isGroup() const { return data.hasType ("group") || isRoot(); }
-        inline bool isRoot()  const { return data.hasType (tree.rootType()); }
+        inline bool isRoot() const { return data.hasType (tree.rootType()); }
         inline bool isValid() const { return data.isValid(); }
 
         inline String getName() const { return data.getProperty ("name", "Untitled"); }
-        inline Value getNameValue()   { return data.getPropertyAsValue ("name", nullptr); }
+        inline Value getNameValue() { return data.getPropertyAsValue ("name", nullptr); }
         inline void setName (const String& name) { data.setProperty ("name", name, nullptr); }
 
         void setFile (const File& file);
@@ -71,7 +71,7 @@ public:
         Item findItemForFile (const File& file) const;
         Item findItemForId (const String& targetId) const;
 
-        template<class ChildFunc>
+        template <class ChildFunc>
         inline void foreachChild (ChildFunc& callback)
         {
             callback (*this);
@@ -105,21 +105,16 @@ public:
         ValueTree data; //XXX: this needs to be private
 
     private:
-
         friend class AssetTree;
-        Item& operator = (const Item& other);
-
+        Item& operator= (const Item& other);
 
         AssetTree& tree;
 
         void setMissingProperties();
     };
 
-
-    AssetTree (const ValueTree& parent, const String& rootName,
-               const String& rootValType = "assets", UndoManager* u = nullptr);
-    AssetTree (const String& rootName, const String& rootValType = "assets",
-               UndoManager* u = nullptr);
+    AssetTree (const ValueTree& parent, const String& rootName, const String& rootValType = "assets", UndoManager* u = nullptr);
+    AssetTree (const String& rootName, const String& rootValType = "assets", UndoManager* u = nullptr);
     AssetTree (const AssetTree& other);
 
     ~AssetTree();
@@ -182,18 +177,16 @@ public:
     /** Get the undomanager */
     UndoManager* getUndoManager();
 
-
     void testPrint() const;
 
     /** Replace the ValueTree with new data */
     void setAssetsNode (const ValueTree& data);
 
 protected:
-    virtual void assetAdded (const AssetTree::Item&) { }
-    virtual void assetRemoved (const AssetTree::Item&) { }
+    virtual void assetAdded (const AssetTree::Item&) {}
+    virtual void assetRemoved (const AssetTree::Item&) {}
 
 private:
-
     AssetTree& operator= (const AssetTree& other);
 
     UndoManager* undo;
@@ -211,12 +204,11 @@ private:
     void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int indexOfRemoved);
     void valueTreeChildOrderChanged (ValueTree& parent, int newIndex, int oldIndex);
     void valueTreeParentChanged (ValueTree& child);
-
 };
 
 typedef AssetTree::Item AssetItem;
 typedef OwnedArray<AssetItem> AssetArray;
 
-}
+} // namespace Element
 
 #endif // ELEMENT_ASSET_TREE_H

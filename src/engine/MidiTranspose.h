@@ -32,7 +32,7 @@ public:
     }
 
     ~MidiTranspose()
-    { 
+    {
         output.clear();
     }
 
@@ -50,7 +50,7 @@ public:
     }
 
     /** Process a single event */
-    inline void process (MidiMessage& message) noexcept 
+    inline void process (MidiMessage& message) noexcept
     {
         if (message.isNoteOnOrOff())
             message.setNoteNumber (offset.get() + message.getNoteNumber());
@@ -63,8 +63,9 @@ public:
             return;
 
         MidiBuffer::Iterator iter (midi);
-        MidiMessage msg; int frame = 0;
-        
+        MidiMessage msg;
+        int frame = 0;
+
         while (iter.getNextEvent (msg, frame))
         {
             if (frame >= numSamples)
@@ -83,4 +84,4 @@ private:
     MidiBuffer output;
 };
 
-}
+} // namespace Element

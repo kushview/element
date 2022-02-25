@@ -166,10 +166,10 @@
     bool GraphPort::isInput() const   { return portIsInput; }
     bool GraphPort::isOutput() const  { return ! portIsInput; }
 
-    #if 1
+#if 1
     bool GraphPort::hasEditor() const                  { return false; }
     AudioProcessorEditor* GraphPort::createEditor()    { return nullptr; }
-    #endif
+#endif
     int GraphPort::getNumParameters()                  { return 0; }
     const String GraphPort::getParameterName (int)     { return String(); }
 
@@ -193,12 +193,12 @@
 
         if (graph != nullptr)
         {
-    #if 0
+#if 0
             setPlayConfigDetails (portType == audioOutputNode ? graph->getNumOutputChannels() : 0,
                                   portType == audioInputNode ? graph->getNumInputChannels() : 0,
                                   getSampleRate(),
                                   getBlockSize());
-    #endif
+#endif
             updateHostDisplay();
         }
     }

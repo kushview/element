@@ -32,7 +32,7 @@ class GraphSettingsView : public ContentView,
 public:
     GraphSettingsView();
     ~GraphSettingsView();
-    
+
     void setPropertyPanelHeaderVisible (bool);
     void setGraphButtonVisible (bool isVisible);
     void setUpdateOnActiveGraphChange (bool shouldUpdate);
@@ -51,5 +51,4 @@ private:
     void valueChanged (Value& value) override;
 };
 
-}
-
+} // namespace Element

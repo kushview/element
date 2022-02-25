@@ -24,7 +24,7 @@
 #include "Workspace.h"
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"
-#define EL_VIEW_CONSOLE     "LuaConsoleViw"
+#define EL_VIEW_CONSOLE "LuaConsoleViw"
 
 namespace Element {
 
@@ -48,11 +48,11 @@ public:
     ContentView();
     virtual ~ContentView();
 
-    virtual void initializeView (AppController&) { }
-    virtual void willBeRemoved() { }
-    virtual void willBecomeActive() { }
-    virtual void didBecomeActive() { }
-    virtual void stabilizeContent() { }
+    virtual void initializeView (AppController&) {}
+    virtual void willBeRemoved() {}
+    virtual void willBecomeActive() {}
+    virtual void didBecomeActive() {}
+    virtual void stabilizeContent() {}
 
     /** Save state to user settings */
     virtual void saveState (PropertiesFile*) {}
@@ -68,9 +68,9 @@ public:
 
     /** Set true if pressing escape should close the view */
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
-    
-    virtual void getAllCommands (Array<CommandID>&) override { }
-    virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+
+    virtual void getAllCommands (Array<CommandID>&) override {}
+    virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
     virtual bool perform (const InvocationInfo&) override { return false; }
 
     Signal<void()> nodeMoved;
@@ -87,11 +87,11 @@ private:
     ApplicationCommandTarget* nextCommandTarget = nullptr;
 };
 
-class ContentComponent :  public Component, 
-                          public DragAndDropContainer,
-                          public FileDragAndDropTarget,
-                          public DragAndDropTarget,
-                          public ApplicationCommandTarget
+class ContentComponent : public Component,
+                         public DragAndDropContainer,
+                         public FileDragAndDropTarget,
+                         public DragAndDropTarget,
+                         public ApplicationCommandTarget
 {
 protected:
     ContentComponent (AppController& app);
@@ -116,7 +116,7 @@ public:
 
     /** Manually refresh the toolbar */
     void refreshToolbar();
-    
+
     //=========================================================================
     /** Manually refresh the status bar */
     void refreshStatusBar();
@@ -125,11 +125,15 @@ public:
     virtual void resizeContent (const Rectangle<int>& area) { ignoreUnused (area); }
 
     virtual NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nullptr; }
-    
+
     /** Implement if can set a view directly. Subclasses should take ownership
         of the view.
     */
-    virtual void setMainView (ContentView* v) { jassertfalse; delete v; }
+    virtual void setMainView (ContentView* v)
+    {
+        jassertfalse;
+        delete v;
+    }
 
     virtual void setMainView (const String& name);
     virtual void setAccessoryView (const String& name);
@@ -138,17 +142,17 @@ public:
 
     virtual void nextMainView();
     virtual void backMainView();
-    
+
     virtual void saveState (PropertiesFile*);
     virtual void restoreState (PropertiesFile*);
-    
+
     virtual int getNavSize();
-    
+
     virtual bool isVirtualKeyboardVisible() const { return false; }
     virtual void setVirtualKeyboardVisible (const bool isVisible);
     virtual void toggleVirtualKeyboard();
     virtual VirtualKeyboardView* getVirtualKeyboardView() const { return nullptr; }
-    
+
     virtual void setNodeChannelStripVisible (const bool isVisible);
     virtual bool isNodeChannelStripVisible() const;
 
@@ -161,37 +165,37 @@ public:
 
     //=========================================================================
     virtual String getWorkspaceName() const { return String(); }
-    virtual WorkspaceState getWorkspaceState() { return { }; }
-    virtual void applyWorkspaceState (const WorkspaceState&) { }
+    virtual WorkspaceState getWorkspaceState() { return {}; }
+    virtual void applyWorkspaceState (const WorkspaceState&) {}
     virtual void addWorkspaceItemsToMenu (PopupMenu&) {}
     virtual void handleWorkspaceMenuResult (int) {}
 
     //=========================================================================
-    virtual void getSessionState (String&) { }
-    virtual void applySessionState (const String&) { }
+    virtual void getSessionState (String&) {}
+    virtual void applySessionState (const String&) {}
 
     //=========================================================================
     void setExtraView (Component* c);
-    
+
     Component* getExtraView() const { return extra.get(); }
 
     /** @internal */
-    void paint (Graphics &g) override;
+    void paint (Graphics& g) override;
     /** @internal */
     void resized() override;
     /** @internal */
-    bool isInterestedInFileDrag (const StringArray &files) override;
+    bool isInterestedInFileDrag (const StringArray& files) override;
     /** @internal */
-    void filesDropped (const StringArray &files, int x, int y) override;
+    void filesDropped (const StringArray& files, int x, int y) override;
     /** @internal */
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     /** @internal */
     void itemDropped (const SourceDetails& dragSourceDetails) override;
 
     /** @internal */
-    void getAllCommands (Array<CommandID>&) override { }
+    void getAllCommands (Array<CommandID>&) override {}
     /** @internal */
-    void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+    void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
     /** @internal */
     bool perform (const InvocationInfo&) override { return false; }
     /** @internal */
@@ -199,14 +203,16 @@ public:
 
 private:
     AppController& controller;
-    
+
     struct Tooltips;
     SharedResourcePointer<Tooltips> tips;
-    
-    class Toolbar; friend class Toolbar;
+
+    class Toolbar;
+    friend class Toolbar;
     ScopedPointer<Toolbar> toolBar;
-    
-    class StatusBar; friend class StatusBar;
+
+    class StatusBar;
+    friend class StatusBar;
     ScopedPointer<StatusBar> statusBar;
 
     std::unique_ptr<Component> extra;
@@ -218,4 +224,4 @@ private:
     int toolBarSize;
 };
 
-}
+} // namespace Element

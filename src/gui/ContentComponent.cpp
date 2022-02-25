@@ -45,7 +45,7 @@
 #include "plugins/PluginEditor.h"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
- #define EL_USE_ACCESSORY_BUTTONS 0
+#define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
 namespace Element {
@@ -65,14 +65,14 @@ ContentView::~ContentView()
 ContentComponent* ContentComponent::create (AppController& controller)
 {
     auto& s = controller.getGlobals().getSettings();
-    
+
     if (s.getMainContentType() == "workspace")
         return new ContentComponentPro (controller);
     if (s.getMainContentType() == "standard")
         return new ContentComponentSolo (controller);
     if (s.getMainContentType() == "compact")
         return new ContentComponentSolo (controller);
-    
+
     return new ContentComponentSolo (controller);
 }
 
@@ -88,7 +88,7 @@ bool ContentView::keyPressed (const KeyPress& k, Component*)
         ViewHelpers::invokeDirectly (this, Commands::showLastContentView, true);
         return true;
     }
-    
+
     return false;
 }
 
@@ -107,22 +107,22 @@ class ContentComponent::Toolbar : public Component,
 {
 public:
     Toolbar (ContentComponent& o)
-        : owner(o), viewBtn ("e")
+        : owner (o), viewBtn ("e")
     {
         addAndMakeVisible (viewBtn);
         viewBtn.setButtonText ("view");
 
-       #if EL_USE_ACCESSORY_BUTTONS
+#if EL_USE_ACCESSORY_BUTTONS
         addAndMakeVisible (panicBtn);
-       #endif
+#endif
 
         if (isPluginVersion())
         {
             addAndMakeVisible (menuBtn);
             menuBtn.setButtonText ("settings");
         }
-        
-        for (auto* b : { (Button*)&viewBtn, (Button*)&panicBtn, (Button*)&menuBtn })
+
+        for (auto* b : { (Button*) &viewBtn, (Button*) &panicBtn, (Button*) &menuBtn })
             b->addListener (this);
         addAndMakeVisible (tempoBar);
         addAndMakeVisible (transport);
@@ -133,17 +133,17 @@ public:
         addAndMakeVisible (mapButton);
         addAndMakeVisible (midiBlinker);
 
-       #if defined (EL_FREE)
+#if defined(EL_FREE)
         mapButton.setEnabled (false);
         mapButton.setVisible (false);
-       #endif
+#endif
 
-       #if ! defined (EL_PRO)
+#if ! defined(EL_PRO)
         transport.setEnabled (false);
         transport.setVisible (false);
-       #endif
+#endif
     }
-    
+
     ~Toolbar()
     {
         for (const auto& conn : connections)
@@ -154,8 +154,8 @@ public:
     void setSession (SessionPtr s)
     {
         session = s;
-        auto& settings (ViewHelpers::getGlobals(this)->getSettings());
-        auto engine (ViewHelpers::getGlobals(this)->getAudioEngine());
+        auto& settings (ViewHelpers::getGlobals (this)->getSettings());
+        auto engine (ViewHelpers::getGlobals (this)->getAudioEngine());
 
         if (midiIOMonitor == nullptr)
         {
@@ -167,7 +167,7 @@ public:
         }
 
         auto* props = settings.getUserSettings();
-        
+
         bool showExt = false;
         if (isPluginVersion())
         {
@@ -179,7 +179,7 @@ public:
         {
             showExt = props->getValue ("clockSource") == "midiClock";
         }
-       
+
         if (session)
         {
             tempoBar.setUseExtButton (showExt);
@@ -187,54 +187,54 @@ public:
             tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue (Tags::externalSync));
             tempoBar.stabilizeWithSession (false);
         }
-        
+
         mapButton.setEnabled (true);
         resized();
     }
-    
+
     void resized() override
     {
         Rectangle<int> r (getLocalBounds());
-        
+
         const int tempoBarWidth = jmax (120, tempoBar.getWidth());
         const int tempoBarHeight = getHeight() - 16;
-        
+
         tempoBar.setBounds (10, 8, tempoBarWidth, tempoBarHeight);
-        
+
         r.removeFromRight (10);
-        
+
         if (menuBtn.isVisible())
         {
             menuBtn.setBounds (r.removeFromRight (tempoBarHeight * 3)
-                   .withSizeKeepingCentre (tempoBarHeight * 3, tempoBarHeight));
+                                   .withSizeKeepingCentre (tempoBarHeight * 3, tempoBarHeight));
             r.removeFromRight (4);
         }
-        
+
         if (panicBtn.isVisible())
         {
-            panicBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                    .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+            panicBtn.setBounds (r.removeFromRight (tempoBarHeight)
+                                    .withSizeKeepingCentre (tempoBarHeight, tempoBarHeight));
             r.removeFromRight (4);
         }
-        
+
         if (midiBlinker.isVisible())
         {
             const int blinkerW = 8;
-            midiBlinker.setBounds (r.removeFromRight(blinkerW).withSizeKeepingCentre (blinkerW, tempoBarHeight));
+            midiBlinker.setBounds (r.removeFromRight (blinkerW).withSizeKeepingCentre (blinkerW, tempoBarHeight));
             r.removeFromRight (4);
         }
 
         if (viewBtn.isVisible())
         {
-            viewBtn.setBounds (r.removeFromRight(tempoBarHeight * 2)
-                                .withSizeKeepingCentre(tempoBarHeight * 2, tempoBarHeight));
+            viewBtn.setBounds (r.removeFromRight (tempoBarHeight * 2)
+                                   .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
         }
-        
+
         if (mapButton.isVisible())
         {
             r.removeFromRight (4);
             mapButton.setBounds (r.removeFromRight (tempoBarHeight * 2)
-                                  .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
+                                     .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
         }
 
         if (transport.isVisible())
@@ -244,22 +244,23 @@ public:
             transport.setBounds (r.withSizeKeepingCentre (r.getWidth(), tempoBarHeight));
         }
     }
-    
+
     void paint (Graphics& g) override
     {
         g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1));
         g.fillRect (getLocalBounds());
     }
-    
+
     void buttonClicked (Button* btn) override
     {
         if (btn == &viewBtn)
         {
             const int command = owner.getMainViewName() == "PatchBay" || owner.getMainViewName() == "GraphEditor"
-                              ? Commands::rotateContentView : Commands::showLastContentView;
+                                    ? Commands::rotateContentView
+                                    : Commands::showLastContentView;
             ViewHelpers::invokeDirectly (this, command, true);
         }
-        else  if (btn == &panicBtn)
+        else if (btn == &panicBtn)
         {
             ViewHelpers::invokeDirectly (this, Commands::panic, true);
         }
@@ -274,7 +275,7 @@ public:
                 if (auto* pe = findParentComponentOfClass<PluginEditor>())
                 {
                     menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
-                    menu.addItem (99997,  "Report zero latency", true, pe->isReportingZeroLatency());
+                    menu.addItem (99997, "Report zero latency", true, pe->isReportingZeroLatency());
                 }
             }
 
@@ -296,7 +297,7 @@ public:
                 {
                     if (auto* pe = findParentComponentOfClass<PluginEditor>())
                     {
-                        pe->setReportZeroLatency (!pe->isReportingZeroLatency());
+                        pe->setReportZeroLatency (! pe->isReportingZeroLatency());
                         owner.refreshStatusBar();
                     }
                 }
@@ -308,7 +309,8 @@ public:
             {
                 mapping->learn (! mapButton.getToggleState());
                 mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
-                if (mapping->isLearning()) {
+                if (mapping->isLearning())
+                {
                     startTimer (600);
                 }
             }
@@ -336,8 +338,8 @@ private:
     SettingButton mapButton;
     PanicButton panicBtn;
     TempoAndMeterBar tempoBar;
-    TransportBar     transport;
-    MidiBlinker      midiBlinker;
+    TransportBar transport;
+    MidiBlinker midiBlinker;
     Array<SignalConnection> connections;
     bool isPluginVersion() const
     {
@@ -358,16 +360,16 @@ public:
         sampleRate.addListener (this);
         streamingStatus.addListener (this);
         if (isPluginVersion())
-            latencySamplesChangedConnection = world.getAudioEngine()->sampleLatencyChanged.connect(
+            latencySamplesChangedConnection = world.getAudioEngine()->sampleLatencyChanged.connect (
                 std::bind (&StatusBar::updateLabels, this));
-        
+
         addAndMakeVisible (sampleRateLabel);
         addAndMakeVisible (streamingStatusLabel);
         addAndMakeVisible (statusLabel);
-        
+
         const Colour labelColor (0xffaaaaaa);
         const Font font (12.0f);
-        
+
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (Label* label = dynamic_cast<Label*> (getChildComponent (i)))
@@ -377,47 +379,47 @@ public:
                 label->setJustificationType (Justification::centredLeft);
             }
         }
-        
+
         startTimer (2000);
         updateLabels();
     }
-    
+
     ~StatusBar()
     {
         latencySamplesChangedConnection.disconnect();
         sampleRate.removeListener (this);
         streamingStatus.removeListener (this);
     }
-    
+
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter(0.1));
+        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1));
         g.fillRect (getLocalBounds());
-        
+
         const Colour lineColor (0xff545454);
         g.setColour (lineColor);
-        
-        g.drawLine(streamingStatusLabel.getX(), 0, streamingStatusLabel.getX(), getHeight());
-        g.drawLine(sampleRateLabel.getX(), 0, sampleRateLabel.getX(), getHeight());
+
+        g.drawLine (streamingStatusLabel.getX(), 0, streamingStatusLabel.getX(), getHeight());
+        g.drawLine (sampleRateLabel.getX(), 0, sampleRateLabel.getX(), getHeight());
         g.setColour (lineColor.darker());
         g.drawLine (0, 0, getWidth(), 0);
         g.setColour (lineColor);
         g.drawLine (0, 1, getWidth(), 1);
     }
-    
+
     void resized() override
     {
         Rectangle<int> r (getLocalBounds());
         statusLabel.setBounds (r.removeFromLeft (getWidth() / 5));
         streamingStatusLabel.setBounds (r.removeFromLeft (r.getWidth() / 2));
-        sampleRateLabel.setBounds(r);
+        sampleRateLabel.setBounds (r);
     }
-    
+
     void valueChanged (Value&) override
     {
         updateLabels();
     }
-    
+
     void updateLabels()
     {
         auto engine = world.getAudioEngine();
@@ -427,7 +429,7 @@ public:
 
             if (auto* pe = findParentComponentOfClass<PluginEditor>())
             {
-                // workaround - 
+                // workaround -
                 engine->updateExternalLatencySamples();
                 const int latencySamples = pe->getLatencySamples();
                 text << latencySamples << " samples";
@@ -449,15 +451,15 @@ public:
                 text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
                 text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
                 sampleRateLabel.setText (text, dontSendNotification);
-                
+
                 text.clear();
                 String strText = streamingStatus.getValue().toString();
                 if (strText.isEmpty())
                     strText = "Running";
-                text << "Engine: " << strText << ":  CPU: " << String(devices.getCpuUsage() * 100.f, 1) << "%";
+                text << "Engine: " << strText << ":  CPU: " << String (devices.getCpuUsage() * 100.f, 1) << "%";
                 streamingStatusLabel.setText (text, dontSendNotification);
-                
-                statusLabel.setText (String("Device: ") + dev->getName(), dontSendNotification);
+
+                statusLabel.setText (String ("Device: ") + dev->getName(), dontSendNotification);
             }
             else
             {
@@ -470,28 +472,29 @@ public:
             {
                 auto text = streamingStatusLabel.getText();
                 auto name = plugins.getCurrentlyScannedPluginName();
-                name = File::createFileWithoutCheckingPath(name).getFileName();
+                name = File::createFileWithoutCheckingPath (name).getFileName();
 
                 text << " - Scanning: " << name;
                 if (name.isNotEmpty())
-                    streamingStatusLabel.setText(text, dontSendNotification);
+                    streamingStatusLabel.setText (text, dontSendNotification);
             }
         }
     }
-    
+
 private:
     Globals& world;
     DeviceManager& devices;
     PluginManager& plugins;
-    
+
     Label sampleRateLabel, streamingStatusLabel, statusLabel;
     ValueTree node;
     Value sampleRate, streamingStatus, status;
-    
+
     SignalConnection latencySamplesChangedConnection;
 
     friend class Timer;
-    void timerCallback() override {
+    void timerCallback() override
+    {
         updateLabels();
     }
     bool isPluginVersion()
@@ -512,7 +515,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)
 {
     setOpaque (true);
-    
+
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     statusBarVisible = true;
     statusBarSize = 22;
@@ -521,7 +524,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     toolBar->setSession (getGlobals().getSession());
     toolBarVisible = true;
     toolBarSize = 32;
-    
+
     // {
     //     int w, h;
     //     windowSizeProperty (settings, "mainWindowState", w, h, 760, 480);
@@ -532,7 +535,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
 
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
-    
+
     resized();
 }
 
@@ -540,8 +543,7 @@ ContentComponent::~ContentComponent() noexcept
 {
 }
 
-
-void ContentComponent::paint (Graphics &g)
+void ContentComponent::paint (Graphics& g)
 {
     g.fillAll (LookAndFeel::backgroundColor);
 }
@@ -556,15 +558,14 @@ void ContentComponent::resized()
         statusBar->setBounds (r.removeFromBottom (statusBarSize));
     if (extra && extraViewHeight > 0)
         extra->setBounds (r.removeFromBottom (extraViewHeight));
-    
+
     resizeContent (r);
 }
 
 bool ContentComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
-    return desc.toString() == "ccNavConcertinaPanel" || 
-        (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
+    return desc.toString() == "ccNavConcertinaPanel" || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
 }
 
 void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
@@ -583,12 +584,11 @@ void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
         if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
-            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin",
-                                              "The plugin you dropped could not be loaded for an unknown reason.");
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin", "The plugin you dropped could not be loaded for an unknown reason.");
     }
 }
 
-bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
+bool ContentComponent::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
     {
@@ -599,7 +599,7 @@ bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
     return false;
 }
 
-void ContentComponent::filesDropped (const StringArray &files, int x, int y)
+void ContentComponent::filesDropped (const StringArray& files, int x, int y)
 {
     for (const auto& path : files)
     {
@@ -612,7 +612,7 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
             //     unlock.save();
             //     unlock.loadAll();
             //     stabilizeViews();
-            //     AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
+            //     AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File",
             //         "Your software has successfully been unlocked.");
             // }
             // else
@@ -629,13 +629,13 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         {
             if (true)
             {
-               #if defined (EL_PRO)
+#if defined(EL_PRO)
                 if (auto* sess = controller.findChild<SessionController>())
                     sess->importGraph (file);
-               #else
+#else
                 if (auto* gc = controller.findChild<GraphController>())
                     gc->openGraph (file);
-               #endif
+#endif
             }
             else
             {
@@ -652,11 +652,10 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
             }
             else
             {
-                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Presets", "Error adding preset");
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
             }
         }
-        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&
-                 (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
+        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
         {
             PluginDescription desc;
             desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
@@ -681,22 +680,22 @@ void ContentComponent::refreshStatusBar()
     statusBar->updateLabels();
 }
 
-Globals& ContentComponent::getGlobals()                 { return controller.getGlobals(); }
-SessionPtr ContentComponent::getSession()               { return getGlobals().getSession(); }
-String ContentComponent::getMainViewName() const        { return String(); }
-String ContentComponent::getAccessoryViewName() const   { return String(); }
-int ContentComponent::getNavSize()                      { return 220; }
+Globals& ContentComponent::getGlobals() { return controller.getGlobals(); }
+SessionPtr ContentComponent::getSession() { return getGlobals().getSession(); }
+String ContentComponent::getMainViewName() const { return String(); }
+String ContentComponent::getAccessoryViewName() const { return String(); }
+int ContentComponent::getNavSize() { return 220; }
 void ContentComponent::setMainView (const String& name) { ignoreUnused (name); }
-void ContentComponent::backMainView()                   { }
-void ContentComponent::nextMainView()                   { }
+void ContentComponent::backMainView() {}
+void ContentComponent::nextMainView() {}
 void ContentComponent::setAccessoryView (const String& name) { ignoreUnused (name); }
-void ContentComponent::stabilize (const bool refreshDataPathTrees) { }
-void ContentComponent::stabilizeViews()                 { }
-void ContentComponent::saveState (PropertiesFile*)      { }
-void ContentComponent::restoreState (PropertiesFile*)   { }
+void ContentComponent::stabilize (const bool refreshDataPathTrees) {}
+void ContentComponent::stabilizeViews() {}
+void ContentComponent::saveState (PropertiesFile*) {}
+void ContentComponent::restoreState (PropertiesFile*) {}
 void ContentComponent::setCurrentNode (const Node& node) { ignoreUnused (node); }
-void ContentComponent::setVirtualKeyboardVisible (const bool) { }
-void ContentComponent::setNodeChannelStripVisible (const bool) { }
+void ContentComponent::setVirtualKeyboardVisible (const bool) {}
+void ContentComponent::setNodeChannelStripVisible (const bool) {}
 bool ContentComponent::isNodeChannelStripVisible() const { return false; }
 
 void ContentComponent::toggleVirtualKeyboard()
@@ -706,7 +705,7 @@ void ContentComponent::toggleVirtualKeyboard()
 
 ApplicationCommandTarget* ContentComponent::getNextCommandTarget() { return nullptr; }
 
-void ContentComponent::setShowAccessoryView (const bool) { }
+void ContentComponent::setShowAccessoryView (const bool) {}
 bool ContentComponent::showAccessoryView() const { return false; }
 
-}
+} // namespace Element

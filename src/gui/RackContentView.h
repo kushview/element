@@ -24,7 +24,7 @@
 
 namespace Element {
 
-class RackView :  public Component
+class RackView : public Component
 {
 public:
     RackView();
@@ -34,13 +34,15 @@ public:
     void resized();
 
     void setMainComponent (Component* comp);
+
 private:
-    class Impl; friend class Impl;
+    class Impl;
+    friend class Impl;
     ScopedPointer<Impl> impl;
     ScopedPointer<Component> main;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RackView)
 };
 
-}
+} // namespace Element
 
-#endif  // RACKVIEW_H_INCLUDED
+#endif // RACKVIEW_H_INCLUDED

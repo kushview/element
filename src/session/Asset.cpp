@@ -22,7 +22,8 @@
 namespace Element {
 AssetNode::AssetNode (const AssetItem& item)
     : ObjectModel (Slugs::asset)
-{ }
-
-AssetNode::~AssetNode() { }
+{
 }
+
+AssetNode::~AssetNode() {}
+} // namespace Element

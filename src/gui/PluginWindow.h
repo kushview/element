@@ -38,11 +38,11 @@ public:
         Colour backgroundColor;
         int titleBarHeight;
     };
-    
+
     ~PluginWindow();
 
     ContentComponent* getElementContentComponent() const;
-    
+
     Toolbar* getToolbar() const;
     void updateGraphNode (NodeObject* newNode, Component* newEditor);
     Node getNode() const { return node; }
@@ -53,13 +53,11 @@ public:
 
     void activeWindowStatusChanged() override;
 
-	int getDesktopWindowStyleFlags() const override
+    int getDesktopWindowStyleFlags() const override
     {
-		return DocumentWindow::getDesktopWindowStyleFlags() |
-               ComponentPeer::windowHasCloseButton |
-			   ComponentPeer::windowHasTitleBar |
-               ComponentPeer::windowHasDropShadow;
-	}
+        return DocumentWindow::getDesktopWindowStyleFlags() | ComponentPeer::windowHasCloseButton | ComponentPeer::windowHasTitleBar | ComponentPeer::windowHasDropShadow;
+    }
+
 protected:
     PluginWindow (GuiController&, Component* const uiComp, const Node& node);
 
@@ -77,4 +75,4 @@ private:
     }
 };
 
-}
+} // namespace Element

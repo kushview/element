@@ -38,10 +38,10 @@ void PluginsPanel::initializeView (AppController& app)
 void PluginsPanel::didBecomeActive() {}
 void PluginsPanel::stabilizeContent() {}
 
-void PluginsPanel::resized() 
+void PluginsPanel::resized()
 {
     if (view)
         view->setBounds (getLocalBounds());
 }
 
-}
+} // namespace Element

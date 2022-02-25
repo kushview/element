@@ -32,4 +32,4 @@ public:
     void deactivate() override;
 };
 
-}
+} // namespace Element

@@ -33,8 +33,9 @@ public:
     void resized() override;
 
 private:
-    class Logger; std::unique_ptr<Logger> logger;
+    class Logger;
+    std::unique_ptr<Logger> logger;
     TextButton clearButton;
 };
 
-}
+} // namespace Element

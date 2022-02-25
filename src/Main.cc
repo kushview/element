@@ -41,20 +41,22 @@ class Startup : public ActionBroadcaster,
 public:
     Startup (Globals& w, const bool useThread = false, const bool splash = false)
         : Thread ("ElementStartup"),
-          world (w), usingThread (useThread),
+          world (w),
+          usingThread (useThread),
           showSplash (splash),
-        isFirstRun (false)
-    { }
+          isFirstRun (false)
+    {
+    }
 
-    ~Startup() { }
-    
+    ~Startup() {}
+
     void launchApplication()
     {
         Settings& settings (world.getSettings());
-        isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
+        isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
         DataPath path;
         ignoreUnused (path);
-        
+
         updateSettingsIfNeeded();
 
         DeviceManager& devices (world.getDeviceManager());
@@ -62,15 +64,18 @@ public:
         if (auto dxml = props->getXmlValue ("devices"))
         {
             devices.initialise (DeviceManager::maxAudioChannels,
-                                DeviceManager::maxAudioChannels, 
-                                dxml.get(), true, "default", nullptr);
+                                DeviceManager::maxAudioChannels,
+                                dxml.get(),
+                                true,
+                                "default",
+                                nullptr);
         }
         else
         {
             devices.initialiseWithDefaultDevices (DeviceManager::maxAudioChannels,
                                                   DeviceManager::maxAudioChannels);
         }
-        
+
         if (usingThread)
         {
             startThread();
@@ -80,13 +85,13 @@ public:
         else
         {
             if (showSplash)
-                (new StartupScreen())->deleteAfterDelay (RelativeTime::seconds(5), true);
+                (new StartupScreen())->deleteAfterDelay (RelativeTime::seconds (5), true);
             this->run();
         }
     }
 
     ScopedPointer<AppController> controller;
-    
+
     const bool isUsingThread() const { return usingThread; }
 
 private:
@@ -95,11 +100,11 @@ private:
     const bool usingThread;
     const bool showSplash;
     bool isFirstRun;
-    
-    class StartupScreen :  public SplashScreen
+
+    class StartupScreen : public SplashScreen
     {
     public:
-        StartupScreen ()
+        StartupScreen()
             : SplashScreen ("Element", 600, 400, true)
         {
             addAndMakeVisible (text);
@@ -131,7 +136,7 @@ private:
         Settings& settings (world.getSettings());
         ignoreUnused (settings);
     }
-    
+
     void run() override
     {
         Settings& settings (world.getSettings());
@@ -149,10 +154,9 @@ private:
 
         sendActionMessage ("finishedLaunching");
     }
-    
+
     void setupAudioEngine()
     {
-
     }
 
     void setupMidiEngine()
@@ -178,9 +182,9 @@ private:
     void setupPlugins()
     {
         auto& settings (world.getSettings());
-        auto& plugins  (world.getPluginManager());
-        auto  engine   (world.getAudioEngine());
-        
+        auto& plugins (world.getPluginManager());
+        auto engine (world.getAudioEngine());
+
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine, world.getMidiEngine()));
         plugins.addFormat (new ElementAudioPluginFormat (world));
@@ -206,19 +210,19 @@ class Application : public JUCEApplication,
                     public ActionListener
 {
 public:
-    Application() { }
-    virtual ~Application() { }
+    Application() {}
+    virtual ~Application() {}
 
-    const String getApplicationName()    override      { return Util::appName(); }
-    const String getApplicationVersion() override      { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed()    override      { return true; }
+    const String getApplicationName() override { return Util::appName(); }
+    const String getApplicationVersion() override { return ProjectInfo::versionString; }
+    bool moreThanOneInstanceAllowed() override { return true; }
 
-    void initialise (const String& commandLine ) override
+    void initialise (const String& commandLine) override
     {
         world = new Globals (commandLine);
         if (maybeLaunchSlave (commandLine))
             return;
-        
+
         if (sendCommandLineToPreexistingInstance())
         {
             quit();
@@ -229,20 +233,20 @@ public:
         printCopyNotice();
         launchApplication();
     }
-    
+
     void actionListenerCallback (const String& message) override
     {
         if (message == "finishedLaunching")
             finishLaunching();
     }
-    
+
     void shutdown() override
     {
         if (! world || ! controller)
             return;
 
         slaves.clearQuick (true);
-        
+
         auto engine (world->getAudioEngine());
         auto& plugins (world->getPluginManager());
         auto& settings (world->getSettings());
@@ -252,10 +256,10 @@ public:
 
         controller->saveSettings();
         controller->deactivate();
-        
+
         plugins.saveUserPlugins (settings);
         midi.writeSettings (settings);
-        
+
         if (auto el = world->getDeviceManager().createStateXml())
             props->setValue ("devices", el.get());
         if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
@@ -275,19 +279,18 @@ public:
             Application::quit();
             return;
         }
-        
-       #if defined (EL_PRO)
+
+#if defined(EL_PRO)
         auto* sc = controller->findChild<SessionController>();
-        
+
         if (world->getSettings().askToSaveSession())
         {
             // - 0 if the third button was pressed ('cancel')
             // - 1 if the first button was pressed ('yes')
             // - 2 if the middle button was pressed ('no')
             const int res = ! sc->hasSessionChanged() ? 2
-                : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Session",
-                    "This session may have changes. Would you like to save before exiting?");
-            
+                                                      : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Session", "This session may have changes. Would you like to save before exiting?");
+
             if (res == 1)
                 sc->saveSession();
             if (res != 0)
@@ -301,9 +304,7 @@ public:
             }
             else
             {
-                if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "Save Session",
-                        "This session has not been saved to disk yet.\nWould you like to before exiting?",
-                        "Yes", "No"))
+                if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "Save Session", "This session has not been saved to disk yet.\nWould you like to before exiting?", "Yes", "No"))
                 {
                     sc->saveSession();
                 }
@@ -312,7 +313,7 @@ public:
             Application::quit();
         }
 
-       #else // SE
+#else // SE
         auto* gc = controller->findChild<GraphController>();
         if (world->getSettings().askToSaveSession())
         {
@@ -320,11 +321,10 @@ public:
             // - 1 if the first button was pressed ('yes')
             // - 2 if the middle button was pressed ('no')
             const int res = ! gc->hasGraphChanged() ? 2
-                : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Graph",
-                    "This graph may have changes. Would you like to save before exiting?");
+                                                    : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Graph", "This graph may have changes. Would you like to save before exiting?");
             if (res == 1)
                 gc->saveGraph (false);
-            
+
             if (res != 0)
                 Application::quit();
         }
@@ -333,15 +333,15 @@ public:
             gc->saveGraph (false);
             Application::quit();
         }
-       #endif
+#endif
     }
 
     void anotherInstanceStarted (const String& commandLine) override
     {
         if (! controller)
             return;
-        
-       #if defined (EL_PRO)
+
+#if defined(EL_PRO)
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = commandLine.unquoted().trim();
@@ -354,7 +354,7 @@ public:
                     sc->importGraph (file);
             }
         }
-       #else
+#else
         if (auto* gc = controller->findChild<GraphController>())
         {
             const auto path = commandLine.unquoted().trim();
@@ -365,36 +365,36 @@ public:
                     gc->openGraph (file);
             }
         }
-       #endif
+#endif
     }
 
     void resumed() override
     {
-       #if JUCE_WINDOWS
+#if JUCE_WINDOWS
         auto& devices (world->getDeviceManager());
         devices.restartLastAudioDevice();
-       #endif
+#endif
     }
 
     void finishLaunching()
     {
         if (nullptr != controller || nullptr == startup)
             return;
-        
+
         if (world->getSettings().scanForPluginsOnStartup())
             world->getPluginManager().scanAudioPlugins();
-    
+
         controller = startup->controller.release();
         startup = nullptr;
-        
+
         controller->run();
 
-       #ifndef EL_FREE
+#ifndef EL_FREE
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
-       #endif
+#endif
 
-       #if EL_PRO
+#if EL_PRO
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = world->cli.commandLine.unquoted().trim();
@@ -405,15 +405,15 @@ public:
                     sc->openFile (File (path));
             }
         }
-       #endif
+#endif
     }
-    
+
 private:
     String launchCommandLine;
-    ScopedPointer<Globals>              world;
-    ScopedPointer<AppController>        controller;
-    ScopedPointer<Startup>              startup;
-    OwnedArray<kv::ChildProcessSlave>   slaves;
+    ScopedPointer<Globals> world;
+    ScopedPointer<AppController> controller;
+    ScopedPointer<Startup> startup;
+    OwnedArray<kv::ChildProcessSlave> slaves;
 
     void printCopyNotice()
     {
@@ -435,49 +435,49 @@ private:
             {
                 if (slave->initialiseFromCommandLine (commandLine, pid))
                 {
-				   #if JUCE_MAC
+#if JUCE_MAC
                     Process::setDockIconVisible (false);
-				   #endif
+#endif
                     juce::shutdownJuce_GUI();
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     void launchApplication()
     {
         if (nullptr != controller)
             return;
-        
+
         startup = new Startup (*world, false, false);
         startup->addActionListener (this);
         startup->launchApplication();
     }
-    
+
     void initializeModulePath()
     {
         const File path (File::getSpecialLocation (File::invokedExecutableFile));
-        File modDir = path.getParentDirectory().getParentDirectory()
-                          .getChildFile("lib/element").getFullPathName();
-       #if JUCE_DEBUG
-        if (! modDir.exists()) {
-            modDir = path.getParentDirectory().getParentDirectory()
-                         .getChildFile ("modules");
+        File modDir = path.getParentDirectory().getParentDirectory().getChildFile ("lib/element").getFullPathName();
+#if JUCE_DEBUG
+        if (! modDir.exists())
+        {
+            modDir = path.getParentDirectory().getParentDirectory().getChildFile ("modules");
         }
-       #endif
-        
-       #if JUCE_WINDOWS
-        String putEnv = "ELEMENT_MODULE_PATH="; putEnv << modDir.getFullPathName();
+#endif
+
+#if JUCE_WINDOWS
+        String putEnv = "ELEMENT_MODULE_PATH=";
+        putEnv << modDir.getFullPathName();
         putenv (putEnv.toRawUTF8());
-       #else
+#else
         setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
-       #endif
+#endif
     }
 };
 
-}
+} // namespace Element
 
 START_JUCE_APPLICATION (Element::Application)

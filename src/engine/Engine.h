@@ -33,4 +33,4 @@ public:
 
 typedef ReferenceCountedObjectPtr<Engine> EnginePtr;
 
-}
+} // namespace Element

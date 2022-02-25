@@ -35,22 +35,22 @@ class InternalFormat : public AudioPluginFormat
 {
 public:
     InternalFormat (AudioEngine&, MidiEngine&);
-    ~InternalFormat() { }
+    ~InternalFormat() {}
 
-    void getAllTypes (OwnedArray <PluginDescription>& results);
+    void getAllTypes (OwnedArray<PluginDescription>& results);
 
     // AudioPluginFormat
-    String getName() const                                      override { return "Internal"; }
-    bool fileMightContainThisPluginType (const String&)         override { return true; }
-    FileSearchPath getDefaultLocationsToSearch()                override { return FileSearchPath(); }
-    bool canScanForPlugins() const                              override { return false; }
-    void findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String&) override { }
-    bool doesPluginStillExist (const PluginDescription&)        override { return true; }
+    String getName() const override { return "Internal"; }
+    bool fileMightContainThisPluginType (const String&) override { return true; }
+    FileSearchPath getDefaultLocationsToSearch() override { return FileSearchPath(); }
+    bool canScanForPlugins() const override { return false; }
+    void findAllTypesForFile (OwnedArray<PluginDescription>& ds, const String&) override {}
+    bool doesPluginStillExist (const PluginDescription&) override { return true; }
     String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
     bool pluginNeedsRescanning (const PluginDescription&) override { return false; }
     StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override { return StringArray(); }
     bool isTrivialToScan() const override { return true; }
-    
+
 protected:
     void createPluginInstance (const PluginDescription&,
                                double initialSampleRate,
@@ -76,31 +76,31 @@ private:
     AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
 };
 
-class ElementAudioPluginFormat   : public AudioPluginFormat
+class ElementAudioPluginFormat : public AudioPluginFormat
 {
 public:
     ElementAudioPluginFormat (Globals&);
-    ~ElementAudioPluginFormat() { }
-    
+    ~ElementAudioPluginFormat() {}
+
     // AudioPluginFormat
-    String getName() const                                      override { return "Element"; }
-    bool fileMightContainThisPluginType (const String&)         override { return true; }
-    FileSearchPath getDefaultLocationsToSearch()                override { return FileSearchPath(); }
-    bool canScanForPlugins() const                              override { return true; }
-    void findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String&) override;
-    bool doesPluginStillExist (const PluginDescription&)        override { return true; }
+    String getName() const override { return "Element"; }
+    bool fileMightContainThisPluginType (const String&) override { return true; }
+    FileSearchPath getDefaultLocationsToSearch() override { return FileSearchPath(); }
+    bool canScanForPlugins() const override { return true; }
+    void findAllTypesForFile (OwnedArray<PluginDescription>& ds, const String&) override;
+    bool doesPluginStillExist (const PluginDescription&) override { return true; }
     String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
-    bool pluginNeedsRescanning (const PluginDescription&)       override { return false; }
+    bool pluginNeedsRescanning (const PluginDescription&) override { return false; }
     StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override;
     bool isTrivialToScan() const override { return true; }
-    
+
 protected:
     void createPluginInstance (const PluginDescription&,
                                double initialSampleRate,
                                int initialBufferSize,
                                PluginCreationCallback) override;
     bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
-    
+
 private:
     Globals& world;
     PluginDescription reverbDesc;
@@ -109,4 +109,4 @@ private:
     AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
 };
 
-}
+} // namespace Element

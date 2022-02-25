@@ -28,7 +28,7 @@ struct PortCount
     {
         clear();
     }
-    
+
     PortCount (const PortCount& o)
     {
         operator= (o);
@@ -36,7 +36,7 @@ struct PortCount
 
     PortCount& operator= (const PortCount& o)
     {
-        memcpy (inputs,  o.inputs,  PortType::Unknown * sizeof (int));
+        memcpy (inputs, o.inputs, PortType::Unknown * sizeof (int));
         memcpy (outputs, o.outputs, PortType::Unknown * sizeof (int));
         return *this;
     }
@@ -51,7 +51,7 @@ struct PortCount
 
     void clear()
     {
-        memset (inputs,  0, PortType::Unknown * sizeof (int));
+        memset (inputs, 0, PortType::Unknown * sizeof (int));
         memset (outputs, 0, PortType::Unknown * sizeof (int));
     }
 
@@ -107,7 +107,7 @@ struct PortCount
                 String symbol = symPrefix;
                 symbol << "_in_" << String (j + 1);
                 String name = namePrefix;
-                name << " In " << int(j + 1);
+                name << " In " << int (j + 1);
 
                 ports.add (i, index++, j, symbol, name, true);
             }
@@ -117,7 +117,7 @@ struct PortCount
                 String symbol = symPrefix;
                 symbol << "_out_" << String (j + 1);
                 String name = namePrefix;
-                name << " Out " << int(j + 1);
+                name << " Out " << int (j + 1);
 
                 ports.add (i, index++, j, symbol, name, false);
             }
@@ -125,8 +125,8 @@ struct PortCount
     }
 
 private:
-    int  inputs [PortType::Unknown];
-    int outputs [PortType::Unknown];
+    int inputs[PortType::Unknown];
+    int outputs[PortType::Unknown];
 };
 
-}
+} // namespace Element

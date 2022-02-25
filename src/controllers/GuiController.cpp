@@ -39,15 +39,15 @@ namespace Element {
 
 struct GlobalLookAndFeel
 {
-    GlobalLookAndFeel()     { LookAndFeel::setDefaultLookAndFeel (&look); }
-    ~GlobalLookAndFeel()    { LookAndFeel::setDefaultLookAndFeel (nullptr); }
+    GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (&look); }
+    ~GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (nullptr); }
     Element::LookAndFeel look;
 };
 
 struct GuiController::KeyPressManager : public KeyListener
 {
-    KeyPressManager (GuiController& g) : owner (g) { }
-    ~KeyPressManager() { }
+    KeyPressManager (GuiController& g) : owner (g) {}
+    ~KeyPressManager() {}
 
     bool keyPressed (const KeyPress& key, Component* component) override
     {
@@ -102,7 +102,8 @@ static Array<GuiController*> sGuiControllerInstances;
 
 GuiController::GuiController (Globals& w, AppController& a)
     : AppController::Child(),
-      controller(a), world(w),
+      controller (a),
+      world (w),
       windowManager (nullptr),
       mainWindow (nullptr)
 {
@@ -121,15 +122,15 @@ GuiController::~GuiController()
 }
 
 Element::LookAndFeel& GuiController::getLookAndFeel()
-{ 
+{
     jassert (sGlobalLookAndFeel);
     return sGlobalLookAndFeel->look;
 }
 
 void GuiController::saveProperties (PropertiesFile* props)
 {
-    jassert(props);
-    
+    jassert (props);
+
     if (mainWindow)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
@@ -140,10 +141,10 @@ void GuiController::saveProperties (PropertiesFile* props)
     if (content)
     {
         props->setValue ("lastContentView", content->getMainViewName());
-        props->setValue ("navSize",         content->getNavSize());
+        props->setValue ("navSize", content->getNavSize());
         props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
-        props->setValue ("channelStrip",    content->isNodeChannelStripVisible());
-        props->setValue ("accessoryView",   content->showAccessoryView());
+        props->setValue ("channelStrip", content->isNodeChannelStripVisible());
+        props->setValue ("accessoryView", content->showAccessoryView());
         content->saveState (props);
     }
 }
@@ -161,7 +162,7 @@ void GuiController::deactivate()
 
     auto& settings = getSettings();
     saveProperties (settings.getUserSettings());
-    
+
     closeAllPluginWindows (true);
     SystemTray::setEnabled (false);
 
@@ -169,7 +170,7 @@ void GuiController::deactivate()
     {
         if (keys)
             mainWindow->removeKeyListener (keys.get());
-        
+
         closeAllWindows();
         mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
@@ -206,7 +207,7 @@ void GuiController::runDialog (const String& uri)
     {
         if (auto* const dialog = windowManager->findDialogByName ("Preferences"))
         {
-            if (!dialog->isOnDesktop() || !dialog->isVisible())
+            if (! dialog->isOnDesktop() || ! dialog->isVisible())
             {
                 dialog->setVisible (true);
                 dialog->addToDesktop();
@@ -220,19 +221,31 @@ void GuiController::runDialog (const String& uri)
         opts.useNativeTitleBar = true;
         opts.dialogTitle = "Preferences";
         opts.componentToCentreAround = (Component*) mainWindow.get();
-        
+
         if (DialogWindow* dw = opts.create())
         {
             dw->setName ("Preferences");
             dw->setComponentID ("PreferencesDialog");
-            windowManager->push (dw, true);        
+            windowManager->push (dw, true);
         }
     }
 }
 
-void GuiController::closePluginWindow (PluginWindow* w) { if (windowManager) windowManager->closePluginWindow (w); }
-void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible) { if (windowManager) windowManager->closeOpenPluginWindowsFor (nodeId, visible); }
-void GuiController::closeAllPluginWindows (const bool visible) { if (windowManager) windowManager->closeAllPluginWindows (visible); }
+void GuiController::closePluginWindow (PluginWindow* w)
+{
+    if (windowManager)
+        windowManager->closePluginWindow (w);
+}
+void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible)
+{
+    if (windowManager)
+        windowManager->closeOpenPluginWindowsFor (nodeId, visible);
+}
+void GuiController::closeAllPluginWindows (const bool visible)
+{
+    if (windowManager)
+        windowManager->closeAllPluginWindows (visible);
+}
 
 void GuiController::closePluginWindowsFor (const Node& node, const bool visible)
 {
@@ -251,7 +264,7 @@ void GuiController::runDialog (Component* c, const String& title)
             windowManager->push (dw);
 }
 
-void GuiController::showSplash() { }
+void GuiController::showSplash() {}
 
 ContentComponent* GuiController::getContentComponent()
 {
@@ -260,7 +273,7 @@ ContentComponent* GuiController::getContentComponent()
         content.reset (ContentComponent::create (controller));
         content->setSize (760, 480);
     }
-    
+
     return content.get();
 }
 
@@ -285,8 +298,7 @@ PluginWindow* GuiController::getPluginWindow (const Node& node) const
     return nullptr;
 }
 
-void GuiController::showPluginWindowsFor (const Node& node, const bool recursive,
-                                          const bool force, const bool focus)
+void GuiController::showPluginWindowsFor (const Node& node, const bool recursive, const bool force, const bool focus)
 {
     if (! node.isGraph())
     {
@@ -307,10 +319,10 @@ void GuiController::presentPluginWindow (const Node& node, const bool focus)
 
     if (node.isIONode() || node.isGraph())
     {
-        DBG("[EL] not showing pugin window for: " << node.getName());
+        DBG ("[EL] not showing pugin window for: " << node.getName());
         return;
     }
-    
+
     auto* window = windowManager->getPluginWindowFor (node);
     if (! window)
         window = windowManager->createPluginWindowFor (node);
@@ -336,7 +348,7 @@ bool GuiController::haveActiveWindows() const
     if (mainWindow && mainWindow->isActiveWindow())
         return true;
     for (int i = 0; i < getNumPluginWindows(); ++i)
-        if (getPluginWindow(i)->isActiveWindow())
+        if (getPluginWindow (i)->isActiveWindow())
             return true;
     return false;
 }
@@ -363,9 +375,9 @@ void GuiController::run()
     }
 
     mainWindow->addToDesktop();
-    Desktop::getInstance().setGlobalScaleFactor(
+    Desktop::getInstance().setGlobalScaleFactor (
         getWorld().getSettings().getDesktopScale());
-    
+
     if (pf->getBoolValue ("mainWindowVisible", true))
     {
         mainWindow->setVisible (true);
@@ -377,7 +389,7 @@ void GuiController::run()
         mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
     }
-    
+
     findSibling<SessionController>()->resetChanges();
     refreshSystemTray();
     stabilizeViews();
@@ -395,33 +407,33 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
     return findSibling<WorkspacesController>();
 }
 
-void GuiController::getAllCommands (Array <CommandID>& commands)
+void GuiController::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
-       #if defined (EL_PRO)
+#if defined(EL_PRO)
         Commands::showSessionConfig,
-        Commands::showGraphMixer,
-       #endif
-       #if defined (EL_SOLO) || defined (EL_PRO)
-        Commands::toggleChannelStrip,
-       #endif
-        Commands::showAbout,
-		Commands::showPluginManager,
-		Commands::showPreferences,
-        Commands::showGraphConfig,
-        Commands::showPatchBay,
-        Commands::showGraphEditor,
-        Commands::showLastContentView,
-        Commands::toggleVirtualKeyboard,
-        Commands::rotateContentView,
-        Commands::showAllPluginWindows,
-        Commands::hideAllPluginWindows,
-        Commands::showKeymapEditor,
-        Commands::showControllerDevices,
-        Commands::toggleUserInterface,
-        Commands::showConsole
+            Commands::showGraphMixer,
+#endif
+#if defined(EL_SOLO) || defined(EL_PRO)
+            Commands::toggleChannelStrip,
+#endif
+            Commands::showAbout,
+            Commands::showPluginManager,
+            Commands::showPreferences,
+            Commands::showGraphConfig,
+            Commands::showPatchBay,
+            Commands::showGraphEditor,
+            Commands::showLastContentView,
+            Commands::toggleVirtualKeyboard,
+            Commands::rotateContentView,
+            Commands::showAllPluginWindows,
+            Commands::hideAllPluginWindows,
+            Commands::showKeymapEditor,
+            Commands::showControllerDevices,
+            Commands::toggleUserInterface,
+            Commands::showConsole
     });
-    
+
     commands.add (Commands::quit);
 }
 
@@ -449,7 +461,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
 
-       #ifdef EL_PRO
+#ifdef EL_PRO
         // MARK: Session Commands
         case Commands::sessionClose:
             result.setInfo ("Close Session", "Close the current session", Commands::Categories::Session, 0);
@@ -486,15 +498,16 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
             result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::Session, Info::isDisabled);
             break;
-        case Commands::showSessionConfig:
-        {
+        case Commands::showSessionConfig: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->getMainViewName() == "SessionSettings") flags |= Info::isTicked;
+            if (content && content->getMainViewName() == "SessionSettings")
+                flags |= Info::isTicked;
             result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
-        } break;
-       #endif
+        }
+        break;
+#endif
 
-       #ifndef EL_PRO
+#ifndef EL_PRO
         // MARK: Graph Commands
         case Commands::graphNew:
             result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
@@ -514,10 +527,9 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         case Commands::importSession:
             // result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Import Session", "Import a graph from a session", 
-                Commands::Categories::Session, 0);
+            result.setInfo ("Import Session", "Import a graph from a session", Commands::Categories::Session, 0);
             break;
-       #endif
+#endif
 
         // MARK: Media Commands
         case Commands::mediaNew:
@@ -532,11 +544,11 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case Commands::mediaSave:
             result.setInfo ("Save Media", "Saves the currently viewed object", Commands::Categories::Session, 0);
             break;
-        
+
         case Commands::mediaSaveAs:
             result.setInfo ("Save Media As", "Saves the current object with another name", Commands::Categories::Session, 0);
             break;
-            
+
         // MARK: Show Commands
         case Commands::showPreferences:
             result.setInfo ("Show Preferences", "Element Preferences", Commands::Categories::Application, 0);
@@ -546,96 +558,94 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Show About", "About this program", Commands::Categories::Application, 0);
             break;
         case Commands::showLegacyView:
-            result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", 
-                            Commands::Categories::UserInterface, 0);
+            result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", Commands::Categories::UserInterface, 0);
             break;
         case Commands::showPluginManager:
             result.setInfo ("Plugin Manager", "Element Plugin Management", Commands::Categories::Application, 0);
             break;
-        
+
         case Commands::showLastContentView:
             result.setInfo ("Last View", "Shows the last content view", Commands::Categories::UserInterface, 0);
             break;
 
-        case Commands::showGraphConfig:
-        {
+        case Commands::showGraphConfig: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->getMainViewName() == "GraphSettings") flags |= Info::isTicked;
+            if (content && content->getMainViewName() == "GraphSettings")
+                flags |= Info::isTicked;
             result.setInfo ("Graph Settings", "Graph Settings", Commands::Categories::Session, flags);
-        } break;
-        
+        }
+        break;
+
         case Commands::showPatchBay: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->getMainViewName() == "PatchBay") flags |= Info::isTicked;
+            if (content && content->getMainViewName() == "PatchBay")
+                flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F1Key, 0);
             result.setInfo ("Patch Bay", "Show the patch bay", Commands::Categories::Session, flags);
-        } break;
-        
+        }
+        break;
+
         case Commands::showGraphEditor: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->getMainViewName() == "GraphEditor") flags |= Info::isTicked;
+            if (content && content->getMainViewName() == "GraphEditor")
+                flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F2Key, 0);
-            result.setInfo ("Graph Editor", "Show the graph editor", 
-                Commands::Categories::UserInterface, flags);
-        } break;
+            result.setInfo ("Graph Editor", "Show the graph editor", Commands::Categories::UserInterface, flags);
+        }
+        break;
 
-
-
-       #if defined (EL_PRO)
+#if defined(EL_PRO)
         case Commands::showGraphMixer: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->showAccessoryView() && 
-                content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
+            if (content && content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
             {
                 flags |= Info::isTicked;
             }
-            result.setInfo ("Graph Mixer", "Show/hide the graph mixer", 
-                Commands::Categories::UserInterface, flags);
-        } break;
-        
+            result.setInfo ("Graph Mixer", "Show/hide the graph mixer", Commands::Categories::UserInterface, flags);
+        }
+        break;
+
         case Commands::showConsole: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->showAccessoryView() && 
-                content->getAccessoryViewName() == EL_VIEW_CONSOLE)
+            if (content && content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_CONSOLE)
             {
                 flags |= Info::isTicked;
             }
-            result.setInfo ("Console", "Show the scripting console", 
-                Commands::Categories::UserInterface, flags);
-        } break;
-       #endif
+            result.setInfo ("Console", "Show the scripting console", Commands::Categories::UserInterface, flags);
+        }
+        break;
+#endif
 
-        case Commands::showControllerDevices:
-        {
+        case Commands::showControllerDevices: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->getMainViewName() == "ControllerDevicesView") flags |= Info::isTicked;
-            result.setInfo ("Controller Devices", "Show the session's controllers", 
-                Commands::Categories::Session, flags);
-        } break;
-        
+            if (content && content->getMainViewName() == "ControllerDevicesView")
+                flags |= Info::isTicked;
+            result.setInfo ("Controller Devices", "Show the session's controllers", Commands::Categories::Session, flags);
+        }
+        break;
+
         case Commands::toggleUserInterface:
-            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", 
-                Commands::Categories::UserInterface, 0);
+            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", Commands::Categories::UserInterface, 0);
             break;
 
-       #if defined (EL_PRO) || defined (EL_SOLO)
-        case Commands::toggleChannelStrip:
-        {
+#if defined(EL_PRO) || defined(EL_SOLO)
+        case Commands::toggleChannelStrip: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->isNodeChannelStripVisible()) flags |= Info::isTicked;
-            result.setInfo ("Channel Strip", "Toggles the global channel strip", 
-                Commands::Categories::UserInterface, flags);
-        } break;
-       #endif
-        
-        case Commands::toggleVirtualKeyboard:
-        {
+            if (content && content->isNodeChannelStripVisible())
+                flags |= Info::isTicked;
+            result.setInfo ("Channel Strip", "Toggles the global channel strip", Commands::Categories::UserInterface, flags);
+        }
+        break;
+#endif
+
+        case Commands::toggleVirtualKeyboard: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->isVirtualKeyboardVisible()) flags |= Info::isTicked;
-            result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", 
-                Commands::Categories::UserInterface, flags);
-        } break;
-        
+            if (content && content->isVirtualKeyboardVisible())
+                flags |= Info::isTicked;
+            result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", Commands::Categories::UserInterface, flags);
+        }
+        break;
+
         case Commands::rotateContentView:
             result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
             result.setInfo ("Rotate View", "Show the graph editor", Commands::Categories::Session, 0);
@@ -651,42 +661,39 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         case Commands::showKeymapEditor:
             // result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Keymap Editor", "Show the keyboard shortcuts and edit them.", 
-                            Commands::Categories::UserInterface, 0);
+            result.setInfo ("Keymap Editor", "Show the keyboard shortcuts and edit them.", Commands::Categories::UserInterface, 0);
             break;
 
         case Commands::checkNewerVersion:
-            result.setInfo ("Check For Updates", "Check newer version", 
-                            Commands::Categories::Application, 0);
+            result.setInfo ("Check For Updates", "Check newer version", Commands::Categories::Application, 0);
             break;
-            
+
         case Commands::signIn:
-            result.setInfo ("Sign In", "Saves the current object with another name", 
-                            Commands::Categories::Application, 0);
+            result.setInfo ("Sign In", "Saves the current object with another name", Commands::Categories::Application, 0);
             break;
         case Commands::signOut:
-            result.setInfo ("Sign Out", "Saves the current object with another name", 
-                            Commands::Categories::Application,   0);
+            result.setInfo ("Sign Out", "Saves the current object with another name", Commands::Categories::Application, 0);
             break;
-            
+
         case Commands::quit:
             result.setInfo ("Quit", "Quit the app", Commands::Categories::Application, 0);
             result.addDefaultKeypress ('q', ModifierKeys::commandModifier);
             break;
-        
+
         case Commands::undo: {
             int flags = getAppController().getUndoManager().canUndo() ? 0 : Info::isDisabled;
-            result.setInfo ("Undo", "Undo the last operation", 
-                Commands::Categories::Application, flags);
+            result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier);
-        } break;
+        }
+        break;
         case Commands::redo: {
             bool canRedo = getAppController().getUndoManager().canRedo();
             int flags = canRedo ? 0 : Info::isDisabled;
             result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-        } break;
-        
+        }
+        break;
+
         case Commands::cut:
             result.setInfo ("Cut", "Cut", Commands::Categories::Application, 0);
             break;
@@ -701,7 +708,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case Commands::selectAll:
             result.setInfo ("Select All", "Select all", Commands::Categories::Application, 0);
             break;
-            
+
         case Commands::transportRewind:
             result.setInfo ("Rewind", "Transport Rewind", "Engine", 0);
             result.addDefaultKeypress ('j', 0);
@@ -725,8 +732,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
 
         case Commands::recentsClear:
-            result.setInfo ("Clear Recent Files", "Clears the recently opened files list",
-                            Commands::Categories::Application, 0);
+            result.setInfo ("Clear Recent Files", "Clears the recently opened files list", Commands::Categories::Application, 0);
             result.setActive (app.getRecentlyOpenedFilesList().getNumFiles() > 0);
             break;
     }
@@ -742,7 +748,8 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showControllerDevices: {
             content->setMainView ("ControllerDevicesView");
-        } break;
+        }
+        break;
         case Commands::showKeymapEditor:
             content->setMainView ("KeymapEditorView");
             break;
@@ -764,8 +771,7 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showGraphEditor:
             content->setMainView ("GraphEditor");
             break;
-        case Commands::showGraphMixer:
-        {
+        case Commands::showGraphMixer: {
             if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
             {
                 content->setShowAccessoryView (false);
@@ -774,9 +780,9 @@ bool GuiController::perform (const InvocationInfo& info)
             {
                 content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
             }
-        } break;
-        case Commands::showConsole:
-        {            
+        }
+        break;
+        case Commands::showConsole: {
             if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_CONSOLE)
             {
                 content->setShowAccessoryView (false);
@@ -785,19 +791,21 @@ bool GuiController::perform (const InvocationInfo& info)
             {
                 content->setAccessoryView (EL_VIEW_CONSOLE);
             }
-        } break;
-        
+        }
+        break;
+
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;
 
         case Commands::toggleChannelStrip: {
-           #if defined (EL_PRO) || defined (EL_SOLO)
+#if defined(EL_PRO) || defined(EL_SOLO)
             content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
-           #else
+#else
             content->setNodeChannelStripVisible (false);
-           #endif
-        } break;
+#endif
+        }
+        break;
 
         case Commands::showLastContentView:
             content->backMainView();
@@ -805,15 +813,17 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::rotateContentView:
             content->nextMainView();
             break;
-        
+
         case Commands::showAllPluginWindows: {
             if (auto s = getWorld().getSession())
                 showPluginWindowsFor (s->getActiveGraph(), true, true);
-        } break;
+        }
+        break;
 
         case Commands::hideAllPluginWindows: {
-                closeAllPluginWindows (false);
-        } break;
+            closeAllPluginWindows (false);
+        }
+        break;
 
         case Commands::toggleUserInterface: {
             auto session = getWorld().getSession();
@@ -830,24 +840,25 @@ bool GuiController::perform (const InvocationInfo& info)
                     window->toFront (true);
                     if (session)
                         showPluginWindowsFor (session->getActiveGraph(), true, false);
-                }   
+                }
             }
-        } break;
+        }
+        break;
 
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
-        
+
         default:
             result = false;
             break;
     }
-    
+
     if (result && mainWindow)
     {
         mainWindow->refreshMenu();
     }
-    
+
     return result;
 }
 
@@ -925,7 +936,7 @@ bool GuiController::handleMessage (const AppMessage& msg)
             content.reset (nullptr);
             mainWindow->setContentNonOwned (getContentComponent(), true);
             mainWindow->restoreWindowStateFromString (ws);
-            
+
             const auto stateName = settings.getWorkspace();
             WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
             if (! state.isValid())
@@ -933,7 +944,7 @@ bool GuiController::handleMessage (const AppMessage& msg)
             getContentComponent()->applyWorkspaceState (state);
             stabilizeContent();
         }
-    
+
         return true;
     }
     else if (auto m = dynamic_cast<const PresentViewMessage*> (&msg))
@@ -941,7 +952,7 @@ bool GuiController::handleMessage (const AppMessage& msg)
         if (m->create)
             if (auto* v = m->create())
                 getContentComponent()->setMainView (v);
-        
+
         return true;
     }
 
@@ -966,8 +977,8 @@ void GuiController::clearContentComponent()
 
     if (mainWindow)
     {
-        jassertfalse; // This should only ever be called from 
-                      // an Element plugin instance
+        jassertfalse; // This should only ever be called from
+            // an Element plugin instance
         mainWindow->clearContentComponent();
     }
 
@@ -975,4 +986,4 @@ void GuiController::clearContentComponent()
     content = nullptr;
 }
 
-}
+} // namespace Element

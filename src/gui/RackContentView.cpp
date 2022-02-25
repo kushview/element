@@ -24,14 +24,13 @@ namespace Element {
 class RackView::Impl
 {
 public:
-    Impl() { }
-    ~Impl() { }
+    Impl() {}
+    ~Impl() {}
 };
 
 RackView::RackView()
 {
     impl = new Impl();
-
 }
 
 RackView::~RackView()
@@ -42,11 +41,10 @@ RackView::~RackView()
 void RackView::paint (Graphics& g)
 {
     g.fillAll (LookAndFeel_KV1::backgroundColor);
-    
+
     g.setColour (Colors::elemental);
     g.setFont (14.0f);
-    g.drawText ("No Selection...", getLocalBounds(),
-                Justification::centred, true);
+    g.drawText ("No Selection...", getLocalBounds(), Justification::centred, true);
 }
 
 void RackView::resized()
@@ -71,8 +69,8 @@ void RackView::setMainComponent (Component* comp)
         if (main)
             addAndMakeVisible (comp);
     }
-    
+
     resized();
 }
 
-}
+} // namespace Element

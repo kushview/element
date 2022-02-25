@@ -35,23 +35,24 @@ LuaConsole::LuaConsole()
     startTimer (200);
 }
 
-LuaConsole::~LuaConsole() { }
+LuaConsole::~LuaConsole() {}
 
 void LuaConsole::textEntered (const String& text)
 {
-    if (text.isEmpty() || !env.valid())
+    if (text.isEmpty() || ! env.valid())
         return;
     Console::textEntered (text);
     auto& e = env;
     sol::state_view lua (e.lua_state());
-    
+
     auto gprint = lua["print"];
     lua["print"] = e["print"];
 
     try
     {
         bool haveReturn = true;
-        String buffer = "return "; buffer << text << ";";
+        String buffer = "return ";
+        buffer << text << ";";
         {
             auto loadResult = lua.load_buffer (buffer.toRawUTF8(), buffer.length());
             if (! loadResult.valid() || loadResult.status() != sol::load_status::ok)
@@ -60,10 +61,9 @@ void LuaConsole::textEntered (const String& text)
                 buffer = text;
             }
         }
-        
-        auto result = lua.script (buffer.toRawUTF8(), e,
-            "console=", sol::load_mode::text);
-        
+
+        auto result = lua.script (buffer.toRawUTF8(), e, "console=", sol::load_mode::text);
+
         if (result.valid())
         {
             if (haveReturn)
@@ -75,15 +75,14 @@ void LuaConsole::textEntered (const String& text)
             for (const auto& line : StringArray::fromLines (error.what()))
                 addText (line);
         }
-        
+
         if (lastError.isNotEmpty())
             addText (lastError);
-    }
-    catch (const sol::error& e)
+    } catch (const sol::error& e)
     {
         addText (e.what());
     }
-    
+
     lua["print"] = gprint;
     lastError.clear();
 }
@@ -97,20 +96,17 @@ void LuaConsole::setEnvironment (const sol::environment& _env)
 
     e["os"]["exit"] = sol::overload (
         [this]() { ViewHelpers::invokeDirectly (this, Commands::quit, true); },
-        [this](int code)
-        {
+        [this] (int code) {
             JUCEApplication::getInstance()->setApplicationReturnValue (code);
             ViewHelpers::invokeDirectly (this, Commands::quit, true);
-        }
-    );
+        });
 
-    e["clear"] = [this](sol::variadic_args va)
-    {
-        if (va.size() == 1 && va.get_type(0) == sol::type::boolean)
+    e["clear"] = [this] (sol::variadic_args va) {
+        if (va.size() == 1 && va.get_type (0) == sol::type::boolean)
         {
             clear (va.get<bool> (0));
         }
-        else if (va.size() >= 2 && va.get_type(0) == sol::type::boolean && va.get_type(1) == sol::type::boolean)
+        else if (va.size() >= 2 && va.get_type (0) == sol::type::boolean && va.get_type (1) == sol::type::boolean)
         {
             clear (va.get<bool> (0), va.get<bool> (1));
         }
@@ -120,8 +116,7 @@ void LuaConsole::setEnvironment (const sol::environment& _env)
         }
     };
 
-    e.set_function ("print", [this](sol::variadic_args va)
-    {
+    e.set_function ("print", [this] (sol::variadic_args va) {
         auto& e = env;
         String msg;
         for (auto v : va)
@@ -141,23 +136,23 @@ void LuaConsole::setEnvironment (const sol::environment& _env)
                         msg << sstr << "  ";
             }
         }
-        
+
         if (msg.isNotEmpty())
         {
             printMessages.add (msg.trimEnd());
         }
     });
 
-    try {
-        auto result = lua.safe_script("require('el.script').exec('console', _ENV)", e);
-        if (!result.valid())
+    try
+    {
+        auto result = lua.safe_script ("require('el.script').exec('console', _ENV)", e);
+        if (! result.valid())
         {
             sol::error error = result;
-            for (const auto& line : StringArray::fromLines(error.what()))
-                addText(line);
+            for (const auto& line : StringArray::fromLines (error.what()))
+                addText (line);
         }
-    }
-    catch (const sol::error& e)
+    } catch (const sol::error& e)
     {
         addText (e.what());
     }
@@ -169,10 +164,10 @@ void LuaConsole::timerCallback()
     {
         const int block = jmax (1, printMessages.size() / 4);
         const int count = jmin (block, printMessages.size());
-        
+
         if (count > 0)
-        {       
-            addText (printMessages.joinIntoString ("\n",0, count));
+        {
+            addText (printMessages.joinIntoString ("\n", 0, count));
             printMessages.removeRange (0, count);
         }
 
@@ -184,4 +179,4 @@ void LuaConsole::timerCallback()
     }
 }
 
-}
+} // namespace Element

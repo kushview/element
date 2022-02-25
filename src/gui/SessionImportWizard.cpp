@@ -45,11 +45,11 @@ public:
         return 0;
     }
 
-    void paintListBoxItem (int rowNumber, Graphics& g,
-                           int width, int height, bool rowIsSelected) override
+    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
     {
         auto session = wizard.getSession();
-        if (session == nullptr) return;
+        if (session == nullptr)
+            return;
         const auto graph (session->getGraph (rowNumber));
         ViewHelpers::drawBasicTextRow (graph.getName(), g, width, height, rowIsSelected);
     }
@@ -57,10 +57,11 @@ public:
     Node getSelectedGraph()
     {
         auto session = wizard.getSession();
-        if (session == nullptr) return Node();
+        if (session == nullptr)
+            return Node();
         return session->getGraph (getSelectedRow());
     }
-   #if 0
+#if 0
     virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                Component* existingComponentToUpdate);
     virtual void listBoxItemClicked (int row, const MouseEvent&);
@@ -73,7 +74,7 @@ public:
     virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe);
     virtual String getTooltipForRow (int row);
     virtual MouseCursor getMouseCursorForRow (int row);
-   #endif
+#endif
 
 private:
     SessionImportWizard& wizard;
@@ -94,17 +95,18 @@ public:
         addAndMakeVisible (graphsList);
         addAndMakeVisible (cancelButton);
         cancelButton.setButtonText ("Cancel");
-        cancelButton.onClick = [this]()
-        {
+        cancelButton.onClick = [this]() {
             if (auto* dialog = findParentComponentOfClass<SessionImportWizardDialog>())
                 dialog->closeButtonPressed();
-            else { jassertfalse; }
+            else
+            {
+                jassertfalse;
+            }
         };
 
         addAndMakeVisible (importButton);
         importButton.setButtonText ("Import");
-        importButton.onClick = [this]()
-        {
+        importButton.onClick = [this]() {
             if (auto* dialog = findParentComponentOfClass<SessionImportWizardDialog>())
             {
                 const auto data = graphsList.getSelectedGraph().getValueTree();
@@ -120,7 +122,7 @@ public:
         };
     }
 
-    ~Content() { }
+    ~Content() {}
 
     void paint (Graphics& g) override
     {
@@ -140,6 +142,7 @@ public:
         r.removeFromBottom (4);
         graphsList.setBounds (r);
     }
+
 private:
     friend class SessionImportWizard;
     Label instructions;
@@ -219,7 +222,7 @@ SessionImportWizardDialog::SessionImportWizardDialog (std::unique_ptr<Component>
     setVisible (true);
 }
 
-SessionImportWizardDialog::~SessionImportWizardDialog() { }
+SessionImportWizardDialog::~SessionImportWizardDialog() {}
 
 bool SessionImportWizardDialog::escapeKeyPressed()
 {
@@ -229,8 +232,7 @@ bool SessionImportWizardDialog::escapeKeyPressed()
 
 void SessionImportWizardDialog::closeButtonPressed()
 {
-    
     holder.reset();
 }
 
-}
+} // namespace Element

@@ -43,15 +43,15 @@ public:
             rms.clear();
         }
 
-        inline float getGain()          const { return gain.get(); }
-        inline int getNumChannels()     const { return numChannels; }
-        inline int getTrackId()         const { return trackId; }
-        inline bool isMuted()           const { return muted.get() > 0; }
+        inline float getGain() const { return gain.get(); }
+        inline int getNumChannels() const { return numChannels; }
+        inline int getTrackId() const { return trackId; }
+        inline bool isMuted() const { return muted.get() > 0; }
 
         inline float getLevel (const int channel)
         {
             if (isPositiveAndBelow (channel, rms.size()))
-                return rms.getReference(channel).get();
+                return rms.getReference (channel).get();
             return 0.f;
         }
 
@@ -74,7 +74,7 @@ public:
         friend class AudioMixerProcessor;
         const int trackId;
         const int numChannels;
-        Array<Atomic<float> > rms;
+        Array<Atomic<float>> rms;
         Atomic<int> muted;
         Atomic<int> nextMute;
         Atomic<float> gain;
@@ -97,25 +97,25 @@ public:
 
     struct Track
     {
-        int index       = -1;
-        int busIdx      = -1;
-        int numInputs   = 0;
-        int numOutputs  = 0;
-        float lastGain  = 1.0;
-        float gain      = 1.0;
-        bool mute       = false;
-        MonitorPtr      monitor;
+        int index = -1;
+        int busIdx = -1;
+        int numInputs = 0;
+        int numOutputs = 0;
+        float lastGain = 1.0;
+        float gain = 1.0;
+        bool mute = false;
+        MonitorPtr monitor;
 
         inline void update (const Track* const track)
         {
-            this->index         = track->index;
-            this->busIdx        = track->busIdx;
-            this->numInputs     = track->numInputs;
-            this->numOutputs    = track->numOutputs;
-            this->gain          = track->gain;
-            this->lastGain      = track->gain;
-            this->mute          = track->mute;
-            this->monitor       = track->monitor;
+            this->index = track->index;
+            this->busIdx = track->busIdx;
+            this->numInputs = track->numInputs;
+            this->numOutputs = track->numOutputs;
+            this->gain = track->gain;
+            this->lastGain = track->gain;
+            this->mute = track->mute;
+            this->monitor = track->monitor;
         }
     };
 
@@ -123,14 +123,14 @@ public:
                                   const double sampleRate = 44100.0,
                                   const int bufferSize = 1024)
         : BaseProcessor (BusesProperties()
-            .withOutput ("Master",  AudioChannelSet::stereo(), false))
+                             .withOutput ("Master", AudioChannelSet::stereo(), false))
     {
         tracks.ensureStorageAllocated (16);
         while (--numTracks >= 0)
             addStereoTrack();
         setRateAndBufferSizeDetails (sampleRate, bufferSize);
         addParameter (masterMute = new AudioParameterBool ("masterMute", "Master Mute", false));
-        addParameter (masterVolume  = new AudioParameterFloat ("masterVolume",  "Master Volume", -120.0f, 12.0f, 0.f));
+        addParameter (masterVolume = new AudioParameterFloat ("masterVolume", "Master Volume", -120.0f, 12.0f, 0.f));
         masterMonitor = new Monitor (-1, 2);
     }
 
@@ -141,30 +141,34 @@ public:
     inline void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier   = "element.audioMixer";
-        desc.descriptiveName    = "Simple 4 track mixer";
-        desc.category           = "Mixer";
-        desc.numInputChannels   = getTotalNumInputChannels();
-        desc.numOutputChannels  = getTotalNumOutputChannels();
+        desc.fileOrIdentifier = "element.audioMixer";
+        desc.descriptiveName = "Simple 4 track mixer";
+        desc.category = "Mixer";
+        desc.numInputChannels = getTotalNumInputChannels();
+        desc.numOutputChannels = getTotalNumOutputChannels();
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
 
-    int getNumTracks() const { ScopedLock sl (getCallbackLock()); return tracks.size(); }
-    
+    int getNumTracks() const
+    {
+        ScopedLock sl (getCallbackLock());
+        return tracks.size();
+    }
+
     MonitorPtr getMonitor (const int track = -1) const;
-    
-    void setTrackGain  (const int track, const float gain);
+
+    void setTrackGain (const int track, const float gain);
     void setTrackMuted (const int track, const bool mute);
-    bool isTrackMuted  (const int track) const;
+    bool isTrackMuted (const int track) const;
     float getTrackGain (const int track) const;
 
-    inline bool acceptsMidi()  const override { return false; }
+    inline bool acceptsMidi() const override { return false; }
     inline bool producesMidi() const override { return false; }
-    
+
     inline bool hasEditor() const override { return true; }
     AudioProcessorEditor* createEditor() override;
 
@@ -185,16 +189,15 @@ public:
 
     bool canAddBus (bool) const override { return true; }
     bool canRemoveBus (bool) const override { return true; }
-    bool canApplyBusCountChange (bool isInput, bool isAdding,
-                                 AudioProcessor::BusProperties& outProperties) override;
+    bool canApplyBusCountChange (bool isInput, bool isAdding, AudioProcessor::BusProperties& outProperties) override;
 
     double getTailLengthSeconds() const override { return 0.0; }
-    
+
     int getNumPrograms() override { return 1; }
     int getCurrentProgram() override { return 1; }
-    void setCurrentProgram (int) override { }
+    void setCurrentProgram (int) override {}
     const String getProgramName (int) override { return "Audio Mixer"; }
-    void changeProgramName (int, const String&) override { }
+    void changeProgramName (int, const String&) override {}
 
     void getStateInformation (juce::MemoryBlock&) override;
     void setStateInformation (const void*, int) override;
@@ -209,4 +212,4 @@ private:
     void addStereoTrack();
 };
 
-}
+} // namespace Element

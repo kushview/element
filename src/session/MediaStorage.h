@@ -20,7 +20,8 @@
 #ifndef ELEMENT_MEDIA_STORAGE_H
 #define ELEMENT_MEDIA_STORAGE_H
 
-class MediaStorage {
+class MediaStorage
+{
 public:
 private:
 };

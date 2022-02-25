@@ -19,9 +19,11 @@
 
 #pragma once
 
-class DataType {
+class DataType
+{
 public:
-    enum ID {
+    enum ID
+    {
         Audio,
         MIDI,
         Unknown
@@ -31,10 +33,16 @@ public:
 
     inline DataType() : type (Unknown) {}
     inline DataType (const ID& i) : type (i) {}
-    template<typename INT> inline
-    DataType (const INT& i)
-        : type (isPositiveAndBelow (i, static_cast<INT> (Unknown)) ? static_cast<ID> (i) : Unknown) {}
-    inline DataType& operator= (const DataType& other) { type = other.type; return *this; }
+    template <typename INT>
+    inline DataType (const INT& i)
+        : type (isPositiveAndBelow (i, static_cast<INT> (Unknown)) ? static_cast<ID> (i) : Unknown)
+    {
+    }
+    inline DataType& operator= (const DataType& other)
+    {
+        type = other.type;
+        return *this;
+    }
 
 private:
     ID type;

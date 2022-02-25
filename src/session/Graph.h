@@ -22,15 +22,15 @@
 #include "session/Node.h"
 
 namespace Element {
-    
+
 class Graph : public Node
 {
 public:
     explicit Graph (const Identifier& type = Tags::graph);
     virtual ~Graph();
-    
+
     void addPlugin();
     void addSubGraph (const Graph& graph);
 };
 
-}
+} // namespace Element

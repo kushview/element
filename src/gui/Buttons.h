@@ -44,23 +44,24 @@ private:
 class SettingButton : public Button
 {
 public:
-    SettingButton (const String& name = String()) : Button (name) { }
-    ~SettingButton() override { }
-    
+    SettingButton (const String& name = String()) : Button (name) {}
+    ~SettingButton() override {}
+
     enum ColourIds
     {
-        textColourId            =  0x30000100,
+        textColourId = 0x30000100,
         textDisabledColourId,
         backgroundColourId,
         backgroundOnColourId
     };
-    
+
     inline void setYesNoText (const String& y, const String& n)
     {
-        yes = y; no = n;
+        yes = y;
+        no = n;
         repaint();
     }
-    
+
     inline void setIcon (const Image& image) { icon = image; }
     inline void setPath (const Path& p, float reduceby = 2.f)
     {
@@ -73,19 +74,20 @@ protected:
     {
         return findColour (isEnabled() ? textColourId : textDisabledColourId);
     }
-    
+
     /** @internal */
     void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
-    
+
 private:
     String yes = "Yes";
-    String no  = "No";
+    String no = "No";
     Image icon;
     Path path;
     int pathReduction = 2;
 };
 
-class PanicButton : public SettingButton {
+class PanicButton : public SettingButton
+{
 public:
     PanicButton() { setButtonText ("!"); }
 };
@@ -98,21 +100,21 @@ public:
         setPath (getIcons().fasPowerOff);
     }
 
-    ~PowerButton() { }
+    ~PowerButton() {}
 };
 
 class ConfigButton : public SettingButton
 {
 public:
     ConfigButton() { setPath (getIcons().fasCog, 2); }
-    ~ConfigButton() { }
+    ~ConfigButton() {}
 };
 
 class GraphButton : public SettingButton
 {
 public:
     GraphButton() { setPath (getIcons().fasThLarge, 2.2); }
-    ~GraphButton() { }
+    ~GraphButton() {}
 };
 
 class DragableIntLabel : public Component,
@@ -121,28 +123,28 @@ class DragableIntLabel : public Component,
 public:
     enum ColourIds
     {
-        textColourId            =  0x90000000,
+        textColourId = 0x90000000,
         backgroundColorId,
         backgroundOnColorId
     };
-    
+
     DragableIntLabel()
-    { 
+    {
         tempoValue.addListener (this);
         setValue (120.0);
     }
-    
+
     ~DragableIntLabel()
-    { 
+    {
         tempoValue.removeListener (this);
     }
-    
+
     void paint (Graphics& g) override
     {
         const bool isOn = false;
-        
+
         g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
-        
+
         String text;
         if (isEnabled() && tempoValue.toString().isNotEmpty())
         {
@@ -156,65 +158,67 @@ public:
         {
             text = String (stickyValue);
         }
-        
+
         if (text.isNotEmpty())
         {
             g.setFont (12.f);
             g.setColour (isEnabled() ? Colours::black : Colours::darkgrey);
             g.drawText (text, getLocalBounds(), Justification::centred);
         }
-        
+
         g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
         g.drawRect (0, 0, getWidth(), getHeight());
     }
-    
+
     void mouseDown (const MouseEvent& ev) override
     {
         if (ev.getNumberOfClicks() == 2)
             settingLabelDoubleClicked();
-        
+
         if (! isEnabled())
             return;
-        
+
         lastY = ev.getDistanceFromDragStartY();
     }
-    
+
     void mouseDrag (const MouseEvent& ev) override
     {
-        if (! isEnabled() || !dragable)
+        if (! isEnabled() || ! dragable)
             return;
-        
+
         const int tempo = (int) tempoValue.getValue();
         int newTempo = tempo + (lastY - ev.getDistanceFromDragStartY());
-        
+
         if (tempo != newTempo)
         {
             setValue (newTempo);
         }
-        
+
         lastY = ev.getDistanceFromDragStartY();
     }
-    
-    void mouseUp (const MouseEvent& ) override
+
+    void mouseUp (const MouseEvent&) override
     {
         if (! isEnabled())
             return;
     }
-    
-    virtual void settingLabelDoubleClicked() { }
-    
+
+    virtual void settingLabelDoubleClicked() {}
+
     void setDragable (const bool yn) { dragable = yn; }
-    
+
     inline void setValue (double value)
     {
         if (useMinMax)
         {
-            if (value < minValue) value = minValue;
-            if (value > maxValue) value = maxValue;
+            if (value < minValue)
+                value = minValue;
+            if (value > maxValue)
+                value = maxValue;
         }
 
-        tempoValue.setValue (value); 
-        repaint();    
+        tempoValue.setValue (value);
+        repaint();
     }
 
     inline void setMinMax (const double newMin, const double newMax)
@@ -224,14 +228,24 @@ public:
         maxValue = newMax;
         jassert (maxValue > minValue);
         const double val = (double) tempoValue.getValue();
-        if (val < minValue) setValue (minValue);
-        if (val > maxValue) setValue (maxValue);
+        if (val < minValue)
+            setValue (minValue);
+        if (val > maxValue)
+            setValue (maxValue);
     }
 
-    inline void setTextWhenMinimum (const String& t) { textWhenMinimum = t; repaint(); }
+    inline void setTextWhenMinimum (const String& t)
+    {
+        textWhenMinimum = t;
+        repaint();
+    }
     inline Value& getValueObject() { return tempoValue; }
 
-    void setNumDecimalPlaces (const int numPlaces) { places = jmax (0, numPlaces); repaint(); }
+    void setNumDecimalPlaces (const int numPlaces)
+    {
+        places = jmax (0, numPlaces);
+        repaint();
+    }
 
     /** @internal */
     inline void valueChanged (Value&) override { repaint(); }
@@ -249,104 +263,105 @@ private:
     bool dragable = true;
 };
 
-
 class TimeSignatureSetting : public Component
 {
 public:
     enum ColourIds
     {
-        textColourId            =  0x90000000,
+        textColourId = 0x90000000,
         backgroundColorId,
         backgroundOnColorId
     };
-    
+
     TimeSignatureSetting()
     {
         beatsPerBar.setValue (4);
         beatDivisor.setValue (BeatType::QuarterNote);
     }
-    
-    ~TimeSignatureSetting() { }
-    
+
+    ~TimeSignatureSetting() {}
+
     void paint (Graphics& g) override
     {
         const bool isOn = false;
-        
+
         g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
-        
+
         String text = beatsPerBar.toString();
-        text << " / " << String (BeatType ((BeatType::ID)(int) beatDivisor.getValue()).divisor());
-        
+        text << " / " << String (BeatType ((BeatType::ID) (int) beatDivisor.getValue()).divisor());
+
         if (text.isNotEmpty())
         {
             g.setFont (12.f);
             g.setColour (isEnabled() ? Colours::black : Colours::darkgrey);
             g.drawText (text, getLocalBounds(), Justification::centred);
         }
-        
+
         g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
         g.drawRect (0, 0, getWidth(), getHeight());
     }
-    
+
     void updateMeter (int bpb, int div, const bool notify = false)
     {
-        if (bpb < 1) bpb = 1;
-        if (bpb > 99) bpb = 99;
-        
-        if (bpb == (int)beatsPerBar.getValue() && (int)beatDivisor.getValue() == div)
+        if (bpb < 1)
+            bpb = 1;
+        if (bpb > 99)
+            bpb = 99;
+
+        if (bpb == (int) beatsPerBar.getValue() && (int) beatDivisor.getValue() == div)
             return;
-        
+
         beatsPerBar.setValue (bpb);
         beatDivisor.setValue (div);
         if (notify)
-            meterChanged ();
-        
+            meterChanged();
+
         repaint();
     }
-    
-    virtual void meterChanged () { }
-    int getBeatsPerBar()    const { return (int) beatsPerBar.getValue(); }
-    int getBeatType()       const { return (int) BeatType::QuarterNote; } // quarter note
-    int getBeatDivisor()    const { return (int) beatDivisor.getValue(); }
-    
+
+    virtual void meterChanged() {}
+    int getBeatsPerBar() const { return (int) beatsPerBar.getValue(); }
+    int getBeatType() const { return (int) BeatType::QuarterNote; } // quarter note
+    int getBeatDivisor() const { return (int) beatDivisor.getValue(); }
+
     void mouseDown (const MouseEvent& ev) override
     {
-            if (! isEnabled())
-                return;
-        
+        if (! isEnabled())
+            return;
+
         isDraggingBeatDivisor = ev.x >= (getWidth() / 2);
         lastY = ev.getDistanceFromDragStartY();
     }
-    
+
     Value& getDraggedValue() { return isDraggingBeatDivisor ? beatDivisor : beatsPerBar; }
-    
+
     void mouseDrag (const MouseEvent& ev) override
     {
         if (! isEnabled())
             return;
-        
+
         dragging = true;
         const bool changed = 0 != (lastY / 10) - (ev.getDistanceFromDragStartY() / 10);
-        
+
         if (changed)
         {
             const int delta = lastY - ev.getDistanceFromDragStartY() > 0 ? 1 : -1;
-            const int value = sanitizeValue ((int)getDraggedValue().getValue() + delta);
+            const int value = sanitizeValue ((int) getDraggedValue().getValue() + delta);
             getDraggedValue().setValue (value);
             repaint();
         }
-        
+
         lastY = ev.getDistanceFromDragStartY();
     }
-    
-    void mouseUp (const MouseEvent& ) override
+
+    void mouseUp (const MouseEvent&) override
     {
         if (! isEnabled())
             return;
-        
+
         if (dragging)
             meterChanged();
-        
+
         dragging = false;
     }
 
@@ -358,24 +373,28 @@ private:
     int decimalPlaces = 0;
     int lastY = 0;
     bool dragging = false;
-    
+
     int sanitizeValue (const int value)
     {
         int iVal = value;
-        
+
         if (isDraggingBeatDivisor)
         {
-            if (iVal < 0) iVal = 0;
-            if (iVal > BeatType::SixteenthNote) iVal = BeatType::SixteenthNote;
+            if (iVal < 0)
+                iVal = 0;
+            if (iVal > BeatType::SixteenthNote)
+                iVal = BeatType::SixteenthNote;
         }
         else
         {
-            if (iVal < 1) iVal = 1;
-            if (iVal > 99) iVal = 99;
+            if (iVal < 1)
+                iVal = 1;
+            if (iVal > 99)
+                iVal = 99;
         }
-        
+
         return iVal;
     }
 };
 
-}
+} // namespace Element

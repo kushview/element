@@ -45,16 +45,13 @@ public:
           processor (o)
     {
         setOpaque (true);
-        chooser.reset (new FileComboBox ("Audio File", File(), 
-                                              false, false, false,
-                                              o.getWildcard(), String(),
-                                              TRANS("Select Audio File")));
+        chooser.reset (new FileComboBox ("Audio File", File(), false, false, false, o.getWildcard(), String(), TRANS ("Select Audio File")));
         addAndMakeVisible (chooser.get());
         chooser->setShowFullPathName (false);
 
-        addAndMakeVisible (watchButton); 
+        addAndMakeVisible (watchButton);
         watchButton.setIcon (Icon (getIcons().fasFolderOpen, Colours::black));
-        
+
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
 
@@ -136,9 +133,9 @@ public:
                 position.setValue (position.getMinimum(), dontSendNotification);
             }
         }
-        
+
         volume.setValue (
-            (double) Decibels::gainToDecibels ((double) processor.getPlayer().getGain(), (double) volume.getMinimum()), 
+            (double) Decibels::gainToDecibels ((double) processor.getPlayer().getGain(), (double) volume.getMinimum()),
             dontSendNotification);
 
         startStopContinueToggle.setToggleState (processor.respondsToStartStopContinue(),
@@ -186,7 +183,7 @@ public:
         return false;
     }
 
-    void itemDropped (const SourceDetails& details) override 
+    void itemDropped (const SourceDetails& details) override
     {
         if (details.description.toString() == "ccNavConcertinaPanel")
         {
@@ -199,31 +196,31 @@ public:
             }
         }
     }
-   #if 0
+#if 0
     virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
     virtual void itemDragMove (const SourceDetails& dragSourceDetails);
     virtual void itemDragExit (const SourceDetails& dragSourceDetails);
     virtual bool shouldDrawDragImageWhenOver();
-   #endif
+#endif
 
     //=========================================================================
     bool isInterestedInFileDrag (const StringArray& files) override
     {
         if (! File::isAbsolutePath (files[0]))
             return false;
-        return processor.canLoad (File (files [0]));
+        return processor.canLoad (File (files[0]));
     }
 
     void filesDropped (const StringArray& files, int x, int y) override
     {
         ignoreUnused (x, y);
-        processor.openFile (File (files [0]));
+        processor.openFile (File (files[0]));
     }
-    
-   #if 0
+
+#if 0
     virtual void fileDragEnter (const StringArray& files, int x, int y);
     virtual void fileDragExit (const StringArray& files);
-   #endif
+#endif
 
 private:
     AudioFilePlayerNode& processor;
@@ -236,7 +233,7 @@ private:
     ToggleButton startStopContinueToggle;
     Atomic<int> startStopContinue { 0 };
     SignalConnection stateRestoredConnection;
-    
+
     bool draggingPos = false;
 
     void sortRecents()
@@ -249,9 +246,8 @@ private:
     void bindHandlers()
     {
         processor.getPlayer().addChangeListener (this);
-        stateRestoredConnection = processor.restoredState.connect (std::bind(
-            &AudioFilePlayerEditor::onStateRestored, this
-        ));
+        stateRestoredConnection = processor.restoredState.connect (std::bind (
+            &AudioFilePlayerEditor::onStateRestored, this));
 
         chooser->addListener (this);
         watchButton.onClick = [this]() {
@@ -267,13 +263,12 @@ private:
             int index = AudioFilePlayerNode::Playing;
             if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[index]))
             {
-                *playing = !*playing;
+                *playing = ! *playing;
                 stabilizeComponents();
             }
         };
 
-        loopButton.onClick = [this]()
-        {
+        loopButton.onClick = [this]() {
             processor.setLooping (! processor.isLooping());
             stabilizeComponents();
         };
@@ -295,13 +290,12 @@ private:
             stabilizeComponents();
         };
 
-        position.textFromValueFunction = [this](double value) -> String {
+        position.textFromValueFunction = [this] (double value) -> String {
             const double posInMinutes = (value * processor.getPlayer().getLengthInSeconds()) / 60.0;
             return Util::minutesToString (posInMinutes);
         };
 
-        startStopContinueToggle.onClick = [this]()
-        {
+        startStopContinueToggle.onClick = [this]() {
             processor.setRespondToStartStopContinue (
                 startStopContinueToggle.getToggleState() ? 1 : 0);
             startStopContinueToggle.setToggleState (
@@ -335,11 +329,11 @@ private:
 
 AudioFilePlayerNode::AudioFilePlayerNode()
     : BaseProcessor (BusesProperties()
-        .withOutput  ("Main",  AudioChannelSet::stereo(), true))
+                         .withOutput ("Main", AudioChannelSet::stereo(), true))
 {
     addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
-    addParameter (slave   = new AudioParameterBool ("slave", "Slave", false));
-    addParameter (volume  = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
+    addParameter (slave = new AudioParameterBool ("slave", "Slave", false));
+    addParameter (volume = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
     addParameter (looping = new AudioParameterBool ("loop", "Loop", false));
 
     for (auto* const param : getParameters())
@@ -347,7 +341,7 @@ AudioFilePlayerNode::AudioFilePlayerNode()
 }
 
 AudioFilePlayerNode::~AudioFilePlayerNode()
-{ 
+{
     for (auto* const param : getParameters())
         param->removeListener (this);
     clearPlayer();
@@ -362,23 +356,23 @@ void AudioFilePlayerNode::setRespondToStartStopContinue (bool respond)
 }
 
 bool AudioFilePlayerNode::respondsToStartStopContinue() const
-{ 
+{
     return midiStartStopContinue.get() == 1;
 }
 
 void AudioFilePlayerNode::fillInPluginDescription (PluginDescription& desc) const
 {
     desc.name = getName();
-    desc.fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_FILE_PLAYER;
-    desc.descriptiveName    = "A single audio file player";
-    desc.numInputChannels   = 0;
-    desc.numOutputChannels  = 2;
+    desc.fileOrIdentifier = EL_INTERNAL_ID_AUDIO_FILE_PLAYER;
+    desc.descriptiveName = "A single audio file player";
+    desc.numInputChannels = 0;
+    desc.numOutputChannels = 2;
     desc.hasSharedContainer = false;
-    desc.isInstrument       = false;
-    desc.manufacturerName   = "Element";
-    desc.pluginFormatName   = "Element";
-    desc.version            = "1.0.0";
-    desc.uniqueId                = EL_INTERNAL_UID_AUDIO_FILE_PLAYER;
+    desc.isInstrument = false;
+    desc.manufacturerName = "Element";
+    desc.pluginFormatName = "Element";
+    desc.version = "1.0.0";
+    desc.uniqueId = EL_INTERNAL_UID_AUDIO_FILE_PLAYER;
 }
 
 void AudioFilePlayerNode::clearPlayer()
@@ -398,8 +392,7 @@ void AudioFilePlayerNode::openFile (const File& file)
         clearPlayer();
         reader.reset (new AudioFormatReaderSource (newReader, true));
         audioFile = file;
-        player.setSource (reader.get(), 1024 * 8, &thread, 
-                          newReader->sampleRate, 2);
+        player.setSource (reader.get(), 1024 * 8, &thread, newReader->sampleRate, 2);
 
         ScopedLock sl (getCallbackLock());
         reader->setLooping (*looping);
@@ -449,7 +442,7 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     const auto nframes = buffer.getNumSamples();
     for (int c = buffer.getNumChannels(); --c >= 0;)
         buffer.clear (c, 0, nframes);
-    
+
     if (*slave)
     {
         if (auto* const playhead = getPlayHead())
@@ -460,7 +453,8 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     }
 
     MidiBuffer::Iterator iter (midi);
-    MidiMessage msg; int frame = 0, start = 0;
+    MidiMessage msg;
+    int frame = 0, start = 0;
     AudioSourceChannelInfo info;
     info.buffer = &buffer;
 
@@ -477,7 +471,7 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
             {
                 midiPlayState.set (Start);
                 triggerAsyncUpdate();
-            } 
+            }
             else if (msg.isMidiContinue())
             {
                 midiPlayState.set (Continue);
@@ -510,7 +504,7 @@ void AudioFilePlayerNode::setLooping (const bool shouldLoop)
 }
 
 bool AudioFilePlayerNode::isLooping() const
-{ 
+{
     return *looping;
 }
 
@@ -518,21 +512,21 @@ void AudioFilePlayerNode::handleAsyncUpdate()
 {
     switch (midiPlayState.get())
     {
-        case Start:
-        {
+        case Start: {
             player.setPosition (0.0);
             player.start();
-        } break;
+        }
+        break;
 
-        case Stop:
-        {
+        case Stop: {
             player.stop();
-        } break;
+        }
+        break;
 
-        case Continue:
-        {
+        case Continue: {
             player.start();
-        } break;
+        }
+        break;
 
         case None:
         default:
@@ -551,11 +545,11 @@ void AudioFilePlayerNode::getStateInformation (juce::MemoryBlock& destData)
 {
     ValueTree state (Tags::state);
     state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
-         .setProperty ("playing", (bool)*playing, nullptr)
-         .setProperty ("slave", (bool)*slave, nullptr)
-         .setProperty ("loop", (bool)*looping, nullptr)
-         .setProperty ("midiStartStopContinue", midiStartStopContinue.get() == 1, nullptr);
-    
+        .setProperty ("playing", (bool) *playing, nullptr)
+        .setProperty ("slave", (bool) *slave, nullptr)
+        .setProperty ("loop", (bool) *looping, nullptr)
+        .setProperty ("midiStartStopContinue", midiStartStopContinue.get() == 1, nullptr);
+
     if (watchDir.exists())
         state.setProperty ("watchDir", watchDir.getFullPathName(), nullptr);
 
@@ -590,31 +584,32 @@ void AudioFilePlayerNode::parameterValueChanged (int parameter, float newValue)
 
     switch (parameter)
     {
-        case Playing:
-        {
+        case Playing: {
             if (*playing)
                 player.start();
             else
                 player.stop();
-        } break;
-        
+        }
+        break;
+
         case Slave: {
             // noop
-        } break;
+        }
+        break;
 
-        case Volume:
-        {
+        case Volume: {
             player.setGain (Decibels::decibelsToGain (volume->get(), volume->range.start));
-        } break;
+        }
+        break;
 
-        case Looping:
-        {
+        case Looping: {
             if (reader != nullptr)
             {
                 player.setLooping (*looping);
                 reader->setLooping (*looping);
             }
-        } break;
+        }
+        break;
     }
 }
 
@@ -628,8 +623,7 @@ bool AudioFilePlayerNode::isBusesLayoutSupported (const BusesLayout& layout) con
     // only one main output bus supported. stereo or mono
     if (layout.inputBuses.size() > 0 || layout.outputBuses.size() > 1)
         return false;
-    return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() ||
-           layout.getMainOutputChannelSet() == AudioChannelSet::mono();
+    return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() || layout.getMainOutputChannelSet() == AudioChannelSet::mono();
 }
 
-}
+} // namespace Element

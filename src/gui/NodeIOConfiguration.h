@@ -44,7 +44,7 @@ public:
     void update();
 
     void buttonClicked (Button*) override;
-    
+
 private:
     ContentComponent* content = nullptr;
     ContentComponent* getContentComponent();
@@ -63,4 +63,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeAudioBusesComponent)
 };
-}
+} // namespace Element

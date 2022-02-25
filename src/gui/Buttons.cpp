@@ -21,8 +21,8 @@
 
 namespace Element {
 
-IconButton::IconButton (const String& buttonName) 
-    : Button (buttonName) { }
+IconButton::IconButton (const String& buttonName)
+    : Button (buttonName) {}
 IconButton::~IconButton() {}
 
 void IconButton::setIcon (Icon newIcon, float reduceSize)
@@ -33,11 +33,8 @@ void IconButton::setIcon (Icon newIcon, float reduceSize)
 
 void IconButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)
 {
-    getLookAndFeel().drawButtonBackground (g, *this,
-        findColour (getToggleState() ? TextButton::buttonOnColourId : TextButton::buttonColourId),
-        isMouseOverButton, isButtonDown);
-    Rectangle<float> bounds (0.f, 0.f, (float) jmin (getWidth(), getHeight()), 
-                                       (float) jmin (getWidth(), getHeight()));
+    getLookAndFeel().drawButtonBackground (g, *this, findColour (getToggleState() ? TextButton::buttonOnColourId : TextButton::buttonColourId), isMouseOverButton, isButtonDown);
+    Rectangle<float> bounds (0.f, 0.f, (float) jmin (getWidth(), getHeight()), (float) jmin (getWidth(), getHeight()));
     icon.colour = isEnabled() ? LookAndFeel::textColor : LookAndFeel::textColor.darker();
     icon.draw (g, bounds.reduced (iconReduceSize), false);
 }
@@ -45,12 +42,11 @@ void IconButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButton
 void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)
 {
     const bool isOn = getToggleState();
-//    Colour fill = isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter();
-    
+    //    Colour fill = isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter();
+
     Colour fill = findColour (isOn ? backgroundOnColourId : backgroundColourId);
     if (isOn)
     {
-        
     }
     else if (isButtonDown)
     {
@@ -60,19 +56,19 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     {
         fill = fill.brighter (0.12);
     }
-    
+
     g.fillAll (fill);
-    
+
     if (! path.isEmpty())
     {
-        Icon i (path, getTextColour().brighter(0.15));
-        Rectangle<float> r { 0.0, 0.0, (float)getWidth(), (float)getHeight() };
+        Icon i (path, getTextColour().brighter (0.15));
+        Rectangle<float> r { 0.0, 0.0, (float) getWidth(), (float) getHeight() };
         i.draw (g, r.reduced (pathReduction), false);
     }
-    else if (icon.isNull() || !icon.isValid())
+    else if (icon.isNull() || ! icon.isValid())
     {
         String text = getButtonText();
-        
+
         if (text.isEmpty() && getClickingTogglesState())
             text = (getToggleState()) ? yes : no;
         g.setFont (12.f);
@@ -82,11 +78,11 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     else
     {
         const Rectangle<float> area (0.f, 0.f, getWidth(), getHeight());
-        g.drawImage (icon, area.reduced(2), RectanglePlacement::onlyReduceInSize);
+        g.drawImage (icon, area.reduced (2), RectanglePlacement::onlyReduceInSize);
     }
 
     g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
     g.drawRect (0, 0, getWidth(), getHeight());
 }
 
-}
+} // namespace Element

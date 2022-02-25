@@ -21,7 +21,7 @@
 #include "ElementApp.h"
 
 #ifndef EL_GIT_VERSION
- #define EL_GIT_VERSION ""
+#define EL_GIT_VERSION ""
 #endif
 
 namespace Element {
@@ -32,7 +32,7 @@ struct Version
     Version();
     ~Version();
 
-    /** Returns the version string with git hash appended */    
+    /** Returns the version string with git hash appended */
     inline static String withGitHash()
     {
         String result = ProjectInfo::versionString;
@@ -43,7 +43,7 @@ struct Version
 
     /** Split a version string into an array of segments */
     static StringArray segments (const String& versionString);
-    
+
     /** Converts version segments into an integer, good for version comparison */
     static int asHexInteger (const String& versionString);
 };
@@ -55,14 +55,18 @@ class CurrentVersion : private Timer,
 public:
     CurrentVersion();
     ~CurrentVersion();
-    
+
     /** Delay version check. Handles presenting AlertWindow */
     static void checkAfterDelay (const int milliseconds, const bool showUpToDate = false);
-    
+
     /** Returns true if a newer version is available for download */
     bool isNewerVersionAvailable();
 
-    void cancel() { cancelled.set(true); signalThreadShouldExit(); }
+    void cancel()
+    {
+        cancelled.set (true);
+        signalThreadShouldExit();
+    }
     bool isCancelled() const { return cancelled.get(); }
 
 private:
@@ -72,9 +76,9 @@ private:
     bool shouldShowUpToDateMessage;
     bool result = false;
     int timeout = 0;
-    
+
     friend class Timer;
     void timerCallback() override;
     void run() override;
 };
-}
+} // namespace Element

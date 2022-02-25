@@ -31,13 +31,14 @@ public:
     ~MappingController();
 
     void activate() override;
-    void deactivate() override;    
+    void deactivate() override;
     void learn (const bool shouldLearn = true);
     bool isLearning() const;
     void remove (const ControllerMap&);
 
 private:
-    class Impl; friend class Impl;
+    class Impl;
+    friend class Impl;
     std::unique_ptr<Impl> impl;
     SignalConnection capturedConnection;
     SignalConnection capturedParamConnection;
@@ -45,4 +46,4 @@ private:
     void onParameterCaptured (const Node&, int);
 };
 
-}
+} // namespace Element

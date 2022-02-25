@@ -31,4 +31,4 @@ public:
     ~GraphEditorPanel() = default;
 };
 
-}
+} // namespace Element

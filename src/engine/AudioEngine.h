@@ -48,7 +48,7 @@ public:
     //==========================================================================
     void activate();
     void deactivate();
-    
+
     /** Adds a message to the MIDI input.  This can be used by Controllers and UI
         components that send MIDI in a non-realtime critical situation. DO NOT call
         this from the audio thread 
@@ -58,40 +58,39 @@ public:
                                         MidiInputDevice callback (don't use except for debugging)
      */
     void addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueue = false);
-    
+
     void applySettings (Settings&);
-    
+
     bool isUsingExternalClock() const;
-    
+
     void setSession (SessionPtr);
     void refreshSession();
-    
+
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
-    
+
     void setCurrentGraph (const int index) { setActiveGraph (index); }
     void setActiveGraph (const int index);
     int getActiveGraph() const;
-    
+
     RootGraph* getGraph (const int index);
-    
+
     void setPlaying (const bool shouldBePlaying);
     void setRecording (const bool shouldBeRecording);
     void seekToAudioFrame (const int64 frame);
     void setMeter (int beatsPerBar, int beatDivisor);
-    
+
     void togglePlayPause();
-    
+
     MidiKeyboardState& getKeyboardState();
     Transport::MonitorPtr getTransportMonitor() const;
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
-    
+
     /** For use by external systems only! e.g. the AU/VST version of Element and
         possibly things like rendering in the future
      */
-    void prepareExternalPlayback (const double sampleRate, const int blockSize,
-                                  const int numIns, const int numOuts);
+    void prepareExternalPlayback (const double sampleRate, const int blockSize, const int numIns, const int numOuts);
     void processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi);
     void processExternalPlayhead (AudioPlayHead* playhead, const int nframes);
     void releaseExternalResources();
@@ -110,4 +109,4 @@ private:
 
 typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
 
-}
+} // namespace Element

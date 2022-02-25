@@ -25,9 +25,9 @@ namespace Element {
 
 struct Icon
 {
-    Icon() : path (nullptr) { }
-    Icon (const Path& p, const Colour& c)  : path (&p), colour (c) {}
-    Icon (const Path* p, const Colour& c)  : path (p),  colour (c) {}
+    Icon() : path (nullptr) {}
+    Icon (const Path& p, const Colour& c) : path (&p), colour (c) {}
+    Icon (const Path* p, const Colour& c) : path (p), colour (c) {}
 
     void draw (Graphics& g, const Rectangle<float>& area, bool isCrossedOut) const
     {
@@ -41,8 +41,7 @@ struct Icon
             if (isCrossedOut)
             {
                 g.setColour (Colours::red.withAlpha (0.8f));
-                g.drawLine ((float) area.getX(), area.getY() + area.getHeight() * 0.2f,
-                            (float) area.getRight(), area.getY() + area.getHeight() * 0.8f, 3.0f);
+                g.drawLine ((float) area.getX(), area.getY() + area.getHeight() * 0.2f, (float) area.getRight(), area.getY() + area.getHeight() * 0.8f, 3.0f);
             }
         }
     }
@@ -62,21 +61,21 @@ public:
     Icons();
     ~Icons();
     Path folder, document, imageDoc,
-         config, exporter, juceLogo,
-         graph, jigsaw, info, warning,
-         bug, mainJuceLogo, 
-         
-         falBars, falCog, falCopy,
-         falBarsOutline, 
-         falAtomAlt, falSyncAlt, falRedoAlt,
+        config, exporter, juceLogo,
+        graph, jigsaw, info, warning,
+        bug, mainJuceLogo,
 
-         farGlobe, farSyncAlt, farRedoAlt, farSave,
-         farTrashAlt,
+        falBars, falCog, falCopy,
+        falBarsOutline,
+        falAtomAlt, falSyncAlt, falRedoAlt,
 
-         fasPlay, fasStop, fasCog, fasCircle,
-         fasChevronDown, fasChevronRight, fasSave,
-         fasFolderOpen, fasPowerOff, fasThLarge,
-         fasRectangleLandscape;
+        farGlobe, farSyncAlt, farRedoAlt, farSave,
+        farTrashAlt,
+
+        fasPlay, fasStop, fasCog, fasCircle,
+        fasChevronDown, fasChevronRight, fasSave,
+        fasFolderOpen, fasPowerOff, fasThLarge,
+        fasRectangleLandscape;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Icons)
@@ -84,4 +83,4 @@ private:
 
 const Icons& getIcons();
 
-}
+} // namespace Element

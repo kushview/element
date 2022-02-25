@@ -31,4 +31,4 @@ public:
     ~VirtualKeyboardPanel() = default;
 };
 
-}
+} // namespace Element

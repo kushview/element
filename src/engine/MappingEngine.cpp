@@ -28,11 +28,11 @@ namespace Element {
 class ControllerMapHandler
 {
 public:
-    ControllerMapHandler() { }
-    virtual ~ControllerMapHandler() { }
+    ControllerMapHandler() {}
+    virtual ~ControllerMapHandler() {}
 
-    virtual bool wants (const MidiMessage& message) const =0;
-    virtual void perform (const MidiMessage& message) =0;
+    virtual bool wants (const MidiMessage& message) const = 0;
+    virtual void perform (const MidiMessage& message) = 0;
 };
 
 struct MidiNoteControllerMap : public ControllerMapHandler,
@@ -40,10 +40,11 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
                                private Value::Listener
 {
     MidiNoteControllerMap (const ControllerDevice::Control& ctl,
-                           const MidiMessage& message, const Node& _node, 
+                           const MidiMessage& message,
+                           const Node& _node,
                            const int _parameter)
         : control (ctl),
-          model (_node), 
+          model (_node),
           node (_node.getObject()),
           parameter (nullptr),
           parameterIndex (_parameter),
@@ -75,18 +76,17 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
     {
         channelObject.removeListener (this);
     }
-    
+
     bool checkNoteAndChannel (const MidiMessage& message) const
     {
-        return message.getNoteNumber() == noteNumber &&
-            (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
+        return message.getNoteNumber() == noteNumber && (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
     }
 
     bool wants (const MidiMessage& message) const override
     {
         bool wants = momentary.get() == 0
-            ? message.isNoteOn() && checkNoteAndChannel (message)
-            : message.isNoteOnOrOff() && checkNoteAndChannel (message);
+                         ? message.isNoteOn() && checkNoteAndChannel (message)
+                         : message.isNoteOnOrOff() && checkNoteAndChannel (message);
         return wants;
     }
 
@@ -100,7 +100,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         }
 
         jassert (message.isNoteOnOrOff());
-       
+
         if (parameter != nullptr)
         {
             parameter->beginChangeGesture();
@@ -116,9 +116,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == NodeObject::EnabledParameter ||
-                 parameterIndex == NodeObject::BypassParameter ||
-                 parameterIndex == NodeObject::MuteParameter)
+        else if (parameterIndex == NodeObject::EnabledParameter || parameterIndex == NodeObject::BypassParameter || parameterIndex == NodeObject::MuteParameter)
         {
             triggerAsyncUpdate();
         }
@@ -215,14 +213,11 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                                     public AsyncUpdater,
                                     private Value::Listener
 {
-    MidiCCControllerMapHandler (const ControllerDevice::Control& ctl, 
+    MidiCCControllerMapHandler (const ControllerDevice::Control& ctl,
                                 const MidiMessage& message,
                                 const Node& _node,
                                 const int _parameter)
-        : control (ctl), model (_node), node (_node.getObject()),
-          parameter (nullptr),
-          controllerNumber (message.getControllerNumber()),
-          parameterIndex (_parameter)
+        : control (ctl), model (_node), node (_node.getObject()), parameter (nullptr), controllerNumber (message.getControllerNumber()), parameterIndex (_parameter)
     {
         jassert (message.isController());
         jassert (node != nullptr);
@@ -264,9 +259,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 
     bool wants (const MidiMessage& message) const override
     {
-        return message.isController() && 
-            message.getControllerNumber() == controllerNumber &&
-            (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
+        return message.isController() && message.getControllerNumber() == controllerNumber && (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
     }
 
     void perform (const MidiMessage& message) override
@@ -279,9 +272,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter->setValueNotifyingHost (static_cast<float> (ccValue) / 127.f);
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == NodeObject::EnabledParameter ||
-                 parameterIndex == NodeObject::BypassParameter ||
-                 parameterIndex == NodeObject::MuteParameter)
+        else if (parameterIndex == NodeObject::EnabledParameter || parameterIndex == NodeObject::BypassParameter || parameterIndex == NodeObject::MuteParameter)
         {
             const auto currentToggleState = desiredToggleState.get();
             const auto mode = toggleMode.get();
@@ -345,9 +336,9 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
     void handleAsyncUpdate() override
     {
         const auto mode = toggleMode.get();
-        const int stateToCompare = mode != ControllerDevice::Equals 
-            ? (inverseToggle.get() == 1 ? 0 : 1) // inverse on, then compare false
-            : 1;                                 // equals mode always compare true
+        const int stateToCompare = mode != ControllerDevice::Equals
+                                       ? (inverseToggle.get() == 1 ? 0 : 1) // inverse on, then compare false
+                                       : 1; // equals mode always compare true
 
         if (parameterIndex == NodeObject::EnabledParameter)
         {
@@ -373,7 +364,7 @@ private:
     Node model;
     NodeObjectPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
-    
+
     const int controllerNumber { -1 };
     const int parameterIndex { -1 };
     int lastControllerValue = 0;
@@ -400,11 +391,11 @@ private:
         }
         else if (inverseToggleObject.refersToSameSourceAs (value))
         {
-            inverseToggle.set ((bool)value.getValue() ? 1 : 0);
+            inverseToggle.set ((bool) value.getValue() ? 1 : 0);
         }
         else if (toggleModeObject.refersToSameSourceAs (value))
         {
-            toggleMode. set (static_cast<int> (ControllerDevice::Control::getToggleMode (
+            toggleMode.set (static_cast<int> (ControllerDevice::Control::getToggleMode (
                 toggleModeObject.getValue().toString())));
         }
         else if (channelObject.refersToSameSourceAs (value))
@@ -420,9 +411,8 @@ public:
     explicit ControllerMapInput (MappingEngine& owner, MidiEngine& m, const ControllerDevice& device)
         : midi (m), mapping (owner), controllerDevice (device)
     {
-
     }
-    
+
     ~ControllerMapInput()
     {
         close();
@@ -430,11 +420,10 @@ public:
 
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
     {
-        if ((! message.isController() || !controllerNumbers [message.getControllerNumber()]) &&
-            (!message.isNoteOnOrOff() || !noteNumbers [message.getNoteNumber()]))
+        if ((! message.isController() || ! controllerNumbers[message.getControllerNumber()]) && (! message.isNoteOnOrOff() || ! noteNumbers[message.getNoteNumber()]))
             return;
 
-        // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
+        // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber()
         //     << " : " << message.getControllerValue());
         if (message.isNoteOn())
             mapping.captureNextEvent (*this, notes[message.getNoteNumber()], message);
@@ -475,7 +464,7 @@ public:
 
         const auto deviceName = controllerDevice.getInputDevice().toString();
         midi.addMidiInputCallback (deviceName, this, true);
-        
+
         return true;
     }
 
@@ -514,14 +503,14 @@ private:
     OwnedArray<ControllerMapHandler> handlers;
     BigInteger controllerNumbers, noteNumbers;
     HashMap<int, ControllerDevice::Control> controls, notes;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllerMapInput)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControllerMapInput)
 };
 
 class MappingEngine::Inputs
 {
 public:
-    Inputs() { }
-    ~Inputs() { }
+    Inputs() {}
+    ~Inputs() {}
 
     bool add (ControllerMapInput* input)
     {
@@ -587,9 +576,9 @@ public:
 
     bool isRunning() const { return running; }
 
-    ControllerMapInput* const* begin()  const noexcept { return inputs.begin(); }
-    ControllerMapInput* const* end()    const noexcept { return inputs.end(); }
-    int size()                    const noexcept { return inputs.size(); }
+    ControllerMapInput* const* begin() const noexcept { return inputs.begin(); }
+    ControllerMapInput* const* end() const noexcept { return inputs.end(); }
+    int size() const noexcept { return inputs.size(); }
 
     void swapWith (OwnedArray<ControllerMapInput>& other) { inputs.swapWith (other); }
 
@@ -599,7 +588,7 @@ private:
 };
 
 MappingEngine::MappingEngine()
-{ 
+{
     inputs.reset (new Inputs());
     capturedEvent.capture.set (true);
 }
@@ -614,16 +603,17 @@ bool MappingEngine::addInput (const ControllerDevice& controller, MidiEngine& mi
 {
     if (inputs->containsInputFor (controller))
         return true;
-    
+
     std::unique_ptr<ControllerMapInput> input;
     input.reset (new ControllerMapInput (*this, midi, controller));
 
-    DBG("[EL] MappingEngine: added input handler for controller: " << controller.getName().toString());
+    DBG ("[EL] MappingEngine: added input handler for controller: " << controller.getName().toString());
     return inputs->add (input.release());
 }
 
-bool MappingEngine::addHandler (const ControllerDevice::Control& control, 
-                                const Node& node, const int parameter)
+bool MappingEngine::addHandler (const ControllerDevice::Control& control,
+                                const Node& node,
+                                const int parameter)
 {
     if (! control.isValid() || ! node.isValid())
         return false;
@@ -661,7 +651,8 @@ bool MappingEngine::removeInput (const ControllerDevice& controller)
 
 bool MappingEngine::refreshInput (const ControllerDevice& device)
 {
-    if (! inputs) return false;
+    if (! inputs)
+        return false;
 
     if (auto* const input = inputs->findInput (device))
     {
@@ -690,8 +681,8 @@ void MappingEngine::stopMapping()
     inputs->stop();
 }
 
-bool MappingEngine::captureNextEvent (ControllerMapInput& input, 
-                                      const ControllerDevice::Control& control, 
+bool MappingEngine::captureNextEvent (ControllerMapInput& input,
+                                      const ControllerDevice::Control& control,
                                       const MidiMessage& message)
 {
     if (! capturedEvent.capture.get())
@@ -704,4 +695,4 @@ bool MappingEngine::captureNextEvent (ControllerMapInput& input,
     return true;
 }
 
-}
+} // namespace Element

@@ -41,7 +41,7 @@ public:
     {
         unbindSignals();
     }
-    
+
     void paint (Graphics& g) override
     {
         NodeChannelStripComponent::paint (g);
@@ -80,4 +80,4 @@ void NodeChannelStripView::initializeView (AppController& app)
     repaint();
 }
 
-}
+} // namespace Element

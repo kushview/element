@@ -64,7 +64,7 @@ public:
             down = true;
             dragging = false;
             selectInGuiController();
-        }    
+        }
     }
 
     void mouseDrag (const MouseEvent& ev) override
@@ -74,7 +74,7 @@ public:
             dragging = true;
             auto* dnd = findParentComponentOfClass<DragAndDropContainer>();
             Image image (Image::ARGB, 1, 1, true);
-            dnd->startDragging (var("graphMixerStrip"), this, image);
+            dnd->startDragging (var ("graphMixerStrip"), this, image);
         }
     }
 
@@ -121,14 +121,13 @@ public:
         if (selected || (hover && ! dragging && ! down))
         {
             g.setColour (Colors::toggleBlue);
-            g.drawRect (0.f, 0.f, (float)getWidth(), (float)getHeight(), 
-                        selected ? 1.4 : 1.0);
+            g.drawRect (0.f, 0.f, (float) getWidth(), (float) getHeight(), selected ? 1.4 : 1.0);
         }
     }
 
     bool isInterestedInDragSource (const SourceDetails& details) override
     {
-    return details.description == "graphMixerStrip";
+        return details.description == "graphMixerStrip";
     }
 
     void itemDropped (const SourceDetails& details) override
@@ -137,11 +136,11 @@ public:
         {
             auto* strip = dynamic_cast<GraphMixerChannelStrip*> (details.sourceComponent.get());
             auto myNode = getNode().getValueTree();
-            auto dNode  = strip->getNode().getValueTree();
+            auto dNode = strip->getNode().getValueTree();
             ValueTree parent = dNode.getParent();
 
             int myIndex = parent.indexOf (myNode);
-            int dIndex  = parent.indexOf (dNode);
+            int dIndex = parent.indexOf (dNode);
             if (myIndex >= 0 && dIndex >= 0)
             {
                 parent.moveChild (dIndex, myIndex, nullptr);
@@ -170,7 +169,7 @@ private:
 
     struct ChildListener : public MouseListener
     {
-        ChildListener (GraphMixerChannelStrip& o) : owner (o) { }
+        ChildListener (GraphMixerChannelStrip& o) : owner (o) {}
         void mouseDown (const MouseEvent& ev) override
         {
             owner.selectInGuiController();
@@ -178,7 +177,7 @@ private:
 
         GraphMixerChannelStrip& owner;
     };
-    
+
     std::unique_ptr<ChildListener> listener;
 
 #if 0
@@ -191,33 +190,30 @@ private:
 class GraphMixerListBoxModel : public ListBoxModel
 {
 public:
-    GraphMixerListBoxModel (GuiController& g, HorizontalListBox& b) : gui (g), box(b) { refreshNodes(); }
-    ~GraphMixerListBoxModel() { }
+    GraphMixerListBoxModel (GuiController& g, HorizontalListBox& b) : gui (g), box (b) { refreshNodes(); }
+    ~GraphMixerListBoxModel() {}
 
     int getNumRows() override
     {
         return nodes.size();
     }
 
-    void paintListBoxItem (int rowNumber, Graphics& g,
-                           int width, int height,
-                           bool rowIsSelected) override
+    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
     {
         ignoreUnused (rowNumber, g, width, height, rowIsSelected);
     }
 
     Node getNode (int r)
     {
-        return nodes [r];
+        return nodes[r];
     }
 
-    Component* refreshComponentForRow (int rowNumber, bool isRowSelected, 
-                                       Component* existing) override
+    Component* refreshComponentForRow (int rowNumber, bool isRowSelected, Component* existing) override
     {
         GraphMixerChannelStrip* const strip = existing == nullptr
-            ? new GraphMixerChannelStrip (gui) 
-            : dynamic_cast<GraphMixerChannelStrip*> (existing);
-        strip->onReordered = std::bind(&GraphMixerListBoxModel::onReordered, this);
+                                                  ? new GraphMixerChannelStrip (gui)
+                                                  : dynamic_cast<GraphMixerChannelStrip*> (existing);
+        strip->onReordered = std::bind (&GraphMixerListBoxModel::onReordered, this);
         auto node = getNode (rowNumber);
         strip->setNode (node);
         strip->setSelected (node == gui.getSelectedNode());
@@ -237,9 +233,7 @@ public:
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             const auto node = graph.getNode (i);
-            if (node.isMidiIONode() || 
-                node.getIdentifier() == EL_INTERNAL_ID_MIDI_INPUT_DEVICE ||
-                node.getIdentifier() == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
+            if (node.isMidiIONode() || node.getIdentifier() == EL_INTERNAL_ID_MIDI_INPUT_DEVICE || node.getIdentifier() == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
             {
                 continue;
             }
@@ -247,7 +241,7 @@ public:
             nodes.add (node);
         }
     }
-   #if 0
+#if 0
     virtual void listBoxItemClicked (int row, const MouseEvent&);
     virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
     virtual void backgroundClicked (const MouseEvent&);
@@ -258,7 +252,7 @@ public:
     virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe);
     virtual String getTooltipForRow (int row);
     virtual MouseCursor getMouseCursorForRow (int row);
-   #endif
+#endif
 private:
     GuiController& gui;
     HorizontalListBox& box;
@@ -308,8 +302,9 @@ public:
         {
             g.setColour (LookAndFeel::textColor);
             g.setFont (Font (15.f));
-            g.drawText (TRANS ("No channels to display"), 
-                getLocalBounds().toFloat(), Justification::centred);
+            g.drawText (TRANS ("No channels to display"),
+                        getLocalBounds().toFloat(),
+                        Justification::centred);
         }
     }
 
@@ -353,10 +348,9 @@ void GraphMixerView::stabilizeContent()
 
 void GraphMixerView::initializeView (AppController& app)
 {
-    content.reset (new Content (*this, *app.findChild<GuiController>(),
-                                app.getGlobals().getSession()));
+    content.reset (new Content (*this, *app.findChild<GuiController>(), app.getGlobals().getSession()));
     addAndMakeVisible (content.get());
     content->stabilize();
 }
 
-}
+} // namespace Element

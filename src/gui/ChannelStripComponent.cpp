@@ -21,8 +21,8 @@
 
 namespace Element {
 
-ChannelStripComponent::VolumeLabel::VolumeLabel() { }
-ChannelStripComponent::VolumeLabel::~VolumeLabel() { }
+ChannelStripComponent::VolumeLabel::VolumeLabel() {}
+ChannelStripComponent::VolumeLabel::~VolumeLabel() {}
 
 void ChannelStripComponent::VolumeLabel::settingLabelDoubleClicked()
 {
@@ -60,7 +60,7 @@ ChannelStripComponent::ChannelStripComponent()
     mute2.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
     mute2.setColour (SettingButton::textColourId, Colours::black);
     mute2.addListener (this);
-    
+
     addAndMakeVisible (volume);
     volume.setNumDecimalPlaces (1);
     volume.setMinMax (fader.getMinimum(), fader.getMaximum());
@@ -109,7 +109,7 @@ void ChannelStripComponent::resized()
     }
 
     mute.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
-    
+
     if (mute2.isVisible())
     {
         r1.removeFromBottom (1);
@@ -159,4 +159,4 @@ void ChannelStripComponent::stabilizeContent()
     volume.getValueObject().addListener (this);
 }
 
-}
+} // namespace Element

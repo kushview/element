@@ -55,7 +55,7 @@ public:
         @param value    The value to set
     */
     void setParameter (int index, float value);
-    
+
     void refreshPorts() override;
 
 protected:
@@ -74,4 +74,4 @@ private:
     bool prepared = false;
 };
 
-}
+} // namespace Element

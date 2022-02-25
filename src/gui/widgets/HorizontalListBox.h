@@ -31,11 +31,10 @@
     @see juce::ComboBox, juce::TableListBox
 */
 
-class HorizontalListBox  : public Component,
-                           public SettableTooltipClient
+class HorizontalListBox : public Component,
+                          public SettableTooltipClient
 {
 public:
-    
     /** Creates a ListBox.
      
      The model pointer passed-in can be null, in which case you can set it later
@@ -43,16 +42,16 @@ public:
      */
     HorizontalListBox (const String& componentName = String(),
                        ListBoxModel* model = nullptr);
-    
+
     /** Destructor. */
     ~HorizontalListBox();
-    
+
     /** Changes the current data model to display. */
     void setModel (ListBoxModel* newModel);
-    
+
     /** Returns the current list model. */
-    ListBoxModel* getModel() const noexcept                     { return model; }
-    
+    ListBoxModel* getModel() const noexcept { return model; }
+
     /** Causes the list to refresh its content.
      
      Call this when the number of rows in the list changes, or if you want it
@@ -61,8 +60,7 @@ public:
      This must only be called from the main message thread.
      */
     void updateContent();
-    
-    
+
     /** Turns on multiple-selection of rows.
      
         By default this is disabled.
@@ -73,7 +71,7 @@ public:
         the ctrl/shift keys are held down.
      */
     void setMultipleSelectionEnabled (bool shouldBeEnabled) noexcept;
-    
+
     /** If enabled, this makes the listbox flip the selection status of
         each row that the user clicks, without affecting other selected rows.
         
@@ -82,15 +80,14 @@ public:
         down CMD or CTRL when clicking.
      */
     void setClickingTogglesRowSelection (bool flipRowSelection) noexcept;
-    
+
     /** Makes the list react to mouse moves by selecting the row that the mouse if over.
      
         This function is here primarily for the ComboBox class to use, but might be
         useful for some other purpose too.
      */
     void setMouseMoveSelectsRows (bool shouldSelect);
-    
-    
+
     /** Selects a row.
      
         If the row is already selected, this won't do anything.
@@ -107,7 +104,7 @@ public:
     void selectRow (int rowNumber,
                     bool dontScrollToShowThisRow = false,
                     bool deselectOthersFirst = true);
-    
+
     /** Selects a set of rows.
      
         This will add these rows to the current selection, so you might need to
@@ -118,28 +115,28 @@ public:
      */
     void selectRangeOfRows (int firstRow,
                             int lastRow);
-    
+
     /** Deselects a row.
      If it's not currently selected, this will do nothing.
      @see selectRow, deselectAllRows
      */
     void deselectRow (int rowNumber);
-    
+
     /** Deselects any currently selected rows.
      @see deselectRow
      */
     void deselectAllRows();
-    
+
     /** Selects or deselects a row.
      If the row's currently selected, this deselects it, and vice-versa.
      */
     void flipRowSelection (int rowNumber);
-    
+
     /** Returns a sparse set indicating the rows that are currently selected.
      @see setSelectedRows
      */
     SparseSet<int> getSelectedRows() const;
-    
+
     /** Sets the rows that should be selected, based on an explicit set of ranges.
      
      If sendNotificationEventToModel is true, the ListBoxModel::selectedRowsChanged()
@@ -149,16 +146,16 @@ public:
      */
     void setSelectedRows (const SparseSet<int>& setOfRowsToBeSelected,
                           NotificationType sendNotificationEventToModel = sendNotification);
-    
+
     /** Checks whether a row is selected.
      */
     bool isRowSelected (int rowNumber) const;
-    
+
     /** Returns the number of rows that are currently selected.
      @see getSelectedRow, isRowSelected, getLastRowSelected
      */
     int getNumSelectedRows() const;
-    
+
     /** Returns the row number of a selected row.
      
      This will return the row number of the Nth selected row. The row numbers returned will
@@ -170,7 +167,7 @@ public:
      @see getNumSelectedRows, isRowSelected, getLastRowSelected
      */
     int getSelectedRow (int index = 0) const;
-    
+
     /** Returns the last row that the user selected.
      
      This isn't the same as the highest row number that is currently selected - if the user
@@ -179,7 +176,7 @@ public:
      If nothing is selected, it will return -1.
      */
     int getLastRowSelected() const;
-    
+
     /** Multiply-selects rows based on the modifier keys.
      
      If no modifier keys are down, this will select the given row and
@@ -196,8 +193,7 @@ public:
     void selectRowsBasedOnModifierKeys (int rowThatWasClickedOn,
                                         ModifierKeys modifiers,
                                         bool isMouseUpEvent);
-    
-    
+
     /** Scrolls the list to a particular position.
      
      The proportion is between 0 and 1.0, so 0 scrolls to the top of the list,
@@ -209,7 +205,7 @@ public:
      @see getVerticalPosition
      */
     void setVerticalPosition (double newProportion);
-    
+
     /** Returns the current vertical position as a proportion of the total.
      
      This can be used in conjunction with setVerticalPosition() to save and restore
@@ -218,23 +214,23 @@ public:
      @see setVerticalPosition
      */
     double getVerticalPosition() const;
-    
+
     /** Scrolls if necessary to make sure that a particular row is visible. */
     void scrollToEnsureRowIsOnscreen (int row);
-    
+
     /** Returns a pointer to the vertical scrollbar. */
     ScrollBar* getVerticalScrollBar() const noexcept;
-    
+
     /** Returns a pointer to the horizontal scrollbar. */
     ScrollBar* getHorizontalScrollBar() const noexcept;
-    
+
     /** Finds the row index that contains a given x,y position.
      The position is relative to the ListBox's top-left.
      If no row exists at this position, the method will return -1.
      @see getComponentForRowNumber
      */
     int getRowContainingPosition (int x, int y) const noexcept;
-    
+
     /** Finds a row index that would be the most suitable place to insert a new
      item for a given position.
      
@@ -249,7 +245,7 @@ public:
      @see getComponentForRowNumber
      */
     int getInsertionIndexForPosition (int x, int y) const noexcept;
-    
+
     /** Returns the position of one of the rows, relative to the top-left of
      the listbox.
      
@@ -258,7 +254,7 @@ public:
      */
     Rectangle<int> getRowPosition (int rowNumber,
                                    bool relativeToComponentTopLeft) const noexcept;
-    
+
     /** Finds the row component for a given row in the list.
      
      The component returned will have been created using createRowComponent().
@@ -269,37 +265,35 @@ public:
      @see getRowContainingPosition
      */
     Component* getComponentForRowNumber (int rowNumber) const noexcept;
-    
+
     /** Returns the row number that the given component represents.
      If the component isn't one of the list's rows, this will return -1.
      */
     int getRowNumberOfComponent (Component* rowComponent) const noexcept;
-    
+
     /** Returns the width of a row (which may be less than the width of this component
      if there's a scrollbar).
      */
     int getVisibleRowWidth() const noexcept;
-    
-    
+
     /** Sets the height of each row in the list.
      The default height is 22 pixels.
      @see getRowHeight
      */
     void setRowHeight (int newHeight);
-    
+
     /** Returns the height of a row in the list.
      @see setRowHeight
      */
-    int getRowHeight() const noexcept                   { return rowHeight; }
-    
+    int getRowHeight() const noexcept { return rowHeight; }
+
     /** Returns the number of rows actually visible.
      
      This is the number of whole rows which will fit on-screen, so the value might
      be more than the actual number of rows in the list.
      */
     int getNumRowsOnScreen() const noexcept;
-    
-    
+
     /** A set of colour IDs to use to change the colour of various aspects of the label.
      
      These constants can be used either via the Component::setColour(), or LookAndFeel::setColour()
@@ -309,25 +303,25 @@ public:
      */
     enum ColourIds
     {
-        backgroundColourId      = 0x1002800, /**< The background colour to fill the list with.
+        backgroundColourId = 0x1002800, /**< The background colour to fill the list with.
                                               Make this transparent if you don't want the background to be filled. */
-        outlineColourId         = 0x1002810, /**< An optional colour to use to draw a border around the list.
+        outlineColourId = 0x1002810, /**< An optional colour to use to draw a border around the list.
                                               Make this transparent to not have an outline. */
-        textColourId            = 0x1002820  /**< The preferred colour to use for drawing text in the listbox. */
+        textColourId = 0x1002820 /**< The preferred colour to use for drawing text in the listbox. */
     };
-    
+
     /** Sets the thickness of a border that will be drawn around the box.
      
      To set the colour of the outline, use @code setColour (ListBox::outlineColourId, colourXYZ); @endcode
      @see outlineColourId
      */
     void setOutlineThickness (int outlineThickness);
-    
+
     /** Returns the thickness of outline that will be drawn around the listbox.
      @see setOutlineColour
      */
-    int getOutlineThickness() const noexcept            { return outlineThickness; }
-    
+    int getOutlineThickness() const noexcept { return outlineThickness; }
+
     /** Sets a component that the list should use as a header.
      
      This will position the given component at the top of the list, maintaining the
@@ -338,10 +332,10 @@ public:
      different component, or when the listbox is deleted.
      */
     void setHeaderComponent (Component* newHeaderComponent);
-    
+
     /** Returns whatever header component was set with setHeaderComponent(). */
-    Component* getHeaderComponent() const noexcept      { return headerComponent; }
-    
+    Component* getHeaderComponent() const noexcept { return headerComponent; }
+
     /** Changes the width of the rows in the list.
      
      This can be used to make the list's row components wider than the list itself - the
@@ -353,19 +347,19 @@ public:
      be the same width as the list.
      */
     void setMinimumContentWidth (int newMinimumWidth);
-    
+
     /** Returns the space currently available for the row items, taking into account
      borders, scrollbars, etc.
      */
     int getVisibleContentWidth() const noexcept;
-    
+
     /** Repaints one of the rows.
 
         This does not invoke updateContent(), it just invokes a straightforward repaint
         for the area covered by this row.
      */
     void repaintRow (int rowNumber) noexcept;
-    
+
     /** This fairly obscure method creates an image that just shows the currently
         selected row components.
 
@@ -379,15 +373,14 @@ public:
         @see Component::createComponentSnapshot
      */
     virtual Image createSnapshotOfSelectedRows (int& x, int& y);
-    
+
     /** Returns the viewport that this ListBox uses.
      
      You may need to use this to change parameters such as whether scrollbars
      are shown, etc.
      */
     Viewport* getViewport() const noexcept;
-    
-    
+
     /** @internal */
     bool keyPressed (const KeyPress&) override;
     /** @internal */
@@ -410,7 +403,7 @@ public:
     void parentHierarchyChanged() override;
     /** @internal */
     void startDragAndDrop (const MouseEvent&, const var& dragDescription, bool allowDraggingToOtherWindows);
-    
+
 private:
     JUCE_PUBLIC_IN_DLL_BUILD (class ListViewport)
     JUCE_PUBLIC_IN_DLL_BUILD (class RowComponent)
@@ -425,14 +418,13 @@ private:
     int lastRowSelected;
     bool multipleSelection, alwaysFlipSelection, hasDoneInitialUpdate;
     SparseSet<int> selected;
-    
-    void selectRowInternal (int rowNumber, bool dontScrollToShowThisRow,
-                            bool deselectOthersFirst, bool isMouseClick);
-    
-   #if JUCE_CATCH_DEPRECATED_CODE_MISUSE
+
+    void selectRowInternal (int rowNumber, bool dontScrollToShowThisRow, bool deselectOthersFirst, bool isMouseClick);
+
+#if JUCE_CATCH_DEPRECATED_CODE_MISUSE
     // This method's bool parameter has changed: see the new method signature.
     JUCE_DEPRECATED (void setSelectedRows (const SparseSet<int>&, bool));
-   #endif
-    
+#endif
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HorizontalListBox)
 };

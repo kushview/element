@@ -40,10 +40,11 @@ public:
     void remove (const ControllerDevice&, const ControllerDevice::Control&);
     void refresh (const ControllerDevice&);
     void refresh();
-    
+
 private:
-    class Impl; friend class Impl;
+    class Impl;
+    friend class Impl;
     std::unique_ptr<Impl> impl;
 };
 
-}
+} // namespace Element

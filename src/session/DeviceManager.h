@@ -24,12 +24,12 @@
 
 namespace Element {
 
-class DeviceManager :  public AudioDeviceManager
+class DeviceManager : public AudioDeviceManager
 {
 public:
     typedef AudioDeviceManager::AudioDeviceSetup AudioSettings;
     static const int maxAudioChannels;
-    
+
     DeviceManager();
     ~DeviceManager();
 
@@ -37,11 +37,11 @@ public:
     void selectAudioDriver (const String& name);
     void attach (EnginePtr engine);
 
-   #if KV_JACK_AUDIO
+#if KV_JACK_AUDIO
     kv::JackClient& getJackClient();
-   #endif
+#endif
 
-    virtual void createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list) override;
+    virtual void createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list) override;
 
 private:
     friend class World;
@@ -49,4 +49,4 @@ private:
     std::unique_ptr<Private> impl;
 };
 
-}
+} // namespace Element

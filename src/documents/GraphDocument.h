@@ -25,8 +25,8 @@
 
 namespace Element {
 
-class GraphDocument :  public FileBasedDocument,
-                       private ValueTree::Listener
+class GraphDocument : public FileBasedDocument,
+                      private ValueTree::Listener
 {
 public:
     GraphDocument();
@@ -40,7 +40,7 @@ public:
     }
 
     inline Node getGraph() const { return graph; }
-    
+
     inline void setGraph (const Node& newGraph)
     {
         jassert (session != nullptr);
@@ -49,7 +49,7 @@ public:
         graph = newGraph;
         session->clear();
         session->addGraph (graph, true);
-        data  = session->getValueTree();
+        data = session->getValueTree();
         data.addListener (this);
     }
 
@@ -66,16 +66,16 @@ public:
         explicit ScopedChangeStopper (GraphDocument& d, bool statusToSet = false)
             : doc (d), changeStatus (statusToSet)
         {
-            doc.listenForChanges = false; 
+            doc.listenForChanges = false;
             doc.setChangedFlag (changeStatus);
         }
-        
+
         ~ScopedChangeStopper() noexcept
         {
-            doc.setChangedFlag (changeStatus); 
-            doc.listenForChanges = true; 
+            doc.setChangedFlag (changeStatus);
+            doc.listenForChanges = true;
         }
-    
+
     private:
         GraphDocument& doc;
         const bool changeStatus;
@@ -93,7 +93,7 @@ private:
         ScopedChangeStopper freeze (*this, false);
         data.removeListener (this);
         graph = session->getActiveGraph();
-        data  = session->getValueTree();
+        data = session->getValueTree();
         data.addListener (this);
     }
 
@@ -106,7 +106,7 @@ private:
         setChangedFlag (true);
     }
 
-    inline void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
+    inline void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override
     {
         if (! listenForChanges)
             return;
@@ -114,7 +114,7 @@ private:
         setChangedFlag (true);
     }
 
-    inline void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
+    inline void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override
     {
         if (! listenForChanges)
             return;
@@ -137,7 +137,7 @@ private:
         ignoreUnused (tree);
     }
 
-    inline void valueTreeRedirected (ValueTree&) override { }
+    inline void valueTreeRedirected (ValueTree&) override {}
 };
 
-}
+} // namespace Element

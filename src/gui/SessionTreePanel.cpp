@@ -70,7 +70,8 @@ public:
     /** @internal */
     void itemClicked (const MouseEvent& ev) override
     {
-        if (ev.x < roundToInt (1.f + getIconSize())) {
+        if (ev.x < roundToInt (1.f + getIconSize()))
+        {
             setOpen (! isOpen());
         }
 
@@ -96,7 +97,7 @@ public:
     {
         ValueTree child (n.getValueTree());
         ValueTree parent (child.getParent());
-        
+
         if (parent.isValid())
         {
             setUniqueName (String (parent.indexOf (child)));
@@ -106,7 +107,7 @@ public:
             setUniqueName (String ((int64) node.getNodeId()));
         }
     }
-    
+
     //=========================================================================
     Node getNode() const { return node; }
 
@@ -117,7 +118,8 @@ public:
     {
         auto* const cc = ViewHelpers::findContentComponent (getOwnerView());
         auto* const gui = cc != nullptr ? cc->getAppController().findChild<GuiController>() : nullptr;
-        if (nullptr == gui) return;
+        if (nullptr == gui)
+            return;
 
         if (showIt)
         {
@@ -143,7 +145,7 @@ public:
             }
         }
     }
-    
+
     virtual void itemDoubleClicked (const MouseEvent& ev) override
     {
         if (ev.x < roundToInt (1.f + getIconSize()))
@@ -164,27 +166,27 @@ public:
         auto* const view = getOwnerView();
         auto* const tree = dynamic_cast<SessionTreePanel*> (view->getParentComponent());
         const bool hadFocus = view && view->hasKeyboardFocus (true);
-        
+
         SharedConnectionBlock block (tree->nodeSelectedConnection, true);
 
-        jassert(session != nullptr && cc != nullptr && gui != nullptr);
+        jassert (session != nullptr && cc != nullptr && gui != nullptr);
 
         auto root = node;
-        while (!root.isRootGraph() && root.isValid())
+        while (! root.isRootGraph() && root.isValid())
             root = root.getParentGraph();
 
         if (root.isRootGraph() && root != session->getCurrentGraph())
         {
             ScopedFlag scopedFlag (tree->ignoreActiveRootGraphSelectionHandler, true);
-            
+
             gui->closeAllPluginWindows (true);
             auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
             graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
-            auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
+            auto& app (ViewHelpers::findContentComponent (getOwnerView())->getAppController());
             app.findChild<EngineController>()->setRootNode (root);
             gui->showPluginWindowsFor (root, true, false, false);
         }
-        
+
         if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
         {
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
@@ -197,7 +199,6 @@ public:
             gui->selectNode (node);
         else if (node.isRootGraph() && node.hasAudioOutputNode())
             gui->selectNode (node.getNodeByFormat ("Internal", "audio.output"));
-        
 
         gui->refreshMainMenu();
         gui->stabilizeViews();
@@ -206,22 +207,22 @@ public:
             view->grabKeyboardFocus();
     }
 
-    String getRenamingName() const override         { return getDisplayName(); }
-    String getDisplayName()  const override         { return node.getDisplayName(); }
+    String getRenamingName() const override { return getDisplayName(); }
+    String getDisplayName() const override { return node.getDisplayName(); }
 
     void setName (const String& newName) override
     {
         node.setProperty (Tags::name, newName);
     }
-    
+
     bool isMissing() override { return false; }
-    
+
     Icon getIcon() const override
     {
         return Icon (node.isGraph() ? getIcons().fasThLarge : getIcons().fasRectangleLandscape,
                      Colors::elemental.withAlpha (0.9f));
     }
-    
+
     virtual void deleteItem() override
     {
         if (! node.isRootGraph())
@@ -229,12 +230,12 @@ public:
             ViewHelpers::postMessageFor (getOwnerView(), new RemoveNodeMessage (node));
         }
     }
-    
+
     virtual void duplicateItem()
     {
         if (! node.isRootGraph())
         {
-            ViewHelpers::postMessageFor(getOwnerView(), new DuplicateNodeMessage (node));
+            ViewHelpers::postMessageFor (getOwnerView(), new DuplicateNodeMessage (node));
         }
     }
 
@@ -249,7 +250,7 @@ public:
         desc.name = "Graph";
         ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
     }
-    
+
     void getSelectedNodes (NodeArray& nodes, bool includeRootGraphs = true)
     {
         const auto numSelected = getOwnerView()->getNumSelectedItems();
@@ -262,13 +263,21 @@ public:
     {
         switch (result)
         {
-            case 0: break;
-            case 1: deleteItem(); break;
-            case 2: duplicateItem(); break;
-            case 5: addNewGraph(); break;
+            case 0:
+                break;
+            case 1:
+                deleteItem();
+                break;
+            case 2:
+                duplicateItem();
+                break;
+            case 5:
+                addNewGraph();
+                break;
 
             case 10: {
-                NodeArray selected; getSelectedNodes (selected);
+                NodeArray selected;
+                getSelectedNodes (selected);
                 NodeArray nodes, rootGraphs;
                 for (const auto& node : selected)
                 {
@@ -279,12 +288,14 @@ public:
                 }
                 selected.clearQuick();
                 ViewHelpers::postMessageFor (getOwnerView(), new RemoveNodeMessage (nodes));
-            } break;
+            }
+            break;
 
-            default: break;
+            default:
+                break;
         }
     }
-    
+
     void showMultiSelectionPopupMenu() override
     {
         PopupMenu menu;
@@ -293,10 +304,10 @@ public:
             menu.addItem (5, "Add Nested Graph");
             menu.addSeparator();
         }
-        
+
         if (! node.isRootGraph())
             menu.addItem (10, "Delete Selected");
-        
+
         launchPopupMenu (menu);
     }
 
@@ -308,23 +319,23 @@ public:
             menu.addItem (5, "Add Nested Graph");
             menu.addSeparator();
         }
-        
+
         menu.addItem (2, "Duplicate");
         menu.addSeparator();
         menu.addItem (1, "Delete");
-        
+
         launchPopupMenu (menu);
     }
-    
+
     bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
         const auto& desc (details.description);
         if (! node.isGraph())
             return false;
-        
+
         return desc.toString() == "ccNavConcertinaPanel"
-            || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
-    } 
+               || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
+    }
 
     void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
     {
@@ -345,15 +356,15 @@ public:
             {
                 const Node newGraph (Node::parse (file));
                 ViewHelpers::postMessageFor (getOwnerView(),
-                    new AddNodeMessage (newGraph, graph));
+                                             new AddNodeMessage (newGraph, graph));
             }
         }
         else if (desc.isArray() && desc[0] == "plugin")
         {
-            if (auto p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString(desc[1].toString()))
+            if (auto p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString (desc[1].toString()))
             {
                 ViewHelpers::postMessageFor (getOwnerView(),
-                    new AddPluginMessage (graph, *p));
+                                             new AddPluginMessage (graph, *p));
             }
         }
     }
@@ -388,9 +399,10 @@ private:
         const bool forUI;
 
         TreeItem() = delete;
-        TreeItem (const Node& n, bool isUI) 
+        TreeItem (const Node& n, bool isUI)
             : SessionNodeTreeItem (n),
-              node(n), forUI (isUI) {}
+              node (n),
+              forUI (isUI) {}
         ~TreeItem() = default;
 
         SessionScriptNodeTreeItem* getParent() const noexcept
@@ -404,7 +416,7 @@ private:
                 cc->setMainView (new ScriptNodeScriptEditorView (node, forUI));
         }
 
-        String getDisplayName()  const override
+        String getDisplayName() const override
         {
             return String (forUI ? "UI" : "DSP");
         }
@@ -452,21 +464,19 @@ class SessionRootGraphTreeItem : public SessionGraphTreeItem
 public:
     SessionRootGraphTreeItem (const Node& n)
         : SessionGraphTreeItem (n)
-    { 
+    {
         jassert (n.isRootGraph());
     }
-    
+
     void deleteItem() override
     {
         const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
-        ViewHelpers::findContentComponent (getOwnerView())->getAppController()
-            .findChild<EngineController>()->removeGraph (index);
+        ViewHelpers::findContentComponent (getOwnerView())->getAppController().findChild<EngineController>()->removeGraph (index);
     }
 
     void duplicateItem() override
     {
-        ViewHelpers::findContentComponent (getOwnerView())->getAppController()
-            .findChild<EngineController>()->duplicateGraph (node);
+        ViewHelpers::findContentComponent (getOwnerView())->getAppController().findChild<EngineController>()->duplicateGraph (node);
     }
 
     void paintContent (Graphics& g, const Rectangle<int>& area) override
@@ -474,9 +484,10 @@ public:
         TreeItemBase::paintContent (g, area);
         if (! node.isRootGraph())
             return;
-       
+
         // Paint the program number if it is enabled
-        const auto h = area.getHeight(); const auto w = h;
+        const auto h = area.getHeight();
+        const auto w = h;
         const int p = (int) node.getProperty (Tags::midiProgram, -1);
         if (p >= 0)
         {
@@ -522,22 +533,34 @@ public:
     {
         switch (result)
         {
-            case 0: break;
-            case 1: deleteItem(); break;
-            case 2: duplicateItem(); break;
-            case 3: showSettings(); break;
-            case 4: editGraph(); break;
-            case 5: addGraph(); break;
-            {
-                
-            } break;
-                
-            default: break;
+            case 0:
+                break;
+            case 1:
+                deleteItem();
+                break;
+            case 2:
+                duplicateItem();
+                break;
+            case 3:
+                showSettings();
+                break;
+            case 4:
+                editGraph();
+                break;
+            case 5:
+                addGraph();
+                break;
+                {
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
     void showPopupMenu() override
-    {   
+    {
         PopupMenu menu;
         menu.addItem (5, "Add Nested Graph");
         menu.addItem (4, "Edit Graph...");
@@ -547,8 +570,7 @@ public:
         menu.addItem (2, "Duplicate");
         menu.addSeparator();
         menu.addItem (1, "Delete");
-        
- 
+
         launchPopupMenu (menu);
     }
 };
@@ -557,7 +579,7 @@ public:
 class SessionRootTreeItem : public TreeItemBase
 {
 public:
-    SessionRootTreeItem (SessionTreePanel& o) : panel (o) { }
+    SessionRootTreeItem (SessionTreePanel& o) : panel (o) {}
 
     String getUniqueName() const override { return "SESSION"; }
 
@@ -578,7 +600,7 @@ public:
     virtual bool mightContainSubItems() override { return true; }
     virtual String getRenamingName() const override { return getDisplayName(); }
     virtual String getDisplayName() const override { return "Session"; }
-    virtual void setName (const String& newName) override { }
+    virtual void setName (const String& newName) override {}
     virtual bool isMissing() override { return false; }
     virtual Icon getIcon() const override { return Icon (getIcons().folder, Colours::red); }
 
@@ -587,7 +609,7 @@ public:
         const auto& desc (details.description);
         return desc.toString() == "ccNavConcertinaPanel";
         // ||    (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
-    } 
+    }
 
     void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
     {
@@ -614,12 +636,12 @@ public:
         }
     }
 
-    #if 0
+#if 0
     void itemDragMove (const SourceDetails& dragSourceDetails) override;
     bool shouldDrawDragImageWhenOver() override { return true; }
     void itemDragExit (const SourceDetails& details) override;
     virtual void itemDragEnter (const SourceDetails& details) override;
-    #endif
+#endif
 
     SessionTreePanel& panel;
 };
@@ -649,7 +671,7 @@ void SessionTreePanel::refresh()
         rootItem->refreshSubItems();
 }
 
-void SessionTreePanel::mouseDown (const MouseEvent &ev) {}
+void SessionTreePanel::mouseDown (const MouseEvent& ev) {}
 
 void SessionTreePanel::setSession (SessionPtr s)
 {
@@ -739,14 +761,13 @@ void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifi
 
 static bool couldBeSessionObjects (ValueTree& parent, ValueTree& child)
 {
-    return  parent.hasType (Tags::session) ||
-            (parent.hasType (Tags::graphs) && child.hasType (Tags::node)) || 
-            (parent.hasType (Tags::nodes) && child.hasType (Tags::node));
+    return parent.hasType (Tags::session) || (parent.hasType (Tags::graphs) && child.hasType (Tags::node)) || (parent.hasType (Tags::nodes) && child.hasType (Tags::node));
 }
 
 static void refreshSubItems (TreeItemBase* item)
 {
-    if (item == nullptr) return;
+    if (item == nullptr)
+        return;
 
     if (auto* root = dynamic_cast<SessionRootTreeItem*> (item))
     {
@@ -777,19 +798,17 @@ void SessionTreePanel::valueTreeChildOrderChanged (ValueTree& parent, int oldInd
 
 void SessionTreePanel::valueTreeParentChanged (ValueTree& tree)
 {
-
 }
 
 void SessionTreePanel::valueTreeRedirected (ValueTree& tree)
 {
-
 }
 
 bool SessionTreePanel::keyPressed (const KeyPress& k)
 {
     if ((k.getKeyCode() == 'A' || k.getKeyCode() == 'a') && k.getModifiers().isCommandDown())
     {
-        rootItem->getSubItem(0)->setSelected (true, true, dontSendNotification);
+        rootItem->getSubItem (0)->setSelected (true, true, dontSendNotification);
         return true;
     }
     else if (k.getKeyCode() == KeyPress::rightKey && k.getModifiers().isAltDown())
@@ -804,4 +823,4 @@ bool SessionTreePanel::keyPressed (const KeyPress& k)
     return TreePanelBase::keyPressed (k);
 }
 
-}
+} // namespace Element

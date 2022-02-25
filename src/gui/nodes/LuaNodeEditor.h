@@ -52,4 +52,4 @@ private:
     void onPortsChanged();
 };
 
-}
+} // namespace Element

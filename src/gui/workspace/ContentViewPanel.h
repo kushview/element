@@ -33,8 +33,8 @@
 
 namespace Element {
 
-template<class ViewType>
-class ContentViewPanel :  public WorkspacePanel
+template <class ViewType>
+class ContentViewPanel : public WorkspacePanel
 {
 public:
     ContentViewPanel() : WorkspacePanel()
@@ -42,11 +42,11 @@ public:
         addAndMakeVisible (view);
     }
 
-    ~ContentViewPanel() { }
-    
-    void initializeView (AppController& app) override   { view.initializeView (app); }
-    void didBecomeActive() override                     { view.didBecomeActive(); }
-    void stabilizeContent() override                    { view.stabilizeContent(); }
+    ~ContentViewPanel() {}
+
+    void initializeView (AppController& app) override { view.initializeView (app); }
+    void didBecomeActive() override { view.didBecomeActive(); }
+    void stabilizeContent() override { view.stabilizeContent(); }
 
     void resized() override
     {
@@ -120,4 +120,4 @@ public:
     ~SessionSettingsPanel() = default;
 };
 
-}
+} // namespace Element

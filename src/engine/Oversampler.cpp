@@ -31,16 +31,14 @@ void Oversampler<T>::prepare (int numChannels, int blockSize)
     reset();
 
     numChannels = jmax (1, numChannels);
-    
+
     if (processors.size() <= 0 || channels != numChannels || buffer != blockSize)
     {
-        buffer      = blockSize;
-        channels    = numChannels;
+        buffer = blockSize;
+        channels = numChannels;
         processors.clear();
         for (int f = 0; f < maxProc; ++f)
-            processors.add (new ProcessorType (channels, f + 1,
-                ProcessorType::FilterType::filterHalfBandPolyphaseIIR));
-       
+            processors.add (new ProcessorType (channels, f + 1, ProcessorType::FilterType::filterHalfBandPolyphaseIIR));
     }
 
     for (auto* proc : processors)
@@ -55,6 +53,6 @@ void Oversampler<T>::reset()
 }
 
 template class Oversampler<float>;
-template class Oversampler<double>; 
+template class Oversampler<double>;
 
-}
+} // namespace Element

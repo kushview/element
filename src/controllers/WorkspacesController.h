@@ -30,7 +30,7 @@ class WorkspacesController final : public AppController::Child
 public:
     WorkspacesController() = default;
     ~WorkspacesController() = default;
-    
+
     void activate() override;
     void deactivate() override;
     void saveSettings() override;
@@ -48,4 +48,4 @@ private:
     void saveCurrentAndLoadWorkspace (const String& name);
 };
 
-}
+} // namespace Element

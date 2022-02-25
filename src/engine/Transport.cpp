@@ -19,8 +19,7 @@
 
 #include "engine/Transport.h"
 
-namespace Element
-{
+namespace Element {
 
 Transport::Transport()
     : playState (false),
@@ -28,30 +27,32 @@ Transport::Transport()
 {
     monitor = new Monitor();
     monitor->tempo.set (getTempo());
-    
+
     seekWanted.set (false);
     seekFrame.set (0);
-    
+
     nextBeatsPerBar.set (getBeatsPerBar());
     nextBeatDivisor.set (getBeatType());
-    
+
     setLengthFrames (0);
 }
 
-Transport::~Transport() { }
+Transport::~Transport() {}
 
 void Transport::preProcess (int nframes)
 {
-    if (recording != recordState.get()) {
+    if (recording != recordState.get())
+    {
         recording = recordState.get();
     }
 
-    if (playing != playState.get()) {
+    if (playing != playState.get())
+    {
         playing = playState.get();
     }
 
-    if (playing) {
-        
+    if (playing)
+    {
     }
 }
 
@@ -63,11 +64,11 @@ void Transport::postProcess (int nframes)
         nextTempo.set (getTempo());
         monitor->tempo.set (nextTempo.get());
     }
-    
+
     monitor->playing.set (playing);
     monitor->recording.set (recording);
     monitor->positionFrames.set (getPositionFrames());
-    
+
     bool updateTimeScale = false;
     if (getBeatsPerBar() != nextBeatsPerBar.get())
     {
@@ -75,17 +76,17 @@ void Transport::postProcess (int nframes)
         monitor->beatsPerBar.set (getBeatsPerBar());
         updateTimeScale = true;
     }
-    
+
     if (ts.beatDivisor() != nextBeatDivisor.get())
     {
         ts.setBeatDivisor ((unsigned short) nextBeatDivisor.get());
         monitor->beatDivisor.set (nextBeatDivisor.get());
         updateTimeScale = true;
     }
-    
+
     if (updateTimeScale)
         ts.updateScale();
-    
+
     if (seekWanted.get())
     {
         if (getPositionFrames() != seekFrame.get())
@@ -96,10 +97,14 @@ void Transport::postProcess (int nframes)
 
 void Transport::requestMeter (int beatsPerBar, int beatDivisor)
 {
-    if (beatsPerBar < 1) beatsPerBar = 1;
-    if (beatsPerBar > 99) beatsPerBar = 99;
-    if (beatDivisor < 0) beatDivisor = 0;
-    if (beatDivisor > BeatType::SixteenthNote) beatDivisor = BeatType::SixteenthNote;
+    if (beatsPerBar < 1)
+        beatsPerBar = 1;
+    if (beatsPerBar > 99)
+        beatsPerBar = 99;
+    if (beatDivisor < 0)
+        beatDivisor = 0;
+    if (beatDivisor > BeatType::SixteenthNote)
+        beatDivisor = BeatType::SixteenthNote;
     nextBeatsPerBar.set (beatsPerBar);
     nextBeatDivisor.set (beatDivisor);
 }
@@ -110,4 +115,4 @@ void Transport::requestAudioFrame (const int64 frame)
     seekWanted.set (true);
 }
 
-}
+} // namespace Element

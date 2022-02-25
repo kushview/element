@@ -23,7 +23,7 @@
 #include "engine/NodeObject.h"
 #include "session/Node.h"
 
-#define EL_NODE_EDITOR_DEFAULT_ID       "el.DefaultNodeEditor"
+#define EL_NODE_EDITOR_DEFAULT_ID "el.DefaultNodeEditor"
 
 namespace Element {
 
@@ -40,10 +40,14 @@ public:
 
 protected:
     inline NodeObject* getNodeObject() const { return node.getObject(); }
-    template<class T> inline T* getNodeObjectOfType() const { return dynamic_cast<T*> (getNodeObject()); }
+    template <class T>
+    inline T* getNodeObjectOfType() const
+    {
+        return dynamic_cast<T*> (getNodeObject());
+    }
 
 private:
     Node node;
 };
 
-}
+} // namespace Element

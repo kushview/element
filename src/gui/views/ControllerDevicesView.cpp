@@ -31,22 +31,28 @@ class ControllerMapsTable : public TableListBox,
                             public TableListBoxModel
 {
 public:
-    enum Columns { Device = 1, Control, Node, Parameter };
+    enum Columns
+    {
+        Device = 1,
+        Control,
+        Node,
+        Parameter
+    };
 
     ControllerMapsTable()
-    { 
+    {
         setModel (this);
         const int flags = TableHeaderComponent::notSortable;
         // getHeader().addColumn ("Device", Device, 100, 30, -1, flags);
         getHeader().addColumn ("Node", Node, 100, 30, -1, flags);
         getHeader().addColumn ("Control", Control, 100, 30, -1, flags);
         getHeader().addColumn ("Parameter", Parameter, 100, 30, -1, flags);
-        setHeaderHeight (22);         
+        setHeaderHeight (22);
         setRowHeight (20);
     }
 
     ~ControllerMapsTable()
-    { 
+    {
         setModel (nullptr);
     }
 
@@ -60,15 +66,14 @@ public:
                          const ControllerDevice::Control& control = ControllerDevice::Control())
     {
         maps.clear (true);
-        
+
         if (session)
         {
             for (int i = 0; i < session->getNumControllerMaps(); ++i)
             {
                 std::unique_ptr<ControllerMapObjects> objects;
                 objects.reset (new ControllerMapObjects (session, session->getControllerMap (i)));
-                if (!device.isValid() || 
-                        (device.isValid() && device.getUuidString() == objects->device.getUuidString()))
+                if (! device.isValid() || (device.isValid() && device.getUuidString() == objects->device.getUuidString()))
                 {
                     maps.add (objects.release());
                 }
@@ -79,7 +84,7 @@ public:
         repaint();
     }
 
-    void updateWith (SessionPtr sess, 
+    void updateWith (SessionPtr sess,
                      const ControllerDevice& device = ControllerDevice(),
                      const ControllerDevice::Control& control = ControllerDevice::Control())
     {
@@ -89,45 +94,45 @@ public:
 
     int getNumRows() override { return maps.size(); }
 
-    void paintRowBackground (Graphics& g, int rowNumber,
-                             int width, int height,
-                             bool rowIsSelected) override
+    void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
         ViewHelpers::drawBasicTextRow ("", g, width, height, rowIsSelected);
     }
 
-    void paintCell (Graphics& g, int rowNumber, int columnId, int width, int height,
-                    bool rowIsSelected) override
+    void paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override
     {
-        auto* const objects = maps [rowNumber];
-        if (! objects) return;
+        auto* const objects = maps[rowNumber];
+        if (! objects)
+            return;
 
         const auto mapp (objects->controllerMap);
         const auto device (objects->device);
         const auto control (objects->control);
         const auto node (objects->node);
         g.setColour (objects->isValid() ? LookAndFeel::textColor : Colours::red);
-        
+
         String text = "N/A";
         switch (columnId)
         {
             case Device: {
                 text = device.getName().toString();
-            } break;
+            }
+            break;
 
             case Control: {
                 text = control.getName().toString();
-            } break;
+            }
+            break;
 
             case Node: {
                 text = node.getName();
-            } break;
+            }
+            break;
 
-            case Parameter:
-            {
+            case Parameter: {
                 text = "Parameter ";
                 text << mapp.getParameterIndex();
-                
+
                 if (NodeObject::isSpecialParameter (mapp.getParameterIndex()))
                 {
                     text = NodeObject::getSpecialParameterName (mapp.getParameterIndex());
@@ -138,15 +143,16 @@ public:
                         if (auto* param = proc->getParameters()[mapp.getParameterIndex()])
                             text = param->getName (64);
                 }
-            } break;
+            }
+            break;
         }
 
-        g.drawText (text, 0,0, width, height, Justification::centredLeft);
+        g.drawText (text, 0, 0, width, height, Justification::centredLeft);
     }
 
     void deleteKeyPressed (int lastRowSelected) override
     {
-        if (auto* objects = maps [lastRowSelected])
+        if (auto* objects = maps[lastRowSelected])
         {
             ViewHelpers::postMessageFor (this, new RemoveControllerMapMessage (objects->controllerMap));
         }
@@ -154,7 +160,7 @@ public:
 
     void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&) override
     {
-        if (auto* const objects = maps [rowNumber])
+        if (auto* const objects = maps[rowNumber])
         {
             switch (columnId)
             {
@@ -167,11 +173,10 @@ public:
         }
     }
 
-    Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
-                                        Component* existing) override
+    Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected, Component* existing) override
     {
         return nullptr;
-        #if 0
+#if 0
         CellContent* const content = nullptr == existing 
             ? new CellContent() : dynamic_cast<CellContent*> (existing);
         jassert (content);
@@ -184,7 +189,7 @@ public:
             content->mapp = ControllerMapObjects();
         content->stabilize();
         return content;
-        #endif
+#endif
     }
 
 #if 0
@@ -208,14 +213,13 @@ private:
     class CellContent : public Component
     {
     public:
-        
         CellContent()
         {
             setInterceptsMouseClicks (false, true);
             addAndMakeVisible (comboBox);
         }
 
-        void resized() override 
+        void resized() override
         {
             comboBox.setBounds (getLocalBounds().reduced (2));
         }
@@ -246,7 +250,7 @@ public:
     Signal<void()> messageReceived;
 
     explicit MidiLearnButton (const String& deviceName = String())
-    { 
+    {
         addListener (this);
     }
 
@@ -255,7 +259,7 @@ public:
         stopListening();
     }
 
-    void buttonClicked (Button*) override { }
+    void buttonClicked (Button*) override {}
 
     bool isListening() const { return listening; }
 
@@ -277,17 +281,17 @@ public:
 
     void stopListening()
     {
-       #if 0
+#if 0
         if (input)
         {
             input->stop();
             input.reset (nullptr);
         }
-       #else
+#else
         jassert (ViewHelpers::getGlobals (this));
         if (auto* world = ViewHelpers::getGlobals (this))
             world->getMidiEngine().removeMidiInputCallback (this);
-       #endif
+#endif
 
         listening = false;
         updateToggleState();
@@ -300,7 +304,7 @@ public:
 
         stopListening();
         clearMessage();
-        
+
         jassert (ViewHelpers::getGlobals (this));
         if (auto* world = ViewHelpers::getGlobals (this))
             world->getMidiEngine().addMidiInputCallback (inputName, this, true);
@@ -311,7 +315,7 @@ public:
 
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& msg) override
     {
-        if (gotFirstMessage.get() && stopOnFirstMessage.get()) 
+        if (gotFirstMessage.get() && stopOnFirstMessage.get())
             return;
         gotFirstMessage.set (true);
         ScopedLock sl (lock);
@@ -327,7 +331,7 @@ public:
     }
 
     MidiMessage getMidiMessage() const
-    { 
+    {
         ScopedLock sl (lock);
         return message;
     }
@@ -354,7 +358,7 @@ class ControlListBox : public ListBox,
 public:
     std::function<void()> selectionChanged;
 
-    ControlListBox ()
+    ControlListBox()
     {
         setModel (this);
         setRowHeight (32);
@@ -384,28 +388,27 @@ public:
         return editedDevice.getNumChildren();
     }
 
-    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
-                           bool rowIsSelected) override 
-    { 
+    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
+    {
         ignoreUnused (rowNumber, g, width, height, rowIsSelected);
     }
 
-    Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
-                                       Component* existingComponentToUpdate) override
+    Component* refreshComponentForRow (int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override
     {
         auto* row = dynamic_cast<ControllerRow*> (existingComponentToUpdate);
         if (row == nullptr)
             row = new ControllerRow (*this);
 
-        row->refresh (editedDevice.getControl (rowNumber), 
-                      rowNumber, isRowSelected);
-        
+        row->refresh (editedDevice.getControl (rowNumber),
+                      rowNumber,
+                      isRowSelected);
+
         return row;
     }
 
-    void listBoxItemClicked (int row, const MouseEvent&) override { DBG("clicked");}
+    void listBoxItemClicked (int row, const MouseEvent&) override { DBG ("clicked"); }
     void selectedRowsChanged (int lastRowSelected) override
-    { 
+    {
         if (selectionChanged)
             selectionChanged();
     }
@@ -417,7 +420,7 @@ public:
         ViewHelpers::postMessageFor (this, new RemoveControlMessage (editedDevice, selected));
     }
 
-   #if 0
+#if 0
     void listBoxItemClicked (int row, const MouseEvent&) override { }
     void listBoxItemDoubleClicked (int row, const MouseEvent&) override { }
     void backgroundClicked (const MouseEvent&) override { }
@@ -428,7 +431,7 @@ public:
     var getDragSourceDescription (const SparseSet<int>& rowsToDescribe) override { }
     String getTooltipForRow (int row) override { }
     MouseCursor getMouseCursorForRow (int row) override { }
-   #endif
+#endif
 
 private:
     ControllerDevice editedDevice;
@@ -459,8 +462,11 @@ private:
 
         void paint (Graphics& g) override
         {
-            ViewHelpers::drawBasicTextRow (control.getName().toString(), 
-                g, getWidth(), getHeight(), selected);
+            ViewHelpers::drawBasicTextRow (control.getName().toString(),
+                                           g,
+                                           getWidth(),
+                                           getHeight(),
+                                           selected);
         }
 
         void resized() override
@@ -482,7 +488,7 @@ private:
             }
             else if (control.isControllerEvent())
             {
-                text = "CC "; 
+                text = "CC ";
                 text << control.getEventId();
             }
 
@@ -515,7 +521,7 @@ class ControllerDevicesView::Content : public Component,
 {
 public:
     Content()
-    { 
+    {
         controllersBox.setTextWhenNoChoicesAvailable ("No Controllers");
         controllersBox.setTextWhenNothingSelected ("(Controllers)");
         controllersBox.addListener (this);
@@ -534,7 +540,7 @@ public:
         controls.setControllerDevice (editedDevice);
         controls.selectionChanged = std::bind (&Content::triggerAsyncUpdate, this);
         addAndMakeVisible (controls);
-        
+
         addControlButton.setButtonText ("+");
         addControlButton.setTooltip ("Add a new control");
         addControlButton.addListener (this);
@@ -576,7 +582,7 @@ public:
 
         triggerAsyncUpdate();
     }
-    
+
     ~Content() noexcept
     {
         disconnectHandlers();
@@ -592,7 +598,7 @@ public:
     {
         ignoreUnused (control);
         return (message.isController() || message.isNoteOn())
-            && message.getRawDataSize() > 0;
+               && message.getRawDataSize() > 0;
     }
 
     void onLearnMidi()
@@ -602,7 +608,7 @@ public:
         if (supportedForMapping (message, control))
         {
             const var mappingData ((void*) message.getRawData(),
-                                  (size_t) message.getRawDataSize());
+                                   (size_t) message.getRawDataSize());
             ValueTree data = control.getValueTree();
             data.setProperty (Tags::mappingData, mappingData, nullptr);
         }
@@ -611,8 +617,8 @@ public:
     }
 
     bool haveControllers() const
-    { 
-        if (auto sess = (const_cast<Content*>(this))->getSession())
+    {
+        if (auto sess = (const_cast<Content*> (this))->getSession())
             return sess->getNumControllerDevices() > 0;
         return false;
     }
@@ -626,8 +632,8 @@ public:
         }
         else if (value.refersToSameSourceAs (inputDevice))
         {
-            ViewHelpers::postMessageFor (this, 
-                new RefreshControllerDeviceMessage (editedDevice));
+            ViewHelpers::postMessageFor (this,
+                                         new RefreshControllerDeviceMessage (editedDevice));
         }
         else if (value.refersToSameSourceAs (controlName))
         {
@@ -684,15 +690,18 @@ public:
         else if (button == &saveControllerButton)
         {
             auto name = editedDevice.getName().toString();
-            if (name.isEmpty()) name << "Controller";
+            if (name.isEmpty())
+                name << "Controller";
             name << ".xml";
 
             FileChooser chooser ("Save Controller Device",
-                DataPath::defaultControllersDir().getChildFile(name).getNonexistentSibling(),
-                "*.xml", true, false);
+                                 DataPath::defaultControllersDir().getChildFile (name).getNonexistentSibling(),
+                                 "*.xml",
+                                 true,
+                                 false);
             if (chooser.browseForFileToSave (true))
             {
-                DBG("[EL] save device");
+                DBG ("[EL] save device");
                 if (auto xml = editedDevice.getValueTree().createXml())
                     xml->writeToFile (chooser.getResult(), String());
             }
@@ -700,11 +709,14 @@ public:
         else if (button == &openControllerButton)
         {
             FileChooser chooser ("Open Controller Device",
-                DataPath::defaultControllersDir(), "*.xml", true, false);
-            if (chooser.browseForFileToOpen ())
+                                 DataPath::defaultControllersDir(),
+                                 "*.xml",
+                                 true,
+                                 false);
+            if (chooser.browseForFileToOpen())
             {
                 ViewHelpers::postMessageFor (this,
-                    new AddControllerDeviceMessage (chooser.getResult()));
+                                             new AddControllerDeviceMessage (chooser.getResult()));
             }
         }
     }
@@ -717,7 +729,7 @@ public:
 
     void resized() override
     {
-        const int controlsWidth     = 280;
+        const int controlsWidth = 280;
         auto r1 (getLocalBounds());
 
         auto mb = r1.removeFromBottom (jmax (10, mappingsSize));
@@ -727,14 +739,14 @@ public:
         auto r2 (r1.removeFromTop (22));
         controllersBox.setBounds (r2.removeFromLeft (controlsWidth).withHeight (22));
         r2.removeFromRight (2);
-        createButton.setBounds (r2.removeFromRight (22).reduced(1));
+        createButton.setBounds (r2.removeFromRight (22).reduced (1));
         r2.removeFromRight (2);
-        deleteButton.setBounds (r2.removeFromRight (22).reduced(1));
+        deleteButton.setBounds (r2.removeFromRight (22).reduced (1));
         r2.removeFromRight (2);
-        openControllerButton.setBounds (r2.removeFromRight (22).reduced(1));
+        openControllerButton.setBounds (r2.removeFromRight (22).reduced (1));
         r2.removeFromRight (2);
-        saveControllerButton.setBounds (r2.removeFromRight (22).reduced(1));
-        
+        saveControllerButton.setBounds (r2.removeFromRight (22).reduced (1));
+
         r1.removeFromTop (4);
 
         auto r3 = r1.removeFromLeft (controlsWidth);
@@ -742,11 +754,11 @@ public:
 
         learnButton.setBounds (r4.removeFromRight (48));
         r4.removeFromRight (8);
-        
+
         removeControlButton.setBounds (r4.removeFromLeft (24));
         r4.removeFromLeft (4);
         addControlButton.setBounds (r4.removeFromLeft (24));
-        
+
         controls.setBounds (r3);
 
         r1.removeFromLeft (4);
@@ -763,8 +775,7 @@ public:
 
     void setChildVisibility (const bool visible)
     {
-        Array<Component*> comps ({ &properties, &controls, &addControlButton,
-            &removeControlButton, &learnButton, &saveControllerButton });
+        Array<Component*> comps ({ &properties, &controls, &addControlButton, &removeControlButton, &learnButton, &saveControllerButton });
         for (auto* comp : comps)
             comp->setVisible (visible);
     }
@@ -776,7 +787,7 @@ public:
         if (haveControllers())
         {
             setChildVisibility (true);
-            
+
             updateProperties();
             updateComboBoxes();
             ensureCorrectDeviceChosen();
@@ -810,8 +821,8 @@ public:
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
-        jassert (ViewHelpers::findContentComponent(this) != nullptr);
-        auto& app = ViewHelpers::findContentComponent(this)->getAppController();
+        jassert (ViewHelpers::findContentComponent (this) != nullptr);
+        auto& app = ViewHelpers::findContentComponent (this)->getAppController();
 
         StringArray keys;
         Array<var> values;
@@ -822,12 +833,11 @@ public:
                 values.add (d);
 
             const auto& inputDeviceVar = editedDevice.getInputDevice();
-            if (inputDeviceVar.toString().isNotEmpty() && 
-                ! keys.contains (inputDeviceVar.toString()))
+            if (inputDeviceVar.toString().isNotEmpty() && ! keys.contains (inputDeviceVar.toString()))
             {
                 keys.add (String());
                 values.add (String());
-                keys.add (inputDeviceVar.toString()); 
+                keys.add (inputDeviceVar.toString());
                 values.add (inputDeviceVar);
             }
             inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
@@ -858,12 +868,14 @@ public:
         if (control.isValid())
         {
             controlName = control.getPropertyAsValue (Tags::name);
-            props.add (new TextPropertyComponent (controlName, 
-                "Control Name", 120, false, true));
-            
+            props.add (new TextPropertyComponent (controlName,
+                                                  "Control Name",
+                                                  120,
+                                                  false,
+                                                  true));
+
             eventType = control.getPropertyAsValue ("eventType");
-            props.add (new ChoicePropertyComponent (eventType, "Event Type", 
-                { "Controller", "Note" }, { var ("controller"), var ("note") }));
+            props.add (new ChoicePropertyComponent (eventType, "Event Type", { "Controller", "Note" }, { var ("controller"), var ("note") }));
 
             String eventName = "Event ID";
             if (control.isNoteEvent())
@@ -872,43 +884,36 @@ public:
                 eventName = "CC Number";
 
             props.add (new ChoicePropertyComponent (control.getPropertyAsValue (Tags::midiChannel),
-                "Channel", { "Omni", "1", "2", "3", "4", "5", "6", "7", "8",
-                             "9", "10", "11", "12", "13", "14", "15", "16" },
-                            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }));
+                                                    "Channel",
+                                                    { "Omni", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" },
+                                                    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }));
 
             eventId = control.getPropertyAsValue ("eventId");
-            props.add (new SliderPropertyComponent (eventId, eventName, 
-                0.0, 127.0, 1.0));
+            props.add (new SliderPropertyComponent (eventId, eventName, 0.0, 127.0, 1.0));
 
             if (control.isControllerEvent())
             {
                 toggleMode = control.getToggleModeObject();
-                props.add (new ChoicePropertyComponent (toggleMode, "Toggle Mode", 
-                    { "Equal or Higher", "Same Value" }, 
-                    { "eqorhi", "eq" } ));
+                props.add (new ChoicePropertyComponent (toggleMode, "Toggle Mode", { "Equal or Higher", "Same Value" }, { "eqorhi", "eq" }));
 
                 Value toggleValue = control.getPropertyAsValue ("toggleValue");
-                props.add (new SliderPropertyComponent (toggleValue, "Toggle Value", 
-                    0.0, 127.0, 1.0));
+                props.add (new SliderPropertyComponent (toggleValue, "Toggle Value", 0.0, 127.0, 1.0));
 
                 if (toggleMode.getValue() != "eq")
                 {
                     Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
-                    props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely",
-                        "Perform the inverse toggle action"));
+                    props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely", "Perform the inverse toggle action"));
                 }
             }
             else if (control.isNoteEvent())
             {
                 momentary = control.getMomentaryValue();
-                props.add (new BooleanPropertyComponent (momentary, "Momentary",
-                    "Hold the toggle until note off received?"));
+                props.add (new BooleanPropertyComponent (momentary, "Momentary", "Hold the toggle until note off received?"));
 
                 if ((bool) momentary.getValue())
                 {
                     Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
-                    props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely",
-                        "Perform the inverse toggle action"));
+                    props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely", "Perform the inverse toggle action"));
                 }
             }
         }
@@ -964,7 +969,7 @@ public:
         const auto index = editedDevice.indexOf (control);
         if (index >= 0 && index < controls.getNumRows())
         {
-            controls.selectRow (index);        
+            controls.selectRow (index);
             controls.repaintRow (index);
         }
     }
@@ -1060,8 +1065,7 @@ private:
     {
         int index = 0;
         const auto controllerName (editedDevice.getName().toString());
-        const auto controllerIndex (editedDevice.getValueTree().getParent()
-                                    .indexOf (editedDevice.getValueTree()));
+        const auto controllerIndex (editedDevice.getValueTree().getParent().indexOf (editedDevice.getValueTree()));
         if (controllerIndex < 0)
             return;
 
@@ -1123,7 +1127,7 @@ void ControllerDevicesView::initializeView (AppController& app)
 }
 
 ControllerDevicesView::~ControllerDevicesView()
-{ 
+{
     content.reset (nullptr);
 }
 
@@ -1137,4 +1141,4 @@ void ControllerDevicesView::stabilizeContent()
     content->stabilizeContent();
 }
 
-}
+} // namespace Element

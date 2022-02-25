@@ -29,7 +29,7 @@ class AudioIONodeEditor : public NodeEditorComponent,
 {
 public:
     AudioIONodeEditor (const Node& node, DeviceManager& devs, bool ins = true, bool outs = true)
-        : NodeEditorComponent (node), devices (devs), showIns(ins), showOuts(outs)
+        : NodeEditorComponent (node), devices (devs), showIns (ins), showOuts (outs)
     {
         content.reset (new Content (*this));
         view.setViewedComponent (content.get(), false);
@@ -44,7 +44,7 @@ public:
         view.setViewedComponent (nullptr, false);
         content.reset();
     }
-    
+
     void paint (Graphics& g) override
     {
         g.setFont (13.f);
@@ -73,27 +73,25 @@ private:
     bool showIns = true;
     bool showOuts = true;
     Viewport view;
-    
+
     friend struct Content;
     struct Content : public Component,
                      public Button::Listener
     {
-        Content (AudioIONodeEditor& ed) 
+        Content (AudioIONodeEditor& ed)
             : owner (ed)
         {
             if (owner.showOuts)
             {
-                
             }
 
             if (owner.showIns)
-            {   
-                
+            {
             }
 
             updateDevices();
         }
-        
+
         int computeHeight()
         {
             return 100;
@@ -109,12 +107,10 @@ private:
 
         void updateInputs()
         {
-            
         }
 
         void updateOutputs()
         {
-            
         }
 
         void buttonClicked (Button* button) override
@@ -123,13 +119,12 @@ private:
 
         void resized() override
         {
-            
         }
-        
+
         AudioIONodeEditor& owner;
     };
 
     std::unique_ptr<Content> content;
 };
 
-}
+} // namespace Element

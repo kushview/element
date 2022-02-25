@@ -27,8 +27,8 @@
 
 namespace Element {
 
-class MidiMonitorNode   : public MidiFilterNode,
-                          private Timer
+class MidiMonitorNode : public MidiFilterNode,
+                        private Timer
 {
 public:
     MidiMonitorNode();
@@ -37,16 +37,16 @@ public:
     void getPluginDescription (PluginDescription& desc) const override
     {
         desc.name = "MIDI Monitor";
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_MONITOR;
-        desc.uniqueId                = EL_INTERNAL_UID_MIDI_MONITOR;
-        desc.descriptiveName    = "MIDI Monitor";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.fileOrIdentifier = EL_INTERNAL_ID_MIDI_MONITOR;
+        desc.uniqueId = EL_INTERNAL_UID_MIDI_MONITOR;
+        desc.descriptiveName = "MIDI Monitor";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
 
     inline void refreshPorts() override
@@ -72,27 +72,25 @@ public:
     void getState (MemoryBlock& block) override {};
 
     void clearMessages();
-    
+
     const StringArray& getLog() const { return midiLog; }
 
 private:
     friend class MidiMonitorNodeEditor;
-     Signal<void()> messagesLogged;
+    Signal<void()> messagesLogged;
     double currentSampleRate = 44100.0;
     int numSamples = 0;
     MidiMessageCollector inputMessages;
     bool createdPorts = false;
     CriticalSection lock;
-    
-    MidiBuffer  midiTemp;
+
+    MidiBuffer midiTemp;
     StringArray midiLog;
     int maxLoggedMessages { 100 };
     float refreshRateHz { 60.0 };
 
-    
-
-    void getMessages (MidiBuffer &destBuffer);
+    void getMessages (MidiBuffer& destBuffer);
     void timerCallback() override;
 };
 
-}
+} // namespace Element

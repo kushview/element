@@ -37,22 +37,22 @@ public:
 
     void refresh();
 
-    void mouseDown (const MouseEvent &event) override;
+    void mouseDown (const MouseEvent& event) override;
     void setSession (SessionPtr);
     SessionPtr getSession() const;
 
     bool keyPressed (const KeyPress&) override;
-    
+
 private:
     friend class SessionNodeTreeItem;
 
     SessionPtr session;
     ValueTree data;
     SignalConnection nodeSelectedConnection;
-    
+
     bool ignoreActiveRootGraphSelectionHandler = false;
     void selectActiveRootGraph();
-    
+
     TreeViewItem* findItemForNode (const Node& node) const;
 
     void onNodeSelected();
@@ -66,4 +66,4 @@ private:
     void valueTreeRedirected (ValueTree& tree) override;
 };
 
-}
+} // namespace Element

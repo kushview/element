@@ -65,7 +65,7 @@ void TreePanelBase::saveOpenness()
 #endif
 }
 
-TreeItemBase::TreeItemBase()  : textX (0)
+TreeItemBase::TreeItemBase() : textX (0)
 {
     setLinesDrawnForSubItems (false);
 }
@@ -90,8 +90,9 @@ Font TreeItemBase::getFont() const
 
 void TreeItemBase::paintItem (Graphics& g, int w, int h)
 {
-    if (isSelected()) {
-       ViewHelpers::drawBasicTextRow (String(), g, w, w, true);
+    if (isSelected())
+    {
+        ViewHelpers::drawBasicTextRow (String(), g, w, w, true);
     }
 }
 
@@ -159,8 +160,8 @@ Component* TreeItemBase::createItemComponent()
     return new TreeItemComponent (*this);
 }
 
-class RenameTreeItemCallback  : public ModalComponentManager::Callback,
-                                public TextEditor::Listener
+class RenameTreeItemCallback : public ModalComponentManager::Callback,
+                               public TextEditor::Listener
 {
 public:
     RenameTreeItemCallback (TreeItemBase& ti, Component& parent, const Rectangle<int>& bounds)
@@ -184,15 +185,15 @@ public:
             item.setName (ed.getText());
     }
 
-    void textEditorTextChanged (TextEditor&) override                { }
-    void textEditorReturnKeyPressed (TextEditor& editor) override    { editor.exitModalState (1); }
-    void textEditorEscapeKeyPressed (TextEditor& editor) override    { editor.exitModalState (0); }
-    void textEditorFocusLost (TextEditor& editor) override           { editor.exitModalState (0); }
+    void textEditorTextChanged (TextEditor&) override {}
+    void textEditorReturnKeyPressed (TextEditor& editor) override { editor.exitModalState (1); }
+    void textEditorEscapeKeyPressed (TextEditor& editor) override { editor.exitModalState (0); }
+    void textEditorFocusLost (TextEditor& editor) override { editor.exitModalState (0); }
 
 private:
-    struct RenameEditor   : public TextEditor
+    struct RenameEditor : public TextEditor
     {
-        void inputAttemptWhenModal() override   { exitModalState (0); }
+        void inputAttemptWhenModal() override { exitModalState (0); }
     };
 
     RenameEditor ed;
@@ -221,9 +222,9 @@ void TreeItemBase::itemClicked (const MouseEvent& e)
     }
 }
 
-void TreeItemBase::deleteItem()    {}
+void TreeItemBase::deleteItem() {}
 void TreeItemBase::deleteAllSelectedItems() {}
-void TreeItemBase::showDocument()  {}
+void TreeItemBase::showDocument() {}
 void TreeItemBase::showPopupMenu() {}
 void TreeItemBase::showMultiSelectionPopupMenu() {}
 
@@ -243,10 +244,10 @@ void TreeItemBase::handlePopupMenuResult (int)
 {
 }
 
-class TreeItemBase::ItemSelectionTimer  : public Timer
+class TreeItemBase::ItemSelectionTimer : public Timer
 {
 public:
-    ItemSelectionTimer (TreeItemBase& tvb)  : owner (tvb) { }
+    ItemSelectionTimer (TreeItemBase& tvb) : owner (tvb) {}
     void timerCallback() override { owner.invokeShowDocument(); }
 
 private:
@@ -283,4 +284,4 @@ void TreeItemBase::cancelDelayedSelectionTimer()
     delayedSelectionTimer = nullptr;
 }
 
-}
+} // namespace Element

@@ -46,71 +46,71 @@ public:
     Signal<void()> nodeSelected;
     GuiController (Globals& w, AppController& a);
     ~GuiController();
-    
+
     void activate() override;
     void deactivate() override;
     bool handleMessage (const AppMessage&) override;
-    
+
     void run();
     CommandManager& commander();
-    
+
     AppController& getAppController() const { return controller; }
     KeyListener* getKeyListener() const;
-            
+
     void closeAllWindows();
-    
+
     MainWindow* getMainWindow() const { return mainWindow.get(); }
     void refreshMainMenu();
-    
+
     void runDialog (const String& uri);
     void runDialog (Component* c, const String& title = String());
 
     /** Get a reference to Sesison data */
     SessionRef session();
-    
+
     /** Show plugin windows for a node */
-    void showPluginWindowsFor (const Node& node, 
-                                const bool recursive = true,
-                                const bool force = false,
-                                const bool focus = false);
-    
+    void showPluginWindowsFor (const Node& node,
+                               const bool recursive = true,
+                               const bool force = false,
+                               const bool focus = false);
+
     /** present a plugin window */
     void presentPluginWindow (const Node& node, const bool focus = false);
-    
+
     /** Sync all UI elements with application/plugin */
     void stabilizeContent();
-    
+
     /** Stabilize Views Only */
     void stabilizeViews();
 
     /** Refershes the system tray based on Settings */
     void refreshSystemTray();
-    
+
     bool haveActiveWindows() const;
-    
+
     /* Command manager... */
     ApplicationCommandTarget* getNextCommandTarget() override;
-    void getAllCommands (Array <CommandID>& commands) override;
+    void getAllCommands (Array<CommandID>& commands) override;
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
 
     /** Returns the content component for this instance */
     ContentComponent* getContentComponent();
-    
+
     int getNumPluginWindows() const;
     PluginWindow* getPluginWindow (const int window) const;
     PluginWindow* getPluginWindow (const Node& node) const;
-    
+
     /** Close all plugin windows housed by this controller */
     void closeAllPluginWindows (const bool windowVisible = true);
-    
+
     /** Close plugin windows for a Node ID
      
         @param nodeId   The Node to close windows for
         @param visible  The visibility state flag, true indicates the window should be open when loaded
     */
     void closePluginWindowsFor (uint32 nodeId, const bool windowVisible);
-    
+
     /** Close plugin windows for a Node */
     void closePluginWindowsFor (const Node& node, const bool windowVisible);
 
@@ -118,7 +118,7 @@ public:
         PluginWindows call this when they need deleted
         */
     void closePluginWindow (PluginWindow*);
-    
+
     /** Get the look and feel used by this instance */
     Element::LookAndFeel& getLookAndFeel();
 
@@ -126,7 +126,7 @@ public:
     void clearContentComponent();
 
     // TODO: content manager on selected nodes
-    Node getSelectedNode() const    { return selectedNode; }
+    Node getSelectedNode() const { return selectedNode; }
     // TODO: content manager on selected nodes.
     // WARNING: don't call from outside the main thread.
     void selectNode (const Node& node)
@@ -139,11 +139,11 @@ private:
     AppController& controller;
     Globals& world;
     SessionRef sessionRef;
-    OwnedArray<PluginWindow>            pluginWindows;
-    std::unique_ptr<WindowManager>      windowManager;
-    std::unique_ptr<MainWindow>         mainWindow;
-    std::unique_ptr<ContentComponent>   content;
-    std::unique_ptr<DialogWindow>       about;
+    OwnedArray<PluginWindow> pluginWindows;
+    std::unique_ptr<WindowManager> windowManager;
+    std::unique_ptr<MainWindow> mainWindow;
+    std::unique_ptr<ContentComponent> content;
+    std::unique_ptr<DialogWindow> about;
 
     Node selectedNode; // TODO: content manager
 
@@ -152,11 +152,11 @@ private:
 
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
-    
+
     void showSplash();
     void toggleAboutScreen();
 
     void saveProperties (PropertiesFile* props);
 };
 
-}
+} // namespace Element

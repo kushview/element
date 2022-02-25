@@ -21,18 +21,18 @@
 
 namespace Element {
 
-const int DeviceManager::maxAudioChannels   = 128;
+const int DeviceManager::maxAudioChannels = 128;
 
 class DeviceManager::Private
 {
 public:
-    Private() { }
-    ~Private() { }
+    Private() {}
+    ~Private() {}
 
     EnginePtr activeEngine;
-   #if KV_JACK_AUDIO
+#if KV_JACK_AUDIO
     kv::JackClient jackClient { "Element", 2, "main_in_", 2, "main_out_" };
-   #endif
+#endif
 };
 
 DeviceManager::DeviceManager()
@@ -70,39 +70,39 @@ void DeviceManager::attach (EnginePtr engine)
     impl->activeEngine = engine;
 }
 
-static void addIfNotNull (OwnedArray <AudioIODeviceType>& list, AudioIODeviceType* const device)
+static void addIfNotNull (OwnedArray<AudioIODeviceType>& list, AudioIODeviceType* const device)
 {
     if (device != nullptr)
         list.add (device);
 }
 
-void DeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list)
+void DeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list)
 {
-    #if JUCE_ALSA
+#if JUCE_ALSA
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
-   #endif
-   #if KV_JACK_AUDIO
+#endif
+#if KV_JACK_AUDIO
     addIfNotNull (list, Jack::createAudioIODeviceType (&impl->jackClient));
-   #endif
+#endif
 
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (true));
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (false));
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
-   
+
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
-      
+
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
-    
+
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenSLES());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Android());
 }
 
 void DeviceManager::getAudioDrivers (StringArray& drivers)
 {
-	const OwnedArray<AudioIODeviceType>& types (getAvailableDeviceTypes());
-	for (int i = 0; i < types.size(); ++i)
-		drivers.add (types.getUnchecked(i)->getTypeName());
+    const OwnedArray<AudioIODeviceType>& types (getAvailableDeviceTypes());
+    for (int i = 0; i < types.size(); ++i)
+        drivers.add (types.getUnchecked (i)->getTypeName());
 }
 
 void DeviceManager::selectAudioDriver (const String& name)
@@ -111,7 +111,10 @@ void DeviceManager::selectAudioDriver (const String& name)
 }
 
 #if KV_JACK_AUDIO
-kv::JackClient& DeviceManager::getJackClient() { return impl->jackClient; }
+kv::JackClient& DeviceManager::getJackClient()
+{
+    return impl->jackClient;
+}
 #endif
 
-}
+} // namespace Element

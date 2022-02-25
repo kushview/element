@@ -24,9 +24,9 @@
 
 namespace Element {
 
-class LogListBox  : public ListBox,
-                    public ListBoxModel,
-                    public AsyncUpdater
+class LogListBox : public ListBox,
+                   public ListBoxModel,
+                   public AsyncUpdater
 {
 public:
     /** Constructor */
@@ -46,8 +46,9 @@ public:
     void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
     {
         ignoreUnused (rowIsSelected);
-        g.setFont (Font (Font::getDefaultMonospacedFontName(), 
-                   g.getCurrentFont().getHeight(), Font::plain));
+        g.setFont (Font (Font::getDefaultMonospacedFontName(),
+                         g.getCurrentFont().getHeight(),
+                         Font::plain));
         if (isPositiveAndBelow (row, logList.size()))
             ViewHelpers::drawBasicTextRow (logList[row], g, width, height, false);
     }
@@ -64,7 +65,7 @@ public:
     /** Add message from std::string */
     void addMessage (const std::string& message)
     {
-        addMessage (String(message));
+        addMessage (String (message));
     }
 
     /** Add a new message to the history */
@@ -96,4 +97,4 @@ private:
     StringArray logList;
 };
 
-}
+} // namespace Element

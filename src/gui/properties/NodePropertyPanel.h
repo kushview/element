@@ -30,7 +30,7 @@ class NodeObjectSync;
 class NodePropertyPanel : public PropertyPanel
 {
 public:
-    NodePropertyPanel() 
+    NodePropertyPanel()
         : PropertyPanel()
     {
         initialize();
@@ -60,4 +60,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePropertyPanel)
 };
 
-}
+} // namespace Element

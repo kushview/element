@@ -17,11 +17,11 @@
 */
 
 #if defined(__MINGW32__) || defined(_MSC_VER)
- #include <windows.h>
+#include <windows.h>
 #elif defined(__APPLE__)
- #include <CoreGraphics/CoreGraphics.h>
+#include <CoreGraphics/CoreGraphics.h>
 #else
- #pragma warning "Linux not yet supported caps lock"
+#pragma warning "Linux not yet supported caps lock"
 #endif
 
 #include "CapsLock.h"
@@ -31,15 +31,15 @@ namespace Element {
 bool isCapsLockOn()
 {
     bool result = false;
-   #if defined(__MINGW32__) || defined(_MSC_VER)
+#if defined(__MINGW32__) || defined(_MSC_VER)
     result = (GetKeyState (VK_CAPITAL) & 0x0001) != 0;
-   #elif defined(__APPLE__)
+#elif defined(__APPLE__)
     CGEventFlags flags = CGEventSourceFlagsState (kCGEventSourceStateHIDSystemState);
     result = (kCGEventFlagMaskAlphaShift & flags) != 0;
-   #else
+#else
     // linux
-   #endif
+#endif
     return result;
 }
 
-}
+} // namespace Element

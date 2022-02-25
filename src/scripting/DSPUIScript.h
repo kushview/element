@@ -25,7 +25,6 @@ namespace Element {
 
 class DSPUIScript : public ScriptInstance
 {
-
 };
 
-}
+} // namespace Element

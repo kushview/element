@@ -21,7 +21,7 @@
 
 namespace Element {
 
-ControllerMapsView::ControllerMapsView() { }
-ControllerMapsView::~ControllerMapsView() { }
+ControllerMapsView::ControllerMapsView() {}
+ControllerMapsView::~ControllerMapsView() {}
 
-}
+} // namespace Element

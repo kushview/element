@@ -27,9 +27,9 @@
 
 namespace Element {
 
-class OSCSenderNode   : public MidiFilterNode,
-                        public ChangeBroadcaster,
-                        public Thread
+class OSCSenderNode : public MidiFilterNode,
+                      public ChangeBroadcaster,
+                      public Thread
 {
 public:
     OSCSenderNode();
@@ -37,17 +37,17 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.name               = "OSC Sender";
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_SENDER;
-        desc.uniqueId           = EL_INTERNAL_UID_OSC_SENDER;
-        desc.descriptiveName    = "OSC Sender";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.name = "OSC Sender";
+        desc.fileOrIdentifier = EL_INTERNAL_ID_OSC_SENDER;
+        desc.uniqueId = EL_INTERNAL_UID_OSC_SENDER;
+        desc.descriptiveName = "OSC Sender";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
 
     void getState (MemoryBlock& block) override;
@@ -69,22 +69,21 @@ public:
     /** GUI */
 
     bool connect (String hostName, int portNumber);
-    bool disconnect ();
-    bool isConnected ();
-    void pause ();
-    void resume ();
-    bool togglePause ();
-    bool isPaused ();
+    bool disconnect();
+    bool isConnected();
+    void pause();
+    void resume();
+    bool togglePause();
+    bool isPaused();
 
-    int getCurrentPortNumber ();
-    String getCurrentHostName ();
+    int getCurrentPortNumber();
+    String getCurrentHostName();
     void setPortNumber (int port);
     void setHostName (String hostName);
 
     std::vector<OSCMessage> getOscMessages();
 
 private:
-
     Semaphore sem;
     CriticalSection lock;
 
@@ -114,4 +113,4 @@ private:
     bool midiMessageQueueInitDone = false;
 };
 
-}
+} // namespace Element

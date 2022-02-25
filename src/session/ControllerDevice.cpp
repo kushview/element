@@ -46,4 +46,4 @@ void ControllerDevice::setMissingProperties()
     stabilizePropertyString ("inputDevice", "");
 }
 
-}
+} // namespace Element

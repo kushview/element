@@ -25,7 +25,8 @@ struct lua_State;
 namespace kv {
 namespace lua {
     struct MidiBufferImpl;
-}}
+}
+} // namespace kv
 
 namespace Element {
 
@@ -47,10 +48,13 @@ public:
     void clear (int index, int startSample, int numSamples);
 
 private:
-    enum { maxReferencedBuffers = 32 };
+    enum
+    {
+        maxReferencedBuffers = 32
+    };
     int size = 0;
-    MidiBuffer* referencedBuffers [maxReferencedBuffers];
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiPipe);
+    MidiBuffer* referencedBuffers[maxReferencedBuffers];
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPipe);
 };
 
 class LuaMidiPipe final
@@ -66,10 +70,10 @@ public:
 
     /** Returns the number of midi buffers contained */
     int getNumBuffers() const { return used; }
-    
+
     /** Get a read only buffer */
     const MidiBuffer* const getReadBuffer (int index) const;
-    
+
     /** Get a writable buffer */
     MidiBuffer* getWriteBuffer (int index) const;
 
@@ -93,4 +97,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LuaMidiPipe);
 };
 
-}
+} // namespace Element

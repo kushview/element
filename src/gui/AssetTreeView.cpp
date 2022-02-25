@@ -41,29 +41,30 @@ void AssetTreeViewItem::addSubItems()
 
 bool AssetTreeViewItem::mightContainSubItems() { return item.isGroup(); }
 String AssetTreeViewItem::getRenamingName() const { return item.getName(); }
-String AssetTreeViewItem::getDisplayName()  const { return item.getName(); }
-String AssetTreeViewItem::getUniqueName()   const { return item.getId(); }
+String AssetTreeViewItem::getDisplayName() const { return item.getName(); }
+String AssetTreeViewItem::getUniqueName() const { return item.getId(); }
 bool AssetTreeViewItem::isMissing() { return false; }
 Icon AssetTreeViewItem::getIcon() const { return Icon(); }
 void AssetTreeViewItem::setName (const String& newName) { item.setName (newName); }
-void AssetTreeViewItem::showPopupMenu() { }
-void AssetTreeViewItem::handlePopupMenuResult (int res) { }
+void AssetTreeViewItem::showPopupMenu() {}
+void AssetTreeViewItem::handlePopupMenuResult (int res) {}
 void AssetTreeViewItem::itemOpennessChanged (bool isNowOpen)
 {
-    if (isNowOpen) {
+    if (isNowOpen)
+    {
         refreshSubItems();
     }
 }
 
 bool AssetTreeViewItem::isRootAsset() const { return item.isRoot(); }
 
-void AssetTreeViewItem::triggerAsyncAssetRename (const AssetTree::Item &itemToRename)
+void AssetTreeViewItem::triggerAsyncAssetRename (const AssetTree::Item& itemToRename)
 {
-    class RenameMessage  : public CallbackMessage
+    class RenameMessage : public CallbackMessage
     {
     public:
         RenameMessage (TreeView* const t, const AssetTree::Item& i)
-            : tree (t), itemToRename (i)  {}
+            : tree (t), itemToRename (i) {}
 
         void messageCallback() override
         {
@@ -82,8 +83,6 @@ void AssetTreeViewItem::triggerAsyncAssetRename (const AssetTree::Item &itemToRe
 
     (new RenameMessage (getOwnerView(), itemToRename))->post();
 }
-
-
 
 //==============================================================================
 void AssetTreeViewItem::treeChildrenChanged (const ValueTree& parentTree)
@@ -124,7 +123,8 @@ void AssetTreeViewItem::valueTreeParentChanged (ValueTree& v)
 //==============================================================================
 GroupTreeViewItem::GroupTreeViewItem (const AssetTree::Item& i)
     : AssetTreeViewItem (i)
-{ }
+{
+}
 
 GroupTreeViewItem::~GroupTreeViewItem()
 {
@@ -136,10 +136,10 @@ void GroupTreeViewItem::addNewGroup()
     triggerAsyncAssetRename (newGroup);
 }
 
-bool GroupTreeViewItem::acceptsDragItems (const OwnedArray <AssetTree::Item>& selectedNodes)
+bool GroupTreeViewItem::acceptsDragItems (const OwnedArray<AssetTree::Item>& selectedNodes)
 {
     for (int i = selectedNodes.size(); --i >= 0;)
-        if (item.canContain (*selectedNodes.getUnchecked(i)))
+        if (item.canContain (*selectedNodes.getUnchecked (i)))
             return true;
 
     return false;
@@ -156,23 +156,25 @@ void GroupTreeViewItem::addFiles (const StringArray& files, int insertIndex)
     }
 }
 
-void GroupTreeViewItem::moveSelectedItemsTo (OwnedArray <AssetTree::Item>& selectedNodes, int insertIndex)
+void GroupTreeViewItem::moveSelectedItemsTo (OwnedArray<AssetTree::Item>& selectedNodes, int insertIndex)
 {
-   // moveItems (selectedNodes, item, insertIndex);
+    // moveItems (selectedNodes, item, insertIndex);
 }
 
 void GroupTreeViewItem::checkFileStatus()
 {
- //   for (int i = 0; i < getNumSubItems(); ++i)
-  //      if (AssetTreeViewItem* p = dynamic_cast <AssetTreeViewItem*> (getSubItem(i)))
-   //         p->checkFileStatus();
+    //   for (int i = 0; i < getNumSubItems(); ++i)
+    //      if (AssetTreeViewItem* p = dynamic_cast <AssetTreeViewItem*> (getSubItem(i)))
+    //         p->checkFileStatus();
 }
 
 AssetTreeViewItem*
-GroupTreeViewItem::createAssetSubItem (const AssetTree::Item& child)
+    GroupTreeViewItem::createAssetSubItem (const AssetTree::Item& child)
 {
-    if (child.isGroup())   return new GroupTreeViewItem (child);
-    if (child.isFile())    return new PlainTextFileTreeViewItem (child);
+    if (child.isGroup())
+        return new GroupTreeViewItem (child);
+    if (child.isFile())
+        return new PlainTextFileTreeViewItem (child);
 
     jassertfalse;
     return nullptr;
@@ -180,8 +182,8 @@ GroupTreeViewItem::createAssetSubItem (const AssetTree::Item& child)
 
 void GroupTreeViewItem::showDocument()
 {
-//    if (ProjectContentComponent* pcc = getProjectContentComponent())
-     //   pcc->setEditorComponent (new GroupInformationComponent (item), nullptr);
+    //    if (ProjectContentComponent* pcc = getProjectContentComponent())
+    //   pcc->setEditorComponent (new GroupInformationComponent (item), nullptr);
 }
 
 static void openOrCloseAllSubGroups (TreeViewItem& item, bool shouldOpen)
@@ -189,17 +191,17 @@ static void openOrCloseAllSubGroups (TreeViewItem& item, bool shouldOpen)
     item.setOpen (shouldOpen);
 
     for (int i = item.getNumSubItems(); --i >= 0;)
-        if (TreeViewItem* sub = item.getSubItem(i))
+        if (TreeViewItem* sub = item.getSubItem (i))
             openOrCloseAllSubGroups (*sub, shouldOpen);
 }
 
 static void setFilesToCompile (AssetTree::Item item, const bool shouldCompile)
 {
-   // if (item.isFile())
-       // item.getShouldCompileValue() = shouldCompile;
-//
-  //  for (int i = item.getNumChildren(); --i >= 0;)
-      //  setFilesToCompile (item.getChild (i), shouldCompile);
+    // if (item.isFile())
+    // item.getShouldCompileValue() = shouldCompile;
+    //
+    //  for (int i = item.getNumChildren(); --i >= 0;)
+    //  setFilesToCompile (item.getChild (i), shouldCompile);
 }
 
 void GroupTreeViewItem::showPopupMenu()
@@ -234,15 +236,33 @@ void GroupTreeViewItem::handlePopupMenuResult (int resultCode)
 {
     switch (resultCode)
     {
-        case 1:     openOrCloseAllSubGroups (*this, false); break;
-        case 2:     openOrCloseAllSubGroups (*this, true); break;
-        case 3:     setFilesToCompile (item, true); break;
-        case 4:     setFilesToCompile (item, false); break;
-        case 5:     item.sortAlphabetically (false); break;
-        case 6:     item.sortAlphabetically (true); break;
-        case 7:     triggerAsyncAssetRename (item); break;
-        case 8:     deleteAllSelectedItems(); break;
-        default:    processCreateFileMenuItem (resultCode); break;
+        case 1:
+            openOrCloseAllSubGroups (*this, false);
+            break;
+        case 2:
+            openOrCloseAllSubGroups (*this, true);
+            break;
+        case 3:
+            setFilesToCompile (item, true);
+            break;
+        case 4:
+            setFilesToCompile (item, false);
+            break;
+        case 5:
+            item.sortAlphabetically (false);
+            break;
+        case 6:
+            item.sortAlphabetically (true);
+            break;
+        case 7:
+            triggerAsyncAssetRename (item);
+            break;
+        case 8:
+            deleteAllSelectedItems();
+            break;
+        default:
+            processCreateFileMenuItem (resultCode);
+            break;
     }
 }
 
@@ -269,7 +289,6 @@ void GroupTreeViewItem::processCreateFileMenuItem (int menuID)
     }
 #endif
 }
-
 
 //==============================================================================
 //==============================================================================
@@ -365,11 +384,11 @@ void PlainTextFileTreeViewItem::showPopupMenu()
 
     m.addItem (1, "Open in external editor");
     m.addItem (2,
-                 #if JUCE_MAC
+#if JUCE_MAC
                   "Reveal in Finder");
-                 #else
+#else
                   "Reveal in Explorer");
-                 #endif
+#endif
 
     m.addItem (4, "Rename File...");
     m.addSeparator();
@@ -398,11 +417,10 @@ void PlainTextFileTreeViewItem::handlePopupMenuResult (int resultCode)
 #endif
 }
 
-
 AssetTreeView::AssetTreeView (const AssetTree::Item& root)
     : TreePanelBase ("assets")
 {
     setRoot (new AssetTreeViewItem (root));
 }
 
-}
+} // namespace Element

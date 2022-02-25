@@ -23,28 +23,28 @@
 
 namespace Element {
 
-const char* Settings::checkForUpdatesKey        = "checkForUpdates";
-const char* Settings::pluginFormatsKey          = "pluginFormatsKey";
-const char* Settings::pluginWindowOnTopDefault  = "pluginWindowOnTopDefault";
-const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
-const char* Settings::showPluginWindowsKey      = "showPluginWindows";
-const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
-const char* Settings::askToSaveSessionKey       = "askToSaveSession";
-const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
-const char* Settings::generateMidiClockKey      = "generateMidiClockKey";
-const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
+const char* Settings::checkForUpdatesKey = "checkForUpdates";
+const char* Settings::pluginFormatsKey = "pluginFormatsKey";
+const char* Settings::pluginWindowOnTopDefault = "pluginWindowOnTopDefault";
+const char* Settings::scanForPluginsOnStartKey = "scanForPluginsOnStart";
+const char* Settings::showPluginWindowsKey = "showPluginWindows";
+const char* Settings::openLastUsedSessionKey = "openLastUsedSession";
+const char* Settings::askToSaveSessionKey = "askToSaveSession";
+const char* Settings::defaultNewSessionFile = "defaultNewSessionFile";
+const char* Settings::generateMidiClockKey = "generateMidiClockKey";
+const char* Settings::sendMidiClockToInputKey = "sendMidiClockToInputKey";
 const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhenFocusLost";
-const char* Settings::lastGraphKey              = "lastGraph";
-const char* Settings::lastSessionKey            = "lastSession";
-const char* Settings::legacyInterfaceKey        = "legacyInterface";
-const char* Settings::workspaceKey              = "workspace";
-const char* Settings::midiEngineKey             = "midiEngine";
-const char* Settings::oscHostPortKey            = "oscHostPortKey";
-const char* Settings::oscHostEnabledKey         = "oscHostEnabledKey";
-const char* Settings::systrayKey                = "systrayKey";
-const char* Settings::midiOutLatencyKey         = "midiOutLatency";
-const char* Settings::desktopScaleKey           = "desktopScale";
-const char* Settings::mainContentTypeKey        = "mainContentType";
+const char* Settings::lastGraphKey = "lastGraph";
+const char* Settings::lastSessionKey = "lastSession";
+const char* Settings::legacyInterfaceKey = "legacyInterface";
+const char* Settings::workspaceKey = "workspace";
+const char* Settings::midiEngineKey = "midiEngine";
+const char* Settings::oscHostPortKey = "oscHostPortKey";
+const char* Settings::oscHostEnabledKey = "oscHostEnabledKey";
+const char* Settings::systrayKey = "systrayKey";
+const char* Settings::midiOutLatencyKey = "midiOutLatency";
+const char* Settings::desktopScaleKey = "desktopScale";
+const char* Settings::mainContentTypeKey = "mainContentType";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -65,54 +65,55 @@ enum OptionsMenuItemId
     BufferSize = 7000000
 };
 
-static bool settingResultIsFor (const int result, const int optionMenuId) {
+static bool settingResultIsFor (const int result, const int optionMenuId)
+{
     return (result >= optionMenuId && result < optionMenuId + 1000000);
 }
 
 #if JUCE_32BIT
- #if JUCE_MAC
-  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath32_";
-  const char* Settings::pluginListKey            = "pluginList32";
- 
- #else
-  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";   // TODO: migrate this
-  const char* Settings::pluginListKey            = "plugin-list";       // TODO: migrate this
- #endif
+#if JUCE_MAC
+const char* Settings::lastPluginScanPathPrefix = "pluginScanPath32_";
+const char* Settings::pluginListKey = "pluginList32";
+
+#else
+const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_"; // TODO: migrate this
+const char* Settings::pluginListKey = "plugin-list"; // TODO: migrate this
+#endif
 
 #else // 64bit keys
- #if JUCE_MAC
-  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";   // TODO: migrate this
-  const char* Settings::pluginListKey            = "plugin-list";       // TODO: migrate this
- 
- #else
-  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath64_";
-  const char* Settings::pluginListKey            = "pluginList64";
- #endif
+#if JUCE_MAC
+const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_"; // TODO: migrate this
+const char* Settings::pluginListKey = "plugin-list"; // TODO: migrate this
+
+#else
+const char* Settings::lastPluginScanPathPrefix = "pluginScanPath64_";
+const char* Settings::pluginListKey = "pluginList64";
 #endif
-    
+#endif
+
 Settings::Settings()
 {
     PropertiesFile::Options opts;
-    opts.applicationName     = "Element";
-    opts.filenameSuffix      = "conf";
+    opts.applicationName = "Element";
+    opts.filenameSuffix = "conf";
     opts.osxLibrarySubFolder = "Application Support";
-    opts.storageFormat       = PropertiesFile::storeAsCompressedBinary;
+    opts.storageFormat = PropertiesFile::storeAsCompressedBinary;
 
-   #if JUCE_DEBUG
+#if JUCE_DEBUG
     opts.applicationName << "Debug";
-    opts.storageFormat       = PropertiesFile::storeAsXML;
-   #endif
-    
-   #if JUCE_LINUX
-    opts.folderName          = ".config/Element";
-   #else
-    opts.folderName          = "Element";
-   #endif
+    opts.storageFormat = PropertiesFile::storeAsXML;
+#endif
+
+#if JUCE_LINUX
+    opts.folderName = ".config/Element";
+#else
+    opts.folderName = "Element";
+#endif
 
     setStorageParameters (opts);
 }
 
-Settings::~Settings() { }
+Settings::~Settings() {}
 
 //=============================================================================
 bool Settings::checkForUpdates() const
@@ -152,7 +153,7 @@ void Settings::setLastGraph (const ValueTree& data)
         if (auto xml = data.createXml())
             p->setValue ("lastGraph", xml.get());
 }
-    
+
 //=============================================================================
 bool Settings::scanForPluginsOnStartup() const
 {
@@ -160,7 +161,7 @@ bool Settings::scanForPluginsOnStartup() const
         return p->getBoolValue (scanForPluginsOnStartKey, false);
     return false;
 }
-    
+
 void Settings::setScanForPluginsOnStartup (const bool shouldScan)
 {
     if (shouldScan == scanForPluginsOnStartup())
@@ -235,7 +236,6 @@ void Settings::setAskToSaveSession (const bool value)
         props->setValue (askToSaveSessionKey, value);
 }
 
-
 bool Settings::sendMidiClockToInput() const
 {
     if (auto* props = getProps())
@@ -272,10 +272,9 @@ const File Settings::getDefaultNewSessionFile() const
 void Settings::setDefaultNewSessionFile (const File& file)
 {
     if (auto* p = getProps())
-        p->setValue (defaultNewSessionFile, 
-            file.existsAsFile() ? file.getFullPathName() : "");
+        p->setValue (defaultNewSessionFile,
+                     file.existsAsFile() ? file.getFullPathName() : "");
 }
-
 
 bool Settings::hidePluginWindowsWhenFocusLost() const
 {
@@ -325,7 +324,8 @@ String Settings::getWorkspace() const
 File Settings::getWorkspaceFile() const
 {
     auto name = getWorkspace();
-    if (name.isNotEmpty()) name << ".elw";
+    if (name.isNotEmpty())
+        name << ".elw";
     return name.isNotEmpty() ? DataPath::workspacesDir().getChildFile (name)
                              : File();
 }
@@ -413,25 +413,25 @@ void Settings::setDesktopScale (double scale)
 //=============================================================================
 String Settings::getMainContentType() const
 {
-   #if defined (EL_PRO)
+#if defined(EL_PRO)
     if (auto* p = getProps())
         return p->getValue (mainContentTypeKey, "standard");
     return "standard";
-   #else
+#else
     return "compact";
-   #endif
+#endif
 }
 
 void Settings::setMainContentType (const String& tp)
 {
-   #if defined (EL_PRO)
+#if defined(EL_PRO)
     if (getMainContentType() == tp)
         return;
     if (auto* p = getProps())
         p->setValue (mainContentTypeKey, tp);
-   #else
+#else
     ignoreUnused (tp);
-   #endif
+#endif
 }
 
 //=============================================================================
@@ -441,48 +441,39 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
     auto& midi (world.getMidiEngine());
     PopupMenu sub;
 
-    sub.addItem (CheckForUpdatesOnStart, "Check Updates at Startup", 
-        true, checkForUpdates());
-    
+    sub.addItem (CheckForUpdatesOnStart, "Check Updates at Startup", true, checkForUpdates());
+
     sub.addSeparator(); // plugins items
-    
-    sub.addItem (ScanFormPluginsOnStart, "Scan Plugins at Startup", 
-        true, scanForPluginsOnStartup());
-    sub.addItem (AutomaticallyShowPluginWindows, "Automatically Show Plugin Windows", 
-        true, showPluginWindowsWhenAdded());
-    sub.addItem (PluginWindowsOnTop, "Plugins On Top By Default", 
-        true, pluginWindowsOnTop());
-    sub.addItem (HidePluginWindowsWhenFocusLost, "Hide Plugin Windows When App Inactive", 
-        true, hidePluginWindowsWhenFocusLost());
-    
+
+    sub.addItem (ScanFormPluginsOnStart, "Scan Plugins at Startup", true, scanForPluginsOnStartup());
+    sub.addItem (AutomaticallyShowPluginWindows, "Automatically Show Plugin Windows", true, showPluginWindowsWhenAdded());
+    sub.addItem (PluginWindowsOnTop, "Plugins On Top By Default", true, pluginWindowsOnTop());
+    sub.addItem (HidePluginWindowsWhenFocusLost, "Hide Plugin Windows When App Inactive", true, hidePluginWindowsWhenFocusLost());
+
     sub.addSeparator(); // session items
-    
-   #if EL_PRO
-    sub.addItem (OpenLastUsedSession, "Open Last Saved Session", 
-        true, openLastUsedSession());
-    sub.addItem (AskToSaveSessions, "Ask To Save Session", 
-        true, askToSaveSession());
-   #else
-    sub.addItem (OpenLastUsedSession, "Open Last Saved Graph", 
-        true, openLastUsedSession());
-    sub.addItem (AskToSaveSessions, "Ask To Save Graph", 
-        true, askToSaveSession());
-   #endif
-   
+
+#if EL_PRO
+    sub.addItem (OpenLastUsedSession, "Open Last Saved Session", true, openLastUsedSession());
+    sub.addItem (AskToSaveSessions, "Ask To Save Session", true, askToSaveSession());
+#else
+    sub.addItem (OpenLastUsedSession, "Open Last Saved Graph", true, openLastUsedSession());
+    sub.addItem (AskToSaveSessions, "Ask To Save Graph", true, askToSaveSession());
+#endif
+
     menu.addSubMenu ("General", sub);
 
     menu.addSeparator();
 
-    int index = 0; sub.clear();
+    int index = 0;
+    sub.clear();
     for (const auto& device : MidiInput::getDevices())
-        sub.addItem (MidiInputDevice + index++, device, true, 
-            midi.isMidiInputEnabled (device));
+        sub.addItem (MidiInputDevice + index++, device, true, midi.isMidiInputEnabled (device));
     menu.addSubMenu ("MIDI Input Devices", sub);
 
-    index = 0; sub.clear();
+    index = 0;
+    sub.clear();
     for (const auto& device : MidiOutput::getDevices())
-        sub.addItem (MidiOutputDevice + index++, device, true, 
-            device == midi.getDefaultMidiOutputName());
+        sub.addItem (MidiOutputDevice + index++, device, true, device == midi.getDefaultMidiOutputName());
     menu.addSubMenu ("MIDI Output Device", sub);
 
     if (auto* type = devices.getCurrentDeviceTypeObject())
@@ -492,34 +483,35 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
         menu.addSeparator();
         if (type->getTypeName() != "ASIO")
         {
-            index = 0; sub.clear();
-            for (const auto& device : type->getDeviceNames(true))
-                sub.addItem(AudioInputDevice + index++, device, true,
-                    device == setup.inputDeviceName);
-            menu.addSubMenu("Audio Input Device", sub);
+            index = 0;
+            sub.clear();
+            for (const auto& device : type->getDeviceNames (true))
+                sub.addItem (AudioInputDevice + index++, device, true, device == setup.inputDeviceName);
+            menu.addSubMenu ("Audio Input Device", sub);
         }
-        index = 0; sub.clear();
+        index = 0;
+        sub.clear();
         for (const auto& device : type->getDeviceNames (false))
-            sub.addItem (AudioOutputDevice + index++, device, true,
-                device == setup.outputDeviceName);
+            sub.addItem (AudioOutputDevice + index++, device, true, device == setup.outputDeviceName);
         const auto menuName = type->getTypeName() == "ASIO"
-            ? "Audio Device" : "Audio Output Device";
+                                  ? "Audio Device"
+                                  : "Audio Output Device";
         menu.addSubMenu (menuName, sub);
     }
 
     if (auto* device = devices.getCurrentAudioDevice())
     {
         menu.addSeparator();
-        index = 0; sub.clear();
+        index = 0;
+        sub.clear();
         for (const auto rate : device->getAvailableSampleRates())
-            sub.addItem (SampleRate + index++, String(int (rate)), true, 
-                rate == device->getCurrentSampleRate());
+            sub.addItem (SampleRate + index++, String (int (rate)), true, rate == device->getCurrentSampleRate());
         menu.addSubMenu ("Sample Rate", sub);
 
-        index = 0; sub.clear();
+        index = 0;
+        sub.clear();
         for (const auto bufSize : device->getAvailableBufferSizes())
-            sub.addItem (BufferSize + index++, String(bufSize), true, 
-                bufSize == device->getCurrentBufferSizeSamples());
+            sub.addItem (BufferSize + index++, String (bufSize), true, bufSize == device->getCurrentBufferSizeSamples());
         menu.addSubMenu ("Buffer Size", sub);
     }
 }
@@ -532,14 +524,30 @@ bool Settings::performMenuResult (Globals& world, const int result)
 
     switch (result)
     {
-        case CheckForUpdatesOnStart: setCheckForUpdates (! checkForUpdates()); break;
-        case ScanFormPluginsOnStart: setScanForPluginsOnStartup (! scanForPluginsOnStartup()); break;
-        case AutomaticallyShowPluginWindows: setShowPluginWindowsWhenAdded (! showPluginWindowsWhenAdded()); break;
-        case PluginWindowsOnTop: setPluginWindowsOnTop (! pluginWindowsOnTop()); break;
-        case HidePluginWindowsWhenFocusLost: setHidePluginWindowsWhenFocusLost (! hidePluginWindowsWhenFocusLost()); break;
-        case OpenLastUsedSession: setOpenLastUsedSession (! openLastUsedSession()); break;
-        case AskToSaveSessions: setAskToSaveSession (! askToSaveSession()); break;
-        default: handled = false; break;
+        case CheckForUpdatesOnStart:
+            setCheckForUpdates (! checkForUpdates());
+            break;
+        case ScanFormPluginsOnStart:
+            setScanForPluginsOnStartup (! scanForPluginsOnStartup());
+            break;
+        case AutomaticallyShowPluginWindows:
+            setShowPluginWindowsWhenAdded (! showPluginWindowsWhenAdded());
+            break;
+        case PluginWindowsOnTop:
+            setPluginWindowsOnTop (! pluginWindowsOnTop());
+            break;
+        case HidePluginWindowsWhenFocusLost:
+            setHidePluginWindowsWhenFocusLost (! hidePluginWindowsWhenFocusLost());
+            break;
+        case OpenLastUsedSession:
+            setOpenLastUsedSession (! openLastUsedSession());
+            break;
+        case AskToSaveSessions:
+            setAskToSaveSession (! askToSaveSession());
+            break;
+        default:
+            handled = false;
+            break;
     }
 
     if (handled)
@@ -572,7 +580,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
         {
             AudioDeviceManager::AudioDeviceSetup setup;
             devices.getAudioDeviceSetup (setup);
-            const auto device = type->getDeviceNames(true)[result - AudioInputDevice];
+            const auto device = type->getDeviceNames (true)[result - AudioInputDevice];
             if (device.isNotEmpty() && device != setup.inputDeviceName)
             {
                 setup.inputDeviceName = device;
@@ -589,7 +597,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
         {
             AudioDeviceManager::AudioDeviceSetup setup;
             devices.getAudioDeviceSetup (setup);
-            const auto device = type->getDeviceNames(false)[result - AudioOutputDevice];
+            const auto device = type->getDeviceNames (false)[result - AudioOutputDevice];
             if (device.isNotEmpty() && device != setup.outputDeviceName)
             {
                 if (type->getTypeName() == "ASIO")
@@ -640,4 +648,4 @@ bool Settings::performMenuResult (Globals& world, const int result)
     return handled;
 }
 
-}
+} // namespace Element

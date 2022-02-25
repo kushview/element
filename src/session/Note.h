@@ -24,76 +24,74 @@
 
 namespace Element {
 
-    class Note;
-    class Note :  public ObjectModel
+class Note;
+class Note : public ObjectModel
+{
+public:
+    struct EditDeltas
     {
-    public:
+        int note, channel;
+        float velocity;
+        double start, length;
 
-        struct EditDeltas
+        EditDeltas()
+            : note (0), channel (0), velocity (0.0), start (0.0), length (0.0) {}
+
+        ~EditDeltas() {}
+
+        inline void reset()
         {
-            int note, channel;
-            float velocity;
-            double start, length;
+            EditDeltas zero;
+            this->operator= (zero);
+        }
 
-            EditDeltas()
-                : note (0), channel (0),
-                  velocity (0.0), start (0.0),
-                  length (0.0) { }
+        inline bool isZero() const
+        {
+            return false;
+        }
 
-            ~EditDeltas() { }
+        inline EditDeltas& operator= (const EditDeltas& other)
+        {
+            this->length = other.length;
+            this->note = other.note;
+            this->start = other.start;
+            this->velocity = other.velocity;
+            return *this;
+        }
+    };
 
-            inline void reset()
-            {
-                EditDeltas zero;
-                this->operator= (zero);
-            }
+    Note (const Note& n) : ObjectModel (n.node()) {}
+    Note (const ValueTree& data) : ObjectModel (data) {}
 
-            inline bool isZero() const
-            {
-                return false;
-            }
-
-            inline EditDeltas& operator= (const EditDeltas& other)
-            {
-                this->length = other.length;
-                this->note = other.note;
-                this->start = other.start;
-                this->velocity = other.velocity;
-                return *this;
-            }
-        };
-
-        Note (const Note& n) : ObjectModel (n.node()) { }
-        Note (const ValueTree& data) : ObjectModel (data) { }
-
-        static inline Note
+    static inline Note
         make (const MidiMessage& midi, double beatLength)
-        {
-            if (! midi.isNoteOn())
-                return Note (ValueTree());
+    {
+        if (! midi.isNoteOn())
+            return Note (ValueTree());
 
-            float velocity = (float)midi.getVelocity() / 127.f;
-            return Note (midi.getNoteNumber(), midi.getTimeStamp(),
-                         beatLength, midi.getChannel(), velocity);
-        }
+        float velocity = (float) midi.getVelocity() / 127.f;
+        return Note (midi.getNoteNumber(), midi.getTimeStamp(), beatLength, midi.getChannel(), velocity);
+    }
 
-        static inline Note
-        make (int note, double beat, double length = 1.0f, int channel = 1, float velocity = 0.8f) {
-            return Note (note, beat, length, channel, velocity);
-        }
+    static inline Note
+        make (int note, double beat, double length = 1.0f, int channel = 1, float velocity = 0.8f)
+    {
+        return Note (note, beat, length, channel, velocity);
+    }
 
-        static inline Note make (const ValueTree& tree) {
-            return Note (tree);
-        }
+    static inline Note make (const ValueTree& tree)
+    {
+        return Note (tree);
+    }
 
-        static inline Note make (const ObjectModel& object) {
-            return make (object.node());
-        }
+    static inline Note make (const ObjectModel& object)
+    {
+        return make (object.node());
+    }
 
+    ~Note() {}
 
-        ~Note() { }
-
-        /** Interfaces that deal with notes can set this id to be used
+    /** Interfaces that deal with notes can set this id to be used
             in fast note lookup ops. See PatternInterface for an example.
             Usually, an interface will set this Id to something relavent
             when the Inferface-Side note is newly created.
@@ -102,72 +100,70 @@ namespace Element {
 
             @param id The new ID to use
         */
-        void setEventId (const int id) const;
+    void setEventId (const int id) const;
 
-        bool isValid() const;
+    bool isValid() const;
 
-        /** The event index in the interface-side implementation. */
-        const int eventId() const;
+    /** The event index in the interface-side implementation. */
+    const int eventId() const;
 
-        /** Returns the current key id (midi note) for this model */
-        const int keyId() const;
+    /** Returns the current key id (midi note) for this model */
+    const int keyId() const;
 
-        /** Returns the channel of this note */
-        const int channel() const;
+    /** Returns the channel of this note */
+    const int channel() const;
 
-        /** Returns the velocity of this note as a ratio (0.0f to 1.0f) */
-        const float velocity() const;
+    /** Returns the velocity of this note as a ratio (0.0f to 1.0f) */
+    const float velocity() const;
 
-        /** The start position in beats */
-        const double tickStart() const;
+    /** The start position in beats */
+    const double tickStart() const;
 
-        /** Length of note in beats */
-        const double beatLength() const;
+    /** Length of note in beats */
+    const double beatLength() const;
 
-        /** End of the note */
-        const double tickEnd() const;
+    /** End of the note */
+    const double tickEnd() const;
 
-        /** Get the timings of this note as a Range */
-        void getBeats (Range<double>& beats) const;
+    /** Get the timings of this note as a Range */
+    void getBeats (Range<double>& beats) const;
 
-        /** Resize this notes length in beats
+    /** Resize this notes length in beats
             Note that this does not change the start time */
-        void resize (EditDeltas& changes, double length);
+    void resize (EditDeltas& changes, double length);
 
-        /** Change the length */
-        void changeLength (EditDeltas& d, double len);
+    /** Change the length */
+    void changeLength (EditDeltas& d, double len);
 
-        /** Change channel */
-        void changeChannel (EditDeltas& changes, int c);
+    /** Change channel */
+    void changeChannel (EditDeltas& changes, int c);
 
-        /** Change the key id for this note */
-        void changeKeyId (EditDeltas& changes, int key);
+    /** Change the key id for this note */
+    void changeKeyId (EditDeltas& changes, int key);
 
-        /** Change this notes velocity */
-        void changeVelocity (EditDeltas& changes, float vel);
+    /** Change this notes velocity */
+    void changeVelocity (EditDeltas& changes, float vel);
 
-        /** Move this note to a new start beat
+    /** Move this note to a new start beat
             Length is unaffected */
-        void move (EditDeltas& changes, const double beat);
+    void move (EditDeltas& changes, const double beat);
 
-        /** Apply pending changes to this note */
-        void applyEdits (EditDeltas& changes, bool reset = true);
+    /** Apply pending changes to this note */
+    void applyEdits (EditDeltas& changes, bool reset = true);
 
-        MidiMessage noteOn() const;
-        MidiMessage noteOff() const;
-        void getMidi (MidiMessage& on, MidiMessage& off) const;
-        ValueTree sequenceNode() const;
+    MidiMessage noteOn() const;
+    MidiMessage noteOff() const;
+    void getMidi (MidiMessage& on, MidiMessage& off) const;
+    ValueTree sequenceNode() const;
 
-        inline bool operator== (const Note& n) const { return node() == n.node(); }
-        inline bool operator!= (const Note& n) const { return node() != n.node(); }
+    inline bool operator== (const Note& n) const { return node() == n.node(); }
+    inline bool operator!= (const Note& n) const { return node() != n.node(); }
 
-    protected:
+protected:
+    friend class NoteSequence;
+    Note (int note, double start, double length = 1.0f, int channel = 1, float velocity = 0.8f);
+};
 
-        friend class NoteSequence;
-        Note (int note, double start, double length = 1.0f, int channel = 1, float velocity = 0.8f);
-
-    };
-
-}
+} // namespace Element
 
 #endif // ELEMENT_NOTE_H

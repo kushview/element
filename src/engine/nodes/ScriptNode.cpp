@@ -17,7 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #include <math.h>
 #include "sol/sol.hpp"
 #include "lua-kv.h"
@@ -34,8 +33,8 @@
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
 
-static const String initScript = 
-R"(
+static const String initScript =
+    R"(
 require ('kv.AudioBuffer')
 require ('kv.MidiBuffer')
 require ('kv.MidiMessage')
@@ -90,7 +89,7 @@ Result ScriptNode::loadScript (const String& newCode)
         return Result::fail ("Could not instantiate script");
 
     auto newScript = std::make_unique<DSPScript> (dsp);
-    
+
     if (true)
     {
         if (prepared)
@@ -114,17 +113,17 @@ Result ScriptNode::loadScript (const String& newCode)
 
 void ScriptNode::getPluginDescription (PluginDescription& desc) const
 {
-    desc.name               = "Script";
-    desc.fileOrIdentifier   = EL_INTERNAL_ID_SCRIPT;
-    desc.uniqueId                = EL_INTERNAL_UID_SCRIPT;
-    desc.descriptiveName    = "A user scriptable Element node";
-    desc.numInputChannels   = 0;
-    desc.numOutputChannels  = 0;
+    desc.name = "Script";
+    desc.fileOrIdentifier = EL_INTERNAL_ID_SCRIPT;
+    desc.uniqueId = EL_INTERNAL_UID_SCRIPT;
+    desc.descriptiveName = "A user scriptable Element node";
+    desc.numInputChannels = 0;
+    desc.numOutputChannels = 0;
     desc.hasSharedContainer = false;
-    desc.isInstrument       = false;
-    desc.manufacturerName   = "Element";
-    desc.pluginFormatName   = EL_INTERNAL_FORMAT_NAME;
-    desc.version            = "1.0.0";
+    desc.isInstrument = false;
+    desc.manufacturerName = "Element";
+    desc.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
+    desc.version = "1.0.0";
 }
 
 void ScriptNode::prepareToRender (double rate, int block)
@@ -157,7 +156,7 @@ void ScriptNode::setState (const void* data, int size)
     if (state.isValid())
     {
         dspCode.replaceAllContent (state["dspCode"].toString());
-        edCode.replaceAllContent  (state["editorCode"].toString());
+        edCode.replaceAllContent (state["editorCode"].toString());
 
         auto result = loadScript (dspCode.getAllContent());
 
@@ -180,7 +179,7 @@ void ScriptNode::getState (MemoryBlock& out)
 {
     ValueTree state ("ScriptNode");
     state.setProperty ("dspCode", dspCode.getAllContent(), nullptr)
-         .setProperty ("editorCode", edCode.getAllContent(), nullptr);
+        .setProperty ("editorCode", edCode.getAllContent(), nullptr);
 
     MemoryBlock block;
     script->save (block);
@@ -200,4 +199,4 @@ void ScriptNode::setParameter (int index, float value)
     ScopedLock sl (lock);
 }
 
-}
+} // namespace Element

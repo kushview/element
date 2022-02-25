@@ -27,7 +27,7 @@ NodeMidiProgramComponent::NodeMidiProgramComponent()
     name.setTooltip ("MIDI Program name");
     name.setFont (Font (12.f));
     name.setEditable (false, true, false);
-    
+
     addAndMakeVisible (slider);
     slider.setSliderStyle (Slider::IncDecButtons);
     slider.setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
@@ -72,4 +72,4 @@ void NodeMidiProgramComponent::resized()
     name.setBounds (r2);
 }
 
-}
+} // namespace Element

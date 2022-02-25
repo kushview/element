@@ -26,26 +26,27 @@
 namespace Element {
 /** A multi-purpose container for notes. This emits an add/removed signal
     as well as a ValueTree listener interface. */
-class NoteSequence :  public ObjectModel
+class NoteSequence : public ObjectModel
 {
 public:
-    
     /** Create an empty sequence */
-    NoteSequence() : ObjectModel ("noteSequence") { }
-    
+    NoteSequence() : ObjectModel ("noteSequence") {}
+
     /** Create an empty sequence */
     NoteSequence (const ValueTree& data)
         : ObjectModel (data)
-    { }
-    
+    {
+    }
+
     NoteSequence (const NoteSequence& o)
         : ObjectModel (o.node())
-    { }
-    
-    ~NoteSequence() { }
-    
+    {
+    }
+
+    ~NoteSequence() {}
+
     inline void
-    getKeysWithEvents (BigInteger& keys)
+        getKeysWithEvents (BigInteger& keys)
     {
         for (int i = node().getNumChildren(); --i >= 0;)
         {
@@ -53,70 +54,67 @@ public:
             keys.setBit (n.keyId(), true);
         }
     }
-    
+
     /** Add a new note to the sequence */
     inline Note
-    addNote (int note, double beat, double length = 1.0f,
-             int channel = 1, float velocity = 0.8f)
+        addNote (int note, double beat, double length = 1.0f, int channel = 1, float velocity = 0.8f)
     {
         Note n (note, beat, length, channel, velocity);
         node().addChild (n.node(), -1, nullptr);
         return n;
     }
-    
+
     inline Note
-    addNote()
+        addNote()
     {
         Note note (0, 0.f, 0.f, 0);
         node().addChild (note.node(), -1, nullptr);
         return note;
     }
-    
+
     /** Add a note from a value tree object */
     Note addNote (const ValueTree& tree);
-    
+
     inline Note addNote (const MidiMessage& on, const MidiMessage& off)
     {
-        Note note (on.getNoteNumber(), on.getTimeStamp(),
-                   off.getTimeStamp() - on.getTimeStamp(),
-                   on.getChannel(), on.getFloatVelocity());
+        Note note (on.getNoteNumber(), on.getTimeStamp(), off.getTimeStamp() - on.getTimeStamp(), on.getChannel(), on.getFloatVelocity());
         objectData.addChild (note.node(), -1, nullptr);
         return note;
     }
-    
-    
+
     inline void
-    addMidiMessageSequence (const MidiMessageSequence& mseq)
+        addMidiMessageSequence (const MidiMessageSequence& mseq)
     {
         const int32 numEvs = mseq.getNumEvents();
         for (int32 i = 0; i < numEvs; ++i)
             if (MidiMessageSequence::MidiEventHolder* mh = mseq.getEventPointer (i))
-                if (mh->message.isNoteOn()&& mh->noteOffObject != nullptr)
+                if (mh->message.isNoteOn() && mh->noteOffObject != nullptr)
                     addNote (mh->message, mh->noteOffObject->message);
     }
-    
-    
+
     /** Remove a note from the sequence */
     inline void removeNote (const Note& note)
     {
         if (note.node().isAChildOf (objectData))
             objectData.removeChild (note.node(), nullptr);
     }
-    
+
     /** Add a value tree listener
      
         This is so things that don't know about this specific class
         can still be listeners of the sequence/notes 
      */
-    inline void addValueListener (ValueTree::Listener* client) {
+    inline void addValueListener (ValueTree::Listener* client)
+    {
         objectData.addListener (client);
     }
-    
+
     /** Remove a value tree listener */
-    inline void removeValueListener (ValueTree::Listener* client) {
+    inline void removeValueListener (ValueTree::Listener* client)
+    {
         objectData.removeListener (client);
     }
-    
+
     /** Add a note from Midi */
     inline Note addMidi (const MidiMessage& msg, double len = 1.0f)
     {
@@ -124,19 +122,21 @@ public:
         objectData.addChild (n.node(), -1, nullptr);
         return n;
     }
-    
+
     inline bool operator== (const NoteSequence& seq) const { return seq.node() == this->node(); }
     inline bool operator!= (const NoteSequence& seq) const { return seq.node() != this->node(); }
-    
-    inline NoteSequence& operator= (const NoteSequence& o) {
+
+    inline NoteSequence& operator= (const NoteSequence& o)
+    {
         setNodeData (o.node());
         return *this;
     }
-    
-    inline void clear (UndoManager* u = nullptr) {
+
+    inline void clear (UndoManager* u = nullptr)
+    {
         node().removeAllChildren (u);
     }
-    
+
     /** This will return Shuttle::PPQ unless specified otherwise
         by setting the property "ppq" to and integer value
          
@@ -146,11 +146,11 @@ public:
         values.
      */
     int32 ppq() const;
-    
+
 private:
     friend class Note;
 };
 
-}
+} // namespace Element
 
 #endif /* ELEMENT_NOTESEQUENCE_H */

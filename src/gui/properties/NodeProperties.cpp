@@ -24,7 +24,7 @@
 #include "Utils.h"
 
 #ifndef EL_PROGRAM_NAME_PLACEHOLDER
- #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
+#define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
 #endif
 
 namespace Element {
@@ -40,8 +40,7 @@ public:
 
         addAndMakeVisible (program);
 
-        program.name.onTextChange = [this]()
-        {
+        program.name.onTextChange = [this]() {
             if (program.name.getText().isEmpty())
                 program.name.setText (EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
             auto theText = program.name.getText();
@@ -53,11 +52,12 @@ public:
             updateMidiProgram();
         };
 
-        program.slider.textFromValueFunction = [this](double value) -> String {
-            if (! node.areMidiProgramsEnabled()) return "Off";
+        program.slider.textFromValueFunction = [this] (double value) -> String {
+            if (! node.areMidiProgramsEnabled())
+                return "Off";
             return String (roundToInt (value));
         };
-        program.slider.valueFromTextFunction = [this](const String& text) -> double {
+        program.slider.valueFromTextFunction = [this] (const String& text) -> double {
             return text.getDoubleValue();
         };
 
@@ -70,8 +70,7 @@ public:
         program.slider.updateText();
 
         program.trashButton.setTooltip ("Delete MIDI program");
-        program.trashButton.onClick = [this]()
-        {
+        program.trashButton.onClick = [this]() {
             if (NodeObjectPtr ptr = node.getObject())
             {
                 if (! ptr->areMidiProgramsEnabled())
@@ -82,8 +81,7 @@ public:
         };
 
         program.saveButton.setTooltip ("Save MIDI program");
-        program.saveButton.onClick = [this]()
-        {
+        program.saveButton.onClick = [this]() {
             if (NodeObjectPtr ptr = node.getObject())
             {
                 if (node.useGlobalMidiPrograms())
@@ -102,8 +100,7 @@ public:
         };
 
         program.loadButton.setTooltip ("Reload saved MIDI program");
-        program.loadButton.onClick = [this]()
-        {
+        program.loadButton.onClick = [this]() {
             if (NodeObjectPtr ptr = node.getObject())
             {
                 if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
@@ -163,9 +160,8 @@ private:
                 program.powerButton.setToggleState (false, dontSendNotification);
             }
         }
-        
-        program.name.setText (programName.isNotEmpty() ? 
-            programName : EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
+
+        program.name.setText (programName.isNotEmpty() ? programName : EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
         program.powerButton.setToggleState (node.areMidiProgramsEnabled(), dontSendNotification);
         program.globalButton.setToggleState (node.useGlobalMidiPrograms(), dontSendNotification);
         program.globalButton.setEnabled (enabled);
@@ -180,7 +176,7 @@ class NodeMidiChannelsPropertyComponent : public MidiMultiChannelPropertyCompone
 {
 public:
     NodeMidiChannelsPropertyComponent (const Node& n)
-        : node (n) 
+        : node (n)
     {
         setChannels (node.getMidiChannels().get());
         getChannelsValue().referTo (node.getPropertyAsValue (Tags::midiChannels, false));
@@ -207,7 +203,7 @@ public:
         : SliderPropertyComponent (value, name, 0.0, 127.0, 1.0, 1.0, false)
     {
         slider.textFromValueFunction = Util::noteValueToString;
-        slider.valueFromTextFunction = [this](const String& text) -> double {
+        slider.valueFromTextFunction = [this] (const String& text) -> double {
             return 0.0;
         };
 
@@ -216,19 +212,19 @@ public:
 };
 
 class MillisecondSliderPropertyComponent : public SliderPropertyComponent
-{ 
+{
 public:
     MillisecondSliderPropertyComponent (const Value& value, const String& name)
         : SliderPropertyComponent (value, name, -1000.0, 1000.0, 0.1, 1.0, false)
     {
-        slider.textFromValueFunction = [](double value) {
+        slider.textFromValueFunction = [] (double value) {
             String str (value, 1);
             str << " ms";
             return str;
         };
 
-        slider.valueFromTextFunction = [this](const String& text) -> double {
-            return text.replace ("ms","", false).trim().getFloatValue();
+        slider.valueFromTextFunction = [this] (const String& text) -> double {
+            return text.replace ("ms", "", false).trim().getFloatValue();
         };
 
         slider.updateText();
@@ -244,8 +240,11 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
 
     if (nodeProps)
     {
-        add (new TextPropertyComponent (node.getPropertyAsValue (Tags::name), 
-            "Name", 100, false, true));
+        add (new TextPropertyComponent (node.getPropertyAsValue (Tags::name),
+                                        "Name",
+                                        100,
+                                        false,
+                                        true));
         if (! node.isIONode())
             add (new MillisecondSliderPropertyComponent (
                 node.getPropertyAsValue (Tags::delayCompensation), "Delay comp."));
@@ -255,19 +254,19 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
     {
         // MIDI Channel
         add (new NodeMidiChannelsPropertyComponent (node));
-        
+
         // MIDI Program
         add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
 
         // Key Start
         add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyStart, false), "Key Start"));
-        
+
         // Key End
         add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyEnd, false), "Key End"));
-        
+
         // Transpose
         add (new SliderPropertyComponent (node.getPropertyAsValue (Tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
     }
 }
 
-}
+} // namespace Element

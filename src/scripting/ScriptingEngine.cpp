@@ -24,19 +24,19 @@
 #include "Globals.h"
 
 #ifndef EL_LUA_SPATH
- #define EL_LUA_SPATH ""
+#define EL_LUA_SPATH ""
 #endif
 
 namespace Element {
 
 namespace LuaHelpers {
 
-static int exceptionHandler (lua_State* L, sol::optional<const std::exception &> e, sol::string_view description) {
-    return sol::stack::push (L, description);
-    
-}
+    static int exceptionHandler (lua_State* L, sol::optional<const std::exception&> e, sol::string_view description)
+    {
+        return sol::stack::push (L, description);
+    }
 
-}
+} // namespace LuaHelpers
 
 //=============================================================================
 
@@ -47,15 +47,13 @@ public:
     Impl (ScriptingEngine& e)
         : owner (e)
     {
-       
     }
-    
+
     ~Impl() {}
 
     void scanDefaultLoctaion()
     {
         manager.scanDefaultLocation();
-       
     }
 
     ScriptManager& getManager() { return manager; }
@@ -91,4 +89,4 @@ ScriptManager& ScriptingEngine::getScriptManager()
     return impl->manager;
 }
 
-}
+} // namespace Element

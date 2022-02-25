@@ -22,100 +22,100 @@
 
 namespace Element {
 
-    static void setMissingNodeProperties (const ValueTree& tree)
+static void setMissingNodeProperties (const ValueTree& tree)
+{
+    if (tree.hasType (Tags::node))
     {
-        if (tree.hasType (Tags::node))
-        {
-            const Node node (tree, true);
-            ignoreUnused (node);
-        }
-        else if (tree.hasType (Tags::controller) ||
-                 tree.hasType (Tags::control))
-        {
-            // noop
-        }
+        const Node node (tree, true);
+        ignoreUnused (node);
     }
-
-    SessionDocument::SessionDocument (SessionPtr s)
-        : FileBasedDocument (".els", "*.els", "Open Session", "Save Session"),
-          session (s)
+    else if (tree.hasType (Tags::controller) || tree.hasType (Tags::control))
     {
-        if (session)
-            session->addChangeListener (this);
-    }
-
-    SessionDocument::~SessionDocument()
-    {
-        if (session)
-            session->removeChangeListener (this);
-    }
-
-    String SessionDocument::getDocumentTitle()
-    {
-        return (session != nullptr) ? session->getName() : "Unknown";
-    }
-
-    Result SessionDocument::loadDocument (const File& file)
-    {
-        if (nullptr == session)
-            return Result::fail ("No session data target");
-
-        String error;
-        if (auto e = XmlDocument::parse (file))
-        {
-            ValueTree newData (ValueTree::fromXml (*e));
-            if (! newData.isValid() && newData.hasType ("session"))
-                error = "Not a valid session file";
-            if (error.isEmpty() && !session->loadData (newData))
-                error = "Could not load session data";
-        }
-        else
-        {
-            error = "Not a valid session file";
-        }
-
-        if (error.isEmpty())
-        {
-            session->forEach (setMissingNodeProperties);
-        }
-
-        return (error.isNotEmpty()) ? Result::fail (error) : Result::ok();
-    }
-
-    Result SessionDocument::saveDocument (const File& file)
-    {
-        if (! session)
-            return Result::fail ("Nil session");
-        
-        session->saveGraphState();
-        if (auto e = session->createXml())
-        {
-            Result res (e->writeToFile (file, String())
-                    ? Result::ok() : Result::fail ("Error writing session file"));
-            return res;
-        }
-
-        return Result::fail ("Could not create session data");
-    }
-
-    File SessionDocument::getLastDocumentOpened() { return lastSession; }
-    void SessionDocument::setLastDocumentOpened (const File& file) { lastSession = file; }
-
-    void SessionDocument::onSessionChanged()
-    {
-        if (! session->notificationsFrozen())
-        {
-            changed();
-        }
-        else
-        {
-            setChangedFlag (false);
-        }
-    }
-    
-    void SessionDocument::changeListenerCallback (ChangeBroadcaster* cb)
-    {
-        if (cb == session.get())
-            onSessionChanged();
+        // noop
     }
 }
+
+SessionDocument::SessionDocument (SessionPtr s)
+    : FileBasedDocument (".els", "*.els", "Open Session", "Save Session"),
+      session (s)
+{
+    if (session)
+        session->addChangeListener (this);
+}
+
+SessionDocument::~SessionDocument()
+{
+    if (session)
+        session->removeChangeListener (this);
+}
+
+String SessionDocument::getDocumentTitle()
+{
+    return (session != nullptr) ? session->getName() : "Unknown";
+}
+
+Result SessionDocument::loadDocument (const File& file)
+{
+    if (nullptr == session)
+        return Result::fail ("No session data target");
+
+    String error;
+    if (auto e = XmlDocument::parse (file))
+    {
+        ValueTree newData (ValueTree::fromXml (*e));
+        if (! newData.isValid() && newData.hasType ("session"))
+            error = "Not a valid session file";
+        if (error.isEmpty() && ! session->loadData (newData))
+            error = "Could not load session data";
+    }
+    else
+    {
+        error = "Not a valid session file";
+    }
+
+    if (error.isEmpty())
+    {
+        session->forEach (setMissingNodeProperties);
+    }
+
+    return (error.isNotEmpty()) ? Result::fail (error) : Result::ok();
+}
+
+Result SessionDocument::saveDocument (const File& file)
+{
+    if (! session)
+        return Result::fail ("Nil session");
+
+    session->saveGraphState();
+    if (auto e = session->createXml())
+    {
+        Result res (e->writeToFile (file, String())
+                        ? Result::ok()
+                        : Result::fail ("Error writing session file"));
+        return res;
+    }
+
+    return Result::fail ("Could not create session data");
+}
+
+File SessionDocument::getLastDocumentOpened() { return lastSession; }
+void SessionDocument::setLastDocumentOpened (const File& file) { lastSession = file; }
+
+void SessionDocument::onSessionChanged()
+{
+    if (! session->notificationsFrozen())
+    {
+        changed();
+    }
+    else
+    {
+        setChangedFlag (false);
+    }
+}
+
+void SessionDocument::changeListenerCallback (ChangeBroadcaster* cb)
+{
+    if (cb == session.get())
+        onSessionChanged();
+}
+} // namespace Element

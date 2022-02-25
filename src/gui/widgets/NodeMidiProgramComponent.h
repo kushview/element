@@ -37,4 +37,4 @@ struct NodeMidiProgramComponent : public Component
     void resized() override;
 };
 
-}
+} // namespace Element

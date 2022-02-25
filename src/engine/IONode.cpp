@@ -3,9 +3,9 @@
 #include "engine/GraphNode.h"
 
 namespace Element {
-    
+
 IONode::IONode (const IODeviceType type_)
-    : NodeObject(0),
+    : NodeObject (0),
       type (type_),
       graph (nullptr)
 {
@@ -13,7 +13,8 @@ IONode::IONode (const IODeviceType type_)
 }
 
 IONode::~IONode()
-{ }
+{
+}
 
 void IONode::updateName()
 {
@@ -43,13 +44,12 @@ PortType IONode::getPortType() const noexcept
 void IONode::refreshPorts()
 {
     PortCount count;
-    
+
     if (auto* const graph = getParentGraph())
     {
-        count.set (getPortType(), 
-            graph->getNumPorts (getPortType(), isInput()), 
-            !isInput()
-        );
+        count.set (getPortType(),
+                   graph->getNumPorts (getPortType(), isInput()),
+                   ! isInput());
     }
 
     setPorts (count.toPortList());
@@ -64,13 +64,21 @@ void IONode::fillInPluginDescription (PluginDescription& d) const
     d.manufacturerName = "Element";
     d.version = "1.0";
     d.isInstrument = false;
-    
+
     switch (static_cast<int> (this->type))
     {
-        case audioInputNode:  d.fileOrIdentifier = "audio.input"; break;
-        case audioOutputNode: d.fileOrIdentifier = "audio.output"; break;
-        case midiInputNode:   d.fileOrIdentifier = "midi.input"; break;
-        case midiOutputNode:  d.fileOrIdentifier = "midi.output"; break;
+        case audioInputNode:
+            d.fileOrIdentifier = "audio.input";
+            break;
+        case audioOutputNode:
+            d.fileOrIdentifier = "audio.output";
+            break;
+        case midiInputNode:
+            d.fileOrIdentifier = "midi.input";
+            break;
+        case midiOutputNode:
+            d.fileOrIdentifier = "midi.output";
+            break;
     }
 }
 
@@ -82,17 +90,17 @@ void IONode::prepareToRender (double r, int b)
 
 void IONode::releaseResources() {}
 
-void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe) 
+void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe)
 {
     jassert (graph != nullptr);
     // jassert (midiPipe.getNumBuffers() > 0);
     auto& midiMessages = *midiPipe.getWriteBuffer (0);
     switch (type)
     {
-        case audioOutputNode:
-        {
+        case audioOutputNode: {
             for (int i = jmin (graph->currentAudioOutputBuffer.getNumChannels(),
-                               buffer.getNumChannels()); --i >= 0;)
+                               buffer.getNumChannels());
+                 --i >= 0;)
             {
                 graph->currentAudioOutputBuffer.addFrom (i, 0, buffer, i, 0, buffer.getNumSamples());
             }
@@ -100,10 +108,10 @@ void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe)
             break;
         }
 
-        case audioInputNode:
-        {
+        case audioInputNode: {
             for (int i = jmin (graph->currentAudioInputBuffer->getNumChannels(),
-                               buffer.getNumChannels()); --i >= 0;)
+                               buffer.getNumChannels());
+                 --i >= 0;)
             {
                 buffer.copyFrom (i, 0, *graph->currentAudioInputBuffer, i, 0, buffer.getNumSamples());
             }
@@ -132,9 +140,12 @@ const String IONode::getInputChannelName (int channelIndex) const
 {
     switch (type)
     {
-        case audioOutputNode:   return "Output " + String (channelIndex + 1);
-        case midiOutputNode:    return "Midi Output";
-        default:                break;
+        case audioOutputNode:
+            return "Output " + String (channelIndex + 1);
+        case midiOutputNode:
+            return "Midi Output";
+        default:
+            break;
     }
 
     return String();
@@ -144,16 +155,19 @@ const String IONode::getOutputChannelName (int channelIndex) const
 {
     switch (type)
     {
-        case audioInputNode:    return "Input " + String (channelIndex + 1);
-        case midiInputNode:     return "Midi Input";
-        default:                break;
+        case audioInputNode:
+            return "Input " + String (channelIndex + 1);
+        case midiInputNode:
+            return "Midi Input";
+        default:
+            break;
     }
 
     return String();
 }
 
-bool IONode::isInput() const   { return type == audioInputNode  || type == midiInputNode; }
-bool IONode::isOutput() const  { return type == audioOutputNode || type == midiOutputNode; }
+bool IONode::isInput() const { return type == audioInputNode || type == midiInputNode; }
+bool IONode::isOutput() const { return type == audioOutputNode || type == midiOutputNode; }
 
 void IONode::setParentGraph (GraphNode* const newGraph)
 {
@@ -161,4 +175,4 @@ void IONode::setParentGraph (GraphNode* const newGraph)
     refreshPorts();
 }
 
-}
+} // namespace Element

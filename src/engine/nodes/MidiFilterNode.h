@@ -27,10 +27,10 @@ class MidiFilterNode : public NodeObject
 {
 public:
     virtual ~MidiFilterNode();
-    
+
 protected:
     MidiFilterNode (uint32 nodeId);
     inline bool wantsMidiPipe() const override { return true; }
 };
 
-}
+} // namespace Element

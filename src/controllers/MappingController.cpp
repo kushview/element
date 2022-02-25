@@ -38,7 +38,7 @@ class AudioProcessorParameterCapture : public AsyncUpdater
 {
 public:
     AudioProcessorParameterCapture()
-    { 
+    {
         capture.set (false);
     }
 
@@ -47,7 +47,7 @@ public:
         clear();
     }
 
-    void handleAsyncUpdate() override 
+    void handleAsyncUpdate() override
     {
         AudioProcessor* capturedProcessor = nullptr;
         NodeObjectPtr capturedObject = nullptr;
@@ -56,23 +56,20 @@ public:
 
         {
             ScopedLock sl (lock);
-            capturedNode      = node;
-            capturedObject    = object;
+            capturedNode = node;
+            capturedObject = object;
             capturedProcessor = processor;
             capturedParameter = parameter;
 
-            node        = Node();
-            object      = nullptr;
-            processor   = nullptr;
-            parameter   = NodeObject::NoParameter;
+            node = Node();
+            object = nullptr;
+            processor = nullptr;
+            parameter = NodeObject::NoParameter;
         }
 
         if (capturedObject != nullptr && capturedObject.get() == capturedNode.getObject())
         {
-            if (capturedParameter == NodeObject::EnabledParameter ||
-                capturedParameter == NodeObject::BypassParameter ||
-                capturedParameter == NodeObject::MuteParameter ||
-                isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
+            if (capturedParameter == NodeObject::EnabledParameter || capturedParameter == NodeObject::BypassParameter || capturedParameter == NodeObject::MuteParameter || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
             {
                 callback (capturedNode, capturedParameter);
             }
@@ -105,12 +102,12 @@ public:
     }
 
     CriticalSection lock;
-    Signal<void(const Node&, int)> callback;
-    Atomic<bool> capture        = false;
+    Signal<void (const Node&, int)> callback;
+    Atomic<bool> capture = false;
     Node node;
-    NodeObjectPtr object         = nullptr;
-    AudioProcessor* processor   = nullptr;
-    int parameter               = -1;
+    NodeObjectPtr object = nullptr;
+    AudioProcessor* processor = nullptr;
+    int parameter = -1;
 
 private:
     class Mappable : public Parameter::Listener
@@ -139,26 +136,26 @@ private:
         {
             if (connections.size() > 0)
                 clear();
-            
+
             connections.add (object->enablementChanged.connect (std::bind (
                 &Mappable::onEnablementChanged, this, std::placeholders::_1)));
             connections.add (object->bypassChanged.connect (std::bind (
                 &Mappable::onBypassChanged, this, std::placeholders::_1)));
             connections.add (object->muteChanged.connect (std::bind (
                 &Mappable::onMuteChanged, this, std::placeholders::_1)));
-                
+
             for (auto* const param : object->getParameters())
                 param->addListener (this);
         }
 
-        void controlValueChanged (int index, float) override 
+        void controlValueChanged (int index, float) override
         {
             if (capture.capture.get() == false)
                 return;
             ScopedLock sl (capture.lock);
             capture.capture.set (false);
-            capture.node      = node;
-            capture.object    = object;
+            capture.node = node;
+            capture.object = object;
             capture.processor = object->getAudioProcessor();
             capture.parameter = index;
             capture.triggerAsyncUpdate();
@@ -172,8 +169,8 @@ private:
                 return;
             capture.capture.set (false);
             ScopedLock sl (capture.lock);
-            capture.node      = node;
-            capture.object    = object;
+            capture.node = node;
+            capture.object = object;
             capture.processor = object->getAudioProcessor();
             capture.parameter = NodeObject::EnabledParameter;
             capture.triggerAsyncUpdate();
@@ -185,8 +182,8 @@ private:
                 return;
             capture.capture.set (false);
             ScopedLock sl (capture.lock);
-            capture.node      = node;
-            capture.object    = object;
+            capture.node = node;
+            capture.object = object;
             capture.processor = object->getAudioProcessor();
             capture.parameter = NodeObject::BypassParameter;
             capture.triggerAsyncUpdate();
@@ -198,8 +195,8 @@ private:
                 return;
             capture.capture.set (false);
             ScopedLock sl (capture.lock);
-            capture.node      = node;
-            capture.object    = object;
+            capture.node = node;
+            capture.object = object;
             capture.processor = object->getAudioProcessor();
             capture.parameter = NodeObject::MuteParameter;
             capture.triggerAsyncUpdate();
@@ -230,7 +227,7 @@ private:
 class MappingController::Impl
 {
 public:
-    Impl() { }
+    Impl() {}
     ~Impl()
     {
         capture.clear();
@@ -239,13 +236,7 @@ public:
     bool isCaptureComplete() const
     {
         NodeObjectPtr object = node.getObject();
-        return object != nullptr && 
-            (parameter == NodeObject::EnabledParameter || 
-             parameter == NodeObject::BypassParameter || 
-             parameter == NodeObject::MuteParameter ||
-             isPositiveAndBelow (parameter, object->getParameters().size())) &&
-            (message.isController() || message.isNoteOn()) && 
-            control.getValueTree().isValid();
+        return object != nullptr && (parameter == NodeObject::EnabledParameter || parameter == NodeObject::BypassParameter || parameter == NodeObject::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOn()) && control.getValueTree().isValid();
     }
 
     AudioProcessorParameterCapture capture;
@@ -272,25 +263,24 @@ MappingController::~MappingController()
 void MappingController::activate()
 {
     Controller::activate();
-   #ifndef EL_FREE
+#ifndef EL_FREE
     auto& capture (impl->capture);
     capturedConnection = getWorld().getMappingEngine().capturedSignal().connect (
         std::bind (&MappingController::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
-        std::bind (&MappingController::onParameterCaptured, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        std::bind (&MappingController::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
     getWorld().getMappingEngine().startMapping();
-   #endif
+#endif
 }
 
 void MappingController::deactivate()
 {
     Controller::deactivate();
-   #ifndef EL_FREE
+#ifndef EL_FREE
     getWorld().getMappingEngine().stopMapping();
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
-   #endif
+#endif
 }
 
 bool MappingController::isLearning() const
@@ -309,7 +299,7 @@ void MappingController::learn (const bool shouldLearn)
 
     if (shouldLearn)
     {
-        DBG("[EL] MappingController: start learning");
+        DBG ("[EL] MappingController: start learning");
         impl->learnState = CaptureParameter;
         capture.addNodes (getWorld().getSession());
     }
@@ -319,7 +309,7 @@ void MappingController::onParameterCaptured (const Node& node, int parameter)
 {
     if (impl->learnState == CaptureParameter)
     {
-        DBG("[EL] MappingController: got parameter: " << parameter);
+        DBG ("[EL] MappingController: got parameter: " << parameter);
         auto& mapping (getWorld().getMappingEngine());
         impl->learnState = CaptureControl;
         impl->node = node;
@@ -328,7 +318,7 @@ void MappingController::onParameterCaptured (const Node& node, int parameter)
     }
     else
     {
-        DBG("[EL] received captured param: invalid state: " << (int) impl->learnState);
+        DBG ("[EL] received captured param: invalid state: " << (int) impl->learnState);
     }
 }
 
@@ -343,17 +333,17 @@ void MappingController::onControlCaptured()
         impl->message = mapping.getCapturedMidiMessage();
         impl->control = mapping.getCapturedControl();
 
-        DBG("[EL] MappingController: got control: " << impl->control.getName().toString());
+        DBG ("[EL] MappingController: got control: " << impl->control.getName().toString());
 
         if (impl->isCaptureComplete())
         {
             if (mapping.addHandler (impl->control, impl->node, impl->parameter))
             {
                 ValueTree newMap (Tags::map);
-                newMap.setProperty (Tags::controller,   impl->control.getControllerDevice().getUuidString(), nullptr)
-                      .setProperty (Tags::control,      impl->control.getUuidString(), nullptr)
-                      .setProperty (Tags::node,         impl->node.getUuidString(), nullptr)
-                      .setProperty (Tags::parameter,    impl->parameter, nullptr);
+                newMap.setProperty (Tags::controller, impl->control.getControllerDevice().getUuidString(), nullptr)
+                    .setProperty (Tags::control, impl->control.getUuidString(), nullptr)
+                    .setProperty (Tags::node, impl->node.getUuidString(), nullptr)
+                    .setProperty (Tags::parameter, impl->parameter, nullptr);
                 auto maps = session->getValueTree().getChildWithName (Tags::maps);
                 maps.addChild (newMap, -1, nullptr);
 
@@ -364,14 +354,14 @@ void MappingController::onControlCaptured()
     }
     else
     {
-        DBG("[EL] received captured control: invalid state: " << (int) impl->learnState);
+        DBG ("[EL] received captured control: invalid state: " << (int) impl->learnState);
     }
 }
 
 void MappingController::remove (const ControllerMap& controllerMap)
 {
     auto session = getWorld().getSession();
-    auto maps = session->getValueTree().getChildWithName(Tags::maps);
+    auto maps = session->getValueTree().getChildWithName (Tags::maps);
     if (controllerMap.getValueTree().isAChildOf (maps))
     {
         maps.removeChild (controllerMap.getValueTree(), nullptr);
@@ -380,4 +370,4 @@ void MappingController::remove (const ControllerMap& controllerMap)
     }
 }
 
-}
+} // namespace Element

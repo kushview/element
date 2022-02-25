@@ -24,14 +24,14 @@
 
 namespace Element {
 
-class TreeItemBase   : public TreeViewItem
+class TreeItemBase : public TreeViewItem
 {
 public:
     TreeItemBase();
     ~TreeItemBase();
 
     void refreshSubItems();
-    
+
     virtual Font getFont() const;
     virtual String getRenamingName() const = 0;
     virtual String getDisplayName() const = 0;
@@ -39,9 +39,9 @@ public:
     virtual bool isMissing() = 0;
     virtual Icon getIcon() const = 0;
     virtual float getIconSize() const;
-    virtual bool isIconCrossedOut() const               { return false; }
+    virtual bool isIconCrossedOut() const { return false; }
     virtual void paintContent (Graphics& g, const Rectangle<int>& area);
-    virtual int getMillisecsAllowedForDragGesture()     { return 120; }
+    virtual int getMillisecsAllowedForDragGesture() { return 120; }
     virtual File getDraggableFile() const { return File(); }
 
     virtual void deleteItem();
@@ -54,9 +54,8 @@ public:
     virtual void showPopupMenu();
     virtual void handlePopupMenuResult (int resultCode);
 
-
-    int getItemWidth() const override                   { return -1; }
-    int getItemHeight() const override                  { return 20; }
+    int getItemWidth() const override { return -1; }
+    int getItemHeight() const override { return 20; }
 
     Component* createItemComponent() override;
 
@@ -65,16 +64,17 @@ public:
 
     void itemSelectionChanged (bool isNowSelected) override;
     void paintItem (Graphics& g, int width, int height) override;
-    #if 0
+#if 0
     void paintOpenCloseButton (Graphics&, const Rectangle<float>& area, 
                                Colour backgroundColour, bool isMouseOver) override;
-    #endif
-    
+#endif
+
     //=========================================================================
     struct WholeTreeOpennessRestorer : public OpennessRestorer
     {
         WholeTreeOpennessRestorer (TreeViewItem& item)
-            : OpennessRestorer (getTopLevelItem (item)) { }
+            : OpennessRestorer (getTopLevelItem (item)) {}
+
     private:
         static TreeViewItem& getTopLevelItem (TreeViewItem& item)
         {
@@ -91,11 +91,11 @@ public:
 protected:
     void cancelDelayedSelectionTimer();
 
-    template<class ParentType>
+    template <class ParentType>
     inline ParentType* findParent() const
     {
         for (Component* c = getOwnerView(); c != nullptr; c = c->getParentComponent())
-            if (ParentType* pcc = dynamic_cast <ParentType*> (c))
+            if (ParentType* pcc = dynamic_cast<ParentType*> (c))
                 return pcc;
 
         return nullptr;
@@ -147,9 +147,7 @@ public:
         const Rectangle<int> area (comp.getLocalBounds());
         g.setColour (Colours::black.contrasting (0.7f));
         g.setFont ((float) fontHeight);
-        g.drawFittedText (message, area.reduced (4, 2),
-                          Justification::centred,
-                          area.getHeight() / fontHeight);
+        g.drawFittedText (message, area.reduced (4, 2), Justification::centred, area.getHeight() / fontHeight);
     }
 
     void paint (Graphics& g) override
@@ -168,7 +166,7 @@ public:
     {
         return Rectangle<int> (0, 2, getWidth() - 2, getHeight() - 2);
     }
-    
+
     TreeView tree;
     ScopedPointer<TreeItemBase> rootItem;
 
@@ -177,7 +175,7 @@ private:
     Value emptyTreeMessage;
 };
 
-class TreeItemComponent   : public Component
+class TreeItemComponent : public Component
 {
 public:
     TreeItemComponent (TreeItemBase& i)
@@ -186,7 +184,7 @@ public:
         setInterceptsMouseClicks (false, true);
     }
 
-    virtual ~TreeItemComponent() { }
+    virtual ~TreeItemComponent() {}
 
     void paint (Graphics& g) override
     {
@@ -197,8 +195,7 @@ public:
 
     void paintIcon (Graphics& g)
     {
-        item.getIcon().draw (g, Rectangle<float> (4.0f, 2.0f, item.getIconSize(), getHeight() - 4.0f),
-                                item.isIconCrossedOut());
+        item.getIcon().draw (g, Rectangle<float> (4.0f, 2.0f, item.getIconSize(), getHeight() - 4.0f), item.isIconCrossedOut());
     }
 
     void resized() override
@@ -209,4 +206,4 @@ public:
     TreeItemBase& item;
 };
 
-}
+} // namespace Element

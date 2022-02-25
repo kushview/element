@@ -22,7 +22,7 @@
 #include "engine/MidiPipe.h"
 #include "Common.h"
 
-#define TRACE_MIDI_ROUTER(output) 
+#define TRACE_MIDI_ROUTER(output)
 
 namespace Element {
 
@@ -67,11 +67,11 @@ MidiRouterNode::MidiRouterNode (int ins, int outs)
     }
 }
 
-MidiRouterNode::~MidiRouterNode() { }
+MidiRouterNode::~MidiRouterNode() {}
 
 void MidiRouterNode::setCurrentProgram (int index)
 {
-    if (auto* program = programs [index])
+    if (auto* program = programs[index])
     {
         currentProgram = index;
         setMatrixState (program->matrix);
@@ -101,7 +101,7 @@ MatrixState MidiRouterNode::getMatrixState() const
 void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     jassert (midi.getNumBuffers() >= numDestinations);
-    
+
     const auto nsamples = audio.getNumSamples();
     const auto nbuffers = midi.getNumBuffers();
     audio.clear();
@@ -111,11 +111,11 @@ void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         if (src >= nbuffers)
             break;
-        
+
         const auto& rb = *midi.getReadBuffer (src);
         for (int dst = 0; dst < numDestinations; ++dst)
             if (toggles.get (src, dst))
-                midiOuts.getUnchecked(dst)->addEvents (rb, 0, nsamples, 0);
+                midiOuts.getUnchecked (dst)->addEvents (rb, 0, nsamples, 0);
     }
 
     for (int i = midiOuts.size(); --i >= 0;)
@@ -133,9 +133,9 @@ void MidiRouterNode::getState (MemoryBlock& block)
 }
 
 void MidiRouterNode::setState (const void* data, int sizeInBytes)
-{ 
+{
     const auto tree = ValueTree::readFromData (data, (size_t) sizeInBytes);
-    
+
     if (tree.isValid())
     {
         kv::MatrixState matrix;
@@ -181,4 +181,4 @@ void MidiRouterNode::initMidiOuts (OwnedArray<MidiBuffer>& outs)
     }
 }
 
-}
+} // namespace Element

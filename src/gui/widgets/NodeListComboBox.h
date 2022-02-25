@@ -27,12 +27,12 @@ class NodeListComboBox : public ComboBox
 {
 public:
     NodeListComboBox()
-    { 
+    {
         setTextWhenNoChoicesAvailable ("Empty graph");
         setTextWhenNothingSelected ("Select node");
     }
 
-    virtual ~NodeListComboBox() { }
+    virtual ~NodeListComboBox() {}
 
     void addNodes (const Node& parent,
                    NotificationType notification = sendNotificationAsync)
@@ -50,7 +50,7 @@ public:
             setSelectedItemIndex (lastIndex, notification);
     }
 
-    void selectNode (const Node& node, 
+    void selectNode (const Node& node,
                      NotificationType notification = sendNotificationAsync)
     {
         const auto graph (node.getParentGraph());
@@ -60,4 +60,4 @@ public:
     }
 };
 
-}
+} // namespace Element

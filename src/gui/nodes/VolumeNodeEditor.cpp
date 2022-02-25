@@ -31,17 +31,17 @@ class VolumeNodeEditor::ChannelStrip : public NodeChannelStripComponent,
 public:
     ChannelStrip (GuiController& g)
         : NodeChannelStripComponent (g, false)
-    { 
+    {
         setVolumeMinMax (-30, 12, 0.5);
-        
+
         ioButton = new SettingButton();
         ioButton->setPath (getIcons().fasCog);
-        ioButton->onClick = [this]()
-        { 
+        ioButton->onClick = [this]() {
             auto node = getNode();
             NodeObjectPtr obj = node.getObject();
             auto* proc = (obj) ? obj->getAudioProcessor() : 0;
-            if (! proc) return;
+            if (! proc)
+                return;
 
             if (ioButton->getToggleState())
             {
@@ -50,19 +50,18 @@ public:
             }
             else
             {
-                auto* component = new NodeAudioBusesComponent (node, proc,
-                        ViewHelpers::findContentComponent (this));
+                auto* component = new NodeAudioBusesComponent (node, proc, ViewHelpers::findContentComponent (this));
                 auto& box = CallOutBox::launchAsynchronously (
-                    std::unique_ptr<Component> (component), 
-                    ioButton->getScreenBounds(), 0);
+                    std::unique_ptr<Component> (component),
+                    ioButton->getScreenBounds(),
+                    0);
                 ioBox.setNonOwned (&box);
             }
         };
 
         getChannelStrip().addButton (ioButton);
 
-        onVolumeChanged = [this](double value)
-        {
+        onVolumeChanged = [this] (double value) {
             float fvalue = static_cast<float> (value);
             if (param != nullptr)
             {
@@ -74,7 +73,7 @@ public:
     }
 
     ~ChannelStrip()
-    { 
+    {
         if (ioButton)
         {
             ioButton->onClick = nullptr;
@@ -97,7 +96,7 @@ public:
     {
         ignoreUnused (parameterIndex, gestureIsStarting);
     }
-    
+
     void updateParameter()
     {
         if (param)
@@ -109,7 +108,7 @@ public:
         if (auto object = getNode().getObject())
             if (auto* proc = dynamic_cast<VolumeProcessor*> (object->getAudioProcessor()))
                 param = dynamic_cast<AudioParameterFloat*> (proc->getParameters()[0]);
-        
+
         stabilizeContent();
 
         if (param)
@@ -130,14 +129,14 @@ private:
 
 VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiController& gui)
     : NodeEditorComponent (node)
-{ 
+{
     setOpaque (true);
     strip.reset (new ChannelStrip (gui));
     addAndMakeVisible (strip.get());
     strip->setComboBoxesVisible (false, false);
 
     setSize (128, 262);
-    
+
     strip->setNode (node);
     strip->updateParameter();
 }
@@ -147,7 +146,7 @@ VolumeNodeEditor::~VolumeNodeEditor()
     strip.reset();
 }
 
-void VolumeNodeEditor::paint (Graphics& g) 
+void VolumeNodeEditor::paint (Graphics& g)
 {
     g.fillAll (Colours::black);
 }
@@ -158,4 +157,4 @@ void VolumeNodeEditor::resized()
         strip->setBounds (getLocalBounds());
 }
 
-}
+} // namespace Element

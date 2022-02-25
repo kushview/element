@@ -42,7 +42,7 @@ struct CommandLine
     explicit CommandLine (const String& cli = String());
     bool fullScreen;
     int port;
-    
+
     const String commandLine;
 };
 
@@ -77,4 +77,4 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
-}
+} // namespace Element

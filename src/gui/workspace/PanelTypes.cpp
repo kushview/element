@@ -30,7 +30,7 @@ class GenericDockPanel : public DockPanel
 {
 public:
     GenericDockPanel (const String& panelName)
-    { 
+    {
         setName (panelName);
     }
     ~GenericDockPanel() = default;
@@ -46,13 +46,16 @@ public:
         {
             case 1: {
                 close();
-            } break;
+            }
+            break;
 
             case 2: {
                 undock();
-            } break;
+            }
+            break;
 
-            default: break;
+            default:
+                break;
         }
     }
 };
@@ -63,9 +66,9 @@ DockPanel* GenericPanelType::createPanel (const Identifier& panelType)
     if (panelType == genericType)
     {
         ++lastPanelNo;
-        return new GenericDockPanel (String("Generic ") + String(lastPanelNo));
+        return new GenericDockPanel (String ("Generic ") + String (lastPanelNo));
     }
-    
+
     return nullptr;
 }
 
@@ -100,11 +103,11 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
 
     if (panelId == PanelIDs::virtualKeyboard)
         return new VirtualKeyboardPanel();
-    
+
     if (panelId == PanelIDs::plugins)
         return new PluginsPanel();
 
     return nullptr;
 }
 
-}
+} // namespace Element

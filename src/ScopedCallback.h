@@ -28,7 +28,7 @@ namespace Element {
 class ScopedCallback
 {
 public:
-   /** Create a new ScopedCallback.
+    /** Create a new ScopedCallback.
        @param f    The function to call
     */
     explicit ScopedCallback (std::function<void()> f)
@@ -44,4 +44,4 @@ private:
     std::function<void()> callback;
 };
 
-}
+} // namespace Element

@@ -30,27 +30,29 @@ class Globals;
 class Action : public UndoableAction
 {
 public:
-    virtual ~Action() { }
+    virtual ~Action() {}
+
 protected:
-    Action() { }
+    Action() {}
 };
 
 struct AppMessage : public Message
 {
-    enum ID {
-        
+    enum ID
+    {
+
     };
-    
-    inline virtual void createActions (AppController&, OwnedArray<UndoableAction>&) const { }
+
+    inline virtual void createActions (AppController&, OwnedArray<UndoableAction>&) const {}
 };
 
 struct AddMidiDeviceMessage : public AppMessage
 {
     AddMidiDeviceMessage (const String& name, const bool isInput)
-        : device (name), inputDevice (isInput) { }
+        : device (name), inputDevice (isInput) {}
     const String device;
     const bool inputDevice;
-    
+
     inline PluginDescription getPluginDescription() const
     {
         PluginDescription desc;
@@ -66,8 +68,8 @@ struct AddMidiDeviceMessage : public AppMessage
 struct AddPresetMessage : public AppMessage
 {
     AddPresetMessage (const Node& n, const String& name_ = String())
-        : node (n), name (name_) { }
-    ~AddPresetMessage() noexcept { }
+        : node (n), name (name_) {}
+    ~AddPresetMessage() noexcept {}
     const Node node;
     const String name;
 };
@@ -75,9 +77,9 @@ struct AddPresetMessage : public AppMessage
 /** Send this to remove a node from the current graph */
 struct RemoveNodeMessage : public AppMessage
 {
-    RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) { }
-    RemoveNodeMessage (const NodeArray& n) : nodeId(KV_INVALID_NODE) { nodes.addArray (n); }
-    RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) { }
+    RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) {}
+    RemoveNodeMessage (const NodeArray& n) : nodeId (KV_INVALID_NODE) { nodes.addArray (n); }
+    RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) {}
     const uint32 nodeId;
     const Node node;
     NodeArray nodes;
@@ -98,23 +100,25 @@ struct AddConnectionMessage : public AppMessage
         sourcePort = destPort = KV_INVALID_PORT;
         jassert (useChannels());
     }
-    
+
     AddConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp, const Node& tgt = Node())
         : target (tgt)
     {
-        sourceNode = s; destNode = d;
-        sourcePort = sp; destPort = dp;
+        sourceNode = s;
+        destNode = d;
+        sourcePort = sp;
+        destPort = dp;
         sourceChannel = destChannel = -1;
         jassert (usePorts());
     }
-    
+
     uint32 sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
 
     const Node target;
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
-    inline bool usePorts() const { return !useChannels(); }
+    inline bool usePorts() const { return ! useChannels(); }
     void createActions (AppController& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
@@ -122,30 +126,34 @@ struct AddConnectionMessage : public AppMessage
 class RemoveConnectionMessage : public AppMessage
 {
 public:
-    RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& t = Node()) 
+    RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& t = Node())
         : target (t)
     {
-        sourceNode = s; destNode = d;
-        sourceChannel = sc; destChannel = dc;
+        sourceNode = s;
+        destNode = d;
+        sourceChannel = sc;
+        destChannel = dc;
         sourcePort = destPort = KV_INVALID_PORT;
         jassert (useChannels());
     }
-    
+
     RemoveConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp, const Node& t = Node())
         : target (t)
     {
-        sourceNode = s; destNode = d;
-        sourcePort = sp; destPort = dp;
+        sourceNode = s;
+        destNode = d;
+        sourcePort = sp;
+        destPort = dp;
         sourceChannel = destChannel = -1;
-        jassert(usePorts());
+        jassert (usePorts());
     }
-    
+
     uint32 sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
     const Node target;
-    
+
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
-    inline bool usePorts() const { return !useChannels(); }
+    inline bool usePorts() const { return ! useChannels(); }
     void createActions (AppController& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
@@ -156,8 +164,9 @@ public:
         : node (Node::resetIds (n.getValueTree().createCopy()), false),
           target (t),
           sourceFile (f)
-    { }
-    
+    {
+    }
+
     const Node node;
     const Node target;
     ConnectionBuilder builder;
@@ -165,23 +174,24 @@ public:
 };
 
 /** Send this when a plugin needs loaded into the graph */
-class LoadPluginMessage : public Message {
+class LoadPluginMessage : public Message
+{
 public:
     LoadPluginMessage (const PluginDescription& pluginDescription, const bool pluginVerified)
-        : Message(), description (pluginDescription), verified (pluginVerified) { }
+        : Message(), description (pluginDescription), verified (pluginVerified) {}
     LoadPluginMessage (const PluginDescription& d, const bool v, const float rx, const float ry)
-        : Message(), description (d), relativeX (rx), relativeY (ry), verified (v) { }
-    ~LoadPluginMessage() { }
-    
+        : Message(), description (d), relativeX (rx), relativeY (ry), verified (v) {}
+    ~LoadPluginMessage() {}
+
     /** Descriptoin of the plugin to load */
     const PluginDescription description;
-    
+
     /** Relative X of the node UI in a graph editor */
     const float relativeX = 0.5f;
 
     /** Relative X of the node UI in a graph editor */
     const float relativeY = 0.5f;
-    
+
     /** Whether or not this plugin has been vetted yet */
     const bool verified;
 };
@@ -190,7 +200,8 @@ struct AddPluginMessage : public AppMessage
 {
     AddPluginMessage (const Node& g, const PluginDescription& d, const bool v = true)
         : graph (g), description (d), verified (v)
-    { }
+    {
+    }
 
     const Node graph;
     const PluginDescription description;
@@ -210,22 +221,22 @@ struct ReplaceNodeMessage : public AppMessage
     boost::signals2::signal<void()> success;
 };
 
-class DuplicateNodeMessage : public Message {
+class DuplicateNodeMessage : public Message
+{
 public:
     DuplicateNodeMessage (const Node& n)
-        : Message(), node (n) { }
-    DuplicateNodeMessage() { }
+        : Message(), node (n) {}
+    DuplicateNodeMessage() {}
     const Node node;
 };
 
 class DisconnectNodeMessage : public Message
 {
 public:
-    DisconnectNodeMessage (const Node& n, const bool i = true, const bool o = true,
-                                          const bool a = true, const bool m = true)
-        : Message(), node (n), inputs(i), outputs(o), audio (a), midi (m) { }
+    DisconnectNodeMessage (const Node& n, const bool i = true, const bool o = true, const bool a = true, const bool m = true)
+        : Message(), node (n), inputs (i), outputs (o), audio (a), midi (m) {}
     DisconnectNodeMessage()
-        : Message(), inputs (true), outputs (true), audio (true), midi (true) { }
+        : Message(), inputs (true), outputs (true), audio (true), midi (true) {}
     const Node node;
     const bool inputs, outputs;
     const bool audio, midi;
@@ -233,26 +244,26 @@ public:
 
 struct FinishedLaunchingMessage : public AppMessage
 {
-    FinishedLaunchingMessage() { }
-    ~FinishedLaunchingMessage() { }
+    FinishedLaunchingMessage() {}
+    ~FinishedLaunchingMessage() {}
 };
 
 struct ChangeBusesLayout : public AppMessage
 {
     ChangeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& l)
-        : node (n), layout (l) { }
+        : node (n), layout (l) {}
     const Node node;
     const AudioProcessor::BusesLayout layout;
 };
 
 struct OpenSessionMessage : public AppMessage
 {
-    OpenSessionMessage (const File& f) : file (f) { }
-    ~OpenSessionMessage() { }
+    OpenSessionMessage (const File& f) : file (f) {}
+    ~OpenSessionMessage() {}
     const File file;
 };
 
-}
+} // namespace Element
 
 #include "messages/ControllerDeviceMessages.h"
 #include "messages/GuiMessages.h"

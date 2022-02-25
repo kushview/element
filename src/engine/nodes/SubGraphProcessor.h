@@ -33,18 +33,22 @@ public:
     SubGraphProcessor();
     virtual ~SubGraphProcessor();
     void fillInPluginDescription (PluginDescription& d) const override;
-    GraphManager& getController() const { jassert(controller); return* controller; }
-    
+    GraphManager& getController() const
+    {
+        jassert (controller);
+        return *controller;
+    }
+
 private:
     typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
-    NodeObjectPtr ioNodes [PortType::Unknown];
+    NodeObjectPtr ioNodes[PortType::Unknown];
     friend class GraphManager;
     friend class PluginManager;
     ScopedPointer<GraphManager> controller;
     void createAllIONodes();
     void initController (PluginManager& plugins);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SubGraphProcessor);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SubGraphProcessor);
 };
 
-}
+} // namespace Element

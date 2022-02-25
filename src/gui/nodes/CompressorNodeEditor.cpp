@@ -24,8 +24,7 @@
 
 namespace Element {
 
-CompressorNodeEditor::CompViz::CompViz (CompressorProcessor& proc) :
-    proc (proc)
+CompressorNodeEditor::CompViz::CompViz (CompressorProcessor& proc) : proc (proc)
 {
     startTimer (40);
 
@@ -119,11 +118,10 @@ void CompressorNodeEditor::CompViz::paint (Graphics& g)
 }
 
 //================================================
-CompressorNodeEditor::CompressorNodeEditor (CompressorProcessor& proc) :
-    AudioProcessorEditor (proc),
-    proc (proc),
-    knobs (proc, [this, &proc] { proc.updateParams(); compViz.updateCurve(); }),
-    compViz (proc)
+CompressorNodeEditor::CompressorNodeEditor (CompressorProcessor& proc) : AudioProcessorEditor (proc),
+                                                                         proc (proc),
+                                                                         knobs (proc, [this, &proc] { proc.updateParams(); compViz.updateCurve(); }),
+                                                                         compViz (proc)
 {
     setSize (610, 420);
 
@@ -143,8 +141,8 @@ void CompressorNodeEditor::resized()
 {
     compViz.setBounds ((getWidth() - 300) / 2, 5, 300, 300);
     knobs.setBounds (0, getHeight() - 100, getWidth(), 100);
-    
+
     compViz.updateCurve();
 }
 
-}
+} // namespace Element

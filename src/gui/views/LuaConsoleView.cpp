@@ -36,8 +36,7 @@ void LuaConsoleView::initializeView (AppController& app)
 {
     auto& se = app.getWorld().getScriptingEngine();
     console.setEnvironment (
-        sol::environment (se.getState(), sol::create, se.getState().globals())
-    );
+        sol::environment (se.getState(), sol::create, se.getState().globals()));
 
     log = &app.getWorld().getLog();
     log->addListener (this);
@@ -48,4 +47,4 @@ void LuaConsoleView::initializeView (AppController& app)
     console.addText (buffer.trimEnd(), false);
 }
 
-}
+} // namespace Element

@@ -24,30 +24,30 @@ namespace Element {
 MidiProgramMapNode::MidiProgramMapNode()
     : MidiFilterNode (0) {}
 
-MidiProgramMapNode::~MidiProgramMapNode() { }
+MidiProgramMapNode::~MidiProgramMapNode() {}
 
 void MidiProgramMapNode::clear()
 {
     entries.clearQuick (true);
     ScopedLock sl (lock);
     for (int i = 0; i < 128; ++i)
-        programMap [i] = -1;
+        programMap[i] = -1;
 }
 
 void MidiProgramMapNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
     ignoreUnused (sampleRate, maxBufferSize);
-    
+
     {
         ScopedLock sl (lock);
         for (int i = 0; i < 128; ++i)
-            programMap [i] = -1;
+            programMap[i] = -1;
         for (const auto* const entry : entries)
-            programMap [entry->in] = entry->out;
+            programMap[entry->in] = entry->out;
     }
 }
 
-void MidiProgramMapNode::releaseResources() { }
+void MidiProgramMapNode::releaseResources() {}
 
 void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
@@ -56,17 +56,18 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         if (! assertedLowChannels)
         {
-            DBG("[EL] PGC map: num bufs: " << midi.getNumBuffers());
+            DBG ("[EL] PGC map: num bufs: " << midi.getNumBuffers());
             assertedLowChannels = true;
         }
 
         return;
     }
-   
+
     auto* const midiIn = midi.getWriteBuffer (0);
 
     ScopedLock sl (lock);
-    MidiMessage msg; int frame = 0;
+    MidiMessage msg;
+    int frame = 0;
 
     if (! toSendMidi.isEmpty())
     {
@@ -81,12 +82,12 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     while (iter2.getNextEvent (msg, frame))
     {
-        if (msg.isProgramChange() && programMap [msg.getProgramChangeNumber()] >= 0)
+        if (msg.isProgramChange() && programMap[msg.getProgramChangeNumber()] >= 0)
         {
             program = msg.getProgramChangeNumber();
             tempMidi.addEvent (MidiMessage::programChange (
-                msg.getChannel(), programMap [msg.getProgramChangeNumber()]),
-                frame);
+                                   msg.getChannel(), programMap[msg.getProgramChangeNumber()]),
+                               frame);
         }
         else
         {
@@ -116,11 +117,15 @@ int MidiProgramMapNode::getNumProgramEntries() const { return entries.size(); }
 
 void MidiProgramMapNode::addProgramEntry (const String& name, int programIn, int programOut)
 {
-    if (programIn < 0)      programIn = 0;
-    if (programIn > 127)    programIn = 127;
-    if (programOut < 0)     programOut = programIn;
-    if (programOut > 127)   programOut = 127;
-    
+    if (programIn < 0)
+        programIn = 0;
+    if (programIn > 127)
+        programIn = 127;
+    if (programOut < 0)
+        programOut = programIn;
+    if (programOut > 127)
+        programOut = 127;
+
     ProgramEntry* entry = nullptr;
     for (auto* e : entries)
     {
@@ -137,21 +142,21 @@ void MidiProgramMapNode::addProgramEntry (const String& name, int programIn, int
     jassert (entry != nullptr);
 
     entry->name = name;
-    entry->in   = programIn;
-    entry->out  = programOut;
+    entry->in = programIn;
+    entry->out = programOut;
     sendChangeMessage();
 
     ScopedLock sl (lock);
-    programMap [entry->in] = entry->out;
+    programMap[entry->in] = entry->out;
 }
 
 void MidiProgramMapNode::editProgramEntry (int index, const String& name, int inProgram, int outProgram)
 {
-    if (auto* entry = entries [index])
+    if (auto* entry = entries[index])
     {
-        entry->name     = name.isNotEmpty() ? name : entry->name;
-        entry->in       = inProgram;
-        entry->out      = outProgram;
+        entry->name = name.isNotEmpty() ? name : entry->name;
+        entry->in = inProgram;
+        entry->out = outProgram;
         ScopedLock sl (lock);
         programMap[entry->in] = entry->out;
         sendChangeMessage();
@@ -161,7 +166,7 @@ void MidiProgramMapNode::editProgramEntry (int index, const String& name, int in
 void MidiProgramMapNode::removeProgramEntry (int index)
 {
     std::unique_ptr<ProgramEntry> deleter;
-    if (auto* const entry = entries [index])
+    if (auto* const entry = entries[index])
     {
         entries.remove (index, false);
         deleter.reset (entry);
@@ -173,9 +178,9 @@ void MidiProgramMapNode::removeProgramEntry (int index)
 
 MidiProgramMapNode::ProgramEntry MidiProgramMapNode::getProgramEntry (int index) const
 {
-    if (auto* const entry = entries [index])
+    if (auto* const entry = entries[index])
         return *entry;
-    return { };
+    return {};
 }
 
-}
+} // namespace Element

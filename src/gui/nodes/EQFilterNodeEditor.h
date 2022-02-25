@@ -49,7 +49,7 @@ private:
         float getFreqForX (float xPos);
         float getXForFreq (float freq);
 
-        void paint (Graphics & g) override;
+        void paint (Graphics& g) override;
         void resized() override;
 
     private:
@@ -58,9 +58,9 @@ private:
 
         const float lowFreq = 10.0f;
         const float highFreq = 22000.0f;
-        const float dashLengths[2] = {4, 1};
+        const float dashLengths[2] = { 4, 1 };
     };
     FreqViz viz;
 };
 
-}
+} // namespace Element

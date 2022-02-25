@@ -65,7 +65,8 @@ private:
         std::function<void()> onClick;
 
     protected:
-        void mouseUp (const MouseEvent& ev) override {
+        void mouseUp (const MouseEvent& ev) override
+        {
             if (onClick)
                 onClick();
         }
@@ -74,10 +75,10 @@ private:
     NodePropsToggle nodePropsToggle;
 
     SignalConnection nodeSelectedConnection,
-                     nodeRemovedConnection;
+        nodeRemovedConnection;
     void onNodeSelected();
     void onNodeRemoved (const Node&);
     void updateSizeInternal (const bool force = true);
 };
 
-}
+} // namespace Element

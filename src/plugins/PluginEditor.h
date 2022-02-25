@@ -53,8 +53,8 @@ public:
     //==========================================================================
     void paint (Graphics&) override;
     void resized() override;
-    bool keyPressed (const KeyPress &key, Component *originatingComponent) override;
-    bool keyStateChanged (bool isKeyDown, Component *originatingComponent) override { return true; }
+    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+    bool keyStateChanged (bool isKeyDown, Component* originatingComponent) override { return true; }
 
 private:
     PluginProcessor& processor;
@@ -63,12 +63,14 @@ private:
 
     const int paramTableSize = 100;
     bool paramTableVisible = false;
-    class ParamTable; std::unique_ptr<ParamTable> paramTable;
-    class ParamTableToggle; std::unique_ptr<ParamTableToggle> paramToggle;
+    class ParamTable;
+    std::unique_ptr<ParamTable> paramTable;
+    class ParamTableToggle;
+    std::unique_ptr<ParamTableToggle> paramToggle;
 
     void updatePerformanceParamEnablements();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
 
-}
+} // namespace Element

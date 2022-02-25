@@ -34,7 +34,7 @@ class MappingEngine
 {
 public:
     using CapturedEventSignal = Signal<void()>;
-    
+
     MappingEngine();
     ~MappingEngine();
 
@@ -54,14 +54,15 @@ public:
 
 private:
     friend class ControllerMapInput;
-    class Inputs; std::unique_ptr<Inputs> inputs;
+    class Inputs;
+    std::unique_ptr<Inputs> inputs;
 
     class CapturedEvent : public AsyncUpdater
     {
     public:
         CapturedEvent() { capture.set (false); }
-        ~CapturedEvent() { }
-        inline void handleAsyncUpdate() override 
+        ~CapturedEvent() {}
+        inline void handleAsyncUpdate() override
         {
             capture.set (false);
             callback();
@@ -78,4 +79,4 @@ private:
     bool captureNextEvent (ControllerMapInput&, const ControllerDevice::Control&, const MidiMessage&);
 };
 
-}
+} // namespace Element

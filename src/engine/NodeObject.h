@@ -29,7 +29,7 @@ namespace Element {
 
 /* So render tasks can be friends of graph node */
 namespace GraphRender {
-class ProcessBufferOp;
+    class ProcessBufferOp;
 }
 
 class GraphNode;
@@ -41,12 +41,12 @@ public:
     /** Special parameter indexes when mapping universal node settings */
     enum SpecialParameter
     {
-        NoParameter             = -1,
-        EnabledParameter        = -2,
-        BypassParameter         = -3,
-        MuteParameter           = -4,
-        SpecialParameterBegin   = MuteParameter,
-        SpecialParameterEnd     = NoParameter
+        NoParameter = -1,
+        EnabledParameter = -2,
+        BypassParameter = -3,
+        MuteParameter = -4,
+        SpecialParameterBegin = MuteParameter,
+        SpecialParameterEnd = NoParameter
     };
 
     /** The ID number assigned to this node. This is assigned by the graph
@@ -54,7 +54,7 @@ public:
     const uint32 nodeId;
 
     virtual ~NodeObject();
-    
+
     /** Returns true if a parameter index is special */
     static bool isSpecialParameter (int parameter);
 
@@ -64,21 +64,29 @@ public:
     //=========================================================================
     /** Returns the name of this node */
     String getName() const { return name; }
-    
+
     /** Returns true if this is a T type node */
-    template<class T> bool isA() const { return nullptr != dynamic_cast<const T*> (this); }
+    template <class T>
+    bool isA() const
+    {
+        return nullptr != dynamic_cast<const T*> (this);
+    }
 
     //=========================================================================
     void setRenderDetails (double newSampleRate, int newBlockSize);
     double getSampleRate() const noexcept { return sampleRate; }
     int getBlockSize() const noexcept { return blockSize; }
-    
+
     //=========================================================================
     /** Returns an audio processor if available */
     virtual AudioProcessor* getAudioProcessor() const noexcept { return nullptr; }
 
     /** The actual processor object dynamic_cast'd to T */
-    template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
+    template <class T>
+    inline T* processor() const noexcept
+    {
+        return dynamic_cast<T*> (getAudioProcessor());
+    }
 
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
@@ -91,17 +99,17 @@ public:
     virtual void releaseResources() = 0;
 
     virtual bool wantsMidiPipe() const { return false; }
-    virtual void render (AudioSampleBuffer&, MidiPipe&) { }
+    virtual void render (AudioSampleBuffer&, MidiPipe&) {}
     virtual void renderBypassed (AudioSampleBuffer&, MidiPipe&);
-    
+
     /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;
 
     /** Returns the total number of audio ouputs */
     int getNumAudioOutputs() const;
-    
+
     //=========================================================================
-    const ParameterArray& getParameters() const    { return parameters; }
+    const ParameterArray& getParameters() const { return parameters; }
 
     //=========================================================================
     /** Returns the type of port
@@ -118,7 +126,7 @@ public:
 
     /** Returns the number of ports for a given type and flow */
     int getNumPorts (const PortType type, const bool isInput) const;
-    
+
     /** Returns the default MIDI input port */
     uint32 getMidiInputPort() const;
 
@@ -140,7 +148,7 @@ public:
     uint32 getPortForChannel (const PortType type, const int channel, const bool isInput) const;
 
     int getNthPort (const PortType type, const int channel, bool, bool) const;
-    
+
     /** Returns true if an input port */
     bool isPortInput (const uint32 port) const;
 
@@ -149,7 +157,7 @@ public:
 
     //==========================================================================
     virtual void refreshPorts() {}
-    
+
     //==========================================================================
     /** Returns true if the underyling processor is a SubGraph or Graph */
     bool isGraph() const noexcept;
@@ -159,7 +167,7 @@ public:
 
     /** Returns true if the processor is a subgraph */
     bool isSubGraph() const noexcept;
-    
+
     /** Get the type string for this Node */
     const String& getTypeString() const;
 
@@ -174,7 +182,7 @@ public:
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
-  
+
     /** Suspend processing */
     void suspendProcessing (const bool);
 
@@ -214,9 +222,9 @@ public:
     GraphNode* getParentGraph() const;
 
     void setInputRMS (int chan, float val);
-    float getInputRMS(int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked(chan)->get() : 0.0f; }
+    float getInputRMS (int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked (chan)->get() : 0.0f; }
     void setOutputRMS (int chan, float val);
-    float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
+    float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked (chan)->get() : 0.0f; }
 
     //=========================================================================
     /** Connect this node's output audio to another node's input audio */
@@ -227,7 +235,7 @@ public:
     void setEnabled (const bool shouldBeEnabled);
 
     /** Returns true if this node is enabled */
-    inline bool isEnabled()  const { return enabled.get() == 1; }
+    inline bool isEnabled() const { return enabled.get() == 1; }
 
     //=========================================================================
     inline void setKeyRange (const int low, const int high)
@@ -235,7 +243,8 @@ public:
         jassert (low <= high);
         jassert (isPositiveAndBelow (low, 128));
         jassert (isPositiveAndBelow (high, 128));
-        keyRangeLow.set (low); keyRangeHigh.set (high);
+        keyRangeLow.set (low);
+        keyRangeHigh.set (high);
     }
 
     inline void setKeyRange (const Range<int>& range) { setKeyRange (range.getStart(), range.getEnd()); }
@@ -258,20 +267,20 @@ public:
     File getMidiProgramFile (int program = -1) const;
 
     /** Returns true if this node should use global MIDI programs */
-    inline bool useGlobalMidiPrograms() const          { return globalMidiPrograms.get() == 1; }
+    inline bool useGlobalMidiPrograms() const { return globalMidiPrograms.get() == 1; }
 
     /** Change usage of global midi programs to on or off */
-    inline void setUseGlobalMidiPrograms (bool use)    { globalMidiPrograms.set (use ? 1 : 0); }
+    inline void setUseGlobalMidiPrograms (bool use) { globalMidiPrograms.set (use ? 1 : 0); }
 
     /** True if MIDI programs should be loaded when Program change messages
         are received */
-    inline bool areMidiProgramsEnabled() const         { return midiProgramsEnabled.get() == 1; }
+    inline bool areMidiProgramsEnabled() const { return midiProgramsEnabled.get() == 1; }
 
     /** Enable or disable changing midi programs */
-    inline void setMidiProgramsEnabled (bool enabled)  { midiProgramsEnabled.set (enabled ? 1 : 0); }
+    inline void setMidiProgramsEnabled (bool enabled) { midiProgramsEnabled.set (enabled ? 1 : 0); }
 
     /** Returns the active midi program */
-    inline int getMidiProgram() const                  { return midiProgram.get(); }
+    inline int getMidiProgram() const { return midiProgram.get(); }
 
     /** Sets the MIDI program, note that this won't load it */
     void setMidiProgram (const int program);
@@ -312,7 +321,7 @@ public:
 
     //=========================================================================
     inline virtual int getNumPrograms() const
-    { 
+    {
         if (auto* const proc = getAudioProcessor())
             return proc->getNumPrograms();
         return 1;
@@ -340,7 +349,7 @@ public:
 
     //=========================================================================
     void setMuted (bool muted);
-    bool isMuted() const        { return mute.get() == 1; }
+    bool isMuted() const { return mute.get() == 1; }
     void setMuteInput (bool shouldMuteInput) { muteInput.set (shouldMuteInput ? 1 : 0); }
     bool isMutingInputs() const { return muteInput.get() == 1; }
 
@@ -359,16 +368,16 @@ public:
 
     //=========================================================================
     /** Triggered when the enabled state changes */
-    Signal<void(NodeObject*)> enablementChanged;
+    Signal<void (NodeObject*)> enablementChanged;
 
     /** Triggered when the bypass state changes */
-    Signal<void(NodeObject*)> bypassChanged;
+    Signal<void (NodeObject*)> bypassChanged;
 
     /** Triggered when the current MIDI program changes */
     Signal<void()> midiProgramChanged;
 
     /** Triggered when the mute state changes */
-    Signal<void(NodeObject*)> muteChanged;
+    Signal<void (NodeObject*)> muteChanged;
 
     /** Triggered immediately before this node is removed from a graph */
     Signal<void()> willBeRemoved;
@@ -418,11 +427,11 @@ private:
     friend class GraphManager;
     friend class GraphNode;
     friend class Node;
-    
+
     kv::PortList ports;
     GraphNode* parent = nullptr;
     bool isPrepared = false;
-    
+
     Atomic<int> enabled { 1 };
     Atomic<int> bypassed { 0 };
     Atomic<int> mute { 0 };
@@ -436,8 +445,8 @@ private:
     ParameterArray parameters;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
-    OwnedArray<AtomicValue<float> > inRMS, outRMS;
-    
+    OwnedArray<AtomicValue<float>> inRMS, outRMS;
+
     Atomic<int> keyRangeLow { 0 };
     Atomic<int> keyRangeHigh { 127 };
     Atomic<int> transposeOffset { 0 };
@@ -451,18 +460,18 @@ private:
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
     {
-        EnablementUpdater (NodeObject& g) : graph (g) { }
-        ~EnablementUpdater() { }
+        EnablementUpdater (NodeObject& g) : graph (g) {}
+        ~EnablementUpdater() {}
         void handleAsyncUpdate() override;
         NodeObject& graph;
     } enablement;
 
     struct MidiProgramLoader : public AsyncUpdater
     {
-        MidiProgramLoader (NodeObject& n) : node (n) { }
+        MidiProgramLoader (NodeObject& n) : node (n) {}
         ~MidiProgramLoader() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
-        NodeObject& node;    
+        NodeObject& node;
     } midiProgramLoader;
 
     friend struct PortResetter;
@@ -471,7 +480,7 @@ private:
         PortResetter (NodeObject& n) : node (n) {}
         ~PortResetter() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
-        NodeObject& node;    
+        NodeObject& node;
     } portResetter;
 
     struct MidiProgram
@@ -504,4 +513,4 @@ private:
 /** A convenient typedef for referring to a pointer to a node object. */
 using NodeObjectPtr = ReferenceCountedObjectPtr<NodeObject>;
 
-}
+} // namespace Element

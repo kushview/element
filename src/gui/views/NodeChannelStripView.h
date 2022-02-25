@@ -32,10 +32,11 @@ public:
     void resized() override;
     void stabilizeContent() override;
     void initializeView (AppController&) override;
-    
+
 private:
-    class Content; friend class Content;
+    class Content;
+    friend class Content;
     std::unique_ptr<Content> content;
 };
 
-}
+} // namespace Element

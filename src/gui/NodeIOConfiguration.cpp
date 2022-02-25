@@ -22,26 +22,25 @@
 #include "gui/NodeIOConfiguration.h"
 #include "gui/MainWindow.h"
 
-namespace Element
-{
+namespace Element {
 
-class NumberedBoxes   : public TableListBox,
-                        private TableListBoxModel,
-                        private Button::Listener
+class NumberedBoxes : public TableListBox,
+                      private TableListBoxModel,
+                      private Button::Listener
 {
 public:
     struct Listener
     {
         virtual ~Listener() {}
 
-        virtual void addColumn()    = 0;
+        virtual void addColumn() = 0;
         virtual void removeColumn() = 0;
         virtual void columnSelected (int columnId) = 0;
     };
 
     enum
     {
-        plusButtonColumnId  = 128,
+        plusButtonColumnId = 128,
         minusButtonColumnId = 129
     };
 
@@ -90,12 +89,11 @@ public:
     }
 
 private:
-    int getNumRows() override                                             { return 1; }
-    void paintCell (Graphics&, int, int, int, int, bool) override         {}
-    void paintRowBackground (Graphics& g, int, int, int, bool) override   { g.fillAll (Colours::grey); }
+    int getNumRows() override { return 1; }
+    void paintCell (Graphics&, int, int, int, int, bool) override {}
+    void paintRowBackground (Graphics& g, int, int, int, bool) override { g.fillAll (Colours::grey); }
 
-    Component* refreshComponentForCell (int, int columnId, bool,
-                                        Component* existingComponentToUpdate) override
+    Component* refreshComponentForCell (int, int columnId, bool, Component* existingComponentToUpdate) override
     {
         auto* textButton = dynamic_cast<TextButton*> (existingComponentToUpdate);
 
@@ -103,8 +101,7 @@ private:
             textButton = new TextButton();
 
         textButton->setButtonText (getButtonName (columnId));
-        textButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight |
-                                       Button::ConnectedOnTop  | Button::ConnectedOnBottom);
+        textButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
 
         const bool isPlusMinusButton = (columnId == plusButtonColumnId || columnId == minusButtonColumnId);
 
@@ -129,8 +126,10 @@ private:
 
     String getButtonName (int columnId)
     {
-        if (columnId == plusButtonColumnId)  return "+";
-        if (columnId == minusButtonColumnId) return "-";
+        if (columnId == plusButtonColumnId)
+            return "+";
+        if (columnId == minusButtonColumnId)
+            return "-";
 
         return String (columnId);
     }
@@ -139,8 +138,10 @@ private:
     {
         auto text = btn->getButtonText();
 
-        if (text == "+") listener.addColumn();
-        if (text == "-") listener.removeColumn();
+        if (text == "+")
+            listener.addColumn();
+        if (text == "-")
+            listener.removeColumn();
     }
 
     void buttonStateChanged (Button* btn) override
@@ -158,10 +159,10 @@ private:
     bool canAddColumn, canRemoveColumn;
 };
 
-class NodeAudioBusesComponent::InputOutputConfig  : public Component,
-                                                        private ComboBox::Listener,
-                                                        private Button::Listener,
-                                                        private NumberedBoxes::Listener
+class NodeAudioBusesComponent::InputOutputConfig : public Component,
+                                                   private ComboBox::Listener,
+                                                   private Button::Listener,
+                                                   private NumberedBoxes::Listener
 {
 public:
     InputOutputConfig (NodeAudioBusesComponent& parent, bool direction)
@@ -238,10 +239,10 @@ private:
             for (int i = 0; i < n; ++i)
                 header.addColumn ("", i + 1, 40);
 
-            header.addColumn ("+", NumberedBoxes::plusButtonColumnId,  20);
+            header.addColumn ("+", NumberedBoxes::plusButtonColumnId, 20);
             header.addColumn ("-", NumberedBoxes::minusButtonColumnId, 20);
 
-            ioBuses.setCanAddColumn    (filter->canAddBus    (isInput));
+            ioBuses.setCanAddColumn (filter->canAddBus (isInput));
             ioBuses.setCanRemoveColumn (filter->canRemoveBus (isInput));
         }
 
@@ -258,7 +259,7 @@ private:
 
                 int i;
                 for (i = 1; i < AudioChannelSet::maxChannelsOfNamedLayout; ++i)
-                    if ((layouts.indexOfItemId(i) == -1) != bus->supportedLayoutWithChannels (i).isDisabled())
+                    if ((layouts.indexOfItemId (i) == -1) != bus->supportedLayoutWithChannels (i).isDisabled())
                         break;
 
                 // supported layouts have changed
@@ -275,18 +276,18 @@ private:
                     }
                 }
 
-                const auto& channelSet = isInput ? owner.currentLayout.inputBuses.getReference(currentBus)
-                                                 : owner.currentLayout.outputBuses.getReference(currentBus);
-                
+                const auto& channelSet = isInput ? owner.currentLayout.inputBuses.getReference (currentBus)
+                                                 : owner.currentLayout.outputBuses.getReference (currentBus);
+
                 layouts.setSelectedId (channelSet.size());
-                
+
                 const bool canBeDisabled = bus->isNumberOfChannelsSupported (0);
 
                 if (canBeDisabled != enabledToggle.isEnabled())
                     enabledToggle.setEnabled (canBeDisabled);
 
                 enabledToggle.setToggleState (bus->isEnabled(), NotificationType::dontSendNotification);
-            }            
+            }
         }
     }
 
@@ -315,7 +316,7 @@ private:
                     {
                         if (isPositiveAndBelow (selectedNumChannels, AudioChannelSet::maxChannelsOfNamedLayout))
                         {
-                            auto& currentSet = isInput ? owner.currentLayout.inputBuses 
+                            auto& currentSet = isInput ? owner.currentLayout.inputBuses
                                                        : owner.currentLayout.outputBuses;
                             currentSet.getReference (currentBus) = bus->supportedLayoutWithChannels (selectedNumChannels);
                             updateOthers();
@@ -329,7 +330,7 @@ private:
 
                             owner.update();
                         }
-                        #endif
+#endif
                     }
                 }
             }
@@ -443,9 +444,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputOutputConfig)
 };
 
-
-NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor* const p,
-                                                  ContentComponent* cc)
+NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor* const p, ContentComponent* cc)
     : AudioProcessorEditor (p),
       content (cc),
       node (n),
@@ -455,31 +454,30 @@ NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor*
     jassert (nullptr != n.getObject());
     jassert (p == n.getObject()->getAudioProcessor());
     currentLayout = p->getBusesLayout();
-    
+
     setOpaque (true);
 
     title.setFont (title.getFont().withStyle (Font::bold));
     addAndMakeVisible (title);
 
-    if (p->getBusCount (true)  > 0)// || p->canAddBus (true))
+    if (p->getBusCount (true) > 0) // || p->canAddBus (true))
         addAndMakeVisible (inConfig = new InputOutputConfig (*this, true));
 
-    if (p->getBusCount (false) > 0)// || p->canAddBus (false))
+    if (p->getBusCount (false) > 0) // || p->canAddBus (false))
         addAndMakeVisible (outConfig = new InputOutputConfig (*this, false));
 
-    
-    addAndMakeVisible(saveButton);
+    addAndMakeVisible (saveButton);
     saveButton.setButtonText ("Save");
     saveButton.addListener (this);
 
-    addAndMakeVisible(cancelButton);
+    addAndMakeVisible (cancelButton);
     cancelButton.setButtonText ("Cancel");
     cancelButton.addListener (this);
 
     setSize (400, (inConfig != nullptr && outConfig != nullptr ? 160 : 0) + 226);
 }
 
-NodeAudioBusesComponent::~NodeAudioBusesComponent() { }
+NodeAudioBusesComponent::~NodeAudioBusesComponent() {}
 
 void NodeAudioBusesComponent::buttonClicked (Button* b)
 {
@@ -499,13 +497,13 @@ void NodeAudioBusesComponent::buttonClicked (Button* b)
         }
     }
 
-    if (auto* co = findParentComponentOfClass<CallOutBox> ())
+    if (auto* co = findParentComponentOfClass<CallOutBox>())
         co->dismiss();
 }
 
 void NodeAudioBusesComponent::paint (Graphics& g)
 {
-     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 }
 
 void NodeAudioBusesComponent::resized()
@@ -521,7 +519,7 @@ void NodeAudioBusesComponent::resized()
 
     if (outConfig != nullptr)
         outConfig->setBounds (r.removeFromTop (160));
-    
+
     cancelButton.changeWidthToFitText (22);
     cancelButton.setBounds (r2.removeFromRight (cancelButton.getWidth()));
 
@@ -530,7 +528,7 @@ void NodeAudioBusesComponent::resized()
     saveButton.setBounds (r2.removeFromRight (saveButton.getWidth()));
 }
 
-void NodeAudioBusesComponent::update() { }
+void NodeAudioBusesComponent::update() {}
 
 int32 NodeAudioBusesComponent::getNodeId() const
 {
@@ -549,18 +547,18 @@ int32 NodeAudioBusesComponent::getNodeId() const
 
 ContentComponent* NodeAudioBusesComponent::getContentComponent()
 {
-   if (! content)
-   {
-       Component* comp;
-       for (int idx = 0; (comp = Desktop::getInstance().getComponent (idx)) != nullptr; ++idx)
-       {
-           if (auto* window = dynamic_cast<MainWindow*> (comp))
-               content = dynamic_cast<ContentComponent*> (window->getContentComponent());
-           if (content != nullptr)
-               break;
+    if (! content)
+    {
+        Component* comp;
+        for (int idx = 0; (comp = Desktop::getInstance().getComponent (idx)) != nullptr; ++idx)
+        {
+            if (auto* window = dynamic_cast<MainWindow*> (comp))
+                content = dynamic_cast<ContentComponent*> (window->getContentComponent());
+            if (content != nullptr)
+                break;
         }
-   }
-   return content;
+    }
+    return content;
 }
 
 GraphEditorComponent* NodeAudioBusesComponent::getGraphEditor() const
@@ -576,5 +574,4 @@ GraphNode* NodeAudioBusesComponent::getGraph() const
     return nullptr;
 }
 
-}
-
+} // namespace Element

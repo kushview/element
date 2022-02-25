@@ -26,7 +26,7 @@ namespace Element {
 
 class AppController;
 
-class ContentComponentPro :  public ContentComponent
+class ContentComponentPro : public ContentComponent
 {
 public:
     ContentComponentPro (AppController& app);
@@ -52,7 +52,8 @@ public:
     void applySessionState (const String&) override;
 
 private:
-    class Impl; std::unique_ptr<Impl> impl;
+    class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
-}
+} // namespace Element

@@ -23,14 +23,14 @@
 
 namespace Element {
 
-class CommandManager :  public ApplicationCommandManager
+class CommandManager : public ApplicationCommandManager
 {
 public:
-    CommandManager() { }
-    ~CommandManager() { }
+    CommandManager() {}
+    ~CommandManager() {}
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommandManager);
 };
 
-}
+} // namespace Element

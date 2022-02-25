@@ -35,8 +35,8 @@ namespace Element {
 static void buildCommandLine (CommandLine& cli, const String& c)
 {
     cli.fullScreen = c.contains ("--full-screen");
-    const var port = c.fromFirstOccurrenceOf("--port=", false, false)
-                      .upToFirstOccurrenceOf(" ", false, false);
+    const var port = c.fromFirstOccurrenceOf ("--port=", false, false)
+                         .upToFirstOccurrenceOf (" ", false, false);
     if (port.isInt() || port.isInt64())
         cli.port = (int) port;
 }
@@ -54,58 +54,58 @@ class Globals::Impl
 {
 public:
     Impl (Globals& g)
-        : owner (g) { }
-    
+        : owner (g) {}
+
     ~Impl() {}
 
     Globals& owner;
-    AudioEnginePtr                      engine;
-    SessionPtr                          session;
-    
-    std::unique_ptr<CommandManager>     commands;
-    std::unique_ptr<DeviceManager>      devices;
-    std::unique_ptr<MediaManager>       media;
-    std::unique_ptr<PluginManager>      plugins;
-    std::unique_ptr<Settings>           settings;
-    std::unique_ptr<MappingEngine>      mapping;
-    std::unique_ptr<PresetCollection>   presets;
-    std::unique_ptr<MidiEngine>         midi;
-    std::unique_ptr<ScriptingEngine>    lua;
-    std::unique_ptr<Log>                log;
+    AudioEnginePtr engine;
+    SessionPtr session;
+
+    std::unique_ptr<CommandManager> commands;
+    std::unique_ptr<DeviceManager> devices;
+    std::unique_ptr<MediaManager> media;
+    std::unique_ptr<PluginManager> plugins;
+    std::unique_ptr<Settings> settings;
+    std::unique_ptr<MappingEngine> mapping;
+    std::unique_ptr<PresetCollection> presets;
+    std::unique_ptr<MidiEngine> midi;
+    std::unique_ptr<ScriptingEngine> lua;
+    std::unique_ptr<Log> log;
 
 private:
     friend class Globals;
-    
+
     void init()
     {
-        log     .reset (new Log());
-        plugins .reset (new PluginManager());
-        devices .reset (new DeviceManager());
-        media   .reset (new MediaManager());
+        log.reset (new Log());
+        plugins.reset (new PluginManager());
+        devices.reset (new DeviceManager());
+        media.reset (new MediaManager());
         settings.reset (new Settings());
         commands.reset (new CommandManager());
-        mapping .reset (new MappingEngine());
-        midi    .reset (new MidiEngine());
-        presets .reset (new PresetCollection());
+        mapping.reset (new MappingEngine());
+        midi.reset (new MidiEngine());
+        presets.reset (new PresetCollection());
         session = new Session();
 
         lua.reset (new ScriptingEngine());
         lua->initialize (owner);
     }
-    
+
     void freeAll()
     {
         commands = nullptr;
-        plugins  = nullptr;
+        plugins = nullptr;
         settings = nullptr;
-        engine   = nullptr;
-        session  = nullptr;
-        media    = nullptr;
-        devices  = nullptr;
-        midi     = nullptr;
-        presets  = nullptr;
-        lua      = nullptr;
-        log      = nullptr;
+        engine = nullptr;
+        session = nullptr;
+        media = nullptr;
+        devices = nullptr;
+        midi = nullptr;
+        presets = nullptr;
+        lua = nullptr;
+        log = nullptr;
     }
 };
 
@@ -134,7 +134,7 @@ DeviceManager& Globals::getDeviceManager()
     return *impl->devices;
 }
 
-Log& Globals::getLog() 
+Log& Globals::getLog()
 {
     jassert (impl != nullptr && impl->log != nullptr);
     return *impl->log;
@@ -172,7 +172,7 @@ PluginManager& Globals::getPluginManager()
     return *impl->plugins;
 }
 
-PresetCollection& Globals::getPresetCollection() 
+PresetCollection& Globals::getPresetCollection()
 {
     jassert (impl->presets != nullptr);
     return *impl->presets;
@@ -194,8 +194,8 @@ void Globals::setEngine (AudioEnginePtr engine)
     if (impl->engine)
         impl->engine->deactivate();
     impl->engine = engine;
-    
+
     getDeviceManager().attach (engine);
 }
 
-}
+} // namespace Element

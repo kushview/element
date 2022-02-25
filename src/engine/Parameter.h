@@ -155,22 +155,22 @@ public:
 
     enum Category
     {
-        genericParameter = (0 << 16) | 0,        /** If your parameter is not a meter then you should use this category */
+        genericParameter = (0 << 16) | 0, /** If your parameter is not a meter then you should use this category */
 
-        inputGain        = (1 << 16) | 0,        /** Currently not used */
-        outputGain       = (1 << 16) | 1,
+        inputGain = (1 << 16) | 0, /** Currently not used */
+        outputGain = (1 << 16) | 1,
 
         /** The following categories tell the host that this parameter is a meter level value
             and therefore read-only. Most hosts will display these type of parameters as
             a meter in the generic view of your plug-in. Pro-Tools will also show the meter
             in the mixer view.
         */
-        inputMeter                          = (2 << 16) | 0,
-        outputMeter                         = (2 << 16) | 1,
+        inputMeter = (2 << 16) | 0,
+        outputMeter = (2 << 16) | 1,
         compressorLimiterGainReductionMeter = (2 << 16) | 2,
-        expanderGateGainReductionMeter      = (2 << 16) | 3,
-        analysisMeter                       = (2 << 16) | 4,
-        otherMeter                          = (2 << 16) | 5
+        expanderGateGainReductionMeter = (2 << 16) | 3,
+        analysisMeter = (2 << 16) | 4,
+        otherMeter = (2 << 16) | 5
     };
 
     /** Returns the parameter's category. */
@@ -240,7 +240,7 @@ public:
     {
     public:
         /** Destructor. */
-        virtual ~Listener()  = default;
+        virtual ~Listener() = default;
 
         /** Receives a callback when a parameter has been changed.
 
@@ -297,9 +297,9 @@ private:
     Array<Listener*> listeners;
     mutable StringArray valueStrings;
 
-   #if JUCE_DEBUG
+#if JUCE_DEBUG
     bool isPerformingGesture = false;
-   #endif
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Parameter)
 };
@@ -314,20 +314,20 @@ public:
     ControlPortParameter (const kv::PortDescription&);
     ~ControlPortParameter();
 
-    int getPortIndex() const noexcept override      { return port.index; }
+    int getPortIndex() const noexcept override { return port.index; }
     int getParameterIndex() const noexcept override { return port.channel; }
-    Category getCategory() const override           { return Parameter::genericParameter; }
+    Category getCategory() const override { return Parameter::genericParameter; }
 
-    float getValue() const override                 { return range.convertTo0to1 (value); }
-    void setValue (float newValue) override         { value = range.convertFrom0to1 (newValue); }
-    float getDefaultValue() const override          { return range.convertTo0to1 (port.defaultValue); }
-    
-    String getName (int maxLength) const override   { return port.name.substring (0, maxLength); }
-    String getLabel() const override                { return {}; }
+    float getValue() const override { return range.convertTo0to1 (value); }
+    void setValue (float newValue) override { value = range.convertFrom0to1 (newValue); }
+    float getDefaultValue() const override { return range.convertTo0to1 (port.defaultValue); }
+
+    String getName (int maxLength) const override { return port.name.substring (0, maxLength); }
+    String getLabel() const override { return {}; }
     String getText (float normalisedValue, int maxLength) const override;
-    
+
     float getValueForText (const String& text) const override { return convertTo0to1 (text.getFloatValue()); }
-    
+
     void setPort (const kv::PortDescription& newPort, bool preserveValue = false);
     kv::PortDescription getPort() const { return port; }
     int getPortChannel() const { return port.channel; }
@@ -373,7 +373,7 @@ public:
 
 private:
     //==============================================================================
-  
+
     void controlValueChanged (int, float) override
     {
         parameterValueHasChanged = 1;
@@ -402,4 +402,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
 };
 
-}
+} // namespace Element

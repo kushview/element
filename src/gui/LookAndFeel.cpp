@@ -26,48 +26,48 @@ namespace Element {
 LookAndFeel::LookAndFeel()
 {
     // Element Colors
-    setColour (Style::backgroundColorId,            Colour (0xff16191a));
-    setColour (Style::backgroundHighlightColorId,   Colour (0xffcccccc).darker(0.6000006).withAlpha(0.6f));
+    setColour (Style::backgroundColorId, Colour (0xff16191a));
+    setColour (Style::backgroundHighlightColorId, Colour (0xffcccccc).darker (0.6000006).withAlpha (0.6f));
 
-    setColour (Style::widgetBackgroundColorId,      Colour (0xff3b3b3b));
-    setColour (Style::contentBackgroundColorId,     Colour (0xff3b3b3b).darker (0.6));
+    setColour (Style::widgetBackgroundColorId, Colour (0xff3b3b3b));
+    setColour (Style::contentBackgroundColorId, Colour (0xff3b3b3b).darker (0.6));
 
-    setColour (Style::textColorId,                  Colour (0xffcccccc));
-    setColour (Style::textActiveColorId,            Colour (0xffe5e5e5));
-    setColour (Style::textBoldColorId,              Colour (0xffe4e4e4));
+    setColour (Style::textColorId, Colour (0xffcccccc));
+    setColour (Style::textActiveColorId, Colour (0xffe5e5e5));
+    setColour (Style::textBoldColorId, Colour (0xffe4e4e4));
 
     // setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
     // setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
 
     // Property Component
-    setColour (PropertyComponent::labelTextColourId,  LookAndFeel::textColor);
-    setColour (PropertyComponent::backgroundColourId, LookAndFeel::backgroundColor.brighter(0.02));
-    
+    setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
+    setColour (PropertyComponent::backgroundColourId, LookAndFeel::backgroundColor.brighter (0.02));
+
     // // Text Editor
     // setColour (TextEditor::textColourId,            textColor);
     // setColour (TextEditor::highlightColourId,       Colors::elemental.brighter (0.31f));
     // setColour (TextEditor::highlightedTextColourId, Colours::black.brighter(0.22f));
     // setColour (TextEditor::outlineColourId,         Colours::black);
     // setColour (TextEditor::focusedOutlineColourId,  Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
-    
-    setColour (Label::textWhenEditingColourId,      findColour(TextEditor::textColourId).darker (0.003));
 
-    setColour (TextPropertyComponent::outlineColourId,      findColour (TextEditor::outlineColourId));
-    setColour (TextPropertyComponent::backgroundColourId,   findColour (TextEditor::backgroundColourId));
-    setColour (TextPropertyComponent::textColourId,         findColour (TextEditor::textColourId));
+    setColour (Label::textWhenEditingColourId, findColour (TextEditor::textColourId).darker (0.003));
+
+    setColour (TextPropertyComponent::outlineColourId, findColour (TextEditor::outlineColourId));
+    setColour (TextPropertyComponent::backgroundColourId, findColour (TextEditor::backgroundColourId));
+    setColour (TextPropertyComponent::textColourId, findColour (TextEditor::textColourId));
 
     setColour (ToggleButton::textColourId, textColor);
-    
+
     // Boolean property comp
-    setColour (BooleanPropertyComponent::backgroundColourId,    findColour (TextEditor::backgroundColourId));
-    setColour (BooleanPropertyComponent::outlineColourId,       Colours::black);
+    setColour (BooleanPropertyComponent::backgroundColourId, findColour (TextEditor::backgroundColourId));
+    setColour (BooleanPropertyComponent::outlineColourId, Colours::black);
 
     // Setting Button
     setColour (SettingButton::backgroundColourId, widgetBackgroundColor.brighter());
     setColour (SettingButton::backgroundOnColourId, Colors::toggleOrange);
     setColour (SettingButton::textColourId, Colours::black);
     setColour (SettingButton::textDisabledColourId, Colours::darkgrey);
-    
+
     // MIDI Blinkers
     setColour (MidiBlinker::backgroundColourId, findColour (SettingButton::backgroundColourId));
     setColour (MidiBlinker::outlineColourId, LookAndFeel::widgetBackgroundColor.brighter().brighter());
@@ -75,7 +75,7 @@ LookAndFeel::LookAndFeel()
     // Tree View
     setColour (TreeView::selectedItemBackgroundColourId, Colors::elemental.darker (0.6000006f));
     setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);
-    
+
     // Keymap Editor
     setColour (KeyMappingEditorComponent::textColourId, LookAndFeel::textColor);
     setColour (KeyMappingEditorComponent::backgroundColourId, findColour (TreeView::backgroundColourId));
@@ -111,22 +111,22 @@ LookAndFeel::LookAndFeel()
     setColour (ToggleButton::tickColourId, Colors::toggleBlue.darker());
 
     // rotary
-    setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker(0.3));
+    setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker (0.3));
 
     // Scrollbar
     setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.25f));
 
     // code editor. TODO
-    setColour (CodeEditorComponent::backgroundColourId,     findColour (Style::widgetBackgroundColorId).darker (0.6));
-    setColour (CodeEditorComponent::highlightColourId,      Colour(0xff1b5381));
-    setColour (CodeEditorComponent::defaultTextColourId,    Colour(0xffc4c4c4));
+    setColour (CodeEditorComponent::backgroundColourId, findColour (Style::widgetBackgroundColorId).darker (0.6));
+    setColour (CodeEditorComponent::highlightColourId, Colour (0xff1b5381));
+    setColour (CodeEditorComponent::defaultTextColourId, Colour (0xffc4c4c4));
     setColour (CodeEditorComponent::lineNumberBackgroundId, findColour (Style::widgetBackgroundColorId).darker (0.55));
-    setColour (CodeEditorComponent::lineNumberTextId,       Colour(0xff555555));
+    setColour (CodeEditorComponent::lineNumberTextId, Colour (0xff555555));
 }
 //==============================================================================
 Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
 {
-   #if JUCE_LINUX
+#if JUCE_LINUX
     if (font.getTypefaceName() == Font::getDefaultSansSerifFontName())
     {
         Font f (font);
@@ -136,7 +136,10 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
             const auto names = Font::findAllTypefaceNames();
             for (const auto& name : possible)
                 if (names.contains (name))
-                    { defaultSansSerifName = name; break; }
+                {
+                    defaultSansSerifName = name;
+                    break;
+                }
             if (defaultSansSerifName.isEmpty())
                 defaultSansSerifName = names[0];
         }
@@ -153,7 +156,10 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
             const auto names = Font::findAllTypefaceNames();
             for (const auto& name : possible)
                 if (names.contains (name))
-                    { defaultSansSerifName = name; break; }
+                {
+                    defaultSansSerifName = name;
+                    break;
+                }
             if (defaultMonospaceName.isEmpty())
                 defaultMonospaceName = names[0];
         }
@@ -162,7 +168,7 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
         f.setTypefaceStyle ("Regular");
         return Typeface::createSystemTypefaceFor (f);
     }
-   #endif
+#endif
     return LookAndFeel_V2::getTypefaceForFont (font);
 }
 
@@ -172,8 +178,7 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
 int LookAndFeel::getDefaultScrollbarWidth() { return 12; }
 
 //
-void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
-                                    const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
+void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
 {
     const float radius = jmin (width / 2, height / 2) - 2.0f;
     const float centreX = x + width * 0.5f;
@@ -202,9 +207,7 @@ void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int he
         {
             const float innerRadius = radius * 0.2f;
             Path p;
-            p.addTriangle (-innerRadius, 0.0f,
-                           0.0f, -radius * thickness * 1.1f,
-                           innerRadius, 0.0f);
+            p.addTriangle (-innerRadius, 0.0f, 0.0f, -radius * thickness * 1.1f, innerRadius, 0.0f);
 
             p.addEllipse (-innerRadius, -innerRadius, innerRadius * 2.0f, innerRadius * 2.0f);
 
@@ -343,9 +346,7 @@ Font LookAndFeel::getAlertWindowFont()           { return { 13.0f }; }
 
 // MARK: Concertina Panel
 
-void LookAndFeel::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
-                                             bool isMouseOver, bool isMouseDown,
-                                             ConcertinaPanel& panel, Component& comp)
+void LookAndFeel::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area, bool isMouseOver, bool isMouseDown, ConcertinaPanel& panel, Component& comp)
 {
     g.setColour (Colour (0xff323232));
     Rectangle<int> r (area.withSizeKeepingCentre (area.getWidth(), area.getHeight() - 2));
@@ -366,9 +367,7 @@ Font LookAndFeel::getLabelFont (Label& label)
 }
 
 //==============================================================================
-void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
-                                   int width, int height, double progress, 
-                                   const String& textToShow)
+void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar, int width, int height, double progress, const String& textToShow)
 {
     LookAndFeel_KV1::drawProgressBar (g, progressBar, width, height, progress, textToShow);
 }
@@ -377,8 +376,7 @@ void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
 
 Path LookAndFeel::getTickShape (float height)
 {
-    static const unsigned char pathData[] = { 110,109,32,210,202,64,126,183,148,64,108,39,244,247,64,245,76,124,64,108,178,131,27,65,246,76,252,64,108,175,242,4,65,246,76,252,
-        64,108,236,5,68,65,0,0,160,180,108,240,150,90,65,21,136,52,63,108,48,59,16,65,0,0,32,65,108,32,210,202,64,126,183,148,64, 99,101,0,0 };
+    static const unsigned char pathData[] = { 110, 109, 32, 210, 202, 64, 126, 183, 148, 64, 108, 39, 244, 247, 64, 245, 76, 124, 64, 108, 178, 131, 27, 65, 246, 76, 252, 64, 108, 175, 242, 4, 65, 246, 76, 252, 64, 108, 236, 5, 68, 65, 0, 0, 160, 180, 108, 240, 150, 90, 65, 21, 136, 52, 63, 108, 48, 59, 16, 65, 0, 0, 32, 65, 108, 32, 210, 202, 64, 126, 183, 148, 64, 99, 101, 0, 0 };
 
     Path path;
     path.loadPathFromData (pathData, sizeof (pathData));
@@ -389,9 +387,7 @@ Path LookAndFeel::getTickShape (float height)
 
 Path LookAndFeel::getCrossShape (float height)
 {
-    static const unsigned char pathData[] = { 110,109,51,51,255,66,0,0,0,0,108,205,204,13,67,51,51,99,65,108,0,0,170,66,205,204,141,66,108,51,179,13,67,52,51,255,66,108,0,0,255,
-        66,205,204,13,67,108,205,204,141,66,0,0,170,66,108,52,51,99,65,51,179,13,67,108,0,0,0,0,51,51,255,66,108,205,204,98,66, 204,204,141,66,108,0,0,0,0,51,51,99,65,108,51,51,
-        99,65,0,0,0,0,108,205,204,141,66,205,204,98,66,108,51,51,255,66,0,0,0,0,99,101,0,0 };
+    static const unsigned char pathData[] = { 110, 109, 51, 51, 255, 66, 0, 0, 0, 0, 108, 205, 204, 13, 67, 51, 51, 99, 65, 108, 0, 0, 170, 66, 205, 204, 141, 66, 108, 51, 179, 13, 67, 52, 51, 255, 66, 108, 0, 0, 255, 66, 205, 204, 13, 67, 108, 205, 204, 141, 66, 0, 0, 170, 66, 108, 52, 51, 99, 65, 51, 179, 13, 67, 108, 0, 0, 0, 0, 51, 51, 255, 66, 108, 205, 204, 98, 66, 204, 204, 141, 66, 108, 0, 0, 0, 0, 51, 51, 99, 65, 108, 51, 51, 99, 65, 0, 0, 0, 0, 108, 205, 204, 141, 66, 205, 204, 98, 66, 108, 51, 51, 255, 66, 0, 0, 0, 0, 99, 101, 0, 0 };
 
     Path path;
     path.loadPathFromData (pathData, sizeof (pathData));
@@ -400,19 +396,12 @@ Path LookAndFeel::getCrossShape (float height)
     return path;
 }
 
-void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button,
-                                       bool shouldDrawButtonAsHighlighted,
-                                       bool shouldDrawButtonAsDown)
+void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto fontSize = jmin (13.0f, button.getHeight() * 0.75f);
     auto tickWidth = fontSize * 1.1f;
 
-    drawTickBox (g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f,
-                 tickWidth, tickWidth,
-                 button.getToggleState(),
-                 button.isEnabled(),
-                 shouldDrawButtonAsHighlighted,
-                 shouldDrawButtonAsDown);
+    drawTickBox (g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f, tickWidth, tickWidth, button.getToggleState(), button.isEnabled(), shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
 
     g.setColour (button.findColour (ToggleButton::textColourId));
     g.setFont (fontSize);
@@ -421,17 +410,12 @@ void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button,
         g.setOpacity (0.5f);
 
     g.drawFittedText (button.getButtonText(),
-                      button.getLocalBounds().withTrimmedLeft (roundToInt (tickWidth) + 10)
-                                             .withTrimmedRight (2),
-                      Justification::centredLeft, 10);
+                      button.getLocalBounds().withTrimmedLeft (roundToInt (tickWidth) + 10).withTrimmedRight (2),
+                      Justification::centredLeft,
+                      10);
 }
 
-void LookAndFeel::drawTickBox (Graphics& g, Component& component,
-                                float x, float y, float w, float h,
-                                const bool ticked,
-                                const bool isEnabled,
-                                const bool shouldDrawButtonAsHighlighted,
-                                const bool shouldDrawButtonAsDown)
+void LookAndFeel::drawTickBox (Graphics& g, Component& component, float x, float y, float w, float h, const bool ticked, const bool isEnabled, const bool shouldDrawButtonAsHighlighted, const bool shouldDrawButtonAsDown)
 {
     ignoreUnused (isEnabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
 
@@ -458,24 +442,22 @@ void LookAndFeel::changeToggleButtonWidthToFitText (ToggleButton& button)
     button.setSize (font.getStringWidth (button.getButtonText()) + roundToInt (tickWidth) + 14, button.getHeight());
 }
 
-
 // MARK: Property Panel
 
-void LookAndFeel::drawPropertyPanelSectionHeader (Graphics& g, const String& name,
-                                                  bool isOpen, int width, int height)
+void LookAndFeel::drawPropertyPanelSectionHeader (Graphics& g, const String& name, bool isOpen, int width, int height)
 {
-    String text = isOpen ? " - " : " + "; text << name;
+    String text = isOpen ? " - " : " + ";
+    text << name;
     g.setColour (isOpen ? LookAndFeel::textBoldColor : LookAndFeel::textColor);
     g.drawText (text, 0, 0, width, height, Justification::centredLeft);
 }
-    
-void LookAndFeel::drawPropertyComponentBackground (Graphics& g, int width, int height,
-                                                   PropertyComponent& pc)
+
+void LookAndFeel::drawPropertyComponentBackground (Graphics& g, int width, int height, PropertyComponent& pc)
 {
     const auto r = getPropertyComponentContentPosition (pc);
     g.setColour (widgetBackgroundColor.darker (0.0015));
     g.fillRect (0, 0, r.getX(), height - 1);
-    
+
     g.setColour (pc.findColour (PropertyComponent::backgroundColourId));
     g.fillRect (r.getX(), 0, width - r.getX(), height - 1);
 }
@@ -484,25 +466,28 @@ static int getPropertyComponentIndent (PropertyComponent& component)
 {
     return jmin (10, component.getWidth() / 10);
 }
-    
-void LookAndFeel::drawPropertyComponentLabel (Graphics& g, int width, int height,
-                                              PropertyComponent& component)
+
+void LookAndFeel::drawPropertyComponentLabel (Graphics& g, int width, int height, PropertyComponent& component)
 {
     ignoreUnused (width);
-    
+
     const auto indent = getPropertyComponentIndent (component);
-    
+
     g.setColour (component.findColour (PropertyComponent::labelTextColourId)
-                 .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
-    
+                     .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
+
     // g.setFont (jmin (height, 24) * 0.65f);
     g.setFont (12.5f);
 
     auto r = getPropertyComponentContentPosition (component);
-    
+
     g.drawFittedText (component.getName(),
-                      indent, r.getY(), r.getX() - 5, r.getHeight(),
-                      Justification::centredLeft, 2);
+                      indent,
+                      r.getY(),
+                      r.getX() - 5,
+                      r.getHeight(),
+                      Justification::centredLeft,
+                      2);
 }
 
 Rectangle<int> LookAndFeel::getPropertyComponentContentPosition (PropertyComponent& component)
@@ -512,10 +497,9 @@ Rectangle<int> LookAndFeel::getPropertyComponentContentPosition (PropertyCompone
 }
 
 // MARK: Treeview
-void LookAndFeel::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float> &area,
-                                            Colour backgroundColour, bool isOpen, bool isMouseOver)
+void LookAndFeel::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float>& area, Colour backgroundColour, bool isOpen, bool isMouseOver)
 {
     LookAndFeel_KV1::drawTreeviewPlusMinusBox (g, area, backgroundColour, isOpen, isMouseOver);
 }
 
-}
+} // namespace Element

@@ -44,16 +44,16 @@ private:
     class SignalLabel : public Label
     {
     public:
-        SignalLabel() { }
-        ~SignalLabel() { }
-        
+        SignalLabel() {}
+        ~SignalLabel() {}
+
         inline void mouseDoubleClick (const MouseEvent& ev) override
-        { 
+        {
             if (onDoubleClicked)
                 onDoubleClicked (ev);
         }
 
-        std::function<void(const MouseEvent&)> onDoubleClicked;
+        std::function<void (const MouseEvent&)> onDoubleClicked;
     };
 
     PropertyPanel props;
@@ -62,4 +62,4 @@ private:
     void updateMidiProgram();
 };
 
-}
+} // namespace Element

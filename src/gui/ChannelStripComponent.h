@@ -60,9 +60,9 @@ public:
             muteChanged();
     }
 
-    inline bool isPowerOn()    const { return mute.getToggleState(); }
-    inline bool isPowerOff()   const { return ! isPowerOn(); }
-    inline bool isMuted()      const { return mute2.getToggleState(); }
+    inline bool isPowerOn() const { return mute.getToggleState(); }
+    inline bool isPowerOff() const { return ! isPowerOn(); }
+    inline bool isMuted() const { return mute2.getToggleState(); }
 
     inline void setMuteButtonVisible (bool visible)
     {
@@ -90,12 +90,12 @@ public:
     void sliderValueChanged (Slider* slider) override;
     void sliderDragStarted (Slider*) override {}
     void sliderDragEnded (Slider*) override {}
-    
-    Signal<void(double)> volumeChanged;
+
+    Signal<void (double)> volumeChanged;
     Signal<void()> powerChanged;
     Signal<void()> muteChanged;
     Signal<void()> volumeLabelDoubleClicked;
-    
+
 private:
     Slider fader;
     DigitalMeter meter;
@@ -108,13 +108,13 @@ private:
         ~VolumeLabel();
         void settingLabelDoubleClicked() override;
     } volume;
-    
+
     PowerButton mute;
     SettingButton mute2;
 
     OwnedArray<Component> extraButtons;
-    
+
     void stabilizeContent();
 };
 
-}
+} // namespace Element

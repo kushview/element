@@ -49,8 +49,8 @@ public:
         }
     };
 
-    PresetCollection() { }
-    ~PresetCollection() { }
+    PresetCollection() {}
+    ~PresetCollection() {}
 
     inline void clear()
     {
@@ -73,8 +73,9 @@ public:
     inline void refresh()
     {
         clear();
-        
-        StringArray files; path.findPresetFiles (files);
+
+        StringArray files;
+        path.findPresetFiles (files);
         for (const auto& filename : files)
         {
             const File file (filename);
@@ -83,12 +84,12 @@ public:
             {
                 std::unique_ptr<PresetDescription> item;
                 item.reset (new PresetDescription());
-                item->file          = file;
-                item->name          = node.getName();
+                item->file = file;
+                item->name = node.getName();
                 if (item->name.isEmpty())
                     item->name = file.getFileNameWithoutExtension();
-                item->format        = node.getFormat();
-                item->identifier    = node.getIdentifier();
+                item->format = node.getFormat();
+                item->identifier = node.getIdentifier();
                 if (item->format.isEmpty() || item->identifier.isEmpty())
                     continue;
 
@@ -104,4 +105,4 @@ private:
     OwnedArray<PresetDescription> presets;
 };
 
-}
+} // namespace Element

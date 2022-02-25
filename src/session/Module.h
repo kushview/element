@@ -32,33 +32,32 @@ class Module
 public:
     static inline const char* extension()
     {
-        #if __APPLE__
-         static const std::string ext = ".dylib";
-        #elif _MSC_VER
-         static const char* ext = ".dll";
-        #else
-         static const char* ext = ".so";
-        #endif
+#if __APPLE__
+        static const std::string ext = ".dylib";
+#elif _MSC_VER
+        static const char* ext = ".dll";
+#else
+        static const char* ext = ".so";
+#endif
         return ext;
     }
 
-    Module() : library (nullptr) { }
-    virtual ~Module() { }
+    Module() : library (nullptr) {}
+    virtual ~Module() {}
 
     virtual void load (WorldData*) = 0;
-    virtual void unload() { }
-    virtual void run (WorldData*) { }
+    virtual void unload() {}
+    virtual void run (WorldData*) {}
 
     ModuleLibrary library;
 };
 
-}
+} // namespace Element
 
 extern "C" {
 
-    /** Entry point for element modules */
-    Element::Module* element_module_load();
-
+/** Entry point for element modules */
+Element::Module* element_module_load();
 }
 
 #endif // ELEMENT_MODULE_H

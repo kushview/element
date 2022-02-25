@@ -22,16 +22,19 @@
 #include "ElementApp.h"
 #include "session/Node.h"
 
-#define EL_OBJECT_GETTER(a,b) inline const var& get##a () const { return objectData.getProperty(b); }
-#define EL_OBJECT_SETTER(a,b) inline void set##a (const var& value) { objectData.setProperty (b, value, nullptr); }
-#define EL_OBJECT_GETTER_AND_SETTER(a,b) EL_OBJECT_GETTER(a,b) EL_OBJECT_SETTER(a,b)
+#define EL_OBJECT_GETTER(a, b) \
+    inline const var& get##a() const { return objectData.getProperty (b); }
+#define EL_OBJECT_SETTER(a, b) \
+    inline void set##a (const var& value) { objectData.setProperty (b, value, nullptr); }
+#define EL_OBJECT_GETTER_AND_SETTER(a, b) EL_OBJECT_GETTER (a, b) \
+EL_OBJECT_SETTER (a, b)
 
 namespace Element {
 
 class ControllerDevice : public ObjectModel
 {
 public:
-    enum ControlToggleMode 
+    enum ControlToggleMode
     {
         EqualsOrHigher = 0,
         Equals
@@ -40,8 +43,8 @@ public:
     class Control : public ObjectModel
     {
     public:
-        explicit Control (const ValueTree& data = ValueTree()) 
-            : ObjectModel (data) 
+        explicit Control (const ValueTree& data = ValueTree())
+            : ObjectModel (data)
         {
             if (data.isValid())
                 setMissingProperties();
@@ -53,24 +56,24 @@ public:
             setName (name);
             setMissingProperties();
         }
-        
-        ~Control() noexcept { }
+
+        ~Control() noexcept {}
 
         bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::control); }
 
-        EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name);
-        EL_OBJECT_GETTER(ControlType, Tags::type);
+        EL_OBJECT_GETTER_AND_SETTER (Name, Tags::name);
+        EL_OBJECT_GETTER (ControlType, Tags::type);
 
         MidiMessage getMappingData() const
         {
             jassertfalse; // don't use this !
             return getMidiMessage();
         }
-        
+
         MidiMessage getMidiMessage() const
         {
             MidiMessage midi;
-            
+
             if (isNoteEvent())
             {
                 midi = MidiMessage::noteOn (1, getEventId(), (uint8) 64);
@@ -83,17 +86,17 @@ public:
             return midi;
         }
 
-        bool isNoteEvent() const        { return getProperty("eventType").toString() == "note"; }
-        bool isControllerEvent() const  { return getProperty("eventType").toString() == "controller"; }
-        int getEventId() const          { return (int)  getProperty ("eventId", 0); }
-        
-        bool isMomentary() const        { return (bool) getProperty ("momentary", false); }
-        Value getMomentaryValue()       { return getPropertyAsValue ("momentary"); }
-        int getToggleValue() const      { return (int)  getProperty ("toggleValue", 0); }
-        Value getToggleValueObject()    { return getPropertyAsValue ("toggleValue"); }
-        bool inverseToggle() const      { return (bool) getProperty ("inverseToggle", false); }
-        Value getInverseToggleObject()  { return getPropertyAsValue ("inverseToggle"); }
-        
+        bool isNoteEvent() const { return getProperty ("eventType").toString() == "note"; }
+        bool isControllerEvent() const { return getProperty ("eventType").toString() == "controller"; }
+        int getEventId() const { return (int) getProperty ("eventId", 0); }
+
+        bool isMomentary() const { return (bool) getProperty ("momentary", false); }
+        Value getMomentaryValue() { return getPropertyAsValue ("momentary"); }
+        int getToggleValue() const { return (int) getProperty ("toggleValue", 0); }
+        Value getToggleValueObject() { return getPropertyAsValue ("toggleValue"); }
+        bool inverseToggle() const { return (bool) getProperty ("inverseToggle", false); }
+        Value getInverseToggleObject() { return getPropertyAsValue ("inverseToggle"); }
+
         static ControllerDevice::ControlToggleMode getToggleMode (const String& str)
         {
             if (str == "eqorhi")
@@ -104,7 +107,7 @@ public:
         }
         ControllerDevice::ControlToggleMode getToggleMode() const
         {
-            return getToggleMode (getProperty("toggleMode").toString());
+            return getToggleMode (getProperty ("toggleMode").toString());
         }
         Value getToggleModeObject() { return getPropertyAsValue ("toggleMode"); }
 
@@ -114,7 +117,7 @@ public:
             return device;
         }
 
-        String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
+        String getUuidString() const { return objectData.getProperty (Tags::uuid).toString(); }
 
     private:
         MidiMessage getMappingDataLegacy() const
@@ -130,7 +133,7 @@ public:
         {
             stabilizePropertyString (Tags::name, "Control");
             stabilizePropertyString (Tags::uuid, Uuid().toString());
-            
+
             if (hasProperty (Tags::mappingData))
             {
                 const auto midi = getMappingDataLegacy();
@@ -159,13 +162,13 @@ public:
 
     explicit ControllerDevice (const ValueTree& data = ValueTree());
     ControllerDevice (const String& name);
-    virtual ~ControllerDevice() { }
+    virtual ~ControllerDevice() {}
 
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::controller); }
 
-    EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name)
-    EL_OBJECT_GETTER(InputDevice, "inputDevice")
-    inline String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
+    EL_OBJECT_GETTER_AND_SETTER (Name, Tags::name)
+    EL_OBJECT_GETTER (InputDevice, "inputDevice")
+    inline String getUuidString() const { return objectData.getProperty (Tags::uuid).toString(); }
 
     inline int getNumControls() const { return getNumChildren(); }
     inline Control getControl (const int index) const
@@ -175,7 +178,8 @@ public:
     }
 
     inline int indexOf (const ObjectModel& model) const { return objectData.indexOf (model.getValueTree()); }
-    inline int indexOf (const Identifier& childType, const ObjectModel& model) const {
+    inline int indexOf (const Identifier& childType, const ObjectModel& model) const
+    {
         return objectData.getChildWithName (childType).indexOf (model.getValueTree());
     }
 
@@ -192,11 +196,10 @@ private:
 class ControllerMap : public ObjectModel
 {
 public:
-
-    explicit ControllerMap (const ValueTree& data = ValueTree()) : ObjectModel (data) { }
-    ~ControllerMap() noexcept { }
+    explicit ControllerMap (const ValueTree& data = ValueTree()) : ObjectModel (data) {}
+    ~ControllerMap() noexcept {}
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::map); }
-    inline int getParameterIndex() const  { return (int) objectData.getProperty (Tags::parameter, -1); }
+    inline int getParameterIndex() const { return (int) objectData.getProperty (Tags::parameter, -1); }
 };
 
-}
+} // namespace Element

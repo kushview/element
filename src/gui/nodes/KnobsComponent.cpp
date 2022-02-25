@@ -26,8 +26,7 @@ namespace Element {
 
 KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> paramLambda)
 {
-    auto setupSlider = [=] (AudioParameterFloat* param, String suffix = {})
-    {
+    auto setupSlider = [=] (AudioParameterFloat* param, String suffix = {}) {
         Slider* newSlider = new Slider;
 
         // set slider style
@@ -43,11 +42,10 @@ KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> para
         newSlider->setRange (Range<double> ((double) param->range.getRange().getStart(), (double) param->range.getRange().getEnd()), 0.01);
         newSlider->setSkewFactor ((double) param->range.skew);
         newSlider->setValue ((double) *param, dontSendNotification);
-        newSlider->setDoubleClickReturnValue (true, param->convertFrom0to1
-        (dynamic_cast<AudioProcessorParameterWithID*> (param)->getDefaultValue()));
+        newSlider->setDoubleClickReturnValue (true, param->convertFrom0to1 (dynamic_cast<AudioProcessorParameterWithID*> (param)->getDefaultValue()));
         newSlider->onDragStart = [param] { param->beginChangeGesture(); };
         newSlider->onDragEnd = [param] { param->endChangeGesture(); };
-        newSlider->onValueChange = [=] { 
+        newSlider->onValueChange = [=] {
             param->setValueNotifyingHost (param->convertTo0to1 ((float) newSlider->getValue()));
             paramLambda();
         };
@@ -55,8 +53,7 @@ KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> para
         sliders.add (newSlider);
     };
 
-    auto setupBox = [=] (AudioParameterChoice* param)
-    {
+    auto setupBox = [=] (AudioParameterChoice* param) {
         ComboBox* newBox = new ComboBox;
 
         addAndMakeVisible (newBox);
@@ -103,8 +100,7 @@ void KnobsComponent::paint (Graphics& g)
     // Print names for sliders and combo boxes
     g.setColour (Colours::white);
     const int height = 20;
-    auto makeName = [this, &g, height] (const Component& comp, String name)
-    {
+    auto makeName = [this, &g, height] (const Component& comp, String name) {
         Rectangle<int> nameBox (comp.getX(), 2, comp.getWidth(), height);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
@@ -137,4 +133,4 @@ void KnobsComponent::resized()
     }
 }
 
-}
+} // namespace Element

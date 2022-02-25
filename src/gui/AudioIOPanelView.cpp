@@ -24,12 +24,11 @@ using namespace Element;
 
 #include "AudioIOPanelView.h"
 
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-AudioIOPanelView::AudioIOPanelView ()
+AudioIOPanelView::AudioIOPanelView()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -54,7 +53,7 @@ AudioIOPanelView::AudioIOPanelView ()
     outputGainDial->addListener (this);
 
     addAndMakeVisible (inputGainLabel = new Label ("inputGainLabel",
-                                                   TRANS("Input Gain")));
+                                                   TRANS ("Input Gain")));
     inputGainLabel->setFont (Font (12.00f, Font::plain).withTypefaceStyle ("Regular"));
     inputGainLabel->setJustificationType (Justification::centredLeft);
     inputGainLabel->setEditable (false, false, false);
@@ -63,7 +62,7 @@ AudioIOPanelView::AudioIOPanelView ()
     inputGainLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     addAndMakeVisible (outputGainLabel = new Label ("outputGainLabel",
-                                                    TRANS("Output Gain")));
+                                                    TRANS ("Output Gain")));
     outputGainLabel->setFont (Font (12.00f, Font::plain).withTypefaceStyle ("Regular"));
     outputGainLabel->setJustificationType (Justification::centredLeft);
     outputGainLabel->setEditable (false, false, false);
@@ -72,7 +71,7 @@ AudioIOPanelView::AudioIOPanelView ()
     outputGainLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     addAndMakeVisible (inputGainDbLabel = new Label ("inputGainDbLabel",
-                                                     TRANS("0.00 dB")));
+                                                     TRANS ("0.00 dB")));
     inputGainDbLabel->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
     inputGainDbLabel->setJustificationType (Justification::centredLeft);
     inputGainDbLabel->setEditable (false, false, false);
@@ -81,7 +80,7 @@ AudioIOPanelView::AudioIOPanelView ()
     inputGainDbLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     addAndMakeVisible (outputGainDbLabel = new Label ("outputGainDbLabel",
-                                                      TRANS("0.00 dB")));
+                                                      TRANS ("0.00 dB")));
     outputGainDbLabel->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
     outputGainDbLabel->setJustificationType (Justification::centredLeft);
     outputGainDbLabel->setEditable (false, false, false);
@@ -100,12 +99,10 @@ AudioIOPanelView::AudioIOPanelView ()
 
     nodeNameLabel->setBounds (10, 11, 150, 24);
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (220, 100);
-
 
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
@@ -123,7 +120,6 @@ AudioIOPanelView::~AudioIOPanelView()
     inputGainDbLabel = nullptr;
     outputGainDbLabel = nullptr;
     nodeNameLabel = nullptr;
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -164,7 +160,8 @@ void AudioIOPanelView::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_inputGainDial] -- add your slider handling code here..
         const auto dB = inputGainDial->getValue();
-        String text (dB, 2); text << " dB";
+        String text (dB, 2);
+        text << " dB";
         inputGainDbLabel->setText (text, dontSendNotification);
         //[/UserSliderCode_inputGainDial]
     }
@@ -172,7 +169,8 @@ void AudioIOPanelView::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_outputGainDial] -- add your slider handling code here..
         const auto dB = outputGainDial->getValue();
-        String text (dB, 2); text << " dB";
+        String text (dB, 2);
+        text << " dB";
         outputGainDbLabel->setText (text, dontSendNotification);
         //[/UserSliderCode_outputGainDial]
     }
@@ -196,8 +194,6 @@ void AudioIOPanelView::labelTextChanged (Label* labelThatHasChanged)
     //[/UserlabelTextChanged_Post]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void AudioIOPanelView::setNode (const Node& node)
 {
@@ -205,7 +201,6 @@ void AudioIOPanelView::setNode (const Node& node)
     nodeNameLabel->getTextValue().referTo (n.getPropertyAsValue (Slugs::name, nullptr));
 }
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -267,7 +262,6 @@ BEGIN_JUCER_METADATA
 END_JUCER_METADATA
 */
 #endif
-
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]

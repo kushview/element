@@ -47,7 +47,7 @@ public:
         view.setViewedComponent (nullptr, false);
         content.reset();
     }
-    
+
     void paint (Graphics& g) override
     {
         g.setFont (13.f);
@@ -103,7 +103,7 @@ private:
     struct Content : public Component,
                      public Button::Listener
     {
-        Content (MidiIONodeEditor& ed) 
+        Content (MidiIONodeEditor& ed)
             : owner (ed)
         {
             if (owner.showOuts)
@@ -113,8 +113,7 @@ private:
                 midiOutputLabel.setJustificationType (Justification::centredLeft);
                 midiOutputLabel.setFont (Font (12.f));
                 addAndMakeVisible (midiOutputs);
-                midiOutputs.onChange = [this]()
-                {
+                midiOutputs.onChange = [this]() {
                     auto index = midiOutputs.getSelectedItemIndex();
                     if (index == 0)
                     {
@@ -128,7 +127,7 @@ private:
             }
 
             if (owner.showIns)
-            {   
+            {
                 addAndMakeVisible (midiInputLabel);
                 midiInputLabel.setText ("MIDI Inputs", dontSendNotification);
                 midiInputLabel.setJustificationType (Justification::centredLeft);
@@ -138,7 +137,7 @@ private:
             updateDevices();
             updateSize();
         }
-        
+
         int computeHeight()
         {
             int height = 10;
@@ -146,7 +145,7 @@ private:
                 height += 44;
 
             if (owner.showIns)
-            {   
+            {
                 if (owner.showOuts)
                     height += 10;
                 height += 22;
@@ -173,7 +172,7 @@ private:
         {
             for (auto* btn : midiInputs)
                 btn->removeListener (this);
-            midiInputs.clearQuick(true);
+            midiInputs.clearQuick (true);
             for (const auto& name : MidiInput::getDevices())
             {
                 auto* toggle = midiInputs.add (new ToggleButton (name));
@@ -219,13 +218,13 @@ private:
         {
             auto r = getLocalBounds().withWidth (jmax (getWidth(), 200)).reduced (10, 0);
             r.removeFromTop (10);
-            
+
             if (midiOutputLabel.isVisible())
             {
                 midiOutputLabel.setBounds (r.removeFromTop (22));
                 midiOutputs.setBounds (r.removeFromTop (22));
             }
-            
+
             if (owner.showOuts && owner.showIns)
                 r.removeFromTop (10);
 
@@ -236,7 +235,7 @@ private:
                     input->setBounds (r.removeFromTop (22));
             }
         }
-        
+
         MidiIONodeEditor& owner;
         Label midiOutputLabel;
         ComboBox midiOutputs;
@@ -252,13 +251,19 @@ private:
             return;
         bool didAnything = false;
         if (showIns && content->midiInputs.size() != MidiInput::getDevices().size())
-            { content->updateInputs(); didAnything = true; }
+        {
+            content->updateInputs();
+            didAnything = true;
+        }
         if (showOuts && content->midiOutputs.getNumItems() - 1 != MidiOutput::getDevices().size())
-            { content->updateOutputs(); didAnything = true; }
+        {
+            content->updateOutputs();
+            didAnything = true;
+        }
 
         if (didAnything)
             content->updateSize();
     }
 };
 
-}
+} // namespace Element

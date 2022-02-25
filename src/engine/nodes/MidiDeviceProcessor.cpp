@@ -50,10 +50,8 @@ public:
             addAndMakeVisible (midiOutLatency);
             midiOutLatency.setRange (-1000.0, 1000.0, 1.0);
             midiOutLatency.setValue (proc.getLatency(), dontSendNotification);
-            midiOutLatency.textFromValueFunction = [this](double value) -> juce::String {
-                return String (roundToInt (value)) + " ms"; };
-            midiOutLatency.onValueChange = [this]() {
-                proc.setLatency (midiOutLatency.getValue()); };
+            midiOutLatency.textFromValueFunction = [this] (double value) -> juce::String { return String (roundToInt (value)) + " ms"; };
+            midiOutLatency.onValueChange = [this]() { proc.setLatency (midiOutLatency.getValue()); };
             midiOutLatency.updateText();
 
             setSize (240, 120);
@@ -102,8 +100,7 @@ public:
         const int widgetSize = 18;
         auto r = getLocalBounds().withSizeKeepingCentre (180, widgetSize);
         deviceBox.setBounds (r.withLeft (r.getX() + 4 + widgetSize / 2));
-        statusButton.setBounds (deviceBox.getX() - widgetSize - 4, deviceBox.getY(), 
-                                widgetSize ,widgetSize);
+        statusButton.setBounds (deviceBox.getX() - widgetSize - 4, deviceBox.getY(), widgetSize, widgetSize);
 
         if (! inputDevice)
         {
@@ -137,7 +134,7 @@ private:
             devices = inputDevice ? MidiInput::getDevices() : MidiOutput::getDevices();
         deviceBox.clear (dontSendNotification);
         for (int i = 0; i < devices.size(); ++i)
-            deviceBox.addItem (devices [i], i + 1);
+            deviceBox.addItem (devices[i], i + 1);
         deviceBox.setSelectedItemIndex (devices.indexOf (proc.getName()));
     }
 };
@@ -150,12 +147,12 @@ MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput, MidiEngine& me)
     setPlayConfigDetails (0, 0, 44100.0, 1024);
 }
 
-MidiDeviceProcessor::~MidiDeviceProcessor() noexcept { }
+MidiDeviceProcessor::~MidiDeviceProcessor() noexcept {}
 
 void MidiDeviceProcessor::setLatency (double latencyMs)
 {
-    if (inputDevice) 
-        return; 
+    if (inputDevice)
+        return;
     midiOutLatency.set (jlimit (-1000.0, 1000.0, latencyMs));
 }
 
@@ -199,11 +196,12 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
     inputMessages.reset (sampleRate);
     if (prepared)
         return;
-    
+
     const StringArray devList = inputDevice ? MidiInput::getDevices() : MidiOutput::getDevices();
     const int defaultIdx = inputDevice ? MidiInput::getDefaultDeviceIndex() : MidiOutput::getDefaultDeviceIndex();
     int deviceIdx = deviceName.isNotEmpty() ? devList.indexOf (deviceName) : defaultIdx;
-    if (deviceIdx < 0) deviceIdx = defaultIdx;
+    if (deviceIdx < 0)
+        deviceIdx = defaultIdx;
 
     if (inputDevice)
     {
@@ -217,10 +215,10 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
         {
             output->clearAllPendingMessages();
             output->startBackgroundThread();
-        } 
+        }
         else
         {
-            DBG("[EL] could not open MIDI output: " << deviceIdx << ": " << deviceName);
+            DBG ("[EL] could not open MIDI output: " << deviceIdx << ": " << deviceName);
         }
     }
 
@@ -279,8 +277,8 @@ void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     ValueTree state ("state");
     state.setProperty ("inputDevice", isInputDevice(), 0)
-         .setProperty ("deviceName", deviceName, 0)
-         .setProperty ("midiLatency", midiOutLatency.get(), nullptr);
+        .setProperty ("deviceName", deviceName, 0)
+        .setProperty ("midiLatency", midiOutLatency.get(), nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -295,7 +293,7 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
     midiOutLatency.set (state.getProperty ("midiLatency", (double) midiOutLatency.get()));
     if (inputDevice != (bool) state.getProperty ("inputDevice"))
     {
-        DBG("[EL] MIDI Device node wrong direction");
+        DBG ("[EL] MIDI Device node wrong direction");
     }
     setCurrentDevice (state.getProperty ("deviceName", "").toString());
 }
@@ -307,10 +305,9 @@ void MidiDeviceProcessor::handleIncomingMidiMessage (MidiInput* source, const Mi
     inputMessages.addMessageToQueue (message);
 }
 
-void MidiDeviceProcessor::handlePartialSysexMessage (MidiInput* source, const uint8* messageData,
-                                                     int numBytesSoFar, double timestamp)
+void MidiDeviceProcessor::handlePartialSysexMessage (MidiInput* source, const uint8* messageData, int numBytesSoFar, double timestamp)
 {
     ignoreUnused (source, messageData, numBytesSoFar, timestamp);
 }
-                                
-}
+
+} // namespace Element

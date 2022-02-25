@@ -47,8 +47,7 @@ public:
     struct Connection : public Arc
     {
     public:
-        Connection (uint32 sourceNode, uint32 sourcePort,
-                    uint32 destNode, uint32 destPort) noexcept;
+        Connection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) noexcept;
         Connection (const ValueTree props);
 
     private:
@@ -65,13 +64,13 @@ public:
     void reset();
 
     /** Returns the number of nodes in the graph. */
-    int getNumNodes() const                                         { return nodes.size(); }
+    int getNumNodes() const { return nodes.size(); }
 
     /** Returns a pointer to one of the nodes in the graph.
         This will return nullptr if the index is out of range.
         @see getNodeForId
     */
-    NodeObject* getNode (const int index) const                           { return nodes [index]; }
+    NodeObject* getNode (const int index) const { return nodes[index]; }
 
     /** Searches the graph for a node with the given ID number and returns it.
         If no such node was found, this returns nullptr.
@@ -100,18 +99,17 @@ public:
 
     /** Builds an array of ordered nodes */
     void getOrderedNodes (ReferenceCountedArray<NodeObject>& res);
-    
+
     /** Returns the number of connections in the graph. */
-    int getNumConnections() const                                       { return connections.size(); }
+    int getNumConnections() const { return connections.size(); }
 
     /** Returns a pointer to one of the connections in the graph. */
-    const Connection* getConnection (int index) const                   { return connections [index]; }
+    const Connection* getConnection (int index) const { return connections[index]; }
 
     /** Searches for a connection between some specified channels.
         If no such connection is found, this returns nullptr.
     */
-    const Connection* getConnectionBetween (uint32 sourceNode, uint32 sourcePort,
-                                            uint32 destNode, uint32 destPort) const;
+    const Connection* getConnectionBetween (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) const;
 
     /** Returns true if there is a connection between any of the channels of
         two specified nodes.
@@ -119,20 +117,17 @@ public:
     bool isConnected (uint32 sourceNode, uint32 destNode) const;
 
     /** Returns true if it would be legal to connect the specified points. */
-    bool canConnect (uint32 sourceNode, uint32 sourcePort,
-                     uint32 destNode, uint32 destPort) const;
+    bool canConnect (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) const;
 
     /** Attempts to connect two specified channels of two nodes.
 
         If this isn't allowed (e.g. because you're trying to connect a midi channel
         to an audio one or other such nonsense), then it'll return false.
     */
-    bool addConnection (uint32 sourceNode, uint32 sourcePort,
-                        uint32 destNode, uint32 destPort);
+    bool addConnection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort);
 
     /** Connect two ports by channel number */
-    bool connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel,
-                          uint32 destNode, int32 destChannel);
+    bool connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel, uint32 destNode, int32 destChannel);
 
     /** Deletes the connection with the specified index. */
     void removeConnection (int index);
@@ -140,8 +135,7 @@ public:
     /** Deletes any connection between two specified points.
         Returns true if a connection was actually deleted.
     */
-    bool removeConnection (uint32 sourceNode, uint32 sourcePort,
-                           uint32 destNode, uint32 destPort);
+    bool removeConnection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort);
 
     /** Removes all connections from the specified node. */
     bool disconnectNode (uint32 nodeId);
@@ -162,7 +156,7 @@ public:
 
     /** Set the allowed MIDI channel of this Graph */
     void setMidiChannel (const int channel) noexcept;
-    
+
     /** Set the allowed MIDI channels of this Graph */
     void setMidiChannels (const BigInteger channels) noexcept;
 
@@ -186,11 +180,11 @@ public:
     int getNumPrograms() const override { return 1; }
     int getCurrentProgram() const override { return 0; }
     const String getProgramName (int index) const override { return "program"; }
-    void setCurrentProgram (int index) override { }
+    void setCurrentProgram (int index) override {}
 
-    void getState (MemoryBlock&) override { }
-    void setState (const void*, int sizeInBytes) override { }
-    
+    void getState (MemoryBlock&) override {}
+    void setState (const void*, int sizeInBytes) override {}
+
     void getPluginDescription (PluginDescription& desc) const override;
 
     void refreshPorts() override {}
@@ -201,8 +195,8 @@ protected:
     //==========================================================================
     virtual void preRenderNodes() {}
     virtual void postRenderNodes() {}
-    
-    //==========================================================================    
+
+    //==========================================================================
     void initialize() override {}
 
 private:
@@ -216,22 +210,22 @@ private:
     typedef ArcTable<Connection> LookupTable;
     ReferenceCountedArray<NodeObject> nodes;
     OwnedArray<Connection> connections;
-    uint32 ioNodes [10];
-    
+    uint32 ioNodes[10];
+
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
-    OwnedArray <MidiBuffer> midiBuffers;
+    OwnedArray<MidiBuffer> midiBuffers;
     Array<void*> renderingOps;
 
     AudioSampleBuffer* currentAudioInputBuffer;
     AudioSampleBuffer currentAudioOutputBuffer;
     MidiBuffer* currentMidiInputBuffer;
     MidiBuffer currentMidiOutputBuffer;
-    
+
     kv::MidiChannels midiChannels;
     VelocityCurve velocityCurve;
     MidiBuffer filteredMidi;
-    
+
     std::atomic<AudioPlayHead*> playhead { nullptr };
 
     void handleAsyncUpdate() override;
@@ -242,4 +236,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
 
-}
+} // namespace Element

@@ -36,20 +36,20 @@ public:
     ScriptManager& getScriptManager();
 
     //==========================================================================
-    lua_State* getLuaState() const          { return lua.lua_state(); }
-    sol::state& getState()                  { return lua; }
-    const sol::state& getState() const      { return lua; }
-    
+    lua_State* getLuaState() const { return lua.lua_state(); }
+    sol::state& getState() { return lua; }
+    const sol::state& getState() const { return lua; }
+
     //==========================================================================
     Result execute (const String& code);
 
 private:
     friend Globals;
-    class Impl; 
+    class Impl;
     std::unique_ptr<Impl> impl;
     Globals* world = nullptr;
     sol::state lua;
     void initialize (Globals&);
 };
 
-}
+} // namespace Element

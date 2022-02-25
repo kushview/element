@@ -24,14 +24,13 @@
 
 namespace Element {
 
-
-class AssetNode :  public ObjectModel
+class AssetNode : public ObjectModel
 {
 public:
     AssetNode (const AssetItem& item);
     ~AssetNode();
 };
 
-}
+} // namespace Element
 
 #endif /* ELEMENT_ASSET_H */

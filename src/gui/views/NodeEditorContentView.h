@@ -38,10 +38,10 @@ public:
 
     void setSticky (bool shouldBeSticky);
     bool isSticky() const { return sticky; }
-    
-    Node getNode()  const { return node; }
+
+    Node getNode() const { return node; }
     void setNode (const Node&);
-    
+
     void stabilizeContent() override;
     void resized() override;
     void paint (Graphics& g) override;
@@ -62,12 +62,13 @@ private:
     bool sticky = false;
     void clearEditor();
     Component* createEmbededEditor();
-    
+
     static void nodeMenuCallback (int, NodeEditorContentView*);
     void onGraphChanged();
     void onSessionLoaded();
-    
-    class NodeWatcher; std::unique_ptr<NodeWatcher> watcher;
+
+    class NodeWatcher;
+    std::unique_ptr<NodeWatcher> watcher;
 };
 
-}
+} // namespace Element

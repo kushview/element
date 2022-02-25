@@ -30,7 +30,7 @@ bool Note::isValid() const { return node().isValid(); }
 const int Note::eventId() const { return node().getProperty ("eventId", 0); }
 const int Note::keyId() const { return (int) node().getProperty (Slugs::id, 0); }
 const int Note::channel() const { return (int) node().getProperty ("channel", 1); }
-const float Note::velocity() const { return (float) node().getProperty("velocity", 0.8f); }
+const float Note::velocity() const { return (float) node().getProperty ("velocity", 0.8f); }
 const double Note::tickStart() const { return (double) node().getProperty ("start"); }
 const double Note::beatLength() const { return (double) node().getProperty ("length"); }
 const double Note::tickEnd() const { return tickStart() + beatLength(); }
@@ -43,7 +43,8 @@ void Note::getBeats (Range<double>& beats) const
 
 void Note::resize (EditDeltas& changes, double length)
 {
-    if (length < 0.015625f) {
+    if (length < 0.015625f)
+    {
         // 1/64th note
         length = 0.015625f;
     }
@@ -51,7 +52,7 @@ void Note::resize (EditDeltas& changes, double length)
     changes.length = length - beatLength();
 }
 
-void  Note::changeLength (EditDeltas& d, double len) { resize (d, len); }
+void Note::changeLength (EditDeltas& d, double len) { resize (d, len); }
 
 void Note::changeChannel (EditDeltas& changes, int c)
 {
@@ -69,7 +70,6 @@ void Note::changeVelocity (EditDeltas& changes, float vel)
 {
     changes.velocity = clampNoMoreThan (vel, 0.0f, 1.0f) - velocity();
 }
-
 
 void Note::move (EditDeltas& changes, const double beat)
 {
@@ -95,7 +95,7 @@ void Note::applyEdits (EditDeltas& changes, bool reset)
 }
 
 MidiMessage
-Note::noteOn() const
+    Note::noteOn() const
 {
     MidiMessage mm = MidiMessage::noteOn (channel(), keyId(), velocity());
     mm.setTimeStamp (tickStart());
@@ -103,7 +103,7 @@ Note::noteOn() const
 }
 
 MidiMessage
-Note::noteOff() const
+    Note::noteOff() const
 {
     MidiMessage mm = MidiMessage::noteOff (channel(), keyId());
     mm.setTimeStamp (tickEnd());
@@ -112,7 +112,7 @@ Note::noteOff() const
 
 void Note::getMidi (MidiMessage& on, MidiMessage& off) const
 {
-    on  = noteOn();
+    on = noteOn();
     off = noteOff();
 }
 
@@ -132,5 +132,4 @@ Note::Note (int note, double start, double length, int channel, float velocity)
     node().setProperty ("eventId", 0, nullptr);
 }
 
-
-}
+} // namespace Element

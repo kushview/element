@@ -27,7 +27,7 @@ class PluginTreeViewItem : public TreeViewItem
 {
 public:
     PluginTreeViewItem (const PluginDescription& d)
-        : desc (new  PluginDescription(d)) { }
+        : desc (new PluginDescription (d)) {}
     bool mightContainSubItems() override { return false; }
     const ScopedPointer<const PluginDescription> desc;
 
@@ -38,10 +38,10 @@ public:
         result.append (desc->createIdentifierString());
         return result;
     }
-    
+
     static String shortFormatName (const String& name)
     {
-        if (name == "VST") 
+        if (name == "VST")
             return "vst";
         else if (name == "AudioUnit")
             return "au";
@@ -54,13 +54,13 @@ public:
         g.setColour (Element::LookAndFeel::textColor.darker (0.22f));
         String text = desc->name;
         String extra = shortFormatName (desc->pluginFormatName);
-        
+
         const int leftSide = (width * 4) / 5;
         g.drawText (text, 0, 0, leftSide, height, Justification::centredLeft);
         if (extra.isNotEmpty())
         {
-            g.setColour (Element::LookAndFeel::textColor.withAlpha(0.8f));
-            extra = String("(") + extra + String(")");
+            g.setColour (Element::LookAndFeel::textColor.withAlpha (0.8f));
+            extra = String ("(") + extra + String (")");
             g.setFont (Font (12.f));
             g.drawText (extra, leftSide, 0, width - leftSide - 3, height, Justification::centredRight);
         }
@@ -70,12 +70,11 @@ public:
 class PluginFolderTreeViewItem : public TreeViewItem
 {
 public:
-    PluginFolderTreeViewItem (PluginsPanelView& o, KnownPluginList::PluginTree& t) 
-        : tree (t), panel (o) 
+    PluginFolderTreeViewItem (PluginsPanelView& o, KnownPluginList::PluginTree& t)
+        : tree (t), panel (o)
     {
-        
     }
-    
+
     bool mightContainSubItems() override { return true; }
     KnownPluginList::PluginTree& tree;
     PluginsPanelView& panel;
@@ -84,7 +83,7 @@ public:
         g.setColour (Element::LookAndFeel::textColor);
         g.drawText (tree.folder, 6, 0, width - 6, height, Justification::centredLeft);
     }
-    
+
     void itemOpennessChanged (bool isNowOpen) override
     {
         if (isNowOpen)
@@ -107,14 +106,14 @@ class PluginsPanelTreeRootItem : public TreeViewItem
 {
 public:
     PluginsPanelTreeRootItem (PluginsPanelView& o, PluginManager& p)
-        : owner(o),
-            plugins (p)
+        : owner (o),
+          plugins (p)
     {
         data = p.getKnownPlugins().createTree (KnownPluginList::sortByCategory);
     }
-    
+
     bool mightContainSubItems() override { return true; }
-    
+
     void itemOpennessChanged (bool isNowOpen) override
     {
         if (isNowOpen)
@@ -127,18 +126,18 @@ public:
             clearSubItems();
         }
     }
-    
+
     PluginsPanelView& owner;
     PluginManager& plugins;
-    
+
     std::unique_ptr<KnownPluginList::PluginTree> data;
 };
 
 PluginsPanelView::PluginsPanelView (PluginManager& p)
-    : plugins(p)
+    : plugins (p)
 {
     addAndMakeVisible (search);
-    search.setTextToShowWhenEmpty (TRANS("Search..."), LookAndFeel::textColor.darker());
+    search.setTextToShowWhenEmpty (TRANS ("Search..."), LookAndFeel::textColor.darker());
     search.addListener (this);
 
     addAndMakeVisible (tree);
@@ -164,7 +163,7 @@ void PluginsPanelView::resized()
     tree.setBounds (r);
 }
 
-void PluginsPanelView::paint (Graphics& g) { }
+void PluginsPanelView::paint (Graphics& g) {}
 
 void PluginsPanelView::textEditorTextChanged (TextEditor&)
 {
@@ -176,8 +175,8 @@ void PluginsPanelView::updateTreeView()
     tree.deleteRootItem();
     tree.setRootItem (new PluginsPanelTreeRootItem (*this, plugins));
     auto* root = tree.getRootItem();
-    for (int i = 0; i < root->getNumSubItems();  ++i)
-        root->getSubItem(i)->setOpenness (TreeViewItem::opennessOpen);
+    for (int i = 0; i < root->getNumSubItems(); ++i)
+        root->getSubItem (i)->setOpenness (TreeViewItem::opennessOpen);
 }
 
 void PluginsPanelView::timerCallback()
@@ -198,4 +197,4 @@ void PluginsPanelView::changeListenerCallback (ChangeBroadcaster* src)
     tree.setRootItem (new PluginsPanelTreeRootItem (*this, plugins));
 }
 
-}
+} // namespace Element

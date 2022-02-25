@@ -31,13 +31,13 @@ public:
         audioInputNode = 0, /**< In this mode, the processor has output channels
                                     representing all the audio input channels that are
                                     coming into its parent audio graph. */
-        audioOutputNode,    /**< In this mode, the processor has input channels
+        audioOutputNode, /**< In this mode, the processor has input channels
                                     representing all the audio output channels that are
                                     going out of its parent audio graph. */
-        midiInputNode,      /**< In this mode, the processor has a midi output which
+        midiInputNode, /**< In this mode, the processor has a midi output which
                                     delivers the same midi data that is arriving at its
                                     parent graph. */
-        midiOutputNode,     /**< In this mode, the processor has a midi input and
+        midiOutputNode, /**< In this mode, the processor has a midi input and
                                     any data sent to it will be passed out of the parent
                                     graph. */
         numDeviceTypes
@@ -49,12 +49,12 @@ public:
 
     //==============================================================================
     /** Returns the mode of this processor. */
-    IODeviceType getType() const                      { return type; }
+    IODeviceType getType() const { return type; }
     PortType getPortType() const noexcept;
 
     /** Returns the parent graph to which this processor belongs, or nullptr if it
         hasn't yet been added to one. */
-    GraphNode* getParentGraph() const                 { return graph; }
+    GraphNode* getParentGraph() const { return graph; }
 
     /** True if this is an audio or midi input. */
     bool isInput() const;
@@ -65,7 +65,7 @@ public:
 
     const String getInputChannelName (int channelIndex) const;
     const String getOutputChannelName (int channelIndex) const;
-    
+
     //==========================================================================
     void refreshPorts() override;
     bool wantsMidiPipe() const override { return true; }
@@ -74,7 +74,7 @@ public:
     void render (AudioSampleBuffer&, MidiPipe&) override;
     void getState (MemoryBlock&) override {}
     void setState (const void*, int sizeInBytes) override {}
-   
+
     //==========================================================================
     /** @internal */
     void setParentGraph (GraphNode*);
@@ -86,4 +86,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IONode)
 };
 
-}
+} // namespace Element

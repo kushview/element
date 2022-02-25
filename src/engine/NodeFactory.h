@@ -31,8 +31,8 @@ class NodeProvider
 public:
     NodeProvider() = default;
     virtual ~NodeProvider() = default;
-    virtual NodeObject* create (const String&) =0;
-    virtual StringArray findTypes() =0;
+    virtual NodeObject* create (const String&) = 0;
+    virtual StringArray findTypes() = 0;
 };
 
 class NodeFactory final
@@ -47,7 +47,7 @@ public:
 
     NodeFactory& add (NodeProvider* f);
 
-    template<class NT>
+    template <class NT>
     NodeFactory& add (const String& identifier)
     {
         return add (new Single<NT> (identifier));
@@ -63,7 +63,7 @@ private:
     OwnedArray<NodeProvider> providers;
     StringArray knownIDs;
 
-    template<class NT>
+    template <class NT>
     struct Single : public NodeProvider
     {
         const String ID;
@@ -71,19 +71,21 @@ private:
 
         Single() = delete;
         Single (const String& inID)
-            : ID (inID) { }
+            : ID (inID) {}
         ~Single() = default;
-        
-        StringArray findTypes() override {
+
+        StringArray findTypes() override
+        {
             return StringArray (ID);
         }
 
-        NodeObject* create (const String& nodeId) override {
+        NodeObject* create (const String& nodeId) override
+        {
             return (this->ID == nodeId) ? new NT() : nullptr;
         }
     };
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeFactory)
 };
 
-}
+} // namespace Element

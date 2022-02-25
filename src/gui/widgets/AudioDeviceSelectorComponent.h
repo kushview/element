@@ -24,12 +24,11 @@
   ==============================================================================
 */
 
-#pragma once 
+#pragma once
 
 #include "JuceHeader.h"
 
-namespace Element
-{
+namespace Element {
 
 //==============================================================================
 /**
@@ -42,9 +41,9 @@ namespace Element
 
     @tags{Audio}
 */
-class JUCE_API  AudioDeviceSelectorComponent  : public Component,
-                                                private ChangeListener,
-                                                private Timer
+class JUCE_API AudioDeviceSelectorComponent : public Component,
+                                              private ChangeListener,
+                                              private Timer
 {
 public:
     //==============================================================================
@@ -86,7 +85,7 @@ public:
     void setItemHeight (int itemHeight);
 
     /** Returns the standard height used for items in the panel. */
-    int getItemHeight() const noexcept      { return itemHeight; }
+    int getItemHeight() const noexcept { return itemHeight; }
 
     /** Returns the ListBox that's being used to show the midi inputs, or nullptr if there isn't one. */
     ListBox* getMidiInputSelectorListBox() const noexcept;

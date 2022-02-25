@@ -86,15 +86,14 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
     return nullptr;
 }
 
-void InternalFormat::getAllTypes (OwnedArray <PluginDescription>& results)
+void InternalFormat::getAllTypes (OwnedArray<PluginDescription>& results)
 {
     results.add (new PluginDescription (placeholderDesc));
     results.add (new PluginDescription (midiInputDeviceDesc));
     results.add (new PluginDescription (midiOutputDeviceDesc));
 }
 
-void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
-                                           int initialBufferSize, PluginCreationCallback callback)
+void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate, int initialBufferSize, PluginCreationCallback callback)
 {
     if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
     {
@@ -113,9 +112,9 @@ bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginD
 
 // MARK: Element Format
 ElementAudioPluginFormat::ElementAudioPluginFormat (Globals& g)
-    : world (g) { }
+    : world (g) {}
 
-void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String& fileOrId)
+void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription>& ds, const String& fileOrId)
 {
     if (fileOrId == "element.comb")
     {
@@ -127,7 +126,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
         desc->numOutputChannels = 1;
-        
+
         desc = ds.add (new PluginDescription (*desc));
         desc->name = "Comb Filter (stereo)";
         desc->fileOrIdentifier = fileOrId + ".stereo";
@@ -144,7 +143,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
         desc->numOutputChannels = 1;
-        
+
         desc = ds.add (new PluginDescription (*desc));
         desc->name = "AllPass Filter (stereo)";
         desc->fileOrIdentifier = fileOrId + ".stereo";
@@ -161,7 +160,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
         desc->numOutputChannels = 1;
-        
+
         desc = ds.add (new PluginDescription (*desc));
         desc->name = "Volume (stereo)";
         desc->fileOrIdentifier = fileOrId + ".stereo";
@@ -182,7 +181,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
     else if (fileOrId == EL_INTERNAL_ID_EQ_FILTER)
     {
         auto* desc = ds.add (new PluginDescription());
-        EQFilterProcessor(2).fillInPluginDescription (*desc);
+        EQFilterProcessor (2).fillInPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_FREQ_SPLITTER)
     {
@@ -197,7 +196,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_MIXER)
     {
         auto* const desc = ds.add (new PluginDescription());
-        AudioMixerProcessor(4).fillInPluginDescription (*desc);
+        AudioMixerProcessor (4).fillInPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_CHANNELIZE)
     {
@@ -246,11 +245,12 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     return results;
 }
 
-AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc, 
-                                                                    double sampleRate, int blockSize)
+AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc,
+                                                                  double sampleRate,
+                                                                  int blockSize)
 {
     ScopedPointer<AudioPluginInstance> base;
-    
+
     if (desc.fileOrIdentifier == "element.comb.mono")
         base = new CombFilterProcessor (false);
     else if (desc.fileOrIdentifier == "element.comb.stereo")
@@ -305,4 +305,4 @@ bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (con
     return false;
 }
 
-}
+} // namespace Element

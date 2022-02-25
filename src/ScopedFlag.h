@@ -44,4 +44,4 @@ private:
     bool previousValue;
 };
 
-}
+} // namespace Element

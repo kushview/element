@@ -43,7 +43,7 @@ public:
                 toggles[i][o] = matrix.connected (i, o);
     }
 
-    ~ToggleGrid() noexcept 
+    ~ToggleGrid() noexcept
     {
         free();
     }
@@ -51,12 +51,12 @@ public:
     inline void resize (int ins, int outs)
     {
         free();
-        jassert(ins > 0 && outs > 0);
+        jassert (ins > 0 && outs > 0);
         numIns = ins;
         numOuts = outs;
-        toggles = new bool* [numIns];
+        toggles = new bool*[numIns];
         for (int i = 0; i < numIns; ++i)
-            toggles[i] = new bool [numOuts];
+            toggles[i] = new bool[numOuts];
     }
 
     inline bool sameSizeAs (const ToggleGrid& other) const noexcept
@@ -88,8 +88,8 @@ public:
         toggles[in][out] = value;
     }
 
-    inline int getNumInputs() const noexcept    { return numIns; }
-    inline int getNumOutputs() const noexcept   { return numOuts; }
+    inline int getNumInputs() const noexcept { return numIns; }
+    inline int getNumOutputs() const noexcept { return numOuts; }
 
     inline void swapWith (ToggleGrid& other) noexcept
     {
@@ -125,12 +125,12 @@ private:
         if (toggles != nullptr)
         {
             for (int i = 0; i < numIns; ++i)
-                delete [] toggles [i];
-            delete [] toggles;
+                delete[] toggles[i];
+            delete[] toggles;
             toggles = nullptr;
         }
         numIns = numOuts = 0;
     }
 };
 
-}
+} // namespace Element

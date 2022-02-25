@@ -33,9 +33,9 @@ protected:
 public:
     virtual ~WorkspacePanel() {}
 
-    virtual void initializeView (AppController&) { }
-    virtual void didBecomeActive() { }
-    virtual void stabilizeContent() { }
+    virtual void initializeView (AppController&) {}
+    virtual void didBecomeActive() {}
+    virtual void stabilizeContent() {}
 
     void showPopupMenu() override
     {
@@ -48,15 +48,18 @@ public:
         {
             case 1: {
                 close();
-            } break;
+            }
+            break;
 
             case 2: {
                 undock();
-            } break;
+            }
+            break;
 
-            default: break;
+            default:
+                break;
         }
     }
 };
 
-}
+} // namespace Element

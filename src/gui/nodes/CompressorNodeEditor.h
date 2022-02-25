@@ -54,7 +54,7 @@ private:
         float getDBForX (float xPos);
         float getYForDB (float db);
 
-        void paint (Graphics & g) override;
+        void paint (Graphics& g) override;
         void resized() override {}
 
     private:
@@ -67,11 +67,11 @@ private:
 
         const float lowDB = -36.0f;
         const float highDB = 6.0f;
-        const float dashLengths[2] = {4, 1};
+        const float dashLengths[2] = { 4, 1 };
     };
     CompViz compViz;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorNodeEditor)
 };
 
-}
+} // namespace Element

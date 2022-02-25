@@ -21,8 +21,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/views/VirtualKeyboardView.h"
 
-namespace Element
-{
+namespace Element {
 
 static int getOctaveOffsetForKeyPress (const KeyPress& key, const int fallback = 6)
 {
@@ -51,16 +50,19 @@ static int getOctaveOffsetForKeyPress (const KeyPress& key, const int fallback =
 }
 
 VirtualKeyboardComponent::VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o)
-        : MidiKeyboardComponent (s, o)
-{  }
+    : MidiKeyboardComponent (s, o)
+{
+}
 
 void VirtualKeyboardComponent::setKeypressOctaveOffset (int offset)
 {
-    if (offset < 0) offset = 0;
-    if (offset > 10) offset = 10;
+    if (offset < 0)
+        offset = 0;
+    if (offset > 10)
+        offset = 10;
     if (offset == keypressOctaveOffset)
         return;
-    
+
     keypressOctaveOffset = offset;
     setKeyPressBaseOctave (keypressOctaveOffset);
 }
@@ -74,22 +76,13 @@ bool VirtualKeyboardComponent::keyPressed (const KeyPress& key)
     {
         setKeypressOctaveOffset (keypressOctaveOffset - 1);
     }
-    else if (key == KeyPress::numberPadAdd 
-        || (isShiftDown && key == KeyPress::numberPadAdd)
-        || (isShiftDown && key == '+'))
+    else if (key == KeyPress::numberPadAdd
+             || (isShiftDown && key == KeyPress::numberPadAdd)
+             || (isShiftDown && key == '+'))
     {
         setKeypressOctaveOffset (keypressOctaveOffset + 1);
     }
-    else if (key == KeyPress::numberPad0 || key == '0' ||
-             key == KeyPress::numberPad1 || key == '1' ||
-             key == KeyPress::numberPad2 || key == '2' ||
-             key == KeyPress::numberPad3 || key == '3' ||
-             key == KeyPress::numberPad4 || key == '4' ||
-             key == KeyPress::numberPad5 || key == '5' ||
-             key == KeyPress::numberPad6 || key == '6' ||
-             key == KeyPress::numberPad7 || key == '7' ||
-             key == KeyPress::numberPad8 || key == '8' ||
-             key == KeyPress::numberPad9 || key == '9')
+    else if (key == KeyPress::numberPad0 || key == '0' || key == KeyPress::numberPad1 || key == '1' || key == KeyPress::numberPad2 || key == '2' || key == KeyPress::numberPad3 || key == '3' || key == KeyPress::numberPad4 || key == '4' || key == KeyPress::numberPad5 || key == '5' || key == KeyPress::numberPad6 || key == '6' || key == KeyPress::numberPad7 || key == '7' || key == KeyPress::numberPad8 || key == '8' || key == KeyPress::numberPad9 || key == '9')
     {
         setKeypressOctaveOffset (getOctaveOffsetForKeyPress (key, keypressOctaveOffset));
     }
@@ -105,9 +98,9 @@ VirtualKeyboardView::VirtualKeyboardView()
 {
     setOpaque (true);
     addAndMakeVisible (keyboard = new VirtualKeyboardComponent (
-        internalState, MidiKeyboardComponent::horizontalKeyboard));
+                           internalState, MidiKeyboardComponent::horizontalKeyboard));
     setupKeyboard (*keyboard);
-   #if 1
+#if 1
 
     addAndMakeVisible (midiChannelLabel);
     midiChannelLabel.setFont (Font (12.f));
@@ -117,8 +110,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     midiChannel.setSliderStyle (Slider::IncDecButtons);
     midiChannel.setRange (1.0, 16.0, 1.0);
     midiChannel.setTextBoxStyle (Slider::TextBoxLeft, false, 30, midiChannel.getTextBoxHeight());
-    midiChannel.onValueChange = [this]()
-    {
+    midiChannel.onValueChange = [this]() {
         keyboard->setMidiChannel (roundToInt (midiChannel.getValue()));
     };
 
@@ -130,14 +122,13 @@ VirtualKeyboardView::VirtualKeyboardView()
     midiProgram.setSliderStyle (Slider::IncDecButtons);
     midiProgram.setRange (1.0, 128, 1.0);
     midiProgram.setTextBoxStyle (Slider::TextBoxLeft, false, 34, midiProgram.getTextBoxHeight());
-    midiProgram.onValueChange = [this]()
-    {
+    midiProgram.onValueChange = [this]() {
         auto* const world = ViewHelpers::getGlobals (this);
         AudioEnginePtr engine = world != nullptr ? world->getAudioEngine() : nullptr;
         if (! engine)
             return;
         auto msg = MidiMessage::programChange (keyboard->getMidiChannel(),
-                                    roundToInt (midiProgram.getValue()) - 1);
+                                               roundToInt (midiProgram.getValue()) - 1);
         msg.setTimeStamp (1.0 + Time::getMillisecondCounterHiRes());
         engine->addMidiMessage (msg, false);
     };
@@ -153,8 +144,8 @@ VirtualKeyboardView::VirtualKeyboardView()
         if (! engine)
             return;
         engine->addMidiMessage (MidiMessage::controllerEvent (
-            keyboard->getMidiChannel(), 0x40, sustain.getToggleState() ? 127 : 0)
-            .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
+                                    keyboard->getMidiChannel(), 0x40, sustain.getToggleState() ? 127 : 0)
+                                    .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
     };
 
     addAndMakeVisible (hold);
@@ -168,8 +159,8 @@ VirtualKeyboardView::VirtualKeyboardView()
         if (! engine)
             return;
         engine->addMidiMessage (MidiMessage::controllerEvent (
-            keyboard->getMidiChannel(), 0x42, hold.getToggleState() ? 127 : 0)
-            .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
+                                    keyboard->getMidiChannel(), 0x42, hold.getToggleState() ? 127 : 0)
+                                    .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
     };
 
     addAndMakeVisible (widthLabel);
@@ -178,7 +169,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     widthLabel.setText ("Width:", dontSendNotification);
     addAndMakeVisible (widthDown);
     widthDown.setButtonText ("-");
-    widthDown.setConnectedEdges(Button::ConnectedOnRight);
+    widthDown.setConnectedEdges (Button::ConnectedOnRight);
     widthDown.onClick = [this]() {
         keyWidth = jlimit (14, 24, keyWidth - 1);
         stabilizeWidthControls();
@@ -186,12 +177,12 @@ VirtualKeyboardView::VirtualKeyboardView()
 
     addAndMakeVisible (widthUp);
     widthUp.setButtonText ("+");
-    widthUp.setConnectedEdges(Button::ConnectedOnLeft);
+    widthUp.setConnectedEdges (Button::ConnectedOnLeft);
     widthUp.onClick = [this]() {
         keyWidth = jlimit (14, 24, keyWidth + 1);
         stabilizeWidthControls();
     };
-   #endif
+#endif
 }
 
 void VirtualKeyboardView::stabilizeWidthControls()
@@ -205,10 +196,10 @@ void VirtualKeyboardView::stabilizeWidthControls()
 
 void VirtualKeyboardView::saveState (PropertiesFile* props)
 {
-    props->setValue ("vkChannel",       keyboard->getMidiChannel());
-    props->setValue ("vkProgram",       midiProgram.getValue());
-    props->setValue ("vkKeyWidth",      keyboard->getKeyWidth());
-    props->setValue ("vkBlackLength",   keyboard->getBlackNoteLengthProportion());
+    props->setValue ("vkChannel", keyboard->getMidiChannel());
+    props->setValue ("vkProgram", midiProgram.getValue());
+    props->setValue ("vkKeyWidth", keyboard->getKeyWidth());
+    props->setValue ("vkBlackLength", keyboard->getBlackNoteLengthProportion());
 }
 
 void VirtualKeyboardView::restoreState (PropertiesFile* props)
@@ -219,13 +210,13 @@ void VirtualKeyboardView::restoreState (PropertiesFile* props)
 
     midiProgram.setValue (props->getDoubleValue ("vkProgram", midiProgram.getValue()),
                           dontSendNotification);
-    
+
     keyboard->setKeyWidth (static_cast<float> (props->getDoubleValue ("vkKeyWidth", (float) keyWidth)));
     keyWidth = jlimit (14, 24, roundToInt (keyboard->getKeyWidth()));
     stabilizeWidthControls();
 
     keyboard->setBlackNoteLengthProportion (static_cast<float> (
-    props->getDoubleValue ("vkBlackLength", keyboard->getBlackNoteLengthProportion())));
+        props->getDoubleValue ("vkBlackLength", keyboard->getBlackNoteLengthProportion())));
 }
 
 void VirtualKeyboardView::setupKeyboard (VirtualKeyboardComponent& kb)
@@ -238,7 +229,7 @@ VirtualKeyboardView::~VirtualKeyboardView()
     keyboard = nullptr;
 }
 
-void VirtualKeyboardView::paint (Graphics& g) 
+void VirtualKeyboardView::paint (Graphics& g)
 {
     g.fillAll (LookAndFeel::widgetBackgroundColor);
 }
@@ -246,7 +237,7 @@ void VirtualKeyboardView::paint (Graphics& g)
 void VirtualKeyboardView::resized()
 {
     auto r = getLocalBounds();
-   #if 1
+#if 1
     r.removeFromTop (2);
     auto r2 = r.removeFromTop (18);
     r2.removeFromLeft (4);
@@ -261,14 +252,16 @@ void VirtualKeyboardView::resized()
     widthDown.setBounds (r2.removeFromRight (20));
     r2.removeFromRight (2);
     widthLabel.setBounds (r2.removeFromRight (42));
-    
+
     sustain.changeWidthToFitText (r2.getHeight());
-    sustain.setBounds (jmax (midiProgram.getRight() + 2, (getWidth() / 2) - (sustain.getWidth())), 
-                        r2.getY(), sustain.getWidth(), r2.getHeight());
+    sustain.setBounds (jmax (midiProgram.getRight() + 2, (getWidth() / 2) - (sustain.getWidth())),
+                       r2.getY(),
+                       sustain.getWidth(),
+                       r2.getHeight());
     hold.setBounds (sustain.getRight(), r2.getY(), sustain.getWidth(), r2.getHeight());
 
     r.removeFromTop (2);
-   #endif
+#endif
     if (keyboard)
         keyboard->setBounds (r);
 }
@@ -278,7 +271,7 @@ void VirtualKeyboardView::didBecomeActive()
     if (auto engine = ViewHelpers::getAudioEngine (this))
     {
         keyboard = new VirtualKeyboardComponent (engine->getKeyboardState(),
-            MidiKeyboardComponent::horizontalKeyboard);
+                                                 MidiKeyboardComponent::horizontalKeyboard);
         setupKeyboard (*keyboard);
         addAndMakeVisible (keyboard);
     }
@@ -289,50 +282,44 @@ bool VirtualKeyboardView::keyPressed (const KeyPress& key, Component* c)
     if (! keyboard)
         return ContentView::keyPressed (key, c);
 
-    const auto isShiftDown  = key.getModifiers().isShiftDown();
-    const auto isCtrlDown   = key.getModifiers().isCommandDown();
-    const auto isAltDown    = key.getModifiers().isAltDown();
+    const auto isShiftDown = key.getModifiers().isShiftDown();
+    const auto isCtrlDown = key.getModifiers().isCommandDown();
+    const auto isAltDown = key.getModifiers().isAltDown();
 
-    if (!isShiftDown && isCtrlDown && !isAltDown &&
-        (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    if (! isShiftDown && isCtrlDown && ! isAltDown && (key.isKeyCode ('_') || key.isKeyCode ('-')))
     {
         // ctrl + minus
         midiChannel.setValue (midiChannel.getValue() - 1);
         return true;
     }
-    else if (!isShiftDown && isCtrlDown && !isAltDown &&
-             (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    else if (! isShiftDown && isCtrlDown && ! isAltDown && (key.isKeyCode ('=') || key.isKeyCode ('+')))
     {
         // ctrl + plus
         midiChannel.setValue (midiChannel.getValue() + 1);
         return true;
     }
 
-    else if (!isShiftDown && isCtrlDown && isAltDown &&
-             (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    else if (! isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('_') || key.isKeyCode ('-')))
     {
         // ctrl + alt + minus
         midiProgram.setValue (midiProgram.getValue() - 1);
         return true;
     }
-    else if (!isShiftDown && isCtrlDown && isAltDown && 
-             (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    else if (! isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('=') || key.isKeyCode ('+')))
     {
         // ctrl + alt + plus
         midiProgram.setValue (midiProgram.getValue() + 1);
         return true;
     }
-    
-    else if (isShiftDown && isCtrlDown && isAltDown && 
-             (key.isKeyCode ('_') || key.isKeyCode ('-')))
+
+    else if (isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('_') || key.isKeyCode ('-')))
     {
         // shift + ctrl + alt + minus
         if (widthDown.onClick)
             widthDown.onClick();
         return true;
     }
-    else if (isShiftDown && isCtrlDown && isAltDown &&
-             (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    else if (isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('=') || key.isKeyCode ('+')))
     {
         // shift + ctrl + alt + plus
         if (widthUp.onClick)
@@ -340,13 +327,13 @@ bool VirtualKeyboardView::keyPressed (const KeyPress& key, Component* c)
         return true;
     }
 
-    else if (!isShiftDown && isCtrlDown && !isAltDown && key.isKeyCode (KeyPress::spaceKey))
+    else if (! isShiftDown && isCtrlDown && ! isAltDown && key.isKeyCode (KeyPress::spaceKey))
     {
         // ctrl + spacebar
         sustain.setToggleState (! sustain.getToggleState(), sendNotification);
     }
 
-    else if (!isShiftDown && isCtrlDown && isAltDown && key.isKeyCode (KeyPress::spaceKey))
+    else if (! isShiftDown && isCtrlDown && isAltDown && key.isKeyCode (KeyPress::spaceKey))
     {
         // ctrl + alt + spacebar
         hold.setToggleState (! hold.getToggleState(), sendNotification);
@@ -360,4 +347,4 @@ bool VirtualKeyboardView::keyStateChanged (bool isDown)
     return keyboard != nullptr ? keyboard->keyStateChanged (isDown) : false;
 }
 
-}
+} // namespace Element

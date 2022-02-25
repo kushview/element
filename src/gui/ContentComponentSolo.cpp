@@ -56,15 +56,15 @@
 #include "gui/ContentComponentSolo.h"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
- #define EL_USE_ACCESSORY_BUTTONS 0
+#define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
 #ifndef EL_USE_GRAPH_MIXER_VIEW
- #define EL_USE_GRAPH_MIXER_VIEW 1
+#define EL_USE_GRAPH_MIXER_VIEW 1
 #endif
 
 #ifndef EL_USE_NODE_CHANNEL_STRIP
- #define EL_USE_NODE_CHANNEL_STRIP 1
+#define EL_USE_NODE_CHANNEL_STRIP 1
 #endif
 
 #define EL_NAV_MIN_WIDTH 100
@@ -72,13 +72,14 @@
 
 namespace Element {
 
-class SmartLayoutManager : public StretchableLayoutManager {
+class SmartLayoutManager : public StretchableLayoutManager
+{
 public:
-    SmartLayoutManager() { }
-    virtual ~SmartLayoutManager() { }
+    SmartLayoutManager() {}
+    virtual ~SmartLayoutManager() {}
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SmartLayoutManager);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartLayoutManager);
 };
 
 class SmartLayoutResizeBar : public StretchableLayoutResizerBar
@@ -86,14 +87,15 @@ class SmartLayoutResizeBar : public StretchableLayoutResizerBar
 public:
     Signal<void()> mousePressed, mouseReleased;
     SmartLayoutResizeBar (StretchableLayoutManager* layoutToUse,
-                          int itemIndexInLayout, bool isBarVertical)
-    : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-      layout (nullptr)
+                          int itemIndexInLayout,
+                          bool isBarVertical)
+        : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
+          layout (nullptr)
     {
         mousePressed.disconnect_all_slots();
         mouseReleased.disconnect_all_slots();
     }
-    
+
     ~SmartLayoutResizeBar()
     {
         layout = nullptr;
@@ -104,13 +106,13 @@ public:
         StretchableLayoutResizerBar::mouseDown (ev);
         mousePressed();
     }
-    
+
     void mouseUp (const MouseEvent& ev) override
     {
         StretchableLayoutResizerBar::mouseUp (ev);
         mouseReleased();
     }
-    
+
 private:
     SmartLayoutManager* layout;
 };
@@ -134,9 +136,9 @@ public:
         updateLayout();
         resized();
     }
-    
-    virtual ~ContentContainer() { }
-    
+
+    virtual ~ContentContainer() {}
+
     void resized() override
     {
         if (content1 == nullptr || content2 == nullptr)
@@ -149,12 +151,13 @@ public:
             lastAccessoryHeight = content2->getHeight();
 
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
-        if (locked && showAccessoryView && content2->getHeight() < accessoryHeightThreshold) {
+        if (locked && showAccessoryView && content2->getHeight() < accessoryHeightThreshold)
+        {
             setShowAccessoryView (false);
-            locked = false; 
-        }       
+            locked = false;
+        }
     }
-    
+
     void setNode (const Node& node)
     {
         if (auto* gdv = dynamic_cast<GraphDisplayView*> (content1.get()))
@@ -166,7 +169,7 @@ public:
         else if (nullptr != content1)
             content1->stabilizeContent();
     }
-    
+
     void setMainView (ContentView* view)
     {
         if (view)
@@ -179,7 +182,7 @@ public:
         }
 
         content1 = view;
-        
+
         if (content1)
         {
             content1->willBecomeActive();
@@ -201,16 +204,16 @@ public:
             content1->stabilizeContent();
         }
     }
-    
+
     void setAccessoryView (ContentView* view)
     {
         if (view)
             view->initializeView (owner.getAppController());
         if (content2)
             removeChildComponent (content2);
-       
+
         content2 = view;
-        
+
         if (content2)
         {
             content2->willBecomeActive();
@@ -225,7 +228,7 @@ public:
             content2->stabilizeContent();
         }
     }
-    
+
     void setShowAccessoryView (const bool show)
     {
         if (showAccessoryView == show)
@@ -243,7 +246,7 @@ public:
         {
             if (capturedAccessoryHeight > 0 && capturedAccessoryHeight != lastAccessoryHeight)
             {
-                lastAccessoryHeight = capturedAccessoryHeight;    
+                lastAccessoryHeight = capturedAccessoryHeight;
             }
             else
             {
@@ -255,7 +258,7 @@ public:
             layout.setItemLayout (2, 0, -1.0, 0);
             capturedAccessoryHeight = -1;
         }
-        
+
         resized();
 
         if (show)
@@ -265,7 +268,7 @@ public:
         locked = false;
         owner.getAppController().findChild<GuiController>()->refreshMainMenu();
     }
-    
+
     void saveState (PropertiesFile* props)
     {
         props->setValue ("ContentContainer_width", getWidth());
@@ -276,7 +279,7 @@ public:
 
     void restoreState (PropertiesFile* props)
     {
-        setSize (props->getIntValue ("ContentContainer_width",  jmax (48, getWidth())),
+        setSize (props->getIntValue ("ContentContainer_width", jmax (48, getWidth())),
                  props->getIntValue ("ContentContainer_height", jmax (48, getHeight())));
         content1->setSize (getWidth(), props->getIntValue ("ContentContainer_height1", 48));
         content2->setSize (getWidth(), props->getIntValue ("ContentContainer_height2", lastAccessoryHeight));
@@ -291,7 +294,7 @@ private:
     ScopedPointer<SmartLayoutResizeBar> bar;
     ScopedPointer<ContentView> content1;
     ScopedPointer<ContentView> content2;
-    
+
     bool showAccessoryView = false;
     int barSize = 2;
     int lastAccessoryHeight = 172;
@@ -302,7 +305,7 @@ private:
     void lockLayout()
     {
         locked = true;
-        
+
         const int content1Min = 48;
         if (showAccessoryView)
         {
@@ -316,7 +319,7 @@ private:
             layout.setItemLayout (1, 0, 0, 0);
             layout.setItemLayout (2, 0, -1.0, 0);
         }
-       
+
         resized();
 
         if (showAccessoryView)
@@ -354,24 +357,24 @@ private:
 class ContentComponentSolo::Resizer : public StretchableLayoutResizerBar
 {
 public:
-    Resizer (ContentComponentSolo& ContentComponentSolo, StretchableLayoutManager* layoutToUse,
-             int itemIndexInLayout, bool isBarVertical)
-    : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-      owner (ContentComponentSolo)
-    { }
-    
+    Resizer (ContentComponentSolo& ContentComponentSolo, StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical)
+        : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
+          owner (ContentComponentSolo)
+    {
+    }
+
     void mouseDown (const MouseEvent& ev) override
     {
         StretchableLayoutResizerBar::mouseDown (ev);
         owner.resizerMouseDown();
     }
-    
+
     void mouseUp (const MouseEvent& ev) override
     {
         StretchableLayoutResizerBar::mouseUp (ev);
         owner.resizerMouseUp();
     }
-    
+
 private:
     ContentComponentSolo& owner;
 };
@@ -393,7 +396,7 @@ static ContentView* createLastContentView (Settings& settings)
         view = new ControllerDevicesView();
     else
         view = new DefaultView();
-    
+
     return view ? view.release() : nullptr;
 }
 
@@ -409,16 +412,16 @@ static bool booleanProperty (Settings& settings, const String& property, const b
     return props == nullptr ? false : props->getBoolValue (property, defaultValue);
 }
 
-static void windowSizeProperty (Settings& settings, const String& property, int& w, int& h,
-                                const int defaultW, const int defaultH)
+static void windowSizeProperty (Settings& settings, const String& property, int& w, int& h, const int defaultW, const int defaultH)
 {
     auto* props = settings.getUserSettings();
     StringArray tokens;
-    tokens.addTokens (props->getValue(property).trim(), false);
+    tokens.addTokens (props->getValue (property).trim(), false);
     tokens.removeEmptyStrings();
     tokens.trim();
 
-    w = defaultW; h = defaultH;
+    w = defaultW;
+    h = defaultH;
 
     const bool fs = tokens[0].startsWithIgnoreCase ("fs");
     const int firstCoord = fs ? 1 : 0;
@@ -444,12 +447,12 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
     auto& settings (getGlobals().getSettings());
 
     setOpaque (true);
-    
+
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
     nav->updateContent();
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (*this, getAppController()));
-    
+
     {
         int w, h;
         windowSizeProperty (settings, "mainWindowState", w, h, 760, 480);
@@ -459,8 +462,8 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
     }
 
     container->setMainView (createLastContentView (settings));
-    
-   #if defined (EL_PRO)
+
+#if defined(EL_PRO)
     if (booleanProperty (settings, "accessoryView", false))
     {
         setAccessoryView (stringProperty (settings, "accessoryViewName", EL_VIEW_GRAPH_MIXER));
@@ -469,41 +472,41 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
     {
         setShowAccessoryView (false);
     }
-   #endif
+#endif
 
     setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));
-   
-   #if defined (EL_PRO) || defined (EL_SOLO) 
+
+#if defined(EL_PRO) || defined(EL_SOLO)
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
-   #else
+#else
     setNodeChannelStripVisible (false);
-   #endif
+#endif
 
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
-    
+
     toolBarVisible = true;
     toolBarSize = 32;
     statusBarVisible = true;
     statusBarSize = 22;
-    
+
     {
         int navSize = settings.getUserSettings()->getIntValue ("navSize", 220);
         nav->setSize (navSize, getHeight());
         resizerMouseUp();
     }
-   #ifdef EL_PRO
+#ifdef EL_PRO
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
-   #endif
+#endif
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 
-   #if defined (EL_SOLO) || defined (EL_FREE)
+#if defined(EL_SOLO) || defined(EL_FREE)
     setShowAccessoryView (false);
-   #endif
+#endif
 
-   #if defined (EL_FREE)
+#if defined(EL_FREE)
     setNodeChannelStripVisible (false);
-   #endif
+#endif
 
     resized();
 }
@@ -535,19 +538,32 @@ int ContentComponentSolo::getNavSize()
 
 void ContentComponentSolo::setMainView (const String& name)
 {
-    if (name == "PatchBay") {
+    if (name == "PatchBay")
+    {
         setContentView (new ConnectionGrid());
-    } else if (name == "GraphEditor" || name == "GraphEditorView") {
+    }
+    else if (name == "GraphEditor" || name == "GraphEditorView")
+    {
         setContentView (new GraphEditorView());
-    } else if (name == "PluginManager") {
+    }
+    else if (name == "PluginManager")
+    {
         setContentView (new PluginManagerContentView());
-    } else if (name == "SessionSettings" || name == "SessionProperties") {
+    }
+    else if (name == "SessionSettings" || name == "SessionProperties")
+    {
         setContentView (new SessionContentView());
-    } else if (name == "GraphSettings") {
+    }
+    else if (name == "GraphSettings")
+    {
         setContentView (new GraphSettingsView());
-    } else if (name == "KeymapEditorView") {
+    }
+    else if (name == "KeymapEditorView")
+    {
         setContentView (new KeymapEditorView());
-    } else if (name == "ControllerDevicesView") {
+    }
+    else if (name == "ControllerDevicesView")
+    {
         setContentView (new ControllerDevicesView());
     }
     else
@@ -597,11 +613,16 @@ void ContentComponentSolo::setContentView (ContentView* view, const bool accesso
 
 void ContentComponentSolo::setAccessoryView (const String& name)
 {
-    if (name == "PatchBay") {
+    if (name == "PatchBay")
+    {
         setContentView (new ConnectionGrid(), true);
-    } else if (name == EL_VIEW_GRAPH_MIXER) {
+    }
+    else if (name == EL_VIEW_GRAPH_MIXER)
+    {
         setContentView (new GraphMixerView(), true);
-    } else if (name == EL_VIEW_CONSOLE) {
+    }
+    else if (name == EL_VIEW_CONSOLE)
+    {
         setContentView (new LuaConsoleView(), true);
     }
 
@@ -611,23 +632,20 @@ void ContentComponentSolo::setAccessoryView (const String& name)
 void ContentComponentSolo::resizeContent (const Rectangle<int>& area)
 {
     Rectangle<int> r (area);
-    
+
     if (virtualKeyboardVisible && keyboard)
         keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
     if (nodeStrip && nodeStrip->isVisible())
         nodeStrip->setBounds (r.removeFromRight (nodeStripSize));
 
-    Component* comps [3] = { nav.get(), bar1.get(), container.get() };
-    layout.layOutComponents (comps, 3, r.getX(), r.getY(),
-                             r.getWidth(), r.getHeight(),
-                             false, true);
+    Component* comps[3] = { nav.get(), bar1.get(), container.get() };
+    layout.layOutComponents (comps, 3, r.getX(), r.getY(), r.getWidth(), r.getHeight(), false, true);
 }
 
 bool ContentComponentSolo::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
-    return desc.toString() == "ccNavConcertinaPanel" || 
-        (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
+    return desc.toString() == "ccNavConcertinaPanel" || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
 }
 
 void ContentComponentSolo::itemDropped (const SourceDetails& dragSourceDetails)
@@ -646,12 +664,11 @@ void ContentComponentSolo::itemDropped (const SourceDetails& dragSourceDetails)
         if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
-            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin",
-                                              "The plugin you dropped could not be loaded for an unknown reason.");
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin", "The plugin you dropped could not be loaded for an unknown reason.");
     }
 }
 
-bool ContentComponentSolo::isInterestedInFileDrag (const StringArray &files)
+bool ContentComponentSolo::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
     {
@@ -662,14 +679,14 @@ bool ContentComponentSolo::isInterestedInFileDrag (const StringArray &files)
     return false;
 }
 
-void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
+void ContentComponentSolo::filesDropped (const StringArray& files, int x, int y)
 {
     for (const auto& path : files)
     {
         const File file (path);
         if (file.hasFileExtension ("elc"))
         {
-            #if 0
+#if 0
             auto& unlock (getGlobals().getUnlockStatus());
             FileInputStream src (file);
             if (unlock.applyKeyFile (src.readString()))
@@ -687,7 +704,7 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
                     "Apply License File", "Your software could not be unlocked.");
             }
-            #endif
+#endif
         }
         else if (file.hasFileExtension ("els"))
         {
@@ -708,42 +725,41 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
             }
             else
             {
-                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Presets", "Error adding preset");
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
             }
         }
-        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&
-                 (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
+        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
         {
             auto s = getSession();
             auto graph = s->getActiveGraph();
             PluginDescription desc;
-            desc.pluginFormatName = file.hasFileExtension("vst3") ? "VST3" : "VST";
+            desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
             desc.fileOrIdentifier = file.getFullPathName();
 #if 0
             this->post(new LoadPluginMessage(desc, false));
 #endif
-            auto message = std::make_unique<AddPluginMessage>(graph, desc);
-            auto& builder(message->builder);
+            auto message = std::make_unique<AddPluginMessage> (graph, desc);
+            auto& builder (message->builder);
 
             if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
             {
-                const auto audioInputNode = graph.getIONode(PortType::Audio, true);
-                const auto midiInputNode = graph.getIONode(PortType::Midi, true);
-                builder.addChannel(audioInputNode, PortType::Audio, 0, 0, false);
-                builder.addChannel(audioInputNode, PortType::Audio, 1, 1, false);
-                builder.addChannel(midiInputNode, PortType::Midi, 0, 0, false);
+                const auto audioInputNode = graph.getIONode (PortType::Audio, true);
+                const auto midiInputNode = graph.getIONode (PortType::Midi, true);
+                builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
+                builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
+                builder.addChannel (midiInputNode, PortType::Midi, 0, 0, false);
             }
 
             if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
             {
-                const auto audioOutputNode = graph.getIONode(PortType::Audio, false);
-                const auto midiOutNode = graph.getIONode(PortType::Midi, false);
-                builder.addChannel(audioOutputNode, PortType::Audio, 0, 0, true);
-                builder.addChannel(audioOutputNode, PortType::Audio, 1, 1, true);
-                builder.addChannel(midiOutNode, PortType::Midi, 0, 0, true);
+                const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
+                const auto midiOutNode = graph.getIONode (PortType::Midi, false);
+                builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
+                builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
+                builder.addChannel (midiOutNode, PortType::Midi, 0, 0, true);
             }
 
-            this->post(message.release());
+            this->post (message.release());
         }
     }
 }
@@ -760,7 +776,7 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
     {
         setContentView (new EmptyContentView());
     }
-    
+
     if (auto* window = findParentComponentOfClass<DocumentWindow>())
         window->setName ("Element - " + session->getName());
     if (auto* ss = nav->findPanel<SessionTreePanel>())
@@ -771,16 +787,16 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
         ncv->stabilizeContent();
     if (auto* gcv = nav->findPanel<GraphSettingsView>())
         gcv->stabilizeContent();
-    
+
     stabilizeViews();
-    
+
     if (auto* main = findParentComponentOfClass<MainWindow>())
         main->refreshMenu();
-    
+
     if (refreshDataPathTrees)
         if (auto* data = nav->findPanel<DataPathTreeComponent>())
             data->refresh();
-    
+
     refreshToolbar();
     refreshStatusBar();
 }
@@ -820,11 +836,7 @@ void ContentComponentSolo::restoreState (PropertiesFile* props)
 
 void ContentComponentSolo::setCurrentNode (const Node& node)
 {
-    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) ||
-        getMainViewName() == "SessionSettings" ||
-        getMainViewName() == "PluginManager" ||
-        getMainViewName() == "ControllerDevicesView") &&
-        getSession()->getNumGraphs() > 0)
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllerDevicesView") && getSession()->getNumGraphs() > 0)
     {
         setMainView ("GraphEditor");
     }
@@ -856,10 +868,11 @@ void ContentComponentSolo::setVirtualKeyboardVisible (const bool isVisible)
 {
     if (isVisible == virtualKeyboardVisible)
         return;
-    
+
     if (isVisible)
     {
-        if (! keyboard) keyboard = new VirtualKeyboardView();
+        if (! keyboard)
+            keyboard = new VirtualKeyboardView();
         keyboard->willBecomeActive();
         addAndMakeVisible (keyboard);
         keyboard->didBecomeActive();
@@ -870,7 +883,7 @@ void ContentComponentSolo::setVirtualKeyboardVisible (const bool isVisible)
     {
         keyboard = nullptr;
     }
-    
+
     virtualKeyboardVisible = isVisible;
     resized();
 }
@@ -885,7 +898,7 @@ void ContentComponentSolo::setNodeChannelStripVisible (const bool isVisible)
 
     if (isVisible == nodeStrip->isVisible())
         return;
-    
+
     if (isVisible)
     {
         nodeStrip->willBecomeActive();
@@ -899,7 +912,7 @@ void ContentComponentSolo::setNodeChannelStripVisible (const bool isVisible)
     {
         nodeStrip->setVisible (false);
     }
-    
+
     resized();
 }
 
@@ -917,7 +930,8 @@ ApplicationCommandTarget* ContentComponentSolo::getNextCommandTarget()
 
 void ContentComponentSolo::setShowAccessoryView (const bool show)
 {
-    if (container) container->setShowAccessoryView (show);
+    if (container)
+        container->setShowAccessoryView (show);
 }
 
 bool ContentComponentSolo::showAccessoryView() const
@@ -928,10 +942,11 @@ bool ContentComponentSolo::showAccessoryView() const
 void ContentComponentSolo::getSessionState (String& state)
 {
     ValueTree data ("state");
-    
+
     if (auto* const ned = nav->findPanel<NodeEditorContentView>())
     {
-        String nedState; ned->getState (nedState);
+        String nedState;
+        ned->getState (nedState);
         if (nedState.isNotEmpty())
         {
             data.setProperty ("NodeEditorContentView", nedState, nullptr);
@@ -949,13 +964,14 @@ void ContentComponentSolo::getSessionState (String& state)
 
 void ContentComponentSolo::applySessionState (const String& state)
 {
-    MemoryBlock mb; mb.fromBase64Encoding (state);
+    MemoryBlock mb;
+    mb.fromBase64Encoding (state);
     const ValueTree data = (mb.getSize() > 0)
-        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
-        : ValueTree();
+                               ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+                               : ValueTree();
     if (! data.isValid())
         return;
-    
+
     if (auto* const ned = nav->findPanel<NodeEditorContentView>())
     {
         String nedState = data.getProperty ("NodeEditorContentView").toString();
@@ -969,4 +985,4 @@ void ContentComponentSolo::setMainView (ContentView* view)
     setContentView (view, false);
 }
 
-}
+} // namespace Element

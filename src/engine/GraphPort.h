@@ -32,7 +32,7 @@
 
     @see AudioProcessorGraph
 */
-class JUCE_API  GraphPort : public Processor
+class JUCE_API GraphPort : public Processor
 {
 public:
     /** Returns the mode of this processor. */
@@ -93,13 +93,11 @@ public:
     void setGraph (GraphProcessor*);
 
 private:
-
-    const PortType  portType;
+    const PortType portType;
     GraphProcessor* graph;
     const bool portIsInput;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphPort)
-
 };
 
 #endif // ELEMENT_PORTPROCESSOR_H

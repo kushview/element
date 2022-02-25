@@ -36,24 +36,23 @@ static ScriptDescription parseScriptComments (const String& buffer)
     for (index = 0; index < lines.size(); ++index)
     {
         const auto line = lines[index].trim();
-        
+
         if (! inBlock)
             inBlock = line.startsWith ("--[[");
-        
+
         if (inBlock || line.startsWith ("--"))
         {
             for (const auto& tag : tags)
             {
                 if (line.contains (tag))
                 {
-                    const auto value = line.fromFirstOccurrenceOf (tag, false, false).trimStart()
-                                           .upToFirstOccurrenceOf ("--]]", false, false).trimEnd();
-                    
+                    const auto value = line.fromFirstOccurrenceOf (tag, false, false).trimStart().upToFirstOccurrenceOf ("--]]", false, false).trimEnd();
+
                     // DBG (tag.replace("@","") << " = " << value);
-                    
+
                     if (tag == "@kind" && desc.type.isEmpty())
                     {
-                        desc.type = value.fromLastOccurrenceOf(".", false, false);
+                        desc.type = value.fromLastOccurrenceOf (".", false, false);
                     }
                     else if (tag == "@script" && desc.name.isEmpty())
                     {
@@ -72,7 +71,7 @@ static ScriptDescription parseScriptComments (const String& buffer)
 
             if (inBlock)
             {
-                inBlock  = ! line.contains ("--]]");
+                inBlock = ! line.contains ("--]]");
                 finished = ! inBlock;
             }
         }
@@ -81,7 +80,8 @@ static ScriptDescription parseScriptComments (const String& buffer)
             finished = true;
         }
 
-        if (finished) {
+        if (finished)
+        {
             // DBG("finihed at line index: " << index);
             // DBG("LINE: " << lines[index]);
             break;
@@ -95,7 +95,8 @@ ScriptDescription ScriptDescription::read (lua_State* L, const String& buffer)
 {
     sol::state_view view (L);
     ScriptDescription desc;
-    try {
+    try
+    {
         sol::table script;
         auto result = view.script (buffer.toRawUTF8());
         if (result.get_type() == sol::type::table)
@@ -103,13 +104,13 @@ ScriptDescription ScriptDescription::read (lua_State* L, const String& buffer)
 
         if (script.valid())
         {
-            desc.name           = script["name"].get_or<std::string> ("");
-            desc.type           = script["type"].get_or<std::string> ("");
-            desc.author         = script["author"].get_or<std::string> ("");
-            desc.description    = script["description"].get_or<std::string> ("");
+            desc.name = script["name"].get_or<std::string> ("");
+            desc.type = script["type"].get_or<std::string> ("");
+            desc.author = script["author"].get_or<std::string> ("");
+            desc.description = script["description"].get_or<std::string> ("");
         }
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception&)
+    {
         desc = {};
     }
 
@@ -129,22 +130,24 @@ ScriptDescription ScriptDescription::read (File file)
     return read (file.loadFileAsString());
 }
 
-ScriptDescription ScriptDescription::parse (const String& buffer) {
+ScriptDescription ScriptDescription::parse (const String& buffer)
+{
     auto desc = parseScriptComments (buffer);
     desc.source = "";
     return desc;
 }
 
-ScriptDescription ScriptDescription::parse (File file) {
-    ScriptDescription desc; 
+ScriptDescription ScriptDescription::parse (File file)
+{
+    ScriptDescription desc;
 
     if (file.existsAsFile())
     {
         desc = parseScriptComments (file.loadFileAsString());
-        desc.source = URL(file).toString (false);
+        desc.source = URL (file).toString (false);
     }
 
     return desc;
 }
 
-}
+} // namespace Element

@@ -29,14 +29,30 @@ class AudioFilePlayerNode : public BaseProcessor,
                             public AsyncUpdater
 {
 public:
-    enum Parameters { Playing = 0, Slave, Volume, Looping };
-    enum MidiPlayState { None = 0, Start, Stop, Continue };
+    enum Parameters
+    {
+        Playing = 0,
+        Slave,
+        Volume,
+        Looping
+    };
+    enum MidiPlayState
+    {
+        None = 0,
+        Start,
+        Stop,
+        Continue
+    };
 
-    AudioFilePlayerNode ();
+    AudioFilePlayerNode();
     virtual ~AudioFilePlayerNode();
 
     AudioFormatManager& getAudioFormatManager() { return formats; }
-    void setWatchDir (const File& newWatchDir) { watchDir = newWatchDir; jassert (newWatchDir.isDirectory()); }
+    void setWatchDir (const File& newWatchDir)
+    {
+        watchDir = newWatchDir;
+        jassert (newWatchDir.isDirectory());
+    }
     File getWatchDir() const { return watchDir; }
 
     void handleAsyncUpdate() override;
@@ -47,7 +63,7 @@ public:
     void openFile (const File& file);
     const File& getAudioFile() const { return audioFile; }
     String getWildcard() const { return formats.getWildcardForAllFormats(); }
-    
+
     bool canLoad (const File& file)
     {
         std::unique_ptr<AudioFormatReader> reader (formats.createReaderFor (file));
@@ -64,22 +80,34 @@ public:
     void releaseResources() override;
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
-    bool canAddBus (bool isInput) const override                     { ignoreUnused (isInput); return false; }
-    bool canRemoveBus (bool isInput) const override                  { ignoreUnused (isInput); return false; }
+    bool canAddBus (bool isInput) const override
+    {
+        ignoreUnused (isInput);
+        return false;
+    }
+    bool canRemoveBus (bool isInput) const override
+    {
+        ignoreUnused (isInput);
+        return false;
+    }
 
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    double getTailLengthSeconds() const override        { return 0.0; }
-    bool acceptsMidi() const override                   { return false; }
-    bool producesMidi() const override                  { return false; }
-    bool supportsMPE() const override                   { return false; }
-    bool isMidiEffect() const override                  { return false; }
+    double getTailLengthSeconds() const override { return 0.0; }
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
+    bool supportsMPE() const override { return false; }
+    bool isMidiEffect() const override { return false; }
 
-    int getNumPrograms() override                       { return 1; };
-    int getCurrentProgram() override                    { return 0; };
-    void setCurrentProgram (int index) override         { ignoreUnused (index); };
-    const String getProgramName (int index) override    { ignoreUnused (index); return getName(); }
+    int getNumPrograms() override { return 1; };
+    int getCurrentProgram() override { return 0; };
+    void setCurrentProgram (int index) override { ignoreUnused (index); };
+    const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return getName();
+    }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
     void getStateInformation (juce::MemoryBlock& destData) override;
@@ -89,12 +117,12 @@ public:
     void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
 
     AudioTransportSource& getPlayer() { return player; }
-    
+
     Signal<void()> restoredState;
 
 protected:
     bool isBusesLayoutSupported (const BusesLayout&) const override;
-    
+
 #if 0
     // Audio Processor Template
     
@@ -132,10 +160,10 @@ private:
     AudioFormatManager formats;
     AudioTransportSource player;
 
-    AudioParameterBool*   slave     { nullptr };
-    AudioParameterBool* playing     { nullptr };
-    AudioParameterFloat* volume     { nullptr };
-    AudioParameterBool* looping     { nullptr };
+    AudioParameterBool* slave { nullptr };
+    AudioParameterBool* playing { nullptr };
+    AudioParameterFloat* volume { nullptr };
+    AudioParameterBool* looping { nullptr };
 
     File audioFile;
     Atomic<int> midiStartStopContinue;
@@ -143,11 +171,11 @@ private:
 
     bool wasPlaying { false };
     double lastTransportPos { 0.0 };
-    
+
     File watchDir;
 
     void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioFilePlayerNode)
 };
 
-}
+} // namespace Element

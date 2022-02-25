@@ -31,9 +31,9 @@ class UnlockStatus;
 
 struct AppMessage;
 
-class AppController :  public Controller,
-                       public MessageListener,
-                       protected ApplicationCommandTarget
+class AppController : public Controller,
+                      public MessageListener,
+                      protected ApplicationCommandTarget
 {
 public:
     AppController (Globals&, RunMode mode = RunMode::Standalone);
@@ -70,14 +70,14 @@ public:
                   protected ApplicationCommandTarget
     {
     public:
-        Child() { }
-        virtual ~Child() { }
-        
+        Child() {}
+        virtual ~Child() {}
+
         inline AppController& getAppController() const
         {
             auto* const app = dynamic_cast<AppController*> (getRoot());
-            jassert (app); // if you hit this then you're probably calling 
-                           // this before controller initialization
+            jassert (app); // if you hit this then you're probably calling
+                // this before controller initialization
             return *app;
         }
 
@@ -88,27 +88,27 @@ public:
     protected:
         friend class AppController;
         virtual bool handleMessage (const AppMessage&) { return false; }
-    
+
         friend class ApplicationCommandTarget;
         virtual ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; }
         virtual void getAllCommands (Array<CommandID>&) override {}
         virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
         virtual bool perform (const InvocationInfo&) override { return false; }
     };
-    
+
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
-    
+
     void checkForegroundStatus();
-    
+
 protected:
     friend class ApplicationCommandTarget;
     ApplicationCommandTarget* getNextCommandTarget() override;
     void getAllCommands (Array<CommandID>& commands) override;
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
-    
+
     void handleMessage (const Message&) override;
-    
+
 private:
     friend class Application;
     File lastSavedFile;
@@ -121,4 +121,4 @@ private:
     void run();
 };
 
-}
+} // namespace Element

@@ -32,4 +32,4 @@ public:
     void exec (const String& sql);
 };
 
-}
+} // namespace Element

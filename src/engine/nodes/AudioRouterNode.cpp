@@ -21,7 +21,7 @@
 #include "engine/nodes/AudioRouterNode.h"
 #include "Common.h"
 
-#define TRACE_AUDIO_ROUTER(output) 
+#define TRACE_AUDIO_ROUTER(output)
 
 namespace Element {
 
@@ -32,7 +32,7 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
       state (ins, outs),
       toggles (ins, outs),
       nextToggles (ins, outs)
-{    
+{
     fadeIn.setFadesIn (true);
     fadeIn.setLength (fadeLengthSeconds);
     fadeOut.setFadesIn (false);
@@ -77,11 +77,11 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
     }
 }
 
-AudioRouterNode::~AudioRouterNode() { }
+AudioRouterNode::~AudioRouterNode() {}
 
 void AudioRouterNode::setCurrentProgram (int index)
 {
-    if (auto* program = programs [index])
+    if (auto* program = programs[index])
     {
         currentProgram = index;
         setMatrixState (program->matrix);
@@ -117,9 +117,9 @@ String AudioRouterNode::getSizeString() const
 
 void AudioRouterNode::setSize (int newIns, int newOuts)
 {
-    newIns  = jmax (1, newIns);
+    newIns = jmax (1, newIns);
     newOuts = jmax (1, newOuts);
-    
+
     {
         ScopedLock sl1 (getLock());
         if (newIns == numSources && newOuts == numDestinations)
@@ -129,7 +129,7 @@ void AudioRouterNode::setSize (int newIns, int newOuts)
     state.resize (newIns, newOuts, true);
     ToggleGrid newPatches (state);
     ToggleGrid newNextPatches (state);
-    
+
     {
         ScopedLock sl (getLock());
         nextToggles.swapWith (newNextPatches);
@@ -161,14 +161,17 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     const auto& midiBuffer = *midi.getReadBuffer (0);
 
     MidiBuffer::Iterator iter (midiBuffer);
-    MidiMessage msg; int midiFrame = 0;
-    
+    MidiMessage msg;
+    int midiFrame = 0;
+
     while (iter.getNextEvent (msg, midiFrame))
     {
         if (! msg.isProgramChange())
             continue;
         if (3 == msg.getProgramChangeNumber())
-            { DBG("program "); }
+        {
+            DBG ("program ");
+        }
     }
 
     const int numFrames = audio.getNumSamples();
@@ -182,7 +185,7 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         fadeIn.reset();
         fadeOut.reset();
         sizeChanged = false;
-        TRACE_AUDIO_ROUTER("size changed");
+        TRACE_AUDIO_ROUTER ("size changed");
     }
 
     if (togglesChanged)
@@ -192,7 +195,7 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         fadeOut.reset();
         fadeOut.startFading();
         togglesChanged = false;
-        TRACE_AUDIO_ROUTER("fade start");
+        TRACE_AUDIO_ROUTER ("fade start");
     }
 
     if (numSources > numChannels || numDestinations > numChannels)
@@ -207,19 +210,19 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         auto framesToProcess = numFrames;
         int frame = 0;
         ScopedLock sl (lock);
-        
-        float fadeInGain  = 0.0f;
+
+        float fadeInGain = 0.0f;
         float fadeOutGain = 1.0f;
 
         while (--framesToProcess >= 0)
         {
-            fadeInGain  = fadeIn.isActive()  ? fadeIn.getNextEnvelopeValue()  : 1.0f;
+            fadeInGain = fadeIn.isActive() ? fadeIn.getNextEnvelopeValue() : 1.0f;
             fadeOutGain = fadeOut.isActive() ? fadeOut.getNextEnvelopeValue() : 0.0f;
 
-            if (!fadeIn.isActive() && !fadeOut.isActive())
+            if (! fadeIn.isActive() && ! fadeOut.isActive())
             {
-                TRACE_AUDIO_ROUTER("last frame fade in gain  : " << fadeInGain);
-                TRACE_AUDIO_ROUTER("last frame fade out gain : " << fadeOutGain);
+                TRACE_AUDIO_ROUTER ("last frame fade in gain  : " << fadeInGain);
+                TRACE_AUDIO_ROUTER ("last frame fade out gain : " << fadeOutGain);
             }
 
             for (int i = 0; i < numSources; ++i)
@@ -229,66 +232,63 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
                     if (toggles.get (i, j) && nextToggles.get (i, j))
                     {
                         // no patch change and on means 1 to 1 mix
-                        tempAudio.getWritePointer(j)[frame] += 
-                            audio.getReadPointer(i)[frame];
+                        tempAudio.getWritePointer (j)[frame] +=
+                            audio.getReadPointer (i)[frame];
                     }
                     else if (! toggles.get (i, j) && ! nextToggles.get (i, j))
                     {
                         // no patch change and off means no fade and zero'd
-                        tempAudio.getWritePointer(j)[frame] += 0.0f;
+                        tempAudio.getWritePointer (j)[frame] += 0.0f;
                     }
-                    else if (!toggles.get (i, j) && nextToggles.get (i, j))
+                    else if (! toggles.get (i, j) && nextToggles.get (i, j))
                     {
-                        tempAudio.getWritePointer(j)[frame] += 
-                            (audio.getReadPointer(i)[frame] * fadeInGain);
+                        tempAudio.getWritePointer (j)[frame] +=
+                            (audio.getReadPointer (i)[frame] * fadeInGain);
                     }
-                    else if (toggles.get (i, j) && !nextToggles.get (i, j))
+                    else if (toggles.get (i, j) && ! nextToggles.get (i, j))
                     {
-                        tempAudio.getWritePointer(j)[frame] += 
-                            (audio.getReadPointer(i)[frame] * fadeOutGain);
+                        tempAudio.getWritePointer (j)[frame] +=
+                            (audio.getReadPointer (i)[frame] * fadeOutGain);
                     }
                 }
             }
 
             ++frame;
 
-            if (!fadeIn.isActive() && !fadeOut.isActive())
+            if (! fadeIn.isActive() && ! fadeOut.isActive())
                 break;
         }
 
-        if (!fadeOut.isActive() && !fadeIn.isActive())
+        if (! fadeOut.isActive() && ! fadeIn.isActive())
         {
-            TRACE_AUDIO_ROUTER("fade stopped @ frame: " << (frame));
-            TRACE_AUDIO_ROUTER("fade in level  : " << fadeInGain);
-            TRACE_AUDIO_ROUTER("fade out level : " << fadeOutGain);
+            TRACE_AUDIO_ROUTER ("fade stopped @ frame: " << (frame));
+            TRACE_AUDIO_ROUTER ("fade in level  : " << fadeInGain);
+            TRACE_AUDIO_ROUTER ("fade out level : " << fadeOutGain);
 
             if (framesToProcess > 0)
             {
-                TRACE_AUDIO_ROUTER("rendering " << framesToProcess << " remainging frames");
+                TRACE_AUDIO_ROUTER ("rendering " << framesToProcess << " remainging frames");
                 for (int i = 0; i < numSources; ++i)
                 {
                     for (int j = 0; j < numDestinations; ++j)
                     {
-                        if (toggles.get(i, j) && nextToggles.get (i, j))
+                        if (toggles.get (i, j) && nextToggles.get (i, j))
                         {
                             // no patch change and on means 1 to 1 mix
-                            tempAudio.addFrom (j, frame, audio.getReadPointer (i, frame), 
-                                               framesToProcess);
+                            tempAudio.addFrom (j, frame, audio.getReadPointer (i, frame), framesToProcess);
                         }
                         else if (! toggles.get (i, j) && ! nextToggles.get (i, j))
                         {
                             // patch not changed and of, so clear the out channel.
                             // nothing to do
                         }
-                        else if (!toggles.get (i, j) && nextToggles.get (i, j))
+                        else if (! toggles.get (i, j) && nextToggles.get (i, j))
                         {
-                            tempAudio.addFromWithRamp (j, frame, audio.getReadPointer (i, frame), 
-                                                          framesToProcess, fadeInGain, 1.0f);
+                            tempAudio.addFromWithRamp (j, frame, audio.getReadPointer (i, frame), framesToProcess, fadeInGain, 1.0f);
                         }
-                        else if (toggles.get (i, j) && !nextToggles.get (i, j))
+                        else if (toggles.get (i, j) && ! nextToggles.get (i, j))
                         {
-                            tempAudio.addFromWithRamp (j, frame, audio.getReadPointer (i, frame),
-                                                          framesToProcess, fadeOutGain, 0.0f);
+                            tempAudio.addFromWithRamp (j, frame, audio.getReadPointer (i, frame), framesToProcess, fadeOutGain, 0.0f);
                         }
                         else
                         {
@@ -312,7 +312,7 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     }
 
     for (int c = 0; c < numChannels; ++c)
-        audio.copyFrom (c, 0, tempAudio.getReadPointer(c), numFrames);
+        audio.copyFrom (c, 0, tempAudio.getReadPointer (c), numFrames);
     midi.clear();
 }
 
@@ -323,9 +323,9 @@ void AudioRouterNode::getState (MemoryBlock& block)
 }
 
 void AudioRouterNode::setState (const void* data, int sizeInBytes)
-{ 
+{
     const auto tree = ValueTree::readFromData (data, (size_t) sizeInBytes);
-    
+
     if (tree.isValid())
     {
         kv::MatrixState matrix;
@@ -380,4 +380,4 @@ void AudioRouterNode::clearPatches()
             state.set (r, c, false);
 }
 
-}
+} // namespace Element

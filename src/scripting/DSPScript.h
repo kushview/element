@@ -36,7 +36,7 @@ public:
 
     void init()
     {
-        if (sol::function f = DSP ["init"])
+        if (sol::function f = DSP["init"])
             f();
     }
 
@@ -48,13 +48,13 @@ public:
     //==========================================================================
     void prepare (double rate, int block)
     {
-        if (sol::function f = DSP ["prepare"])
+        if (sol::function f = DSP["prepare"])
             f (rate, block);
     }
-    
+
     void release()
     {
-        if (sol::function f = DSP ["release"])
+        if (sol::function f = DSP["release"])
             f();
     }
 
@@ -80,20 +80,24 @@ public:
 private:
     sol::table DSP;
     sol::function processFunc;
-    AudioBuffer<float>** audio  = nullptr;
-    LuaMidiPipe** midi          = nullptr;
-    int processRef              = LUA_REFNIL;
-    int audioRef                = LUA_REFNIL;
-    int midiRef                 = LUA_REFNIL;
-    lua_State* L                = nullptr;
-    bool loaded                 = false;
-    int numParams               = 0;
-    enum { maxParams = 128 };
-    float paramData [maxParams];
+    AudioBuffer<float>** audio = nullptr;
+    LuaMidiPipe** midi = nullptr;
+    int processRef = LUA_REFNIL;
+    int audioRef = LUA_REFNIL;
+    int midiRef = LUA_REFNIL;
+    lua_State* L = nullptr;
+    bool loaded = false;
+    int numParams = 0;
+    enum
+    {
+        maxParams = 128
+    };
+    float paramData[maxParams];
     sol::userdata params;
     kv::PortList ports;
 
-    class Parameter; friend class Parameter;
+    class Parameter;
+    friend class Parameter;
     ReferenceCountedArray<Parameter> inParams, outParams;
 
     void deref();
@@ -105,4 +109,4 @@ private:
     void setParameter (int, float);
 };
 
-}
+} // namespace Element

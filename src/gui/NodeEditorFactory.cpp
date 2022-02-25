@@ -31,14 +31,14 @@ public:
 
     void findEditors (Array<NodeEditorDescription>&) override {}
 
-    NodeEditorComponent* instantiate (const String& identifier, const Node& node,
-                                      NodeEditorPlacement placement) override
+    NodeEditorComponent* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
 
     {
-        if (node.getFormat() != EL_INTERNAL_FORMAT_NAME || identifier != EL_NODE_EDITOR_DEFAULT_ID) {
+        if (node.getFormat() != EL_INTERNAL_FORMAT_NAME || identifier != EL_NODE_EDITOR_DEFAULT_ID)
+        {
             return nullptr;
         }
-        
+
         switch (placement)
         {
             case NodeEditorPlacement::PluginWindow:
@@ -47,11 +47,13 @@ public:
             case NodeEditorPlacement::NavigationPanel:
                 return instantiateForNavigationPanel (node);
                 break;
-            default: break;
+            default:
+                break;
         }
 
         return nullptr;
     }
+
 private:
     NodeEditorComponent* instantiateForPluginWindow (const Node& node)
     {
@@ -157,10 +159,10 @@ private:
         auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (proc != nullptr)
         {
-            if (node.getFormat() == "Element" && !proc->hasEditor())
+            if (node.getFormat() == "Element" && ! proc->hasEditor())
                 return new GenericNodeEditor (node);
         }
-        
+
         return nullptr;
     }
 };
@@ -190,10 +192,10 @@ std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEdi
     if (proc == nullptr)
         return nullptr;
 
-    editor.reset (proc->hasEditor() ? proc->createEditorIfNeeded() 
-        : new GenericAudioProcessorEditor (proc));
+    editor.reset (proc->hasEditor() ? proc->createEditorIfNeeded()
+                                    : new GenericAudioProcessorEditor (proc));
 
     return editor;
 }
 
-}
+} // namespace Element

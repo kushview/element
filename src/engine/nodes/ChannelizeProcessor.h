@@ -25,28 +25,28 @@ namespace Element {
 
 namespace Midi {
 
-inline static int getChannel (const uint8 *data)
-{
-    if ((data[0] & 0xf0) != 0xf0)
-        return (data[0] & 0xf) + 1;
-    return 0;
-}
+    inline static int getChannel (const uint8* data)
+    {
+        if ((data[0] & 0xf0) != 0xf0)
+            return (data[0] & 0xf) + 1;
+        return 0;
+    }
 
-inline static void setChannel (uint8 *data, const int channel)
-{
-    jassert (channel > 0 && channel <= 16); // valid channels are numbered 1 to 16
-    if ((data[0] & 0xf0) != (uint8) 0xf0)
-        data[0] = (uint8) ((data[0] & (uint8) 0xf0)
-                            | (uint8)(channel - 1));
-}
+    inline static void setChannel (uint8* data, const int channel)
+    {
+        jassert (channel > 0 && channel <= 16); // valid channels are numbered 1 to 16
+        if ((data[0] & 0xf0) != (uint8) 0xf0)
+            data[0] = (uint8) ((data[0] & (uint8) 0xf0)
+                               | (uint8) (channel - 1));
+    }
 
-}
+} // namespace Midi
 
 class ChannelizeProcessor : public BaseProcessor
 {
     AudioParameterInt* channel = nullptr;
+
 public:
-    
     ChannelizeProcessor()
     {
         setPlayConfigDetails (0, 0, 44100.0, 512);
@@ -62,33 +62,35 @@ public:
     inline void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_CHANNELIZE;
-        desc.descriptiveName    = "MIDI Channelize";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.fileOrIdentifier = EL_INTERNAL_ID_CHANNELIZE;
+        desc.descriptiveName = "MIDI Channelize";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
-    
+
     inline AudioProcessorEditor* createEditor() override { return nullptr; }
     inline bool hasEditor() const override { return false; }
 
-    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override { 
+    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
+    {
         setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
     }
-    inline void releaseResources() override { }
+    inline void releaseResources() override {}
 
     inline void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
     {
         const int outChan = *channel;
         if (outChan <= 0)
             return;
-        
+
         MidiBuffer::Iterator iter (midiMessages);
-        const uint8* data = nullptr; int bytes = 0, frame = 0;
+        const uint8* data = nullptr;
+        int bytes = 0, frame = 0;
         while (iter.getNextEvent (data, bytes, frame))
         {
             // TODO: optimize
@@ -106,7 +108,7 @@ public:
     inline bool acceptsMidi() const override { return true; }
     inline bool producesMidi() const override { return true; }
     inline bool supportsMPE() const override { return false; }
-    inline bool isMidiEffect() const override  { return true; }
+    inline bool isMidiEffect() const override { return true; }
 
     inline void getStateInformation (juce::MemoryBlock& destData) override
     {
@@ -118,9 +120,9 @@ public:
 
         destData.append (&chtoWrite, sizeof (int));
     }
-    
+
     inline void setStateInformation (const void* data, int sizeInBytes) override
-    { 
+    {
         MemoryBlock block (data, sizeInBytes);
         ScopedLock sl (getCallbackLock());
         *channel = *reinterpret_cast<int*> (block.getData());
@@ -129,7 +131,11 @@ public:
     inline int getNumPrograms() override { return 1; }
     inline int getCurrentProgram() override { return 0; }
     inline void setCurrentProgram (int index) override { ignoreUnused (index); }
-    inline const String getProgramName (int index) override { ignoreUnused (index); return ""; }
+    inline const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return "";
+    }
     inline void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
 #if 0
@@ -175,4 +181,4 @@ private:
     MidiBuffer tempMidi;
 };
 
-}
+} // namespace Element

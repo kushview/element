@@ -35,7 +35,7 @@ public:
         setEditable (false, true);
     }
 
-    ~ProgramNameLabel() { }
+    ~ProgramNameLabel() {}
 
     void setRow (int r) { row = r; }
 
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    void update() { }
+    void update() {}
 
 protected:
     void textWasEdited() override
@@ -72,12 +72,12 @@ class ProgramNumberLabel : public Label
 public:
     ProgramNumberLabel (MidiProgramMapEditor& e, bool input)
         : editor (e), isInput (input)
-    { 
+    {
         setEditable (false, true);
         setJustificationType (Justification::centred);
     }
-    
-    ~ProgramNumberLabel() { }
+
+    ~ProgramNumberLabel() {}
 
     void mouseDown (const MouseEvent& ev) override
     {
@@ -136,80 +136,81 @@ public:
     TableModel (MidiProgramMapEditor& e)
         : editor (e) {}
 
-    ~TableModel() { }
+    ~TableModel() {}
 
     int getNumRows() override { return editor.getNumPrograms(); }
 
-    void paintRowBackground (Graphics& g, int rowNumber, int width, int height,
-                                        bool rowIsSelected) override
+    void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
         ViewHelpers::drawBasicTextRow ("", g, width, height, rowIsSelected);
     }
 
-    void paintCell (Graphics& g, int rowNumber, int columnId,
-                    int width, int height, bool rowIsSelected) override
+    void paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override
     {
         const auto program = editor.getProgram (rowNumber);
-        Justification alignment = columnId == TableModel::Name 
-            ? Justification::centredLeft : Justification::centred;
+        Justification alignment = columnId == TableModel::Name
+                                      ? Justification::centredLeft
+                                      : Justification::centred;
         int padding = columnId == TableModel::Name ? 4 : 0;
 
         String text;
         switch (columnId)
         {
-            case TableModel::Name:       text = program.name; break;
-            case TableModel::InProgram:  text = String (1 + program.in); break;
-            case TableModel::OutProgram: text = String (1 + program.out); break;
+            case TableModel::Name:
+                text = program.name;
+                break;
+            case TableModel::InProgram:
+                text = String (1 + program.in);
+                break;
+            case TableModel::OutProgram:
+                text = String (1 + program.out);
+                break;
         }
 
         g.setFont (editor.getFontSize());
         ViewHelpers::drawBasicTextRow (text, g, width, height, rowIsSelected, padding, alignment);
     }
 
-    Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
-                                        Component* existing) override
+    Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected, Component* existing) override
     {
         const auto program = editor.getProgram (rowNumber);
         Label* label = nullptr;
         switch (columnId)
         {
-            case TableModel::Name:
-            {
-                ProgramNameLabel* name = existing == nullptr ? new ProgramNameLabel (editor) :
-                    dynamic_cast<ProgramNameLabel*> (existing);
+            case TableModel::Name: {
+                ProgramNameLabel* name = existing == nullptr ? new ProgramNameLabel (editor) : dynamic_cast<ProgramNameLabel*> (existing);
                 name->setText (program.name, dontSendNotification);
                 name->setRow (rowNumber);
                 label = name;
-            } break;
+            }
+            break;
 
-            case TableModel::InProgram:
-            {
-                ProgramNumberLabel* input = existing == nullptr ? new ProgramNumberLabel (editor, true) :
-                    dynamic_cast<ProgramNumberLabel*> (existing);
+            case TableModel::InProgram: {
+                ProgramNumberLabel* input = existing == nullptr ? new ProgramNumberLabel (editor, true) : dynamic_cast<ProgramNumberLabel*> (existing);
                 input->setProgram (program.in);
                 input->setRow (rowNumber);
                 label = input;
-            } break;
+            }
+            break;
 
-            case TableModel::OutProgram: 
-            {
-                ProgramNumberLabel* output = existing == nullptr ? new ProgramNumberLabel (editor, false) :
-                    dynamic_cast<ProgramNumberLabel*> (existing);
+            case TableModel::OutProgram: {
+                ProgramNumberLabel* output = existing == nullptr ? new ProgramNumberLabel (editor, false) : dynamic_cast<ProgramNumberLabel*> (existing);
                 output->setProgram (program.out);
                 output->setRow (rowNumber);
                 label = output;
-            } break;
+            }
+            break;
         }
-        
+
         if (label == nullptr)
             return nullptr;
-        
+
         label->setFont (Font (editor.getFontSize()));
 
         return label;
     }
 
-   #if 0
+#if 0
     virtual void cellClicked (int rowNumber, int columnId, const MouseEvent&);
     virtual void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&);
     virtual void backgroundClicked (const MouseEvent&);
@@ -221,7 +222,7 @@ public:
     void returnKeyPressed (int lastRowSelected) override {}
     void listWasScrolled() override {}
     var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows) override {}
-   #endif
+#endif
 };
 
 MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
@@ -233,12 +234,9 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
 
     auto& header = table.getHeader();
     const int flags = TableHeaderComponent::visible;
-    header.addColumn ("Name", TableModel::Name, 100, 100, -1, 
-        flags, -1);
-    header.addColumn ("Input", TableModel::InProgram, 50, 50, -1, 
-        flags, -1);
-    header.addColumn ("Output", TableModel::OutProgram, 50, 50, -1, 
-        flags, -1);
+    header.addColumn ("Name", TableModel::Name, 100, 100, -1, flags, -1);
+    header.addColumn ("Input", TableModel::InProgram, 50, 50, -1, flags, -1);
+    header.addColumn ("Output", TableModel::OutProgram, 50, 50, -1, flags, -1);
     model.reset (new TableModel (*this));
     table.setModel (model.get());
     table.updateContent();
@@ -249,7 +247,7 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
     addAndMakeVisible (delButton);
     delButton.setButtonText ("-");
     delButton.onClick = std::bind (&MidiProgramMapEditor::removeSelectedProgram, this);
-    
+
     addAndMakeVisible (fontSlider);
     fontSlider.setSliderStyle (Slider::LinearBar);
     fontSlider.setRange (9.0, 72.0, 1.0);
@@ -268,9 +266,9 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
         lastProgramChangeConnection = node->lastProgramChanged.connect (
             std::bind (&MidiProgramMapEditor::selectLastProgram, this));
         node->addChangeListener (this);
-        node->sendChangeMessage();  // Workaround to get font size right.
-                                    // setFontSize needs to know if this is in a plugin window
-                                    // and doesn't know until after the ctor has returned
+        node->sendChangeMessage(); // Workaround to get font size right.
+            // setFontSize needs to know if this is in a plugin window
+            // and doesn't know until after the ctor has returned
     }
     else
     {
@@ -312,7 +310,7 @@ void MidiProgramMapEditor::setFontSize (float newSize, bool updateNode)
 {
     float defaultSize = getDefaultFontSize();
     fontSize = jlimit (9.f, 72.f, newSize);
-    
+
     if (isRunningInPluginWindow())
     {
         table.setRowHeight (6 + static_cast<int> (1.125 * fontSize));
@@ -324,7 +322,7 @@ void MidiProgramMapEditor::setFontSize (float newSize, bool updateNode)
 
     if ((double) fontSize != fontSlider.getValue())
         fontSlider.setValue (fontSize, dontSendNotification);
-    
+
     table.updateContent();
 
     if (updateNode)
@@ -411,13 +409,14 @@ void MidiProgramMapEditor::addProgram()
         const int program = nextBestProgram (*node);
         if (program >= 0)
         {
-            String name = "Program "; name << (program + 1);
+            String name = "Program ";
+            name << (program + 1);
             node->addProgramEntry (name, program);
             table.updateContent();
         }
         else
         {
-            DBG("couldn't find a good program");
+            DBG ("couldn't find a good program");
         }
     }
 }
@@ -432,7 +431,7 @@ int MidiProgramMapEditor::getNumPrograms() const
 void MidiProgramMapEditor::removeSelectedProgram()
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
-    {    
+    {
         const int selected = table.getSelectedRow();
         if (! isPositiveAndBelow (selected, node->getNumProgramEntries()))
             return;
@@ -441,9 +440,8 @@ void MidiProgramMapEditor::removeSelectedProgram()
     }
 }
 
-void MidiProgramMapEditor::paint (Graphics& g) 
+void MidiProgramMapEditor::paint (Graphics& g)
 {
-    
 }
 
 void MidiProgramMapEditor::resized()
@@ -463,8 +461,7 @@ void MidiProgramMapEditor::resized()
     auto& header = table.getHeader();
 
     header.setColumnWidth (TableModel::Name,
-        table.getWidth() - (header.getColumnWidth (TableModel::InProgram) + 
-                             header.getColumnWidth (TableModel::OutProgram)));
+                           table.getWidth() - (header.getColumnWidth (TableModel::InProgram) + header.getColumnWidth (TableModel::OutProgram)));
 
     if (isRunningInPluginWindow())
         if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
@@ -484,7 +481,8 @@ void MidiProgramMapEditor::setStoreSize (const bool storeSize)
 void MidiProgramMapEditor::selectLastProgram()
 {
     MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>();
-    if (! node) return;
+    if (! node)
+        return;
     const auto lastProgram = node->getLastProgram();
     for (int i = 0; i < getNumPrograms(); ++i)
     {
@@ -497,4 +495,4 @@ void MidiProgramMapEditor::selectLastProgram()
     }
 }
 
-}
+} // namespace Element

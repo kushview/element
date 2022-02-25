@@ -25,10 +25,10 @@
 #include "plugins/PluginProcessor.h"
 #include "ElementApp.h"
 
-#define EL_PLUGIN_MIN_WIDTH         546
-#define EL_PLUGIN_MIN_HEIGHT        266
-#define EL_PLUGIN_DEFAULT_WIDTH     760
-#define EL_PLUGIN_DEFAULT_HEIGHT    480
+#define EL_PLUGIN_MIN_WIDTH 546
+#define EL_PLUGIN_MIN_HEIGHT 266
+#define EL_PLUGIN_DEFAULT_WIDTH 760
+#define EL_PLUGIN_DEFAULT_HEIGHT 480
 
 namespace Element {
 using Element::LookAndFeel;
@@ -53,29 +53,28 @@ public:
             setRange (0.0, 1.0);
 
         handleNewParameterValue();
-        
+
         onValueChange = [this]() { sliderValueChanged(); };
-        onDragStart   = [this]() { sliderStartedDragging(); };
-        onDragEnd     = [this]() { sliderStoppedDragging(); };
-        
+        onDragStart = [this]() { sliderStartedDragging(); };
+        onDragEnd = [this]() { sliderStoppedDragging(); };
+
         updateEnablement();
         updateToolTip();
 
-        param.onCleared = [this]()
-        {
+        param.onCleared = [this]() {
             updateEnablement();
             updateToolTip();
         };
 
         startTimerHz (100);
     }
-    
+
     ~PerformanceParameterSlider()
     {
         param.onCleared = nullptr;
         param.removeListener (this);
     }
-    
+
     void updateToolTip()
     {
         if (! param.haveNode())
@@ -83,17 +82,17 @@ public:
             setTooltip (param.getName (100));
             return;
         }
-        
+
         String message = param.getNode().getName();
         String paramName = param.getBoundParameterName();
         if (paramName.isEmpty())
             paramName = param.getName (100);
-        
+
         if (message.isNotEmpty() && paramName.isNotEmpty())
             message << " - " << paramName;
         else if (paramName.isNotEmpty())
             message = paramName;
-        
+
         setTooltip (message);
     }
 
@@ -103,7 +102,7 @@ public:
     }
 
     void mouseDown (const MouseEvent& ev) override;
-    
+
 private:
     PerformanceParameter& param;
     Atomic<int> parameterValueHasChanged { 0 };
@@ -133,13 +132,13 @@ private:
 
     void updateTextDisplay()
     {
-        jassert(MessageManager::getInstance()->isThisTheMessageThread());
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
         // valueLabel.setText (getParameter().getCurrentValueAsText(), dontSendNotification);
     }
 
     void handleNewParameterValue()
     {
-        jassert(MessageManager::getInstance()->isThisTheMessageThread());
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
         if (! isDragging)
         {
             setValue (param.getValue(), dontSendNotification);
@@ -214,8 +213,8 @@ public:
         int space = 12;
         Rectangle<int> sb;
         sb = getLocalBounds();
-        
-       #if 0
+
+#if 0
         // right to left
         sb.removeFromRight (space);
         for (int i = sliders.size(); --i >= 0;)
@@ -224,16 +223,16 @@ public:
             slider->setBounds (sb.removeFromRight (44).reduced(4));
             sb.removeFromRight (space);
         }
-       #else
+#else
         // left to right
         sb.removeFromLeft (space);
         for (int i = 0; i < sliders.size(); ++i)
         {
-            auto* const slider = sliders [i];
+            auto* const slider = sliders[i];
             slider->setBounds (sb.removeFromLeft (44).reduced (4));
             sb.removeFromLeft (space);
         }
-       #endif
+#endif
     }
 
 private:
@@ -257,12 +256,9 @@ public:
 
     int getNumRows() override { return 8; }
 
-    void paintRowBackground (Graphics&, int rowNumber,
-                             int width, int height,
-                             bool rowIsSelected) override {}
+    void paintRowBackground (Graphics&, int rowNumber, int width, int height, bool rowIsSelected) override {}
 
-    void paintCell (Graphics& g, int rowNumber, int columnId,
-                    int width, int height, bool rowIsSelected) override
+    void paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override
     {
         g.setColour (Colours::black);
         g.fillRect (0, 0, width, height);
@@ -294,12 +290,11 @@ void PerformanceParameterSlider::mouseDown (const MouseEvent& ev)
         auto& processor = editor->getProcessor();
         PopupMenu menu = processor.getPerformanceParameterMenu (param.getParameterIndex());
         const int paramIndex = param.getParameterIndex();
-        menu.showMenuAsync (PopupMenu::Options().withTargetComponent(this),
-                            std::bind (&PluginProcessor::handlePerformanceParameterResult, &processor,
-                            std::placeholders::_1, paramIndex));
+        menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this),
+                            std::bind (&PluginProcessor::handlePerformanceParameterResult, &processor, std::placeholders::_1, paramIndex));
         return;
     }
-    
+
     return Slider::mouseDown (ev);
 }
 
@@ -308,16 +303,13 @@ class PluginEditor::ParamTableToggle : public Button
 {
 public:
     ParamTableToggle() : Button ("ParamToggle") {}
-    ~ParamTableToggle() { }
+    ~ParamTableToggle() {}
 
 protected:
-    void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
-                                   bool shouldDrawButtonAsDown) override
+    void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
         ignoreUnused (shouldDrawButtonAsDown);
-        getLookAndFeel().drawTreeviewPlusMinusBox (g, getLocalBounds().toFloat().reduced (2),
-            kv::LookAndFeel_KV1::widgetBackgroundColor.darker(), getToggleState(),
-            shouldDrawButtonAsHighlighted);
+        getLookAndFeel().drawTreeviewPlusMinusBox (g, getLocalBounds().toFloat().reduced (2), kv::LookAndFeel_KV1::widgetBackgroundColor.darker(), getToggleState(), shouldDrawButtonAsHighlighted);
     }
 };
 
@@ -331,8 +323,7 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
     paramToggle.reset (new ParamTableToggle());
     // addAndMakeVisible (paramToggle.get());
     paramToggle->setClickingTogglesState (true);
-    paramToggle->onClick = [this]
-    {
+    paramToggle->onClick = [this] {
         paramTableVisible = paramToggle->getToggleState();
         if (paramTableVisible)
         {
@@ -348,7 +339,7 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
 
     auto* const app = processor.getAppController();
     auto* const gui = app->findChild<GuiController>();
-    
+
     addAndMakeVisible (content = gui->getContentComponent());
     jassert (content);
     if (auto* cc = dynamic_cast<ContentComponent*> (content.getComponent()))
@@ -360,7 +351,7 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
     const auto& bounds (processor.getEditorBounds());
     if (bounds.getWidth() > 0 && bounds.getHeight() > 0)
     {
-        setSize (jmax (EL_PLUGIN_MIN_WIDTH,  bounds.getWidth()), 
+        setSize (jmax (EL_PLUGIN_MIN_WIDTH, bounds.getWidth()),
                  jmax (EL_PLUGIN_MIN_HEIGHT, bounds.getHeight()));
     }
     else
@@ -369,9 +360,9 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
     }
 
     setWantsPluginKeyboardFocus (processor.getEditorWantsKeyboard());
-    
+
     gui->stabilizeContent();
-    
+
     if (auto session = app->getWorld().getSession())
     {
         const auto graph (session->getActiveGraph());
@@ -383,7 +374,6 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
                     window->toFront (false);
         }
     }
-
 
     perfParamChangedConnection = processor.onPerfParamsChanged.connect (std::bind (
         &PluginEditor::updatePerformanceParamEnablements, this));
@@ -423,7 +413,7 @@ void PluginEditor::setWantsPluginKeyboardFocus (bool focus)
 
     setWantsKeyboardFocus (focus);
     processor.setEditorWantsKeyboard (focus);
-    
+
     if (getWantsKeyboardFocus())
     {
         addKeyListener (this);
@@ -440,9 +430,9 @@ bool PluginEditor::getWantsPluginKeyboardFocus() const
 }
 
 //==============================================================================
-int PluginEditor::getLatencySamples() const             { return processor.getLatencySamples(); }
-void PluginEditor::setReportZeroLatency (bool force)    { processor.setForceZeroLatency (force); }
-bool PluginEditor::isReportingZeroLatency() const       { return processor.isForcingZeroLatency(); }
+int PluginEditor::getLatencySamples() const { return processor.getLatencySamples(); }
+void PluginEditor::setReportZeroLatency (bool force) { processor.setForceZeroLatency (force); }
+bool PluginEditor::isReportingZeroLatency() const { return processor.isForcingZeroLatency(); }
 
 //==============================================================================
 void PluginEditor::paint (Graphics& g)
@@ -452,7 +442,12 @@ void PluginEditor::paint (Graphics& g)
     {
         g.setColour (Element::LookAndFeel::textColor);
         g.drawFittedText ("Unauthorized: Please activate your license in the application.",
-                           0, 0, getWidth(), getHeight(), Justification::centred, 2);
+                          0,
+                          0,
+                          getWidth(),
+                          getHeight(),
+                          Justification::centred,
+                          2);
     }
 }
 
@@ -464,7 +459,7 @@ void PluginEditor::resized()
         content->setBounds (bounds);
 }
 
-bool PluginEditor::keyPressed (const KeyPress &key, Component *originatingComponent)
+bool PluginEditor::keyPressed (const KeyPress& key, Component* originatingComponent)
 {
     ignoreUnused (originatingComponent);
     auto* app = processor.getAppController();
@@ -475,9 +470,9 @@ bool PluginEditor::keyPressed (const KeyPress &key, Component *originatingCompon
         const auto* info = cmd.getCommandForIndex (i);
         for (const auto& k : info->defaultKeypresses)
             if (k == key)
-               return cmd.invokeDirectly (info->commandID, true);
+                return cmd.invokeDirectly (info->commandID, true);
     }
-    
+
     return false;
 }
 
@@ -489,4 +484,4 @@ void PluginEditor::updatePerformanceParamEnablements()
             ps->update();
 }
 
-}
+} // namespace Element

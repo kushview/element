@@ -34,10 +34,7 @@ public:
           processor (o)
     {
         setOpaque (true);
-        chooser.reset (new FilenameComponent ("Audio File", File(), 
-                                              false, false, false,
-                                              o.getWildcard(), String(),
-                                              TRANS("Select Audio File")));
+        chooser.reset (new FilenameComponent ("Audio File", File(), false, false, false, o.getWildcard(), String(), TRANS ("Select Audio File")));
         addAndMakeVisible (chooser.get());
 
         addAndMakeVisible (playButton);
@@ -90,9 +87,9 @@ public:
                 position.setValue (position.getMinimum(), dontSendNotification);
             }
         }
-        
+
         volume.setValue (
-            (double) Decibels::gainToDecibels ((double) processor.getPlayer().getGain(), (double) volume.getMinimum()), 
+            (double) Decibels::gainToDecibels ((double) processor.getPlayer().getGain(), (double) volume.getMinimum()),
             dontSendNotification);
     }
 
@@ -135,7 +132,7 @@ private:
             int index = MediaPlayerProcessor::Playing;
             if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[index]))
             {
-                *playing = !*playing;
+                *playing = ! *playing;
                 stabilizeComponents();
             }
         };
@@ -157,7 +154,7 @@ private:
             stabilizeComponents();
         };
 
-        position.textFromValueFunction = [this](double value) -> String {
+        position.textFromValueFunction = [this] (double value) -> String {
             const double posInMinutes = (value * processor.getPlayer().getLengthInSeconds()) / 60.0;
             return Util::minutesToString (posInMinutes);
         };
@@ -177,7 +174,7 @@ private:
 
 MediaPlayerProcessor::MediaPlayerProcessor()
     : BaseProcessor (BusesProperties()
-        .withOutput  ("Main",  AudioChannelSet::stereo(), true))
+                         .withOutput ("Main", AudioChannelSet::stereo(), true))
 {
     addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
     addParameter (slave = new AudioParameterBool ("slave", "Slave", false));
@@ -187,7 +184,7 @@ MediaPlayerProcessor::MediaPlayerProcessor()
 }
 
 MediaPlayerProcessor::~MediaPlayerProcessor()
-{ 
+{
     for (auto* const param : getParameters())
         param->removeListener (this);
     clearPlayer();
@@ -199,15 +196,15 @@ MediaPlayerProcessor::~MediaPlayerProcessor()
 void MediaPlayerProcessor::fillInPluginDescription (PluginDescription& desc) const
 {
     desc.name = getName();
-    desc.fileOrIdentifier   = EL_INTERNAL_ID_MEDIA_PLAYER;
-    desc.descriptiveName    = EL_INTERNAL_ID_MEDIA_PLAYER;
-    desc.numInputChannels   = 0;
-    desc.numOutputChannels  = 2;
+    desc.fileOrIdentifier = EL_INTERNAL_ID_MEDIA_PLAYER;
+    desc.descriptiveName = EL_INTERNAL_ID_MEDIA_PLAYER;
+    desc.numInputChannels = 0;
+    desc.numOutputChannels = 2;
     desc.hasSharedContainer = false;
-    desc.isInstrument       = false;
-    desc.manufacturerName   = "Element";
-    desc.pluginFormatName   = "Element";
-    desc.version            = "1.0.0";
+    desc.isInstrument = false;
+    desc.manufacturerName = "Element";
+    desc.pluginFormatName = "Element";
+    desc.version = "1.0.0";
 }
 
 void MediaPlayerProcessor::clearPlayer()
@@ -228,7 +225,7 @@ void MediaPlayerProcessor::openFile (const File& file)
         reader.reset (new AudioFormatReaderSource (newReader, true));
         audioFile = file;
         player.setSource (reader.get(), 1024 * 8, &thread, getSampleRate(), 2);
-        ScopedLock sl (getCallbackLock());        
+        ScopedLock sl (getCallbackLock());
         player.setLooping (true);
         reader->setLooping (true);
     }
@@ -257,7 +254,7 @@ void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&
     const auto nframes = buffer.getNumSamples();
     for (int c = buffer.getNumChannels(); --c >= 0;)
         buffer.clear (c, 0, nframes);
-    
+
     if (*slave)
     {
         if (auto* const playhead = getPlayHead())
@@ -281,8 +278,8 @@ void MediaPlayerProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     ValueTree state (Tags::state);
     state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
-         .setProperty ("playing", (bool)*playing, nullptr)
-         .setProperty ("slave", (bool)*slave, nullptr);
+        .setProperty ("playing", (bool) *playing, nullptr)
+        .setProperty ("slave", (bool) *slave, nullptr);
     MemoryOutputStream stream (destData, false);
     state.writeToStream (stream);
 }
@@ -310,15 +307,18 @@ void MediaPlayerProcessor::parameterValueChanged (int parameter, float newValue)
                 player.start();
             else
                 player.stop();
-        } break;
-        
+        }
+        break;
+
         case Slave: {
             // noop
-        } break;
+        }
+        break;
 
         case Volume: {
             player.setGain (Decibels::decibelsToGain (volume->get(), volume->range.start));
-        } break;
+        }
+        break;
     }
 }
 
@@ -332,8 +332,7 @@ bool MediaPlayerProcessor::isBusesLayoutSupported (const BusesLayout& layout) co
     // only one main output bus supported. stereo or mono
     if (layout.inputBuses.size() > 0 || layout.outputBuses.size() > 1)
         return false;
-    return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() ||
-           layout.getMainOutputChannelSet() == AudioChannelSet::mono();
+    return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() || layout.getMainOutputChannelSet() == AudioChannelSet::mono();
 }
 
-}
+} // namespace Element

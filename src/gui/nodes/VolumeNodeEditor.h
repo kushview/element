@@ -36,8 +36,9 @@ public:
     void resized() override;
 
 private:
-    class ChannelStrip; friend class ChannelStrip;
+    class ChannelStrip;
+    friend class ChannelStrip;
     std::unique_ptr<ChannelStrip> strip;
 };
 
-}
+} // namespace Element

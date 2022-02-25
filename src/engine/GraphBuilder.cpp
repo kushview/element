@@ -13,9 +13,10 @@ class ClearChannelOp : public GraphOp
 public:
     ClearChannelOp (const int channelNum_)
         : channelNum (channelNum_)
-    { }
+    {
+    }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
         sharedBufferChans.clear (channelNum, 0, numSamples);
     }
@@ -32,9 +33,10 @@ public:
     CopyChannelOp (const int srcChannelNum_, const int dstChannelNum_)
         : srcChannelNum (srcChannelNum_),
           dstChannelNum (dstChannelNum_)
-    { }
+    {
+    }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
         sharedBufferChans.copyFrom (dstChannelNum, 0, sharedBufferChans, srcChannelNum, 0, numSamples);
     }
@@ -51,9 +53,10 @@ public:
     AddChannelOp (const int srcChannelNum_, const int dstChannelNum_)
         : srcChannelNum (srcChannelNum_),
           dstChannelNum (dstChannelNum_)
-    { }
+    {
+    }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
         sharedBufferChans.addFrom (dstChannelNum, 0, sharedBufferChans, srcChannelNum, 0, numSamples);
     }
@@ -69,9 +72,10 @@ class ClearMidiBufferOp : public GraphOp
 public:
     ClearMidiBufferOp (const int bufferNum_)
         : bufferNum (bufferNum_)
-    {}
+    {
+    }
 
-    void perform (AudioSampleBuffer&, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
     {
         sharedMidiBuffers.getUnchecked (bufferNum)->clear();
     }
@@ -88,9 +92,10 @@ public:
     CopyMidiBufferOp (const int srcBufferNum_, const int dstBufferNum_)
         : srcBufferNum (srcBufferNum_),
           dstBufferNum (dstBufferNum_)
-    { }
+    {
+    }
 
-    void perform (AudioSampleBuffer&, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
     {
         *sharedMidiBuffers.getUnchecked (dstBufferNum) = *sharedMidiBuffers.getUnchecked (srcBufferNum);
     }
@@ -107,9 +112,10 @@ public:
     AddMidiBufferOp (const int srcBufferNum_, const int dstBufferNum_)
         : srcBufferNum (srcBufferNum_),
           dstBufferNum (dstBufferNum_)
-    { }
+    {
+    }
 
-    void perform (AudioSampleBuffer&, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
     {
         sharedMidiBuffers.getUnchecked (dstBufferNum)
             ->addEvents (*sharedMidiBuffers.getUnchecked (srcBufferNum), 0, numSamples, 0);
@@ -127,22 +133,25 @@ public:
     DelayChannelOp (const int channel_, const int numSamplesDelay_)
         : channel (channel_),
           bufferSize (numSamplesDelay_ + 1),
-          readIndex (0), writeIndex (numSamplesDelay_)
+          readIndex (0),
+          writeIndex (numSamplesDelay_)
     {
         buffer.calloc ((size_t) bufferSize);
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
         float* data = sharedBufferChans.getWritePointer (channel, 0);
 
         for (int i = numSamples; --i >= 0;)
         {
-            buffer [writeIndex] = *data;
-            *data++ = buffer [readIndex];
+            buffer[writeIndex] = *data;
+            *data++ = buffer[readIndex];
 
-            if (++readIndex  >= bufferSize) readIndex = 0;
-            if (++writeIndex >= bufferSize) writeIndex = 0;
+            if (++readIndex >= bufferSize)
+                readIndex = 0;
+            if (++writeIndex >= bufferSize)
+                writeIndex = 0;
         }
     }
 
@@ -158,10 +167,10 @@ class ProcessBufferOp : public GraphOp
 {
 public:
     ProcessBufferOp (const NodeObjectPtr& node_,
-                     const Array <int>& audioChannelsToUse_,
+                     const Array<int>& audioChannelsToUse_,
                      const int totalChans_,
                      const int midiBufferToUse_,
-                     const Array <int> chans [PortType::Unknown])
+                     const Array<int> chans[PortType::Unknown])
         : node (node_),
           processor (node_->getAudioPluginInstance()),
           audioChannelsToUse (audioChannelsToUse_),
@@ -180,17 +189,18 @@ public:
             midiBufferToUse = midiChannelsToUse.getFirst();
         else
             midiChannelsToUse.add (midiBufferToUse);
-        
+
         lastMute = node->isMuted();
 
         osChanSize = totalChans;
-        osChans.reset (new float* [osChanSize]);
+        osChans.reset (new float*[osChanSize]);
         tempMidi.ensureSize (128);
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
     {
-        for (int i = totalChans; --i >= 0;) {
+        for (int i = totalChans; --i >= 0;)
+        {
             channels[i] = sharedBufferChans.getWritePointer (audioChannelsToUse.getUnchecked (i), 0);
         }
 
@@ -220,7 +230,7 @@ public:
                 buffer.applyGain (0, numSamples, 0.0);
             }
         }
-        else if (!muted && muteInput && muted != lastMute)
+        else if (! muted && muteInput && muted != lastMute)
         {
             // just became unmuted
             buffer.applyGainRamp (0, numSamples, 0.0, node->getInputGain());
@@ -228,8 +238,8 @@ public:
         else if (node->getInputGain() != node->getLastInputGain())
         {
             buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), node->getInputGain());
-        } 
-        else 
+        }
+        else
         {
             buffer.applyGain (0, numSamples, node->getInputGain());
         }
@@ -237,7 +247,7 @@ public:
         for (int i = numAudioIns; --i >= 0;)
             node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
 
-       #ifndef EL_FREE
+#ifndef EL_FREE
         // Begin MIDI filters
         {
             jassert (tempMidi.getNumEvents() == 0);
@@ -246,19 +256,20 @@ public:
             const auto keyRange (node->getKeyRange());
             const auto midiChans (node->getMidiChannels());
             const auto useMidiProgram (node->areMidiProgramsEnabled());
- 
-            if (keyRange.getLength() > 0 || !midiChans.isOmni() || useMidiProgram)
+
+            if (keyRange.getLength() > 0 || ! midiChans.isOmni() || useMidiProgram)
             {
                 for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
                 {
                     auto& midi = *midiPipe.getWriteBuffer (i);
                     MidiBuffer::Iterator iter (midi);
-                    int frame = 0; MidiMessage msg;
+                    int frame = 0;
+                    MidiMessage msg;
                     while (iter.getNextEvent (msg, frame))
                     {
                         if (msg.isNoteOnOrOff())
                         {
-                            // out of range 
+                            // out of range
                             if (keyRange.getLength() > 0 && (msg.getNoteNumber() < keyRange.getStart() || msg.getNoteNumber() > keyRange.getEnd()))
                                 continue;
                         }
@@ -290,10 +301,9 @@ public:
 
         tempMidi.clear();
         // End MIDI filters
-       #endif
-        
-        auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended)
-        {
+#endif
+
+        auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended) {
             if (node->wantsMidiPipe())
             {
                 if (! node->isSuspended())
@@ -328,17 +338,17 @@ public:
             if (buffer.getNumChannels() > osChanSize)
             {
                 osChanSize = buffer.getNumChannels();
-                osChans.reset (new float* [osChanSize]);
+                osChans.reset (new float*[osChanSize]);
             }
 
             float** osData = osChans.get();
             for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
                 osData[ch] = osBlock.getChannelPointer (ch);
-            
-            AudioSampleBuffer osBuffer (osData, 
-                buffer.getNumChannels(),
-                static_cast<int> (osBlock.getNumSamples()));
-            
+
+            AudioSampleBuffer osBuffer (osData,
+                                        buffer.getNumChannels(),
+                                        static_cast<int> (osBlock.getNumSamples()));
+
             tempMidi.clear();
             for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
             {
@@ -346,10 +356,9 @@ public:
                 for (const MidiMessageMetadata msg : mb)
                 {
                     tempMidi.addEvent (
-                        msg.data, 
-                        msg.numBytes, 
-                        msg.samplePosition * osFactor
-                    );
+                        msg.data,
+                        msg.numBytes,
+                        msg.samplePosition * osFactor);
                 }
                 mb.swapWith (tempMidi);
                 tempMidi.clear();
@@ -367,8 +376,7 @@ public:
                     tempMidi.addEvent (
                         msg.data,
                         msg.numBytes,
-                        msg.samplePosition / osFactor
-                    );
+                        msg.samplePosition / osFactor);
                 }
                 mb.swapWith (tempMidi);
                 tempMidi.clear();
@@ -378,8 +386,8 @@ public:
         {
             pluginProcessBlock (buffer, midiPipe, node->isSuspended());
         }
-        
-        if (muted && !muteInput)
+
+        if (muted && ! muteInput)
         {
             if (lastMute != muted)
             {
@@ -392,7 +400,7 @@ public:
                 buffer.applyGain (0, numSamples, 0.0);
             }
         }
-        else if (!muted && !muteInput && muted != lastMute)
+        else if (! muted && ! muteInput && muted != lastMute)
         {
             // just became unmuted
             buffer.applyGainRamp (0, numSamples, 0.0, node->getGain());
@@ -401,7 +409,7 @@ public:
         {
             buffer.applyGainRamp (0, numSamples, node->getLastGain(), node->getGain());
         }
-        else 
+        else
         {
             buffer.applyGain (0, numSamples, node->getGain());
         }
@@ -417,9 +425,9 @@ public:
     AudioProcessor* const processor;
 
 private:
-    Array <int> audioChannelsToUse;
-    Array <int> midiChannelsToUse;
-    HeapBlock <float*> channels;
+    Array<int> audioChannelsToUse;
+    Array<int> midiChannelsToUse;
+    HeapBlock<float*> channels;
     int totalChans, numAudioIns, numAudioOuts;
     int midiBufferToUse;
     bool lastMute = false;
@@ -431,7 +439,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ProcessBufferOp)
 };
 
-GraphBuilder::GraphBuilder (GraphNode& graph_, 
+GraphBuilder::GraphBuilder (GraphNode& graph_,
                             const Array<void*>& orderedNodes_,
                             Array<void*>& renderingOps)
     : graph (graph_),
@@ -440,20 +448,21 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
 {
     for (int i = 0; i < PortType::Unknown; ++i)
     {
-        allNodes[i].add ((uint32) zeroNodeID);  // first buffer is read-only zeros
+        allNodes[i].add ((uint32) zeroNodeID); // first buffer is read-only zeros
         allPorts[i].add (KV_INVALID_PORT);
     }
 
     for (int i = 0; i < orderedNodes.size(); ++i)
     {
         createRenderingOpsForNode ((NodeObject*) orderedNodes.getUnchecked (i),
-                                    renderingOps, i);
+                                   renderingOps,
+                                   i);
         markUnusedBuffersFree (i);
     }
 }
 
-int GraphBuilder::buffersNeeded (PortType type)             { return allNodes[type.id()].size(); }
-int GraphBuilder::getNodeDelay (const uint32 nodeID) const  { return nodeDelays [nodeDelayIDs.indexOf (nodeID)]; }
+int GraphBuilder::buffersNeeded (PortType type) { return allNodes[type.id()].size(); }
+int GraphBuilder::getNodeDelay (const uint32 nodeID) const { return nodeDelays[nodeDelayIDs.indexOf (nodeID)]; }
 
 void GraphBuilder::setNodeDelay (const uint32 nodeID, const int latency)
 {
@@ -484,7 +493,7 @@ int GraphBuilder::getInputLatency (const uint32 nodeID) const
     return maxLatency;
 }
 
-void GraphBuilder::createRenderingOpsForNode (NodeObject* const node, 
+void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
                                               Array<void*>& renderingOps,
                                               const int ourRenderingIndex)
 {
@@ -500,8 +509,8 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
         if (IONode::audioOutputNode == ioproc->getType() && numIns <= 0)
             return;
     }
-    
-    Array <int> channelsToUse [PortType::Unknown];
+
+    Array<int> channelsToUse[PortType::Unknown];
     int maxLatency = getInputLatency (node->nodeId);
 
     const uint32 numPorts (node->getNumPorts());
@@ -511,18 +520,18 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
         if (portType != PortType::Audio && portType != PortType::Midi)
             continue;
 
-        const uint32 numIns    = node->getNumPorts (portType, true);
-        const uint32 numOuts   = node->getNumPorts (portType, false);
+        const uint32 numIns = node->getNumPorts (portType, true);
+        const uint32 numOuts = node->getNumPorts (portType, false);
 
         // Outputs only need a buffer if the channel index is greater
         // than or equal to the total inputs of the same port type
         if (node->isPortOutput (port))
         {
             const int outputChan = node->getChannelPort (port);
-            if (outputChan >= (int)numIns && outputChan < (int)numOuts)
+            if (outputChan >= (int) numIns && outputChan < (int) numOuts)
             {
                 const int bufIndex = getFreeBuffer (portType);
-                channelsToUse [portType.id()].add (bufIndex);
+                channelsToUse[portType.id()].add (bufIndex);
                 const uint32 outPort = node->getNthPort (portType, outputChan, false, false);
 
                 jassert (bufIndex != 0);
@@ -539,8 +548,8 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
         const int inputChan = node->getChannelPort (port);
 
         // get a list of all the inputs to this node
-        Array <uint32> sourceNodes;
-        Array <uint32> sourcePorts;
+        Array<uint32> sourceNodes;
+        Array<uint32> sourcePorts;
         for (int i = graph.getNumConnections(); --i >= 0;)
         {
             const auto* const c = graph.getConnection (i);
@@ -555,7 +564,7 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
         if (sourceNodes.size() == 0)
         {
             // unconnected input channel
-            if (portType == PortType::Audio && inputChan >= (int)numOuts)
+            if (portType == PortType::Audio && inputChan >= (int) numOuts)
             {
                 bufIndex = getReadOnlyEmptyBuffer();
                 jassert (bufIndex >= 0);
@@ -590,7 +599,7 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
                 bufIndex = getReadOnlyEmptyBuffer();
                 jassert (bufIndex >= 0);
             }
-            
+
             const bool bufNeededLater = isBufferNeededLater (ourRenderingIndex, port, srcNode, srcPort);
             if (bufNeededLater && (inputChan < (int) numOuts || portType == PortType::Midi))
             {
@@ -626,14 +635,13 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
 
             for (int i = 0; i < sourceNodes.size(); ++i)
             {
-                const int sourceBufIndex = getBufferContaining (portType, sourceNodes.getUnchecked(i),
-                                                                            sourcePorts.getUnchecked(i));
+                const int sourceBufIndex = getBufferContaining (portType, sourceNodes.getUnchecked (i), sourcePorts.getUnchecked (i));
 
                 if (sourceBufIndex >= 0
                     && ! isBufferNeededLater (ourRenderingIndex,
-                                                inputChan,
-                                                sourceNodes.getUnchecked(i),
-                                                sourcePorts.getUnchecked(i)))
+                                              inputChan,
+                                              sourceNodes.getUnchecked (i),
+                                              sourcePorts.getUnchecked (i)))
                 {
                     // we've found one of our input chans that can be re-used..
                     reusableInputIndex = i;
@@ -655,11 +663,10 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
                 // can't re-use any of our input chans, so get a new one and copy everything into it..
                 bufIndex = getFreeBuffer (portType);
                 jassert (bufIndex != 0);
-                
+
                 markBufferAsContaining (bufIndex, portType, anonymousNodeID, 0);
-                
-                const int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (0),
-                                                                    sourcePorts.getUnchecked (0));
+
+                const int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (0), sourcePorts.getUnchecked (0));
                 if (srcIndex < 0)
                 {
                     // if not found, this is probably a feedback loop
@@ -690,8 +697,7 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
             {
                 if (j != reusableInputIndex)
                 {
-                    int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked(j),
-                                                                    sourcePorts.getUnchecked(j));
+                    int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j));
                     if (srcIndex >= 0)
                     {
                         if (portType == PortType::Audio)
@@ -700,9 +706,7 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
 
                             if (nodeDelay < maxLatency)
                             {
-                                if (! isBufferNeededLater (ourRenderingIndex, port,
-                                                            sourceNodes.getUnchecked(j),
-                                                            sourcePorts.getUnchecked(j)))
+                                if (! isBufferNeededLater (ourRenderingIndex, port, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j)))
                                 {
                                     renderingOps.add (new DelayChannelOp (srcIndex, maxLatency - nodeDelay));
                                 }
@@ -737,23 +741,22 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
     } /* foreach port */
 
     setNodeDelay (node->nodeId, maxLatency + node->getLatencySamples());
-    
+
     if (node->isAudioIONode() && node->getNumPorts (PortType::Audio, false) == 0)
         totalLatency = maxLatency;
 
     int totalChans = jmax (node->getNumPorts (PortType::Audio, true),
-                            node->getNumPorts (PortType::Audio, false));
-    renderingOps.add (new ProcessBufferOp (node, channelsToUse [PortType::Audio],
-                                            totalChans, 0, channelsToUse));
+                           node->getNumPorts (PortType::Audio, false));
+    renderingOps.add (new ProcessBufferOp (node, channelsToUse[PortType::Audio], totalChans, 0, channelsToUse));
 }
 
 int GraphBuilder::getFreeBuffer (PortType type)
 {
     jassert (type.id() < PortType::Unknown);
 
-    Array<uint32>& nodes = allNodes [type.id()];
+    Array<uint32>& nodes = allNodes[type.id()];
     for (int i = 1; i < nodes.size(); ++i)
-        if (nodes.getUnchecked(i) == freeNodeID)
+        if (nodes.getUnchecked (i) == freeNodeID)
             return i;
 
     nodes.add ((uint32) freeNodeID);
@@ -767,12 +770,12 @@ int GraphBuilder::getReadOnlyEmptyBuffer() const noexcept
 
 int GraphBuilder::getBufferContaining (const PortType type, const uint32 nodeId, const uint32 outputPort) noexcept
 {
-    Array<uint32>& nodes = allNodes [type.id()];
-    Array<uint32>& ports = allPorts [type.id()];
+    Array<uint32>& nodes = allNodes[type.id()];
+    Array<uint32>& ports = allPorts[type.id()];
 
     for (int i = nodes.size(); --i >= 0;)
-        if (nodes.getUnchecked(i) == nodeId
-                && ports.getUnchecked(i) == outputPort)
+        if (nodes.getUnchecked (i) == nodeId
+            && ports.getUnchecked (i) == outputPort)
             return i;
 
     return -1;
@@ -782,15 +785,13 @@ void GraphBuilder::markUnusedBuffersFree (const int stepIndex)
 {
     for (uint32 type = 0; type < PortType::Unknown; ++type)
     {
-        Array<uint32>& nodes = allNodes [type];
-        Array<uint32>& ports = allPorts [type];
+        Array<uint32>& nodes = allNodes[type];
+        Array<uint32>& ports = allPorts[type];
 
         for (int i = 0; i < nodes.size(); ++i)
         {
             if (isNodeBusy (nodes.getUnchecked (i))
-                    && ! isBufferNeededLater (stepIndex, KV_INVALID_PORT,
-                                                        nodes.getUnchecked(i),
-                                                        ports.getUnchecked(i)))
+                && ! isBufferNeededLater (stepIndex, KV_INVALID_PORT, nodes.getUnchecked (i), ports.getUnchecked (i)))
             {
                 nodes.set (i, (uint32) freeNodeID);
             }
@@ -798,8 +799,7 @@ void GraphBuilder::markUnusedBuffersFree (const int stepIndex)
     }
 }
 
-bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputChannelOfIndexToIgnore,
-                                        const uint32 sourceNode, const uint32 outputPortIndex) const
+bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputChannelOfIndexToIgnore, const uint32 sourceNode, const uint32 outputPortIndex) const
 {
     while (stepIndexToSearchFrom < orderedNodes.size())
     {
@@ -808,8 +808,7 @@ bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputC
         {
             for (uint32 port = 0; port < node->getNumPorts(); ++port)
             {
-                if (port != inputChannelOfIndexToIgnore &&
-                        graph.getConnectionBetween (sourceNode, outputPortIndex, node->nodeId, port) != nullptr)
+                if (port != inputChannelOfIndexToIgnore && graph.getConnectionBetween (sourceNode, outputPortIndex, node->nodeId, port) != nullptr)
                 {
                     return true;
                 }
@@ -825,12 +824,12 @@ bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputC
 
 void GraphBuilder::markBufferAsContaining (int bufferNum, PortType type, uint32 nodeId, uint32 portIndex)
 {
-    Array<uint32>& nodes = allNodes [type.id()];
-    Array<uint32>& ports = allPorts [type.id()];
+    Array<uint32>& nodes = allNodes[type.id()];
+    Array<uint32>& ports = allPorts[type.id()];
 
     jassert (bufferNum >= 0 && bufferNum < nodes.size());
     nodes.set (bufferNum, nodeId);
     ports.set (bufferNum, portIndex);
 }
 
-}
+} // namespace Element

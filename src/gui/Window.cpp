@@ -21,43 +21,40 @@
 
 namespace Element {
 
-    Dialog::Dialog (const String& name)
-        : DialogWindow (name, Colours::darkgrey, true, true)
-    {
+Dialog::Dialog (const String& name)
+    : DialogWindow (name, Colours::darkgrey, true, true)
+{
 #if JUCE_IOS
-        setUsingNativeTitleBar (false);
+    setUsingNativeTitleBar (false);
 #else
-        setUsingNativeTitleBar (true);
+    setUsingNativeTitleBar (true);
 #endif
-        setResizable (true, false);
-    }
+    setResizable (true, false);
+}
 
-    Dialog::~Dialog() { }
+Dialog::~Dialog() {}
 
-    void
-    Dialog::closeButtonPressed()
-    {
-        closedSignal();
-    }
+void Dialog::closeButtonPressed()
+{
+    closedSignal();
+}
 
+Window::Window (const String& name)
+    : DocumentWindow (name, LookAndFeel_KV1::widgetBackgroundColor, DocumentWindow::closeButton | DocumentWindow::minimiseButton, true)
+{
+#if JUCE_IOS
+    setUsingNativeTitleBar (false);
+#else
+    setUsingNativeTitleBar (true);
+#endif
+    setResizable (true, false);
+}
 
-    Window::Window (const String& name)
-        : DocumentWindow (name, LookAndFeel_KV1::widgetBackgroundColor,
-                          DocumentWindow::closeButton | DocumentWindow::minimiseButton, true)
-    {
-       #if JUCE_IOS
-        setUsingNativeTitleBar (false);
-       #else
-        setUsingNativeTitleBar (true);
-       #endif
-        setResizable (true, false);
-    }
+Window::~Window() {}
 
-    Window::~Window() {}
+void Window::closeButtonPressed()
+{
+    closedSignal();
+}
 
-    void Window::closeButtonPressed()
-    {
-        closedSignal();
-    }
-
-}  /* namespace Element */
+} /* namespace Element */

@@ -31,7 +31,7 @@ public:
     enum ColourIds
     {
         backgroundColourId = 0x90001000,
-        outlineColourId 
+        outlineColourId
     };
 
     MidiBlinker();
@@ -51,4 +51,4 @@ private:
     void timerCallback() override;
 };
 
-}
+} // namespace Element

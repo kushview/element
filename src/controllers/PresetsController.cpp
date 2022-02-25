@@ -29,8 +29,8 @@ namespace Element {
 
 struct PresetsController::Pimpl
 {
-    Pimpl() { }
-    ~Pimpl() { }
+    Pimpl() {}
+    ~Pimpl() {}
 
     void refresh()
     {
@@ -48,7 +48,7 @@ PresetsController::~PresetsController()
 }
 
 void PresetsController::activate()
-{ 
+{
 }
 
 void PresetsController::deactivate()
@@ -65,8 +65,9 @@ void PresetsController::add (const Node& node, const String& presetName)
     const DataPath path;
     if (! node.savePresetTo (path, presetName))
     {
-        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, 
-            "Preset", "Could not save preset");        
+        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                          "Preset",
+                                          "Could not save preset");
     }
     else
     {
@@ -78,4 +79,4 @@ void PresetsController::add (const Node& node, const String& presetName)
             cc->stabilize (true);
 }
 
-}
+} // namespace Element

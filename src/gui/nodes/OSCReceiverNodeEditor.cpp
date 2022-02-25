@@ -35,9 +35,9 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     portNumberSlider.setSliderStyle (Slider::IncDecButtons);
     portNumberSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 22);
 
-    syncUIFromNodeState ();
+    syncUIFromNodeState();
 
-    resetBounds(width, height);
+    resetBounds (width, height);
     addAndMakeVisible (hostNameLabel);
     addAndMakeVisible (hostNameField);
     addAndMakeVisible (portNumberLabel);
@@ -54,8 +54,7 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
     pauseButton.onClick = std::bind (&OSCReceiverNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
-    hostNameField.onTextChange = [this]()
-    {
+    hostNameField.onTextChange = [this]() {
         String newHostName = hostNameField.getText();
         if (currentHostName == newHostName)
             return;
@@ -64,9 +63,8 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
         currentHostName = newHostName;
         oscReceiverNodePtr->setHostName (currentHostName);
     };
-    portNumberSlider.onValueChange = [this]()
-    {
-        int newPortNumber = roundToInt( portNumberSlider.getValue() );
+    portNumberSlider.onValueChange = [this]() {
+        int newPortNumber = roundToInt (portNumberSlider.getValue());
         if (newPortNumber == currentPortNumber)
             return;
         if (connected)
@@ -91,9 +89,9 @@ OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
     oscReceiverNodePtr->removeMessageLoopListener (this);
 }
 
-void OSCReceiverNodeEditor::resized ()
+void OSCReceiverNodeEditor::resized()
 {
-    resetBounds(getWidth(), getHeight());
+    resetBounds (getWidth(), getHeight());
 }
 
 void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
@@ -149,7 +147,7 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
 
 void OSCReceiverNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::backgroundColor.brighter(0.1));
+    g.fillAll (LookAndFeel::backgroundColor.brighter (0.1));
 }
 
 void OSCReceiverNodeEditor::connectButtonClicked()
@@ -175,7 +173,7 @@ void OSCReceiverNodeEditor::clearButtonClicked()
 
 void OSCReceiverNodeEditor::oscMessageReceived (const OSCMessage& message)
 {
-    if ( paused )
+    if (paused)
         return;
 
     oscReceiverLog.addOSCMessage (message);
@@ -183,7 +181,7 @@ void OSCReceiverNodeEditor::oscMessageReceived (const OSCMessage& message)
 
 void OSCReceiverNodeEditor::oscBundleReceived (const OSCBundle& bundle)
 {
-    if ( paused )
+    if (paused)
         return;
 
     oscReceiverLog.addOSCBundle (bundle);
@@ -191,26 +189,26 @@ void OSCReceiverNodeEditor::oscBundleReceived (const OSCBundle& bundle)
 
 void OSCReceiverNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 {
-    syncUIFromNodeState ();
+    syncUIFromNodeState();
 }
 
-void OSCReceiverNodeEditor::syncUIFromNodeState ()
+void OSCReceiverNodeEditor::syncUIFromNodeState()
 {
     currentHostName = oscReceiverNodePtr->getCurrentHostName();
     currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
     connected = oscReceiverNodePtr->isConnected();
     paused = oscReceiverNodePtr->isPaused();
 
-    updateHostNameField ();
-    updatePortNumberSlider ();
-    updateConnectionStatusLabel ();
-    updateConnectButton ();
-    updatePauseButton ();
+    updateHostNameField();
+    updatePortNumberSlider();
+    updateConnectionStatusLabel();
+    updateConnectButton();
+    updatePauseButton();
 }
 
 void OSCReceiverNodeEditor::updateHostNameField()
 {
-    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
+    hostNameField.setText (currentHostName, NotificationType::dontSendNotification);
 }
 
 void OSCReceiverNodeEditor::updatePortNumberSlider()
@@ -255,36 +253,36 @@ void OSCReceiverNodeEditor::disconnect()
 void OSCReceiverNodeEditor::handleConnectError (int failedPort)
 {
     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                        "OSC Connection error",
-                                        "Could not connect to port " + String (failedPort) + ".",
-                                        "OK");
+                                      "OSC Connection error",
+                                      "Could not connect to port " + String (failedPort) + ".",
+                                      "OK");
 }
 
 void OSCReceiverNodeEditor::handleDisconnectError()
 {
     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                        "Unknown error",
-                                        "An unknown error occurred while trying to disconnect from UDP port.",
-                                        "OK");
+                                      "Unknown error",
+                                      "An unknown error occurred while trying to disconnect from UDP port.",
+                                      "OK");
 }
 
 void OSCReceiverNodeEditor::handleInvalidPortNumberEntered()
 {
     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                        "Invalid port number",
-                                        "You have entered an invalid UDP port number.",
-                                        "OK");
+                                      "Invalid port number",
+                                      "You have entered an invalid UDP port number.",
+                                      "OK");
 }
 
 void OSCReceiverNodeEditor::updateConnectButton()
 {
-    connectButton.setButtonText ( connected ? "Disconnect" : "Connect" );
+    connectButton.setButtonText (connected ? "Disconnect" : "Connect");
 }
 
 void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 {
     String text = connected ? "On" : "Off";
-    auto textColour = connected ? Colours::green.brighter(0.3) : Colours::red.brighter(0.3);
+    auto textColour = connected ? Colours::green.brighter (0.3) : Colours::red.brighter (0.3);
 
     connectionStatusLabel.setText (text, dontSendNotification);
     connectionStatusLabel.setColour (Label::textColourId, textColour);
@@ -292,8 +290,7 @@ void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 
 void OSCReceiverNodeEditor::updatePauseButton()
 {
-    pauseButton.setButtonText ( paused ? "Resume" : "Pause" );
+    pauseButton.setButtonText (paused ? "Resume" : "Pause");
 };
 
-
-};
+}; // namespace Element

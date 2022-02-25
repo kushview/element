@@ -19,13 +19,13 @@
 #include "Version.h"
 
 #ifndef TEST_CURRENT_VERSION
- #define TEST_CURRENT_VERSION 0
+#define TEST_CURRENT_VERSION 0
 #endif
 
 namespace Element {
 
-Version::Version() { }
-Version::~Version() { }
+Version::Version() {}
+Version::~Version() {}
 
 StringArray Version::segments (const String& versionString)
 {
@@ -39,21 +39,21 @@ StringArray Version::segments (const String& versionString)
 int Version::asHexInteger (const String& versionString)
 {
     const StringArray segs (segments (versionString));
-    
+
     int value = (segs[0].getIntValue() << 16)
-              + (segs[1].getIntValue() << 8)
-              + segs[2].getIntValue();
-    
+                + (segs[1].getIntValue() << 8)
+                + segs[2].getIntValue();
+
     if (segs.size() >= 4)
         value = (value << 8) + segs[3].getIntValue();
-    
+
     return value;
 }
 
 CurrentVersion::CurrentVersion()
-    : Thread("elVersionCheck"),
+    : Thread ("elVersionCheck"),
       version (ProjectInfo::versionString),
-      hasChecked (false) { }
+      hasChecked (false) {}
 
 CurrentVersion::~CurrentVersion()
 {
@@ -76,29 +76,29 @@ bool CurrentVersion::isNewerVersionAvailable()
 {
     if (hasChecked)
         return result;
-    
-   #if TEST_CURRENT_VERSION
+
+#if TEST_CURRENT_VERSION
     const URL url ("http://kushview.dev/?edd_action=get_version&item_id=15");
-   #else
+#else
     const URL url ("https://kushview.net/?edd_action=get_version&item_id=20");
-   #endif
-   
+#endif
+
     if (threadShouldExit() || cancelled.get())
         return false;
-    
+
     bool result = false;
     auto stream = url.createInputStream (false, nullptr, nullptr, {}, 300, nullptr, nullptr, 5, {});
 
     WebInputStream::Listener dummyListener;
-    if (stream && ((WebInputStream*)stream.get())->connect (&dummyListener))
+    if (stream && ((WebInputStream*) stream.get())->connect (&dummyListener))
     {
         var data;
         const Result res (JSON::parse (stream->readEntireStreamAsString(), data));
-        if (!res.failed() && data.isObject())
+        if (! res.failed() && data.isObject())
         {
-            permalink   = "https://kushview.net/element/download/"; // data["homepage"].toString();
-            version     = data["stable_version"].toString();
-            result      = Version::asHexInteger(version) > ProjectInfo::versionNumber;
+            permalink = "https://kushview.net/element/download/"; // data["homepage"].toString();
+            version = data["stable_version"].toString();
+            result = Version::asHexInteger (version) > ProjectInfo::versionNumber;
         }
     }
 
@@ -121,21 +121,20 @@ void CurrentVersion::timerCallback()
     {
         if (result)
         {
-            if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "New Version",
-                                            "A new version is available: " + version, "Download"))
+            if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "New Version", "A new version is available: " + version, "Download"))
             {
-                URL(permalink).launchInDefaultBrowser();
+                URL (permalink).launchInDefaultBrowser();
             }
         }
         else if (shouldShowUpToDateMessage)
         {
             String msg = "Element v";
             msg << ProjectInfo::versionString << " is currently the newest version available.";
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "You're up-to-date.", msg);
+            AlertWindow::showMessageBox (AlertWindow::InfoIcon, "You're up-to-date.", msg);
         }
     }
 
     delete this;
 }
 
-}
+} // namespace Element

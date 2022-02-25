@@ -24,7 +24,7 @@
 namespace Element {
 
 /** A juce::CodeEditorComponent that sets some default options and color scheme */
-class ScriptEditorComponent  : public CodeEditorComponent
+class ScriptEditorComponent : public CodeEditorComponent
 {
 public:
     /** Create a new script editor.
@@ -43,19 +43,19 @@ public:
 
     //==============================================================================
     /** Returns a font height that looks 'good' in most systems */
-    static float getDefaultFontHeight()     { return defaultFontHeight; }
+    static float getDefaultFontHeight() { return defaultFontHeight; }
 
 private:
-    #if JUCE_MAC
+#if JUCE_MAC
     static constexpr float defaultFontHeight = 14.5f;
-   #elif JUCE_WINDOWS
+#elif JUCE_WINDOWS
     static constexpr float defaultFontHeight = 13.f;
-   #elif JUCE_LINUX
+#elif JUCE_LINUX
     static constexpr float defaultFontHeight = 16.f;
-   #else
+#else
     static constexpr float defaultFontHeight = 15.f;
-   #endif
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScriptEditorComponent)
+#endif
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptEditorComponent)
 };
 
-}
+} // namespace Element

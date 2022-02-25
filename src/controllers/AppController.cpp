@@ -42,8 +42,8 @@
 
 namespace Element {
 
-Globals& AppController::Child::getWorld()               { return getAppController().getWorld(); }
-Settings& AppController::Child::getSettings()           { return getWorld().getSettings(); }
+Globals& AppController::Child::getWorld() { return getAppController().getWorld(); }
+Settings& AppController::Child::getSettings() { return getWorld().getSettings(); }
 
 AppController::AppController (Globals& g, RunMode m)
     : world (g), runMode (m)
@@ -63,21 +63,21 @@ AppController::AppController (Globals& g, RunMode m)
 
     auto& commands = getWorld().getCommandManager();
     commands.registerAllCommandsForTarget (this);
-   #if 1
+#if 1
     commands.registerAllCommandsForTarget (findChild<GuiController>());
     commands.registerAllCommandsForTarget (findChild<WorkspacesController>());
-   #else
+#else
     // can't do this yet until all controllers have a reliable way to
     // return the next command target
     for (auto* ctl : getChildren())
         if (auto* child = dynamic_cast<AppController::Child*> (ctl))
             commands.registerAllCommandsForTarget (child);
-   #endif
+#endif
 
     commands.setFirstCommandTarget (this);
 }
 
-AppController::~AppController() { }
+AppController::~AppController() {}
 
 void AppController::activate()
 {
@@ -89,7 +89,7 @@ void AppController::activate()
         progsdir.getParentDirectory().createDirectory();
         olddir.copyDirectoryTo (progsdir);
     }
-    
+
     // restore recents
     const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
     if (recentList.existsAsFile())
@@ -102,20 +102,20 @@ void AppController::activate()
 }
 
 void AppController::deactivate()
-{    
+{
     const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
     if (! recentList.existsAsFile())
         recentList.create();
     if (recentList.exists())
         recentList.replaceWithText (recentFiles.toString(), false, false);
-    
+
     Controller::deactivate();
 }
 
 void AppController::run()
 {
     activate();
-    
+
     // need content component parented for the following init routines
     // TODO: better controlled startup procedure
     if (auto* gui = findChild<GuiController>())
@@ -123,8 +123,8 @@ void AppController::run()
 
     auto session = getWorld().getSession();
     Session::ScopedFrozenLock freeze (*session);
-    
-   #if EL_PRO
+
+#if EL_PRO
     if (auto* sc = findChild<SessionController>())
     {
         bool loadDefault = true;
@@ -132,7 +132,7 @@ void AppController::run()
         if (world.getSettings().openLastUsedSession())
         {
             const auto lastSession = getWorld().getSettings().getUserSettings()->getValue ("lastSession");
-            if (File::isAbsolutePath(lastSession) && File(lastSession).existsAsFile())
+            if (File::isAbsolutePath (lastSession) && File (lastSession).existsAsFile())
             {
                 sc->openFile (File (lastSession));
                 loadDefault = false;
@@ -142,14 +142,14 @@ void AppController::run()
         if (loadDefault)
             sc->openDefaultSession();
     }
-   #else
+#else
     if (auto* gc = findChild<GraphController>())
     {
         bool loadDefaultGraph = true;
         if (world.getSettings().openLastUsedSession())
         {
             const auto lastGraph = getWorld().getSettings().getUserSettings()->getValue (Settings::lastGraphKey);
-            if (File::isAbsolutePath(lastGraph) && File(lastGraph).existsAsFile())
+            if (File::isAbsolutePath (lastGraph) && File (lastGraph).existsAsFile())
             {
                 gc->openGraph (File (lastGraph));
                 loadDefaultGraph = false;
@@ -158,7 +158,7 @@ void AppController::run()
         if (loadDefaultGraph)
             gc->openDefaultGraph();
     }
-   #endif
+#endif
 
     if (auto* gui = findChild<GuiController>())
     {
@@ -178,16 +178,16 @@ void AppController::run()
 
 void AppController::handleMessage (const Message& msg)
 {
-	auto* ec        = findChild<EngineController>();
-    auto* gui       = findChild<GuiController>();
-    auto* sess      = findChild<SessionController>();
-    auto* devs      = findChild<DevicesController>();
-    auto* maps      = findChild<MappingController>();
-    auto* presets   = findChild<PresetsController>();
-	jassert(ec && gui && sess && devs && maps && presets);
+    auto* ec = findChild<EngineController>();
+    auto* gui = findChild<GuiController>();
+    auto* sess = findChild<SessionController>();
+    auto* devs = findChild<DevicesController>();
+    auto* maps = findChild<MappingController>();
+    auto* presets = findChild<PresetsController>();
+    jassert (ec && gui && sess && devs && maps && presets);
 
     bool handled = false; // final else condition will set false
-    
+
     if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
     {
         OwnedArray<UndoableAction> actions;
@@ -230,7 +230,7 @@ void AppController::handleMessage (const Message& msg)
         const Node graph (parent, false);
         node.savePluginState();
         Node newNode (node.getValueTree().createCopy(), false);
-        
+
         if (newNode.isValid() && graph.isValid())
         {
             newNode = Node (Node::resetIds (newNode.getValueTree()), false);
@@ -240,8 +240,7 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* dnm2 = dynamic_cast<const DisconnectNodeMessage*> (&msg))
     {
-        ec->disconnectNode (dnm2->node, dnm2->inputs, dnm2->outputs,
-                                        dnm2->audio, dnm2->midi);
+        ec->disconnectNode (dnm2->node, dnm2->inputs, dnm2->outputs, dnm2->audio, dnm2->midi);
     }
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {
@@ -249,7 +248,7 @@ void AppController::handleMessage (const Message& msg)
         Node node = aps->node;
         bool canceled = false;
 
-        if (name.isEmpty ())
+        if (name.isEmpty())
         {
             AlertWindow alert ("Add Preset", "Enter preset name", AlertWindow::NoIcon, 0);
             alert.addTextEditor ("name", aps->node.getName());
@@ -267,12 +266,12 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
-        if (anm->target.isValid ())
+        if (anm->target.isValid())
             ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
 
-        if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension(".elg"))
+        if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension (".elg"))
             recentFiles.addFile (anm->sourceFile);
     }
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
@@ -281,11 +280,11 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {
-       #if defined (EL_PRO)
+#if defined(EL_PRO)
         sess->openFile (osm->file);
-       #else
+#else
         findChild<GraphController>()->openGraph (osm->file);
-       #endif
+#endif
         recentFiles.addFile (osm->file);
     }
     else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))
@@ -300,7 +299,7 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* addControllerDeviceMessage = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
     {
         const auto device = addControllerDeviceMessage->device;
-        const auto file   = addControllerDeviceMessage->file;
+        const auto file = addControllerDeviceMessage->file;
         if (file.existsAsFile())
         {
             devs->add (file);
@@ -311,7 +310,7 @@ void AppController::handleMessage (const Message& msg)
         }
         else
         {
-            DBG("[EL] add controller device not valid");
+            DBG ("[EL] add controller device not valid");
         }
     }
     else if (const auto* removeControlMessage = dynamic_cast<const RemoveControlMessage*> (&msg))
@@ -340,10 +339,9 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* replaceNodeMessage = dynamic_cast<const ReplaceNodeMessage*> (&msg))
     {
         const auto graph = replaceNodeMessage->graph;
-        const auto node  = replaceNodeMessage->node;
+        const auto node = replaceNodeMessage->node;
         const auto desc (replaceNodeMessage->description);
-        if (graph.isValid() && node.isValid() && 
-            graph.getNodesValueTree() == node.getValueTree().getParent())
+        if (graph.isValid() && node.isValid() && graph.getNodesValueTree() == node.getValueTree().getParent())
         {
             ec->replace (node, desc);
         }
@@ -352,10 +350,10 @@ void AppController::handleMessage (const Message& msg)
     {
         handled = false;
     }
-    
+
     if (! handled)
     {
-        DBG("[EL] unhandled Message received");
+        DBG ("[EL] unhandled Message received");
     }
 }
 
@@ -371,10 +369,10 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::mediaOpen,
         Commands::mediaSave,
         Commands::mediaSaveAs,
-        
+
         Commands::signIn,
         Commands::signOut,
-       #ifdef EL_PRO
+#ifdef EL_PRO
         Commands::sessionNew,
         Commands::sessionSave,
         Commands::sessionSaveAs,
@@ -383,26 +381,26 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::sessionDuplicateGraph,
         Commands::sessionDeleteGraph,
         Commands::sessionInsertPlugin,
-       #endif
+#endif
         Commands::importGraph,
         Commands::exportGraph,
         Commands::panic,
-        
+
         Commands::checkNewerVersion,
-        
+
         Commands::transportPlay,
 
-       #ifndef EL_PRO
+#ifndef EL_PRO
         Commands::graphNew,
         Commands::graphOpen,
         Commands::graphSave,
         Commands::graphSaveAs,
         Commands::importSession,
-       #endif
-        
+#endif
+
         Commands::recentsClear,
     });
-    cids.addArray({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
+    cids.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
 
 void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -424,26 +422,27 @@ bool AppController::perform (const InvocationInfo& info)
             if (auto* cc = findChild<GuiController>()->getContentComponent())
                 cc->stabilizeViews();
             findChild<GuiController>()->refreshMainMenu();
-        } break;
-        
+        }
+        break;
+
         case Commands::redo: {
             if (undo.canRedo())
                 undo.redo();
             if (auto* cc = findChild<GuiController>()->getContentComponent())
                 cc->stabilizeViews();
             findChild<GuiController>()->refreshMainMenu();
-        } break;
+        }
+        break;
 
-        case Commands::sessionOpen:
-        {
+        case Commands::sessionOpen: {
             FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);
             if (chooser.browseForFileToOpen())
             {
                 findChild<SessionController>()->openFile (chooser.getResult());
                 recentFiles.addFile (chooser.getResult());
             }
-
-        } break;
+        }
+        break;
 
         case Commands::sessionNew:
             findChild<SessionController>()->newSession();
@@ -466,30 +465,28 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::sessionDeleteGraph:
             findChild<EngineController>()->removeGraph();
             break;
-        
+
         case Commands::transportPlay:
             getWorld().getAudioEngine()->togglePlayPause();
             break;
-            
-        case Commands::importGraph:
-        {
+
+        case Commands::importGraph: {
             FileChooser chooser ("Import Graph", lastExportedGraph, "*.elg");
             if (chooser.browseForFileToOpen())
                 findChild<SessionController>()->importGraph (chooser.getResult());
-            
-        } break;
-            
-        case Commands::exportGraph:
-        {
+        }
+        break;
+
+        case Commands::exportGraph: {
             auto session = getWorld().getSession();
             auto node = session->getCurrentGraph();
             node.savePluginState();
-            
-            if (!lastExportedGraph.isDirectory())
+
+            if (! lastExportedGraph.isDirectory())
                 lastExportedGraph = lastExportedGraph.getParentDirectory();
             if (lastExportedGraph.isDirectory())
             {
-                lastExportedGraph = lastExportedGraph.getChildFile(node.getName()).withFileExtension ("elg");
+                lastExportedGraph = lastExportedGraph.getChildFile (node.getName()).withFileExtension ("elg");
                 lastExportedGraph = lastExportedGraph.getNonexistentSibling();
             }
 
@@ -500,61 +497,60 @@ bool AppController::perform (const InvocationInfo& info)
                 if (auto* gui = findChild<GuiController>())
                     gui->stabilizeContent();
             }
-        } break;
+        }
+        break;
 
-        case Commands::panic:
-        {
+        case Commands::panic: {
             auto e = getWorld().getAudioEngine();
             for (int c = 1; c <= 16; ++c)
             {
                 auto msg = MidiMessage::allNotesOff (c);
                 msg.setTimeStamp (Time::getMillisecondCounterHiRes());
                 e->addMidiMessage (msg);
-                msg = MidiMessage::allSoundOff(c);
+                msg = MidiMessage::allSoundOff (c);
                 msg.setTimeStamp (Time::getMillisecondCounterHiRes());
                 e->addMidiMessage (msg);
             }
-        }  break;
-            
+        }
+        break;
+
         case Commands::mediaNew:
         case Commands::mediaSave:
         case Commands::mediaSaveAs:
             break;
-        
-        case Commands::signIn:
-        {
-            
-        } break;
-        
-        case Commands::signOut:
-        {
+
+        case Commands::signIn: {
+        }
+        break;
+
+        case Commands::signOut: {
             // noop
-        } break;
-        
+        }
+        break;
+
         case Commands::checkNewerVersion:
             CurrentVersion::checkAfterDelay (20, true);
             break;
-        
+
         case Commands::graphNew:
             findChild<GraphController>()->newGraph();
             break;
-        case Commands::graphOpen:
-        {
+        case Commands::graphOpen: {
             FileChooser chooser ("Open Graph", lastSavedFile, "*.elg", true, false);
             if (chooser.browseForFileToOpen())
             {
                 findChild<GraphController>()->openGraph (chooser.getResult());
                 recentFiles.addFile (chooser.getResult());
             }
-        } break;
+        }
+        break;
         case Commands::graphSave:
             findChild<GraphController>()->saveGraph (false);
             break;
-        case Commands::graphSaveAs: 
+        case Commands::graphSaveAs:
             findChild<GraphController>()->saveGraph (true);
             break;
-        case Commands::importSession:
-        {
+        case Commands::importSession: {
             FileChooser chooser ("Import Session Graph", lastSavedFile, "*.els", true, false);
             if (chooser.browseForFileToOpen())
             {
@@ -562,16 +558,17 @@ bool AppController::perform (const InvocationInfo& info)
                 recentFiles.addFile (chooser.getResult());
                 findChild<GuiController>()->refreshMainMenu();
             }
-        } break;
+        }
+        break;
 
-        case Commands::recentsClear:
-        {
+        case Commands::recentsClear: {
             recentFiles.clear();
             findChild<GuiController>()->refreshMainMenu();
-        } break;
+        }
+        break;
 
-        default: 
-            res = false; 
+        default:
+            res = false;
             break;
     }
 
@@ -586,19 +583,19 @@ void AppController::checkForegroundStatus()
     class CheckForeground : public CallbackMessage
     {
     public:
-        CheckForeground (AppController& a) : app (a) { }
+        CheckForeground (AppController& a) : app (a) {}
         void messageCallback() override
         {
             static bool sIsForeground = true;
             const auto foreground = Process::isForegroundProcess();
             if (sIsForeground == foreground)
                 return;
-            
+
             if (! app.getWorld().getSettings().hidePluginWindowsWhenFocusLost())
                 return;
 
-            auto session  = app.getWorld().getSession();
-            auto& gui     = *app.findChild<GuiController>();
+            auto session = app.getWorld().getSession();
+            auto& gui = *app.findChild<GuiController>();
             const Node graph (session->getCurrentGraph());
             jassert (session);
             if (foreground)
@@ -610,7 +607,7 @@ void AppController::checkForegroundStatus()
             {
                 gui.closeAllPluginWindows();
             }
-            
+
             sIsForeground = foreground;
         }
 
@@ -618,7 +615,7 @@ void AppController::checkForegroundStatus()
         AppController& app;
     };
 
-    (new CheckForeground(*this))->post();
+    (new CheckForeground (*this))->post();
 }
 
-}
+} // namespace Element

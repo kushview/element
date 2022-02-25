@@ -34,7 +34,7 @@ public:
     ~MidiRouterNode();
 
     void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
-    void releaseResources() override { }
+    void releaseResources() override {}
 
     inline bool wantsMidiPipe() const override { return true; }
     void render (AudioSampleBuffer&, MidiPipe&) override;
@@ -49,26 +49,26 @@ public:
     int getNumPrograms() const override { return jmax (1, programs.size()); }
     int getCurrentProgram() const override { return currentProgram; }
     void setCurrentProgram (int index) override;
-    const String getProgramName (int index) const override 
+    const String getProgramName (int index) const override
     {
-        if (auto* prog = programs [index])
+        if (auto* prog = programs[index])
             return prog->name;
-        return "MIDI Router " + String (index + 1); 
+        return "MIDI Router " + String (index + 1);
     }
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_ROUTER;
-        desc.uniqueId                = EL_INTERNAL_UID_MIDI_ROUTER;
-        desc.name               = "MIDI Router";
-        desc.descriptiveName    = "A MIDI Patch Grid";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.fileOrIdentifier = EL_INTERNAL_ID_MIDI_ROUTER;
+        desc.uniqueId = EL_INTERNAL_UID_MIDI_ROUTER;
+        desc.name = "MIDI Router";
+        desc.descriptiveName = "A MIDI Patch Grid";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
 
     void refreshPorts() override
@@ -93,11 +93,11 @@ private:
     CriticalSection lock;
     const int numSources;
     const int numDestinations;
-    
+
     struct Program
     {
         Program (const String& programName, int midiProgramNumber = -1)
-            : name (programName), midiProgram (midiProgramNumber) { }
+            : name (programName), midiProgram (midiProgramNumber) {}
         String name { "1 to 1" };
         int midiProgram { -1 };
         MatrixState matrix;
@@ -120,4 +120,4 @@ private:
     void initMidiOuts (OwnedArray<MidiBuffer>& outs);
 };
 
-}
+} // namespace Element

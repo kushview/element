@@ -74,19 +74,21 @@ private:
     void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
     {
         // watched node changed
-        if (tree == node.getValueTree() && property == Tags::name) {
+        if (tree == node.getValueTree() && property == Tags::name)
+        {
             if (onNodeNameChanged)
                 onNodeNameChanged();
         }
 
         // Sibling node name changed
-        if (property == Tags::name && data.getChildWithName(Tags::nodes).indexOf(tree) > 0) {
+        if (property == Tags::name && data.getChildWithName (Tags::nodes).indexOf (tree) > 0)
+        {
             if (onNodeNameChanged)
                 onNodeNameChanged();
         }
     }
 
-    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override
     {
         if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
         {
@@ -95,7 +97,7 @@ private:
         }
     }
 
-    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override
     {
         if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
         {
@@ -117,7 +119,7 @@ private:
         ignoreUnused (tree);
     }
 
-    void valueTreeRedirected (ValueTree&) override { }
+    void valueTreeRedirected (ValueTree&) override {}
 };
 
 NodeEditorContentView::NodeEditorContentView()
@@ -127,22 +129,20 @@ NodeEditorContentView::NodeEditorContentView()
     nodesCombo.addListener (this);
 
     addAndMakeVisible (menuButton);
-    menuButton.setIcon (Icon (getIcons().falBarsOutline, 
-        findColour (TextButton::textColourOffId)));
+    menuButton.setIcon (Icon (getIcons().falBarsOutline,
+                              findColour (TextButton::textColourOffId)));
     menuButton.setTriggeredOnMouseDown (true);
-    menuButton.onClick = [this]()
-    {
-        #if 0
+    menuButton.onClick = [this]() {
+#if 0
         NodePopupMenu menu (node, [this](NodePopupMenu& nodeMenu) {
             nodeMenu.addItem (1, "Sticky", true, isSticky());
         });
-        #else
+#else
         PopupMenu menu;
         menu.addItem (1, "Sticky", true, isSticky());
-        #endif
-        
+#endif
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&menuButton),
-            ModalCallbackFunction::forComponent (nodeMenuCallback, this));
+                            ModalCallbackFunction::forComponent (nodeMenuCallback, this));
     };
 
     watcher.reset (new NodeWatcher());
@@ -150,8 +150,7 @@ NodeEditorContentView::NodeEditorContentView()
         nodesCombo.addNodes (graph, dontSendNotification);
     };
 
-    watcher->onNodeNameChanged = [this]()
-    {
+    watcher->onNodeNameChanged = [this]() {
         nodesCombo.addNodes (graph, dontSendNotification);
     };
 }
@@ -187,13 +186,13 @@ void NodeEditorContentView::setState (const String& state)
     MemoryBlock mb;
     mb.fromBase64Encoding (state);
     const ValueTree tree = (mb.getSize() > 0)
-        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
-        : ValueTree();
+                               ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+                               : ValueTree();
     if (! tree.isValid())
         return;
-    
+
     setSticky ((bool) tree.getProperty ("sticky", sticky));
-    
+
     auto session = ViewHelpers::getSession (this);
     if (session == nullptr)
     {
@@ -201,7 +200,7 @@ void NodeEditorContentView::setState (const String& state)
         return;
     }
 
-    const auto nodeStr  = tree[Tags::node].toString();
+    const auto nodeStr = tree[Tags::node].toString();
     Node newNode;
     if (nodeStr.isNotEmpty())
     {
@@ -209,13 +208,16 @@ void NodeEditorContentView::setState (const String& state)
         newNode = session->findNodeById (gid);
     }
 
-    if (newNode.isValid()) {
+    if (newNode.isValid())
+    {
         setNode (newNode);
-    } else {
-        DBG("[EL] couldn't find node to to select in node editor");
+    }
+    else
+    {
+        DBG ("[EL] couldn't find node to to select in node editor");
     }
 }
-    
+
 void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView* view)
 {
     if (result == 1)
@@ -236,8 +238,7 @@ void NodeEditorContentView::comboBoxChanged (ComboBox*)
     {
         if (sticky)
             setNode (selectedNode);
-        ViewHelpers::findContentComponent(this)->getAppController()
-            .findChild<GuiController>()->selectNode (selectedNode);
+        ViewHelpers::findContentComponent (this)->getAppController().findChild<GuiController>()->selectNode (selectedNode);
     }
 }
 
@@ -250,8 +251,8 @@ void NodeEditorContentView::resized()
     r1.removeFromTop (4);
     auto r2 = r1.removeFromTop (20);
     nodesCombo.setBounds (r2.removeFromLeft (jmax (100, r2.getWidth() - 24)));
-    menuButton.setBounds (r2.withWidth(22).withX (r2.getX() + 2));
-    
+    menuButton.setBounds (r2.withWidth (22).withX (r2.getX() + 2));
+
     if (editor)
     {
         r1.removeFromTop (2);
@@ -269,7 +270,7 @@ void NodeEditorContentView::setSticky (bool shouldBeSticky)
 
 void NodeEditorContentView::onGraphChanged()
 {
-    auto *cc = ViewHelpers::findContentComponent (this);
+    auto* cc = ViewHelpers::findContentComponent (this);
     jassert (cc);
     auto& graphs = *cc->getAppController().findChild<GraphController>();
     setNode (graphs.getGraph().getNode (0));
@@ -283,7 +284,7 @@ void NodeEditorContentView::onSessionLoaded()
 
 void NodeEditorContentView::stabilizeContent()
 {
-    auto *cc = ViewHelpers::findContentComponent (this);
+    auto* cc = ViewHelpers::findContentComponent (this);
     auto session = ViewHelpers::getSession (this);
     jassert (cc && session);
     auto& gui = *cc->getAppController().findChild<GuiController>();
@@ -316,14 +317,14 @@ void NodeEditorContentView::setNode (const Node& newNode)
     auto newGraph = newNode.getParentGraph();
     bool graphChanged = false;
     if (newGraph != graph)
-    {   
+    {
         graphChanged = true;
         graph = newGraph;
     }
-    
+
     if (graphChanged || nodesCombo.getNumItems() != graph.getNumNodes())
         nodesCombo.addNodes (graph, dontSendNotification);
-    
+
     if (newNode != node)
     {
         nodeObjectValue.removeListener (this);
@@ -334,7 +335,7 @@ void NodeEditorContentView::setNode (const Node& newNode)
         editor.reset (createEmbededEditor());
         if (editor)
             addAndMakeVisible (editor.get());
-        
+
         nodeObjectValue.addListener (this);
 
         resized();
@@ -374,18 +375,24 @@ void NodeEditorContentView::clearEditor()
 Component* NodeEditorContentView::createEmbededEditor()
 {
     auto* const world = ViewHelpers::getGlobals (this);
-    jassert(world);
-    auto& app   = ViewHelpers::findContentComponent (this)->getAppController();
-    
+    jassert (world);
+    auto& app = ViewHelpers::findContentComponent (this)->getAppController();
+
     if (node.isAudioInputNode())
     {
         if (app.getRunMode() == RunMode::Standalone)
         {
             if (node.isChildOfRootGraph())
             {
-                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                    1, DeviceManager::maxAudioChannels, 0, 0, 
-                    false, false, false, false);
+                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(),
+                                                                  1,
+                                                                  DeviceManager::maxAudioChannels,
+                                                                  0,
+                                                                  0,
+                                                                  false,
+                                                                  false,
+                                                                  false,
+                                                                  false);
             }
             else
             {
@@ -402,9 +409,15 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             if (node.isChildOfRootGraph())
             {
-                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                    0, 0, 1, DeviceManager::maxAudioChannels, 
-                    false, false, false, false);
+                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(),
+                                                                  0,
+                                                                  0,
+                                                                  1,
+                                                                  DeviceManager::maxAudioChannels,
+                                                                  false,
+                                                                  false,
+                                                                  false,
+                                                                  false);
             }
             else
             {
@@ -430,4 +443,4 @@ Component* NodeEditorContentView::createEmbededEditor()
     return nullptr;
 }
 
-}
+} // namespace Element

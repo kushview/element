@@ -27,16 +27,17 @@ namespace Element {
 class GuiController;
 class Node;
 
-enum struct NodeEditorPlacement : uint32_t {
-    PluginWindow    = 1 << 0,
+enum struct NodeEditorPlacement : uint32_t
+{
+    PluginWindow = 1 << 0,
     NavigationPanel = 1 << 1
 };
 
 struct NodeEditorDescription
 {
-    String                  ID;
-    NodeEditorPlacement     placement;
-    StringArray             nodes;
+    String ID;
+    NodeEditorPlacement placement;
+    StringArray nodes;
 };
 
 class NodeEditorSource
@@ -44,15 +45,14 @@ class NodeEditorSource
 public:
     NodeEditorSource() = default;
     virtual ~NodeEditorSource() = default;
-    virtual NodeEditorComponent* instantiate (const String& identifier, const Node& node,
-                                              NodeEditorPlacement placement) =0;
-    virtual void findEditors (Array<NodeEditorDescription>&) =0;
+    virtual NodeEditorComponent* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) = 0;
+    virtual void findEditors (Array<NodeEditorDescription>&) = 0;
 };
 
 class NodeEditorFactory final
 {
 public:
-    NodeEditorFactory ();
+    NodeEditorFactory();
     NodeEditorFactory (GuiController& g);
     ~NodeEditorFactory();
 
@@ -66,14 +66,14 @@ public:
     }
 
     /** Register an explicit editor for the given node and editor types */
-    template<class ET>
+    template <class ET>
     void add (const String& editorType, const String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
     {
         add (new Single<ET> (editorType, nodeType, placement));
     }
 
     /** Register a default editor for the given node and editor types */
-    template<class ET>
+    template <class ET>
     void add (const String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
     {
         add (new Single<ET> (EL_NODE_EDITOR_DEFAULT_ID, nodeType, placement));
@@ -85,7 +85,10 @@ public:
         std::unique_ptr<NodeEditorComponent> ed;
         for (auto* s : sources)
             if (auto* e = s->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
-                { ed.reset (e); break; }
+            {
+                ed.reset (e);
+                break;
+            }
         if (ed == nullptr && fallback)
             if (auto* e = fallback->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
                 ed.reset (e);
@@ -103,24 +106,20 @@ private:
     std::unique_ptr<NodeEditorSource> fallback;
     Array<NodeEditorDescription> editors;
 
-    template<class ET>
+    template <class ET>
     class Single : public NodeEditorSource
     {
     public:
-        Single (const String& inID, const String& nodeID, 
-                NodeEditorPlacement placement)
+        Single (const String& inID, const String& nodeID, NodeEditorPlacement placement)
         {
-            desc.ID     = inID;
-            desc.placement   = placement;
+            desc.ID = inID;
+            desc.placement = placement;
             desc.nodes.add (nodeID);
         }
 
-        NodeEditorComponent* instantiate (const String& identifier, const Node& node,
-                                          NodeEditorPlacement placement) override 
+        NodeEditorComponent* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
         {
-            if (desc.placement == placement &&
-                desc.ID == identifier && 
-                desc.nodes.contains (node.getIdentifier().toString()))
+            if (desc.placement == placement && desc.ID == identifier && desc.nodes.contains (node.getIdentifier().toString()))
             {
                 auto* editor = new ET (node);
                 return editor;
@@ -129,7 +128,8 @@ private:
             return nullptr;
         }
 
-        void findEditors (Array<NodeEditorDescription>& out) override {
+        void findEditors (Array<NodeEditorDescription>& out) override
+        {
             out.add (desc);
         }
 
@@ -137,8 +137,8 @@ private:
         NodeEditorDescription desc;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Single)
     };
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeEditorFactory)
 };
 
-}
+} // namespace Element

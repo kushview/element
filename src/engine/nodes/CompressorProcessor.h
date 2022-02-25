@@ -33,7 +33,7 @@ class LevelDetector
 public:
     LevelDetector() {}
 
-    void setAttackMs  (float newAttackMs)
+    void setAttackMs (float newAttackMs)
     {
         if (attackMs != newAttackMs)
         {
@@ -101,7 +101,7 @@ public:
     GainComputer()
     {
         thresh.reset (numSteps);
-        ratio.reset  (numSteps);
+        ratio.reset (numSteps);
     }
 
     void setThreshold (float newThreshDB)
@@ -111,9 +111,9 @@ public:
             threshDB = newThreshDB;
             thresh.setTargetValue (Decibels::decibelsToGain (newThreshDB));
             recalcKnees();
-        }    
+        }
     }
-    
+
     void setRatio (float newRatio)
     {
         if (ratio.getTargetValue() != newRatio)
@@ -206,16 +206,20 @@ public:
     float calcGainDB (float db);
 
     AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override                 { return true; }
+    bool hasEditor() const override { return true; }
 
-    double getTailLengthSeconds() const override    { return 0.0; };
-    bool acceptsMidi() const override               { return false; }
-    bool producesMidi() const override              { return false; }
+    double getTailLengthSeconds() const override { return 0.0; };
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
 
-    int getNumPrograms() override                                      { return 1; };
-    int getCurrentProgram() override                                   { return 1; };
-    void setCurrentProgram (int index) override                        { ignoreUnused (index); };
-    const String getProgramName (int index) override                   { ignoreUnused (index); return "Parameter"; }
+    int getNumPrograms() override { return 1; };
+    int getCurrentProgram() override { return 1; };
+    void setCurrentProgram (int index) override { ignoreUnused (index); };
+    const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return "Parameter";
+    }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
     void getStateInformation (juce::MemoryBlock& destData) override;
@@ -234,7 +238,7 @@ public:
     void removeListener (Listener* l) { listeners.remove (l); }
 
 protected:
-    inline bool isBusesLayoutSupported (const BusesLayout& layout) const override 
+    inline bool isBusesLayoutSupported (const BusesLayout& layout) const override
     {
         // supports two input buses, one output
         if (layout.inputBuses.size() != 2 && layout.outputBuses.size() != 1)
@@ -269,12 +273,12 @@ private:
     };
 
     int numChannels = 0;
-    AudioParameterFloat* threshDB  = nullptr;
-    AudioParameterFloat* ratio     = nullptr;
-    AudioParameterFloat* kneeDB    = nullptr;
-    AudioParameterFloat* attackMs  = nullptr;
+    AudioParameterFloat* threshDB = nullptr;
+    AudioParameterFloat* ratio = nullptr;
+    AudioParameterFloat* kneeDB = nullptr;
+    AudioParameterFloat* attackMs = nullptr;
     AudioParameterFloat* releaseMs = nullptr;
-    AudioParameterFloat* makeupDB  = nullptr;
+    AudioParameterFloat* makeupDB = nullptr;
     AudioParameterFloat* sideChain = nullptr;
 
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> makeupGain = 1.0f;
@@ -289,4 +293,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorProcessor)
 };
 
-}
+} // namespace Element

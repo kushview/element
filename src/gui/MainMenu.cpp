@@ -43,45 +43,45 @@
 namespace Element {
 
 MainMenu::MainMenu (MainWindow& parent, CommandManager& c)
-    : owner (parent), world (parent.getWorld()), cmd (c) { }
+    : owner (parent), world (parent.getWorld()), cmd (c) {}
 
 MainMenu::~MainMenu()
 {
-   #if JUCE_MAC
+#if JUCE_MAC
     MainMenu::setMacMainMenu (nullptr);
     macMenu = nullptr;
-   #else
+#else
     owner.setMenuBar (nullptr);
-   #endif
+#endif
 }
 
 void MainMenu::setupMenu()
 {
-   #if JUCE_MAC
+#if JUCE_MAC
     macMenu = new PopupMenu();
     macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About"));
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
     macMenu->addSeparator();
     macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
     MenuBarModel::setMacMainMenu (this, macMenu.get());
-   #else
+#else
     owner.setMenuBar (this);
-   #endif
+#endif
 }
 
 StringArray MainMenu::getMenuBarNames()
 {
     const char* const names[] = {
-        "File", 
-        "Edit", 
+        "File",
+        "Edit",
         "View",
         "Options",
-        "Window", 
-       #if JUCE_DEBUG
+        "Window",
+#if JUCE_DEBUG
         "Debug",
-       #endif
-        "Help", 
-        nullptr 
+#endif
+        "Help",
+        nullptr
     };
 
     return StringArray (names, MainMenu::NumMenus);
@@ -91,7 +91,7 @@ PopupMenu MainMenu::getMenuForIndex (int index, const String& name)
 {
     ignoreUnused (index);
     PopupMenu menu;
-    
+
     if (name == "File")
         buildFileMenu (menu);
     else if (name == "Edit")
@@ -104,15 +104,15 @@ PopupMenu MainMenu::getMenuForIndex (int index, const String& name)
         buildOptionsMenu (menu);
     else if (name == "Help")
         buildHelpMenu (menu);
-   #if JUCE_DEBUG
+#if JUCE_DEBUG
     else if (name == "Debug")
         buildDebugMenu (menu);
-   #endif
+#endif
 
     return menu;
 }
 
-ContentComponent* MainMenu::getContentComponent() 
+ContentComponent* MainMenu::getContentComponent()
 {
     return dynamic_cast<ContentComponent*> (owner.getContentComponent());
 }
@@ -120,33 +120,33 @@ ContentComponent* MainMenu::getContentComponent()
 void MainMenu::menuItemSelected (int index, int menu)
 {
     auto session = world.getSession();
-    auto engine  = world.getAudioEngine();
+    auto engine = world.getAudioEngine();
 
     if (index == 6000 && menu == Help)
     {
-        URL(EL_URL_MANUAL_HOME).launchInDefaultBrowser();
+        URL (EL_URL_MANUAL_HOME).launchInDefaultBrowser();
     }
     else if (index == 6500 && menu == Help)
     {
-       #ifdef EL_URL_API_LUA_EL
-        URL(EL_URL_API_LUA_EL).launchInDefaultBrowser();
-       #endif
+#ifdef EL_URL_API_LUA_EL
+        URL (EL_URL_API_LUA_EL).launchInDefaultBrowser();
+#endif
     }
     else if (index == 6501 && menu == Help)
     {
-       #ifdef EL_URL_API_LUA_KV
-        URL(EL_URL_API_LUA_KV).launchInDefaultBrowser();
-       #endif
+#ifdef EL_URL_API_LUA_KV
+        URL (EL_URL_API_LUA_KV).launchInDefaultBrowser();
+#endif
     }
     else if (index == 7000 && menu == Help)
     {
-        URL(EL_URL_BUG_TRACKER).launchInDefaultBrowser();
+        URL (EL_URL_BUG_TRACKER).launchInDefaultBrowser();
     }
     else if (index == 2000 && menu == Window)
     {
         ViewHelpers::closePluginWindows (&owner, false);
     }
-    
+
     if (menu == Options)
     {
         world.getSettings().performMenuResult (world, index);
@@ -162,13 +162,13 @@ void MainMenu::menuItemSelected (int index, int menu)
         }
     }
 
-    #if JUCE_DEBUG
+#if JUCE_DEBUG
     if (index == 1000)
     {
-        DBG("[EL] === SESSION DUMP ===");
+        DBG ("[EL] === SESSION DUMP ===");
         auto data = session->getValueTree().createCopy();
         Node::sanitizeProperties (data, true);
-        DBG(data.toXmlString());
+        DBG (data.toXmlString());
     }
     else if (index >= 1111 && index <= 1114)
     {
@@ -179,12 +179,12 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 2222)
     {
-        auto&  app = owner.getAppController();
-        DBG("has changed: " << (int) app.findChild<SessionController>()->hasSessionChanged());
+        auto& app = owner.getAppController();
+        DBG ("has changed: " << (int) app.findChild<SessionController>()->hasSessionChanged());
     }
     else if (index == 3333)
     {
-        auto&  app = owner.getAppController();
+        auto& app = owner.getAppController();
         if (auto* mapping = app.findChild<MappingController>())
             mapping->learn (true);
     }
@@ -200,12 +200,12 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 5555)
     {
-        if (auto *cc = getContentComponent())
+        if (auto* cc = getContentComponent())
             cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
     }
     else if (index == 6666)
     {
-        DBG("no workspace debug window");
+        DBG ("no workspace debug window");
     }
     else if (index == 7777)
     {
@@ -217,7 +217,6 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 8000)
     {
-        
     }
     else if (index == 9000)
     {
@@ -234,17 +233,17 @@ void MainMenu::menuItemSelected (int index, int menu)
         engine->addMidiMessage (MidiMessage::midiContinue().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
                                 true);
     }
-   #endif
-    
+#endif
+
     if (menu == File && index >= recentMenuOffset)
     {
         const int fileIdx = index - recentMenuOffset;
         class File f = owner.getAppController().getRecentlyOpenedFilesList().getFile (fileIdx);
-       #if EL_PRO
+#if EL_PRO
         owner.getAppController().findChild<SessionController>()->openFile (f);
-       #else
+#else
         owner.getAppController().findChild<GraphController>()->openGraph (f);
-       #endif
+#endif
     }
 }
 
@@ -260,7 +259,7 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
             list.createPopupMenuItems (recents, recentMenuOffset, false, true);
             recents.addSeparator();
         }
-        
+
         recents.addCommandItem (&cmd, Commands::recentsClear, "Clear Recent Files");
         menu.addSubMenu ("Open Recent", recents);
         menu.addSeparator();
@@ -269,18 +268,18 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 
 void MainMenu::buildFileMenu (PopupMenu& menu)
 {
-   #if defined (EL_SOLO) || defined (EL_FREE)
+#if defined(EL_SOLO) || defined(EL_FREE)
     menu.addCommandItem (&cmd, Commands::graphNew, "New Graph");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
     addRecentFiles (menu);
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importSession, "Import from Session...");
-    menu.addSeparator();    
+    menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::graphSave, "Save Graph");
     menu.addCommandItem (&cmd, Commands::graphSaveAs, "Save Graph As...");
 
-   #else
+#else
     menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
@@ -290,15 +289,15 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-   #endif
+#endif
 
-   #if ! JUCE_MAC
+#if ! JUCE_MAC
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");
     menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
     menu.addSeparator();
     menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
-   #endif
+#endif
 }
 
 void MainMenu::buildEditMenu (PopupMenu& menu) { buildEditMenu (cmd, menu); }
@@ -363,49 +362,49 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
 
     menu.addCommandItem (&cmd, Commands::panic, "Panic!");
 }
-    
+
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
     menu.addItem (6000, "User Manual");
-    menu.addSeparator();   
-   #ifdef EL_URL_API_LUA_EL
+    menu.addSeparator();
+#ifdef EL_URL_API_LUA_EL
     menu.addItem (6500, "Element Lua API");
-   #endif
-   #ifdef EL_URL_API_LUA_KV
+#endif
+#ifdef EL_URL_API_LUA_KV
     menu.addItem (6501, "KV Lua Modules API");
-   #endif
+#endif
     menu.addSeparator();
     menu.addItem (7000, "Submit Feedback");
-   #if ! JUCE_MAC
+#if ! JUCE_MAC
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
-   #endif
+#endif
 }
 
 void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
     menu.addSeparator();
-    
-    menu.addCommandItem (&cmd, Commands::sessionOpen,   "Open Session...");
-    menu.addCommandItem (&cmd, Commands::sessionSave,   "Save Session");
+
+    menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
+    menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
     menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
-    
-   #ifndef EL_FREE
+
+#ifndef EL_FREE
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-   #endif
+#endif
 }
-    
+
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
 {
-   #if EL_PRO
+#if EL_PRO
     menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
     menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
     menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete current graph");
     menu.addSeparator();
-   #endif
+#endif
     menu.addCommandItem (&cmd, Commands::undo, "Undo");
     menu.addCommandItem (&cmd, Commands::redo, "Redo");
     menu.addSeparator();
@@ -415,10 +414,10 @@ void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
 }
-    
+
 void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
 {
-   #ifdef EL_PRO
+#ifdef EL_PRO
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
@@ -435,40 +434,40 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
     menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
-   #else
+#else
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
-   #if defined (EL_SOLO)
+#if defined(EL_SOLO)
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
-   #endif
+#endif
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
-   #if defined (EL_SOLO)
-    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");   
-   #endif 
-   #endif
+#if defined(EL_SOLO)
+    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
+#endif
+#endif
 }
 
 void MainMenu::buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
 {
     buildSessionMenu (cmd, menu);
     menu.addSeparator();
-    buildEditMenu(cmd, menu);
+    buildEditMenu (cmd, menu);
     menu.addSeparator();
-    buildViewMenu(cmd, menu);
-    
+    buildViewMenu (cmd, menu);
+
     menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
     menu.addSeparator();
     menu.addItem (99999, "Close all plugin windows...");
 
-   #if 0
+#if 0
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
-   #endif
+#endif
 }
-}
+} // namespace Element

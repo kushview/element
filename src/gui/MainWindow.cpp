@@ -62,17 +62,17 @@ void MainWindow::refreshName()
 
 void MainWindow::nameChanged()
 {
-   #if defined (EL_PRO)
+#if defined(EL_PRO)
     nameChangedSession();
-   #else
+#else
     nameChangedSingleGraph();
-   #endif
+#endif
 }
 
 void MainWindow::nameChangedSession()
 {
     String title = Util::appName();
-    
+
     auto session = world.getSession();
     SessionController* controller = nullptr;
     if (auto* cc = dynamic_cast<ContentComponent*> (getContentComponent()))
@@ -84,8 +84,8 @@ void MainWindow::nameChangedSession()
         return;
     }
 
-    auto sessionName     = session->getName().trim();
-    auto graphName       = session->getCurrentGraph().getName().trim();
+    auto sessionName = session->getName().trim();
+    auto graphName = session->getCurrentGraph().getName().trim();
     if (sessionName.isEmpty())
     {
         const auto file = controller->getSessionFile();
@@ -108,8 +108,8 @@ void MainWindow::nameChangedSingleGraph()
     String sessionName, graphName;
     if (auto session = world.getSession())
     {
-        sessionName     = session->getName().trim();
-        graphName       = session->getCurrentGraph().getName().trim();
+        sessionName = session->getName().trim();
+        graphName = session->getCurrentGraph().getName().trim();
         if (graphName.isNotEmpty())
             title << " - " << graphName;
     }
@@ -167,9 +167,9 @@ void MainWindow::refreshMenu()
 
 AppController& MainWindow::getAppController()
 {
-    jassert(nullptr != dynamic_cast<ContentComponent*> (getContentComponent()));
+    jassert (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()));
     return (dynamic_cast<ContentComponent*> (getContentComponent()))
         ->getAppController();
 }
 
-}
+} // namespace Element

@@ -19,23 +19,23 @@
 #pragma once
 
 //==============================================================================
-#define EL_URL_HOME                     "https://kushview.net"
+#define EL_URL_HOME "https://kushview.net"
 
 //==============================================================================
-#define EL_URL_HELP_HOME                "https://help.kushview.net"
-#define EL_URL_HELP_ELEMENT             EL_URL_HELP_HOME "/collection/10-element"
-#define EL_URL_HELP_LICENSE_MANAGEMENT  EL_URL_HELP_HOME "/article/35-license-management"
-#define EL_URL_HELP_ACTIVATION          EL_URL_HELP_HOME "/article/61-online-activation"
+#define EL_URL_HELP_HOME "https://help.kushview.net"
+#define EL_URL_HELP_ELEMENT EL_URL_HELP_HOME "/collection/10-element"
+#define EL_URL_HELP_LICENSE_MANAGEMENT EL_URL_HELP_HOME "/article/35-license-management"
+#define EL_URL_HELP_ACTIVATION EL_URL_HELP_HOME "/article/61-online-activation"
 
-#define EL_URL_BUG_TRACKER              "https://github.com/kushview/element/issues"
+#define EL_URL_BUG_TRACKER "https://github.com/kushview/element/issues"
 
 //==============================================================================
-#define EL_URL_API_HOME                 "https://api.kushview.net"
-#define EL_URL_MANUAL_HOME              "https://element.readthedocs.io"
+#define EL_URL_API_HOME "https://api.kushview.net"
+#define EL_URL_MANUAL_HOME "https://element.readthedocs.io"
 
 #ifndef EL_URL_API_LUA_EL
- #define EL_URL_API_LUA_EL              EL_URL_API_HOME "/lua/el/latest/"
+#define EL_URL_API_LUA_EL EL_URL_API_HOME "/lua/el/latest/"
 #endif
 #ifndef EL_URL_API_LUA_KV
- #define EL_URL_API_LUA_KV               EL_URL_API_HOME "/lua/el/latest/"
+#define EL_URL_API_LUA_KV EL_URL_API_HOME "/lua/el/latest/"
 #endif

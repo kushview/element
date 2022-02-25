@@ -23,24 +23,22 @@
 #include "ElementApp.h"
 
 namespace Element {
-    class Node;
+class Node;
 }
 //[/Headers]
-
-
 
 //==============================================================================
 /**
                                                                     //[Comments]
                                                                     //[/Comments]
 */
-class AudioIOPanelView  : public Component,
-                          public Slider::Listener,
-                          public Label::Listener
+class AudioIOPanelView : public Component,
+                         public Slider::Listener,
+                         public Label::Listener
 {
 public:
     //==============================================================================
-    AudioIOPanelView ();
+    AudioIOPanelView();
     ~AudioIOPanelView();
 
     //==============================================================================
@@ -52,8 +50,6 @@ public:
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void labelTextChanged (Label* labelThatHasChanged) override;
-
-
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -68,7 +64,6 @@ private:
     ScopedPointer<Label> inputGainDbLabel;
     ScopedPointer<Label> outputGainDbLabel;
     ScopedPointer<Label> nodeNameLabel;
-
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioIOPanelView)

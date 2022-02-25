@@ -51,14 +51,14 @@ private:
 
     PropertyPanel props;
     int propsWidth = 220,
-        propsGap   = 2;
-    
+        propsGap = 2;
+
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
-    
+
     FileBrowserComponent fileBrowser;
     std::unique_ptr<FileChooser> chooser;
-    
+
     void updateAll();
     void updatePreview();
     void updateCodeEditor();
@@ -69,4 +69,4 @@ private:
     void log (const String& txt) { Logger::writeToLog (txt); }
 };
 
-}
+} // namespace Element

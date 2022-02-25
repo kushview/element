@@ -25,49 +25,51 @@
 namespace Element {
 
 class PlaceholderProcessor : public BaseProcessor
-{    
+{
 public:
     PlaceholderProcessor()
         : BaseProcessor (BusesProperties()
-            .withInput ("Main", AudioChannelSet::stereo())
-            .withOutput ("Main", AudioChannelSet::stereo()))
-    { 
+                             .withInput ("Main", AudioChannelSet::stereo())
+                             .withOutput ("Main", AudioChannelSet::stereo()))
+    {
         numInputs = numOutputs = 2;
         acceptMidi = produceMidi = true;
     }
 
-    PlaceholderProcessor (const Node& node, double sampleRate = 44100.0, 
-                          int blockSize = 1024)
-    { 
+    PlaceholderProcessor (const Node& node, double sampleRate = 44100.0, int blockSize = 1024)
+    {
         setupFor (node, sampleRate, blockSize);
     }
-    
-    PlaceholderProcessor (const int numAudioIns, const int numAudioOuts,
-                          const bool hasMidiIn, const bool hasMidiOut)
-        : BaseProcessor (BusesProperties()
-            .withInput ("Main", AudioChannelSet::namedChannelSet (numAudioIns))
-            .withOutput ("Main", AudioChannelSet::namedChannelSet (numAudioOuts))),
-          numInputs (numAudioIns), numOutputs (numAudioOuts),
-          acceptMidi (hasMidiIn), produceMidi (hasMidiOut)
-    { }
 
-    virtual ~PlaceholderProcessor() { }
+    PlaceholderProcessor (const int numAudioIns, const int numAudioOuts, const bool hasMidiIn, const bool hasMidiOut)
+        : BaseProcessor (BusesProperties()
+                             .withInput ("Main", AudioChannelSet::namedChannelSet (numAudioIns))
+                             .withOutput ("Main", AudioChannelSet::namedChannelSet (numAudioOuts))),
+          numInputs (numAudioIns),
+          numOutputs (numAudioOuts),
+          acceptMidi (hasMidiIn),
+          produceMidi (hasMidiOut)
+    {
+    }
+
+    virtual ~PlaceholderProcessor() {}
 
     inline const String getName() const override { return "Placeholder"; };
-    
+
     inline void setupFor (const Node& node, double sampleRate, int bufferSize)
     {
         PortArray ins, outs;
         node.getPorts (ins, outs, PortType::Audio);
-        numInputs       = ins.size();
-        numOutputs      = outs.size();
-        setChannelLayoutOfBus (true,  0, AudioChannelSet::namedChannelSet (numInputs));
+        numInputs = ins.size();
+        numOutputs = outs.size();
+        setChannelLayoutOfBus (true, 0, AudioChannelSet::namedChannelSet (numInputs));
         setChannelLayoutOfBus (false, 0, AudioChannelSet::namedChannelSet (numOutputs));
 
-        ins.clearQuick(); outs.clearQuick();
+        ins.clearQuick();
+        outs.clearQuick();
         node.getPorts (ins, outs, PortType::Midi);
-        acceptMidi      = ins.size() > 0;
-        produceMidi     = outs.size() > 0;
+        acceptMidi = ins.size() > 0;
+        produceMidi = outs.size() > 0;
 
         int controlIdx = 0;
         for (int i = 0; i < node.getPortsValueTree().getNumChildren(); ++i)
@@ -75,12 +77,13 @@ public:
             const auto port = node.getPort (i);
             if (port.isA (PortType::Control, true))
             {
-                String controlId = "control-"; controlId << controlIdx++;
+                String controlId = "control-";
+                controlId << controlIdx++;
                 addParameter (new AudioParameterFloat (controlId, port.getName(), 0, 1, 0));
             }
         }
     }
-    
+
     inline void fillInPluginDescription (PluginDescription& d) const override
     {
         d.name = "Placeholder";
@@ -91,34 +94,40 @@ public:
         d.numInputChannels = numInputs;
         d.numOutputChannels = numOutputs;
     }
-    
-    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override {
+
+    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
+    {
         setPlayConfigDetails (numInputs, numOutputs, sampleRate, maximumExpectedSamplesPerBlock);
     }
-    
-    inline void releaseResources() override { }
-    inline void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override {
+
+    inline void releaseResources() override {}
+    inline void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
+    {
         processBlockBypassed (buffer, midiMessages);
     }
-    
+
     inline double getTailLengthSeconds() const override { return 0.0; }
-    
-    inline bool acceptsMidi() const override       { return acceptMidi; }
-    inline bool producesMidi() const override      { return produceMidi; }
-    
+
+    inline bool acceptsMidi() const override { return acceptMidi; }
+    inline bool producesMidi() const override { return produceMidi; }
+
     inline AudioProcessorEditor* createEditor() override { return nullptr; }
     inline bool hasEditor() const override { return false; }
-    
-    inline void getStateInformation (juce::MemoryBlock&) override { }
-    inline void setStateInformation (const void*, int) override { }
 
-    inline int getNumPrograms() override        { return 1; };
-    inline int getCurrentProgram() override     { return 1; };
+    inline void getStateInformation (juce::MemoryBlock&) override {}
+    inline void setStateInformation (const void*, int) override {}
+
+    inline int getNumPrograms() override { return 1; };
+    inline int getCurrentProgram() override { return 1; };
     inline void setCurrentProgram (int index) override { ignoreUnused (index); };
-    inline const String getProgramName (int index) override { ignoreUnused (index); return ""; }
+    inline const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return "";
+    }
     inline void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
-    
-   #if 0
+
+#if 0
     // Audio Processor Template
     virtual StringArray getAlternateDisplayNames() const;
     
@@ -148,25 +157,24 @@ public:
 protected:
     virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
 
-   #endif
+#endif
 
 protected:
     bool isBusesLayoutSupported (const BusesLayout& layout) const override
     {
         if (layout.inputBuses.size() > 1 || layout.outputBuses.size() > 1)
             return false;
-        return layout.getNumChannels (true, 0) == numInputs &&
-            layout.getNumChannels (false, 0) == numOutputs; 
+        return layout.getNumChannels (true, 0) == numInputs && layout.getNumChannels (false, 0) == numOutputs;
     }
 
     bool canApplyBusesLayout (const BusesLayout& layouts) const override { return isBusesLayoutSupported (layouts); }
 
 private:
-    int numInputs       = 2;
-    int numOutputs      = 2;
-    bool acceptMidi     = true;
-    bool produceMidi    = true;
+    int numInputs = 2;
+    int numOutputs = 2;
+    bool acceptMidi = true;
+    bool produceMidi = true;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlaceholderProcessor)
 };
 
-}
+} // namespace Element

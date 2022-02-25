@@ -57,7 +57,7 @@ public:
             return onUpKey();
         else if (k.getKeyCode() == KeyPress::downKey && onDownKey != nullptr)
             return onDownKey();
-        
+
         const auto mods = k.getModifiers();
 
         if (mods.isCtrlDown())
@@ -90,24 +90,22 @@ public:
     {
         addAndMakeVisible (buffer);
         buffer.setLookAndFeel (&style);
-        
+
         addAndMakeVisible (prefixLabel);
         prefixLabel.setText (prefixText, dontSendNotification);
         prefixLabel.setFont (prompt.getFont().withHeight (12.f));
         prefixLabel.setJustificationType (Justification::centred);
-        
+
         addAndMakeVisible (prompt);
         prompt.setLookAndFeel (&style);
 
-        prompt.onUpKey = [this]() -> bool
-        {
+        prompt.onUpKey = [this]() -> bool {
             historyPos = jmax (0, historyPos - 1);
             loadHistoryItem (historyPos);
             return true;
         };
 
-        prompt.onDownKey = [this]() -> bool
-        {
+        prompt.onDownKey = [this]() -> bool {
             historyPos = jmin (history.size(), historyPos + 1);
             loadHistoryItem (historyPos);
             return true;
@@ -115,8 +113,7 @@ public:
 
         prompt.onTextChange = [this]() {};
 
-        prompt.onReturnKey = [this]
-        {
+        prompt.onReturnKey = [this] {
             auto text = prompt.getText();
             if (text.isEmpty())
                 return;
@@ -150,7 +147,7 @@ public:
         if (line.isNotEmpty())
             line << " ";
         line << text;
-        
+
         buffer.moveCaretToEnd();
         buffer.insertTextAtCaret (line.trimEnd());
         buffer.insertTextAtCaret (newLine);
@@ -190,7 +187,7 @@ private:
     void addToHistory (const String& text)
     {
         if (history.isEmpty() || (history.size() > 0 && text != history.getReference (history.size() - 1)))
-           history.add (text);
+            history.add (text);
         if (history.size() > 100)
             history.remove (0);
         historyPos = history.size();
@@ -239,8 +236,10 @@ Console::~Console()
 
 void Console::clear (bool buffer, bool history)
 {
-    if (buffer)     content->clearBuffer();
-    if (history)    content->clearHistory();
+    if (buffer)
+        content->clearBuffer();
+    if (history)
+        content->clearHistory();
 }
 
 void Console::setPromptVisible (bool visible)
@@ -273,4 +272,4 @@ void Console::handleTextEntry (const String& text)
     textEntered (text);
 }
 
-}
+} // namespace Element

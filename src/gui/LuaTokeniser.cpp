@@ -29,34 +29,37 @@ struct LuaTokeniserFunctions
 {
     static bool isControlStatement (String::CharPointerType token, const int tokenLength) noexcept
     {
-        static const char* const keywords2Char[] =
-            { "if", "in", "do", nullptr };
+        static const char* const keywords2Char[] = { "if", "in", "do", nullptr };
 
-        static const char* const keywords3Char[] =
-            { "end", "for", "not", "and", nullptr };
+        static const char* const keywords3Char[] = { "end", "for", "not", "and", nullptr };
 
-        static const char* const keywords4Char[] =
-            { "then", "else", nullptr };
+        static const char* const keywords4Char[] = { "then", "else", nullptr };
 
-        static const char* const keywords5Char[] =
-            {  "until", "while", "break", nullptr };
+        static const char* const keywords5Char[] = { "until", "while", "break", nullptr };
 
-        static const char* const keywords6Char[] =
-            { "repeat", "return", "elseif", nullptr};
+        static const char* const keywords6Char[] = { "repeat", "return", "elseif", nullptr };
 
-        static const char* const keywordsOther[] =
-            { "function", "require", "@interface", "@end", "@synthesize", "@dynamic", "@public",
-              "@private", "@property", "@protected", "@class", nullptr };
+        static const char* const keywordsOther[] = { "function", "require", "@interface", "@end", "@synthesize", "@dynamic", "@public", "@private", "@property", "@protected", "@class", nullptr };
 
         const char* const* k;
 
         switch (tokenLength)
         {
-            case 2:   k = keywords2Char; break;
-            case 3:   k = keywords3Char; break;
-            case 4:   k = keywords4Char; break;
-            case 5:   k = keywords5Char; break;
-            case 6:   k = keywords6Char; break;
+            case 2:
+                k = keywords2Char;
+                break;
+            case 3:
+                k = keywords3Char;
+                break;
+            case 4:
+                k = keywords4Char;
+                break;
+            case 5:
+                k = keywords5Char;
+                break;
+            case 6:
+                k = keywords6Char;
+                break;
 
             default:
                 if (tokenLength < 2 || tokenLength > 16)
@@ -77,31 +80,35 @@ struct LuaTokeniserFunctions
     {
         static const char* const keywords2Char[] = { nullptr };
 
-        static const char* const keywords3Char[] =
-            { "nil", nullptr };
+        static const char* const keywords3Char[] = { "nil", nullptr };
 
-        static const char* const keywords4Char[] =
-            { "then", "true", "else", "self", nullptr };
+        static const char* const keywords4Char[] = { "then", "true", "else", "self", nullptr };
 
-        static const char* const keywords5Char[] =
-            {  "false", "local", "until", "while", "break", nullptr };
+        static const char* const keywords5Char[] = { "false", "local", "until", "while", "break", nullptr };
 
-        static const char* const keywords6Char[] =
-            { "repeat", "return", "elseif", nullptr};
+        static const char* const keywords6Char[] = { "repeat", "return", "elseif", nullptr };
 
-        static const char* const keywordsOther[] =
-            { "function", "@interface", "@end", "@synthesize", "@dynamic", "@public",
-              "@private", "@property", "@protected", "@class", nullptr };
+        static const char* const keywordsOther[] = { "function", "@interface", "@end", "@synthesize", "@dynamic", "@public", "@private", "@property", "@protected", "@class", nullptr };
 
         const char* const* k;
 
         switch (tokenLength)
         {
-            case 2:   k = keywords2Char; break;
-            case 3:   k = keywords3Char; break;
-            case 4:   k = keywords4Char; break;
-            case 5:   k = keywords5Char; break;
-            case 6:   k = keywords6Char; break;
+            case 2:
+                k = keywords2Char;
+                break;
+            case 3:
+                k = keywords3Char;
+                break;
+            case 4:
+                k = keywords4Char;
+                break;
+            case 5:
+                k = keywords5Char;
+                break;
+            case 6:
+                k = keywords6Char;
+                break;
 
             default:
                 if (tokenLength < 2 || tokenLength > 16)
@@ -166,7 +173,6 @@ struct LuaTokeniserFunctions
                 brackets = 0;
                 lastWasDash = true;
                 lastWasBracket = false;
-                
             }
             else if (c == ']' && dashes == 2)
             {
@@ -191,105 +197,119 @@ struct LuaTokeniserFunctions
 
         switch (firstChar)
         {
-        case 0:
-            break;
+            case 0:
+                break;
 
-        case '0':   case '1':   case '2':   case '3':   case '4':
-        case '5':   case '6':   case '7':   case '8':   case '9':
-        case '.':
-        {
-            auto result = CppTokeniserFunctions::parseNumber (source);
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '.': {
+                auto result = CppTokeniserFunctions::parseNumber (source);
 
-            if (result == LuaTokeniser::tokenType_error)
-            {
-                source.skip();
+                if (result == LuaTokeniser::tokenType_error)
+                {
+                    source.skip();
 
-                if (firstChar == '.')
-                    return LuaTokeniser::tokenType_punctuation;
+                    if (firstChar == '.')
+                        return LuaTokeniser::tokenType_punctuation;
+                }
+
+                return result;
             }
 
-            return result;
-        }
-
-        case ',':
-        case ';':
-        case ':':
-            source.skip();
-            return LuaTokeniser::tokenType_punctuation;
-
-        case '(':   case ')':
-        case '{':   case '}':
-        case '[':   case ']':
-            source.skip();
-            return LuaTokeniser::tokenType_bracket;
-
-        case '"':
-        case '\'':
-            CppTokeniserFunctions::skipQuotedString (source);
-            return LuaTokeniser::tokenType_string;
-
-        case '+':
-            source.skip();
-            CppTokeniserFunctions::skipIfNextCharMatches (source, '+', '=');
-            return LuaTokeniser::tokenType_operator;
-
-        case '-':
-        {
-            source.skip();
-            auto result = CppTokeniserFunctions::parseNumber (source);
-
-            if (source.peekNextChar() == '-')
-            {
+            case ',':
+            case ';':
+            case ':':
                 source.skip();
-                if (source.peekNextChar() == '[')
+                return LuaTokeniser::tokenType_punctuation;
+
+            case '(':
+            case ')':
+            case '{':
+            case '}':
+            case '[':
+            case ']':
+                source.skip();
+                return LuaTokeniser::tokenType_bracket;
+
+            case '"':
+            case '\'':
+                CppTokeniserFunctions::skipQuotedString (source);
+                return LuaTokeniser::tokenType_string;
+
+            case '+':
+                source.skip();
+                CppTokeniserFunctions::skipIfNextCharMatches (source, '+', '=');
+                return LuaTokeniser::tokenType_operator;
+
+            case '-': {
+                source.skip();
+                auto result = CppTokeniserFunctions::parseNumber (source);
+
+                if (source.peekNextChar() == '-')
                 {
                     source.skip();
                     if (source.peekNextChar() == '[')
-                        skipComment (source);
+                    {
+                        source.skip();
+                        if (source.peekNextChar() == '[')
+                            skipComment (source);
+                        else
+                            source.skipToEndOfLine();
+                    }
                     else
+                    {
                         source.skipToEndOfLine();
+                    }
+
+                    return LuaTokeniser::tokenType_comment;
                 }
-                else
+
+                if (result == LuaTokeniser::tokenType_error)
                 {
-                    source.skipToEndOfLine();
+                    CppTokeniserFunctions::skipIfNextCharMatches (source, '-', '=');
+                    return LuaTokeniser::tokenType_operator;
                 }
 
-                return LuaTokeniser::tokenType_comment;
+                return result;
             }
 
-            if (result == LuaTokeniser::tokenType_error)
-            {
-                CppTokeniserFunctions::skipIfNextCharMatches (source, '-', '=');
+            case '*':
+            case '%':
+            case '=':
+            case '!':
+                source.skip();
+                CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
                 return LuaTokeniser::tokenType_operator;
-            }
 
-            return result;
-        }
+            case '?':
+            case '~':
+                source.skip();
+                return LuaTokeniser::tokenType_operator;
 
-        case '*':   case '%':
-        case '=':   case '!':
-            source.skip();
-            CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
-            return LuaTokeniser::tokenType_operator;
+            case '<':
+            case '>':
+            case '|':
+            case '&':
+            case '^':
+                source.skip();
+                CppTokeniserFunctions::skipIfNextCharMatches (source, firstChar);
+                CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
+                return LuaTokeniser::tokenType_operator;
 
-        case '?':
-        case '~':
-            source.skip();
-            return LuaTokeniser::tokenType_operator;
+            default:
+                if (CppTokeniserFunctions::isIdentifierStart (firstChar))
+                    return parseIdentifier (source);
 
-        case '<':   case '>':
-        case '|':   case '&':   case '^':
-            source.skip();
-            CppTokeniserFunctions::skipIfNextCharMatches (source, firstChar);
-            CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
-            return LuaTokeniser::tokenType_operator;
-
-        default:
-            if (CppTokeniserFunctions::isIdentifierStart (firstChar))
-                return parseIdentifier (source);
-
-            source.skip();
-            break;
+                source.skip();
+                break;
         }
 
         return LuaTokeniser::tokenType_error;
@@ -308,17 +328,17 @@ int LuaTokeniser::readNextToken (CodeDocument::Iterator& source)
 CodeEditorComponent::ColourScheme LuaTokeniser::getDefaultColourScheme()
 {
     static const CodeEditorComponent::ColourScheme::TokenType types[] = {
-        { "Error",              Colour (0xffcc0000) },
-        { "Comment",            Colour (0xff6a9955) },
-        { "Keyword",            Colour (0xff569cd6) },
-        { "Operator",           Colour (0xffb3b3b3) },
-        { "Identifier",         Colour (0xffc5c5c5) },
-        { "Integer",            Colour (0xffb5cea8) },
-        { "Float",              Colour (0xffb5cea8) },
-        { "String",             Colour (0xffce9178) },
-        { "Bracket",            Colour (0xffd4d4d4) },
-        { "Punctuation",        Colour (0xffb3b3b3) },
-        { "Preprocessor Text",  Colour (0xffc586c0) } // used for control statements
+        { "Error", Colour (0xffcc0000) },
+        { "Comment", Colour (0xff6a9955) },
+        { "Keyword", Colour (0xff569cd6) },
+        { "Operator", Colour (0xffb3b3b3) },
+        { "Identifier", Colour (0xffc5c5c5) },
+        { "Integer", Colour (0xffb5cea8) },
+        { "Float", Colour (0xffb5cea8) },
+        { "String", Colour (0xffce9178) },
+        { "Bracket", Colour (0xffd4d4d4) },
+        { "Punctuation", Colour (0xffb3b3b3) },
+        { "Preprocessor Text", Colour (0xffc586c0) } // used for control statements
     };
 
     CodeEditorComponent::ColourScheme cs;

@@ -39,4 +39,4 @@ private:
     std::unique_ptr<SessionTreePanel> tree;
 };
 
-}
+} // namespace Element

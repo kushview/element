@@ -22,9 +22,8 @@
 
 namespace Element {
 
-ClipModel Sequence::Track::addClip (const File &file, double startTime)
+ClipModel Sequence::Track::addClip (const File& file, double startTime)
 {
-
     ClipModel invalid;
 #if 0
     if (! supportsFile (file))
@@ -58,38 +57,33 @@ ClipModel Sequence::Track::addClip (const File &file, double startTime)
 
 Sequence::Track Sequence::Track::next() const
 {
-    return Track (session, session->node().getChild (
-                  session->node().indexOf (trackData) + 1));
+    return Track (session, session->node().getChild (session->node().indexOf (trackData) + 1));
 }
 
 Sequence::Track Sequence::Track::previous() const
 {
-    return Track (session, session->node().getChild (
-                  session->node().indexOf (trackData) - 1));
+    return Track (session, session->node().getChild (session->node().indexOf (trackData) - 1));
 }
 
-void
-Sequence::Track::removeFromSession()
-{        
+void Sequence::Track::removeFromSession()
+{
     trackData.removeAllChildren (undoManager());
     session->sequenceNode().removeChild (trackData, undoManager());
 }
 
-bool Sequence::Track::supportsAsset (const AssetItem &asset) const
+bool Sequence::Track::supportsAsset (const AssetItem& asset) const
 {
     return supportsFile (asset.getFile());
 }
 
-bool
-Sequence::Track::supportsClip (const ClipModel &clip) const
+bool Sequence::Track::supportsClip (const ClipModel& clip) const
 {
-    return clip.node().getProperty("media").equals (trackData.getProperty ("type"));
+    return clip.node().getProperty ("media").equals (trackData.getProperty ("type"));
 }
 
-bool
-Sequence::Track::supportsFile (const File &file) const
+bool Sequence::Track::supportsFile (const File& file) const
 {
     return session->media().canOpenFile (file);
 }
 
-}
+} // namespace Element

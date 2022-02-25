@@ -28,7 +28,8 @@ class NodePortsTable : public juce::TableListBox,
                        public juce::TableListBoxModel
 {
 public:
-    enum Columns {
+    enum Columns
+    {
         VisibleColumn = 1,
         NameColumn,
         TypeColumn
@@ -81,8 +82,9 @@ public:
     void stabilizeContent() override {}
 
 private:
-    class Content; friend class Content;
+    class Content;
+    friend class Content;
     std::unique_ptr<Content> content;
 };
 
-}
+} // namespace Element

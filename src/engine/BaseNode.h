@@ -30,4 +30,4 @@ protected:
     BaseNode() {}
 };
 
-}
+} // namespace Element

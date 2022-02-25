@@ -26,10 +26,10 @@ namespace Element {
 class Globals;
 
 namespace Lua {
-extern void initializeState (sol::state_view&);
-extern void initializeState (sol::state_view&, Globals&);
-extern void setGlobals (sol::state_view&, Globals&);
-extern void clearGlobals (sol::state_view&);
-}
+    extern void initializeState (sol::state_view&);
+    extern void initializeState (sol::state_view&, Globals&);
+    extern void setGlobals (sol::state_view&, Globals&);
+    extern void clearGlobals (sol::state_view&);
+} // namespace Lua
 
-}
+} // namespace Element

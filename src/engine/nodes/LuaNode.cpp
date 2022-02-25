@@ -31,8 +31,8 @@
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
 
-static const String initScript = 
-R"(
+static const String initScript =
+    R"(
 require ('kv.AudioBuffer')
 require ('kv.MidiBuffer')
 require ('kv.MidiMessage')
@@ -41,8 +41,8 @@ require ('kv.audio')
 require ('el.MidiPipe')
 )";
 
-static const String stereoAmpScript = 
-R"(--- Stereo Amplifier in Lua
+static const String stereoAmpScript =
+    R"(--- Stereo Amplifier in Lua
 --
 -- This script came with Element and is in the public domain.
 --
@@ -161,7 +161,7 @@ public:
 
     void controlValueChanged (int parameterIndex, float newValue) override;
     void controlTouched (int parameterIndex, bool gestureIsStarting) override;
-    
+
 private:
     LuaNode::Context* ctx { nullptr };
 };
@@ -169,7 +169,7 @@ private:
 //=============================================================================
 struct LuaNode::Context
 {
-    explicit Context ()
+    explicit Context()
     {
         L = state.lua_state();
     }
@@ -177,9 +177,9 @@ struct LuaNode::Context
     ~Context()
     {
         for (auto* ip : inParams)
-            dynamic_cast<LuaParameter*>(ip)->unlink();
+            dynamic_cast<LuaParameter*> (ip)->unlink();
         for (auto* op : outParams)
-            dynamic_cast<LuaParameter*>(op)->unlink();
+            dynamic_cast<LuaParameter*> (op)->unlink();
         inParams.clear();
         outParams.clear();
 
@@ -223,7 +223,7 @@ struct LuaNode::Context
                     renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = renderRef != LUA_REFNIL && renderRef != LUA_NOREF;
                 }
-                
+
                 if (! ok)
                     errorMsg = "render function not found";
 
@@ -249,8 +249,7 @@ struct LuaNode::Context
 
                 loaded = ok;
             }
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception& e)
         {
             errorMsg = e.what();
             loaded = false;
@@ -270,8 +269,9 @@ struct LuaNode::Context
         }
 
         return loaded ? Result::ok()
-            : Result::fail (errorMsg.isNotEmpty() 
-                ? errorMsg : String("unknown error in script"));
+                      : Result::fail (errorMsg.isNotEmpty()
+                                          ? errorMsg
+                                          : String ("unknown error in script"));
     }
 
     static Result validate (const String& script)
@@ -292,7 +292,7 @@ struct LuaNode::Context
             const double rate = 44100.0;
 
             using PT = kv::PortType;
-            
+
             // call node_io_ports() and node_params()
             PortList validatePorts;
             ctx->getPorts (validatePorts);
@@ -300,14 +300,14 @@ struct LuaNode::Context
             // create a dummy audio buffer and midipipe
             auto nchans = jmax (validatePorts.size (PT::Audio, true),
                                 validatePorts.size (PT::Audio, false));
-            auto nmidi  = jmax (validatePorts.size (PT::Midi, true),
-                                validatePorts.size (PT::Midi, false));
-            
+            auto nmidi = jmax (validatePorts.size (PT::Midi, true),
+                               validatePorts.size (PT::Midi, false));
+
             ctx->prepare (rate, block);
 
-            ctx->state["__ln_validate_rate"]    = rate;
-            ctx->state["__ln_validate_nmidi"]   = nmidi;
-            ctx->state["__ln_validate_nchans"]  = nchans;
+            ctx->state["__ln_validate_rate"] = rate;
+            ctx->state["__ln_validate_nmidi"] = nmidi;
+            ctx->state["__ln_validate_nchans"] = nchans;
             ctx->state["__ln_validate_nframes"] = block;
             ctx->state.script (R"(
                 function __ln_validate_render()
@@ -341,8 +341,7 @@ struct LuaNode::Context
             ctx->release();
             ctx.reset();
             result = Result::ok();
-        }
-        catch (const std::exception& e)
+        } catch (const std::exception& e)
         {
             result = Result::fail (e.what());
         }
@@ -355,15 +354,14 @@ struct LuaNode::Context
         if (! ready())
             return;
 
-        if (sol::function f = state ["node_prepare"])
+        if (sol::function f = state["node_prepare"])
             f (rate, block);
-        
+
         using PT = kv::PortType;
         auto nchans = jmax (ports.size (PT::Audio, true),
                             ports.size (PT::Audio, false));
-        auto nmidi  = jmax (ports.size (PT::Midi, true),
-                            ports.size (PT::Midi, false));
-
+        auto nmidi = jmax (ports.size (PT::Midi, true),
+                           ports.size (PT::Midi, false));
 
         if (audioBuffer != nullptr)
         {
@@ -382,9 +380,9 @@ struct LuaNode::Context
         if (! ready())
             return;
 
-        if (sol::function f = state ["node_release"])
+        if (sol::function f = state["node_release"])
             f();
-        
+
         if (audioBuffer != nullptr)
         {
             (*audioBuffer)->setSize (1, 1, false, true, false);
@@ -410,22 +408,21 @@ struct LuaNode::Context
                 if (lua_rawgeti (L, LUA_REGISTRYINDEX, midiPipeRef) == LUA_TUSERDATA)
                 {
                     // (*audioBuffer)->setSize (audio.getNumChannels(), audio.getNumSamples(), true, false, true);
-                    (*audioBuffer)->setDataToReferTo (audio.getArrayOfWritePointers(),
-                            audio.getNumChannels(), audio.getNumSamples());
+                    (*audioBuffer)->setDataToReferTo (audio.getArrayOfWritePointers(), audio.getNumChannels(), audio.getNumSamples());
                     (*midiPipe)->swapWith (midi);
 
                     lua_call (L, 2, 0);
-                    
+
                     (*midiPipe)->swapWith (midi);
                 }
             }
         }
         else
         {
-            DBG("didn't get render fucntion in callback");
+            DBG ("didn't get render fucntion in callback");
         }
     }
-    
+
     const OwnedArray<PortDescription>& getPortArray() const noexcept
     {
         return ports.getPorts();
@@ -440,7 +437,7 @@ struct LuaNode::Context
     Parameter* getParameter (const PortDescription& port)
     {
         auto& params = port.input ? inParams : outParams;
-        auto param = params [port.channel];
+        auto param = params[port.channel];
         jassert (param != nullptr);
         return param;
     }
@@ -453,17 +450,17 @@ struct LuaNode::Context
 
     void getParameterData (MemoryBlock& block) const
     {
-        block.append (paramData, sizeof(float) * (size_t) inParams.size());
+        block.append (paramData, sizeof (float) * (size_t) inParams.size());
     }
 
     void setParameterData (const MemoryBlock& block)
     {
-        jassert (block.getSize() % sizeof(float) == 0);
-        jassert (block.getSize() < sizeof(float) * maxParams);
+        jassert (block.getSize() % sizeof (float) == 0);
+        jassert (block.getSize() < sizeof (float) * maxParams);
         memcpy (paramData, block.getData(), block.getSize());
         for (int i = 0; i < inParams.size(); ++i)
             if (auto* param = dynamic_cast<LuaParameter*> (inParams.getObjectPointerUnchecked (i)))
-                param->set (paramData [i]);
+                param->set (paramData[i]);
     }
 
     void copyParameterValues (const Context& other)
@@ -474,7 +471,7 @@ struct LuaNode::Context
         for (auto* const ip : inParams)
         {
             auto* const param = dynamic_cast<LuaParameter*> (ip);
-            const auto  port  = param->getPort();
+            const auto port = param->getPort();
             paramData[port.channel] = jlimit (port.minValue, port.maxValue, paramData[port.channel]);
             param->setValue (param->convertTo0to1 (paramData[port.channel]));
         }
@@ -482,11 +479,12 @@ struct LuaNode::Context
 
     void getState (MemoryBlock& block)
     {
-        sol::function save = state ["node_save"];
+        sol::function save = state["node_save"];
         if (! save.valid())
             return;
-        
-        try {
+
+        try
+        {
             auto result = state.safe_script (R"(
                 local tf = io.tmpfile()
                 local oo = io.output()
@@ -508,8 +506,9 @@ struct LuaNode::Context
                     mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
                 }
             }
-        } catch (const std::exception& e) {
-            DBG("[EL] " << e.what());
+        } catch (const std::exception& e)
+        {
+            DBG ("[EL] " << e.what());
         }
     }
 
@@ -519,7 +518,8 @@ struct LuaNode::Context
         if (! restore.valid())
             return;
 
-        try {
+        try
+        {
             sol::userdata ud = state["io"]["tmpfile"]();
             luaL_Stream* const stream = (luaL_Stream*) ud.pointer();
             fwrite (data, 1, size, stream->f);
@@ -537,8 +537,9 @@ struct LuaNode::Context
 
             state["__state_data__"] = nullptr;
             state.collect_garbage();
-        } catch (const std::exception& e) { 
-            DBG("[EL] " << e.what());
+        } catch (const std::exception& e)
+        {
+            DBG ("[EL] " << e.what());
         }
     }
 
@@ -546,11 +547,11 @@ private:
     sol::state state;
     lua_State* L { nullptr };
     sol::function renderf;
-    std::function<void(AudioSampleBuffer&, MidiPipe&)> renderstdf;
+    std::function<void (AudioSampleBuffer&, MidiPipe&)> renderstdf;
     String name;
     bool loaded = false;
 
-    int renderRef   = LUA_NOREF;
+    int renderRef = LUA_NOREF;
     int audioBufRef = LUA_NOREF;
     int midiPipeRef = LUA_NOREF;
     LuaMidiPipe** midiPipe { nullptr };
@@ -560,9 +561,12 @@ private:
     ParameterArray inParams, outParams;
 
     int numParams = 0;
-    enum { maxParams = 512 };
-    float paramData [maxParams];
-    float paramDataOut [maxParams];
+    enum
+    {
+        maxParams = 512
+    };
+    float paramData[maxParams];
+    float paramDataOut[maxParams];
 
     LuaParameter* findParameter (const PortDescription& port) const
     {
@@ -578,12 +582,12 @@ private:
 
     void resetParameters() noexcept
     {
-        memset (paramData, 0, sizeof(float) * (size_t) maxParams);
+        memset (paramData, 0, sizeof (float) * (size_t) maxParams);
     }
 
     void addParameters()
     {
-        if (sol::function f = state ["node_params"])
+        if (sol::function f = state["node_params"])
         {
             int index = ports.size();
             int inChan = 0, outChan = 0;
@@ -593,46 +597,43 @@ private:
                 sol::table params = f();
                 for (size_t i = 0; i < params.size(); ++i)
                 {
-                    auto param = params [i + 1];
+                    auto param = params[i + 1];
 
-                    String name  = param["name"].get_or (std::string ("Param"));
-                    String sym   = name.trim().toLowerCase().replace(" ", "_");
-                    String type  = param["type"].get_or (std::string ("float"));
-                    String flow  = param["flow"].get_or (std::string ("input"));
+                    String name = param["name"].get_or (std::string ("Param"));
+                    String sym = name.trim().toLowerCase().replace (" ", "_");
+                    String type = param["type"].get_or (std::string ("float"));
+                    String flow = param["flow"].get_or (std::string ("input"));
                     jassert (flow == "input" || flow == "output");
-                    
+
                     bool isInput = flow == "input";
-                    float min    = param["min"].get_or (0.0);
-                    float max    = param["max"].get_or (1.0);
+                    float min = param["min"].get_or (0.0);
+                    float max = param["max"].get_or (1.0);
                     float dfault = param["default"].get_or (1.0);
                     ignoreUnused (min, max, dfault);
                     const int channel = isInput ? inChan++ : outChan++;
 
-                    EL_LUA_DBG("index = " << index);
-                    EL_LUA_DBG("channel = " << channel);
-                    EL_LUA_DBG("is input = " << (int) isInput);
-                    EL_LUA_DBG("name = " << name);
-                    EL_LUA_DBG("symbol = " << sym);
-                    EL_LUA_DBG("min = " << min);
-                    EL_LUA_DBG("max = " << max);
-                    EL_LUA_DBG("default = " << dfault);
+                    EL_LUA_DBG ("index = " << index);
+                    EL_LUA_DBG ("channel = " << channel);
+                    EL_LUA_DBG ("is input = " << (int) isInput);
+                    EL_LUA_DBG ("name = " << name);
+                    EL_LUA_DBG ("symbol = " << sym);
+                    EL_LUA_DBG ("min = " << min);
+                    EL_LUA_DBG ("max = " << max);
+                    EL_LUA_DBG ("default = " << dfault);
 
                     if (isInput)
                     {
                         paramData[channel] = dfault;
                     }
 
-                    ports.addControl (index++, channel, sym, name,
-                                      min, max, dfault, isInput);
+                    ports.addControl (index++, channel, sym, name, min, max, dfault, isInput);
                     auto& lparams = isInput ? inParams : outParams;
                     lparams.add (new LuaParameter (this, ports.getPort (ports.size() - 1)));
                 }
 
                 numParams = ports.size (PortType::Control, true);
-            }
-            catch (const std::exception&)
+            } catch (const std::exception&)
             {
-
             }
         }
     }
@@ -641,64 +642,70 @@ private:
     {
         auto& lua = state;
 
-        if (sol::function f = lua ["node_io_ports"])
+        if (sol::function f = lua["node_io_ports"])
         {
             sol::table t = f();
             int audioIns = 0, audioOuts = 0,
                 midiIns = 0, midiOuts = 0;
 
-            try {
+            try
+            {
                 if (t.size() == 0)
                 {
-                    audioIns  = t["audio_ins"].get_or (0);
+                    audioIns = t["audio_ins"].get_or (0);
                     audioOuts = t["audio_outs"].get_or (0);
-                    midiIns   = t["midi_ins"].get_or (0);
-                    midiOuts  = t["midi_outs"].get_or (0);
+                    midiIns = t["midi_ins"].get_or (0);
+                    midiOuts = t["midi_outs"].get_or (0);
                 }
                 else
                 {
-                    audioIns  = t[1]["audio_ins"].get_or (0);
+                    audioIns = t[1]["audio_ins"].get_or (0);
                     audioOuts = t[1]["audio_outs"].get_or (0);
-                    midiIns   = t[1]["midi_ins"].get_or (0);
-                    midiOuts  = t[1]["midi_outs"].get_or (0);
+                    midiIns = t[1]["midi_ins"].get_or (0);
+                    midiOuts = t[1]["midi_outs"].get_or (0);
                 }
+            } catch (const std::exception&)
+            {
             }
-            catch (const std::exception&) {}
 
             int index = 0, channel = 0;
             for (int i = 0; i < audioIns; ++i)
             {
-                String slug = "in_"; slug << (i + 1);
-                String name = "In "; name << (i + 1);
-                ports.add (PortType::Audio, index++, channel++,
-                           slug, name, true);
+                String slug = "in_";
+                slug << (i + 1);
+                String name = "In ";
+                name << (i + 1);
+                ports.add (PortType::Audio, index++, channel++, slug, name, true);
             }
 
             channel = 0;
             for (int i = 0; i < audioOuts; ++i)
             {
-                String slug = "out_"; slug << (i + 1);
-                String name = "Out "; name << (i + 1);
-                ports.add (PortType::Audio, index++, channel++,
-                           slug, name, false);
+                String slug = "out_";
+                slug << (i + 1);
+                String name = "Out ";
+                name << (i + 1);
+                ports.add (PortType::Audio, index++, channel++, slug, name, false);
             }
 
             channel = 0;
             for (int i = 0; i < midiIns; ++i)
             {
-                String slug = "midi_in_"; slug << (i + 1);
-                String name = "MIDI In "; name << (i + 1);
-                ports.add (PortType::Midi, index++, channel++,
-                           slug, name, true);
+                String slug = "midi_in_";
+                slug << (i + 1);
+                String name = "MIDI In ";
+                name << (i + 1);
+                ports.add (PortType::Midi, index++, channel++, slug, name, true);
             }
 
             channel = 0;
             for (int i = 0; i < midiOuts; ++i)
             {
-                String slug = "midi_out_"; slug << (i + 1);
-                String name = "MIDI Out "; name << (i + 1);
-                ports.add (PortType::Midi, index++, channel++,
-                           slug, name, false);
+                String slug = "midi_out_";
+                slug << (i + 1);
+                String name = "MIDI Out ";
+                name << (i + 1);
+                ports.add (PortType::Midi, index++, channel++, slug, name, false);
             }
         }
     }
@@ -743,7 +750,7 @@ Result LuaNode::loadScript (const String& newScript)
     auto result = Context::validate (newScript);
     if (result.failed())
         return result;
-    
+
     auto newContext = std::make_unique<Context>();
     result = newContext->load (newScript);
 
@@ -770,17 +777,17 @@ Result LuaNode::loadScript (const String& newScript)
 
 void LuaNode::getPluginDescription (PluginDescription& desc) const
 {
-    desc.name               = "Lua";
-    desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;
-    desc.uniqueId                = EL_INTERNAL_UID_LUA;
-    desc.descriptiveName    = "A user scriptable Element node";
-    desc.numInputChannels   = 0;
-    desc.numOutputChannels  = 0;
+    desc.name = "Lua";
+    desc.fileOrIdentifier = EL_INTERNAL_ID_LUA;
+    desc.uniqueId = EL_INTERNAL_UID_LUA;
+    desc.descriptiveName = "A user scriptable Element node";
+    desc.numInputChannels = 0;
+    desc.numOutputChannels = 0;
     desc.hasSharedContainer = false;
-    desc.isInstrument       = false;
-    desc.manufacturerName   = "Element";
-    desc.pluginFormatName   = EL_INTERNAL_FORMAT_NAME;
-    desc.version            = "1.0.0";
+    desc.isInstrument = false;
+    desc.manufacturerName = "Element";
+    desc.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
+    desc.version = "1.0.0";
 }
 
 void LuaNode::prepareToRender (double rate, int block)
@@ -841,7 +848,7 @@ void LuaNode::getState (MemoryBlock& block)
 {
     ValueTree state ("LuaNodeState");
     state.setProperty ("script", script, nullptr)
-         .setProperty ("draft",  draftScript, nullptr);
+        .setProperty ("draft", draftScript, nullptr);
 
     MemoryBlock scriptBlock;
     context->getParameterData (scriptBlock);
@@ -866,4 +873,4 @@ void LuaNode::setParameter (int index, float value)
     context->setParameter (index, value);
 }
 
-}
+} // namespace Element

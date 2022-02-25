@@ -30,10 +30,9 @@ class SessionGraphsListBox : public ListBox,
 public:
     SessionGraphsListBox (Session* session = nullptr);
     ~SessionGraphsListBox();
-    
+
     int getNumRows() override;
-    virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
-                                   bool rowIsSelected) override;
+    virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
 
     inline void setSession (Session* s, const bool selectActiveGraph = true)
     {
@@ -44,10 +43,10 @@ public:
         else
             selectRow (0);
     }
-    
-    Node getGraph (int index)   { return session ? session->getGraph (index) : Node(); }
-    Node getSelectedGraph()     { return getGraph (getSelectedRow()); }
-    
+
+    Node getGraph (int index) { return session ? session->getGraph (index) : Node(); }
+    Node getSelectedGraph() { return getGraph (getSelectedRow()); }
+
 #if 0
     virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                Component* existingComponentToUpdate);
@@ -62,9 +61,9 @@ public:
     virtual String getTooltipForRow (int row);
     virtual MouseCursor getMouseCursorForRow (int row);
 #endif
-    
+
 private:
     SessionPtr session;
 };
 
-}
+} // namespace Element

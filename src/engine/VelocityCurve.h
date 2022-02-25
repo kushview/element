@@ -26,7 +26,8 @@ namespace Element {
 class VelocityCurve
 {
 public:
-    enum Mode {
+    enum Mode
+    {
         Linear = 0,
         Soft_1,
         Soft_2,
@@ -39,30 +40,46 @@ public:
     };
 
     VelocityCurve() { setMode (Linear); }
-    ~VelocityCurve() { }
+    ~VelocityCurve() {}
 
     inline static String getModeName (const int mode)
     {
         switch (mode)
         {
-            case Linear: return "Linear"; break;
-            case Soft_1: return "Soft"; break;
-            case Soft_2: return "Softer"; break;
-            case Soft_3: return "Softest"; break;
-            case Hard_1: return "Hard"; break;
-            case Hard_2: return "Harder"; break;
-            case Hard_3: return "Hardest"; break;
-            case Max: return "Max"; break;
+            case Linear:
+                return "Linear";
+                break;
+            case Soft_1:
+                return "Soft";
+                break;
+            case Soft_2:
+                return "Softer";
+                break;
+            case Soft_3:
+                return "Softest";
+                break;
+            case Hard_1:
+                return "Hard";
+                break;
+            case Hard_2:
+                return "Harder";
+                break;
+            case Hard_3:
+                return "Hardest";
+                break;
+            case Max:
+                return "Max";
+                break;
         }
 
-        return { };
+        return {};
     }
 
     inline String getModeName() const { return getModeName (mode); }
     inline int getMode() const { return static_cast<int> (mode); }
     inline void setMode (const Mode m)
     {
-        if (mode == m) 
+        if (mode == m)
             return;
         mode = m;
 
@@ -70,13 +87,27 @@ public:
         {
             default:
             case Max:
-            case Linear: setOffset (0.50); break;
-            case Soft_1: setOffset (0.45); break;
-            case Soft_2: setOffset (0.35); break;
-            case Soft_3: setOffset (0.25); break;
-            case Hard_1: setOffset (0.55); break;
-            case Hard_2: setOffset (0.65); break;
-            case Hard_3: setOffset (0.75); break;
+            case Linear:
+                setOffset (0.50);
+                break;
+            case Soft_1:
+                setOffset (0.45);
+                break;
+            case Soft_2:
+                setOffset (0.35);
+                break;
+            case Soft_3:
+                setOffset (0.25);
+                break;
+            case Hard_1:
+                setOffset (0.55);
+                break;
+            case Hard_2:
+                setOffset (0.65);
+                break;
+            case Hard_3:
+                setOffset (0.75);
+                break;
         }
     }
 
@@ -93,7 +124,7 @@ public:
 
         jassert (velocity >= 0 && velocity <= 1.f);
         jassert (mode >= Soft_1 && mode <= Hard_3);
-        
+
         if (t < 0.5)
         {
             velocity = c1 - sqrtf (rsq - square (127.f * velocity - c0));
@@ -128,10 +159,12 @@ private:
 
     void setOffset (float newT)
     {
-       #define dbgVars 0
+#define dbgVars 0
         t = newT;
-        if (t < 0.001) t = 0.001;
-        if (t > 0.999) t = 0.999;
+        if (t < 0.001)
+            t = 0.001;
+        if (t > 0.999)
+            t = 0.999;
 
         const float z0 = t * 127.f;
         const float z1 = (1.f - t) * 127.f;
@@ -142,23 +175,23 @@ private:
         const float b1 = z1 * 0.5;
         const float b2 = (127.f + z0) * 0.5;
         const float b3 = (127.f + z1) * 0.5;
-        
+
         c0 = (b3 - b1 + (s0 * b0) - (s1 * b2)) / (s0 - s1);
         c1 = s1 * (b3 - b1 + (s0 * b0) - (s1 * b2));
         c1 /= (s0 - s1);
         c1 -= (s1 * b2);
         c1 += b3;
-        rsq = square(c0) + square(c1);
+        rsq = square (c0) + square (c1);
 
-       #if dbgVars
-        DBG("t=" << t << " z0=" << z0 << " z1=" << z1);
-        DBG("s0=" << s0 << " s1=" << s1);
-        DBG("b0=" << b0 << " b1=" << b1 << " b2=" << b2 << " b3=" << b3);
-        DBG("c0=" << c0 << " c1=" << c1);
-        DBG("r^2=" << rsq << " r=" << sqrtf (rsq));
-        DBG(newLine);
-       #endif
+#if dbgVars
+        DBG ("t=" << t << " z0=" << z0 << " z1=" << z1);
+        DBG ("s0=" << s0 << " s1=" << s1);
+        DBG ("b0=" << b0 << " b1=" << b1 << " b2=" << b2 << " b3=" << b3);
+        DBG ("c0=" << c0 << " c1=" << c1);
+        DBG ("r^2=" << rsq << " r=" << sqrtf (rsq));
+        DBG (newLine);
+#endif
     }
 };
 
-}
+} // namespace Element

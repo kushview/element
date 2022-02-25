@@ -35,11 +35,11 @@ void MidiEngine::applySettings (Settings& settings)
             const auto child (data.getChild (i));
             if (child.hasType ("input"))
             {
-                if (auto* const holder = getMidiInput (child [Tags::name], true))
+                if (auto* const holder = getMidiInput (child[Tags::name], true))
                 {
-                    holder->active = false;  // open but not active initially
-                    if ((bool) child [Tags::active])
-                        midiInsFromXml.add (child [Tags::name]);
+                    holder->active = false; // open but not active initially
+                    if ((bool) child[Tags::active])
+                        midiInsFromXml.add (child[Tags::name]);
                 }
             }
         }
@@ -47,7 +47,7 @@ void MidiEngine::applySettings (Settings& settings)
         for (auto& m : MidiInput::getDevices())
             setMidiInputEnabled (m, midiInsFromXml.contains (m));
 
-        setDefaultMidiOutput (data ["defaultMidiOutput"].toString());
+        setDefaultMidiOutput (data["defaultMidiOutput"].toString());
     }
 }
 
@@ -58,7 +58,7 @@ void MidiEngine::writeSettings (Settings& settings)
     {
         ValueTree input ("input");
         input.setProperty (Tags::name, holder->input->getName(), nullptr)
-             .setProperty (Tags::active, holder->active, nullptr);
+            .setProperty (Tags::active, holder->active, nullptr);
         data.appendChild (input, nullptr);
     }
 
@@ -73,8 +73,8 @@ void MidiEngine::writeSettings (Settings& settings)
             if (availableMidiDevices.contains (midiInsFromXml[i], true))
                 continue;
             ValueTree input ("input");
-            input.setProperty (Tags::name, midiInsFromXml [i], nullptr)
-                 .setProperty (Tags::active, true, nullptr);
+            input.setProperty (Tags::name, midiInsFromXml[i], nullptr)
+                .setProperty (Tags::active, true, nullptr);
             data.appendChild (input, nullptr);
         }
     }
@@ -86,12 +86,12 @@ void MidiEngine::writeSettings (Settings& settings)
 }
 
 //==============================================================================
-class MidiEngine::CallbackHandler  : public AudioIODeviceCallback,
-                                     public MidiInputCallback,
-                                     public AudioIODeviceType::Listener
+class MidiEngine::CallbackHandler : public AudioIODeviceCallback,
+                                    public MidiInputCallback,
+                                    public AudioIODeviceType::Listener
 {
 public:
-    CallbackHandler (MidiEngine& me) noexcept  : owner (me) {}
+    CallbackHandler (MidiEngine& me) noexcept : owner (me) {}
 
 private:
     void audioDeviceIOCallback (const float** ins, int numIns, float** outs, int numOuts, int numSamples) override
@@ -159,10 +159,10 @@ MidiEngine::MidiInputHolder* MidiEngine::getMidiInput (const String& deviceName,
     for (auto* const holder : openMidiInputs)
         if (holder->input && holder->input->getName() == deviceName)
             return holder;
-    
+
     if (! openIfNotAlready)
         return nullptr;
-    
+
     auto index = MidiInput::getDevices().indexOf (deviceName);
     if (index >= 0)
     {
@@ -273,16 +273,17 @@ void MidiEngine::handleIncomingMidiMessageInt (MidiInput* source, const MidiMess
 void MidiEngine::processMidiBuffer (const MidiBuffer& buffer, int nframes, double sampleRate)
 {
     MidiBuffer::Iterator iter (buffer);
-    MidiMessage message; int frame = 0;
+    MidiMessage message;
+    int frame = 0;
     const double timeNow = 1.5 + Time::getMillisecondCounterHiRes();
-    
+
     const ScopedLock sl (midiCallbackLock);
 
     while (iter.getNextEvent (message, frame))
     {
         if (frame >= nframes)
             break;
-        
+
         message.setTimeStamp (timeNow + (1000.0 * (static_cast<double> (frame) / sampleRate)));
         for (auto& mc : midiCallbacks)
             mc.callback->handleIncomingMidiMessage (nullptr, message);
@@ -306,7 +307,7 @@ void MidiEngine::setDefaultMidiOutput (const String& deviceName)
         std::unique_ptr<MidiOutput> newMidiOut;
 
         if (deviceName.isNotEmpty())
-            newMidiOut= MidiOutput::openDevice (MidiOutput::getDevices().indexOf (deviceName));
+            newMidiOut = MidiOutput::openDevice (MidiOutput::getDevices().indexOf (deviceName));
 
         if (newMidiOut)
         {
@@ -329,4 +330,4 @@ void MidiEngine::setDefaultMidiOutput (const String& deviceName)
     }
 }
 
-}
+} // namespace Element

@@ -26,9 +26,9 @@ namespace Element {
 
 using MidiMonitorNodePtr = ReferenceCountedObjectPtr<MidiMonitorNode>;
 
-class MidiMonitorNodeEditor::Logger  : public ListBox,
-                                       public ListBoxModel,
-                                       public AsyncUpdater
+class MidiMonitorNodeEditor::Logger : public ListBox,
+                                      public ListBoxModel,
+                                      public AsyncUpdater
 {
 public:
     /** Constructor */
@@ -54,8 +54,9 @@ public:
     {
         const auto& logList = node->getLog();
         ignoreUnused (rowIsSelected);
-        g.setFont (Font (Font::getDefaultMonospacedFontName(), 
-                   g.getCurrentFont().getHeight(), Font::plain));
+        g.setFont (Font (Font::getDefaultMonospacedFontName(),
+                         g.getCurrentFont().getHeight(),
+                         Font::plain));
         if (isPositiveAndBelow (row, logList.size()))
             ViewHelpers::drawBasicTextRow (logList[row], g, width, height, false);
     }
@@ -95,7 +96,7 @@ MidiMonitorNodeEditor::~MidiMonitorNodeEditor()
     logger.reset();
 }
 
-void MidiMonitorNodeEditor::resized ()
+void MidiMonitorNodeEditor::resized()
 {
     auto r1 = getLocalBounds().reduced (4);
     clearButton.changeWidthToFitText (24);
@@ -104,4 +105,4 @@ void MidiMonitorNodeEditor::resized ()
     logger->setBounds (r1);
 }
 
-};
+}; // namespace Element

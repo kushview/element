@@ -36,8 +36,10 @@ public:
         setPlayConfigDetails (0, 0, 44100.0, 512);
         for (int i = 0; i < 16; ++i)
         {
-            String identifier = "channel-"; identifier << String (i + 1);
-            String name = "Channel "; name << String (i + 1);
+            String identifier = "channel-";
+            identifier << String (i + 1);
+            String name = "Channel ";
+            name << String (i + 1);
             auto param = new AudioParameterInt (identifier, name, 1, 16, i + 1);
             addParameter (param);
             params.add (param);
@@ -59,33 +61,33 @@ public:
         channels.set (parameterIndex + 1, *params.getUnchecked (parameterIndex));
     }
 
-    void parameterGestureChanged (int, bool) override { }
+    void parameterGestureChanged (int, bool) override {}
 
     inline const String getName() const override { return "MIDI Channel Map"; }
 
     inline void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_CHANNEL_MAP;
-        desc.descriptiveName    = "MIDI Channel Map";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.fileOrIdentifier = EL_INTERNAL_ID_MIDI_CHANNEL_MAP;
+        desc.descriptiveName = "MIDI Channel Map";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
-    
+
     inline AudioProcessorEditor* createEditor() override { return nullptr; }
     inline bool hasEditor() const override { return false; }
 
     inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
-    { 
+    {
         setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
     }
 
-    inline void releaseResources() override { }
+    inline void releaseResources() override {}
 
     inline void processBlock (AudioBuffer<float>&, MidiBuffer& midiMessages) override
     {
@@ -97,10 +99,10 @@ public:
     inline bool acceptsMidi() const override { return true; }
     inline bool producesMidi() const override { return true; }
     inline bool supportsMPE() const override { return false; }
-    inline bool isMidiEffect() const override  { return true; }
-    
+    inline bool isMidiEffect() const override { return true; }
+
     inline void getStateInformation (juce::MemoryBlock& destData) override
-    { 
+    {
         ValueTree state ("state");
         int chans[16] = { 0 };
 
@@ -112,10 +114,11 @@ public:
 
         for (int ch = 0; ch < 16; ++ch)
         {
-            String key = "channel-"; key << ch;
-            state.setProperty (key, chans [ch], 0);
+            String key = "channel-";
+            key << ch;
+            state.setProperty (key, chans[ch], 0);
         }
-        
+
         MemoryOutputStream stream (destData, false);
         state.writeToStream (stream);
     }
@@ -129,21 +132,26 @@ public:
         int chans[16] = { 0 };
         for (int ch = 0; ch < 16; ++ch)
         {
-            String key = "channel-"; key << ch;
+            String key = "channel-";
+            key << ch;
             chans[ch] = (int) state.getProperty (key, ch + 1);
         }
 
         {
             ScopedLock sl (getCallbackLock());
             for (int ch = 0; ch < 16; ++ch)
-                *params.getUnchecked(ch) = chans[ch];
+                *params.getUnchecked (ch) = chans[ch];
         }
     }
 
     inline int getNumPrograms() override { return 1; }
     inline int getCurrentProgram() override { return 0; }
     inline void setCurrentProgram (int index) override { ignoreUnused (index); }
-    inline const String getProgramName (int index) override { ignoreUnused (index); return ""; }
+    inline const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return "";
+    }
     inline void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
 protected:
@@ -188,4 +196,4 @@ private:
     MidiBuffer tempMidi;
 };
 
-}
+} // namespace Element

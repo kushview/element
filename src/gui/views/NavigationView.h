@@ -47,7 +47,7 @@ private:
     friend class NavigationTree;
     void updateLayout();
     void setRootItem (int item);
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NavigationView)
 };
 
@@ -56,12 +56,12 @@ class PluginTreeView : public TreePanelBase
 public:
     PluginTreeView (PluginManager&);
     ~PluginTreeView();
-    
+
     void rootItemChanged (int item);
-    
+
 private:
     int rootItem;
     PluginManager& plugins;
 };
 
-}
+} // namespace Element

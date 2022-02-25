@@ -98,7 +98,8 @@ void MidiMonitorNode::timerCallback()
         return;
 
     MidiBuffer::Iterator iter (midiTemp);
-    MidiMessage msg; int frame = 0;
+    MidiMessage msg;
+    int frame = 0;
 
     int numLogged = 0;
     String text;
@@ -116,7 +117,7 @@ void MidiMonitorNode::timerCallback()
             text << "Stop";
         else if (msg.isMidiContinue())
             text << "Continue";
-        
+
         midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
         text.clear();
         ++numLogged;
@@ -129,4 +130,4 @@ void MidiMonitorNode::timerCallback()
         messagesLogged();
 }
 
-};
+}; // namespace Element

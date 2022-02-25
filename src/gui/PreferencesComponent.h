@@ -23,17 +23,15 @@
 #include "ElementApp.h"
 
 namespace Element {
-    class GuiController;
+class GuiController;
 //[/Headers]
-
-
 
 //==============================================================================
 /**
                                                                     //[Comments]
                                                                     //[/Comments]
 */
-class PreferencesComponent  : public Component
+class PreferencesComponent : public Component
 {
 public:
     //==============================================================================
@@ -51,8 +49,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     class PageList;
@@ -66,11 +62,10 @@ private:
     ScopedPointer<GroupComponent> groupComponent;
     ScopedPointer<Component> pageComponent;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
 };
 
 //[EndFile] You can add extra defines here...
-}
+} // namespace Element
 //[/EndFile]

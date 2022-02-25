@@ -43,7 +43,7 @@ enum SystemTrayMenuResult
 static MainWindow* getMainWindow()
 {
     for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;)
-        if (auto* const window = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow(i)))
+        if (auto* const window = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))
             return window;
     return nullptr;
 }
@@ -51,24 +51,24 @@ static MainWindow* getMainWindow()
 SystemTray* SystemTray::instance = nullptr;
 SystemTray::SystemTray()
 {
-   #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
+#if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
     {
         const auto traySize = 22.f * 4;
         const float padding = 8.f;
-        Image image (Image::ARGB, roundToInt(traySize), roundToInt(traySize), true);
+        Image image (Image::ARGB, roundToInt (traySize), roundToInt (traySize), true);
         Graphics g (image);
         Icon icon (getIcons().falAtomAlt, Colours::black);
         icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
         instance->setIconImage (image, image);
     }
-   #else
+#else
     setIconImage (
         ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
         ImageCache::getFromMemory (BinaryData::ElementIconTemplate_png, BinaryData::ElementIcon_pngSize));
-   #endif
-   #if JUCE_LINUX
+#endif
+#if JUCE_LINUX
     setSize (EL_SYSTRAY_MIN_SIZE, EL_SYSTRAY_MIN_SIZE);
-   #endif
+#endif
 }
 
 void SystemTray::setEnabled (bool enabled)
@@ -107,13 +107,13 @@ void SystemTray::mouseUp (const MouseEvent& ev)
         menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
         menu.addSeparator();
         menu.addCommandItem (cmd, Commands::quit, "Exit");
-       #if JUCE_MAC
+#if JUCE_MAC
         showDropdownMenu (menu);
-       #else
+#else
         menu.show();
-       #endif
+#endif
     }
-    else 
+    else
     {
         window->setVisible (true);
         if (window->isMinimised())
@@ -135,20 +135,20 @@ void SystemTray::runMenu()
     menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
     menu.addSeparator();
     menu.addCommandItem (cmd, Commands::quit, "Exit");
-   #if JUCE_MAC
+#if JUCE_MAC
     showDropdownMenu (menu);
-   #else
+#else
     menu.show();
-   #endif
+#endif
 }
 
 void SystemTray::mouseDown (const MouseEvent& ev)
 {
-   #if JUCE_MAC
+#if JUCE_MAC
     ignoreUnused (ev);
     mouseUpAction = -1;
     runMenu();
-   #else
+#else
     if (ev.mods.isPopupMenu())
     {
         mouseUpAction = ShowMenu;
@@ -157,7 +157,7 @@ void SystemTray::mouseDown (const MouseEvent& ev)
     {
         mouseUpAction = ShowWindow;
     }
-   #endif
+#endif
 }
 
-}
+} // namespace Element

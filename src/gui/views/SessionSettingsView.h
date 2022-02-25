@@ -29,7 +29,7 @@ class SessionContentView : public ContentView
 public:
     SessionContentView();
     ~SessionContentView();
-    
+
     void resized() override;
     void didBecomeActive() override;
     void paint (Graphics& g) override;
@@ -40,4 +40,4 @@ private:
 };
 
 typedef SessionContentView SessionSettingsView;
-}
+} // namespace Element

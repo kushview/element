@@ -36,21 +36,21 @@ namespace Element {
 class SessionController::ChangeResetter : public AsyncUpdater
 {
 public:
-    explicit ChangeResetter (SessionController& sc) : owner(sc) {}
+    explicit ChangeResetter (SessionController& sc) : owner (sc) {}
     ~ChangeResetter() = default;
-    
+
     void handleAsyncUpdate() override
     {
         owner.resetChanges (false);
-        jassert (!owner.hasSessionChanged());
+        jassert (! owner.hasSessionChanged());
     }
 
 private:
     SessionController& owner;
 };
 
-SessionController::SessionController() { }
-SessionController::~SessionController() { }
+SessionController::SessionController() {}
+SessionController::~SessionController() {}
 
 void SessionController::activate()
 {
@@ -65,7 +65,7 @@ void SessionController::deactivate()
     auto& world = getWorld();
     auto& settings (world.getSettings());
     auto* props = settings.getUserSettings();
-    
+
     if (document)
     {
         if (document->getFile().existsAsFile())
@@ -94,15 +94,14 @@ void SessionController::openDefaultSession()
 void SessionController::openFile (const File& file)
 {
     bool didSomething = true;
-    
+
     if (file.hasFileExtension ("elg"))
     {
         const ValueTree node (Node::parse (file));
         if (Node::isProbablyGraphNode (node))
         {
             const Node model (node, true);
-            model.forEach ([](const ValueTree& tree)
-            {
+            model.forEach ([] (const ValueTree& tree) {
                 if (! tree.hasType (Tags::node))
                     return;
                 auto nodeRef = tree;
@@ -117,13 +116,13 @@ void SessionController::openFile (const File& file)
         document->saveIfNeededAndUserAgrees();
         Session::ScopedFrozenLock freeze (*currentSession);
         Result result = document->loadFrom (file, true);
-        
+
         if (result.wasOk())
         {
             auto& gui = *findSibling<GuiController>();
             gui.closeAllPluginWindows();
             refreshOtherControllers();
-            
+
             if (auto* cc = gui.getContentComponent())
             {
                 auto ui = currentSession->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
@@ -134,13 +133,13 @@ void SessionController::openFile (const File& file)
             resetChanges();
         }
 
-        jassert(!hasSessionChanged());
+        jassert (! hasSessionChanged());
     }
     else
     {
         didSomething = false;
     }
-    
+
     if (didSomething)
     {
         if (auto* gc = findSibling<GuiController>())
@@ -151,11 +150,12 @@ void SessionController::openFile (const File& file)
 
 void SessionController::exportGraph (const Node& node, const File& targetFile)
 {
-    if (! node.hasNodeType (Tags::graph)) {
+    if (! node.hasNodeType (Tags::graph))
+    {
         jassertfalse;
         return;
     }
-    
+
     TemporaryFile tempFile (targetFile);
     if (node.writeToFile (tempFile.getFile()))
         tempFile.overwriteTargetFileWithTemporary();
@@ -168,7 +168,7 @@ void SessionController::importGraph (const File& file)
 
 void SessionController::closeSession()
 {
-    DBG("[SC] close session");
+    DBG ("[SC] close session");
 }
 
 void SessionController::resetChanges (const bool resetDocumentFile)
@@ -189,20 +189,24 @@ void SessionController::saveSession (const bool saveAs, const bool askForFile, c
 
     if (auto* cc = gui.getContentComponent())
     {
-        String state; cc->getSessionState (state);
+        String state;
+        cc->getSessionState (state);
         auto ui = currentSession->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
         ui.setProperty ("content", state, nullptr);
     }
 
-    if (saveAs) {
+    if (saveAs)
+    {
         result = document->saveAs (File(), true, askForFile, showError);
-    } else {
+    }
+    else
+    {
         result = document->save (askForFile, showError);
     }
 
     if (result == FileBasedDocument::userCancelledSave)
         return;
-    
+
     if (result == FileBasedDocument::savedOk)
     {
         // ensure change messages are flushed so the changed flag doesn't reset
@@ -220,12 +224,10 @@ void SessionController::newSession()
     // - 2 if the middle button was pressed ('no')
     int res = 2;
     if (document->hasChangedSinceSaved())
-        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon, "Save Session?",
-                                               "The current session has changes. Would you like to save it?",
-                                               "Save Session", "Don't Save", "Cancel");
+        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon, "Save Session?", "The current session has changes. Would you like to save it?", "Save Session", "Don't Save", "Cancel");
     if (res == 1)
         document->save (true, true);
-    
+
     if (res == 1 || res == 2)
     {
         findSibling<GuiController>()->closeAllPluginWindows();
@@ -252,7 +254,7 @@ void SessionController::loadNewSessionData()
     }
 
     if (! wasLoaded)
-    {   
+    {
         currentSession->clear();
         currentSession->addGraph (
             Node::createDefaultGraph ("Graph"), true);
@@ -268,4 +270,4 @@ void SessionController::refreshOtherControllers()
     sessionLoaded();
 }
 
-}
+} // namespace Element

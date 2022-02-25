@@ -267,11 +267,11 @@ void bindJUCE (sol::table& M)
         ),
         "revealToUser",                 &File::revealToUser,
         "getSpecialLocation", [](lua_Integer location) {
-           #if JUCE_WINDOWS
+#if JUCE_WINDOWS
             if (location >= File::userHomeDirectory && location <= File::globalApplicationsDirectoryX86)
-           #else
+#else
             if (location >= File::userHomeDirectory && location <= File::globalApplicationsDirectory)
-           #endif
+#endif
                 return File::getSpecialLocation (static_cast<File::SpecialLocationType> (location));
             return File();
         },
@@ -299,18 +299,18 @@ void bindJUCE (sol::table& M)
             return File::addTrailingSeparator (String::fromUTF8 (path));
         },
 
-       #if JUCE_WINDOWS
+#if JUCE_WINDOWS
         "createShortcut", [](File& self, const char* desc, const File& linkFile) {
             return self.createShortcut (String::fromUTF8 (desc), linkFile);
         },
         "isShortcut",                   &File::isShortcut,
-       #elif JUCE_MAC || JUCE_IOS
-        #if JUCE_MAC
+#elif JUCE_MAC || JUCE_IOS
+#if JUCE_MAC
          "addToDock",                   &File::addToDock,
-        #endif
+#endif
         "getMacOSType",                 &File::getMacOSType,
         "isBundle",                     &File::isBundle,
-       #endif
+#endif
 
         "createSymbolicLink", [](File& self, const File& link, bool overwrite) { 
             return self.createSymbolicLink (link, overwrite);
@@ -693,9 +693,9 @@ void bindJUCE (sol::table& M)
         "removeComponentListener",          &Component::removeComponentListener,
         "postCommandMessage",               &Component::postCommandMessage,
         "handleCommandMessage",             &Component::handleCommandMessage,
-       #if JUCE_MODAL_LOOPS_PERMITTED
+#if JUCE_MODAL_LOOPS_PERMITTED
         "runModalLoop", &Component::runModalLoop,
-       #endif
+#endif
         "enterModalState", sol::overload (
             [](Component& self) { self.enterModalState(); },
             [](Component& self, bool focus) {

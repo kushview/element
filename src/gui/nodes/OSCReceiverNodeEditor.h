@@ -50,8 +50,8 @@ public:
 
     void addOSCBundle (const OSCBundle& bundle, int level = 0)
     {
-        addMessage (String(indent (level)
-                        + "Bundle"));
+        addMessage (String (indent (level)
+                            + "Bundle"));
 
         for (auto& element : bundle)
         {
@@ -64,7 +64,7 @@ public:
 
     void addInvalidOSCPacket (const char* /* data */, int dataSize)
     {
-        addMessage ("Invalid format of " + String(dataSize) + " bytes");
+        addMessage ("Invalid format of " + String (dataSize) + " bytes");
     }
 
 private:
@@ -86,20 +86,20 @@ public:
     void resized() override;
     void resetBounds (int width, int height);
     void changeListenerCallback (ChangeBroadcaster*) override;
-    void syncUIFromNodeState ();
+    void syncUIFromNodeState();
 
 private:
     OSCReceiverLogListBox oscReceiverLog;
     ReferenceCountedObjectPtr<OSCReceiverNode> oscReceiverNodePtr;
 
-    Label hostNameLabel      { {}, "Host" };
-    Label hostNameField      { {}, "127.0.0.1" };
-    Label portNumberLabel    { {}, "Port" };
+    Label hostNameLabel { {}, "Host" };
+    Label hostNameField { {}, "127.0.0.1" };
+    Label portNumberLabel { {}, "Port" };
     Slider portNumberSlider;
 
     TextButton connectButton { "Connect" };
     TextButton pauseButton { "Pause" };
-    TextButton clearButton   { "Clear" };
+    TextButton clearButton { "Clear" };
     Label connectionStatusLabel;
 
     bool paused = false;
@@ -129,4 +129,4 @@ private:
     void handleInvalidPortNumberEntered();
 };
 
-}
+} // namespace Element

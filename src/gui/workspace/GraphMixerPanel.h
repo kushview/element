@@ -31,4 +31,4 @@ public:
     ~GraphMixerPanel() = default;
 };
 
-}
+} // namespace Element

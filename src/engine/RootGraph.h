@@ -12,14 +12,15 @@ class RootGraph : public GraphNode
 public:
     RootGraph();
     ~RootGraph() {}
-    
+
     enum RenderMode
     {
-        SingleGraph     = 0,
-        Parallel        = (1 << 0)
+        SingleGraph = 0,
+        Parallel = (1 << 0)
     };
 
-    inline static bool renderModeValid (const int mode) {
+    inline static bool renderModeValid (const int mode)
+    {
         return mode == SingleGraph || mode == Parallel;
     }
 
@@ -27,8 +28,12 @@ public:
     {
         switch (mode)
         {
-            case SingleGraph: return "single"; break;
-            case Parallel:    return "parallel"; break;
+            case SingleGraph:
+                return "single";
+                break;
+            case Parallel:
+                return "parallel";
+                break;
         }
         return String();
     }
@@ -39,11 +44,11 @@ public:
     void setPlayConfigFor (AudioIODevice* device);
     void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
     void setPlayConfigFor (DeviceManager&);
-    
+
     inline RenderMode getRenderMode() const { return renderMode; }
     inline String getRenderModeSlug() const { return getSlugForRenderMode (renderMode); }
     inline bool isSingle() const { return getRenderMode() == SingleGraph; }
-    
+
     inline void setRenderMode (const RenderMode mode)
     {
         if (renderMode == mode)
@@ -59,23 +64,23 @@ public:
         ScopedLock sl (getPropertyLock());
         midiProgram = program;
     }
-    
+
     // const String getName() const override;
     const String getInputChannelName (int channelIndex) const;
     const String getOutputChannelName (int channelIndex) const;
-    const String getAudioInputDeviceName()  const { return graphName; }
+    const String getAudioInputDeviceName() const { return graphName; }
     const String getAudioOutputDeviceName() const { return graphName; }
-    
+
     /** the index in the audio engine.  if less than 0 then the graph
         is not attached
      */
-    int getEngineIndex()    const { return engineIndex; }
+    int getEngineIndex() const { return engineIndex; }
 
 private:
     friend class AudioEngine;
     friend struct RootGraphRender;
     using IODeviceType = IONode::IODeviceType;
-    NodeObjectPtr ioNodes [IONode::numDeviceTypes];
+    NodeObjectPtr ioNodes[IONode::numDeviceTypes];
     String graphName = "Device";
     StringArray audioInputNames;
     StringArray audioOutputNames;
@@ -83,8 +88,8 @@ private:
     int midiProgram = -1;
     int engineIndex = -1;
     RenderMode renderMode = Parallel;
-    
+
     bool locked = false;
     void updateChannelNames (AudioIODevice* device);
 };
-}
+} // namespace Element

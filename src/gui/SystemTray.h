@@ -39,4 +39,4 @@ private:
     void runMenu();
 };
 
-}
+} // namespace Element

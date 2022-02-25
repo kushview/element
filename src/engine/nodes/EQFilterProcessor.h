@@ -37,7 +37,7 @@ public:
         HighPass,
         LowPass,
     };
-    
+
     EQFilter()
     {
         freq.reset (smoothSteps);
@@ -73,32 +73,32 @@ public:
 
         switch (eqShape) // Set calcCoefs lambda to correct function for this shape
         {
-        case Bell:
-            calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsBell (fc, Q, gain); };
-            break;
+            case Bell:
+                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsBell (fc, Q, gain); };
+                break;
 
-        case Notch:
-            calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsNotch (fc, Q, gain); };
-            break;
+            case Notch:
+                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsNotch (fc, Q, gain); };
+                break;
 
-        case LowShelf:
-            calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsLowShelf (fc, Q, gain); };
-            break;
+            case LowShelf:
+                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsLowShelf (fc, Q, gain); };
+                break;
 
-        case HighShelf:
-            calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsHighShelf (fc, Q, gain); };
-            break;
+            case HighShelf:
+                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsHighShelf (fc, Q, gain); };
+                break;
 
-        case LowPass:
-            calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsLowPass (fc, Q, gain); };
-            break;
+            case LowPass:
+                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsLowPass (fc, Q, gain); };
+                break;
 
-        case HighPass:
-            calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsHighPass (fc, Q, gain); };
-            break;
+            case HighPass:
+                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsHighPass (fc, Q, gain); };
+                break;
 
-        default:
-            return;
+            default:
+                return;
         }
 
         calcCoefs (freq.skip (smoothSteps), Q.skip (smoothSteps), gain.skip (smoothSteps));
@@ -109,7 +109,7 @@ public:
     {
         float wc = MathConstants<float>::twoPi * newFreq / fs;
         float c = 1.0f / dsp::FastMathApproximations::tan (wc / 2.0f);
-        float phi = c*c;
+        float phi = c * c;
         float Knum = c / newQ;
         float Kdenom = Knum;
 
@@ -153,14 +153,14 @@ public:
         float wC = dsp::FastMathApproximations::cos (wc);
         float beta = sqrtf (A) / newQ;
 
-        float a0 = ((A+1.0f) + ((A-1.0f) * wC) + (beta*wS));
+        float a0 = ((A + 1.0f) + ((A - 1.0f) * wC) + (beta * wS));
 
-        b[0] = A*((A+1.0f) - ((A-1.0f)*wC) + (beta*wS)) / a0;
-        b[1] = 2.0f*A * ((A-1.0f) - ((A+1.0f)*wC)) / a0;
-        b[2] = A*((A+1.0f) - ((A-1.0f)*wC) - (beta*wS)) / a0;
+        b[0] = A * ((A + 1.0f) - ((A - 1.0f) * wC) + (beta * wS)) / a0;
+        b[1] = 2.0f * A * ((A - 1.0f) - ((A + 1.0f) * wC)) / a0;
+        b[2] = A * ((A + 1.0f) - ((A - 1.0f) * wC) - (beta * wS)) / a0;
 
-        a[1] = -2.0f * ((A-1.0f) + ((A+1.0f)*wC)) / a0;
-        a[2] = ((A+1.0f) + ((A-1.0f)*wC)-(beta*wS)) / a0;
+        a[1] = -2.0f * ((A - 1.0f) + ((A + 1.0f) * wC)) / a0;
+        a[2] = ((A + 1.0f) + ((A - 1.0f) * wC) - (beta * wS)) / a0;
     }
 
     void calcCoefsHighShelf (float newFreq, float newQ, float newGain)
@@ -171,14 +171,14 @@ public:
         float wC = dsp::FastMathApproximations::cos (wc);
         float beta = sqrtf (A) / newQ;
 
-        float a0 = ((A+1.0f) - ((A-1.0f) * wC) + (beta*wS));
+        float a0 = ((A + 1.0f) - ((A - 1.0f) * wC) + (beta * wS));
 
-        b[0] = A*((A+1.0f) + ((A-1.0f)*wC) + (beta*wS)) / a0;
-        b[1] = -2.0f*A * ((A-1.0f) + ((A+1.0f)*wC)) / a0;
-        b[2] = A*((A+1.0f) + ((A-1.0f)*wC) - (beta*wS)) / a0;
+        b[0] = A * ((A + 1.0f) + ((A - 1.0f) * wC) + (beta * wS)) / a0;
+        b[1] = -2.0f * A * ((A - 1.0f) + ((A + 1.0f) * wC)) / a0;
+        b[2] = A * ((A + 1.0f) + ((A - 1.0f) * wC) - (beta * wS)) / a0;
 
-        a[1] = 2.0f * ((A-1.0f) - ((A+1.0f)*wC)) / a0;
-        a[2] = ((A+1.0f) - ((A-1.0f)*wC)-(beta*wS)) / a0;
+        a[1] = 2.0f * ((A - 1.0f) - ((A + 1.0f) * wC)) / a0;
+        a[2] = ((A + 1.0f) - ((A - 1.0f) * wC) - (beta * wS)) / a0;
     }
 
     void calcCoefsLowPass (float newFreq, float newQ, float newGain)
@@ -216,8 +216,8 @@ public:
         // process input sample, direct form II transposed
         float y = z[1] + x * b[0];
 
-        z[1] = z[2] + x*b[1] - y*a[1];
-        z[2] = x*b[2] - y*a[2];
+        z[1] = z[2] + x * b[1] - y * a[1];
+        z[2] = x * b[2] - y * a[2];
 
         return y;
     }
@@ -277,7 +277,7 @@ public:
 
             auto A = powf (10.0f, Decibels::gainToDecibels (gain.getTargetValue()) / 40.0f);
             numerator = s * s + s * sqrtf (A) / Q.getTargetValue() + A;
-            denominator = A * s * s + s * sqrtf(A) / Q.getTargetValue() + 1.0f;
+            denominator = A * s * s + s * sqrtf (A) / Q.getTargetValue() + 1.0f;
             numerator *= A;
         }
         else if (eqShape == HighShelf)
@@ -287,8 +287,8 @@ public:
             //           s^2 + s * (sqrt(A) / Q) + A
 
             auto A = powf (10.0f, Decibels::gainToDecibels (gain.getTargetValue()) / 40.0f);
-            numerator = A  * s * s + s * sqrtf (A) / Q.getTargetValue() + 1.0f;
-            denominator = s * s + s * sqrtf(A) / Q.getTargetValue() + A;
+            numerator = A * s * s + s * sqrtf (A) / Q.getTargetValue() + 1.0f;
+            denominator = s * s + s * sqrtf (A) / Q.getTargetValue() + A;
             numerator *= A;
         }
         else if (eqShape == LowPass)
@@ -352,16 +352,20 @@ public:
     float getMagnitudeAtFreq (float freq) { return eqFilter[0].getMagnitudeAtFreq (freq); }
 
     AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override                 { return true; }
+    bool hasEditor() const override { return true; }
 
-    double getTailLengthSeconds() const override    { return 0.0; };
-    bool acceptsMidi() const override               { return false; }
-    bool producesMidi() const override              { return false; }
+    double getTailLengthSeconds() const override { return 0.0; };
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
 
-    int getNumPrograms() override                                      { return 1; };
-    int getCurrentProgram() override                                   { return 1; };
-    void setCurrentProgram (int index) override                        { ignoreUnused (index); };
-    const String getProgramName (int index) override                   { ignoreUnused (index); return "Parameter"; }
+    int getNumPrograms() override { return 1; };
+    int getCurrentProgram() override { return 1; };
+    void setCurrentProgram (int index) override { ignoreUnused (index); };
+    const String getProgramName (int index) override
+    {
+        ignoreUnused (index);
+        return "Parameter";
+    }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
     void getStateInformation (juce::MemoryBlock& destData) override;
@@ -370,7 +374,7 @@ public:
     void numChannelsChanged() override;
 
 protected:
-    inline bool isBusesLayoutSupported (const BusesLayout& layout) const override 
+    inline bool isBusesLayoutSupported (const BusesLayout& layout) const override
     {
         // supports single bus only
         if (layout.inputBuses.size() != 1 && layout.outputBuses.size() != 1)
@@ -393,11 +397,11 @@ protected:
 
 private:
     int numChannels = 0;
-    AudioParameterFloat* freq     = nullptr;
-    AudioParameterFloat* q        = nullptr;
-    AudioParameterFloat* gainDB   = nullptr;
+    AudioParameterFloat* freq = nullptr;
+    AudioParameterFloat* q = nullptr;
+    AudioParameterFloat* gainDB = nullptr;
     AudioParameterChoice* eqShape = nullptr;
     EQFilter eqFilter[2];
 };
 
-}
+} // namespace Element

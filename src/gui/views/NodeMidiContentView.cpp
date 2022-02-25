@@ -56,8 +56,8 @@ void NodeMidiContentView::resized()
 
 void NodeMidiContentView::stabilizeContent()
 {
-    auto *cc = ViewHelpers::findContentComponent(this);
-    jassert(cc);
+    auto* cc = ViewHelpers::findContentComponent (this);
+    jassert (cc);
     auto& gui = *cc->getAppController().findChild<GuiController>();
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
@@ -75,10 +75,10 @@ void NodeMidiContentView::stabilizeContent()
 
         if (NodeObjectPtr ptr = node.getObject())
         {
-           #if defined (EL_PRO) || defined (EL_SOLO)
+#if defined(EL_PRO) || defined(EL_SOLO)
             midiProgramChangedConnection = ptr->midiProgramChanged.connect (
                 std::bind (&NodeMidiContentView::updateMidiProgram, this));
-           #endif
+#endif
         }
     }
     else
@@ -101,4 +101,4 @@ void NodeMidiContentView::updateMidiProgram()
     updateProperties();
 }
 
-}
+} // namespace Element

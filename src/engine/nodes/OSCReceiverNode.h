@@ -36,17 +36,17 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.name               = "OSC Receiver";
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_RECEIVER;
-        desc.uniqueId           = EL_INTERNAL_UID_OSC_RECEIVER;
-        desc.descriptiveName    = "OSC Receiver";
-        desc.numInputChannels   = 0;
-        desc.numOutputChannels  = 0;
+        desc.name = "OSC Receiver";
+        desc.fileOrIdentifier = EL_INTERNAL_ID_OSC_RECEIVER;
+        desc.uniqueId = EL_INTERNAL_UID_OSC_RECEIVER;
+        desc.descriptiveName = "OSC Receiver";
+        desc.numInputChannels = 0;
+        desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
+        desc.isInstrument = false;
+        desc.manufacturerName = "Element";
+        desc.pluginFormatName = "Element";
+        desc.version = "1.0.0";
     }
 
     void refreshPorts() override;
@@ -56,17 +56,17 @@ public:
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
-    
+
     /** For node editor */
     bool connect (int portNumber);
-    bool disconnect ();
-    bool isConnected ();
-    void pause ();
-    void resume ();
-    bool togglePause ();
-    bool isPaused ();
-    int getCurrentPortNumber ();
-    String getCurrentHostName ();
+    bool disconnect();
+    bool isConnected();
+    void pause();
+    void resume();
+    bool togglePause();
+    bool isPaused();
+    int getCurrentPortNumber();
+    String getCurrentHostName();
     void setPortNumber (int port);
     void setHostName (String hostName);
 
@@ -74,7 +74,6 @@ public:
     void removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
 
 private:
-
     /** MIDI */
     bool createdPorts = false;
     double currentSampleRate;
@@ -88,9 +87,8 @@ private:
     int currentPortNumber = 9001;
     String currentHostName = "";
 
-    void oscMessageReceived(const OSCMessage& message) override;
-    void oscBundleReceived(const OSCBundle& bundle) override;
+    void oscMessageReceived (const OSCMessage& message) override;
+    void oscBundleReceived (const OSCBundle& bundle) override;
 };
 
-
-}
+} // namespace Element

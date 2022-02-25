@@ -53,15 +53,14 @@ public:
     */
     ~GraphProcessor();
 
-   /** Represents a connection between two channels of two nodes in an AudioProcessorGraph.
+    /** Represents a connection between two channels of two nodes in an AudioProcessorGraph.
 
         To create a connection, use AudioProcessorGraph::addConnection().
     */
-    struct JUCE_API  Connection :  public Arc
+    struct JUCE_API Connection : public Arc
     {
     public:
-        Connection (uint32 sourceNode, uint32 sourcePort,
-                    uint32 destNode, uint32 destPort) noexcept;
+        Connection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) noexcept;
         Connection (const ValueTree props);
 
     private:
@@ -75,13 +74,13 @@ public:
     void clear();
 
     /** Returns the number of nodes in the graph. */
-    int getNumNodes() const                                         { return nodes.size(); }
+    int getNumNodes() const { return nodes.size(); }
 
     /** Returns a pointer to one of the nodes in the graph.
         This will return nullptr if the index is out of range.
         @see getNodeForId
     */
-    NodeObject* getNode (const int index) const                           { return nodes [index]; }
+    NodeObject* getNode (const int index) const { return nodes[index]; }
 
     /** Searches the graph for a node with the given ID number and returns it.
         If no such node was found, this returns nullptr.
@@ -112,18 +111,17 @@ public:
 
     /** Builds an array of ordered nodes */
     void getOrderedNodes (ReferenceCountedArray<NodeObject>& res);
-    
+
     /** Returns the number of connections in the graph. */
-    int getNumConnections() const                                       { return connections.size(); }
+    int getNumConnections() const { return connections.size(); }
 
     /** Returns a pointer to one of the connections in the graph. */
-    const Connection* getConnection (int index) const                   { return connections [index]; }
+    const Connection* getConnection (int index) const { return connections[index]; }
 
     /** Searches for a connection between some specified channels.
         If no such connection is found, this returns nullptr.
     */
-    const Connection* getConnectionBetween (uint32 sourceNode, uint32 sourcePort,
-                                            uint32 destNode, uint32 destPort) const;
+    const Connection* getConnectionBetween (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) const;
 
     /** Returns true if there is a connection between any of the channels of
         two specified nodes.
@@ -131,20 +129,17 @@ public:
     bool isConnected (uint32 sourceNode, uint32 destNode) const;
 
     /** Returns true if it would be legal to connect the specified points. */
-    bool canConnect (uint32 sourceNode, uint32 sourcePort,
-                     uint32 destNode, uint32 destPort) const;
+    bool canConnect (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) const;
 
     /** Attempts to connect two specified channels of two nodes.
 
         If this isn't allowed (e.g. because you're trying to connect a midi channel
         to an audio one or other such nonsense), then it'll return false.
     */
-    bool addConnection (uint32 sourceNode, uint32 sourcePort,
-                        uint32 destNode, uint32 destPort);
+    bool addConnection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort);
 
     /** Connect two ports by channel number */
-    bool connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel,
-                          uint32 destNode, int32 destChannel);
+    bool connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel, uint32 destNode, int32 destChannel);
 
     /** Deletes the connection with the specified index. */
     void removeConnection (int index);
@@ -152,8 +147,7 @@ public:
     /** Deletes any connection between two specified points.
         Returns true if a connection was actually deleted.
     */
-    bool removeConnection (uint32 sourceNode, uint32 sourcePort,
-                           uint32 destNode, uint32 destPort);
+    bool removeConnection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort);
 
     /** Removes all connections from the specified node. */
     bool disconnectNode (uint32 nodeId);
@@ -174,7 +168,7 @@ public:
 
     /** Set the allowed MIDI channel of this Graph */
     void setMidiChannel (const int channel) noexcept;
-    
+
     /** Set the allowed MIDI channels of this Graph */
     void setMidiChannels (const BigInteger channels) noexcept;
 
@@ -217,13 +211,13 @@ public:
             audioInputNode = 0, /**< In this mode, the processor has output channels
                                      representing all the audio input channels that are
                                      coming into its parent audio graph. */
-            audioOutputNode,    /**< In this mode, the processor has input channels
+            audioOutputNode, /**< In this mode, the processor has input channels
                                      representing all the audio output channels that are
                                      going out of its parent audio graph. */
-            midiInputNode,      /**< In this mode, the processor has a midi output which
+            midiInputNode, /**< In this mode, the processor has a midi output which
                                      delivers the same midi data that is arriving at its
                                      parent graph. */
-            midiOutputNode,     /**< In this mode, the processor has a midi input and
+            midiOutputNode, /**< In this mode, the processor has a midi input and
                                      any data sent to it will be passed out of the parent
                                      graph. */
             numDeviceTypes
@@ -231,11 +225,11 @@ public:
 
         //==============================================================================
         /** Returns the mode of this processor. */
-        IODeviceType getType() const                                { return type; }
+        IODeviceType getType() const { return type; }
 
         /** Returns the parent graph to which this processor belongs, or nullptr if it
             hasn't yet been added to one. */
-        GraphProcessor* getParentGraph() const                 { return graph; }
+        GraphProcessor* getParentGraph() const { return graph; }
 
         /** True if this is an audio or midi input. */
         bool isInput() const;
@@ -251,7 +245,7 @@ public:
         const String getName() const;
         const String getInputChannelName (int channelIndex) const;
         const String getOutputChannelName (int channelIndex) const;
-        
+
         void prepareToPlay (double sampleRate, int estimatedSamplesPerBlock);
         void releaseResources();
         void processBlock (AudioSampleBuffer&, MidiBuffer&);
@@ -292,13 +286,13 @@ public:
     // MARK: AudioProcessor methods
 
     virtual const String getName() const override;
-    
+
     virtual void prepareToPlay (double sampleRate, int estimatedBlockSize) override;
     virtual void releaseResources() override;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-    
+
     void reset() override;
-    
+
     virtual const String getInputChannelName (int channelIndex) const override;
     virtual const String getOutputChannelName (int channelIndex) const override;
     virtual bool isInputChannelStereoPair (int index) const override;
@@ -309,20 +303,20 @@ public:
     virtual bool acceptsMidi() const override;
     virtual bool producesMidi() const override;
 
-    virtual bool hasEditor() const override                          { return false; }
-    virtual AudioProcessorEditor* createEditor() override            { return nullptr; }
+    virtual bool hasEditor() const override { return false; }
+    virtual AudioProcessorEditor* createEditor() override { return nullptr; }
 
-    virtual int getNumParameters() override                          { return 0; }
-    virtual const String getParameterName (int) override             { return String(); }
-    virtual float getParameter (int) override                        { return 0; }
-    virtual const String getParameterText (int) override             { return String(); }
-    virtual void setParameter (int, float) override                  { }
+    virtual int getNumParameters() override { return 0; }
+    virtual const String getParameterName (int) override { return String(); }
+    virtual float getParameter (int) override { return 0; }
+    virtual const String getParameterText (int) override { return String(); }
+    virtual void setParameter (int, float) override {}
 
-    virtual int getNumPrograms() override                            { return 0; }
-    virtual int getCurrentProgram() override                         { return 0; }
-    virtual void setCurrentProgram (int) override                    { }
-    virtual const String getProgramName (int) override               { return String(); }
-    virtual void changeProgramName (int, const String&) override     { }
+    virtual int getNumPrograms() override { return 0; }
+    virtual int getCurrentProgram() override { return 0; }
+    virtual void setCurrentProgram (int) override {}
+    virtual const String getProgramName (int) override { return String(); }
+    virtual void changeProgramName (int, const String&) override {}
 
     virtual void getStateInformation (MemoryBlock&) override;
     virtual void setStateInformation (const void* data, int sizeInBytes) override;
@@ -331,18 +325,18 @@ public:
 
 protected:
     virtual NodeObject* createNode (uint32, AudioProcessor*);
-    virtual void preRenderNodes() { }
-    virtual void postRenderNodes() { }
+    virtual void preRenderNodes() {}
+    virtual void postRenderNodes() {}
 
 private:
     typedef ArcTable<Connection> LookupTable;
     ReferenceCountedArray<NodeObject> nodes;
     OwnedArray<Connection> connections;
-    uint32 ioNodes [AudioGraphIOProcessor::numDeviceTypes];
-    
+    uint32 ioNodes[AudioGraphIOProcessor::numDeviceTypes];
+
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
-    OwnedArray <MidiBuffer> midiBuffers;
+    OwnedArray<MidiBuffer> midiBuffers;
     Array<void*> renderingOps;
 
     friend class AudioGraphIOProcessor;
@@ -352,11 +346,11 @@ private:
     AudioSampleBuffer currentAudioOutputBuffer;
     MidiBuffer* currentMidiInputBuffer;
     MidiBuffer currentMidiOutputBuffer;
-    
+
     kv::MidiChannels midiChannels;
     VelocityCurve velocityCurve;
     MidiBuffer filteredMidi;
-    
+
     void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();
@@ -367,4 +361,4 @@ private:
 
 typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
 typedef IOProcessor::IODeviceType IODeviceType;
-}
+} // namespace Element

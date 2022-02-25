@@ -47,8 +47,8 @@ public:
 
     float getValue() const { return param->getValue(); }
     void setValue (float val) { param->setValue (val); }
-    
-    bool isControl() const  { return control != nullptr; }
+
+    bool isControl() const { return control != nullptr; }
 
     float getControl() const
     {
@@ -91,7 +91,7 @@ public:
 
     ~ScriptNodeControlPort() override {}
 
-    sol::function getChangedFunction () const { return changed; }
+    sol::function getChangedFunction() const { return changed; }
     void setChangedFunction (const sol::function& f) { changed = f; }
 
 private:
@@ -120,20 +120,17 @@ public:
         slider.setSkewFactor (1.0, false);
         slider.setSliderStyle (Slider::LinearBar);
 
-        slider.onDragStart = [this]()
-        {
+        slider.onDragStart = [this]() {
             dragging = true;
             param->beginChangeGesture();
         };
 
-        slider.onDragEnd = [this]()
-        {
+        slider.onDragEnd = [this]() {
             dragging = false;
             param->endChangeGesture();
         };
 
-        slider.onValueChange = [this]
-        {
+        slider.onValueChange = [this] {
             auto newValue = (float) slider.getValue();
             if (param->getValue() != newValue)
             {
@@ -147,15 +144,13 @@ public:
             }
         };
 
-        slider.valueFromTextFunction = [this](const String& text) -> double
-        {
+        slider.valueFromTextFunction = [this] (const String& text) -> double {
             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
                 return (double) cp->convertTo0to1 (text.getFloatValue());
             return text.getDoubleValue();
         };
 
-        slider.textFromValueFunction = [this](double value) -> String
-        {
+        slider.textFromValueFunction = [this] (double value) -> String {
             String text;
             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
                 return cp->getText (static_cast<float> (value), 1024);
@@ -186,12 +181,14 @@ private:
 };
 
 //==============================================================================
-static ValueTree getUIChild (const Node& node, const String& name) {
+static ValueTree getUIChild (const Node& node, const String& name)
+{
     auto UI = node.getUIValueTree();
     return UI.getOrCreateChildWithName (name, nullptr);
 }
 
-static ValueTree getScriptNodeEditorState (const Node& node) {
+static ValueTree getScriptNodeEditorState (const Node& node)
+{
     return getUIChild (node, "ScriptNodeEditor");
 }
 
@@ -201,14 +198,17 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
       engine (scripts),
       state (engine.getLuaState()),
       env (state, sol::create, state.globals()),
-      fileBrowser (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles, 
-                   ScriptManager::getUserScriptsDir(), nullptr, nullptr)
+      fileBrowser (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                   ScriptManager::getUserScriptsDir(),
+                   nullptr,
+                   nullptr)
 {
     setOpaque (true);
 
     auto M = state.create_table();
-    M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
-       #if 0
+    M.new_usertype<ScriptNodeControlPort> (
+        "ControlPort", sol::no_constructor,
+#if 0
         "value",        sol::overload (
             [](ScriptNodeControlPort& self) -> double {
                 return self.getValue();
@@ -226,26 +226,25 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
                 return normal ? self.getValue() : self.getControl();
             }
         ),
-       #endif
-        "get", [](ScriptNodeControlPort& self) -> double { return self.getControl(); },
-        "set", [](ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
-        
-        "valuechanged", sol::property (&ScriptNodeControlPort::getChangedFunction,
-                                       &ScriptNodeControlPort::setChangedFunction)
-    );
+#endif
+        "get",
+        [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
+        "set",
+        [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
+
+        "valuechanged",
+        sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction));
     env["ScriptNodeEditor.ControlPort"] = M;
-    
+
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
 
-    chooser.reset (new FileChooser ("Script", ScriptManager::getUserScriptsDir(),
-                                    "*.lua", false, false, this));
+    chooser.reset (new FileChooser ("Script", ScriptManager::getUserScriptsDir(), "*.lua", false, false, this));
 
     addAndMakeVisible (paramsButton);
     paramsButton.setButtonText ("Params");
     paramsButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    paramsButton.onClick = [this]()
-    {
+    paramsButton.onClick = [this]() {
         paramsButton.setToggleState (! paramsButton.getToggleState(), dontSendNotification);
         props.setVisible (paramsButton.getToggleState());
         updateSize();
@@ -286,12 +285,12 @@ sol::table ScriptNodeEditor::createContext()
 {
     using CPP = ControlPortParameter;
     sol::state_view view (state.lua_state());
-    sol::table ctx  = view.create_table();
+    sol::table ctx = view.create_table();
 
     ctx["params"] = view.create_table();
     for (auto* param : lua->getParameters())
     {
-        ctx["params"][1 + param->getParameterIndex()] = 
+        ctx["params"][1 + param->getParameterIndex()] =
             std::make_shared<ScriptNodeControlPort> (param);
     }
 
@@ -330,7 +329,7 @@ void ScriptNodeEditor::updateSize()
     {
         int w = comp->getWidth(), h = comp->getHeight();
         if (props.isVisible())
-        { 
+        {
             w += propsGap;
             w += propsWidth;
         }
@@ -350,14 +349,16 @@ void ScriptNodeEditor::updatePreview()
         comp = nullptr;
     }
 
-    try {
+    try
+    {
         Script loader (state);
-        if (loader.load (lua->getCodeDocument(true).getAllContent()))
+        if (loader.load (lua->getCodeDocument (true).getAllContent()))
         {
-            auto f = loader.caller(); env.set_on (f);
+            auto f = loader.caller();
+            env.set_on (f);
             auto ctx = createContext();
             sol::protected_function_result instance = f (ctx);
-        
+
             if (! instance.valid())
             {
                 sol::error e = instance;
@@ -365,16 +366,15 @@ void ScriptNodeEditor::updatePreview()
                     log (line);
                 return;
             }
-            
+
             if (instance.get_type() == sol::type::table)
             {
                 sol::table DSPUI = instance;
                 sol::table editor;
-                
+
                 switch (DSPUI["editor"].get_type())
                 {
-                    case sol::type::function:
-                    {
+                    case sol::type::function: {
                         sol::function instantiate = DSPUI["editor"];
                         auto editorResult = instantiate (ctx);
                         if (! editorResult.valid())
@@ -411,13 +411,12 @@ void ScriptNodeEditor::updatePreview()
         {
             log (loader.getErrorMessage());
         }
-    }
-    catch (const std::exception& e)
+    } catch (const std::exception& e)
     {
         for (const auto& line : StringArray::fromLines (e.what()))
             log (line);
     }
-    
+
     resized();
 }
 
@@ -442,9 +441,9 @@ void ScriptNodeEditor::resized()
     const int toolbarSize = 22;
     auto r1 = getLocalBounds().reduced (4);
     auto r2 = r1.removeFromTop (toolbarSize);
-    
+
     fileBrowser.setBounds (r1.reduced (8));
-    
+
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
 
@@ -455,11 +454,11 @@ void ScriptNodeEditor::resized()
 
     if (props.isVisible())
     {
-        props.setBounds (comp != nullptr ? comp->getRight() + propsGap : 0, 
-                         comp != nullptr ? comp->getY() : 0, 
-                         propsWidth, 
+        props.setBounds (comp != nullptr ? comp->getRight() + propsGap : 0,
+                         comp != nullptr ? comp->getY() : 0,
+                         propsWidth,
                          getHeight() - (comp != nullptr ? comp->getY() : 0));
     }
 }
 
-}
+} // namespace Element

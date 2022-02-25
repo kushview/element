@@ -32,7 +32,7 @@ class DataPath
 public:
     DataPath();
     ~DataPath();
-    
+
     /** Returns the app data dir.
         For example, on OSX this is ~/Library/Application Support/Element
      */
@@ -65,7 +65,6 @@ public:
     /** Returns the default Workspaces directory */
     static const File workspacesDir();
 
-    
     /** Returns the installation directory. May return an invalid file,
         especially when in debug mode. Use this sparingly.
       */
@@ -75,10 +74,12 @@ public:
     File createNewPresetFile (const Node& node, const String& name = String()) const;
     void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
     void findPresetFiles (StringArray& results) const;
-    
+
 private:
     File root;
 };
 
-class DataSearchPath { };
-}
+class DataSearchPath
+{
+};
+} // namespace Element
