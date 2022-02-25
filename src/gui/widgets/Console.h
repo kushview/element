@@ -41,6 +41,9 @@ public:
     */
     void addText (const String& text, bool prefix = false);
 
+    /** Show or hide the text prompt */
+    void setPromptVisible (bool visible);
+
     /** Override this to handle when text is entered on the prompt. The default
         implementation just adds entered text to the display buffer */
     virtual void textEntered (const String& text);

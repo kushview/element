@@ -157,12 +157,24 @@ public:
         buffer.moveCaretToEnd();
     }
 
+    void setPromptVisible (bool visible)
+    {
+        if (visible == prompt.isVisible())
+            return;
+        prompt.setVisible (visible);
+        prefixLabel.setVisible (visible);
+        resized();
+    }
+
     void resized() override
     {
         auto r1 = getLocalBounds();
-        auto r2 = r1.removeFromBottom (23);
-        prefixLabel.setBounds (r2.removeFromLeft (24));
-        prompt.setBounds (r2);
+        if (prompt.isVisible())
+        {
+            auto r2 = r1.removeFromBottom (23);
+            prefixLabel.setBounds (r2.removeFromLeft (24));
+            prompt.setBounds (r2);
+        }
         buffer.setBounds (r1);
     }
 
@@ -229,6 +241,11 @@ void Console::clear (bool buffer, bool history)
 {
     if (buffer)     content->clearBuffer();
     if (history)    content->clearHistory();
+}
+
+void Console::setPromptVisible (bool visible)
+{
+    content->setPromptVisible (visible);
 }
 
 void Console::addText (const String& text, bool prefix)
