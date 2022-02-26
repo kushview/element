@@ -164,8 +164,8 @@ def common_includes():
     ]
 
 def lua_kv_sources (ctx):
-    return ctx.path.ant_glob ('libs/lua-kv/src/kv/**/*.c') + \
-           ctx.path.ant_glob ('libs/lua-kv/src/kv/**/*.cpp')
+    return ctx.path.ant_glob ('libs/element/lua/el/**/*.c') + \
+           ctx.path.ant_glob ('libs/element/lua/el/**/*.cpp')
 
 def juce_sources (ctx):
     return element.get_juce_library_code ("libs/compat") + \
@@ -272,8 +272,7 @@ def build_liblua (bld):
         env      = luaEnv,
         install_path = None,
         features = 'cxx cxxstlib',
-        includes = common_includes() + [ 'libs/lua-kv/include', \
-                                         'libs/lua-kv/src' ],
+        includes = common_includes() + [ 'libs/element/lua/el' ],
         source = lua_kv_sources (bld),
         use = [ 'LUA' ]
     )
@@ -291,13 +290,7 @@ def add_scripts_to (bld, builddir, instdir,
             target      = [ '%s/%s/el/%s' % (builddir, modsdir, node.name) ],
             install_path= '%s/%s/el' % (instdir, modsdir) if instdir else None
         )
-    for node in bld.path.ant_glob ('libs/lua-kv/src/kv/*.lua'):
-        bld (
-            features    ='subst',
-            source      = node,
-            target      = [ '%s/%s/kv/%s' % (builddir, modsdir, node.name) ],
-            install_path= '%s/%s/kv' % (instdir, modsdir) if instdir else None
-        )
+
     for node in bld.path.ant_glob ('scripts/**/*.lua'):
         bld (
             features    ='subst',
@@ -570,6 +563,8 @@ def check (ctx):
         ctx.fatal ("Test suite not compiled")
         return
     os.environ["LD_LIBRARY_PATH"] = "build/lib"
+    os.environ["DYLD_LIBRARY_PATH"] = "build/lib"
+    os.environ["LUA_PATH"] = "libs/element/lua/?.lua"
     failed = 0
     print ("JUCE Tests")
     if 0 != call (["build/bin/test_juce"]):
@@ -610,8 +605,6 @@ def versionbump (ctx):
 def resave (ctx):
     import projects
     ctx.add_pre_fun (projects.resave)
-
-
 
 from waflib.Build import BuildContext
 

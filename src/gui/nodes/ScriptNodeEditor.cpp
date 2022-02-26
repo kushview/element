@@ -18,7 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "kv/lua/object.hpp"
+#include "../../../libs/element/lua/el/object.hpp"
 #include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/LookAndFeel.h"
 #include "scripting/LuaBindings.h"

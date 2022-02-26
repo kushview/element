@@ -20,7 +20,7 @@
 #include <math.h>
 #include "sol/sol.hpp"
 #include "lua-kv.h"
-#include "kv/lua/factories.hpp"
+#include "../../../libs/element/lua/el/factories.hpp"
 
 #include "ElementApp.h"
 #include "engine/nodes/LuaNode.h"
@@ -33,11 +33,11 @@
 
 static const String initScript =
     R"(
-require ('kv.AudioBuffer')
-require ('kv.MidiBuffer')
-require ('kv.MidiMessage')
-require ('kv.midi')
-require ('kv.audio')
+require ('el.AudioBuffer')
+require ('el.MidiBuffer')
+require ('el.MidiMessage')
+require ('el.midi')
+require ('el.audio')
 require ('el.MidiPipe')
 )";
 
@@ -55,7 +55,7 @@ static const String stereoAmpScript =
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
-local audio = require ('kv.audio')
+local audio = require ('el.audio')
 
 --- Gain parameters.
 -- Used for fading between changes in volume
@@ -95,7 +95,7 @@ end
 
 --- Render audio and midi
 -- Use the provided audio and midi objects to process your plugin
--- @param a     The source kv.AudioBuffer
+-- @param a     The source el.AudioBuffer
 -- @param m     The source el.MidiPipe
 function node_render (a, m)
    end_gain = audio.togain (Param.values [1])
@@ -311,7 +311,7 @@ struct LuaNode::Context
             ctx->state["__ln_validate_nframes"] = block;
             ctx->state.script (R"(
                 function __ln_validate_render()
-                    local AudioBuffer = require ('kv.AudioBuffer')
+                    local AudioBuffer = require ('el.AudioBuffer')
                     local MidiPipe    = require ('el.MidiPipe')
 
                     local a = AudioBuffer.new (__ln_validate_nchans, __ln_validate_nframes)

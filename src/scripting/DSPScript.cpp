@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "kv/lua/factories.hpp"
+#include "../../libs/element/lua/el/factories.hpp"
 #include "engine/MidiPipe.h"
 #include "scripting/DSPScript.h"
 
@@ -100,11 +100,11 @@ DSPScript::DSPScript (sol::table tbl)
         {
             sol::state_view lua (L);
             auto result = lua.safe_script (R"(
-                require ('kv.audio')
-                require ('kv.midi')
-                require ('kv.AudioBuffer')
-                require ('kv.MidiBuffer')
-                require ('kv.MidiMessage')
+                require ('el.audio')
+                require ('el.midi')
+                require ('el.AudioBuffer')
+                require ('el.MidiBuffer')
+                require ('el.MidiMessage')
                 require ('el.MidiPipe')
             )");
             ok = result.status() == sol::call_status::ok;
@@ -234,7 +234,7 @@ Result DSPScript::validate (const String& script)
         ctx->state["__ln_validate_nframes"] = block;
         ctx->state.script (R"(
             function __ln_validate_render()
-                local AudioBuffer = require ('kv.AudioBuffer')
+                local AudioBuffer = require ('el.AudioBuffer')
                 local MidiPipe    = require ('el.MidiPipe')
 
                 local a = AudioBuffer (__ln_validate_nchans, __ln_validate_nframes)

@@ -24,8 +24,8 @@
 // @pragma nostrip
 
 #include "lua.hpp"
-#include "kv/lua/midi_buffer.hpp"
-#include "kv/lua/factories.hpp"
+#include "../../libs/element/lua/el/midi_buffer.hpp"
+#include "../../libs/element/lua/el/factories.hpp"
 #include "engine/MidiPipe.h"
 
 namespace Element {

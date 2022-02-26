@@ -7,6 +7,3 @@
 [submodule "libs/jlv2"]
 	path = libs/jlv2
 	url = https://github.com/lvtk/jlv2
-[submodule "libs/lua-kv"]
-	path = libs/lua-kv
-	url = https://github.com/kushview/lua-kv

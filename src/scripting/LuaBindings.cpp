@@ -32,6 +32,7 @@
 #include "session/Presets.h"
 #include "session/Session.h"
 #include "DataPath.h"
+#include "Globals.h"
 #include "Settings.h"
 #include "sol/sol.hpp"
 #include "lua-kv.hpp"
@@ -40,48 +41,34 @@
 #define EL_LOCAL_LUA_PATHS 0
 #endif
 
-namespace sol {
-/** Support juce::ReferenceCountedObjectPtr */
-template <typename T>
-struct unique_usertype_traits<ReferenceCountedObjectPtr<T>>
-{
-    typedef T type;
-    typedef ReferenceCountedObjectPtr<T> actual_type;
-    static const bool value = true;
-    static bool is_null (const actual_type& ptr) { return ptr == nullptr; }
-    static type* get (const actual_type& ptr) { return ptr.get(); }
-};
-} // namespace sol
-
-#include "../../element/lua/el/CommandManager.cpp"
-#include "../../element/lua/el/Globals.cpp"
-#include "../../element/lua/el/Node.cpp"
-#include "../../element/lua/el/Session.cpp"
-
 extern "C" {
-extern int luaopen_kv_audio (lua_State* L);
-extern int luaopen_kv_bytes (lua_State*);
-extern int luaopen_kv_midi (lua_State*);
-extern int luaopen_kv_round (lua_State*);
+extern int luaopen_el_audio (lua_State* L);
+extern int luaopen_el_bytes (lua_State*);
+extern int luaopen_el_midi (lua_State*);
+extern int luaopen_el_round (lua_State*);
 }
 
-extern int luaopen_kv_AudioBuffer32 (lua_State*);
-extern int luaopen_kv_AudioBuffer64 (lua_State*);
-extern int luaopen_kv_Bounds (lua_State*);
-extern int luaopen_kv_TextButton (lua_State*);
-extern int luaopen_kv_Widget (lua_State*);
-extern int luaopen_kv_Desktop (lua_State*);
-extern int luaopen_kv_DocumentWindow (lua_State*);
-extern int luaopen_kv_File (lua_State*);
-extern int luaopen_kv_Graphics (lua_State*);
-extern int luaopen_kv_MidiBuffer (lua_State*);
-extern int luaopen_kv_MidiMessage (lua_State*);
-extern int luaopen_kv_MouseEvent (lua_State*);
-extern int luaopen_kv_Point (lua_State*);
-extern int luaopen_kv_Range (lua_State*);
-extern int luaopen_kv_Rectangle (lua_State*);
-extern int luaopen_kv_Slider (lua_State*);
+extern int luaopen_el_AudioBuffer32 (lua_State*);
+extern int luaopen_el_AudioBuffer64 (lua_State*);
+extern int luaopen_el_Bounds (lua_State*);
+extern int luaopen_el_TextButton (lua_State*);
+extern int luaopen_el_Widget (lua_State*);
+extern int luaopen_el_Desktop (lua_State*);
+extern int luaopen_el_DocumentWindow (lua_State*);
+extern int luaopen_el_File (lua_State*);
+extern int luaopen_el_Graphics (lua_State*);
+extern int luaopen_el_MidiBuffer (lua_State*);
+extern int luaopen_el_MidiMessage (lua_State*);
+extern int luaopen_el_MouseEvent (lua_State*);
+extern int luaopen_el_Point (lua_State*);
+extern int luaopen_el_Range (lua_State*);
+extern int luaopen_el_Rectangle (lua_State*);
+extern int luaopen_el_Slider (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
+extern int luaopen_el_CommandManager (lua_State*);
+extern int luaopen_el_Globals (lua_State*);
+extern int luaopen_el_Node (lua_State*);
+extern int luaopen_el_Session (lua_State*);
 
 using namespace sol;
 
@@ -304,94 +291,94 @@ namespace Lua {
 
 #define EL_LUA_INTERNAL_MOD_KV 1
 #if defined(EL_LUA_INTERNAL_MOD_KV)
-        else if (mod == "kv.audio")
+        else if (mod == "el.audio" || mod == "kv.audio")
         {
-            sol::stack::push (L, luaopen_kv_audio);
+            sol::stack::push (L, luaopen_el_audio);
         }
-        else if (mod == "kv.midi")
+        else if (mod == "el.midi" || mod == "kv.midi")
         {
-            sol::stack::push (L, luaopen_kv_midi);
+            sol::stack::push (L, luaopen_el_midi);
         }
-        else if (mod == "kv.bytes")
+        else if (mod == "el.bytes" || mod == "kv.bytes")
         {
-            sol::stack::push (L, luaopen_kv_bytes);
+            sol::stack::push (L, luaopen_el_bytes);
         }
-        else if (mod == "kv.round")
+        else if (mod == "el.round" || mod == "kv.round")
         {
-            sol::stack::push (L, luaopen_kv_round);
+            sol::stack::push (L, luaopen_el_round);
         }
-        else if (mod == "kv.AudioBuffer32")
+        else if (mod == "el.AudioBuffer32" || mod == "kv.AudioBuffer32")
         {
-            sol::stack::push (L, luaopen_kv_AudioBuffer32);
+            sol::stack::push (L, luaopen_el_AudioBuffer32);
         }
-        else if (mod == "kv.AudioBuffer64")
+        else if (mod == "el.AudioBuffer64" || mod == "kv.AudioBuffer64")
         {
-            sol::stack::push (L, luaopen_kv_AudioBuffer64);
+            sol::stack::push (L, luaopen_el_AudioBuffer64);
         }
-        else if (mod == "kv.MidiMessage")
+        else if (mod == "el.MidiMessage" || mod == "kv.MidiMessage")
         {
-            sol::stack::push (L, luaopen_kv_MidiMessage);
+            sol::stack::push (L, luaopen_el_MidiMessage);
         }
-        else if (mod == "kv.MidiBuffer")
+        else if (mod == "el.MidiBuffer" || mod == "kv.MidiBuffer")
         {
-            sol::stack::push (L, luaopen_kv_MidiBuffer);
+            sol::stack::push (L, luaopen_el_MidiBuffer);
         }
-        else if (mod == "kv.Graphics")
+        else if (mod == "el.Graphics" || mod == "kv.Graphics")
         {
-            sol::stack::push (L, luaopen_kv_Graphics);
+            sol::stack::push (L, luaopen_el_Graphics);
         }
-        else if (mod == "kv.Point")
+        else if (mod == "el.Point" || mod == "kv.Point")
         {
-            sol::stack::push (L, luaopen_kv_Point);
+            sol::stack::push (L, luaopen_el_Point);
         }
-        else if (mod == "kv.Range")
+        else if (mod == "el.Range" || mod == "kv.Range")
         {
-            sol::stack::push (L, luaopen_kv_Range);
+            sol::stack::push (L, luaopen_el_Range);
         }
-        else if (mod == "kv.Rectangle")
+        else if (mod == "el.Rectangle" || mod == "kv.Rectangle")
         {
-            sol::stack::push (L, luaopen_kv_Rectangle);
+            sol::stack::push (L, luaopen_el_Rectangle);
         }
 
-        else if (mod == "kv.Bounds")
+        else if (mod == "el.Bounds" || mod == "kv.Bounds")
         {
-            sol::stack::push (L, luaopen_kv_Bounds);
+            sol::stack::push (L, luaopen_el_Bounds);
         }
-        else if (mod == "kv.TextButton")
+        else if (mod == "el.TextButton" || mod == "kv.TextButton")
         {
-            sol::stack::push (L, luaopen_kv_TextButton);
+            sol::stack::push (L, luaopen_el_TextButton);
         }
-        else if (mod == "kv.Widget")
+        else if (mod == "el.Widget" || mod == "kv.Widget")
         {
-            sol::stack::push (L, luaopen_kv_Widget);
+            sol::stack::push (L, luaopen_el_Widget);
         }
-        else if (mod == "kv.Desktop")
+        else if (mod == "el.Desktop" || mod == "kv.Desktop")
         {
-            sol::stack::push (L, luaopen_kv_Desktop);
+            sol::stack::push (L, luaopen_el_Desktop);
         }
-        else if (mod == "kv.DocumentWindow")
+        else if (mod == "el.DocumentWindow" || mod == "kv.DocumentWindow")
         {
-            sol::stack::push (L, luaopen_kv_DocumentWindow);
+            sol::stack::push (L, luaopen_el_DocumentWindow);
         }
-        else if (mod == "kv.MouseEvent")
+        else if (mod == "el.MouseEvent" || mod == "kv.MouseEvent")
         {
-            sol::stack::push (L, luaopen_kv_MouseEvent);
+            sol::stack::push (L, luaopen_el_MouseEvent);
         }
-        else if (mod == "kv.File")
+        else if (mod == "el.File" || mod == "kv.File")
         {
-            sol::stack::push (L, luaopen_kv_File);
+            sol::stack::push (L, luaopen_el_File);
         }
-        else if (mod == "kv.Slider")
+        else if (mod == "el.Slider" || mod == "kv.Slider")
         {
-            sol::stack::push (L, luaopen_kv_Slider);
+            sol::stack::push (L, luaopen_el_Slider);
         }
 #endif
 
         else
         {
-            String msg = "no internal '";
-            msg << mod << "'";
-            sol::stack::push (L, msg.toStdString());
+            std::stringstream msg;
+            msg << "no internal '" << mod << "'";
+            sol::stack::push (L, msg.str());
         }
 
         return 1;

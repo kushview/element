@@ -47,8 +47,7 @@ public:
         // by default
         auto package = lua["package"];
         const auto root = File::getCurrentWorkingDirectory().getFullPathName();
-        String path; path << root << "/libs/element/lua/?.lua;" 
-                          << root << "/libs/lua-kv/src/?.lua";
+        String path; path << root << "/libs/element/lua/?.lua";
         package["path"] = path.toStdString();
         path.clear(); path << root << "/scripts/?.lua";
         package["spath"] = path.toStdString();

@@ -3,8 +3,14 @@
 // @classmod el.Globals
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include "lua.hpp"
+#include "sol_helpers.hpp"
+
+#include "session/CommandManager.h"
+#include "session/PluginManager.h"
+#include "session/Presets.h"
 #include "Globals.h"
+#include "Settings.h"
 
 static Element::Globals* el_Globals_instance (lua_State* L)
 {
@@ -91,6 +97,6 @@ LUAMOD_API int luaopen_el_Globals (lua_State* L)
         require ('el.Session')
     )");
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "Globals"));
+    sol::stack::push (L, element::lua::remove_and_clear (M, "Globals"));
     return 1;
 }

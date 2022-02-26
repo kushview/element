@@ -8,7 +8,7 @@
 -- @license     GPL v3
 -- @author      Michael Fisher
 
-local audio  = require ('kv.audio')
+local audio  = require ('el.audio')
 
 --- Gain parameters.
 -- Used for fading between changes in volume
@@ -39,7 +39,7 @@ end
 
 --- Render audio and midi.
 -- Use the provided audio and midi objects to process your plugin
--- @param a The source kv.AudioBuffer
+-- @param a The source el.AudioBuffer
 -- @param m The source el.MidiPipe
 -- @param params DSP parameters
 local function amp_process (a, m, params)

@@ -1,5 +1,5 @@
 local Amp = {}
-local audio  = require ('kv.audio')
+local audio  = require ('el.audio')
 
 local gain1 = 1.0
 local gain2 = 1.0

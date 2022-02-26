@@ -20,7 +20,7 @@
 #include <math.h>
 #include "sol/sol.hpp"
 #include "lua-kv.h"
-#include "kv/lua/factories.hpp"
+#include "../../../libs/element/lua/el/factories.hpp"
 
 #include "ElementApp.h"
 #include "engine/nodes/ScriptNode.h"
@@ -35,11 +35,11 @@
 
 static const String initScript =
     R"(
-require ('kv.AudioBuffer')
-require ('kv.MidiBuffer')
-require ('kv.MidiMessage')
-require ('kv.midi')
-require ('kv.audio')
+require ('el.AudioBuffer')
+require ('el.MidiBuffer')
+require ('el.MidiMessage')
+require ('el.midi')
+require ('el.audio')
 require ('el.MidiPipe')
 )";
 
