@@ -2,9 +2,9 @@
 -- @script ampui
 -- @kind DSPUI amp
 
-local Widget        = require ('kv.Widget')
-local Slider        = require ('kv.Slider')
-local object        = require ('kv.object')
+local Widget        = require ('el.Widget')
+local Slider        = require ('el.Slider')
+local object        = require ('el.object')
 local script        = require ('el.script')
 
 local bgcolor       = 0xff545454

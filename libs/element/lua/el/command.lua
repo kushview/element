@@ -61,7 +61,7 @@ end
 -- Define standard commands as constants. 
 -- e.g. Commands::showAbout in C++ becomes command.SHOW_ABOUT
 for _,cmd in ipairs (CommandManager.standard()) do
-    local slug = require ('kv.slug')
+    local slug = require ('el.slug')
     local s = CommandManager.tostring (cmd)
     if string.len(s) > 0 and slug.valid(s) then
         local k = slug.tosnake (s)

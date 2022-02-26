@@ -1,5 +1,5 @@
 --- Define objects with attributes.
--- @module kv.object
+-- @module el.object
 -- @usage
 -- local Animal = object()
 local M = {}
@@ -206,7 +206,7 @@ end
 -- @param base
 -- @treturn table The new object type table
 -- @usage
--- local object = require ('kv.object')
+-- local object = require ('el.object')
 -- -- Verbose method
 -- local Animal = object.define()
 -- -- Calling the module

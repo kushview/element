@@ -5,9 +5,9 @@
 -- @license     GPL v3
 -- @author      Michael Fisher
 
-local bytes         = require ('kv.bytes')
+local bytes         = require ('el.bytes')
 local script        = require ('el.script')
-local MidiBuffer    = require ('kv.MidiBuffer')
+local MidiBuffer    = require ('el.MidiBuffer')
 
 local output        = MidiBuffer.new (128)
 local sysex         = bytes.new (4)

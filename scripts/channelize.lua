@@ -8,9 +8,9 @@
 -- @license     GPL v3
 -- @author      Michael Fisher
 
-local MidiBuffer    = require ('kv.MidiBuffer')
+local MidiBuffer    = require ('el.MidiBuffer')
 local script        = require ('el.script')
-local round         = require ('kv.round')
+local round         = require ('el.round')
 
 -- Buffer to render filtered output
 local output        = MidiBuffer.new()

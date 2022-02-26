@@ -1,6 +1,6 @@
 --- Slugs.
 -- Deal with keyword-like symbols and identifiers
--- @module kv.slug
+-- @module el.slug
 local M = {}
 
 --- Convert to camel case.

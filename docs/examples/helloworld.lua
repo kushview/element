@@ -1,13 +1,13 @@
 --- Show a custom widget in a window.
--- The return value is the displayed kv.DocumentWindow or nil
+-- The return value is the displayed el.DocumentWindow or nil
 -- @script helloworld
 -- @usage
 -- local win = script.exec ('helloworld')
 
-local object            = require ('kv.object')
-local DocumentWindow    = require ('kv.DocumentWindow')
-local TextButton        = require ('kv.TextButton')
-local Widget            = require ('kv.Widget')
+local object            = require ('el.object')
+local DocumentWindow    = require ('el.DocumentWindow')
+local TextButton        = require ('el.TextButton')
+local Widget            = require ('el.Widget')
 local new = object.new
 
 local colors = {

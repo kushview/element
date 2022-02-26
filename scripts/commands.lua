@@ -15,7 +15,7 @@
 -- ...
 
 local CMD   = require ('el.CommandManager')
-local slug  = require ('kv.slug')
+local slug  = require ('el.slug')
 local format = select (1, ...) or 'constants'
 
 if not slug.valid (format) then

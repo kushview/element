@@ -6,7 +6,7 @@
 -- @kind anonymous
 
 io      = require ('io')
-object  = require ('kv.object')
+object  = require ('el.object')
 command = require ('el.command')
 script  = require ('el.script')
 

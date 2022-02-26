@@ -2,9 +2,9 @@
 -- @script examples.sysexui
 -- @kind DSPUI examples.sysex
 
-local Widget        = require ('kv.Widget')
-local TextButton    = require ('kv.TextButton')
-local object        = require ('kv.object')
+local Widget        = require ('el.Widget')
+local TextButton    = require ('el.TextButton')
+local object        = require ('el.object')
 local new           = object.new
 local script        = require ('el.script')
 
