@@ -108,10 +108,6 @@ def configure (conf):
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
 
-    # Hidden Visibiility by default
-    for k in 'CFLAGS CXXFLAGS'.split():
-        conf.env.append_unique (k, ['-fvisibility=hidden'])
-
     print
     juce.display_header ("Element")
     conf.message ("Config", 'Debug' if conf.options.debug else 'Release')
@@ -218,12 +214,14 @@ def build_liblua (bld):
     luaEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         luaEnv.append_unique (k, [ '-fPIC' ])
-    lua = bld (
-        name     = 'LUA',
-        target   = 'lib/lua',
-        env      = luaEnv,
-        install_path = None,
-        features = 'cxx cxxstlib',
+    for k in 'CFLAGS CXXFLAGS'.split():
+        luaEnv.append_unique (k, [ '-fvisibility=default' ])
+    lua = bld.objects (
+        features        = 'cxx',
+        name            = 'LUA_objects',
+        target          = 'lib/lua',
+        env             = luaEnv,
+        install_path    = None,
         includes = [
             'libs/lua',
             'libs/lua/src'
@@ -266,18 +264,38 @@ def build_liblua (bld):
     lua.export_includes = lua.includes
     bld.add_group()
 
-    lua_kv = bld (
-        name     = 'LUA_KV',
+    lua_kv = bld.objects (
+        name     = 'LUA_KV_objects',
         target   = 'lib/lua-kv',
         env      = luaEnv,
         install_path = None,
-        features = 'cxx cxxstlib',
+        features = 'cxx',
         includes = common_includes() + [ 'libs/element/lua/el' ],
-        source = lua_kv_sources (bld),
-        use = [ 'LUA' ]
+        source = lua_kv_sources (bld)
     )
     lua_kv.export_includes = lua_kv.includes
     bld.add_group()
+
+    library = bld (
+        name            = 'ELEMENT',
+        target          = 'lib/element',
+        features        = 'cxx cxxshlib',
+        use             = [ 'LUA_objects' ],
+        vnum            = element.VERSION,
+        env             = bld.env.derive(),
+        install_path    = bld.env.LIBDIR,
+        includes        = [
+            'libs/lua',
+            'libs/lua/src',
+            'libs/element/include',
+            'libs/element/src'
+        ]
+    )
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        library.env.append_unique (k, [ '-fPIC' ])
+    for k in 'CFLAGS CXXFLAGS'.split():
+        library.env.append_unique (k, [ '-fvisibility=hidden' ])
+    library.export_includes = library.includes
 
 def add_scripts_to (bld, builddir, instdir, 
                     modsdir='Modules', 
@@ -388,19 +406,19 @@ def build_libjuce (bld):
         libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
     bld.add_group()
 
-def build_libelement (bld):
+def build_app_objects (bld):
     env = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
-        env.append_unique (k, [ '-fPIC' ])
+        env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
     
-    library = bld (
-        features    = 'cxx cxxstlib',
+    library = bld.objects (
+        features    = 'cxx',
         source      = element_sources (bld),
-        includes    = common_includes(),
-        target      = 'lib/element',
-        name        = 'ELEMENT',
+        includes    = common_includes() + [ 'libs/element/lua/el' ],
+        target      = 'lib/app-objects',
+        name        = 'APP_objects',
         env         = env,
-        use         = [ 'BOOST_SIGNALS', 'LUA', 'LUA_KV', 'DEPENDS' ],
+        use         = [ 'ELEMENT', 'BOOST_SIGNALS', 'DEPENDS' ],
         cxxflags    = [],
         linkflags   = [],
         defines     = [],
@@ -448,7 +466,7 @@ def build_app (bld):
         name        = 'ELEMENT_APP',
         env         = appEnv,
         defines     = [],
-        use         = [ 'LUA', 'ELEMENT', 'LIBJUCE' ],
+        use         = [ 'APP_objects', 'LUA_KV_objects', 'LIBJUCE', 'ELEMENT' ],
         linkflags   = []
     )
 
@@ -545,11 +563,12 @@ def build (bld):
     build_liblua (bld)
     install_lua_files (bld)
     build_libjuce (bld)
-    build_libelement (bld)
+    build_app_objects (bld)
     build_app (bld)
     # build_vst (bld)
     # build_vst3 (bld)
 
+    return
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:

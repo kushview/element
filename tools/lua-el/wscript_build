@@ -6,6 +6,6 @@ bld.program (
     name = 'lua-el',
     target = '../../bin/lua-el',
     includes = [ '.', ],
-    use = [ 'ELEMENT', 'LUA', 'READLINE', 'LIBJUCE' ],
+    use = [ 'APP_objects', 'LUA', 'READLINE', 'LIBJUCE' ],
     install_path = None
 )

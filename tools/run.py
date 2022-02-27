@@ -30,7 +30,7 @@ def main():
     opts = options()
     if opts.local_lua:
         set_local_lua_paths()
-
+    os.environ['LD_LIBRARY_PATH'] = 'build/lib'
     cmd = [element_binary()]
     call (cmd)
 

@@ -5,7 +5,7 @@ bld.program (
     source = bld.path.ant_glob ("juce/**/*.cpp"),
     includes = [ 'juce' ],
     target = '../bin/test_juce',
-    use = [ 'LUA', 'ELEMENT', 'LIBJUCE' ],
+    use = [ 'LUA', 'APP_objects', 'LIBJUCE' ],
     install_path = None
 )
 
@@ -14,6 +14,6 @@ bld.program (
              bld.path.ant_glob ("scripting/*.cpp"),
     includes = [ '.' ],
     target = '../bin/test_element',
-    use = [ 'ELEMENT', 'LUA', 'LIBJUCE', 'BOOST_TEST' ],
+    use = [ 'APP_objects', 'LUA', 'LIBJUCE', 'BOOST_TEST' ],
     install_path = None
 )
