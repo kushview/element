@@ -25,8 +25,10 @@
 #include "session/Session.h"
 #include "URIs.h"
 
-namespace Element {
+namespace element { class Context; }
 
+namespace Element {
+using Context = element::Context;
 class CommandManager;
 class DeviceManager;
 class ScriptingEngine;
@@ -54,6 +56,7 @@ public:
 
     const CommandLine cli;
 
+    Context& getContext();
     AudioEnginePtr getAudioEngine() const;
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();

@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <element/context.hpp>
+
 #include "ElementApp.h"
 #include "engine/InternalFormat.h"
 #include "scripting/ScriptingEngine.h"
@@ -59,9 +61,11 @@ public:
     ~Impl() {}
 
     Globals& owner;
+
     AudioEnginePtr engine;
     SessionPtr session;
 
+    std::unique_ptr<Context> context;
     std::unique_ptr<CommandManager> commands;
     std::unique_ptr<DeviceManager> devices;
     std::unique_ptr<MediaManager> media;
@@ -78,6 +82,7 @@ private:
 
     void init()
     {
+        context.reset (new Context());
         log.reset (new Log());
         plugins.reset (new PluginManager());
         devices.reset (new DeviceManager());
@@ -106,6 +111,7 @@ private:
         presets = nullptr;
         lua = nullptr;
         log = nullptr;
+        context = nullptr;
     }
 };
 
@@ -120,6 +126,12 @@ Globals::Globals (const String& _cli)
 Globals::~Globals()
 {
     impl->freeAll();
+}
+
+Context& Globals::getContext()
+{
+    jassert (impl && impl->context);
+    return *impl->context;
 }
 
 CommandManager& Globals::getCommandManager()

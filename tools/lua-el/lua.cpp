@@ -651,7 +651,7 @@ static int pmain (lua_State *L)
     return 1;
 }
 
-static void do_overrides (sol::state& L) {
+static void do_overrides (sol::state_view& L) {
     L["os"]["exit"] = sol::overload (
         [](int code) -> void {
             exit_code = code;
@@ -673,7 +673,7 @@ int main (int argc, char **argv)
     {
         juce::initialiseJuce_GUI();
         std::unique_ptr<Element::Globals> world (new Element::Globals ());
-        auto& L = world->getScriptingEngine().getState();
+        sol::state_view L (world->getScriptingEngine().getLuaState());
         L.script ("_G['script'] = require ('el.script')");
         do_overrides (L);
 

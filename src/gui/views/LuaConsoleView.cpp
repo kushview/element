@@ -35,8 +35,9 @@ LuaConsoleView::~LuaConsoleView()
 void LuaConsoleView::initializeView (AppController& app)
 {
     auto& se = app.getWorld().getScriptingEngine();
+    sol::state_view view (se.getLuaState());
     console.setEnvironment (
-        sol::environment (se.getState(), sol::create, se.getState().globals()));
+        sol::environment (view, sol::create, view.globals()));
 
     log = &app.getWorld().getLog();
     log->addListener (this);

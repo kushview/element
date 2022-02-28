@@ -17,6 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/context.hpp>
+#include <element/scripting.hpp>
+
 #include "sol/sol.hpp"
 #include "scripting/ScriptingEngine.h"
 #include "scripting/ScriptManager.h"
@@ -68,20 +71,25 @@ private:
 ScriptingEngine::ScriptingEngine()
 {
     impl.reset (new Impl (*this));
-    Lua::initializeState (lua);
 }
 
 ScriptingEngine::~ScriptingEngine()
 {
-    Lua::clearGlobals (lua);
-    lua.collect_garbage();
+    if (L != nullptr) {
+        sol::state_view view (L);
+        Lua::clearGlobals (view);
+        view.collect_garbage();
+        L = nullptr;
+    }
 }
 
 void ScriptingEngine::initialize (Globals& g)
 {
     world = &g;
-    Lua::setGlobals (lua, g);
-    lua.set_exception_handler (LuaHelpers::exceptionHandler);
+    L = g.getContext().scripting().root_state();
+    sol::state_view view (L);
+    Lua::initializeState (view, g);
+    view.set_exception_handler (LuaHelpers::exceptionHandler);
 }
 
 ScriptManager& ScriptingEngine::getScriptManager()

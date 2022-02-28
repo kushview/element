@@ -36,10 +36,8 @@ public:
     ScriptManager& getScriptManager();
 
     //==========================================================================
-    lua_State* getLuaState() const { return lua.lua_state(); }
-    sol::state& getState() { return lua; }
-    const sol::state& getState() const { return lua; }
-
+    lua_State* getLuaState() const { return L; }
+    
     //==========================================================================
     Result execute (const String& code);
 
@@ -48,7 +46,7 @@ private:
     class Impl;
     std::unique_ptr<Impl> impl;
     Globals* world = nullptr;
-    sol::state lua;
+    lua_State* L = nullptr;
     void initialize (Globals&);
 };
 

@@ -289,12 +289,26 @@ def build_liblua (bld):
             'libs/lua/src',
             'libs/element/include',
             'libs/element/src'
+        ],
+        source = [
+            'libs/element/src/bindings.cpp',
+            'libs/element/src/context.cpp',
+            'libs/element/src/module.cpp',
+            'libs/element/src/scripting.cpp',
+            'libs/element/src/strings.cpp'
         ]
     )
+
+    if bld.host_is_linux():
+        library.source.append ('libs/element/src/native_unix.cpp')
+    elif bld.host_is_windows():
+        library.source.append ('libs/element/src/dlfcn-win32.c')
+
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         library.env.append_unique (k, [ '-fPIC' ])
     for k in 'CFLAGS CXXFLAGS'.split():
         library.env.append_unique (k, [ '-fvisibility=hidden' ])
+    
     library.export_includes = library.includes
     bld.install_files (os.path.join (bld.env.PREFIX, 'include/element'),
         bld.path.ant_glob ('libs/element/include/element/**/*.*'),

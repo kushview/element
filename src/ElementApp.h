@@ -22,7 +22,7 @@
 #include "DataPath.h"
 #include "Signals.h"
 
-#include <element/element.h>
+#include <element/element.hpp>
 
 namespace kv {
 }
