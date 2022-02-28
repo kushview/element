@@ -1,6 +1,5 @@
 
 #include <algorithm>
-#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -10,6 +9,7 @@
 #include "element/context.hpp"
 #include "element/scripting.hpp"
 
+#include "filesystem.hpp"
 #include "module.hpp"
 #include <sol/sol.hpp>
 
