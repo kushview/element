@@ -22,6 +22,8 @@ def options():
     parser = OptionParser()
     parser.add_option ("--no-local-lua", action="store_false", dest="local_lua", default=True,
         help="Load system lua modules and scripts instead of in tree")
+    parser.add_option ("--wine", action="store_true", dest="wine", default=False,
+        help="Load system lua modules and scripts instead of in tree")
 
     (opts, args) = parser.parse_args()
     return opts
@@ -31,7 +33,12 @@ def main():
     if opts.local_lua:
         set_local_lua_paths()
     os.environ['LD_LIBRARY_PATH'] = 'build/lib'
-    cmd = [element_binary()]
+    cmd = []
+    if opts.wine:
+        cmd.append ('wine')
+        cmd.append ('build/bin/element')
+    else:
+        cmd.append (element_binary())
     call (cmd)
 
 if __name__ == '__main__':

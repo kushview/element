@@ -43,6 +43,47 @@ def configure (self):
 def host_path (self):
     return '%s' % self.env.DEPENDSDIR
 
+def copydlls (self):
+    import subprocess
+    import shutil
+    d = self.env.DEPENDSDIR
+    
+    # Compiled
+    for dll in [ 'build/lib/element-0.dll' ]: #, 'build/lib/element-juce-0.dll' ]:
+        path = dll
+        if os.path.exists (path):
+            print ("copy: %s" % path)
+            shutil.copy2 (path, 'build/bin')
+        else:
+            self.fatal ("could not copy DLL: %s" % dll)
+    
+    # 3rd party dll's
+    for dll in [ 'lib/serd-0.dll', 'lib/sord-0.dll', 'lib/sratom-0.dll', 
+                 'lib/lilv-0.dll', 'lib/suil-0.dll' ]:
+        path = os.path.join (d, dll)
+        if os.path.exists (path):
+            print ("copy: %s" % path)
+            shutil.copy2 (path, 'build/bin')
+        else:
+            self.fatal ("could not copy DLL: %s" % dll)
+    
+    # GCC dll's
+    for dll in [ 'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll' ]:
+        program = ''
+        for prog in self.env.CC:
+            if 'gcc' in prog:
+                program = prog
+                break
+        cmd = [ program, '-print-file-name=%s' % dll ]
+        path = subprocess.check_output(cmd)
+        path = path.strip()
+
+        if os.path.exists (path):
+            print ("copy: %s" % path)
+            shutil.copy2 (path, 'build/bin')
+        else:
+            self.fatal ("could not copy DLL: %s" % path)
+
 # TODO: figure out how to make this work with out-of-tree / absolute
 # resource paths:
 #

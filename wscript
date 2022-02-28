@@ -222,6 +222,7 @@ def build_liblua (bld):
         target          = 'lib/lua',
         env             = luaEnv,
         install_path    = None,
+        defines         = [],
         includes = [
             'libs/lua',
             'libs/lua/src'
@@ -262,6 +263,9 @@ def build_liblua (bld):
         '''.split()
     )
     lua.export_includes = lua.includes
+    if bld.host_is_windows():
+        lua.defines.append ('LUA_BUILD_AS_DLL=1')
+
     bld.add_group()
 
     lua_kv = bld.objects (
@@ -270,6 +274,7 @@ def build_liblua (bld):
         env      = luaEnv,
         install_path = None,
         features = 'cxx',
+        use      = [ 'DEPENDS' ],
         includes = common_includes() + [ 'libs/element/lua/el', 'libs/element/include' ],
         source = lua_kv_sources (bld)
     )
@@ -280,10 +285,11 @@ def build_liblua (bld):
         name            = 'ELEMENT',
         target          = 'lib/element',
         features        = 'cxx cxxshlib',
-        use             = [ 'LUA_objects' ],
+        use             = [ 'LUA_objects', 'DEPENDS' ],
         vnum            = element.VERSION,
         env             = bld.env.derive(),
         install_path    = bld.env.LIBDIR,
+        defines         = [],
         includes        = [
             'libs/lua',
             'libs/lua/src',
@@ -303,6 +309,7 @@ def build_liblua (bld):
         library.source.append ('libs/element/src/native_unix.cpp')
     elif bld.host_is_windows():
         library.source.append ('libs/element/src/dlfcn-win32.c')
+        library.defines.append ('EL_DLLEXPORT=1')
 
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         library.env.append_unique (k, [ '-fPIC' ])
@@ -314,6 +321,7 @@ def build_liblua (bld):
         bld.path.ant_glob ('libs/element/include/element/**/*.*'),
         relative_trick=True,
         cwd=bld.path.find_dir ('libs/element/include/element'))
+    bld.add_group()
 
 def add_scripts_to (bld, builddir, instdir, 
                     modsdir='Modules', 
@@ -422,6 +430,8 @@ def build_libjuce (bld):
     )
     if bld.host_is_linux():
         libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
+    if bld.host_is_windows():
+        libjuce.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
     bld.add_group()
 
 def build_app_objects (bld):
@@ -511,16 +521,11 @@ def build_app (bld):
         app.env.append_unique ('LINKFLAGS_STATIC_GCC', [ '-static-libgcc', '-static-libstdc++',
                                                          '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
                                                          '-Wl,--no-whole-archive' ])
-        app.use += [ 'STATIC_GCC' ]
+        # app.use += [ 'STATIC_GCC' ]
         app.install_path = bld.env.BINDIR
         if len(bld.env.DEPENDSDIR) > 0:
-            import shutil
-            def copydlls (bld):
-                d = bld.env.DEPENDSDIR
-                for dll in [ 'lib/serd-0.dll', 'lib/sord-0.dll', 'lib/sratom-0.dll', 
-                             'lib/lilv-0.dll', 'lib/suil-0.dll' ]:
-                    shutil.copy (os.path.join (d, dll), 'build/bin')
-            bld.add_post_fun (copydlls)
+            import depends    
+            bld.add_post_fun (depends.copydlls)
 
 def install_lua_files (bld):
     if not bld.host_is_linux() and not bld.host_is_mingw32():
