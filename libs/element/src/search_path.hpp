@@ -77,7 +77,7 @@ private:
                 std::filesystem::path path (dir);
                 if (std::filesystem::exists (path) && std::filesystem::is_directory (path)) {
                     for (auto const& entry : Iter (path)) {
-                        if (entry.is_directory() && match (entry))
+                        if (std::filesystem::is_directory (entry) && match (entry))
                             results.push_back (entry.path());
                     }
                 }

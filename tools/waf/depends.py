@@ -68,7 +68,8 @@ def copydlls (self):
             self.fatal ("could not copy DLL: %s" % dll)
     
     # GCC dll's
-    for dll in [ 'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll' ]:
+    dlls = [ 'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll' ]
+    for dll in dlls:
         program = ''
         for prog in self.env.CC:
             if 'gcc' in prog:

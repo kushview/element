@@ -41,7 +41,19 @@ def check_curl (self):
     self.define ('JUCE_USE_CURL', bool (self.env.HAVE_CURL))
 
 @conf
+def check_filesystem (self):
+    self.env.USE_LIBCXXFS = False
+    self.check (header_name='filesystem', uselib_store='FILESYSTEM', mandatory=False)
+    if self.env.HAVE_FILESYSTEM:
+        return
+
+    self.env.USE_LIBCXXFS = True
+    self.check (header_name='experimental/filesystem', uselib_store='FILESYSTEM', mandatory=True)
+    self.check (lib='c++fs' if self.host_is_mac() else 'stdc++fs', uselib_store='FILESYSTEM', mandatory=True)
+
+@conf
 def check_common (self):
+    self.check_filesystem()
     self.check_curl()
     self.check (header_name='stdbool.h', mandatory=True)
 

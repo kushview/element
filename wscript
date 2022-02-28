@@ -285,7 +285,7 @@ def build_liblua (bld):
         name            = 'ELEMENT',
         target          = 'lib/element',
         features        = 'cxx cxxshlib',
-        use             = [ 'LUA_objects', 'DEPENDS' ],
+        use             = [ 'LUA_objects', 'DEPENDS', 'FILESYSTEM' ],
         vnum            = element.VERSION,
         env             = bld.env.derive(),
         install_path    = bld.env.LIBDIR,
