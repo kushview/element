@@ -46,6 +46,7 @@ node_modules
 /tools/linuxdeploy.sh
 /data/Info.plist
 /dist/
+/stage/
 
 /*.lua
 
