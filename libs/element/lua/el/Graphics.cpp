@@ -1,5 +1,5 @@
 /// A drawing context.
-// @classmod kv.Graphics
+// @classmod el.Graphics
 // @pragma nostrip
 
 #include "lua-kv.hpp"
@@ -7,7 +7,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Graphics (lua_State* L) {
     sol::state_view lua (L);
 
@@ -32,7 +32,7 @@ int luaopen_el_Graphics (lua_State* L) {
         /// Draw some text.
         // @function Graphics:drawtext
         // @string text Text to draw
-        // @tparam kv.Rectangle r
+        // @tparam el.Rectangle r
 
         /// Draw some text.
         // @function Graphics:drawtext

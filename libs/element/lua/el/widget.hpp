@@ -1,5 +1,5 @@
 /// A GUI Widget.
-// @classmod kv.Widget
+// @classmod el.Widget
 // @pragma nostrip
 
 #pragma once
@@ -243,8 +243,8 @@ new_widgettype (lua_State* L, const char* name, Args&& ...args) {
     lua.script (R"(
         require ('kv.Bounds')
         require ('kv.Graphics')
-        require ('kv.Point')
-        require ('kv.Rectangle')
+        require ('el.Point')
+        require ('el.Rectangle')
     )");
 
     return T;

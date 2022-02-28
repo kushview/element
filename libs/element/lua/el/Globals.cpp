@@ -28,7 +28,7 @@ static int el_Globals_userdata (lua_State* L)
     return 1;
 }
 
-LUAMOD_API int luaopen_el_Globals (lua_State* L)
+EL_PLUGIN_EXPORT int luaopen_el_Globals (lua_State* L)
 {
     using Element::Globals;
     sol::state_view lua (L);

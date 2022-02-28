@@ -33,34 +33,9 @@ extern "C" {
  #pragma GCC error "Lua KV requires Lua v5.3.5 or higher"
 #endif
 
-#ifdef LKV_MODULE
-  #ifdef __cplusplus
-    #define LKV_EXTERN extern "C"
-  #else
-    #define LKV_EXTERN
-  #endif
-
-  #ifdef _WIN32
-    #define LKV_EXPORT LKV_EXTERN __declspec(dllexport)
-  #else
-    #define LKV_EXPORT LKV_EXTERN __attribute__((visibility("default")))
-  #endif
-#else
-  #define LKV_EXTERN
-  #define LKV_EXPORT LUAMOD_API
-#endif
-
 #ifndef LKV_FORCE_FLOAT32
  #define LKV_FORCE_FLOAT32                  0
 #endif
-
-#define LKV_MT_AUDIO_BUFFER_64              "el.AudioBuffer64"
-#define LKV_MT_AUDIO_BUFFER_32              "el.AudioBuffer32"
-#define LKV_MT_BYTE_ARRAY                   "el.ByteArray"
-#define LKV_MT_MIDI_MESSAGE                 "el.MidiMessage"
-#define LKV_MT_MIDI_BUFFER                  "el.MidiBuffer"
-#define LKV_MT_MIDI_PIPE                    "el.MidiPipe"
-#define LKV_MT_VECTOR                       "el.Vector"
 
 #if LKV_FORCE_FLOAT32
 typedef float                               kv_sample_t;

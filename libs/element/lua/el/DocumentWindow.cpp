@@ -1,7 +1,7 @@
 /// A Document Window.
-// A window with a title bar and optional buttons. Is a @{kv.Widget}
+// A window with a title bar and optional buttons. Is a @{el.Widget}
 // Backed by a JUCE DocumentWindow
-// @classmod kv.DocumentWindow
+// @classmod el.DocumentWindow
 // @pragma nostrip
 
 #include "object.hpp"
@@ -91,7 +91,7 @@ private:
 
 }}
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_DocumentWindow (lua_State* L) {
     using kv::lua::DocumentWindow;
 
@@ -112,12 +112,12 @@ int luaopen_el_DocumentWindow (lua_State* L) {
 
         /// Change the viewed content.
         // @function DocumentWindow:setcontent
-        // @tparam kv.Widget widget Content to set
+        // @tparam el.Widget widget Content to set
         "setcontent",      &DocumentWindow::setContent,
 
         /// Returns the viewed content widget.
         // @function DocumentWindow:content
-        // @treturn kv.Widget
+        // @treturn el.Widget
         "content",         &DocumentWindow::getContent,
         
         sol::base_classes, sol::bases<juce::DocumentWindow,

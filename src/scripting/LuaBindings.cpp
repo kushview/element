@@ -46,8 +46,6 @@ extern int luaopen_el_audio (lua_State* L);
 extern int luaopen_el_bytes (lua_State*);
 extern int luaopen_el_midi (lua_State*);
 extern int luaopen_el_round (lua_State*);
-}
-
 extern int luaopen_el_AudioBuffer32 (lua_State*);
 extern int luaopen_el_AudioBuffer64 (lua_State*);
 extern int luaopen_el_Bounds (lua_State*);
@@ -69,6 +67,7 @@ extern int luaopen_el_CommandManager (lua_State*);
 extern int luaopen_el_Globals (lua_State*);
 extern int luaopen_el_Node (lua_State*);
 extern int luaopen_el_Session (lua_State*);
+}
 
 using namespace sol;
 

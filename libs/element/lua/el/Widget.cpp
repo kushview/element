@@ -1,6 +1,6 @@
 /// A GUI Widget.
-// Is defined with @{kv.object} and can be inherrited. Backed by a JUCE Component.
-// @classmod kv.Widget
+// Is defined with @{el.object} and can be inherrited. Backed by a JUCE Component.
+// @classmod el.Widget
 // @pragma nostrip
 
 #include "object.hpp"
@@ -98,7 +98,7 @@ private:
 
 }}
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Widget (lua_State* L) {
     using kv::lua::Widget;
 
@@ -108,7 +108,7 @@ int luaopen_el_Widget (lua_State* L) {
         },
         /// Add a child widget.
         // @function Widget:add
-        // @tparam kv.Widget widget Widget to add
+        // @tparam el.Widget widget Widget to add
         // @int[opt] zorder Z-order
         // @within Methods
         "add", sol::overload (&Widget::add, &Widget::addWithZ),

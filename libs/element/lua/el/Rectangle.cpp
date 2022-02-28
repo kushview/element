@@ -1,6 +1,6 @@
 /// A rectangle.
 // The value type for this is a 32 bit float.
-// @classmod kv.Rectangle
+// @classmod el.Rectangle
 // @pragma nostrip
 
 #include "rectangle.hpp"
@@ -8,7 +8,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Rectangle (lua_State* L) {
     using R = Rectangle<float>;
 

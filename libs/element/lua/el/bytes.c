@@ -16,14 +16,15 @@ PERFORMANCE OF THIS SOFTWARE.
 
 /// Manage raw byte arrays.
 // @author Michael Fisher
-// @module kv.bytes
+// @module el.bytes
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <lauxlib.h>
 #include <lualib.h>
-#include "lua-kv.h"
+#include "element/element.h"
 #include "bytes.h"
 #include "packed.h"
 
@@ -59,7 +60,7 @@ void kv_bytes_set (kv_bytes_t* b, lua_Integer index, uint8_t value) {
 // @treturn kv.ByteArray The new byte array.
 static int f_new (lua_State* L) {
     kv_bytes_t* b = (kv_bytes_t*) lua_newuserdata (L, sizeof (kv_bytes_t));
-    luaL_setmetatable (L, LKV_MT_BYTE_ARRAY);
+    luaL_setmetatable (L, EL_MT_BYTE_ARRAY);
     size_t size = lua_isnumber (L, 1) ? (size_t) lua_tonumber (L, 1) : 0;
     kv_bytes_init (b, size);
     return 1;
@@ -174,9 +175,9 @@ static const luaL_Reg bytes_m[] = {
     { NULL, NULL }
 };
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_bytes (lua_State* L) {
-    if (luaL_newmetatable (L, LKV_MT_BYTE_ARRAY)) {
+    if (luaL_newmetatable (L, EL_MT_BYTE_ARRAY)) {
         lua_pushvalue (L, -1);               /* duplicate the metatable */
         lua_setfield (L, -2, "__index");     /* mt.__index = mt */
         luaL_setfuncs (L, bytes_m, 0);

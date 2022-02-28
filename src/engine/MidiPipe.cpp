@@ -238,6 +238,7 @@ static const luaL_Reg methods[] = {
     { nullptr, nullptr }
 };
 
+EL_PLUGIN_EXPORT
 int luaopen_el_MidiPipe (lua_State* L)
 {
     if (luaL_newmetatable (L, "el.MidiPipe"))

@@ -1,7 +1,7 @@
 /// Bounding box
 // The value type for this is a 32bit integer and Backed by a juce::Rectangle.
-// API is identical to @{kv.Rectangle}.
-// @classmod kv.Bounds
+// API is identical to @{el.Rectangle}.
+// @classmod el.Bounds
 // @pragma nostrip
 
 #include "rectangle.hpp"
@@ -9,7 +9,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Bounds (lua_State* L) {
     using B = Rectangle<int>;
     

@@ -1,14 +1,14 @@
 /// A MIDI buffer.
 // Designed for real time performance, therefore does virtually no type
 // checking in method calls.
-// @classmod kv.MidiBuffer
+// @classmod el.MidiBuffer
 // @pragma nostrip
 
 #include "lua-kv.hpp"
 #include "midi_buffer.hpp"
 #include "bytes.h"
 #include "packed.h"
-#define LKV_MT_MIDI_BUFFER_TYPE "kv.MidiBufferClass"
+#define EL_MT_MIDI_BUFFER_TYPE "kv.MidiBufferClass"
 
 using MidiBuffer    = juce::MidiBuffer;
 using Iterator      = juce::MidiBufferIterator;
@@ -300,21 +300,21 @@ static const luaL_Reg buffer_methods[] = {
 };
 
 //==============================================================================
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_MidiBuffer (lua_State* L) {
-    if (luaL_newmetatable (L, LKV_MT_MIDI_BUFFER)) {
+    if (luaL_newmetatable (L, EL_MT_MIDI_BUFFER)) {
         lua_pushvalue (L, -1);               /* duplicate the metatable */
         lua_setfield (L, -2, "__index");     /* mt.__index = mt */
         luaL_setfuncs (L, buffer_methods, 0);
         lua_pop (L, 1);
     }
 
-    if (luaL_newmetatable (L, LKV_MT_MIDI_BUFFER_TYPE)) {
+    if (luaL_newmetatable (L, EL_MT_MIDI_BUFFER_TYPE)) {
         lua_pop (L, 1);
     }
 
     lua_newtable (L);
-    luaL_setmetatable (L, LKV_MT_MIDI_BUFFER_TYPE);
+    luaL_setmetatable (L, EL_MT_MIDI_BUFFER_TYPE);
     lua_pushcfunction (L, midibuffer_new);
     lua_setfield (L, -2, "new");
     return 1;

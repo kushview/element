@@ -1,5 +1,5 @@
 /// A mouse event
-// @classmod kv.MouseEvent
+// @classmod el.MouseEvent
 // @pragma nostrip
 
 #include "lua-kv.hpp"
@@ -9,7 +9,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_MouseEvent (lua_State* L)
 {
     sol::state_view lua (L);
@@ -18,7 +18,7 @@ int luaopen_el_MouseEvent (lua_State* L)
         /// Attributes.
         // @section attributes
 
-        /// Position as @{kv.Point}.
+        /// Position as @{el.Point}.
         // @field MouseEvent.position
         "position", sol::readonly_property ([](MouseEvent& self) {
             return self.position.toFloat();

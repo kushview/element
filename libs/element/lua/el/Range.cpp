@@ -1,6 +1,6 @@
 
 /// A numeric value range.
-// @classmod kv.Range
+// @classmod el.Range
 // @pragma nostrip
 
 #include "lua-kv.hpp"
@@ -10,7 +10,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Range (lua_State* L)
 {
     sol::state_view lua (L);

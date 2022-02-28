@@ -1,5 +1,5 @@
 /// A file or directory on your system.
-// @classmod kv.File
+// @classmod el.File
 // @pragma nostrip
 
 #include "lua-kv.hpp"
@@ -8,7 +8,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_File (lua_State* L) {
     sol::state_view lua (L);
     auto t = lua.create_table();

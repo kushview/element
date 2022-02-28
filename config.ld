@@ -7,7 +7,12 @@ file = {
     'src/engine/MidiPipe.cpp',
     exclude = {
         'docs/examples',
-        'libs/element/lua/element.lua'
+        'libs/element/lua/element.lua',
+        'libs/element/lua/el/audio_buffer.hpp',
+        'libs/element/lua/el/midi_buffer.hpp',
+        'libs/element/lua/el/sol_helpers.hpp',
+        'libs/element/lua/el/lua-kv.hpp',
+        'libs/element/lua/el/lua-kv.h',
     },
 }
 examples = {
@@ -24,6 +29,7 @@ merge       = true
 all         = false
 
 add_language_extension ('.hpp', 'c')
+add_language_extension ('.ipp', 'c')
 
 ---[[
 custom_tags = {

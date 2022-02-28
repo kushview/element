@@ -11,14 +11,14 @@
 #endif
 
 #if LKV_AUDIO_BUFFER_32
- #define LKV_MT_AUDIO_BUFFER_TYPE   "el.AudioBuffer32Class"
- #define LKV_MT_AUDIO_BUFFER_IMPL   LKV_MT_AUDIO_BUFFER_32
+ #define EL_MT_AUDIO_BUFFER_TYPE   "el.AudioBuffer32Class"
+ #define EL_MT_AUDIO_BUFFER_IMPL   EL_MT_AUDIO_BUFFER_32
  #define LKV_AUDIO_BUFFER_OPEN      luaopen_el_AudioBuffer32
  using SampleType    = float;
 
 #else
- #define LKV_MT_AUDIO_BUFFER_TYPE   "el.AudioBuffer64Class"
- #define LKV_MT_AUDIO_BUFFER_IMPL   LKV_MT_AUDIO_BUFFER_64
+ #define EL_MT_AUDIO_BUFFER_TYPE   "el.AudioBuffer64Class"
+ #define EL_MT_AUDIO_BUFFER_IMPL   EL_MT_AUDIO_BUFFER_64
  #define LKV_AUDIO_BUFFER_OPEN      luaopen_el_AudioBuffer
  using SampleType    = lua_Number;
 #endif
@@ -304,7 +304,7 @@ static int audio_new (lua_State* L) {
     }
 
     *buf = new Buffer (nchans, nframes);
-    luaL_setmetatable (L, LKV_MT_AUDIO_BUFFER_IMPL);
+    luaL_setmetatable (L, EL_MT_AUDIO_BUFFER_IMPL);
     return 1;
 }
 
@@ -328,25 +328,25 @@ static const luaL_Reg buffer_methods[] = {
 
 //==============================================================================
 #if LKV_AUDIO_BUFFER_32
-LKV_EXPORT 
+EL_PLUGIN_EXPORT 
 int luaopen_el_AudioBuffer32 (lua_State* L) {
 #else
-LKV_EXPORT 
+EL_PLUGIN_EXPORT 
 int luaopen_el_AudioBuffer64 (lua_State* L) {
 #endif
-    if (luaL_newmetatable (L, LKV_MT_AUDIO_BUFFER_IMPL)) {
+    if (luaL_newmetatable (L, EL_MT_AUDIO_BUFFER_IMPL)) {
         lua_pushvalue (L, -1);               /* duplicate the metatable */
         lua_setfield (L, -2, "__index");     /* mt.__index = mt */
         luaL_setfuncs (L, buffer_methods, 0);
         lua_pop (L, 1);
     }
 
-    if (luaL_newmetatable (L, LKV_MT_AUDIO_BUFFER_TYPE)) {
+    if (luaL_newmetatable (L, EL_MT_AUDIO_BUFFER_TYPE)) {
         lua_pop (L, 1);
     }
 
     lua_newtable (L);
-    luaL_setmetatable (L, LKV_MT_AUDIO_BUFFER_TYPE);
+    luaL_setmetatable (L, EL_MT_AUDIO_BUFFER_TYPE);
     lua_pushcfunction (L, audio_new);
     lua_setfield (L, -2, "new");
     return 1;

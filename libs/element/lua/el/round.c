@@ -16,10 +16,10 @@ PERFORMANCE OF THIS SOFTWARE.
 
 /// MIDI utilities.
 // @author Michael Fisher
-// @module kv.round
+// @module el.round
 
-#include "lua-kv.h"
-#include <lualib.h>
+#include "element/element.h"
+#include <lauxlib.h>
 
 static int f_float (lua_State* L) {
     if (lua_gettop (L) <= 0) {
@@ -79,7 +79,7 @@ static const luaL_Reg round_f[] = {
     { NULL, NULL }
 };
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_round (lua_State* L) {
     luaL_newlib (L, round_f);
     return 1;

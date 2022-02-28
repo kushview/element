@@ -1,6 +1,6 @@
 /// A rectangle.
 // Easy to use Rectangle object backed by JUCE Rectangle.
-// @classmod kv.Rectangle
+// @classmod el.Rectangle
 
 #pragma once
 
@@ -23,7 +23,7 @@ new_rectangle (lua_State* L, const char* name, Args&& ...args) {
         "new", sol::factories (
             /// Create a new empty rectangle.
             // @function Rectangle.new
-            // @treturn kv.Rectangle
+            // @treturn el.Rectangle
             []() { return R(); },
 
             /// Create a new rectangle.
@@ -32,21 +32,21 @@ new_rectangle (lua_State* L, const char* name, Args&& ...args) {
             // @param y
             // @param width
             // @param height
-            // @treturn kv.Rectangle
+            // @treturn el.Rectangle
             [](T x, T y, T w, T h) { return R (x, y, w, h); },
 
             /// Create a new rectangle.
             // @function Rectangle.new
             // @param width
             // @param height
-            // @treturn kv.Rectangle
+            // @treturn el.Rectangle
             [](T w, T h) { return R (w, h); },
 
             /// Create a new rectangle from two points.
             // @function Rectangle.new
-            // @tparam kv.Point p1
-            // @tparam kv.Point p2
-            // @treturn kv.Rectangle
+            // @tparam el.Point p1
+            // @tparam el.Point p2
+            // @treturn el.Rectangle
             [](juce::Point<T> p1, juce::Point<T> p2) { return R (p1, p2); }
         ),
 
@@ -56,7 +56,7 @@ new_rectangle (lua_State* L, const char* name, Args&& ...args) {
         // @int y1 Top
         // @int x2 Right
         // @int y2 Bottom
-        // @treturn kv.Rectangle New rectangle
+        // @treturn el.Rectangle New rectangle
         "fromcoords",      R::leftTopRightBottom,
 
         /// Attributes.
@@ -91,7 +91,7 @@ new_rectangle (lua_State* L, const char* name, Args&& ...args) {
 
         /// Returns the center point of this rect. 
         // @function Rectangle:center
-        // @treturn kv.Point
+        // @treturn el.Point
         "center",           [](R& self) {
             juce::Point<lua_Number> pt ((lua_Number)self.getCentreX(), 
                                         (lua_Number)self.getCentreY());

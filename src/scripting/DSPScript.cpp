@@ -152,7 +152,7 @@ DSPScript::DSPScript (sol::table tbl)
     if (ok)
     {
         audio = kv::lua::new_userdata<AudioBuffer<float>> (
-            L, LKV_MT_AUDIO_BUFFER_32);
+            L, EL_MT_AUDIO_BUFFER_32);
         audioRef = luaL_ref (L, LUA_REGISTRYINDEX);
         ok = audioRef != LUA_REFNIL && audioRef != LUA_NOREF;
     }

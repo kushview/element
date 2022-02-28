@@ -1,6 +1,6 @@
 
 /// A pair of x,y coordinates.
-// @classmod kv.Point
+// @classmod el.Point
 // @pragma nostrip
 
 #include "lua-kv.hpp"
@@ -10,7 +10,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Point (lua_State* L)
 {
     sol::state_view lua (L);
@@ -20,14 +20,14 @@ int luaopen_el_Point (lua_State* L)
         "new", sol::factories (
             /// Create a new point with x and y = 0.
             // @function Point.new
-            // @treturn kv.Point
+            // @treturn el.Point
             []() { return PTF(); },
 
             /// Create a new point.
             // @function Point.new
             // @number x X coordinate
             // @number y Y coordinate
-            // @treturn kv.Point
+            // @treturn el.Point
             [](lua_Number x, lua_Number y) { return PTF (x, y); }
         ),
         sol::meta_method::to_string, [](PTF& self) {
@@ -62,13 +62,13 @@ int luaopen_el_Point (lua_State* L)
         /// Returns a point with the given x coordinate.
         // @param x New x coord
         // @function Point:withx
-        // @treturn kv.Point New point object
+        // @treturn el.Point New point object
         "withx",       &PTF::withX,
 
         /// Returns a point with the given y coordinate.
         // @param y New y coord
         // @function Point:withy
-        // @treturn kv.Point New point object
+        // @treturn el.Point New point object
         "withy",       &PTF::withY,
 
         /// Set x and y at the same time.

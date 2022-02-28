@@ -1,6 +1,6 @@
 /// Desktop controls.
 // Describes and controls aspects of the computer's desktop.
-// @classmod kv.Desktop
+// @classmod el.Desktop
 // @pragma nostrip
 
 #include "lua-kv.hpp"
@@ -10,7 +10,7 @@
 
 using namespace juce;
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Desktop (lua_State* L)
 {
     sol::state_view lua (L);

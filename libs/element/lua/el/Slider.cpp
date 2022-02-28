@@ -1,6 +1,6 @@
 /// Slider widget.
-// Is a @{kv.Widget}
-// @classmod kv.Slider
+// Is a @{el.Widget}
+// @classmod el.Slider
 // @pragma nostrip
 
 #include "object.hpp"
@@ -70,7 +70,7 @@ private:
 
 }}
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_Slider (lua_State* L) {
     using namespace juce;
     using kv::lua::Slider;

@@ -16,10 +16,10 @@
 
 /// MIDI utilities.
 // @author Michael Fisher
-// @module kv.midi
+// @module el.midi
 
-#include "lua-kv.h"
-#include <lualib.h>
+#include "element/element.h"
+#include <lauxlib.h>
 
 typedef union _PackedMessage {
     int64_t packed;
@@ -108,7 +108,7 @@ static const luaL_Reg midi_f[] = {
     { NULL, NULL }
 };
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_midi (lua_State* L) {
     luaL_newlib (L, midi_f);
     return 1;

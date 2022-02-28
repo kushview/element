@@ -1,6 +1,6 @@
 /// A Text Button.
-// Is a @{kv.Widget}.
-// @classmod kv.TextButton
+// Is a @{el.Widget}.
+// @classmod el.TextButton
 // @pragma nostrip
 
 #include "object.hpp"
@@ -52,7 +52,7 @@ private:
 
 }}
 
-LKV_EXPORT
+EL_PLUGIN_EXPORT
 int luaopen_el_TextButton (lua_State* L) {
     using kv::lua::TextButton;
 

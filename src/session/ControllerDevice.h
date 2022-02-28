@@ -26,8 +26,9 @@
     inline const var& get##a() const { return objectData.getProperty (b); }
 #define EL_OBJECT_SETTER(a, b) \
     inline void set##a (const var& value) { objectData.setProperty (b, value, nullptr); }
-#define EL_OBJECT_GETTER_AND_SETTER(a, b) EL_OBJECT_GETTER (a, b) \
-EL_OBJECT_SETTER (a, b)
+#define EL_OBJECT_GETTER_AND_SETTER(a, b) \
+    EL_OBJECT_GETTER (a, b)               \
+    EL_OBJECT_SETTER (a, b)
 
 namespace Element {
 

@@ -6,7 +6,7 @@
 #include "session/CommandManager.h"
 #include "Commands.h"
 
-LUAMOD_API int luaopen_el_CommandManager (lua_State* L)
+EL_PLUGIN_EXPORT int luaopen_el_CommandManager (lua_State* L)
 {
     using namespace Element;
     sol::state_view lua (L);

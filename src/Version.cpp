@@ -19,7 +19,7 @@
 #include "Version.h"
 
 #ifndef TEST_CURRENT_VERSION
- #define TEST_CURRENT_VERSION 0
+#define TEST_CURRENT_VERSION 0
 #endif
 
 namespace Element {

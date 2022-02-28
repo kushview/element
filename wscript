@@ -76,7 +76,7 @@ def configure (conf):
                      os.path.join (conf.env.PREFIX, 'bin'))
     set_install_dir (conf, 'LIBDIR', conf.options.libdir, 
                      os.path.join (conf.env.PREFIX, 'lib'))
-
+    conf.env.INCLUDEDIR = os.path.join (conf.env.PREFIX,  'include')
     conf.env.DATADIR    = os.path.join (conf.env.PREFIX,  'share/element')
     conf.env.DOCDIR     = os.path.join (conf.env.PREFIX,  'share/doc/element')
     conf.env.VSTDIR     = os.path.join (conf.env.LIBDIR,  'vst')
@@ -270,7 +270,7 @@ def build_liblua (bld):
         env      = luaEnv,
         install_path = None,
         features = 'cxx',
-        includes = common_includes() + [ 'libs/element/lua/el' ],
+        includes = common_includes() + [ 'libs/element/lua/el', 'libs/element/include' ],
         source = lua_kv_sources (bld)
     )
     lua_kv.export_includes = lua_kv.includes
@@ -296,6 +296,10 @@ def build_liblua (bld):
     for k in 'CFLAGS CXXFLAGS'.split():
         library.env.append_unique (k, [ '-fvisibility=hidden' ])
     library.export_includes = library.includes
+    bld.install_files (os.path.join (bld.env.PREFIX, 'include/element'),
+        bld.path.ant_glob ('libs/element/include/element/**/*.*'),
+        relative_trick=True,
+        cwd=bld.path.find_dir ('libs/element/include/element'))
 
 def add_scripts_to (bld, builddir, instdir, 
                     modsdir='Modules', 
@@ -520,11 +524,6 @@ def install_lua_files (bld):
                        cwd=path.find_dir ('build/doc/lua'))
 
     bld.install_files (bld.env.LUADIR,
-                       bld.path.ant_glob ("libs/lua-kv/src/**/*.lua"),
-                       relative_trick=True,
-                       cwd=path.find_dir ('libs/lua-kv/src'))
-
-    bld.install_files (bld.env.LUADIR,
                        path.ant_glob ("libs/element/lua/**/*.lua"),
                        relative_trick=True,
                        cwd=path.find_dir ('libs/element/lua'))
@@ -568,7 +567,6 @@ def build (bld):
     # build_vst (bld)
     # build_vst3 (bld)
 
-    return
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:
@@ -647,5 +645,6 @@ def format (ctx):
     from subprocess import call
     if not bool(ctx.env.CLANG_FORMAT_ALL) or not bool(ctx.env.CLANG_FORMAT):
         ctx.fatal("formatting requires clang-format + clang-format-all")
-    cmd = ctx.env.CLANG_FORMAT_ALL + './src'.split()
-    call (cmd)
+    dirs = [ './src', './libs/element/include', './libs/element/include' ]
+    for d in dirs:
+        call (ctx.env.CLANG_FORMAT_ALL + [d])
