@@ -310,6 +310,8 @@ def build_liblua (bld):
     elif bld.host_is_windows():
         library.source.append ('libs/element/src/dlfcn-win32.c')
         library.defines.append ('EL_DLLEXPORT=1')
+    elif bld.host_is_mac():
+        library.install_path = None
 
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         library.env.append_unique (k, [ '-fPIC' ])
