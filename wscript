@@ -210,12 +210,13 @@ def build_lua_docs (bld):
     if bool(bld.env.LDOC):
         call ([bld.env.LDOC[0], '-f', 'markdown', '.' ])
 
-def build_liblua (bld):
+def build_libelement (bld):
     luaEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         luaEnv.append_unique (k, [ '-fPIC' ])
     for k in 'CFLAGS CXXFLAGS'.split():
         luaEnv.append_unique (k, [ '-fvisibility=default' ])
+    
     lua = bld.objects (
         features        = 'cxx',
         name            = 'LUA_objects',
@@ -224,61 +225,47 @@ def build_liblua (bld):
         install_path    = None,
         defines         = [],
         includes = [
-            'libs/lua',
-            'libs/lua/src'
+            'libs/element/lua/src'
         ],
         source = '''
-            libs/lua/src/lauxlib.c
-            libs/lua/src/liolib.c
-            libs/lua/src/lopcodes.c
-            libs/lua/src/lstate.c
-            libs/lua/src/lobject.c
-            libs/lua/src/lmathlib.c
-            libs/lua/src/loadlib.c
-            libs/lua/src/lvm.c
-            libs/lua/src/lfunc.c
-            libs/lua/src/lstrlib.c
-            libs/lua/src/linit.c
-            libs/lua/src/lstring.c
-            libs/lua/src/lundump.c
-            libs/lua/src/lctype.c
-            libs/lua/src/ltable.c
-            libs/lua/src/ldump.c
-            libs/lua/src/loslib.c
-            libs/lua/src/lgc.c
-            libs/lua/src/lzio.c
-            libs/lua/src/ldblib.c
-            libs/lua/src/lutf8lib.c
-            libs/lua/src/lmem.c
-            libs/lua/src/lcorolib.c
-            libs/lua/src/lcode.c
-            libs/lua/src/ltablib.c
-            libs/lua/src/lapi.c
-            libs/lua/src/lbaselib.c
-            libs/lua/src/ldebug.c
-            libs/lua/src/lparser.c
-            libs/lua/src/llex.c
-            libs/lua/src/ltm.c
-            libs/lua/src/ldo.c
+            libs/element/lua/src/lauxlib.c
+            libs/element/lua/src/liolib.c
+            libs/element/lua/src/lopcodes.c
+            libs/element/lua/src/lstate.c
+            libs/element/lua/src/lobject.c
+            libs/element/lua/src/lmathlib.c
+            libs/element/lua/src/loadlib.c
+            libs/element/lua/src/lvm.c
+            libs/element/lua/src/lfunc.c
+            libs/element/lua/src/lstrlib.c
+            libs/element/lua/src/linit.c
+            libs/element/lua/src/lstring.c
+            libs/element/lua/src/lundump.c
+            libs/element/lua/src/lctype.c
+            libs/element/lua/src/ltable.c
+            libs/element/lua/src/ldump.c
+            libs/element/lua/src/loslib.c
+            libs/element/lua/src/lgc.c
+            libs/element/lua/src/lzio.c
+            libs/element/lua/src/ldblib.c
+            libs/element/lua/src/lutf8lib.c
+            libs/element/lua/src/lmem.c
+            libs/element/lua/src/lcorolib.c
+            libs/element/lua/src/lcode.c
+            libs/element/lua/src/ltablib.c
+            libs/element/lua/src/lapi.c
+            libs/element/lua/src/lbaselib.c
+            libs/element/lua/src/ldebug.c
+            libs/element/lua/src/lparser.c
+            libs/element/lua/src/llex.c
+            libs/element/lua/src/ltm.c
+            libs/element/lua/src/ldo.c
         '''.split()
     )
     lua.export_includes = lua.includes
     if bld.host_is_windows():
         lua.defines.append ('LUA_BUILD_AS_DLL=1')
 
-    bld.add_group()
-
-    lua_kv = bld.objects (
-        name     = 'LUA_KV_objects',
-        target   = 'lib/lua-kv',
-        env      = luaEnv,
-        install_path = None,
-        features = 'cxx',
-        use      = [ 'DEPENDS' ],
-        includes = common_includes() + [ 'libs/element/lua/el', 'libs/element/include' ],
-        source = lua_kv_sources (bld)
-    )
-    lua_kv.export_includes = lua_kv.includes
     bld.add_group()
 
     library = bld (
@@ -291,9 +278,8 @@ def build_liblua (bld):
         install_path    = bld.env.LIBDIR,
         defines         = [],
         includes        = [
-            'libs/lua',
-            'libs/lua/src',
             'libs/element/include',
+            'libs/element/lua',
             'libs/element/src'
         ],
         source = [
@@ -419,7 +405,7 @@ def build_libjuce (bld):
         libEnv.append_unique (k, [ '-fPIC' ])
 
     libjuce = bld (
-        features    = 'cxx cxxstlib',
+        features    = 'cxx cxxshlib',
         source      = juce_sources (bld),
         includes    = common_includes(),
         target      = 'lib/juce',
@@ -434,6 +420,29 @@ def build_libjuce (bld):
         libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
     if bld.host_is_windows():
         libjuce.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
+    bld.add_group()
+
+def build_el_module (bld):
+    env = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
+
+    el = bld.objects (
+        name     = 'LUA_KV_objects',
+        target   = 'lib/lua-kv',
+        env      = env,
+        install_path = None,
+        features = 'cxx',
+        use      = [ 'DEPENDS' ],
+        includes = common_includes() + [
+            'libs/element/lua/src',
+            'libs/element/lua/el', 
+            'libs/element/include'
+        ],
+        source = lua_kv_sources (bld)
+    )
+
+    el.export_includes = el.includes
     bld.add_group()
 
 def build_app_objects (bld):
@@ -562,8 +571,8 @@ def build (bld):
         source = bld.path.ant_glob ('src/**/*.h.in') \
                + bld.path.ant_glob ('data/**/*.in') \
                + bld.path.ant_glob ("tools/**/*.in"),
-        install_path = None,
-        PACKAGE_VERSION     = VERSION,
+        install_path            = None,
+        PACKAGE_VERSION         = VERSION,
         MAC_BUNDLE_NAME         = 'Element',
         MAC_BUNDLE_DISPLAY_NAME = 'Element',
         MAC_BUNDLE_IDENTIFIER   = 'net.kushview.Element',
@@ -580,9 +589,9 @@ def build (bld):
     if bld.options.minimal:
         return
 
-    build_liblua (bld)
-    install_lua_files (bld)
+    build_libelement (bld)
     build_libjuce (bld)
+    build_el_module (bld)
     build_app_objects (bld)
     build_app (bld)
     # build_vst (bld)
@@ -592,6 +601,8 @@ def build (bld):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:
         bld.recurse ('test')
+
+    install_lua_files (bld)
 
 def check (ctx):
     if not os.path.exists('build/bin/test_juce'):
@@ -666,6 +677,6 @@ def format (ctx):
     from subprocess import call
     if not bool(ctx.env.CLANG_FORMAT_ALL) or not bool(ctx.env.CLANG_FORMAT):
         ctx.fatal("formatting requires clang-format + clang-format-all")
-    dirs = [ './src', './libs/element/include', './libs/element/include' ]
+    dirs = [ './src', './libs/element/include', './libs/element/src' ]
     for d in dirs:
         call (ctx.env.CLANG_FORMAT_ALL + [d])

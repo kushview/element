@@ -61,8 +61,8 @@ def configure (self):
         self.check_cxx (
             msg = "Checking for Lua",
             includes = [
-                self.path.find_node ('libs/lua').abspath(),
-                self.path.find_node ('libs/lua/src').abspath(),
+                self.path.find_node ('libs/element/lua').abspath(),
+                self.path.find_node ('libs/element/lua/src').abspath(),
             ],
             fragment = '''
                 #include <sol/forward.hpp>
