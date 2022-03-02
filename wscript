@@ -541,14 +541,7 @@ def build_app (bld):
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     elif bld.host_is_mingw32():
-        app.env.append_unique ('LINKFLAGS_STATIC_GCC', [ '-static-libgcc', '-static-libstdc++',
-                                                         '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
-                                                         '-Wl,--no-whole-archive' ])
-        # app.use += [ 'STATIC_GCC' ]
-        app.install_path = bld.env.BINDIR
-        if len(bld.env.DEPENDSDIR) > 0:
-            import depends    
-            bld.add_post_fun (depends.copydlls)
+        pass
 
 def install_lua_files (bld):
     if not bld.host_is_linux() and not bld.host_is_mingw32():
@@ -652,39 +645,43 @@ def dist (ctx):
     ctx.excl += ' **/.DS_Store **/.vscode **/.travis.yml *.bz2 *.zip *.gz'
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
 
-def docs (ctx):
-    ctx.add_pre_fun (build_lua_docs)
-
 def version (ctx):
     print (element.VERSION)
     exit(0)
-
-def versionbump (ctx):
-    import projects
-    ctx.add_pre_fun (projects.update_version)
-
-def resave (ctx):
-    import projects
-    ctx.add_pre_fun (projects.resave)
 
 from waflib.Build import BuildContext
 
 class ResaveBuildContext (BuildContext):
     cmd  = 'resave'
     fun  = 'resave'
+def resave (ctx):
+    import projects
+    ctx.add_pre_fun (projects.resave)
+
+class CopyDLLsContext (BuildContext):
+    cmd = 'copydlls'
+    fun = 'copydlls'
+def copydlls (ctx):
+    import depends
+    if ctx.host_is_windows():
+        depends.copydlls (ctx)
 
 class DocsBuildContext (BuildContext):
     cmd = 'docs'
     fun = 'docs'
+def docs (ctx):
+    ctx.add_pre_fun (build_lua_docs)
 
 class VersionBumpContext (BuildContext):
     cmd = 'versionbump'
     fun = 'versionbump'
+def versionbump (ctx):
+    import projects
+    ctx.add_pre_fun (projects.update_version)
 
 class FormatContext (BuildContext):
     cmd = 'format'
     fun = 'format'
-
 def format (ctx):
     from subprocess import call
     if not bool(ctx.env.CLANG_FORMAT_ALL) or not bool(ctx.env.CLANG_FORMAT):

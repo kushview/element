@@ -12,15 +12,17 @@ def options (self):
 
 def configure (self):
     d = self.env.DEPENDSDIR = '%s'.strip() % self.options.depends
+    self.env.HAVE_DEPENDS = False
     allow_system = self.env.DEPENDS_ALLOW_SYSTEM = self.options.depends_allow_system
     if not os.path.exists (d):
-        return
+        self.fatal ("depends directory does not exist\n  - %s" % d)
     try:
         configfile = open (os.path.join (d, 'share', 'config.json'))
     except:
         self.fatal ("depends.py: could not read config.json")
+
     config = json.load (configfile)
-    
+    self.env.HAVE_DEPENDS = True
     self.env.HOST = os.path.basename (d)
 
     os.environ['PKG_CONFIG_PATH'] = '%s/lib/pkgconfig' % d
@@ -47,7 +49,9 @@ def copydlls (self):
     import subprocess
     import shutil
     d = self.env.DEPENDSDIR
-    
+    targetdir = 'build/lib'
+    if not os.path.exists (targetdir):
+        os.mkdir (targetdir)
     # # Compiled
     # for dll in [ 'build/lib/element-0.dll' ]: #, 'build/lib/element-juce-0.dll' ]:
     #     path = dll
@@ -62,8 +66,8 @@ def copydlls (self):
                  'lib/lilv-0.dll', 'lib/suil-0.dll' ]:
         path = os.path.join (d, dll)
         if os.path.exists (path):
-            print ("copy: %s" % path)
-            shutil.copy2 (path, 'build/lib')
+            print ("copy: %s" % os.path.basename (path))
+            shutil.copy2 (path, targetdir)
         else:
             self.fatal ("could not copy DLL: %s" % dll)
     
@@ -80,8 +84,8 @@ def copydlls (self):
         path = path.strip()
 
         if os.path.exists (path):
-            print ("copy: %s" % path)
-            shutil.copy2 (path, 'build/lib')
+            print ("copy: %s" % os.path.basename (path))
+            shutil.copy2 (path, targetdir)
         else:
             self.fatal ("could not copy DLL: %s" % path)
 
