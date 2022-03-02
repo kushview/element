@@ -9,8 +9,6 @@ here=`pwd`
     --with-vst3sdk="/SDKs/vst3sdk" \
     --with-asiosdk="/SDKs/asiosdk" \
     --prefix="/" \
-    --bindir="/" \
-    --libdir="/" \
     --scriptsdir="/scripts" \
     --luadir="/lua"
 ./waf build ${WAF_BUILD_OPTIONS}
@@ -18,7 +16,8 @@ here=`pwd`
 pkgname="element-win64-`./waf version`_`date +%Y%m%d`"
 win64dir="/dist/${pkgname}"
 ./waf install --destdir="$win64dir"
-cp build/bin/*.dll "$win64dir"
+cp -f build/lib/*.dll "$win64dir/lib"
+cp -f tools/element.bat "$win64dir"
 
 find "$win64dir" -name \*.exe -exec x86_64-w64-mingw32-strip {} \;
 find "$win64dir" -name \*.dll -exec x86_64-w64-mingw32-strip {} \;

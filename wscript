@@ -405,10 +405,10 @@ def build_libjuce (bld):
         libEnv.append_unique (k, [ '-fPIC' ])
 
     libjuce = bld (
-        features    = 'cxx cxxshlib',
+        features    = 'cxx cxxstlib',
         source      = juce_sources (bld),
         includes    = common_includes(),
-        target      = 'lib/juce',
+        target      = 'lib/element_juce',
         name        = 'LIBJUCE',
         env         = libEnv,
         use         = [ 'DEPENDS', 'LILV', 'SUIL', 'ASIO', 'VST3' ],

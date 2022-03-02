@@ -48,14 +48,14 @@ def copydlls (self):
     import shutil
     d = self.env.DEPENDSDIR
     
-    # Compiled
-    for dll in [ 'build/lib/element-0.dll' ]: #, 'build/lib/element-juce-0.dll' ]:
-        path = dll
-        if os.path.exists (path):
-            print ("copy: %s" % path)
-            shutil.copy2 (path, 'build/bin')
-        else:
-            self.fatal ("could not copy DLL: %s" % dll)
+    # # Compiled
+    # for dll in [ 'build/lib/element-0.dll' ]: #, 'build/lib/element-juce-0.dll' ]:
+    #     path = dll
+    #     if os.path.exists (path):
+    #         print ("copy: %s" % path)
+    #         shutil.copy2 (path, 'build/bin')
+    #     else:
+    #         self.fatal ("could not copy DLL: %s" % dll)
     
     # 3rd party dll's
     for dll in [ 'lib/serd-0.dll', 'lib/sord-0.dll', 'lib/sratom-0.dll', 
@@ -63,7 +63,7 @@ def copydlls (self):
         path = os.path.join (d, dll)
         if os.path.exists (path):
             print ("copy: %s" % path)
-            shutil.copy2 (path, 'build/bin')
+            shutil.copy2 (path, 'build/lib')
         else:
             self.fatal ("could not copy DLL: %s" % dll)
     
@@ -81,7 +81,7 @@ def copydlls (self):
 
         if os.path.exists (path):
             print ("copy: %s" % path)
-            shutil.copy2 (path, 'build/bin')
+            shutil.copy2 (path, 'build/lib')
         else:
             self.fatal ("could not copy DLL: %s" % path)
 
