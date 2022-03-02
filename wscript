@@ -211,17 +211,17 @@ def build_lua_docs (bld):
         call ([bld.env.LDOC[0], '-f', 'markdown', '.' ])
 
 def build_libelement (bld):
-    luaEnv = bld.env.derive()
+    env = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
-        luaEnv.append_unique (k, [ '-fPIC' ])
+        env.append_unique (k, [ '-fPIC' ])
     for k in 'CFLAGS CXXFLAGS'.split():
-        luaEnv.append_unique (k, [ '-fvisibility=default' ])
+        env.append_unique (k, [ '-fvisibility=default' ])
     
     lua = bld.objects (
         features        = 'cxx',
         name            = 'LUA_objects',
         target          = 'lib/lua',
-        env             = luaEnv,
+        env             = env,
         install_path    = None,
         defines         = [],
         includes = [
@@ -265,6 +265,14 @@ def build_libelement (bld):
     lua.export_includes = lua.includes
     if bld.host_is_windows():
         lua.defines.append ('LUA_BUILD_AS_DLL=1')
+    
+    for lh in 'lua.h lauxlib.h lualib.h luaconf.h'.split():
+        bld (
+            features        = 'subst',
+            source          = 'libs/element/lua/src/%s' % lh,
+            target          = 'include/element/detail/%s' % lh,
+            install_path    = None
+        )
 
     bld.add_group()
 
@@ -278,6 +286,7 @@ def build_libelement (bld):
         install_path    = bld.env.LIBDIR,
         defines         = [],
         includes        = [
+            'build/include',
             'libs/element/include',
             'libs/element/lua',
             'libs/element/src'
@@ -300,11 +309,14 @@ def build_libelement (bld):
         library.install_path = None
 
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
-        library.env.append_unique (k, [ '-fPIC' ])
-    for k in 'CFLAGS CXXFLAGS'.split():
-        library.env.append_unique (k, [ '-fvisibility=hidden' ])
+        library.env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
     
     library.export_includes = library.includes
+    
+    bld.install_files (os.path.join (bld.env.PREFIX, 'include/element'),
+        bld.path.ant_glob ('build/include/element/**/*.*'),
+        relative_trick=True,
+        cwd=bld.path.find_dir ('build/include/element'))
     bld.install_files (os.path.join (bld.env.PREFIX, 'include/element'),
         bld.path.ant_glob ('libs/element/include/element/**/*.*'),
         relative_trick=True,

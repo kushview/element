@@ -1,9 +1,9 @@
 #pragma once
 
 extern "C" {
-#include "lauxlib.h"
-#include "lua.h"
-#include "lualib.h"
+#include "element/detail/lauxlib.h"
+#include "element/detail/lua.h"
+#include "element/detail/lualib.h"
 }
 
 #include <map>
