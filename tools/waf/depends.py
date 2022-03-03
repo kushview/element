@@ -13,6 +13,8 @@ def options (self):
 def configure (self):
     d = self.env.DEPENDSDIR = '%s'.strip() % self.options.depends
     self.env.HAVE_DEPENDS = False
+    if (len(d) <= 0): return
+
     allow_system = self.env.DEPENDS_ALLOW_SYSTEM = self.options.depends_allow_system
     if not os.path.exists (d):
         self.fatal ("depends directory does not exist\n  - %s" % d)
