@@ -448,8 +448,17 @@ def build_libjuce (bld):
         linkflags       = [],
         install_path    = bld.env.LIBDIR
     )
+
     if bld.host_is_linux():
-        libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
+        libjuce.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+
+    elif bld.host_is_mac():    
+        libjuce.use += [
+            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
+            'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
+            'TEMPLATES'
+        ]
+
     elif bld.host_is_windows():
         libjuce.defines.append ('JUCE_DLL_BUILD=1')
         for l in element.mingw_libs.split():
@@ -522,11 +531,7 @@ def build_app_objects (bld):
         ]
 
     elif bld.host_is_mac():
-        library.use += [
-            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
-            'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
-            'TEMPLATES'
-        ]
+        pass
 
     elif bld.host_is_mingw32():
         library.defines.append ('JUCE_DLL_BUILD=1')
