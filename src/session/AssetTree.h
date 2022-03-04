@@ -16,8 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef ELEMENT_ASSET_TREE_H
-#define ELEMENT_ASSET_TREE_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -210,5 +209,3 @@ typedef AssetTree::Item AssetItem;
 typedef OwnedArray<AssetItem> AssetArray;
 
 } // namespace Element
-
-#endif // ELEMENT_ASSET_TREE_H

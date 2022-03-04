@@ -108,6 +108,16 @@ def configure (conf):
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
 
+    conf.define ('JUCE_DLL', True)
+    conf.define ('JUCE_STANDALONE_APPLICATION', True)
+    conf.define ('JUCE_DISPLAY_SPLASH_SCREEN', False)
+    conf.define ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', True)
+    for m in element.juce_modules.split():
+        conf.define ('JUCE_MODULE_AVAILABLE_%s' % m, True)
+    
+    conf.write_config_header (configfile='include/element/config.h',
+                              guard='EL_CONFIG_H')
+    
     print
     juce.display_header ("Element")
     conf.message ("Config", 'Debug' if conf.options.debug else 'Release')
@@ -164,11 +174,14 @@ def lua_kv_sources (ctx):
            ctx.path.ant_glob ('libs/element/lua/el/**/*.cpp')
 
 def juce_sources (ctx):
-    return element.get_juce_library_code ("libs/compat") + \
-           ctx.path.ant_glob ('libs/compat/BinaryData*.cpp')
+    return element.get_juce_library_code ("libs/compat")
+
+def juce_extra_sources (ctx):
+    return element.get_juce_extra_code ('libs/compat')
 
 def element_sources (ctx):
-    return ctx.path.ant_glob ('src/**/*.cpp')
+    return ctx.path.ant_glob ('src/**/*.cpp') + \
+           ctx.path.ant_glob ('libs/compat/BinaryData*.cpp')
 
 def build_desktop (bld, slug='element'):
     if not juce.is_linux():
@@ -412,26 +425,42 @@ def build_vst3 (bld):
             build_vst3_linux (bld, plugin)
 
 def build_libjuce (bld):
-    libEnv = bld.env.derive()
+    env = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
-        libEnv.append_unique (k, [ '-fPIC' ])
+        env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
 
     libjuce = bld (
-        features    = 'cxx cxxstlib',
-        source      = juce_sources (bld),
-        includes    = common_includes(),
-        target      = 'lib/element_juce',
-        name        = 'LIBJUCE',
-        env         = libEnv,
-        use         = [ 'DEPENDS', 'LILV', 'SUIL', 'ASIO', 'VST3' ],
-        cxxflags    = [],
-        linkflags   = [],
-        install_path = None
+        features        = 'cxx cxxshlib',
+        source          = juce_sources (bld),
+        includes        = [
+            'build/include',
+            'libs/JUCE/modules',
+            'libs/kv/modules',
+            'libs/jlv2/modules',
+            'libs/compat'
+        ],
+        target          = 'lib/element_juce',
+        name            = 'LIBJUCE',
+        env             = env,
+        use             = [ 'DEPENDS', 'LILV', 'SUIL', 'ASIO', 'VST3' ],
+        defines         = [],
+        cxxflags        = [],
+        linkflags       = [],
+        install_path    = bld.env.LIBDIR
     )
     if bld.host_is_linux():
         libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
-    if bld.host_is_windows():
+    elif bld.host_is_windows():
+        libjuce.defines.append ('JUCE_DLL_BUILD=1')
+        for l in element.mingw_libs.split():
+            libjuce.use.append (l.upper())
         libjuce.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
+    libjuce.export_includes = libjuce.includes
+
+    bld.install_files (os.path.join (bld.env.PREFIX, 'include/element/juce/modules'), \
+        bld.path.ant_glob ("libs/JUCE/modules/**/*.h"), \
+        relative_trick=True, cwd=bld.path.find_dir ('libs/JUCE/modules'))
+    
     bld.add_group()
 
 def build_el_module (bld):
@@ -464,7 +493,7 @@ def build_app_objects (bld):
     
     library = bld.objects (
         features    = 'cxx',
-        source      = element_sources (bld),
+        source      = element_sources (bld) + juce_extra_sources (bld),
         includes    = common_includes() + [ 'libs/element/lua/el' ],
         target      = 'lib/app-objects',
         name        = 'APP_objects',
@@ -500,8 +529,7 @@ def build_app_objects (bld):
         ]
 
     elif bld.host_is_mingw32():
-        for l in element.mingw_libs.split():
-            library.use.append (l.upper())
+        library.defines.append ('JUCE_DLL_BUILD=1')
         if bld.env.DEBUG:
             library.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
 
@@ -541,7 +569,9 @@ def build_app (bld):
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     elif bld.host_is_mingw32():
-        pass
+        app.defines.append ('JUCE_DLL_BUILD=1')
+        bld (features='subst', source='tools/element.bat',
+             target='element.bat', install_path=None)
 
 def install_lua_files (bld):
     if not bld.host_is_linux() and not bld.host_is_mingw32():

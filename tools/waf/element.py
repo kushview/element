@@ -15,10 +15,14 @@ PLUGIN_VERSION="1.47.0"
 JUCE_VST3SDK_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 juce_modules = '''
-    jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
+    juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
     juce_data_structures juce_dsp juce_events juce_graphics juce_gui_basics
-    juce_gui_extra juce_osc kv_core kv_engines kv_gui kv_models
+    juce_gui_extra juce_osc
+'''
+
+extra_juce_modules = '''
+    jlv2_host kv_core kv_engines kv_gui kv_models
 '''
 
 mingw_libs = '''
@@ -237,7 +241,7 @@ def check_linux (self):
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]
 
-def get_juce_library_code (prefix, ext=''):
+def get_juce_module_code (prefix, modules, ext=''):
     extension = ext
     if len(ext) <= 0:
         if juce.is_mac():
@@ -247,7 +251,13 @@ def get_juce_library_code (prefix, ext=''):
 
     cpp_only = [ 'juce_analytics', 'juce_osc', 'jlv2_host' ]
     code = []
-    for f in juce_modules.split():
+    for f in modules:
         e = '.cpp' if f in cpp_only else extension
         code.append (prefix + '/include_' + f + e)
     return code
+
+def get_juce_library_code (prefix, ext=''):
+    return get_juce_module_code (prefix, juce_modules.split(), ext)
+
+def get_juce_extra_code (prefix, ext=''):
+    return get_juce_module_code (prefix, extra_juce_modules.split(), ext)

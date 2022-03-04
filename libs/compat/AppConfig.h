@@ -16,6 +16,7 @@
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
 
+#include "element/config.h"
 #include "CommonConfig.h"
 
 // [END_USER_CODE_SECTION]
