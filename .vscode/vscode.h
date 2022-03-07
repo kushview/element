@@ -4,8 +4,8 @@
 #include "JuceHeader.h"
 #include "ElementApp.h"
 #include "Globals.h"
-#include "lua.hpp"
-#include "sol/sol.hpp"
+#include "element/lua.hpp"
+#include "sol/forward.hpp"
 
 using namespace juce;
 using namespace Element;
