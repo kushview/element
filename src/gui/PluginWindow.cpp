@@ -258,7 +258,11 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     bool windowResize = false;
     bool useResizeHandle = false;
     
-	if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
+    if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
+	{
+		setResizable (false, false);
+	}
+	else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
         windowResize = false;
         useResizeHandle = ed->isResizable() && ed->resizableCorner == nullptr;
