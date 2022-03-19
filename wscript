@@ -367,11 +367,11 @@ def build_vst_linux (bld, plugin):
             'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
             'libs/compat/include_juce_audio_plugin_client_VST2.cpp'
         ],
-        includes        = common_includes(),
+        includes        = [ 'src' ],
         target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
-        use             = [ 'ELEMENT', 'LUA', 'LIBJUCE' ],
+        use             = [ 'ELEMENT', 'LIBJUCE' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
 
@@ -634,7 +634,7 @@ def build (bld):
     build_el_module (bld)
     build_app_objects (bld)
     build_app (bld)
-    # build_vst (bld)
+    build_vst (bld)
     # build_vst3 (bld)
 
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
@@ -724,3 +724,24 @@ def format (ctx):
     dirs = [ './src', './libs/element/include', './libs/element/src' ]
     for d in dirs:
         call (ctx.env.CLANG_FORMAT_ALL + [d])
+
+def clean_artifacts (ctx):
+    from subprocess import call
+    root = os.path.abspath (os.path.join (os.getcwd(), 'build'))
+    if os.path.exists (root):
+        call ('bash tools/clean_artifacts.sh'.split())
+
+def deepclean (ctx):
+    from waflib import Options
+    lst = ['clean_artifacts', 'distclean']
+    Options.commands = lst + Options.commands
+
+def cleanbuild (ctx):
+    from waflib import Options
+    lst = [ 'clean', 'build' ]
+    Options.commands = lst + Options.commands
+
+def relink (ctx):
+    from waflib import Options
+    lst = [ 'clean_artifacts', 'build', 'copydlls' ]
+    Options.commands = lst + Options.commands
