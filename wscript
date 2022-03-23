@@ -371,7 +371,7 @@ def build_vst_linux (bld, plugin):
         target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
-        use             = [ 'ELEMENT', 'LIBJUCE' ],
+        use             = [ 'APP_objects', 'ELEMENT', 'LIBJUCE' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
 
