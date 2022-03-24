@@ -19,6 +19,10 @@
 #include "Utils.h"
 #include "engine/nodes/BaseProcessor.h"
 
+#if JUCE_WINDOWS
+ #include <windows.h>
+#endif
+
 namespace Element {
 namespace Util {
 
@@ -44,6 +48,16 @@ namespace Util {
 
         return fmts;
     }
+
+bool isRunningInWine()
+{
+   #if JUCE_WINDOWS
+    HMODULE ntdll = GetModuleHandleA ("ntdll");
+    return ntdll != nullptr && GetProcAddress (ntdll, "wine_get_version") != nullptr;
+   #else
+    return false;
+   #endif
+}
 
 } // namespace Util
 } // namespace Element

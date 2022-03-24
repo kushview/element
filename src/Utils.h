@@ -462,6 +462,7 @@ namespace Util {
     }
 
     StringArray getSupportedAudioPluginFormats();
+    bool isRunningInWine();
 
 } // namespace Util
 
