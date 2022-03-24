@@ -365,18 +365,20 @@ def build_vst_linux (bld, plugin):
         features        = 'cxx cxxshlib',
         source          = [
             'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
-            'libs/compat/include_juce_audio_plugin_client_VST2.cpp'
+            'libs/compat/include_juce_audio_plugin_client_VST2.cpp',
+            'libs/compat/include_juce_audio_plugin_client_utils.cpp'
         ],
         includes        = [ 'src' ],
+        defines         = [ 'JUCE_DLL_BUILD=1' ],
         target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
-        use             = [ 'APP_objects', 'ELEMENT', 'LIBJUCE' ],
+        use             = [ 'APP_objects', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
 
 def build_vst (bld):
-    if bld.env.VST and bld.host_is_linux():
+    if bld.env.VST and (bld.host_is_linux() or bld.host_is_mingw32()):
         for plugin in 'Element ElementFX'.split():
             build_vst_linux (bld, plugin)
 
@@ -730,6 +732,14 @@ def clean_artifacts (ctx):
     root = os.path.abspath (os.path.join (os.getcwd(), 'build'))
     if os.path.exists (root):
         call ('bash tools/clean_artifacts.sh'.split())
+
+def dockermingw32 (ctx):
+    from subprocess import call
+    call ('bash tools/dockerdeploy/run.sh tools/dockerdeploy/build-mingw32.sh'.split())
+
+def dockerappimage (ctx):
+    from subprocess import call
+    call ('bash tools/dockerdeploy/run.sh tools/dockerdeploy/build-mingw32.sh'.split())
 
 def deepclean (ctx):
     from waflib import Options
