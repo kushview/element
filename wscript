@@ -739,7 +739,7 @@ def dockermingw32 (ctx):
 
 def dockerappimage (ctx):
     from subprocess import call
-    call ('bash tools/dockerdeploy/run.sh tools/dockerdeploy/build-mingw32.sh'.split())
+    call ('bash tools/dockerdeploy/run.sh tools/dockerdeploy/build-appimage.sh'.split())
 
 def deepclean (ctx):
     from waflib import Options
