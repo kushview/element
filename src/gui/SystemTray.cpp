@@ -19,9 +19,10 @@
 
 #include "gui/MainWindow.h"
 #include "gui/SystemTray.h"
-#include "Globals.h"
-#include "Commands.h"
 #include "session/CommandManager.h"
+#include "Commands.h"
+#include "Globals.h"
+#include "Utils.h"
 
 #define EL_USE_NEW_SYSTRAY_ICON 0
 #define EL_SYSTRAY_MIN_SIZE 22
@@ -73,6 +74,9 @@ SystemTray::SystemTray()
 
 void SystemTray::setEnabled (bool enabled)
 {
+    if (Element::Util::isRunningInWine())
+        return;
+    
     if (enabled)
     {
         if (instance == nullptr)
