@@ -20,6 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/ContentComponentPro.h"
+#include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
 #include "Globals.h"
@@ -57,6 +58,17 @@ public:
                 workspacePanel->stabilizeContent();
             }
         }
+    }
+
+    template <class PanelType>
+    PanelType* findPanel() const noexcept
+    {
+        auto* me = const_cast<Impl*> (this);
+        auto& dock = me->getDock();
+        for (int i = 0; i < dock.getNumPanels(); ++i)
+            if (auto* const panel = dynamic_cast<PanelType*> (dock.getPanel (i)))
+                return panel;
+        return nullptr;
     }
 
     AppController& app;
@@ -159,6 +171,31 @@ void ContentComponentPro::getSessionState (String&)
 
 void ContentComponentPro::applySessionState (const String&)
 {
+}
+
+//==============================================================================
+bool ContentComponentPro::isVirtualKeyboardVisible() const
+{
+    if (auto* panel = impl->findPanel<VirtualKeyboardPanel>())
+        return panel->isVisible();
+    return false;
+}
+
+void ContentComponentPro::setVirtualKeyboardVisible (const bool isVisible)
+{
+    ContentComponent::setVirtualKeyboardVisible (isVisible);
+}
+
+void ContentComponentPro::toggleVirtualKeyboard()
+{
+    ContentComponent::toggleVirtualKeyboard();
+}
+
+VirtualKeyboardView* ContentComponentPro::getVirtualKeyboardView() const
+{
+    if (auto* panel = impl->findPanel<VirtualKeyboardPanel>())
+        return dynamic_cast<VirtualKeyboardView*> (&panel->getView());
+    return nullptr;
 }
 
 } // namespace Element

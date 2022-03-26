@@ -53,6 +53,9 @@ public:
         view.setBounds (getLocalBounds());
     }
 
+    const ContentView& getView() const noexcept { return view; }
+    ContentView& getView() noexcept { return view; }
+
 protected:
     ViewType view;
 };

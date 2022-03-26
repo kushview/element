@@ -51,6 +51,12 @@ public:
     void getSessionState (String&) override;
     void applySessionState (const String&) override;
 
+    //=========================================================================
+    bool isVirtualKeyboardVisible() const override;
+    void setVirtualKeyboardVisible (const bool isVisible) override;
+    void toggleVirtualKeyboard() override;
+    VirtualKeyboardView* getVirtualKeyboardView() const override;
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl;
