@@ -141,19 +141,45 @@ void ContentComponentPro::handleWorkspaceMenuResult (int result)
     const int index = result - 100000;
     const auto& descs = dock.getPanelDescriptions();
 
-    if (isPositiveAndBelow (index, descs.size()))
-    {
-        const auto panelId = descs[index]->identifier;
+    if (! isPositiveAndBelow (index, descs.size()))
+        return;
 
-        if (auto* const selected = dock.getSelectedItem())
+    const auto panelId      = descs[index]->identifier;
+    const auto singleton    = descs[index]->singleton;
+
+    if (singleton)
+    {
+        kv::DockPanel* panel = nullptr;
+        for (int i = 0; i < dock.getNumPanels(); ++i)
         {
-            if (auto* const item = dock.createItem (panelId))
-                item->dockTo (selected, DockPlacement::Center);
+            auto* p = dock.getPanel (i);
+            if (p->getType() == panelId)
+                { panel = p; break; }
         }
-        else
+
+        if (panel != nullptr)
         {
-            dock.createItem (panelId, DockPlacement::Top);
+            if (auto* item = panel->findParentComponentOfClass<kv::DockItem>()) {
+                item->setSelected (true, true);
+                for (int j = 0; j < item->getNumPanels(); ++j)
+                {
+                    if (panel == item->getPanel (j))
+                        { item->setCurrentPanelIndex (j); break; }
+                }
+            }
+
+            return;
         }
+    }
+
+    if (auto* const selected = dock.getSelectedItem())
+    {
+        if (auto* const item = dock.createItem (panelId))
+            item->dockTo (selected, DockPlacement::Center);
+    }
+    else
+    {
+        dock.createItem (panelId, DockPlacement::Top);
     }
 }
 

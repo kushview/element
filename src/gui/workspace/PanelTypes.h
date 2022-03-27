@@ -70,7 +70,8 @@ public:
         type->identifier = PanelIDs::virtualKeyboard;
         type->name = "Virtual Keyboard";
         type->description = "Embedded virtual keyboard which sends MIDI events to the Global MIDI input";
-
+        type->singleton = true;
+        
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::graphMixer;
         type->name = "Graph Mixer";
