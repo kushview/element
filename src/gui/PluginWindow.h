@@ -41,6 +41,8 @@ public:
 
     ~PluginWindow();
 
+    float getDesktopScaleFactor() const override;
+
     ContentComponent* getElementContentComponent() const;
 
     Toolbar* getToolbar() const;

@@ -257,15 +257,15 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
                             node.getValueTree().getProperty (Tags::windowY, Random::getSystemRandom().nextInt (500)));
         node.getValueTree().setProperty (Tags::windowVisible, true, 0);
     }
-    
+
     bool windowResize = false;
     bool useResizeHandle = false;
-    
+
     if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
-	{
-		setResizable (false, false);
-	}
-	else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
+    {
+        setResizable (false, false);
+    }
+    else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
         windowResize = false;
         useResizeHandle = ed->isResizable() && ed->resizableCorner == nullptr;
@@ -280,9 +280,9 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
         windowResize = true;
         useResizeHandle = false;
     }
-    
+
     setResizable (windowResize, useResizeHandle);
-    
+
     const bool defaultOnTop = g.getWorld().getSettings().pluginWindowsOnTop();
     setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, defaultOnTop));
 
@@ -299,6 +299,8 @@ PluginWindow::~PluginWindow()
     clearContentComponent();
     setLookAndFeel (nullptr);
 }
+
+float PluginWindow::getDesktopScaleFactor() const { return 1.f; }
 
 ContentComponent* PluginWindow::getElementContentComponent() const
 {
