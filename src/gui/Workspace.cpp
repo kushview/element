@@ -176,6 +176,7 @@ Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
         {
             wp->initializeView (app);
             wp->didBecomeActive();
+            wp->stabilizeContent();
         }
     };
 
