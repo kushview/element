@@ -426,12 +426,12 @@ def build_vst3 (bld):
         for plugin in 'Element ElementFX'.split():
             build_vst3_linux (bld, plugin)
 
-def build_libjuce (bld):
+def build_element_juce (bld):
     env = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
 
-    libjuce = bld (
+    JUCE = bld (
         features        = 'cxx cxxshlib',
         source          = juce_sources (bld),
         includes        = [
@@ -453,21 +453,21 @@ def build_libjuce (bld):
     )
 
     if bld.host_is_linux():
-        libjuce.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+        JUCE.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
 
-    elif bld.host_is_mac():    
-        libjuce.use += [
+    elif bld.host_is_mac():
+        JUCE.use += [
             'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
             'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
             'TEMPLATES'
         ]
 
     elif bld.host_is_windows():
-        libjuce.defines.append ('JUCE_DLL_BUILD=1')
+        JUCE.defines.append ('JUCE_DLL_BUILD=1')
         for l in element.mingw_libs.split():
-            libjuce.use.append (l.upper())
-        libjuce.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
-    libjuce.export_includes = libjuce.includes
+            JUCE.use.append (l.upper())
+        JUCE.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
+    JUCE.export_includes = JUCE.includes
 
     bld.install_files (os.path.join (bld.env.PREFIX, 'include/element/juce/modules'), \
         bld.path.ant_glob ("libs/JUCE/modules/**/*.h"), \
@@ -633,7 +633,7 @@ def build (bld):
         return
 
     build_libelement (bld)
-    build_libjuce (bld)
+    build_element_juce (bld)
     build_el_module (bld)
     build_app_objects (bld)
     build_app (bld)
