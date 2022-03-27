@@ -443,6 +443,7 @@ def build_libjuce (bld):
         ],
         target          = 'lib/element_juce',
         name            = 'LIBJUCE',
+        vnum            = '6.0.8',
         env             = env,
         use             = [ 'DEPENDS', 'LILV', 'SUIL', 'ASIO', 'VST3' ],
         defines         = [],
