@@ -461,6 +461,7 @@ def build_element_juce (bld):
             'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
             'TEMPLATES'
         ]
+        JUCE.install_path = None
 
     elif bld.host_is_windows():
         JUCE.defines.append ('JUCE_DLL_BUILD=1')
