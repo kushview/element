@@ -313,6 +313,22 @@ def build_libelement (bld):
         ]
     )
 
+    pcfile = bld (
+        features      = 'subst',
+        source        = 'libs/element/element.pc.in',
+        target        = 'lib/pkgconfig/element.pc',
+        name          = 'element_pc',
+        NAME          = 'element',
+        DESCRIPTION   = 'Element core library.',
+        LIBNAME       = os.path.basename (library.target),
+        PREFIX        = bld.env.PREFIX,
+        VERSION       = library.vnum,
+        REQUIRES_PRIVATE = '',
+        INCLUDEDIR    = os.path.join (bld.env.PREFIX, 'include'),
+        CFLAGS_EXTRA  = '',
+        install_path  = os.path.join (library.install_path, 'pkgconfig')
+    )
+
     if bld.host_is_linux():
         library.source.append ('libs/element/src/native_unix.cpp')
     elif bld.host_is_windows():
@@ -320,6 +336,7 @@ def build_libelement (bld):
         library.defines.append ('EL_DLLEXPORT=1')
     elif bld.host_is_mac():
         library.install_path = None
+        pcfile.install_path = None
 
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         library.env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
@@ -452,6 +469,22 @@ def build_element_juce (bld):
         install_path    = bld.env.LIBDIR
     )
 
+    pcfile = bld (
+        features      = 'subst',
+        source        = 'libs/element/element.pc.in',
+        target        = 'lib/pkgconfig/element-juce.pc',
+        name          = 'element-juce_pc',
+        NAME          = 'element-juce',
+        DESCRIPTION   = 'The JUCE library (element)',
+        LIBNAME       = os.path.basename (JUCE.target),
+        PREFIX        = bld.env.PREFIX,
+        VERSION       = JUCE.vnum,
+        REQUIRES_PRIVATE = '',
+        INCLUDEDIR    = os.path.join (bld.env.PREFIX, 'include'),
+        CFLAGS_EXTRA  = '-I${includedir}/element/juce/modules',
+        install_path  = os.path.join (JUCE.install_path, 'pkgconfig')
+    )
+
     if bld.host_is_linux():
         JUCE.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
 
@@ -462,12 +495,16 @@ def build_element_juce (bld):
             'TEMPLATES'
         ]
         JUCE.install_path = None
+        pcfile.install_path = None
 
     elif bld.host_is_windows():
         JUCE.defines.append ('JUCE_DLL_BUILD=1')
         for l in element.mingw_libs.split():
             JUCE.use.append (l.upper())
         JUCE.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
+
+    
+
     JUCE.export_includes = JUCE.includes
 
     bld.install_files (os.path.join (bld.env.PREFIX, 'include/element/juce/modules'), \
