@@ -8,6 +8,9 @@
 
 namespace BinaryData
 {
+    extern const char*   RobotoRegular_ttf;
+    const int            RobotoRegular_ttfSize = 168260;
+
     extern const char*   PowerButton_48x48_png;
     const int            PowerButton_48x48_pngSize = 1153;
 
@@ -30,7 +33,7 @@ namespace BinaryData
     const int            ElementIconTemplate_pngSize = 7122;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 7;
+    const int namedResourceListSize = 8;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

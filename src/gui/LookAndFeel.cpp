@@ -129,23 +129,8 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
 #if JUCE_LINUX
     if (font.getTypefaceName() == Font::getDefaultSansSerifFontName())
     {
-        Font f (font);
-        if (defaultSansSerifName.isEmpty())
-        {
-            const StringArray possible ("Roboto", "FreeSans", "Arial");
-            const auto names = Font::findAllTypefaceNames();
-            for (const auto& name : possible)
-                if (names.contains (name))
-                {
-                    defaultSansSerifName = name;
-                    break;
-                }
-            if (defaultSansSerifName.isEmpty())
-                defaultSansSerifName = names[0];
-        }
-
-        f.setTypefaceName (defaultSansSerifName);
-        return Typeface::createSystemTypefaceFor (f);
+        return Typeface::createSystemTypefaceFor (
+            BinaryData::RobotoRegular_ttf, BinaryData::RobotoRegular_ttfSize);
     }
     else if (font.getTypefaceName() == Font::getDefaultMonospacedFontName())
     {
@@ -157,7 +142,7 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
             for (const auto& name : possible)
                 if (names.contains (name))
                 {
-                    defaultSansSerifName = name;
+                    defaultMonospaceName = name;
                     break;
                 }
             if (defaultMonospaceName.isEmpty())

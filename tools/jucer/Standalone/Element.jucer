@@ -9,6 +9,12 @@
               jucerFormatVersion="1">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
+      <GROUP id="{7781D324-BF7F-88B0-7FF2-E052588AB2FF}" name="fonts">
+        <FILE id="iWwjIP" name="Roboto-LICENSE.txt" compile="0" resource="0"
+              file="../../../data/fonts/Roboto-LICENSE.txt"/>
+        <FILE id="QjpmfJ" name="Roboto-Regular.ttf" compile="0" resource="1"
+              file="../../../data/fonts/Roboto-Regular.ttf"/>
+      </GROUP>
       <GROUP id="{ABE6AB65-908D-580A-65CC-8CB15CFABA76}" name="Assets">
         <FILE id="USJbal" name="PowerButton_48x48.png" compile="0" resource="1"
               file="../../../data/Assets/PowerButton_48x48.png"/>

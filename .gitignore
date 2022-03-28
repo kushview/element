@@ -2,6 +2,9 @@
 
 data/*.ai
 
+data/**/*.ttf
+!data/fonts/Roboto-Regular.ttf
+
 dst
 waf-*
 waf3-*
