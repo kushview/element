@@ -503,8 +503,6 @@ def build_element_juce (bld):
             JUCE.use.append (l.upper())
         JUCE.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
 
-    
-
     JUCE.export_includes = JUCE.includes
 
     bld.install_files (os.path.join (bld.env.PREFIX, 'include/element/juce/modules'), \
@@ -639,6 +637,11 @@ def install_lua_files (bld):
                        relative_trick=True,
                        cwd=path.find_dir ('libs/element/lua'))
 
+def build_plugins (bld):
+    import glob
+    for d in glob.glob ('plugins/*.element'):
+        bld.recurse (d)
+
 def build (bld):
     if bld.is_install:
         if juce.is_mac(): bld.fatal ("waf install not supported on OSX")
@@ -682,6 +685,8 @@ def build (bld):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:
         bld.recurse ('test')
+
+    build_plugins (bld)
 
     install_lua_files (bld)
 
