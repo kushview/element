@@ -26,11 +26,11 @@ namespace Element {
 
 class AppController;
 
-class ContentComponentPro : public ContentComponent
+class WorkspacesContentComponent : public ContentComponent
 {
 public:
-    ContentComponentPro (AppController& app);
-    ~ContentComponentPro() noexcept;
+    WorkspacesContentComponent (AppController& app);
+    ~WorkspacesContentComponent() noexcept;
 
     void resizeContent (const Rectangle<int>& area) override;
 

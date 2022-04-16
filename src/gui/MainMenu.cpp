@@ -27,7 +27,7 @@
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
 #include "gui/Workspace.h"
-#include "gui/ContentComponentPro.h"
+#include "gui/WorkspacesContentComponent.h"
 #include "engine/AudioEngine.h"
 #include "session/Session.h"
 #include "session/CommandManager.h"
@@ -305,7 +305,7 @@ void MainMenu::buildViewMenu (PopupMenu& menu) { buildViewMenu (cmd, menu); }
 
 void MainMenu::buildWindowMenu (PopupMenu& menu)
 {
-    if (auto* const cc = dynamic_cast<ContentComponentPro*> (owner.getContentComponent()))
+    if (auto* const cc = dynamic_cast<WorkspacesContentComponent*> (owner.getContentComponent()))
     {
         PopupMenu workspace;
         workspace.addCommandItem (&cmd, Commands::workspaceClassic, "Classic");
@@ -331,7 +331,7 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
 
 void MainMenu::buildWorkspaceMenu (PopupMenu& menu)
 {
-    if (auto* const cc = dynamic_cast<ContentComponentPro*> (owner.getContentComponent()))
+    if (auto* const cc = dynamic_cast<WorkspacesContentComponent*> (owner.getContentComponent()))
         cc->addWorkspaceItemsToMenu (menu);
 }
 

@@ -521,14 +521,14 @@
               file="../../../src/gui/ContentComponent.cpp"/>
         <FILE id="gCFLl4" name="ContentComponent.h" compile="0" resource="0"
               file="../../../src/gui/ContentComponent.h"/>
-        <FILE id="ak4ekL" name="ContentComponentPro.cpp" compile="1" resource="0"
-              file="../../../src/gui/ContentComponentPro.cpp"/>
-        <FILE id="BuZiYq" name="ContentComponentPro.h" compile="0" resource="0"
-              file="../../../src/gui/ContentComponentPro.h"/>
-        <FILE id="c1umXx" name="ContentComponentSolo.cpp" compile="1" resource="0"
-              file="../../../src/gui/ContentComponentSolo.cpp"/>
-        <FILE id="ed8Wle" name="ContentComponentSolo.h" compile="0" resource="0"
-              file="../../../src/gui/ContentComponentSolo.h"/>
+        <FILE id="ak4ekL" name="WorkspacesContentComponent.cpp" compile="1" resource="0"
+              file="../../../src/gui/WorkspacesContentComponent.cpp"/>
+        <FILE id="BuZiYq" name="WorkspacesContentComponent.h" compile="0" resource="0"
+              file="../../../src/gui/WorkspacesContentComponent.h"/>
+        <FILE id="c1umXx" name="StandardContentComponent.cpp" compile="1" resource="0"
+              file="../../../src/gui/StandardContentComponent.cpp"/>
+        <FILE id="ed8Wle" name="StandardContentComponent.h" compile="0" resource="0"
+              file="../../../src/gui/StandardContentComponent.h"/>
         <FILE id="twamqO" name="ContextMenus.cpp" compile="1" resource="0"
               file="../../../src/gui/ContextMenus.cpp"/>
         <FILE id="sIV8YE" name="ContextMenus.h" compile="0" resource="0" file="../../../src/gui/ContextMenus.h"/>

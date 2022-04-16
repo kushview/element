@@ -19,7 +19,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "gui/ContentComponentPro.h"
+#include "gui/WorkspacesContentComponent.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
@@ -28,10 +28,10 @@
 
 namespace Element {
 
-class ContentComponentPro::Impl
+class WorkspacesContentComponent::Impl
 {
 public:
-    Impl (ContentComponentPro& o, AppController& a)
+    Impl (WorkspacesContentComponent& o, AppController& a)
         : app (a), owner (o), workspace (a.getGlobals(), a, *a.findChild<GuiController>())
     {
         owner.addAndMakeVisible (workspace);
@@ -72,54 +72,54 @@ public:
     }
 
     AppController& app;
-    ContentComponentPro& owner;
+    WorkspacesContentComponent& owner;
     Workspace workspace;
 };
 
-ContentComponentPro::ContentComponentPro (AppController& controller)
+WorkspacesContentComponent::WorkspacesContentComponent (AppController& controller)
     : ContentComponent (controller)
 {
     impl.reset (new Impl (*this, controller));
 }
 
-ContentComponentPro::~ContentComponentPro() noexcept
+WorkspacesContentComponent::~WorkspacesContentComponent() noexcept
 {
     impl.reset (nullptr);
 }
 
-void ContentComponentPro::resizeContent (const Rectangle<int>& area)
+void WorkspacesContentComponent::resizeContent (const Rectangle<int>& area)
 {
     impl->resized (area);
 }
 
-void ContentComponentPro::stabilize (const bool refreshDataPathTrees)
+void WorkspacesContentComponent::stabilize (const bool refreshDataPathTrees)
 {
     impl->stabilizePanels();
 }
 
-void ContentComponentPro::stabilizeViews()
+void WorkspacesContentComponent::stabilizeViews()
 {
     impl->stabilizePanels();
 }
 
-String ContentComponentPro::getWorkspaceName() const
+String WorkspacesContentComponent::getWorkspaceName() const
 {
     return impl->workspace.getName();
 }
 
-WorkspaceState ContentComponentPro::getWorkspaceState()
+WorkspaceState WorkspacesContentComponent::getWorkspaceState()
 {
     WorkspaceState state (impl->workspace);
     return state;
 }
 
-void ContentComponentPro::applyWorkspaceState (const WorkspaceState& state)
+void WorkspacesContentComponent::applyWorkspaceState (const WorkspaceState& state)
 {
     auto& workspace = impl->workspace;
     workspace.applyState (state);
 }
 
-void ContentComponentPro::addWorkspaceItemsToMenu (PopupMenu& menu)
+void WorkspacesContentComponent::addWorkspaceItemsToMenu (PopupMenu& menu)
 {
     auto& dock = impl->getDock();
     const int offset = 100000;
@@ -135,7 +135,7 @@ void ContentComponentPro::addWorkspaceItemsToMenu (PopupMenu& menu)
     }
 }
 
-void ContentComponentPro::handleWorkspaceMenuResult (int result)
+void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
 {
     auto& dock = impl->getDock();
     const int index = result - 100000;
@@ -183,41 +183,41 @@ void ContentComponentPro::handleWorkspaceMenuResult (int result)
     }
 }
 
-void ContentComponentPro::saveState (PropertiesFile*)
+void WorkspacesContentComponent::saveState (PropertiesFile*)
 {
 }
 
-void ContentComponentPro::restoreState (PropertiesFile*)
+void WorkspacesContentComponent::restoreState (PropertiesFile*)
 {
 }
 
-void ContentComponentPro::getSessionState (String&)
+void WorkspacesContentComponent::getSessionState (String&)
 {
 }
 
-void ContentComponentPro::applySessionState (const String&)
+void WorkspacesContentComponent::applySessionState (const String&)
 {
 }
 
 //==============================================================================
-bool ContentComponentPro::isVirtualKeyboardVisible() const
+bool WorkspacesContentComponent::isVirtualKeyboardVisible() const
 {
     if (auto* panel = impl->findPanel<VirtualKeyboardPanel>())
         return panel->isVisible();
     return false;
 }
 
-void ContentComponentPro::setVirtualKeyboardVisible (const bool isVisible)
+void WorkspacesContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 {
     ContentComponent::setVirtualKeyboardVisible (isVisible);
 }
 
-void ContentComponentPro::toggleVirtualKeyboard()
+void WorkspacesContentComponent::toggleVirtualKeyboard()
 {
     ContentComponent::toggleVirtualKeyboard();
 }
 
-VirtualKeyboardView* ContentComponentPro::getVirtualKeyboardView() const
+VirtualKeyboardView* WorkspacesContentComponent::getVirtualKeyboardView() const
 {
     if (auto* panel = impl->findPanel<VirtualKeyboardPanel>())
         return dynamic_cast<VirtualKeyboardView*> (&panel->getView());

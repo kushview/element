@@ -23,8 +23,8 @@
 #include "controllers/SessionController.h"
 
 #include "gui/widgets/MidiBlinker.h"
-#include "gui/ContentComponentPro.h"
-#include "gui/ContentComponentSolo.h"
+#include "gui/WorkspacesContentComponent.h"
+#include "gui/StandardContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
@@ -65,13 +65,13 @@ ContentComponent* ContentComponent::create (AppController& controller)
     auto& s = controller.getGlobals().getSettings();
 
     if (s.getMainContentType() == "workspace")
-        return new ContentComponentPro (controller);
+        return new WorkspacesContentComponent (controller);
     if (s.getMainContentType() == "standard")
-        return new ContentComponentSolo (controller);
+        return new StandardContentComponent (controller);
     if (s.getMainContentType() == "compact")
-        return new ContentComponentSolo (controller);
+        return new StandardContentComponent (controller);
 
-    return new ContentComponentSolo (controller);
+    return new StandardContentComponent (controller);
 }
 
 void ContentView::paint (Graphics& g)

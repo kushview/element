@@ -53,7 +53,7 @@
 #include "Globals.h"
 #include "Settings.h"
 
-#include "gui/ContentComponentSolo.h"
+#include "gui/StandardContentComponent.h"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0
@@ -122,7 +122,7 @@ private:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (ContentComponentSolo& cc, AppController& app)
+    ContentContainer (StandardContentComponent& cc, AppController& app)
         : owner (cc)
     {
         content1.reset (new ContentView());
@@ -290,8 +290,8 @@ public:
     }
 
 private:
-    friend class ContentComponentSolo;
-    ContentComponentSolo& owner;
+    friend class StandardContentComponent;
+    StandardContentComponent& owner;
     StretchableLayoutManager layout;
     std::unique_ptr<SmartLayoutResizeBar> bar;
     std::unique_ptr<ContentView> content1;
@@ -356,12 +356,12 @@ private:
     }
 };
 
-class ContentComponentSolo::Resizer : public StretchableLayoutResizerBar
+class StandardContentComponent::Resizer : public StretchableLayoutResizerBar
 {
 public:
-    Resizer (ContentComponentSolo& ContentComponentSolo, StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical)
+    Resizer (StandardContentComponent& StandardContentComponent, StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical)
         : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-          owner (ContentComponentSolo)
+          owner (StandardContentComponent)
     {
     }
 
@@ -378,7 +378,7 @@ public:
     }
 
 private:
-    ContentComponentSolo& owner;
+    StandardContentComponent& owner;
 };
 
 static ContentView* createLastContentView (Settings& settings)
@@ -443,7 +443,7 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
     }
 }
 
-ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
+StandardContentComponent::StandardContentComponent (AppController& ctl_)
     : ContentComponent (ctl_)
 {
     auto& settings (getGlobals().getSettings());
@@ -504,32 +504,32 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
     resized();
 }
 
-ContentComponentSolo::~ContentComponentSolo() noexcept
+StandardContentComponent::~StandardContentComponent() noexcept
 {
     setContentView (nullptr, false);
     setContentView (nullptr, true);
 }
 
-String ContentComponentSolo::getMainViewName() const
+String StandardContentComponent::getMainViewName() const
 {
     if (container && container->content1)
         return container->content1->getName();
     return String();
 }
 
-String ContentComponentSolo::getAccessoryViewName() const
+String StandardContentComponent::getAccessoryViewName() const
 {
     if (container && container->content2)
         return container->content2->getName();
     return String();
 }
 
-int ContentComponentSolo::getNavSize()
+int StandardContentComponent::getNavSize()
 {
     return nav != nullptr ? nav->getWidth() : 220;
 }
 
-void ContentComponentSolo::setMainView (const String& name)
+void StandardContentComponent::setMainView (const String& name)
 {
     if (name == "PatchBay")
     {
@@ -575,12 +575,12 @@ void ContentComponentSolo::setMainView (const String& name)
     }
 }
 
-void ContentComponentSolo::backMainView()
+void StandardContentComponent::backMainView()
 {
     setMainView (lastMainView.isEmpty() ? "GraphEditor" : lastMainView);
 }
 
-void ContentComponentSolo::nextMainView()
+void StandardContentComponent::nextMainView()
 {
     // only have two rotatable views as of now
     if (getMainViewName() == "EmptyView")
@@ -589,7 +589,7 @@ void ContentComponentSolo::nextMainView()
     setMainView (nextName);
 }
 
-void ContentComponentSolo::setContentView (ContentView* view, const bool accessory)
+void StandardContentComponent::setContentView (ContentView* view, const bool accessory)
 {
     jassert (container != nullptr);
     std::unique_ptr<ContentView> deleter (view);
@@ -604,7 +604,7 @@ void ContentComponentSolo::setContentView (ContentView* view, const bool accesso
     }
 }
 
-void ContentComponentSolo::setAccessoryView (const String& name)
+void StandardContentComponent::setAccessoryView (const String& name)
 {
     if (name == "PatchBay")
     {
@@ -622,7 +622,7 @@ void ContentComponentSolo::setAccessoryView (const String& name)
     container->setShowAccessoryView (true);
 }
 
-void ContentComponentSolo::resizeContent (const Rectangle<int>& area)
+void StandardContentComponent::resizeContent (const Rectangle<int>& area)
 {
     Rectangle<int> r (area);
 
@@ -635,13 +635,13 @@ void ContentComponentSolo::resizeContent (const Rectangle<int>& area)
     layout.layOutComponents (comps, 3, r.getX(), r.getY(), r.getWidth(), r.getHeight(), false, true);
 }
 
-bool ContentComponentSolo::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
+bool StandardContentComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
     return desc.toString() == "ccNavConcertinaPanel" || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
 }
 
-void ContentComponentSolo::itemDropped (const SourceDetails& dragSourceDetails)
+void StandardContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
     if (desc.toString() == "ccNavConcertinaPanel")
@@ -661,7 +661,7 @@ void ContentComponentSolo::itemDropped (const SourceDetails& dragSourceDetails)
     }
 }
 
-bool ContentComponentSolo::isInterestedInFileDrag (const StringArray& files)
+bool StandardContentComponent::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
     {
@@ -672,7 +672,7 @@ bool ContentComponentSolo::isInterestedInFileDrag (const StringArray& files)
     return false;
 }
 
-void ContentComponentSolo::filesDropped (const StringArray& files, int x, int y)
+void StandardContentComponent::filesDropped (const StringArray& files, int x, int y)
 {
     for (const auto& path : files)
     {
@@ -757,7 +757,7 @@ void ContentComponentSolo::filesDropped (const StringArray& files, int x, int y)
     }
 }
 
-void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
+void StandardContentComponent::stabilize (const bool refreshDataPathTrees)
 {
     auto session = getGlobals().getSession();
     if (session->getNumGraphs() > 0)
@@ -794,7 +794,7 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
     refreshStatusBar();
 }
 
-void ContentComponentSolo::stabilizeViews()
+void StandardContentComponent::stabilizeViews()
 {
     if (container->content1)
         container->content1->stabilizeContent();
@@ -804,7 +804,7 @@ void ContentComponentSolo::stabilizeViews()
         nodeStrip->stabilizeContent();
 }
 
-void ContentComponentSolo::saveState (PropertiesFile* props)
+void StandardContentComponent::saveState (PropertiesFile* props)
 {
     jassert (props);
     if (nav)
@@ -815,7 +815,7 @@ void ContentComponentSolo::saveState (PropertiesFile* props)
         vk->saveState (props);
 }
 
-void ContentComponentSolo::restoreState (PropertiesFile* props)
+void StandardContentComponent::restoreState (PropertiesFile* props)
 {
     jassert (props);
     if (nav)
@@ -827,7 +827,7 @@ void ContentComponentSolo::restoreState (PropertiesFile* props)
     resized();
 }
 
-void ContentComponentSolo::setCurrentNode (const Node& node)
+void StandardContentComponent::setCurrentNode (const Node& node)
 {
     if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllerDevicesView") && getSession()->getNumGraphs() > 0)
     {
@@ -837,19 +837,19 @@ void ContentComponentSolo::setCurrentNode (const Node& node)
     container->setNode (node);
 }
 
-void ContentComponentSolo::updateLayout()
+void StandardContentComponent::updateLayout()
 {
     layout.setItemLayout (0, EL_NAV_MIN_WIDTH, EL_NAV_MAX_WIDTH, nav->getWidth());
     layout.setItemLayout (1, 2, 2, 2);
     layout.setItemLayout (2, 100, -1, 400);
 }
 
-void ContentComponentSolo::resizerMouseDown()
+void StandardContentComponent::resizerMouseDown()
 {
     updateLayout();
 }
 
-void ContentComponentSolo::resizerMouseUp()
+void StandardContentComponent::resizerMouseUp()
 {
     layout.setItemLayout (0, nav->getWidth(), nav->getWidth(), nav->getWidth());
     layout.setItemLayout (1, 2, 2, 2);
@@ -857,7 +857,7 @@ void ContentComponentSolo::resizerMouseUp()
     resized();
 }
 
-void ContentComponentSolo::setVirtualKeyboardVisible (const bool isVisible)
+void StandardContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 {
     if (isVisible == virtualKeyboardVisible)
         return;
@@ -881,7 +881,7 @@ void ContentComponentSolo::setVirtualKeyboardVisible (const bool isVisible)
     resized();
 }
 
-void ContentComponentSolo::setNodeChannelStripVisible (const bool isVisible)
+void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
 {
     if (! nodeStrip)
     {
@@ -909,30 +909,30 @@ void ContentComponentSolo::setNodeChannelStripVisible (const bool isVisible)
     resized();
 }
 
-bool ContentComponentSolo::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
+bool StandardContentComponent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
 
-void ContentComponentSolo::toggleVirtualKeyboard()
+void StandardContentComponent::toggleVirtualKeyboard()
 {
     setVirtualKeyboardVisible (! virtualKeyboardVisible);
 }
 
-ApplicationCommandTarget* ContentComponentSolo::getNextCommandTarget()
+ApplicationCommandTarget* StandardContentComponent::getNextCommandTarget()
 {
     return (container) ? container->content1.get() : nullptr;
 }
 
-void ContentComponentSolo::setShowAccessoryView (const bool show)
+void StandardContentComponent::setShowAccessoryView (const bool show)
 {
     if (container)
         container->setShowAccessoryView (show);
 }
 
-bool ContentComponentSolo::showAccessoryView() const
+bool StandardContentComponent::showAccessoryView() const
 {
     return (container) ? container->showAccessoryView : false;
 }
 
-void ContentComponentSolo::getSessionState (String& state)
+void StandardContentComponent::getSessionState (String& state)
 {
     ValueTree data ("state");
 
@@ -955,7 +955,7 @@ void ContentComponentSolo::getSessionState (String& state)
     state = mo.getMemoryBlock().toBase64Encoding();
 }
 
-void ContentComponentSolo::applySessionState (const String& state)
+void StandardContentComponent::applySessionState (const String& state)
 {
     MemoryBlock mb;
     mb.fromBase64Encoding (state);
@@ -972,7 +972,7 @@ void ContentComponentSolo::applySessionState (const String& state)
     }
 }
 
-void ContentComponentSolo::setMainView (ContentView* view)
+void StandardContentComponent::setMainView (ContentView* view)
 {
     jassert (view != nullptr);
     setContentView (view, false);

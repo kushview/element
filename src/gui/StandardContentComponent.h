@@ -23,11 +23,11 @@
 
 namespace Element {
 
-class ContentComponentSolo : public ContentComponent
+class StandardContentComponent : public ContentComponent
 {
 public:
-    ContentComponentSolo (AppController& app);
-    ~ContentComponentSolo() noexcept;
+    StandardContentComponent (AppController& app);
+    ~StandardContentComponent() noexcept;
 
     void resizeContent (const Rectangle<int>& area) override;
 
