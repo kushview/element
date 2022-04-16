@@ -477,12 +477,7 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
 #endif
 
     setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));
-
-#if defined(EL_PRO) || defined(EL_SOLO)
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
-#else
-    setNodeChannelStripVisible (false);
-#endif
 
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
@@ -504,10 +499,6 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
 
 #if defined(EL_SOLO) || defined(EL_FREE)
     setShowAccessoryView (false);
-#endif
-
-#if defined(EL_FREE)
-    setNodeChannelStripVisible (false);
 #endif
 
     resized();

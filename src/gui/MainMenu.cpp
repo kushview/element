@@ -440,16 +440,12 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
-#if defined(EL_SOLO)
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
-#endif
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
-#if defined(EL_SOLO)
     menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
-#endif
 #endif
 }
 

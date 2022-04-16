@@ -412,26 +412,24 @@ void GuiController::getAllCommands (Array<CommandID>& commands)
     commands.addArray ({
 #if defined(EL_PRO)
         Commands::showSessionConfig,
-            Commands::showGraphMixer,
+        Commands::showGraphMixer,
 #endif
-#if defined(EL_SOLO) || defined(EL_PRO)
-            Commands::toggleChannelStrip,
-#endif
-            Commands::showAbout,
-            Commands::showPluginManager,
-            Commands::showPreferences,
-            Commands::showGraphConfig,
-            Commands::showPatchBay,
-            Commands::showGraphEditor,
-            Commands::showLastContentView,
-            Commands::toggleVirtualKeyboard,
-            Commands::rotateContentView,
-            Commands::showAllPluginWindows,
-            Commands::hideAllPluginWindows,
-            Commands::showKeymapEditor,
-            Commands::showControllerDevices,
-            Commands::toggleUserInterface,
-            Commands::showConsole
+        Commands::toggleChannelStrip,
+        Commands::showAbout,
+        Commands::showPluginManager,
+        Commands::showPreferences,
+        Commands::showGraphConfig,
+        Commands::showPatchBay,
+        Commands::showGraphEditor,
+        Commands::showLastContentView,
+        Commands::toggleVirtualKeyboard,
+        Commands::rotateContentView,
+        Commands::showAllPluginWindows,
+        Commands::hideAllPluginWindows,
+        Commands::showKeymapEditor,
+        Commands::showControllerDevices,
+        Commands::toggleUserInterface,
+        Commands::showConsole
     });
 
     commands.add (Commands::quit);
@@ -628,7 +626,6 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", Commands::Categories::UserInterface, 0);
             break;
 
-#if defined(EL_PRO) || defined(EL_SOLO)
         case Commands::toggleChannelStrip: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->isNodeChannelStripVisible())
@@ -636,7 +633,6 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Channel Strip", "Toggles the global channel strip", Commands::Categories::UserInterface, flags);
         }
         break;
-#endif
 
         case Commands::toggleVirtualKeyboard: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -797,16 +793,9 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;
-
-        case Commands::toggleChannelStrip: {
-#if defined(EL_PRO) || defined(EL_SOLO)
+        case Commands::toggleChannelStrip:
             content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
-#else
-            content->setNodeChannelStripVisible (false);
-#endif
-        }
-        break;
-
+            break;
         case Commands::showLastContentView:
             content->backMainView();
             break;

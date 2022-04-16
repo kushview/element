@@ -63,9 +63,7 @@ namespace Util {
         else
             name = "Element";
 
-#if defined(EL_FREE)
-        name << " LT";
-#elif defined(EL_SOLO)
+#if defined(EL_SOLO)
         name << " SE";
 #endif
 
