@@ -50,8 +50,6 @@
 
 namespace Element {
 
-// MARK: Content View
-
 ContentView::ContentView()
 {
     addKeyListener (this);

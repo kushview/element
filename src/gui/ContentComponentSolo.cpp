@@ -125,14 +125,16 @@ public:
     ContentContainer (ContentComponentSolo& cc, AppController& app)
         : owner (cc)
     {
-        addAndMakeVisible (content1 = new ContentView());
-        addAndMakeVisible (bar = new SmartLayoutResizeBar (&layout, 1, false));
+        content1.reset (new ContentView());
+        addAndMakeVisible (content1.get());
+        bar.reset (new SmartLayoutResizeBar (&layout, 1, false));
+        addAndMakeVisible (bar.get());
         bar->mousePressed.connect (
             std::bind (&ContentContainer::updateLayout, this));
         bar->mouseReleased.connect (
             std::bind (&ContentContainer::lockLayout, this));
-
-        addAndMakeVisible (content2 = new ContentView());
+        content2.reset (new ContentView());
+        addAndMakeVisible (content2.get());
         updateLayout();
         resized();
     }
@@ -178,15 +180,15 @@ public:
         if (content1)
         {
             content1->willBeRemoved();
-            removeChildComponent (content1);
+            removeChildComponent (content1.get());
         }
 
-        content1 = view;
+        content1.reset (view);
 
         if (content1)
         {
             content1->willBecomeActive();
-            addAndMakeVisible (content1);
+            addAndMakeVisible (content1.get());
         }
 
         if (showAccessoryView)
@@ -210,14 +212,14 @@ public:
         if (view)
             view->initializeView (owner.getAppController());
         if (content2)
-            removeChildComponent (content2);
+            removeChildComponent (content2.get());
 
-        content2 = view;
+        content2.reset (view);
 
         if (content2)
         {
             content2->willBecomeActive();
-            addAndMakeVisible (content2);
+            addAndMakeVisible (content2.get());
         }
 
         resized();
@@ -291,9 +293,9 @@ private:
     friend class ContentComponentSolo;
     ContentComponentSolo& owner;
     StretchableLayoutManager layout;
-    ScopedPointer<SmartLayoutResizeBar> bar;
-    ScopedPointer<ContentView> content1;
-    ScopedPointer<ContentView> content2;
+    std::unique_ptr<SmartLayoutResizeBar> bar;
+    std::unique_ptr<ContentView> content1;
+    std::unique_ptr<ContentView> content2;
 
     bool showAccessoryView = false;
     int barSize = 2;
@@ -383,19 +385,19 @@ static ContentView* createLastContentView (Settings& settings)
 {
     auto* props = settings.getUserSettings();
     const String lastContentView = props->getValue ("lastContentView");
-    ScopedPointer<ContentView> view;
+    std::unique_ptr<ContentView> view;
     typedef GraphEditorView DefaultView;
 
     if (lastContentView.isEmpty())
-        view = new DefaultView();
+        view = std::make_unique<DefaultView>();
     else if (lastContentView == "PatchBay")
-        view = new ConnectionGrid();
+        view = std::make_unique<ConnectionGrid>();
     else if (lastContentView == "GraphEditor")
-        view = new GraphEditorView();
+        view = std::make_unique<GraphEditorView>();
     else if (lastContentView == "ControllerDevicesView")
-        view = new ControllerDevicesView();
+        view = std::make_unique<ControllerDevicesView>();
     else
-        view = new DefaultView();
+        view = std::make_unique<DefaultView>();
 
     return view ? view.release() : nullptr;
 }
