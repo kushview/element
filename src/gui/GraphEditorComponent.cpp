@@ -439,14 +439,12 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             menu.addItem (4, "MIDI Output", true, graph.hasMidiOutputNode());
             menu.addSeparator();
 
-#ifndef EL_FREE
             PopupMenu submenu;
             addMidiDevicesToMenu (submenu, true, 80000);
             menu.addSubMenu ("MIDI Input Device", submenu);
             submenu.clear();
             addMidiDevicesToMenu (submenu, false, 90000);
             menu.addSubMenu ("MIDI Output Device", submenu);
-#endif
         }
 
         menu.addSeparator();
@@ -986,7 +984,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
                 const Node node (Node::parse (file));
                 bool wasHandled = false;
 
-#if defined(EL_SOLO) || defined(EL_FREE)
+#if defined(EL_SOLO)
                 // SE and LT Should just open graphs instead of trying to embed them
                 if (file.hasFileExtension (".elg"))
                 {

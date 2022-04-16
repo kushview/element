@@ -263,24 +263,20 @@ MappingController::~MappingController()
 void MappingController::activate()
 {
     Controller::activate();
-#ifndef EL_FREE
     auto& capture (impl->capture);
     capturedConnection = getWorld().getMappingEngine().capturedSignal().connect (
         std::bind (&MappingController::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
         std::bind (&MappingController::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
     getWorld().getMappingEngine().startMapping();
-#endif
 }
 
 void MappingController::deactivate()
 {
     Controller::deactivate();
-#ifndef EL_FREE
     getWorld().getMappingEngine().stopMapping();
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
-#endif
 }
 
 bool MappingController::isLearning() const

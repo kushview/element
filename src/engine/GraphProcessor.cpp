@@ -282,7 +282,6 @@ public:
         for (int i = numAudioIns; --i >= 0;)
             node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
 
-#ifndef EL_FREE
         // Begin MIDI filters
         {
             jassert (tempMidi.getNumEvents() == 0);
@@ -335,7 +334,6 @@ public:
 
         tempMidi.clear();
         // End MIDI filters
-#endif
         
         auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended)
         {
@@ -1479,9 +1477,7 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
 
             if (msg.isNoteOn())
             {
-#ifndef EL_FREE
                 msg.setVelocity (velocityCurve.process (msg.getFloatVelocity()));
-#endif
             }
 
             filteredMidi.addEvent (msg, frame);

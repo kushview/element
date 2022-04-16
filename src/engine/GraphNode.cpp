@@ -533,9 +533,7 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
 
             if (msg.isNoteOn())
             {
-#ifndef EL_FREE
                 msg.setVelocity (velocityCurve.process (msg.getFloatVelocity()));
-#endif
             }
 
             filteredMidi.addEvent (msg, frame);

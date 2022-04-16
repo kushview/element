@@ -389,10 +389,8 @@ public:
 
         controller->run();
 
-#ifndef EL_FREE
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
-#endif
 
 #if EL_PRO
         if (auto* sc = controller->findChild<SessionController>())

@@ -131,11 +131,6 @@ public:
         addAndMakeVisible (mapButton);
         addAndMakeVisible (midiBlinker);
 
-#if defined(EL_FREE)
-        mapButton.setEnabled (false);
-        mapButton.setVisible (false);
-#endif
-
 #if ! defined(EL_PRO)
         transport.setEnabled (false);
         transport.setVisible (false);

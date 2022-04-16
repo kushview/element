@@ -268,7 +268,7 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 
 void MainMenu::buildFileMenu (PopupMenu& menu)
 {
-#if defined(EL_SOLO) || defined(EL_FREE)
+#if defined(EL_SOLO)
     menu.addCommandItem (&cmd, Commands::graphNew, "New Graph");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
@@ -390,11 +390,9 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
     menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
 
-#ifndef EL_FREE
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-#endif
 }
 
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)

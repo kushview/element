@@ -497,7 +497,7 @@ StandardContentComponent::StandardContentComponent (AppController& ctl_)
 #endif
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 
-#if defined(EL_SOLO) || defined(EL_FREE)
+#if defined(EL_SOLO)
     setShowAccessoryView (false);
 #endif
 

@@ -555,7 +555,6 @@ public:
         gv->setPropertyPanelHeaderVisible (false);
         addPanelInternal (-1, gv, "Graph", nullptr);
 
-#ifndef EL_FREE
         auto* nv = new NodeEditorContentView();
         nv->setName ("Node");
         nv->setComponentID ("Node");
@@ -565,7 +564,6 @@ public:
         mv->setName ("MIDI");
         mv->setComponentID ("MIDI");
         addPanelInternal (-1, mv, "MIDI", nullptr);
-#endif
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals (this)->getPluginManager());
         pv->setName ("Plugins");

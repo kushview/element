@@ -722,7 +722,6 @@ bool Node::isChildOfRootGraph() const
 kv::MidiChannels Node::getMidiChannels() const
 {
     kv::MidiChannels chans;
-#ifndef EL_FREE
     if (objectData.hasProperty (Tags::midiChannels))
     {
         if (auto* const block = objectData.getProperty (Tags::midiChannels).getBinaryData())
@@ -733,7 +732,6 @@ kv::MidiChannels Node::getMidiChannels() const
         }
     }
     else
-#endif
     {
         const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
         if (channel > 0)
