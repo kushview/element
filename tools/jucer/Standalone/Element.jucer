@@ -9,6 +9,12 @@
               jucerFormatVersion="1">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
+      <GROUP id="{F750817A-4846-F0A7-25D2-E610EADFA1E7}" name="images">
+        <FILE id="mB1Kwy" name="digitalelements-logo_220.png" compile="0" resource="1"
+              file="../../../data/images/digitalelements-logo_220.png"/>
+        <FILE id="MsgVXq" name="kushview-logo-text_220.png" compile="0" resource="1"
+              file="../../../data/images/kushview-logo-text_220.png"/>
+      </GROUP>
       <GROUP id="{7781D324-BF7F-88B0-7FF2-E052588AB2FF}" name="fonts">
         <FILE id="iWwjIP" name="Roboto-LICENSE.txt" compile="0" resource="0"
               file="../../../data/fonts/Roboto-LICENSE.txt"/>
@@ -537,8 +543,8 @@
               file="../../../src/gui/ContentComponent.cpp"/>
         <FILE id="H1YxnA" name="ContentComponent.h" compile="0" resource="0"
               file="../../../src/gui/ContentComponent.h"/>
-        <FILE id="DZ3woU" name="WorkspacesContentComponent.cpp" compile="1" resource="0"
-              file="../../../src/gui/WorkspacesContentComponent.cpp"/>
+        <FILE id="DZ3woU" name="WorkspacesContentComponent.cpp" compile="1"
+              resource="0" file="../../../src/gui/WorkspacesContentComponent.cpp"/>
         <FILE id="biYLNO" name="WorkspacesContentComponent.h" compile="0" resource="0"
               file="../../../src/gui/WorkspacesContentComponent.h"/>
         <FILE id="MIAzs2" name="StandardContentComponent.cpp" compile="1" resource="0"

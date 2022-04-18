@@ -8,6 +8,12 @@
 
 namespace BinaryData
 {
+    extern const char*   digitalelementslogo_220_png;
+    const int            digitalelementslogo_220_pngSize = 7467;
+
+    extern const char*   kushviewlogotext_220_png;
+    const int            kushviewlogotext_220_pngSize = 6588;
+
     extern const char*   RobotoRegular_ttf;
     const int            RobotoRegular_ttfSize = 168260;
 
@@ -33,7 +39,7 @@ namespace BinaryData
     const int            ElementIconTemplate_pngSize = 7122;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 8;
+    const int namedResourceListSize = 10;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

@@ -453,10 +453,10 @@ def build_element_juce (bld):
         source          = juce_sources (bld),
         includes        = [
             'build/include',
+            'libs/compat',
             'libs/JUCE/modules',
             'libs/kv/modules',
-            'libs/jlv2/modules',
-            'libs/compat'
+            'libs/jlv2/modules'            
         ],
         target          = 'lib/element_juce',
         name            = 'LIBJUCE',
@@ -629,7 +629,7 @@ def install_lua_files (bld):
 
     bld.install_files (join (bld.env.DOCDIR, 'lua'),
                        bld.path.ant_glob ("build/doc/lua/**/*.*"),
-                       relative_trick=True,
+                       relative_trick=True, quiet=True,
                        cwd=path.find_dir ('build/doc/lua'))
 
     bld.install_files (bld.env.LUADIR,

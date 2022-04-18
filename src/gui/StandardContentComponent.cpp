@@ -72,6 +72,45 @@
 
 namespace Element {
 
+//=============================================================================
+class GraphEditorViewSE : public GraphEditorView
+{
+public:
+    GraphEditorViewSE()
+    {
+        logo1 = ImageCache::getFromMemory (BinaryData::kushviewlogotext_220_png,
+                                           BinaryData::kushviewlogotext_220_pngSize);
+        logo2 = ImageCache::getFromMemory (BinaryData::digitalelementslogo_220_png,
+                                           BinaryData::digitalelementslogo_220_pngSize);
+    }
+
+    ~GraphEditorViewSE() = default;
+
+    void paintOverChildren (Graphics& g) override
+    {
+        const int pad = 10;
+        auto dw = logo1.getWidth() * 0.38;
+        auto dh = logo1.getHeight() * 0.38;
+        g.drawImageWithin (logo1, -40, getHeight() - dh - pad, dw, dh, RectanglePlacement::centred);
+        dw = logo2.getWidth() * 0.4;
+        dh = logo2.getHeight() * 0.4;
+        g.drawImageWithin (logo2, getWidth() - dw - pad, getHeight() - dh - pad, dw, dh, RectanglePlacement::xRight | RectanglePlacement::yBottom);
+    }
+
+private:
+    Image logo1, logo2;
+};
+
+static GraphEditorView* createGraphEditorView()
+{
+#if defined(EL_PRO)
+    return new GraphEditorView();
+#else
+    return new GraphEditorViewSE();
+#endif
+}
+
+//=============================================================================
 class SmartLayoutManager : public StretchableLayoutManager
 {
 public:
@@ -465,7 +504,7 @@ StandardContentComponent::StandardContentComponent (AppController& ctl_)
 
     container->setMainView (createLastContentView (settings));
 
-#if defined(EL_PRO)
+#if EL_PRO
     if (booleanProperty (settings, "accessoryView", false))
     {
         setAccessoryView (stringProperty (settings, "accessoryViewName", EL_VIEW_GRAPH_MIXER));
@@ -537,7 +576,7 @@ void StandardContentComponent::setMainView (const String& name)
     }
     else if (name == "GraphEditor" || name == "GraphEditorView")
     {
-        setContentView (new GraphEditorView());
+        setContentView (createGraphEditorView());
     }
     else if (name == "PluginManager")
     {
@@ -564,7 +603,7 @@ void StandardContentComponent::setMainView (const String& name)
         if (auto s = getGlobals().getSession())
         {
             if (s->getNumGraphs() > 0)
-                setContentView (new GraphEditorView());
+                setContentView (createGraphEditorView());
             else
                 setContentView (new EmptyContentView());
         }
