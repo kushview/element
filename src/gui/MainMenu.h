@@ -64,7 +64,7 @@ public:
     void menuItemSelected (int index, int menu) override;
 
     // Command Target
-    ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; /* &owner.app(); */ }
+    ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; }
     void getAllCommands (Array<CommandID>&) override {}
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
     bool perform (const InvocationInfo& info) override { return false; }
@@ -73,7 +73,7 @@ private:
     MainWindow& owner;
     Globals& world;
     CommandManager& cmd;
-    ScopedPointer<PopupMenu> macMenu;
+    std::unique_ptr<PopupMenu> macMenu;
     const int recentMenuOffset = 20000;
 
     void buildFileMenu (PopupMenu& menu);

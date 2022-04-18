@@ -52,7 +52,6 @@ MainWindow::~MainWindow()
 void MainWindow::changeListenerCallback (ChangeBroadcaster*)
 {
     refreshName();
-    // refreshMenu();
 }
 
 void MainWindow::refreshName()

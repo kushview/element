@@ -58,7 +58,7 @@ MainMenu::~MainMenu()
 void MainMenu::setupMenu()
 {
 #if JUCE_MAC
-    macMenu = new PopupMenu();
+    macMenu.reset (ew PopupMenu());
     macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About"));
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
     macMenu->addSeparator();
@@ -239,7 +239,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         const int fileIdx = index - recentMenuOffset;
         class File f = owner.getAppController().getRecentlyOpenedFilesList().getFile (fileIdx);
-#if EL_PRO
+#if defined(EL_PRO)
         owner.getAppController().findChild<SessionController>()->openFile (f);
 #else
         owner.getAppController().findChild<GraphController>()->openGraph (f);
@@ -370,9 +370,6 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
 #ifdef EL_URL_API_LUA_EL
     menu.addItem (6500, "Element Lua API");
 #endif
-#ifdef EL_URL_API_LUA_KV
-    menu.addItem (6501, "KV Lua Modules API");
-#endif
     menu.addSeparator();
     menu.addItem (7000, "Submit Feedback");
 #if ! JUCE_MAC
@@ -415,13 +412,14 @@ void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
 
 void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
 {
-#ifdef EL_PRO
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
+#if defined(EL_SOLO)
     menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
     menu.addCommandItem (&cmd, Commands::showConsole, "Console");
     menu.addSeparator();
+#endif
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
@@ -432,19 +430,6 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
     menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
-#else
-    menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
-    menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
-    menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
-    menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
-    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
-#endif
 }
 
 void MainMenu::buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
