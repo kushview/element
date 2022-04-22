@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import inspect, os, sys
-
-submodule_help = "Are submodules up to date? Try 'git submodule update --init --recursive'\n"
+submodule_help  = "Are submodules up to date? Try 'git submodule update --init --recursive'\n"
+waflib_path     = os.path.join (os.getcwd(), 'libs/waf')
+sys.path.insert (0, waflib_path)
 
 try:
     from waflib import Context, Scripting
@@ -13,9 +14,7 @@ except Exception as e:
     sys.exit(1)
 
 def main():
-    script_path = os.path.abspath(inspect.getfile(inspect.getmodule(main)))
-    project_path = os.path.dirname(script_path)
-    Scripting.waf_entry_point(os.getcwd(), Context.WAFVERSION, project_path)
+    Scripting.waf_entry_point(os.getcwd(), Context.WAFVERSION, waflib_path)
 
 if __name__ == '__main__':
     main()
