@@ -24,7 +24,7 @@ namespace DataPathHelpers {
     StringArray getSubDirs()
     {
         auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts" });
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         dirs.add ("Sessions");
 #endif
         return dirs;

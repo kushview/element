@@ -975,7 +975,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
             File file = panel->getSelectedFile();
             if (file.hasFileExtension ("els"))
             {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
                 postMessage (new OpenSessionMessage (file));
 #endif
             }

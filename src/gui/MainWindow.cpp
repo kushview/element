@@ -61,7 +61,7 @@ void MainWindow::refreshName()
 
 void MainWindow::nameChanged()
 {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
     nameChangedSession();
 #else
     nameChangedSingleGraph();

@@ -282,18 +282,14 @@ private:
                                               TRANS ("Name"),
                                               256,
                                               false));
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         props.add (new RenderModePropertyComponent (g));
         props.add (new VelocityCurvePropertyComponent (g));
 #endif
 
-#if defined(EL_SOLO) || defined(EL_PRO)
         props.add (new RootGraphMidiChannels (g, getWidth() - 100));
-#else
-        props.add (new RootGraphMidiChanel (g));
-#endif
 
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         props.add (new MidiProgramPropertyComponent (g));
 #endif
 

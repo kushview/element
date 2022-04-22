@@ -342,7 +342,7 @@ public:
 
     GeneralSettingsPage (Globals& world, GuiController& g)
         : pluginSettings (world),
-#ifdef EL_PRO
+#ifndef EL_SOLO
           defaultSessionFile ("Default Session", File(), true, false,
                               false, // bool isForSaving,
                               "*.els", //const String& fileBrowserWildcard,
@@ -408,7 +408,7 @@ public:
         hidePluginWindows.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (openLastSessionLabel);
-#ifdef EL_PRO
+#ifndef EL_SOLO
         openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
 #else
         openLastSessionLabel.setText ("Open last used Graph", dontSendNotification);
@@ -420,7 +420,7 @@ public:
         openLastSession.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (askToSaveSessionLabel);
-#ifdef EL_PRO
+#ifndef EL_SOLO
         askToSaveSessionLabel.setText ("Ask to save sessions on exit", dontSendNotification);
 #else
         askToSaveSessionLabel.setText ("Ask to save graphs on exit", dontSendNotification);
@@ -461,7 +461,7 @@ public:
             }
         };
 
-#ifdef EL_PRO
+#ifndef EL_SOLO
         addAndMakeVisible (defaultSessionFileLabel);
         defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
         defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
@@ -480,7 +480,7 @@ public:
         clockSource.setValue (source);
         clockSource.addListener (this);
 
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         addAndMakeVisible (mainContentLabel);
         mainContentLabel.setText ("UI Type", dontSendNotification);
         mainContentLabel.setFont (Font (12.0, Font::bold));
@@ -554,7 +554,7 @@ public:
         layoutSetting (r, openLastSessionLabel, openLastSession);
         layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
 
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         r.removeFromTop (spacingBetweenSections);
         r2 = r.removeFromTop (settingHeight);
         mainContentLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
@@ -564,7 +564,7 @@ public:
         layoutSetting (r, systrayLabel, systray);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
 
-#ifdef EL_PRO
+#ifndef EL_SOLO
         layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
         defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
                                              defaultSessionFile.getY(),

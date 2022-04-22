@@ -131,7 +131,7 @@ public:
         addAndMakeVisible (mapButton);
         addAndMakeVisible (midiBlinker);
 
-#if ! defined(EL_PRO)
+#ifdef EL_SOLO
         transport.setEnabled (false);
         transport.setVisible (false);
 #endif
@@ -622,7 +622,7 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
         {
             if (true)
             {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
                 if (auto* sess = controller.findChild<SessionController>())
                     sess->importGraph (file);
 #else

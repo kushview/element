@@ -103,7 +103,7 @@ private:
 
 static GraphEditorView* createGraphEditorView()
 {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
     return new GraphEditorView();
 #else
     return new GraphEditorViewSE();
@@ -432,7 +432,7 @@ static ContentView* createLastContentView (Settings& settings)
     else if (lastContentView == "PatchBay")
         view = std::make_unique<ConnectionGrid>();
     else if (lastContentView == "GraphEditor")
-        view = std::make_unique<GraphEditorView>();
+        view.reset (createGraphEditorView());
     else if (lastContentView == "ControllerDevicesView")
         view = std::make_unique<ControllerDevicesView>();
     else
@@ -504,7 +504,7 @@ StandardContentComponent::StandardContentComponent (AppController& ctl_)
 
     container->setMainView (createLastContentView (settings));
 
-#if EL_PRO
+#ifndef EL_SOLO
     if (booleanProperty (settings, "accessoryView", false))
     {
         setAccessoryView (stringProperty (settings, "accessoryViewName", EL_VIEW_GRAPH_MIXER));
@@ -531,7 +531,7 @@ StandardContentComponent::StandardContentComponent (AppController& ctl_)
         nav->setSize (navSize, getHeight());
         resizerMouseUp();
     }
-#ifdef EL_PRO
+#ifndef EL_SOLO
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
 #endif
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);

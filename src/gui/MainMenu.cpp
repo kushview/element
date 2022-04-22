@@ -239,7 +239,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         const int fileIdx = index - recentMenuOffset;
         class File f = owner.getAppController().getRecentlyOpenedFilesList().getFile (fileIdx);
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         owner.getAppController().findChild<SessionController>()->openFile (f);
 #else
         owner.getAppController().findChild<GraphController>()->openGraph (f);
@@ -394,7 +394,7 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
 
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
 {
-#if EL_PRO
+#ifndef EL_SOLO
     menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
     menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
     menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete current graph");

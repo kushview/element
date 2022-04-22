@@ -459,10 +459,7 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::keyEnd, 127);
     stabilizeProperty (Tags::transpose, 0);
     stabilizeProperty (Tags::delayCompensation, 0);
-
-#if ! defined(EL_PRO)
     stabilizeProperty (Tags::tempo, (double) 120.0);
-#endif
     objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
     objectData.getOrCreateChildWithName (Tags::ports, nullptr);
     objectData.getOrCreateChildWithName (Tags::ui, nullptr);

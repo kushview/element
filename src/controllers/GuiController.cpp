@@ -410,7 +410,8 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
 void GuiController::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
-#if defined(EL_PRO)
+#ifndef EL_SOLO
+        Commands::showConsole,
         Commands::showSessionConfig,
         Commands::showGraphMixer,
 #endif
@@ -428,8 +429,7 @@ void GuiController::getAllCommands (Array<CommandID>& commands)
         Commands::hideAllPluginWindows,
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
-        Commands::toggleUserInterface,
-        Commands::showConsole
+        Commands::toggleUserInterface
     });
 
     commands.add (Commands::quit);
@@ -459,7 +459,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
 
-#ifdef EL_PRO
+#ifndef EL_SOLO
         // MARK: Session Commands
         case Commands::sessionClose:
             result.setInfo ("Close Session", "Close the current session", Commands::Categories::Session, 0);
@@ -505,7 +505,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         break;
 #endif
 
-#ifndef EL_PRO
+#ifdef EL_SOLO
         // MARK: Graph Commands
         case Commands::graphNew:
             result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
@@ -592,7 +592,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         }
         break;
 
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         case Commands::showGraphMixer: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
@@ -778,6 +778,8 @@ bool GuiController::perform (const InvocationInfo& info)
             }
         }
         break;
+
+#ifndef EL_SOLO
         case Commands::showConsole: {
             if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_CONSOLE)
             {
@@ -787,9 +789,9 @@ bool GuiController::perform (const InvocationInfo& info)
             {
                 content->setAccessoryView (EL_VIEW_CONSOLE);
             }
+            break;
         }
-        break;
-
+#endif
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;

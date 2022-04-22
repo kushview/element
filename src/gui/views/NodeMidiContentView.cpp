@@ -75,10 +75,8 @@ void NodeMidiContentView::stabilizeContent()
 
         if (NodeObjectPtr ptr = node.getObject())
         {
-#if defined(EL_PRO) || defined(EL_SOLO)
             midiProgramChangedConnection = ptr->midiProgramChanged.connect (
                 std::bind (&NodeMidiContentView::updateMidiProgram, this));
-#endif
         }
     }
     else

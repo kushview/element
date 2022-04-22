@@ -413,7 +413,7 @@ void Settings::setDesktopScale (double scale)
 //=============================================================================
 String Settings::getMainContentType() const
 {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
     if (auto* p = getProps())
         return p->getValue (mainContentTypeKey, "standard");
     return "standard";
@@ -424,7 +424,7 @@ String Settings::getMainContentType() const
 
 void Settings::setMainContentType (const String& tp)
 {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
     if (getMainContentType() == tp)
         return;
     if (auto* p = getProps())
@@ -452,7 +452,7 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 
     sub.addSeparator(); // session items
 
-#if EL_PRO
+#ifndef EL_SOLO
     sub.addItem (OpenLastUsedSession, "Open Last Saved Session", true, openLastUsedSession());
     sub.addItem (AskToSaveSessions, "Ask To Save Session", true, askToSaveSession());
 #else

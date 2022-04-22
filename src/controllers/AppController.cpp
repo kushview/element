@@ -124,7 +124,7 @@ void AppController::run()
     auto session = getWorld().getSession();
     Session::ScopedFrozenLock freeze (*session);
 
-#if EL_PRO
+#ifndef EL_SOLO
     if (auto* sc = findChild<SessionController>())
     {
         bool loadDefault = true;
@@ -280,7 +280,7 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         sess->openFile (osm->file);
 #else
         findChild<GraphController>()->openGraph (osm->file);
@@ -372,7 +372,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
 
         Commands::signIn,
         Commands::signOut,
-#ifdef EL_PRO
+#ifndef EL_SOLO
         Commands::sessionNew,
         Commands::sessionSave,
         Commands::sessionSaveAs,
@@ -390,7 +390,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
 
         Commands::transportPlay,
 
-#ifndef EL_PRO
+#ifdef EL_SOLO
         Commands::graphNew,
         Commands::graphOpen,
         Commands::graphSave,

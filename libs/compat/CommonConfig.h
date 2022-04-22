@@ -51,7 +51,3 @@
     #pragma warning(disable : 4389) // signed/unsigned mismatch
     #pragma warning(disable : 26812)
 #endif
-
-#if ! defined(EL_SOLO)
-    #define EL_PRO 1
-#endif

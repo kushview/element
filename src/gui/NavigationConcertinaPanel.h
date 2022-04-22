@@ -540,7 +540,7 @@ public:
     {
         clearPanels();
 
-#ifdef EL_PRO
+#ifndef EL_SOLO
         auto* sess = new SessionTreePanel();
         sess->setName ("Session");
         sess->setComponentID ("Session");

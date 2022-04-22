@@ -280,7 +280,7 @@ public:
             return;
         }
 
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         auto* sc = controller->findChild<SessionController>();
 
         if (world->getSettings().askToSaveSession())
@@ -341,7 +341,7 @@ public:
         if (! controller)
             return;
 
-#if defined(EL_PRO)
+#ifndef EL_SOLO
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = commandLine.unquoted().trim();
@@ -392,7 +392,7 @@ public:
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
-#if EL_PRO
+#ifndef EL_SOLO
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = world->cli.commandLine.unquoted().trim();
