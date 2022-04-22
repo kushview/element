@@ -58,7 +58,7 @@ MainMenu::~MainMenu()
 void MainMenu::setupMenu()
 {
 #if JUCE_MAC
-    macMenu.reset (ew PopupMenu());
+    macMenu.reset (new PopupMenu());
     macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About"));
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
     macMenu->addSeparator();
