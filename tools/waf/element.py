@@ -97,8 +97,10 @@ def check_common (self):
             self.env.append_unique ('CXXFLAGS', [ '-I%s' % self.options.vstsdk24 ])
 
         line_just = self.line_just
-        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',  uselib_store='AEFFECT_H',  mandatory=False)
-        self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', uselib_store='AEFFECTX_H', mandatory=False)
+        self.check(header_name='pluginterfaces/vst2.x/aeffect.h', msg="Checking for header 'aeffect.h'",
+            uselib_store='AEFFECT_H',  mandatory=False)
+        self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', msg="Checking for header 'aeffectx.h'",
+            uselib_store='AEFFECTX_H', mandatory=False)
         self.env.VST = bool(self.env.HAVE_AEFFECT_H) and bool(self.env.HAVE_AEFFECTX_H)
         if not self.env.VST:
             # check for distrho... somehow?
@@ -117,7 +119,8 @@ def check_common (self):
 
     if self.env.VST3:
         line_just = self.line_just
-        self.check(header_name='pluginterfaces/vst2.x/vstfxstore.h', uselib_store='VSTFXSTORE_H', mandatory=False)
+        self.check(header_name='pluginterfaces/vst2.x/vstfxstore.h', msg="Checking for header 'vstfxstore.h'",
+            uselib_store='VSTFXSTORE_H', mandatory=False)
         self.define ('JUCE_VST3_CAN_REPLACE_VST2', bool (self.env.HAVE_VSTFXSTORE_H))
         self.env.INCLUDES_VST3 = [ self.env.VST3SDK_PATH ]
         self.line_just = line_just
