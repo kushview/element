@@ -2,16 +2,19 @@ Element/Builds/
 Element/JuceLibraryCode/**/*.*
 !Element/JuceLibraryCode/AppConfig.h
 !Element/JuceLibraryCode/JuceHeader.h
+!Element/JuceLibraryCode/JucePluginDefines.h
 
 ElementFX/Builds/
 ElementFX/JuceLibraryCode/**/*.*
 !ElementFX/JuceLibraryCode/AppConfig.h
 !ElementFX/JuceLibraryCode/JuceHeader.h
+!ElementFX/JuceLibraryCode/JucePluginDefines.h
 
 ElementMFX/Builds/
 ElementMFX/JuceLibraryCode/**/*.*
 !ElementMFX/JuceLibraryCode/AppConfig.h
 !ElementMFX/JuceLibraryCode/JuceHeader.h
+!ElementMFX/JuceLibraryCode/JucePluginDefines.h
 
 Standalone/Builds/
 Standalone/JuceLibraryCode/**/*.*
