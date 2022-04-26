@@ -9,7 +9,7 @@ import juce
 APPNAME="element"
 # Version number
 VERSION="0.47.0"
-# plugin version is +1 that of standalone. VST2 has to start at 1.0.0
+VERSION_LAST="0.46.4"
 PLUGIN_VERSION="1.47.0"
 
 JUCE_VST3SDK_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'

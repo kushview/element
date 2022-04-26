@@ -46,6 +46,7 @@ def options (opt):
 
     opt.add_option ('--minimal', dest='minimal', default=False, action='store_true')
     opt.add_option ('--se', dest='se', default=False, action='store_true')
+    opt.add_option ('--revision', dest='revision', default=False, action='store_true')
 
 def silence_warnings (conf):
     '''TODO: resolve these'''
@@ -730,7 +731,12 @@ def dist (ctx):
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
 
 def version (ctx):
-    print (element.VERSION)
+    vers = element.VERSION
+    if repo.is_dirty():
+        vers += "-dirty"
+    if ctx.options.revision:
+        vers += '_r%s' % repo.ncommits (element.VERSION_LAST)
+    print(vers)
     exit(0)
 
 from waflib.Build import BuildContext
