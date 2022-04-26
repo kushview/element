@@ -780,14 +780,6 @@ def clean_artifacts (ctx):
     if os.path.exists (root):
         call ('bash tools/clean_artifacts.sh'.split())
 
-def dockermingw32 (ctx):
-    from subprocess import call
-    call ('bash tools/dockerdeploy/run.sh tools/dockerdeploy/build-mingw32.sh'.split())
-
-def dockerappimage (ctx):
-    from subprocess import call
-    call ('bash tools/dockerdeploy/run.sh tools/dockerdeploy/build-appimage.sh'.split())
-
 def deepclean (ctx):
     from waflib import Options
     lst = ['clean_artifacts', 'distclean']
