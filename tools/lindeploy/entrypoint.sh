@@ -15,5 +15,5 @@ export CXXFLAGS="-DEL_APPIMAGE=1"
 ./waf docs
 
 export LD_LIBRARY_PATH="/depends/x86_64-pc-linux-gnu/lib"
-sh tools/appimage.sh
+sh tools/lindeploy/appimage.sh
 cp -fv build/*.AppImage /dist/

@@ -13,7 +13,7 @@ here=`pwd`
     --luadir="/lua"
 ./waf build ${WAF_BUILD_OPTIONS}
 
-pkgname="element-win64-`./waf version`_`date +%Y%m%d`"
+pkgname="element-w64-`./waf version`_`date +%Y%m%d`"
 win64dir="/dist/${pkgname}"
 ./waf copydlls install --destdir="$win64dir"
 cp -f build/lib/*.dll "$win64dir/lib"
