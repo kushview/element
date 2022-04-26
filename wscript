@@ -616,6 +616,7 @@ def build_app (bld):
 
     elif bld.host_is_mingw32():
         app.defines.append ('JUCE_DLL_BUILD=1')
+        app.linkflags.append ('-mwindows')
         bld (features='subst', source='tools/element.bat',
              target='element.bat', install_path=None)
 
