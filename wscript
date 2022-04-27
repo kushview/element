@@ -112,7 +112,8 @@ def configure (conf):
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
 
     conf.env.JUCE_DLL = False
-    conf.define ('JUCE_DLL', conf.env.JUCE_DLL)
+    if conf.env.JUCE_DLL:
+        conf.define ('JUCE_DLL', conf.env.JUCE_DLL)
     conf.define ('JUCE_STANDALONE_APPLICATION', True)
     conf.define ('JUCE_DISPLAY_SPLASH_SCREEN', False)
     conf.define ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', True)
