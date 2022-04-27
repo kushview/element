@@ -118,6 +118,14 @@ private:
     RecentlyOpenedFilesList recentFiles;
     UndoManager undo;
     RunMode runMode;
+    
+    struct ForegroundCheck : public Timer
+    {
+        ForegroundCheck (AppController& a) : app (a) {}
+        void timerCallback() override;
+        AppController& app;
+    } foregroundCheck;
+
     void run();
 };
 

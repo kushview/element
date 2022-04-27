@@ -127,7 +127,10 @@ public:
         {
             for (int i = activePluginWindows.size(); --i >= 0;)
                 deletePluginWindow (i, windowVisible);
+           #if JUCE_MAC || JUCE_WINDOWS
+            // needed?
             MessageManager::getInstance()->runDispatchLoopUntil (50);
+           #endif
         }
     }
     
