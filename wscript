@@ -111,7 +111,8 @@ def configure (conf):
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
 
-    conf.define ('JUCE_DLL', True)
+    conf.env.JUCE_DLL = False
+    conf.define ('JUCE_DLL', conf.env.JUCE_DLL)
     conf.define ('JUCE_STANDALONE_APPLICATION', True)
     conf.define ('JUCE_DISPLAY_SPLASH_SCREEN', False)
     conf.define ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', True)
@@ -389,13 +390,16 @@ def build_vst_linux (bld, plugin):
             'libs/compat/include_juce_audio_plugin_client_utils.cpp'
         ],
         includes        = [ 'src' ],
-        defines         = [ 'JUCE_DLL_BUILD=1' ],
+        defines         = [],
         target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
         use             = [ 'APP_objects', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
+
+    if bld.host_is_windows() and bld.env.JUCE_DLL:
+        vst.defines.append ('JUCE_DLL_BUILD=1')
 
 def build_vst (bld):
     if bld.env.VST and (bld.host_is_linux() or bld.host_is_mingw32()):
@@ -452,7 +456,7 @@ def build_element_juce (bld):
         env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
 
     JUCE = bld (
-        features        = 'cxx cxxshlib',
+        features        = 'cxx cxxshlib' if bld.env.JUCE_DLL else 'cxx cxxstlib',
         source          = juce_sources (bld),
         includes        = [
             'build/include',
@@ -471,7 +475,7 @@ def build_element_juce (bld):
         linkflags       = [],
         install_path    = bld.env.LIBDIR
     )
-
+    
     pcfile = bld (
         features      = 'subst',
         source        = 'libs/element/element.pc.in',
@@ -501,7 +505,8 @@ def build_element_juce (bld):
         pcfile.install_path = None
 
     elif bld.host_is_windows():
-        JUCE.defines.append ('JUCE_DLL_BUILD=1')
+        if bld.env.JUCE_DLL:
+            JUCE.defines.append ('JUCE_DLL_BUILD=1')
         for l in element.mingw_libs.split():
             JUCE.use.append (l.upper())
         JUCE.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
@@ -576,7 +581,8 @@ def build_app_objects (bld):
         pass
 
     elif bld.host_is_mingw32():
-        library.defines.append ('JUCE_DLL_BUILD=1')
+        if bld.env.JUCE_DLL:
+            library.defines.append ('JUCE_DLL_BUILD=1')
         if bld.env.DEBUG:
             library.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
 
@@ -618,7 +624,8 @@ def build_app (bld):
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     elif bld.host_is_mingw32():
-        app.defines.append ('JUCE_DLL_BUILD=1')
+        if bld.env.JUCE_DLL:
+            app.defines.append ('JUCE_DLL_BUILD=1')
         app.linkflags.append ('-mwindows')
         bld (features='subst', source='tools/element.bat',
              target='element.bat', install_path=None)
