@@ -39,6 +39,8 @@ def configure (self):
         else:
             self.fatal ('depends.py: %s config key not handled' % k)
     
+    self.env.WINDRES = [ '%s-windres' % self.env.HOST ]
+
     self.env.append_unique ('CPPFLAGS_DEPENDS',  ['-I%s/include' % d])
     self.env.append_unique ('LINKFLAGS_DEPENDS', ['-L%s/lib' % d])
 
