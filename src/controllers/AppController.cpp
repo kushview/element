@@ -46,7 +46,7 @@ Globals& AppController::Child::getWorld() { return getAppController().getWorld()
 Settings& AppController::Child::getSettings() { return getWorld().getSettings(); }
 
 AppController::AppController (Globals& g, RunMode m)
-    : world (g), runMode (m)
+    : world (g), runMode (m), foregroundCheck (*this)
 {
     addChild (new GuiController (g, *this));
     addChild (new DevicesController());
@@ -575,47 +575,40 @@ bool AppController::perform (const InvocationInfo& info)
     return res;
 }
 
-void AppController::checkForegroundStatus()
+void AppController::ForegroundCheck::timerCallback()
 {
-    if (runMode != RunMode::Standalone)
+    static bool sIsForeground = true;
+    auto foreground = Process::isForegroundProcess();
+    if (sIsForeground == foreground)
+        return;
+            
+    if (! app.getWorld().getSettings().hidePluginWindowsWhenFocusLost())
         return;
 
-    class CheckForeground : public CallbackMessage
+    auto session  = app.getWorld().getSession();
+    auto& gui     = *app.findChild<GuiController>();
+    
+    jassert (session);
+    if (foreground)
     {
-    public:
-        CheckForeground (AppController& a) : app (a) {}
-        void messageCallback() override
-        {
-            static bool sIsForeground = true;
-            const auto foreground = Process::isForegroundProcess();
-            if (sIsForeground == foreground)
-                return;
+        if (session)
+            gui.showPluginWindowsFor (session->getCurrentGraph(), true, false);
+        gui.getMainWindow()->toFront (true);
+    }
+    else if (! foreground)
+    {
+        gui.closeAllPluginWindows();
+    }
+    
+    sIsForeground = foreground;
+    stopTimer();
+}
 
-            if (! app.getWorld().getSettings().hidePluginWindowsWhenFocusLost())
-                return;
-
-            auto session = app.getWorld().getSession();
-            auto& gui = *app.findChild<GuiController>();
-            const Node graph (session->getCurrentGraph());
-            jassert (session);
-            if (foreground)
-            {
-                gui.showPluginWindowsFor (graph, true, false);
-                gui.getMainWindow()->toFront (true);
-            }
-            else if (! foreground)
-            {
-                gui.closeAllPluginWindows();
-            }
-
-            sIsForeground = foreground;
-        }
-
-    private:
-        AppController& app;
-    };
-
-    (new CheckForeground (*this))->post();
+void AppController::checkForegroundStatus()
+{
+    if (runMode != RunMode::Standalone || foregroundCheck.isTimerRunning())
+        return;
+    foregroundCheck.startTimer (50);
 }
 
 } // namespace Element
