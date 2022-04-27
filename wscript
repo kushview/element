@@ -585,6 +585,8 @@ def build_app_objects (bld):
 
 def build_app (bld):
     appEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        appEnv.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
     app = bld.program (
         source      = [ 'src/Main.cc' ],
         includes    = common_includes(),
