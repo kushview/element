@@ -71,6 +71,7 @@ public:
         type->name = "Virtual Keyboard";
         type->description = "Embedded virtual keyboard which sends MIDI events to the Global MIDI input";
         type->singleton = true;
+        type->placement = kv::DockPlacement::Bottom;
         
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::graphMixer;

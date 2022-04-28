@@ -120,10 +120,11 @@ void WorkspacesContentComponent::applyWorkspaceState (const WorkspaceState& stat
     workspace.applyState (state);
 }
 
+#define EL_WORKSPACES_MENU_OFFSET   100000
 void WorkspacesContentComponent::addWorkspaceItemsToMenu (PopupMenu& menu)
 {
     auto& dock = impl->getDock();
-    const int offset = 100000;
+    const int offset = EL_WORKSPACES_MENU_OFFSET;
     int index = 0;
     for (const auto* const desc : dock.getPanelDescriptions())
     {
@@ -139,14 +140,15 @@ void WorkspacesContentComponent::addWorkspaceItemsToMenu (PopupMenu& menu)
 void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
 {
     auto& dock = impl->getDock();
-    const int index = result - 100000;
+    const int index = result - EL_WORKSPACES_MENU_OFFSET;
     const auto& descs = dock.getPanelDescriptions();
 
     if (! isPositiveAndBelow (index, descs.size()))
         return;
-
-    const auto panelId      = descs[index]->identifier;
-    const auto singleton    = descs[index]->singleton;
+    
+    const auto desc         = *descs[index];
+    const auto panelId      = desc.identifier;
+    const auto singleton    = desc.singleton;
 
     if (singleton)
     {
@@ -172,15 +174,22 @@ void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
             return;
         }
     }
-
-    if (auto* const selected = dock.getSelectedItem())
+    
+    if (DockPlacement::isValid (desc.placement))
     {
-        if (auto* const item = dock.createItem (panelId))
-            item->dockTo (selected, DockPlacement::Center);
+         dock.createItem (panelId, static_cast<DockPlacement> (desc.placement));
     }
     else
     {
-        dock.createItem (panelId, DockPlacement::Top);
+        if (auto* const selected = dock.getSelectedItem())
+        {
+            if (auto* const item = dock.createItem (panelId))
+                item->dockTo (selected, DockPlacement::Center);
+        }
+        else
+        {
+            dock.createItem (panelId, DockPlacement::Top);
+        }
     }
 }
 
