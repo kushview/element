@@ -24,6 +24,7 @@
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
 #include "Globals.h"
+#include "Settings.h"
 #include "BinaryData.h"
 
 namespace Element {
@@ -185,10 +186,16 @@ void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
 
 void WorkspacesContentComponent::saveState (PropertiesFile*)
 {
+    if (auto* props = getAppController().getWorld().getSettings().getUserSettings())
+        if (auto* vk = getVirtualKeyboardView())
+            vk->saveState (props);
 }
 
 void WorkspacesContentComponent::restoreState (PropertiesFile*)
 {
+    if (auto* props = getAppController().getWorld().getSettings().getUserSettings())
+        if (auto* vk = getVirtualKeyboardView())
+            vk->restoreState (props);
 }
 
 void WorkspacesContentComponent::getSessionState (String&)

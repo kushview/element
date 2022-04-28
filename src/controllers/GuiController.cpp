@@ -364,8 +364,7 @@ void GuiController::run()
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commander().getKeyMappings());
-    getContentComponent()->restoreState (pf);
-
+    
     {
         const auto stateName = settings.getWorkspace();
         WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
@@ -374,6 +373,7 @@ void GuiController::run()
         getContentComponent()->applyWorkspaceState (state);
     }
 
+    getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();
     Desktop::getInstance().setGlobalScaleFactor (
         getWorld().getSettings().getDesktopScale());
