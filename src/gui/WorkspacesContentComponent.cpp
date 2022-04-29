@@ -162,15 +162,7 @@ void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
 
         if (panel != nullptr)
         {
-            if (auto* item = panel->findParentComponentOfClass<kv::DockItem>()) {
-                item->setSelected (true, true);
-                for (int j = 0; j < item->getNumPanels(); ++j)
-                {
-                    if (panel == item->getPanel (j))
-                        { item->setCurrentPanelIndex (j); break; }
-                }
-            }
-
+            dock.selectPanel (panel);
             return;
         }
     }
