@@ -327,6 +327,12 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
             .setProperty ("pluginEditorBounds", editorBounds.toString(), nullptr)
             .setProperty ("editorKeyboardFocus", editorWantsKeyboard, nullptr)
             .setProperty ("forceZeroLatency", isForcingZeroLatency(), nullptr);
+        
+        if (auto engine = world->getAudioEngine())
+            if (auto mon = engine->getTransportMonitor())
+                session->getValueTree().setProperty (
+                    "pluginTransportPlaying", mon->playing.get(), nullptr);
+
         auto ppData = session->getValueTree().getOrCreateChildWithName ("perfParams", nullptr);
         ppData.removeAllChildren (nullptr);
         for (auto* const pp : perfparams)
@@ -350,6 +356,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
     PLUGIN_DBG ("[EL] restore state: prepared: " << (int) prepared);
 
     auto session = world->getSession();
+    auto engine = world->getAudioEngine();
     if (! session || ! shouldProcess.get())
         return;
 
@@ -375,7 +382,10 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
                                                       "pluginEditorBounds", RI().toString())
                                                .toString());
             editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
-            setForceZeroLatency ((bool) session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
+            setForceZeroLatency ((bool)session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
+            if (auto engine = world->getAudioEngine())
+                if (! engine->isUsingExternalClock())
+                    engine->setPlaying ((bool) session->getProperty ("pluginTransportPlaying", false));
             session->forEach (setPluginMissingNodeProperties);
             for (auto* const param : perfparams)
                 param->clearNode();
