@@ -237,11 +237,25 @@ private:
     AudioProcessor* getProcessor() { return (object != nullptr) ? object->getAudioProcessor() : nullptr; }
 };
 
+void PluginWindow::DelayedNodeFocus::timerCallback()
+{
+    if (! window.isActiveWindow())
+        return;
+    if (auto* const cc = ViewHelpers::findContentComponent())
+    {
+        auto node = window.getNode();
+        if (node.isValid())
+            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+                gui->selectNode (node);
+    }
+}
+
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
     : DocumentWindow (n.getName(), LookAndFeel::backgroundColor, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
       gui (g),
       owner (n.getObject()),
-      node (n)
+      node (n),
+      delayedNodeFocus (*this)
 {
     setLookAndFeel (&g.getLookAndFeel());
     setUsingNativeTitleBar (true);
@@ -295,6 +309,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
 
 PluginWindow::~PluginWindow()
 {
+    delayedNodeFocus.stopTimer();
     name.removeListener (this);
     clearContentComponent();
     setLookAndFeel (nullptr);
@@ -340,6 +355,9 @@ void PluginWindow::resized()
 
 void PluginWindow::activeWindowStatusChanged()
 {
+    if (isActiveWindow())
+        delayedNodeFocus.trigger();
+
     if (nullptr == getContentComponent() || isActiveWindow())
         return;
     if (auto* app = dynamic_cast<AppController*> (gui.getRoot()))

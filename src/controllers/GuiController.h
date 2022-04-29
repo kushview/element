@@ -131,6 +131,8 @@ public:
     // WARNING: don't call from outside the main thread.
     void selectNode (const Node& node)
     {
+        if (selectedNode == node)
+            return;
         selectedNode = node;
         nodeSelected();
     }

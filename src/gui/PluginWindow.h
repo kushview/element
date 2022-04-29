@@ -70,6 +70,15 @@ private:
     Node node;
     Value name;
 
+    struct DelayedNodeFocus : public Timer
+    {
+        DelayedNodeFocus (PluginWindow& w) : window (w) { }
+        void timerCallback() override;
+        void trigger (int millis = 100) { startTimer (millis); }
+
+        PluginWindow& window;
+    } delayedNodeFocus;
+
     void valueChanged (Value& value) override
     {
         if (value.refersToSameSourceAs (name))
