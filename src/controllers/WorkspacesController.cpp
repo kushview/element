@@ -27,6 +27,8 @@ namespace Element {
 void WorkspacesController::activate()
 {
     content = findSibling<GuiController>()->getContentComponent();
+    if (lastWorkspaceBrowsePath == File())
+        lastWorkspaceBrowsePath = DataPath::workspacesDir();
 }
 
 void WorkspacesController::deactivate()
@@ -61,7 +63,6 @@ ApplicationCommandTarget* WorkspacesController::getNextCommandTarget() { return 
 void WorkspacesController::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
-
         Commands::workspaceSave,
         Commands::workspaceOpen,
         Commands::workspaceResetActive,
@@ -116,9 +117,11 @@ bool WorkspacesController::perform (const InvocationInfo& info)
     {
         case Commands::workspaceSave: {
             const auto state = content->getWorkspaceState();
-            FileChooser chooser ("Save Workspace", juce::File(), "*.elw", true, false);
+            FileChooser chooser ("Save Workspace", lastWorkspaceBrowsePath, 
+                "*.elw", true, false);
             if (chooser.browseForFileToSave (true))
             {
+                lastWorkspaceBrowsePath = chooser.getResult().getParentDirectory();
                 const auto state = content->getWorkspaceState();
                 state.writeToXmlFile (chooser.getResult());
             }
@@ -126,9 +129,11 @@ bool WorkspacesController::perform (const InvocationInfo& info)
         break;
 
         case Commands::workspaceOpen: {
-            FileChooser chooser ("Load Workspace", juce::File(), "*.elw", true, false);
+            FileChooser chooser ("Load Workspace", lastWorkspaceBrowsePath,
+                "*.elw", true, false);
             if (chooser.browseForFileToOpen())
             {
+                lastWorkspaceBrowsePath = chooser.getResult().getParentDirectory();
                 getAppController().postMessage (
                     new WorkspaceOpenFileMessage (chooser.getResult()));
             }

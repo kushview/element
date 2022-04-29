@@ -44,6 +44,7 @@ protected:
 
 private:
     Component::SafePointer<ContentComponent> content;
+    File lastWorkspaceBrowsePath;
     void saveCurrentWorkspace();
     void saveCurrentAndLoadWorkspace (const String& name);
 };
