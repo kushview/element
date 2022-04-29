@@ -123,16 +123,19 @@ public:
         type->identifier = PanelIDs::keymaps;
         type->name = "Keymaps";
         type->description = "Key Mappings";
+        type->singleton = true;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::maps;
         type->name = "Maps";
         type->description = "MIDI Mappings";
+        type->singleton = true;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::controllers;
         type->name = "Controllers";
-        type->description = "Controller Device Management";
+        type->description = "External controllers manager.";
+        type->singleton = true;
     }
 
     DockPanel* createPanel (const Identifier& panelType) override;
