@@ -21,7 +21,7 @@ namespace BinaryData
     const int            PowerButton_48x48_pngSize = 1153;
 
     extern const char*   Classic_elw;
-    const int            Classic_elwSize = 1631;
+    const int            Classic_elwSize = 1806;
 
     extern const char*   Editing_elw;
     const int            Editing_elwSize = 1820;
