@@ -127,7 +127,6 @@ WorkspaceState WorkspaceState::fromXmlFile (const File& file)
 WorkspaceState WorkspaceState::loadByName (const String& name)
 {
     WorkspaceState state;
-    DBG ("[EL] workspace loading: " << name);
     if (name == "Classic")
     {
         if (auto xml = XmlDocument::parse (String::fromUTF8 (
@@ -162,7 +161,6 @@ WorkspaceState WorkspaceState::loadByFileOrName (const String& name)
 void WorkspaceState::setMissing()
 {
     stabilizePropertyString (Tags::name, "New Workspace");
-    // stabilizePropertyString (Tags::uuid, Uuid().toString());
 }
 
 Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
