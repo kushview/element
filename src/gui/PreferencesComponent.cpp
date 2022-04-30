@@ -723,9 +723,9 @@ class MidiSettingsPage : public SettingsPage,
 public:
     MidiSettingsPage (Globals& g)
         : devices (g.getDeviceManager()),
-          settings (g.getSettings()),
-          midi (g.getMidiEngine()),
-          world (g)
+            settings (g.getSettings()),
+            midi (g.getMidiEngine()),
+            world (g)
     {
         addAndMakeVisible (midiOutputLabel);
         midiOutputLabel.setFont (Font (12.0, Font::bold));
@@ -735,24 +735,29 @@ public:
         midiOutput.addListener (this);
 
         addAndMakeVisible (midiOutLatencyLabel);
-        midiOutLatencyLabel.setFont (Font (12.0, Font::bold));
-        midiOutLatencyLabel.setText ("Output latency (ms)", dontSendNotification);
+        midiOutLatencyLabel.setFont(Font(12.0, Font::bold));
+        midiOutLatencyLabel.setText("Output latency (ms)", dontSendNotification);
         addAndMakeVisible (midiOutLatencyLabel);
-
+        
         addAndMakeVisible (midiOutLatency);
-        midiOutLatency.textFromValueFunction = [this] (double value) -> String {
-            return String (roundToInt (value));
+        midiOutLatency.textFromValueFunction = [this](double value) -> String {
+            return String(roundToInt(value));
         };
         midiOutLatency.setRange (-1000.0, 1000.0, 1.0);
         midiOutLatency.setValue ((double) settings.getMidiOutLatency());
         midiOutLatency.setSliderStyle (Slider::IncDecButtons);
         midiOutLatency.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
-        midiOutLatency.onValueChange = [this]() {
+        midiOutLatency.onValueChange = [this]()
+        {
             world.getSettings().setMidiOutLatency (midiOutLatency.getValue());
             if (auto e = world.getAudioEngine())
                 e->applySettings (world.getSettings());
         };
-
+       #if JUCE_WINDOWS
+        midiOutLatencyLabel.setEnabled (false);
+        midiOutLatency.setEnabled (false);
+       #endif
+        
         addAndMakeVisible (generateClockLabel);
         generateClockLabel.setFont (Font (12.0, Font::bold));
         generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
@@ -770,8 +775,8 @@ public:
         sendClockToInput.setClickingTogglesState (true);
         sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
         sendClockToInput.addListener (this);
-
-        addAndMakeVisible (midiInputHeader);
+        
+        addAndMakeVisible(midiInputHeader);
         midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
         midiInputHeader.setFont (Font (12, Font::bold));
 

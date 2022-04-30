@@ -239,8 +239,12 @@ void MidiDeviceProcessor::processBlock (AudioBuffer<float>& audio, MidiBuffer& m
         if (output && ! midi.isEmpty())
         {
             const auto delayMs = midiOutLatency.get();
+           #if JUCE_WINDOWS
+            output->sendBlockOfMessagesNow (midi);
+           #else
             output->sendBlockOfMessages (
                 midi, delayMs + Time::getMillisecondCounterHiRes(), getSampleRate());
+           #endif
         }
 
         midi.clear (0, nframes);
