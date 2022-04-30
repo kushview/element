@@ -701,7 +701,7 @@ namespace Element {
             midiOutLatencyLabel.setFont(Font(12.0, Font::bold));
             midiOutLatencyLabel.setText("Output latency (ms)", dontSendNotification);
             addAndMakeVisible (midiOutLatencyLabel);
-
+            
             addAndMakeVisible (midiOutLatency);
             midiOutLatency.textFromValueFunction = [this](double value) -> String {
                 return String(roundToInt(value));
@@ -716,7 +716,11 @@ namespace Element {
                 if (auto e = world.getAudioEngine())
                     e->applySettings (world.getSettings());
             };
-
+           #if JUCE_WINDOWS
+            midiOutLatencyLabel.setEnabled (false);
+            midiOutLatency.setEnabled (false);
+           #endif
+            
             addAndMakeVisible (generateClockLabel);
             generateClockLabel.setFont (Font (12.0, Font::bold));
             generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
