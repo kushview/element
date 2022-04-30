@@ -387,9 +387,8 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
                 "pluginEditorBounds", RI().toString()).toString());
             editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
             setForceZeroLatency ((bool)session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
-            if (auto engine = world->getAudioEngine())
-                if (! engine->isUsingExternalClock())
-                    engine->setPlaying ((bool) session->getProperty ("pluginTransportPlaying", false));
+            if (engine && ! engine->isUsingExternalClock())
+                engine->setPlaying ((bool) session->getProperty ("pluginTransportPlaying", false));
             session->forEach (setPluginMissingNodeProperties);
             for (auto* const param : perfparams)
                 param->clearNode();
