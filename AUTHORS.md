@@ -8,8 +8,11 @@
     David Runge (dvzrv)
     Eliot Akira (eliot-akira)
     Max Hunter (nippoo)
+    Michael Forrest (michaelforrest)
     Steve Schow (steveschow)
     Trevor Parscal (trevorparscal)
     iamvs2002
     jatinchowdhury18
     mmoole. (mmoole)
+    schnitzeltony
+    splisp
