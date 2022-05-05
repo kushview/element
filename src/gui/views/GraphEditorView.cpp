@@ -48,7 +48,7 @@ GraphEditorView::GraphEditorView()
             if (revertTopLeft)
             {
                 block.setNodePosition (revertTopLeftPos);
-                block.setPositionFromNode();
+                block.updatePosition();
             }
         });
 

@@ -135,7 +135,6 @@ private:
     Value nodeName;
     Value hiddenPorts;
 
-    int numInputs = 0, numOutputs = 0;
     int numIns = 0, numOuts = 0;
 
     double relativeX = 0.5f;
@@ -160,14 +159,13 @@ private:
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
 
-    void setPositionFromNode();
     void deleteAllPins();
     Rectangle<int> getOpenCloseBox() const;
     Rectangle<int> getBoxRectangle() const;
     GraphEditorComponent* getGraphPanel() const noexcept;
     void setButtonVisible (Button&, bool);
-    void setNodePosition (const int x, const int y);
 
+    void setNodePosition (const int x, const int y);
     template <typename T>
     void setNodePosition (const Point<T>& pt)
     {
@@ -175,9 +173,12 @@ private:
         setNodePosition (pti.x, pti.y);
     }
 
-    void updatePosition();
     void makeEditorActive();
+    
     void update (const bool doPosition = true, const bool forcePins = false);
+    void updatePins (bool force);
+    void updatePosition();
+
     void handleAsyncUpdate() override;
     void valueChanged (Value& value) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent);

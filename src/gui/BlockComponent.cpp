@@ -177,7 +177,7 @@ BlockComponent::~BlockComponent() noexcept
 void BlockComponent::moveBlockTo (double x, double y)
 {
     node.setPosition (x, y);
-    setPositionFromNode();
+    updatePosition();
 }
 
 void BlockComponent::setPowerButtonVisible (bool visible) { setButtonVisible (powerButton, visible); }
@@ -242,54 +242,8 @@ void BlockComponent::buttonClicked (Button* b)
     }
 }
 
-void BlockComponent::setPositionFromNode()
-{
-    if (! node.isValid())
-        return;
 
-    double x = 0.0, y = 0.0;
-    auto* const panel = getGraphPanel();
-    Component* parent = nullptr;
-    if (panel != nullptr)
-        parent = panel->findParentComponentOfClass<Viewport>();
-    if (parent == nullptr)
-        parent = panel;
 
-    if (! node.hasPosition() && nullptr != parent)
-    {
-        node.getRelativePosition (x, y);
-        x = x * (parent->getWidth()) - (getWidth() / 2);
-        y = y * (parent->getHeight()) - (getHeight() / 2);
-        node.setPosition (x, y);
-    }
-    else
-    {
-        node.getPosition (x, y);
-    }
-
-    setBounds ({ roundDoubleToInt (vertical ? x : y),
-                 roundDoubleToInt (vertical ? y : x),
-                 getWidth(),
-                 getHeight() });
-}
-
-void BlockComponent::setNodePosition (const int x, const int y)
-{
-    if (vertical)
-    {
-        node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
-                                  (y + getHeight() / 2) / (double) getParentHeight());
-        node.setProperty (Tags::x, (double) x);
-        node.setProperty (Tags::y, (double) y);
-    }
-    else
-    {
-        node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
-                                  (x + getWidth() / 2) / (double) getParentWidth());
-        node.setProperty (Tags::y, (double) x);
-        node.setProperty (Tags::x, (double) y);
-    }
-}
 
 void BlockComponent::deleteAllPins()
 {
@@ -406,7 +360,7 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
 
     setNodePosition (pos.getX(), pos.getY());
-    setPositionFromNode();
+    updatePosition();
 
     if (auto* const panel = getGraphPanel())
     {
@@ -431,13 +385,7 @@ void BlockComponent::mouseUp (const MouseEvent& e)
     dragging = selectionMouseDownResult = blockDrag = false;
 }
 
-void BlockComponent::updatePosition()
-{
-    node.getRelativePosition (relativeX, relativeY);
-    vertical ? setCentreRelative (relativeX, relativeY)
-             : setCentreRelative (relativeY, relativeX);
-    getGraphPanel()->updateConnectorComponents();
-}
+
 
 void BlockComponent::makeEditorActive()
 {
@@ -678,7 +626,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         return;
     }
 
-    vertical = ged->isLayoutVertical();
+   
 
     if (! node.getValueTree().getParent().hasType (Tags::nodes))
     {
@@ -686,20 +634,10 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         return;
     }
 
-    collapsed = (bool) node.getProperty (Tags::collapsed, false);
-    numIns = numOuts = 0;
-    const auto numPorts = node.getNumPorts();
-    for (int i = 0; i < numPorts; ++i)
-    {
-        const Port port (node.getPort (i));
-        if (PortType::Control == port.getType() || port.isHiddenOnBlock())
-            continue;
-
-        if (port.isInput())
-            ++numIns;
-        else
-            ++numOuts;
-    }
+    vertical    = ged->isLayoutVertical();
+    collapsed   = (bool) node.getProperty (Tags::collapsed, false);
+    
+    updatePins (forcePins);
 
     int w = roundToInt (120.0 * ged->getZoomScale());
     int h = roundToInt (46.0 * ged->getZoomScale());
@@ -726,7 +664,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     if (doPosition)
     {
-        setPositionFromNode();
+        updatePosition();
     }
     else if (nullptr != getParentComponent())
     {
@@ -735,14 +673,82 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         setNodePosition (b.getX(), b.getY());
     }
 
-    if (forcePins || numIns != numInputs || numOuts != numOutputs)
+    repaint();
+}
+
+void BlockComponent::setNodePosition (const int x, const int y)
+{
+    if (vertical)
     {
-        numInputs = numIns;
-        numOutputs = numOuts;
+        node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
+                                  (y + getHeight() / 2) / (double) getParentHeight());
+        node.setProperty (Tags::x, (double) x);
+        node.setProperty (Tags::y, (double) y);
+    }
+    else
+    {
+        node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
+                                  (x + getWidth() / 2) / (double) getParentWidth());
+        node.setProperty (Tags::y, (double) x);
+        node.setProperty (Tags::x, (double) y);
+    }
+}
+
+void BlockComponent::updatePosition()
+{
+    if (! node.isValid())
+        return;
+
+    double x = 0.0, y = 0.0;
+    auto* const panel = getGraphPanel();
+    Component* parent = nullptr;
+    if (panel != nullptr)
+        parent = panel->findParentComponentOfClass<Viewport>();
+    if (parent == nullptr)
+        parent = panel;
+
+    if (! node.hasPosition() && nullptr != parent)
+    {
+        node.getRelativePosition (x, y);
+        x = x * (parent->getWidth()) - (getWidth() / 2);
+        y = y * (parent->getHeight()) - (getHeight() / 2);
+        node.setPosition (x, y);
+    }
+    else
+    {
+        node.getPosition (x, y);
+    }
+
+    setBounds ({ roundDoubleToInt (vertical ? x : y),
+                 roundDoubleToInt (vertical ? y : x),
+                 getWidth(),
+                 getHeight() });
+}
+
+void BlockComponent::updatePins (bool force)
+{
+    int numInputs = 0, numOutputs = 0;
+    const auto numPorts = node.getNumPorts();
+    for (int i = 0; i < numPorts; ++i)
+    {
+        const Port port (node.getPort (i));
+        if (PortType::Control == port.getType() || port.isHiddenOnBlock())
+            continue;
+
+        if (port.isInput())
+            ++numInputs;
+        else
+            ++numOutputs;
+    }
+
+    if (force || numIns != numInputs || numOuts != numOutputs)
+    {
+        numIns = numInputs;
+        numOuts = numOutputs;
 
         deleteAllPins();
 
-        for (uint32 i = 0; i < (uint32) numPorts; ++i)
+        for (int i = 0; i < numPorts; ++i)
         {
             const Port port (node.getPort (i));
             const PortType t (port.getType());
@@ -755,8 +761,6 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
         resized();
     }
-
-    repaint();
 }
 
 void BlockComponent::setButtonVisible (Button& b, bool v)
