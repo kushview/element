@@ -15,8 +15,10 @@
 
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
-#include <element/config.h>
-#include "CommonConfig.h"
+#if defined(__APPLE__)
+    // make sure uuid_t gets defined before juce headers included
+    #include <uuid/uuid.h>
+#endif
 // [END_USER_CODE_SECTION]
 
 /*
