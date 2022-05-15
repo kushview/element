@@ -247,7 +247,6 @@ public:
 
     inline void getPresetsMenu (PresetCollection& collection, PopupMenu& menu)
     {
-#if EL_USE_PRESETS
         const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
@@ -284,7 +283,6 @@ public:
 
         for (int i = 0; i < presetItems.size(); ++i)
             menu.addItem (offset + i, presetItems[i]->name);
-#endif
     }
 
     inline void getProgramsMenu (PopupMenu& menu)

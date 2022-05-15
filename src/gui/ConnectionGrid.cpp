@@ -797,10 +797,8 @@ ConnectionGrid::ConnectionGrid()
     quads->setQuadrantComponent (Quads::Q3, controls = new Controls (matrix));
     quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
 
-#if EL_USE_SUBGRAPHS
     addAndMakeVisible (breadcrumb = new BreadCrumbComponent());
     breadcrumb->toFront (false);
-#endif
     resized();
 }
 
