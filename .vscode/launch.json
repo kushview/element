@@ -38,6 +38,9 @@
             "osx": {
                 "MIMode": "lldb",
                 "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element",
+                "environment": [
+                    { "name": "DYLD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }
+                ],
                 "logging": {
                     "moduleLoad": false,
                     "exceptions": false,
