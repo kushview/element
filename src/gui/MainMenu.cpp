@@ -415,7 +415,7 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
-#if defined(EL_SOLO)
+#ifndef EL_SOLO
     menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
     menu.addCommandItem (&cmd, Commands::showConsole, "Console");
     menu.addSeparator();
