@@ -20,6 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/views/NodePortsTableView.h"
+#include "gui/Artist.h"
 #include "gui/BlockComponent.h"
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
@@ -126,7 +127,6 @@ GraphEditorComponent* PortComponent::getGraphEditor() const noexcept
 }
 
 //=============================================================================
-
 BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const bool vertical_)
     : filterID (node_.getNodeId()), graph (graph_), node (node_), font (11.0f)
 {
@@ -241,9 +241,6 @@ void BlockComponent::buttonClicked (Button* b)
         node.setMuted (muteButton.getToggleState());
     }
 }
-
-
-
 
 void BlockComponent::deleteAllPins()
 {
@@ -384,8 +381,6 @@ void BlockComponent::mouseUp (const MouseEvent& e)
 
     dragging = selectionMouseDownResult = blockDrag = false;
 }
-
-
 
 void BlockComponent::makeEditorActive()
 {
@@ -530,11 +525,18 @@ void BlockComponent::paint (Graphics& g)
     }
     else
     {
-        g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(), 18, Justification::centredLeft, 2);
-        if (subName.isNotEmpty())
+        if (! collapsed)
         {
-            g.setFont (Font (8.f));
-            g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(), 18, Justification::centredLeft, 2);
+            g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(), 18, Justification::centredLeft, 2);
+            if (subName.isNotEmpty())
+            {
+                g.setFont (Font (8.f));
+                g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(), 18, Justification::centredLeft, 2);
+            }
+        }
+        else
+        {
+            Artist::drawVerticalText (g, displayName, getLocalBounds(), Justification::centred);
         }
     }
 
@@ -626,8 +628,6 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         return;
     }
 
-   
-
     if (! node.getValueTree().getParent().hasType (Tags::nodes))
     {
         delete this;
@@ -638,28 +638,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     collapsed   = (bool) node.getProperty (Tags::collapsed, false);
     
     updatePins (forcePins);
-
-    int w = roundToInt (120.0 * ged->getZoomScale());
-    int h = roundToInt (46.0 * ged->getZoomScale());
-
-    const int maxPorts = jmax (numIns, numOuts) + 1;
-
-    if (vertical)
-    {
-        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSize * 1.25f));
-    }
-    else
-    {
-        float scale = collapsed ? 0.25f : 1.125f;
-        int endcap = collapsed ? 9 : -5;
-        h = jmax (h, int (maxPorts * pinSize) + int (maxPorts * jmax (int (pinSize * scale), 2)) + endcap);
-    }
-
-    font.setHeight (11.f * ged->getZoomScale());
-    int textWidth = font.getStringWidth (node.getDisplayName());
-    textWidth += (vertical) ? 20 : 36;
-    w = jmax (w, textWidth);
-    setSize (w, h);
+    updateSize();
     setName (node.getDisplayName());
 
     if (doPosition)
@@ -674,6 +653,43 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
 
     repaint();
+}
+
+void BlockComponent::updateSize()
+{
+    auto *ged = getGraphPanel();
+    if (! ged)
+        return;
+    
+    int w = roundToInt (120.0 * ged->getZoomScale());
+    int h = roundToInt (46.0 * ged->getZoomScale());
+    const int maxPorts = jmax (numIns, numOuts) + 1;
+    font.setHeight (11.f * ged->getZoomScale());
+    int textWidth = font.getStringWidth (node.getDisplayName());
+    textWidth += (vertical) ? 20 : 36;
+    
+    if (vertical)
+    {
+        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSize * 1.25f));
+        w = jmax (w, textWidth);
+    }
+    else
+    {
+        float scale = collapsed ? 0.25f : 1.125f;
+        int endcap = collapsed ? 9 : -5;
+        h = jmax (h, int (maxPorts * pinSize) + int (maxPorts * jmax (int (pinSize * scale), 2)) + endcap);
+    
+        if (collapsed)
+        {
+            w = (pinSize * 2) + 26;
+        }
+        else
+        {
+            w = jmax (w, textWidth);
+        }
+    }
+
+    setSize (w, h);
 }
 
 void BlockComponent::setNodePosition (const int x, const int y)

@@ -176,6 +176,7 @@ private:
     void makeEditorActive();
     
     void update (const bool doPosition = true, const bool forcePins = false);
+    void updateSize();
     void updatePins (bool force);
     void updatePosition();
 
