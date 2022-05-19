@@ -524,11 +524,14 @@ void BlockComponent::paint (Graphics& g)
     {
         if (! collapsed)
         {
-            g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(), 18, Justification::centredLeft, 2);
+            // g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(), 18, Justification::centred, 2);
+            g.drawFittedText (displayName, box.getX(), box.getY(), box.getWidth(), 18, Justification::centred, 2);
+
             if (subName.isNotEmpty())
             {
                 g.setFont (Font (8.f));
-                g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(), 18, Justification::centredLeft, 2);
+                // g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(), 18, Justification::centred, 2);
+                g.drawFittedText (subName, box.getX(), box.getY(), box.getWidth(), 18, Justification::centred, 2);
             }
         }
         else
