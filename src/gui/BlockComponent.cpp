@@ -635,7 +635,23 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
 
     vertical    = ged->isLayoutVertical();
-    collapsed   = (bool) node.getProperty (Tags::collapsed, false);
+
+    if (collapsed != (bool) node.getProperty (Tags::collapsed, collapsed))
+    {
+        collapsed = ! collapsed;
+        if (collapsed && ! vertical)
+        {
+            setMuteButtonVisible (false);
+            setConfigButtonVisible (false);
+            setPowerButtonVisible (false);
+        }
+        else 
+        {
+            setMuteButtonVisible (true);
+            setConfigButtonVisible (true);
+            setPowerButtonVisible (true);
+        }
+    }
     
     updatePins (forcePins);
     updateSize();
@@ -681,7 +697,8 @@ void BlockComponent::updateSize()
     
         if (collapsed)
         {
-            w = (pinSize * 2) + 26;
+            w = (pinSize * 2) + 24;
+            h = jmax (h, textWidth);
         }
         else
         {
