@@ -199,10 +199,20 @@ public:
         int index = 30000;
         NodeObjectPtr ptr = node.getObject();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
-
         addOversamplingSubmenu (menu);
+        addSubMenu (TRANS("Options"), menu, ptr != nullptr);
+    }
 
-        addSubMenu ("Options", menu, ptr != nullptr);
+    inline void addDisplaySubmenu (PopupMenu& menuToAddTo)
+    {
+        PopupMenu dMenu;
+        int index = 50000;
+
+        const auto block = node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
+        const bool compact = (bool) block.getProperty (Tags::collapsed);
+        dMenu.addItem (index++, TRANS("Normal"), true, ! compact);
+        dMenu.addItem (index++, TRANS("Compact"), true, compact);
+        menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
     }
 
     inline void addOversamplingSubmenu (PopupMenu& menuToAddTo)
@@ -367,6 +377,12 @@ public:
                 // graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
                 // graph->suspendProcessing (wasSuspended);
             }
+        }
+        else if (result >= 50000 && result < 60000)
+        {
+            bool compact = result == 50001;
+            node.getUIValueTree().getChildWithName (Tags::block)
+                .setProperty (Tags::collapsed, compact, nullptr);
         }
 
         return nullptr;

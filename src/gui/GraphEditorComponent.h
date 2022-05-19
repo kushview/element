@@ -127,6 +127,7 @@ private:
     float zoomScale = 1.0;
 
     void selectNode (const Node& node, ModifierKeys mods);
+    void setSelectedNodesCompact (bool selected);
 
     Component* createContainerForNode (NodeObjectPtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (NodeObjectPtr node, bool useGenericEditor);

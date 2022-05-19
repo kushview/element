@@ -134,6 +134,7 @@ private:
     Value nodeEnabled;
     Value nodeName;
     Value hiddenPorts;
+    Value compact;
 
     int numIns = 0, numOuts = 0;
 
@@ -160,7 +161,6 @@ private:
     ScopedPointer<Component> embedded;
 
     void deleteAllPins();
-    Rectangle<int> getOpenCloseBox() const;
     Rectangle<int> getBoxRectangle() const;
     GraphEditorComponent* getGraphPanel() const noexcept;
     void setButtonVisible (Button&, bool);

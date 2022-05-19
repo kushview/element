@@ -163,6 +163,10 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
                       .getPropertyAsValue ("hiddenPorts", nullptr);
     hiddenPorts.addListener (this);
 
+    compact =  node.getUIValueTree()
+                    .getOrCreateChildWithName (Tags::block, nullptr)
+                    .getPropertyAsValue (Tags::collapsed, nullptr);
+    compact.addListener (this);
     setSize (170, 60);
 }
 
@@ -199,6 +203,17 @@ void BlockComponent::valueChanged (Value& value)
     {
         if (auto* ge = getGraphPanel())
             ge->updateComponents (false);
+    }
+    else if (compact.refersToSameSourceAs (value))
+    {
+        update (false, false);
+        if (auto* gp = getGraphPanel())
+        {
+            if (gp->selectedNodes.getItemArray().contains (node.getNodeId()))
+                gp->setSelectedNodesCompact ((bool) compact.getValue());
+            else
+                gp->updateConnectorComponents();
+        }
     }
 }
 
@@ -255,14 +270,6 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         return;
 
     bool collapsedToggled = false;
-    if (! vertical && getOpenCloseBox().contains (e.x, e.y))
-    {
-        node.setProperty (Tags::collapsed, ! collapsed);
-        update (false);
-        getGraphPanel()->updateConnectorComponents();
-        collapsedToggled = true;
-        blockDrag = true;
-    }
 
     originalPos = localPointToGlobal (Point<int>());
     toFront (true);
@@ -292,6 +299,8 @@ void BlockComponent::mouseDown (const MouseEvent& e)
             }
 
             menu.addSeparator();
+            menu.addDisplaySubmenu (menu);
+
             menu.addOptionsSubmenu();
 
             if (world)
@@ -416,12 +425,6 @@ bool BlockComponent::hitTest (int x, int y)
                     : y >= 3 && y < getHeight() - 6 && x >= pinSize && x < getWidth() - pinSize;
 }
 
-Rectangle<int> BlockComponent::getOpenCloseBox() const
-{
-    const auto box (getBoxRectangle());
-    return { box.getX() + 5, box.getY() + 4, 16, 16 };
-}
-
 Rectangle<int> BlockComponent::getBoxRectangle() const
 {
 #if 0
@@ -476,12 +479,6 @@ void BlockComponent::paint (Graphics& g)
                      ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
                      : LookAndFeel::widgetBackgroundColor.brighter (0.2));
     g.fillRoundedRectangle (box.toFloat(), cornerSize);
-
-    if (! vertical)
-    {
-        getLookAndFeel().drawTreeviewPlusMinusBox (
-            g, getOpenCloseBox().toFloat(), LookAndFeel::widgetBackgroundColor.brighter (0.7), ! collapsed, false);
-    }
 
     if (node.isMissing())
     {
@@ -636,9 +633,9 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     vertical    = ged->isLayoutVertical();
 
-    if (collapsed != (bool) node.getProperty (Tags::collapsed, collapsed))
+    if (collapsed != (bool) compact.getValue())
     {
-        collapsed = ! collapsed;
+        collapsed = (bool) compact.getValue();
         if (collapsed && ! vertical)
         {
             setMuteButtonVisible (false);

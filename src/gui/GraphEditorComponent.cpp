@@ -1085,6 +1085,27 @@ void GraphEditorComponent::deleteSelectedNodes()
     selectedNodes.deselectAll();
 }
 
+void GraphEditorComponent::setSelectedNodesCompact (bool selected)
+{
+    int nchanged = 0;
+    for (int i = 0; i < getNumChildComponents(); ++i)
+    {
+        auto* block = dynamic_cast<BlockComponent*> (getChildComponent (i));
+        if (nullptr == block)
+            continue;
+        if (! selectedNodes.getItemArray().contains (block->node.getNodeId()))
+            continue;
+        block->compact.removeListener (block);
+        block->compact.setValue (selected);
+        block->compact.addListener (block);
+        block->update (false, false);
+        ++nchanged;
+    }
+
+    if (nchanged > 0)
+        updateConnectorComponents();
+}
+
 void GraphEditorComponent::setZoomScale (float scale)
 {
     if (scale == zoomScale)
