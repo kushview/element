@@ -529,9 +529,9 @@ void BlockComponent::paint (Graphics& g)
 
             if (subName.isNotEmpty())
             {
-                g.setFont (Font (8.f));
+                g.setFont (Font (9.f));
                 // g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(), 18, Justification::centred, 2);
-                g.drawFittedText (subName, box.getX(), box.getY(), box.getWidth(), 18, Justification::centred, 2);
+                g.drawFittedText (subName, box.getX(), box.getY() + 9.5, box.getWidth(), 18, Justification::centred, 2);
             }
         }
         else
