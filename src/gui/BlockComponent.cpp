@@ -583,7 +583,7 @@ void BlockComponent::resized()
                             box.getY() + 9,
                             pinSize,
                             box.getHeight());
-        float scale = collapsed ? 0.25f : 1.125f;
+        float scale = collapsed ? 0.5f : 1.125f;
         int spacing = jmax (2, int (pinSize * scale));
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
@@ -691,7 +691,7 @@ void BlockComponent::updateSize()
     }
     else
     {
-        float scale = collapsed ? 0.25f : 1.125f;
+        float scale = collapsed ? 0.5f : 1.125f;
         int endcap = collapsed ? 9 : -5;
         h = jmax (h, int (maxPorts * pinSize) + int (maxPorts * jmax (int (pinSize * scale), 2)) + endcap);
     
