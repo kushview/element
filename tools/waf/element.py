@@ -8,9 +8,9 @@ import juce
 # Package name
 APPNAME="element"
 # Version number
-VERSION="0.46.5"
+VERSION="0.46.6"
 # plugin version is +1 that of standalone. VST2 has to start at 1.0.0
-PLUGIN_VERSION="1.46.5"
+PLUGIN_VERSION="1.46.6"
 
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
