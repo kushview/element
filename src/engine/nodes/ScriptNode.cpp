@@ -29,6 +29,7 @@
 #include "scripting/LuaBindings.h"
 #include "scripting/DSPScript.h"
 #include "scripting/Script.h"
+#include "scripting/ScriptManager.h"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -51,6 +52,19 @@ ScriptNode::ScriptNode() noexcept
 {
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
+    
+    auto sdir = ScriptManager::getSystemScriptsDir();
+    if (auto amp = sdir.getChildFile("amp.lua").createInputStream())
+    {
+        dspCode.replaceAllContent (amp->readEntireStreamAsString());
+        loadScript (dspCode.getAllContent());        
+    }
+    if (auto ampui = sdir.getChildFile("ampui.lua").createInputStream())
+    {
+        edCode.replaceAllContent (ampui->readEntireStreamAsString());
+    }
+
+    refreshPorts();
 }
 
 ScriptNode::~ScriptNode()
