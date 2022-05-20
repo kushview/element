@@ -488,9 +488,9 @@ public:
         mainContentBox.addItem ("Standard", 1);
         mainContentBox.addItem ("Workspace", 2);
         if (settings.getMainContentType() == "standard")
-            mainContentBox.setSelectedId (1);
+            mainContentBox.setSelectedId (1, dontSendNotification);
         else if (settings.getMainContentType() == "workspace")
-            mainContentBox.setSelectedId (2);
+            mainContentBox.setSelectedId (2, dontSendNotification);
         else
         {
             jassertfalse;
@@ -628,12 +628,17 @@ public:
         }
         else if (value.refersToSameSourceAs (mainContentBox.getSelectedIdAsValue()))
         {
+            auto uitype = settings.getMainContentType();
             if (1 == mainContentBox.getSelectedId())
-                settings.setMainContentType ("standard");
+                uitype = "standard";
             else if (2 == mainContentBox.getSelectedId())
-                settings.setMainContentType ("workspace");
+                uitype = "workspace";
 
-            ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
+            if (uitype != settings.getMainContentType())
+            {
+                settings.setMainContentType (uitype);
+                ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
+            }
         }
 
         settings.saveIfNeeded();
