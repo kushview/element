@@ -28,8 +28,10 @@
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/views/SessionTreeContentView.h"
 #include "gui/views/SessionSettingsView.h"
+#include "gui/views/LuaConsoleView.h"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/views/NodeEditorContentView.h"
+#include "gui/views/ScriptEditorView.h"
 
 namespace Element {
 
@@ -122,5 +124,21 @@ public:
     SessionSettingsPanel() { setName ("Session Settings"); }
     ~SessionSettingsPanel() = default;
 };
+
+class LuaConsolePanel : public ContentViewPanel<LuaConsoleView>
+{
+public:
+    LuaConsolePanel() { setName ("Console"); }
+    ~LuaConsolePanel() = default;
+};
+
+#if 0
+class CodeEditorPanel : public ContentViewPanel<ScriptNodeScriptEditorView>
+{
+public:
+    CodeEditorPanel() { setName ("Code Editor"); }
+    ~CodeEditorPanel() = default;
+};
+#endif
 
 } // namespace Element

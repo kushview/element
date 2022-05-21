@@ -37,6 +37,9 @@ namespace PanelIDs {
     static const Identifier session = "session";
     static const Identifier sessionSettings = "sessionSettings";
     static const Identifier virtualKeyboard = "virtualKeyboard";
+    static const Identifier luaConsole = "luaConsole";
+    static const Identifier codeEditor = "codeEditor";
+    
 } // namespace PanelIDs
 
 /** A generic panel used for testing and development */
@@ -136,6 +139,19 @@ public:
         type->name = "Controllers";
         type->description = "External controllers manager.";
         type->singleton = true;
+
+        type = types.add (new DockPanelInfo());
+        type->identifier = PanelIDs::luaConsole;
+        type->name = "Lua Console";
+        type->description = "Lua scripting console";
+        type->singleton = true;
+#if 0
+        type = types.add (new DockPanelInfo());
+        type->identifier = PanelIDs::codeEditor;
+        type->name = "Code Editor";
+        type->description = "Script and config editor.";
+        type->singleton = true;
+#endif
     }
 
     DockPanel* createPanel (const Identifier& panelType) override;
