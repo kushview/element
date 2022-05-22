@@ -20,6 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/WorkspacesContentComponent.h"
+#include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
@@ -72,6 +73,111 @@ public:
         return nullptr;
     }
 
+    void showPanel (const DockPanelInfo& info)
+    {
+        auto& dock = getDock();
+        const auto panelId      = info.identifier;
+        const auto singleton    = info.singleton;
+
+        if (singleton)
+        {
+            kv::DockPanel* panel = nullptr;
+            for (int i = 0; i < dock.getNumPanels(); ++i)
+            {
+                auto* p = dock.getPanel (i);
+                if (p->getType() == panelId)
+                    { panel = p; break; }
+            }
+
+            if (panel != nullptr)
+            {
+                dock.selectPanel (panel);
+                return;
+            }
+        }
+        
+        if (DockPlacement::isValid (info.placement))
+        {
+            dock.createItem (panelId, static_cast<DockPlacement> (info.placement));
+        }
+        else
+        {
+            if (auto* const selected = dock.getSelectedItem())
+            {
+                if (auto* const item = dock.createItem (panelId))
+                    item->dockTo (selected, DockPlacement::Center);
+            }
+            else
+            {
+                dock.createItem (panelId, DockPlacement::Top);
+            }
+        }
+    }
+
+    const DockPanelInfo* findPanelInfo (const Identifier& panelID) const
+    {
+        for (const auto* info : (*const_cast<Impl*>(this)).getDock().getPanelDescriptions())
+            if (info->identifier == panelID)
+                return info;
+        return nullptr;
+    }
+
+    String getPanelID (CommandID command)
+    {
+        String result;
+        switch (command)
+        {
+            case Commands::toggleVirtualKeyboard:
+                result = PanelIDs::virtualKeyboard.toString();
+                break;
+            case Commands::showControllerDevices:
+                result = PanelIDs::controllers.toString();
+                break;
+            case Commands::showKeymapEditor:
+                result = PanelIDs::keymaps.toString();
+                break;
+            case Commands::showPluginManager:
+                result = PanelIDs::pluginManager.toString();
+                break;
+            case Commands::showSessionConfig:
+                result = PanelIDs::sessionSettings.toString();
+                break;
+            case Commands::showGraphConfig:
+                result = PanelIDs::graphSettings.toString();
+                break;
+
+            case Commands::showPatchBay:
+                result = PanelIDs::graphEditor.toString();
+                break;
+
+            case Commands::showGraphEditor:
+                result = PanelIDs::graphEditor.toString();
+                break;
+
+            case Commands::showGraphMixer:
+                result = PanelIDs::graphMixer.toString();
+                break;
+
+            case Commands::showConsole:
+                result = PanelIDs::luaConsole.toString();
+                break;
+
+            case Commands::toggleChannelStrip:
+                result = PanelIDs::nodeChannelStrip.toString();
+                break;
+
+            // noop commands
+            case Commands::showLastContentView:
+            case Commands::rotateContentView:
+                break;
+
+            default:
+                result.clear();
+                break;
+        }
+        return result;
+    }
+
     AppController& app;
     WorkspacesContentComponent& owner;
     Workspace workspace;
@@ -86,6 +192,21 @@ WorkspacesContentComponent::WorkspacesContentComponent (AppController& controlle
 WorkspacesContentComponent::~WorkspacesContentComponent() noexcept
 {
     impl.reset (nullptr);
+}
+
+bool WorkspacesContentComponent::perform (const InvocationInfo& info)
+{
+    auto ID = impl->getPanelID (info.commandID);
+    if (ID.isEmpty())
+        return false;
+    
+    if (const auto* info = impl->findPanelInfo (ID))
+    {
+        impl->showPanel (*info);
+        return true;
+    }
+
+    return false;
 }
 
 void WorkspacesContentComponent::resizeContent (const Rectangle<int>& area)
@@ -139,50 +260,11 @@ void WorkspacesContentComponent::addWorkspaceItemsToMenu (PopupMenu& menu)
 
 void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
 {
-    auto& dock = impl->getDock();
     const int index = result - EL_WORKSPACES_MENU_OFFSET;
-    const auto& descs = dock.getPanelDescriptions();
-
+    const auto& descs = impl->getDock().getPanelDescriptions();
     if (! isPositiveAndBelow (index, descs.size()))
         return;
-    
-    const auto desc         = *descs[index];
-    const auto panelId      = desc.identifier;
-    const auto singleton    = desc.singleton;
-
-    if (singleton)
-    {
-        kv::DockPanel* panel = nullptr;
-        for (int i = 0; i < dock.getNumPanels(); ++i)
-        {
-            auto* p = dock.getPanel (i);
-            if (p->getType() == panelId)
-                { panel = p; break; }
-        }
-
-        if (panel != nullptr)
-        {
-            dock.selectPanel (panel);
-            return;
-        }
-    }
-    
-    if (DockPlacement::isValid (desc.placement))
-    {
-         dock.createItem (panelId, static_cast<DockPlacement> (desc.placement));
-    }
-    else
-    {
-        if (auto* const selected = dock.getSelectedItem())
-        {
-            if (auto* const item = dock.createItem (panelId))
-                item->dockTo (selected, DockPlacement::Center);
-        }
-        else
-        {
-            dock.createItem (panelId, DockPlacement::Top);
-        }
-    }
+    impl->showPanel (*descs[index]);
 }
 
 void WorkspacesContentComponent::saveState (PropertiesFile*)

@@ -88,10 +88,10 @@ private:
 };
 
 class ContentComponent : public Component,
+                         public ApplicationCommandTarget,
                          public DragAndDropContainer,
-                         public FileDragAndDropTarget,
                          public DragAndDropTarget,
-                         public ApplicationCommandTarget
+                         public FileDragAndDropTarget
 {
 protected:
     ContentComponent (AppController& app);

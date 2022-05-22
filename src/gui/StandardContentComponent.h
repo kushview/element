@@ -76,7 +76,7 @@ public:
     // App commands
     void getAllCommands (Array<CommandID>&) override {}
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
-    bool perform (const InvocationInfo&) override { return false; }
+    bool perform (const InvocationInfo&) override;
     ApplicationCommandTarget* getNextCommandTarget() override;
 
 private:

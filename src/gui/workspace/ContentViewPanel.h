@@ -21,6 +21,7 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/workspace/WorkspacePanel.h"
+#include "gui/PluginManagerComponent.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/views/ControllerMapsView.h"
 #include "gui/views/GraphSettingsView.h"
@@ -130,6 +131,13 @@ class LuaConsolePanel : public ContentViewPanel<LuaConsoleView>
 public:
     LuaConsolePanel() { setName ("Console"); }
     ~LuaConsolePanel() = default;
+};
+
+class PluginManagerPanel : public ContentViewPanel<PluginManagerContentView>
+{
+public:
+    PluginManagerPanel() { setName ("Plugin Manager"); }
+    ~PluginManagerPanel() = default;
 };
 
 #if 0

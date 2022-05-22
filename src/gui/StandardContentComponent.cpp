@@ -955,6 +955,79 @@ void StandardContentComponent::toggleVirtualKeyboard()
     setVirtualKeyboardVisible (! virtualKeyboardVisible);
 }
 
+bool StandardContentComponent::perform (const InvocationInfo& info)
+{
+    bool result = true;
+    switch (info.commandID)
+    {
+        case Commands::showControllerDevices: {
+            setMainView ("ControllerDevicesView");
+            break;
+        }
+        case Commands::showKeymapEditor:
+            setMainView ("KeymapEditorView");
+            break;
+        case Commands::showPluginManager:
+            setMainView ("PluginManager");
+            break;
+
+        case Commands::showSessionConfig:
+            setMainView ("SessionSettings");
+            break;
+        case Commands::showGraphConfig:
+            setMainView ("GraphSettings");
+            break;
+        case Commands::showPatchBay:
+            setMainView ("PatchBay");
+            break;
+        case Commands::showGraphEditor:
+            setMainView ("GraphEditor");
+            break;
+        case Commands::showGraphMixer: {
+            if (showAccessoryView() && getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
+            {
+                setShowAccessoryView (false);
+            }
+            else
+            {
+                setAccessoryView (EL_VIEW_GRAPH_MIXER);
+            }
+        }
+        break;
+
+#ifndef EL_SOLO
+        case Commands::showConsole: {
+            if (showAccessoryView() && getAccessoryViewName() == EL_VIEW_CONSOLE)
+            {
+                setShowAccessoryView (false);
+            }
+            else
+            {
+                setAccessoryView (EL_VIEW_CONSOLE);
+            }
+            break;
+        }
+#endif
+        case Commands::toggleVirtualKeyboard:
+            toggleVirtualKeyboard();
+            break;
+        case Commands::toggleChannelStrip:
+            setNodeChannelStripVisible (! isNodeChannelStripVisible());
+            break;
+        case Commands::showLastContentView:
+            backMainView();
+            break;
+        case Commands::rotateContentView:
+            nextMainView();
+            break;
+        default:
+            result = false;
+            break;
+    }
+
+    return result;
+}
+
 ApplicationCommandTarget* StandardContentComponent::getNextCommandTarget()
 {
     return (container) ? container->content1.get() : nullptr;

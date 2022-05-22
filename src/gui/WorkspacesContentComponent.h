@@ -52,6 +52,9 @@ public:
     void applySessionState (const String&) override;
 
     //=========================================================================
+    bool perform (const InvocationInfo& info) override;
+
+    //=========================================================================
     bool isVirtualKeyboardVisible() const override;
     void setVirtualKeyboardVisible (const bool isVisible) override;
     void toggleVirtualKeyboard() override;

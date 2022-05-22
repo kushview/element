@@ -34,6 +34,7 @@ namespace PanelIDs {
     static const Identifier nodeEditor = "nodeEditor";
     static const Identifier nodeMidi = "nodeMidi";
     static const Identifier plugins = "plugins";
+    static const Identifier pluginManager = "pluginManager";
     static const Identifier session = "session";
     static const Identifier sessionSettings = "sessionSettings";
     static const Identifier virtualKeyboard = "virtualKeyboard";
@@ -69,22 +70,26 @@ public:
 
     inline void getAllTypes (OwnedArray<DockPanelInfo>& types) override
     {
-        auto* type = types.add (new DockPanelInfo());
+        DockPanelInfo* type = nullptr;
+        type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::virtualKeyboard;
         type->name = "Virtual Keyboard";
         type->description = "Embedded virtual keyboard which sends MIDI events to the Global MIDI input";
         type->singleton = true;
+        type->showInMenu = false;
         type->placement = kv::DockPlacement::Bottom;
-        
+
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::graphMixer;
         type->name = "Graph Mixer";
         type->description = "A mixer where the channel strips represent a node on a graph";
+        type->showInMenu = false;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::graphEditor;
         type->name = "Graph Editor";
         type->description = "The Graph Editor";
+        type->showInMenu = false;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::nodeEditor;
@@ -95,7 +100,9 @@ public:
         type->identifier = PanelIDs::nodeChannelStrip;
         type->name = "Node Channel Strip";
         type->description = "Displays a single channel strip for a given node";
-
+        type->showInMenu = false;
+        type->singleton = true;
+        
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::nodeMidi;
         type->name = "MIDI";
@@ -127,24 +134,36 @@ public:
         type->name = "Keymaps";
         type->description = "Key Mappings";
         type->singleton = true;
+        type->showInMenu = false;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::maps;
         type->name = "Maps";
         type->description = "MIDI Mappings";
         type->singleton = true;
+        type->showInMenu = false;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::controllers;
         type->name = "Controllers";
         type->description = "External controllers manager.";
         type->singleton = true;
+        type->showInMenu = false;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::luaConsole;
         type->name = "Lua Console";
         type->description = "Lua scripting console";
         type->singleton = true;
+        type->showInMenu = false;
+
+        type = types.add (new DockPanelInfo());
+        type->identifier = PanelIDs::pluginManager;
+        type->name = "Plugin Manager";
+        type->description = "Plugin library management";
+        type->singleton = true;
+        type->showInMenu = false;
+
 #if 0
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::codeEditor;

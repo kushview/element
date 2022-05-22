@@ -166,7 +166,7 @@ void WorkspaceState::setMissing()
 Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
     : world (w), app (a), gui (g)
 {
-    dock.registerPanelType (new GenericPanelType());
+    // dock.registerPanelType (new GenericPanelType());
     dock.registerPanelType (new ApplicationPanelType());
 
     dock.onPanelAdded = [this] (DockPanel* panel) {

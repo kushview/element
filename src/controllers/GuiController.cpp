@@ -736,85 +736,32 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
 
 bool GuiController::perform (const InvocationInfo& info)
 {
+    if (content && content->perform (info))
+    {
+        if (mainWindow)
+            mainWindow->refreshMenu();
+        return true;
+    }
+
     bool result = true;
     switch (info.commandID)
     {
         case Commands::showAbout:
             toggleAboutScreen();
             break;
-        case Commands::showControllerDevices: {
-            content->setMainView ("ControllerDevicesView");
-            break;
-        }
-        case Commands::showKeymapEditor:
-            content->setMainView ("KeymapEditorView");
-            break;
-        case Commands::showPluginManager:
-            content->setMainView ("PluginManager");
-            break;
         case Commands::showPreferences:
             runDialog (ELEMENT_PREFERENCES);
             break;
-        case Commands::showSessionConfig:
-            content->setMainView ("SessionSettings");
-            break;
-        case Commands::showGraphConfig:
-            content->setMainView ("GraphSettings");
-            break;
-        case Commands::showPatchBay:
-            content->setMainView ("PatchBay");
-            break;
-        case Commands::showGraphEditor:
-            content->setMainView ("GraphEditor");
-            break;
-        case Commands::showGraphMixer: {
-            if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
-            {
-                content->setShowAccessoryView (false);
-            }
-            else
-            {
-                content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
-            }
-        }
-        break;
-
-#ifndef EL_SOLO
-        case Commands::showConsole: {
-            if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_CONSOLE)
-            {
-                content->setShowAccessoryView (false);
-            }
-            else
-            {
-                content->setAccessoryView (EL_VIEW_CONSOLE);
-            }
-            break;
-        }
-#endif
-        case Commands::toggleVirtualKeyboard:
-            content->toggleVirtualKeyboard();
-            break;
-        case Commands::toggleChannelStrip:
-            content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
-            break;
-        case Commands::showLastContentView:
-            content->backMainView();
-            break;
-        case Commands::rotateContentView:
-            content->nextMainView();
-            break;
-
         case Commands::showAllPluginWindows: {
             if (auto s = getWorld().getSession())
                 showPluginWindowsFor (s->getActiveGraph(), true, true);
+            break;
         }
-        break;
 
         case Commands::hideAllPluginWindows: {
             closeAllPluginWindows (false);
+            break;
         }
-        break;
 
         case Commands::toggleUserInterface: {
             auto session = getWorld().getSession();

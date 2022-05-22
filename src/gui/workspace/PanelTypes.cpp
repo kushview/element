@@ -109,6 +109,8 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
 
     if (panelId == PanelIDs::luaConsole)
         return new LuaConsolePanel();
+    if (panelId == PanelIDs::pluginManager)
+        return new PluginManagerPanel();
 #if 0
     if (panelId == PanelIDs::codeEditor)
         return new CodeEditorPanel();
