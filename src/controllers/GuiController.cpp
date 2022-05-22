@@ -509,19 +509,19 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         // MARK: Graph Commands
         case Commands::graphNew:
             result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
-            result.setInfo ("New Graph", "Create a new session", Commands::Categories::Session, 0);
+            result.setInfo ("New Graph", "Create a new graph", Commands::Categories::Session, 0);
             break;
         case Commands::graphOpen:
             result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
-            result.setInfo ("Open Graph", "Open an existing session", Commands::Categories::Session, 0);
+            result.setInfo ("Open Graph", "Open an existing graph", Commands::Categories::Session, 0);
             break;
         case Commands::graphSave:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
-            result.setInfo ("Save Graph", "Save the current session", Commands::Categories::Session, 0);
+            result.setInfo ("Save Graph", "Save the current graph", Commands::Categories::Session, 0);
             break;
         case Commands::graphSaveAs:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Save Graph As", "Save the current session with a new name", Commands::Categories::Session, 0);
+            result.setInfo ("Save Graph As", "Save the current graph with a new name", Commands::Categories::Session, 0);
             break;
         case Commands::importSession:
             // result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
@@ -744,8 +744,8 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showControllerDevices: {
             content->setMainView ("ControllerDevicesView");
+            break;
         }
-        break;
         case Commands::showKeymapEditor:
             content->setMainView ("KeymapEditorView");
             break;
