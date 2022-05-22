@@ -203,6 +203,14 @@ public:
         addSubMenu (TRANS("Options"), menu, ptr != nullptr);
     }
 
+    inline void addColorSubmenu (ColourSelector& selector)
+    {
+        PopupMenu color;
+        color.addCustomItem (std::numeric_limits<int>::max(), 
+            selector, 220, 300, false, nullptr);
+        addSubMenu (TRANS ("Color"), color, true);
+    }
+
     inline void addDisplaySubmenu (PopupMenu& menuToAddTo)
     {
         PopupMenu dMenu;

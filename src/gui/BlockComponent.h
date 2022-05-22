@@ -70,7 +70,8 @@ private:
 class BlockComponent : public Component,
                        public Button::Listener,
                        private AsyncUpdater,
-                       private Value::Listener
+                       private Value::Listener,
+                       private ChangeListener
 {
 public:
     BlockComponent() = delete;
@@ -126,6 +127,7 @@ public:
 private:
     friend class GraphEditorComponent;
     friend class GraphEditorView;
+    friend class juce::ChangeBroadcaster;
 
     const uint32 filterID;
     Node graph;
@@ -159,6 +161,13 @@ private:
 
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
+
+    Colour color { 0x00000000 };
+    ColourSelector colorSelector { ColourSelector::showColourAtTop | 
+                                   ColourSelector::showSliders | 
+                                   ColourSelector::showColourspace };
+
+    void changeListenerCallback (ChangeBroadcaster*) override;
 
     void deleteAllPins();
     Rectangle<int> getBoxRectangle() const;

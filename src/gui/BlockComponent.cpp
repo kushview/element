@@ -264,6 +264,13 @@ void BlockComponent::deleteAllPins()
             delete c;
 }
 
+void BlockComponent::changeListenerCallback (ChangeBroadcaster*)
+{
+    color = colorSelector.getCurrentColour().withAlpha (1.0f);
+    node.getUIValueTree().setProperty ("color", color.toString(), nullptr);
+    repaint();
+}
+
 void BlockComponent::mouseDown (const MouseEvent& e)
 {
     if (! isEnabled())
@@ -299,6 +306,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
             }
 
             menu.addSeparator();
+            menu.addColorSubmenu (colorSelector);
             menu.addDisplaySubmenu (menu);
 
             menu.addOptionsSubmenu();
@@ -306,7 +314,12 @@ void BlockComponent::mouseDown (const MouseEvent& e)
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
 
+            colorSelector.setCurrentColour (Colour::fromString (
+                node.getUIValueTree().getProperty ("color", color.toString()).toString()));
+            colorSelector.addChangeListener (this);
             const int result = menu.show();
+            colorSelector.removeChangeListener (this);
+
             if (auto* message = menu.createMessageForResultCode (result))
             {
                 ViewHelpers::postMessageFor (this, message);
@@ -475,10 +488,33 @@ void BlockComponent::paint (Graphics& g)
     const float cornerSize = 2.4f;
     const auto box (getBoxRectangle());
 
-    g.setColour (isEnabled() && node.isEnabled()
+    bool colorize = color != Colour(0x00000000) && ! collapsed;
+    if (colorize)
+    {
+        int colorBarHeight = vertical ? 20 : 18;
+        auto b1 = box;
+        auto b2 = b1.removeFromTop (colorBarHeight);
+        g.setColour (isEnabled() && node.isEnabled() ? color : color.darker (.1));
+        Path path;
+        path.addRoundedRectangle (b2.getX(), b2.getY(), b2.getWidth(), b2.getHeight(),
+            cornerSize, cornerSize, true, true, false, false);
+        g.fillPath (path);
+
+        path.clear();
+        g.setColour (isEnabled() && node.isEnabled()
+                        ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
+                        : LookAndFeel::widgetBackgroundColor.brighter (0.2));
+        path.addRoundedRectangle (b1.getX(), b1.getY(), b1.getWidth(), b1.getHeight(),
+            cornerSize, cornerSize, false, false, true, true);
+        g.fillPath (path);
+    }
+    else
+    {
+         g.setColour (isEnabled() && node.isEnabled()
                      ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
                      : LookAndFeel::widgetBackgroundColor.brighter (0.2));
-    g.fillRoundedRectangle (box.toFloat(), cornerSize);
+        g.fillRoundedRectangle (box.toFloat(), cornerSize);
+    }
 
     if (node.isMissing())
     {
@@ -512,12 +548,12 @@ void BlockComponent::paint (Graphics& g)
 
     if (vertical)
     {
-        g.drawFittedText (displayName, box.getX() + 9, box.getY() + 2, box.getWidth(), 18, Justification::centredLeft, 2);
+        g.drawFittedText (displayName, box.getX(), box.getY() + 2, box.getWidth(), 18, Justification::centred, 2);
 
         if (subName.isNotEmpty())
         {
             g.setFont (Font (8.f));
-            g.drawFittedText (subName, box.getX() + 9, box.getY() + 10, box.getWidth(), 18, Justification::centredLeft, 2);
+            g.drawFittedText (subName, box.getX(), box.getY() + 10, box.getWidth(), 18, Justification::centred, 2);
         }
     }
     else
@@ -666,6 +702,15 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         // position is relative and parent might be resizing
         const auto b = getBoundsInParent();
         setNodePosition (b.getX(), b.getY());
+    }
+
+    if (node.getUIValueTree().hasProperty ("color"))
+    {
+        color = Colour::fromString (node.getUIValueTree().getProperty ("color").toString());
+    }
+    else
+    {
+        color = Colour (0x00000000);
     }
 
     repaint();
