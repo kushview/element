@@ -94,9 +94,26 @@ Colour PortComponent::getColor() const noexcept
 void PortComponent::paint (Graphics& g)
 {
     g.setColour (getColor());
-    g.fillEllipse (getLocalBounds().toFloat());
-    g.setColour (Colours::black);
-    g.drawEllipse (getLocalBounds().toFloat(), 0.5f);
+    // g.fillEllipse (getLocalBounds().toFloat());
+    // g.setColour (Colours::black);
+    // g.drawEllipse (getLocalBounds().toFloat(), 0.5f);
+    Path path;
+    
+    float start = 0.0, end = 0.0;
+    if (vertical)
+    {
+        start = input ?  -90.f :  270.f;
+        end   = input ? 90.f :   90.f;
+    }
+    else
+    {
+        start = input ?  180.f :   0.f;
+        end   = input ?  360.f : 180.f;
+    }
+
+    path.addPieSegment(getLocalBounds().toFloat(), 
+        degreesToRadians(start), degreesToRadians (end), 0);
+    g.fillPath(path);
 }
 
 void PortComponent::mouseDown (const MouseEvent& e)
@@ -487,11 +504,16 @@ void BlockComponent::paint (Graphics& g)
 {
     const float cornerSize = 2.4f;
     const auto box (getBoxRectangle());
-
+    const int colorBarHeight = vertical ? 20 : 18;
     bool colorize = color != Colour(0x00000000) && ! collapsed;
+    Colour bgc = isEnabled() && node.isEnabled()
+            ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
+            : LookAndFeel::widgetBackgroundColor.brighter (0.2);
+    if (getGraphPanel()->selectedNodes.getItemArray().contains (node.getNodeId()))
+        bgc = bgc.brighter (0.55);
+
     if (colorize)
     {
-        int colorBarHeight = vertical ? 20 : 18;
         auto b1 = box;
         auto b2 = b1.removeFromTop (colorBarHeight);
         g.setColour (isEnabled() && node.isEnabled() ? color : color.darker (.1));
@@ -501,18 +523,14 @@ void BlockComponent::paint (Graphics& g)
         g.fillPath (path);
 
         path.clear();
-        g.setColour (isEnabled() && node.isEnabled()
-                        ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
-                        : LookAndFeel::widgetBackgroundColor.brighter (0.2));
+        g.setColour (bgc);
         path.addRoundedRectangle (b1.getX(), b1.getY(), b1.getWidth(), b1.getHeight(),
             cornerSize, cornerSize, false, false, true, true);
         g.fillPath (path);
     }
     else
     {
-         g.setColour (isEnabled() && node.isEnabled()
-                     ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
-                     : LookAndFeel::widgetBackgroundColor.brighter (0.2));
+        g.setColour (bgc);
         g.fillRoundedRectangle (box.toFloat(), cornerSize);
     }
 
@@ -525,8 +543,12 @@ void BlockComponent::paint (Graphics& g)
         g.drawFittedText ("(placeholder)", pr, Justification::centred, 2);
     }
 
-    g.setColour (Colours::black);
-    g.setFont (font);
+    if (! collapsed)
+        g.setColour (Colours::white.overlaidWith(color).contrasting());
+    else
+        g.setColour (Colours::black);
+    
+    g.setFont (Font (12.f));
 
     auto displayName = node.getDisplayName();
     auto subName = node.hasModifiedName() ? node.getPluginName() : String();
@@ -548,26 +570,31 @@ void BlockComponent::paint (Graphics& g)
 
     if (vertical)
     {
-        g.drawFittedText (displayName, box.getX(), box.getY() + 2, box.getWidth(), 18, Justification::centred, 2);
+        int y = box.getY() + 2;
+        g.drawFittedText (displayName, box.getX(), y, box.getWidth(), 18, Justification::centred, 2);
 
         if (subName.isNotEmpty())
         {
-            g.setFont (Font (8.f));
-            g.drawFittedText (subName, box.getX(), box.getY() + 10, box.getWidth(), 18, Justification::centred, 2);
+            g.setColour (Colours::black);
+            g.setFont (Font (9.f));
+            y += colorBarHeight;
+            g.drawFittedText (subName, box.getX(), y, 
+                box.getWidth(), 9, Justification::centred, 2);
         }
     }
     else
     {
         if (! collapsed)
         {
-            // g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(), 18, Justification::centred, 2);
-            g.drawFittedText (displayName, box.getX(), box.getY(), box.getWidth(), 18, Justification::centred, 2);
+            int y = box.getY();
+            g.drawFittedText (displayName, box.getX(), y, box.getWidth(), 18, Justification::centred, 2);
 
             if (subName.isNotEmpty())
             {
+                g.setColour (Colours::black);
                 g.setFont (Font (9.f));
-                // g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(), 18, Justification::centred, 2);
-                g.drawFittedText (subName, box.getX(), box.getY() + 9.5, box.getWidth(), 18, Justification::centred, 2);
+                y += colorBarHeight;
+                g.drawFittedText (subName, box.getX(), y, box.getWidth(), 13, Justification::centred, 2);
             }
         }
         else
@@ -575,10 +602,6 @@ void BlockComponent::paint (Graphics& g)
             Artist::drawVerticalText (g, displayName, getLocalBounds(), Justification::centred);
         }
     }
-
-    bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
-    g.setColour (selected ? Colors::toggleBlue : Colours::grey);
-    g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.4);
 }
 
 void BlockComponent::resized()
@@ -612,14 +635,14 @@ void BlockComponent::resized()
     else
     {
         Rectangle<int> pri (box.getX() - halfPinSize,
-                            box.getY() + 9,
+                            box.getY() + (collapsed ? 9 : 22),
                             pinSize,
                             box.getHeight());
         Rectangle<int> pro (box.getWidth(),
-                            box.getY() + 9,
+                            box.getY() + (collapsed ? 9 : 22),
                             pinSize,
                             box.getHeight());
-        float scale = collapsed ? 0.5f : 1.125f;
+        float scale = collapsed ? 0.5f : 0.75f;
         int spacing = jmax (2, int (pinSize * scale));
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
@@ -733,6 +756,7 @@ void BlockComponent::updateSize()
     {
         w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSize * 1.25f));
         w = jmax (w, textWidth);
+        h = 60;
     }
     else
     {
