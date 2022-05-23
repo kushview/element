@@ -359,10 +359,6 @@ uint32 GraphManager::addNode (const Node& newNode)
         return KV_INVALID_NODE;
     }
 
-    DBG ("GraphManager::addNode (const Node&):");
-    DBG ("  name=" << newNode.getName());
-    DBG ("  identifier=" << newNode.getIdentifier().toString());
-
     uint32 nodeId = KV_INVALID_NODE;
     const PluginDescription desc (pluginManager.findDescriptionFor (newNode));
     if (auto* node = createFilter (&desc, 0, 0, newNode.hasProperty (Tags::id) ? newNode.getNodeId() : 0))
