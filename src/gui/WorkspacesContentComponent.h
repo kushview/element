@@ -52,6 +52,8 @@ public:
     void applySessionState (const String&) override;
 
     //=========================================================================
+    void getAllCommands (Array<CommandID>&) override;
+    void getCommandInfo (CommandID, ApplicationCommandInfo&) override;
     bool perform (const InvocationInfo& info) override;
 
     //=========================================================================

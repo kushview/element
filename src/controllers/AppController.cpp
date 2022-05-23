@@ -28,7 +28,6 @@
 #include "controllers/SessionController.h"
 #include "controllers/PresetsController.h"
 #include "controllers/ScriptingController.h"
-#include "controllers/WorkspacesController.h"
 
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
@@ -56,7 +55,6 @@ AppController::AppController (Globals& g, RunMode m)
     addChild (new SessionController());
     addChild (new GraphController());
     addChild (new ScriptingController());
-    addChild (new WorkspacesController());
     addChild (new OSCController());
 
     lastExportedGraph = DataPath::defaultGraphDir();
@@ -65,7 +63,6 @@ AppController::AppController (Globals& g, RunMode m)
     commands.registerAllCommandsForTarget (this);
 #if 1
     commands.registerAllCommandsForTarget (findChild<GuiController>());
-    commands.registerAllCommandsForTarget (findChild<WorkspacesController>());
 #else
     // can't do this yet until all controllers have a reliable way to
     // return the next command target

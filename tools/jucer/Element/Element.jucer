@@ -137,10 +137,6 @@
               file="../../../src/controllers/SessionController.cpp"/>
         <FILE id="DGvRwL" name="SessionController.h" compile="0" resource="0"
               file="../../../src/controllers/SessionController.h"/>
-        <FILE id="bS9e2i" name="WorkspacesController.cpp" compile="1" resource="0"
-              file="../../../src/controllers/WorkspacesController.cpp"/>
-        <FILE id="C0VHHe" name="WorkspacesController.h" compile="0" resource="0"
-              file="../../../src/controllers/WorkspacesController.h"/>
       </GROUP>
       <GROUP id="{BAD03880-5058-DA9B-B102-CAF2CF071570}" name="db">
         <FILE id="mPYbtP" name="Database.cpp" compile="1" resource="0" file="../../../src/db/Database.cpp"/>

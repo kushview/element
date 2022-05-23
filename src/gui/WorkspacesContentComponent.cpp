@@ -23,6 +23,8 @@
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
+#include "Messages.h"
+#include "messages/GuiMessages.h"
 #include "gui/Workspace.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -36,6 +38,7 @@ public:
     Impl (WorkspacesContentComponent& o, AppController& a)
         : app (a), owner (o), workspace (a.getGlobals(), a, *a.findChild<GuiController>())
     {
+        lastWorkspaceBrowsePath = DataPath::workspacesDir();
         owner.addAndMakeVisible (workspace);
     }
 
@@ -178,9 +181,30 @@ public:
         return result;
     }
 
+    void saveCurrentWorkspace()
+    {
+        WorkspaceState state (workspace);
+        if (state.isValid())
+        {
+            auto name = workspace.getName();
+            app.getWorld().getSettings().setWorkspace (name);
+            name << ".elw";
+            state.writeToXmlFile (DataPath::workspacesDir().getChildFile (name));
+        }
+    }
+
+    void saveCurrentAndLoadWorkspace (const String& name)
+    {
+        saveCurrentWorkspace();
+        auto state = WorkspaceState::loadByFileOrName (name);
+        if (state.isValid())
+            workspace.applyState (state);
+    }
+
     AppController& app;
     WorkspacesContentComponent& owner;
     Workspace workspace;
+    File lastWorkspaceBrowsePath;
 };
 
 WorkspacesContentComponent::WorkspacesContentComponent (AppController& controller)
@@ -194,8 +218,104 @@ WorkspacesContentComponent::~WorkspacesContentComponent() noexcept
     impl.reset (nullptr);
 }
 
+void WorkspacesContentComponent::getAllCommands (Array<CommandID>& commands)
+{
+    commands.addArray ({
+        Commands::workspaceSave,
+        Commands::workspaceOpen,
+        Commands::workspaceResetActive,
+        Commands::workspaceSaveActive,
+        Commands::workspaceClassic,
+        Commands::workspaceEditing 
+    });
+}
+
+void WorkspacesContentComponent::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
+{
+    switch (command)
+    {
+        case Commands::workspaceSave:
+            result.setInfo ("Save Workspace", "Save the current workspace", Commands::Categories::UserInterface, 0);
+            break;
+        case Commands::workspaceOpen:
+            result.setInfo ("Open Workspace", "Open a saved workspace", Commands::Categories::UserInterface, 0);
+            break;
+        case Commands::workspaceResetActive: {
+            result.addDefaultKeypress ('0', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.addDefaultKeypress (')', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.setInfo ("Reset Workspace", "Reset the active workspace to it's default state.", Commands::Categories::UserInterface, 0);
+        }
+        break;
+        case Commands::workspaceSaveActive: {
+            result.setInfo ("Save Active Workspace", "Save the current workspace to disk.", Commands::Categories::UserInterface, 0);
+        }
+        break;
+        case Commands::workspaceClassic: {
+            result.setInfo ("Classic Workspace", "Open the classic workspace", Commands::Categories::UserInterface, 0);
+            result.setTicked (getWorkspaceName() == "Classic");
+            result.addDefaultKeypress ('1', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.addDefaultKeypress ('!', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+        }
+        break;
+        case Commands::workspaceEditing: {
+            result.setInfo ("Editing Workspace", "Open the editing workspace", Commands::Categories::UserInterface, 0);
+            result.setTicked (getWorkspaceName() == "Editing");
+            result.addDefaultKeypress ('2', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.addDefaultKeypress ('@', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+        }
+        break;
+    }
+}
+
 bool WorkspacesContentComponent::perform (const InvocationInfo& info)
 {
+    bool handled = true;
+    switch (info.commandID)
+    {
+        case Commands::workspaceSave: {
+            FileChooser chooser ("Save Workspace", impl->lastWorkspaceBrowsePath, 
+                "*.elw", true, false);
+            if (chooser.browseForFileToSave (true))
+            {
+                impl->lastWorkspaceBrowsePath = chooser.getResult().getParentDirectory();
+                const auto state = getWorkspaceState();
+                state.writeToXmlFile (chooser.getResult());
+            }
+            break;
+        }
+        case Commands::workspaceOpen: {
+            FileChooser chooser ("Load Workspace", impl->lastWorkspaceBrowsePath,
+                "*.elw", true, false);
+            if (chooser.browseForFileToOpen())
+            {
+                impl->lastWorkspaceBrowsePath = chooser.getResult().getParentDirectory();
+                post (new WorkspaceOpenFileMessage (chooser.getResult()));
+            }
+            break;
+        }
+        case Commands::workspaceResetActive: {
+            auto state = WorkspaceState::loadByName (getWorkspaceName());
+            if (state.isValid())
+                applyWorkspaceState (state);
+            break;
+        }
+        case Commands::workspaceSaveActive:
+            impl->saveCurrentWorkspace();
+            break;
+        case Commands::workspaceClassic:
+            impl->saveCurrentAndLoadWorkspace ("Classic");
+            break;
+        case Commands::workspaceEditing:
+            impl->saveCurrentAndLoadWorkspace ("Editing");
+            break;
+        default:
+            handled = false;
+            break;
+    }
+
+    if (handled)
+        return true;
+
     auto ID = impl->getPanelID (info.commandID);
     if (ID.isEmpty())
         return false;

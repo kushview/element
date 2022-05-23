@@ -20,7 +20,6 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/SessionController.h"
-#include "controllers/WorkspacesController.h"
 
 #include "engine/AudioEngine.h"
 
@@ -396,7 +395,7 @@ SessionRef GuiController::session()
 
 ApplicationCommandTarget* GuiController::getNextCommandTarget()
 {
-    return findSibling<WorkspacesController>();
+    return nullptr;
 }
 
 void GuiController::getAllCommands (Array<CommandID>& commands)
@@ -425,6 +424,7 @@ void GuiController::getAllCommands (Array<CommandID>& commands)
     });
 
     commands.add (Commands::quit);
+    getContentComponent()->getAllCommands (commands);
 }
 
 void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -724,6 +724,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setActive (app.getRecentlyOpenedFilesList().getNumFiles() > 0);
             break;
     }
+
+    getContentComponent()->getCommandInfo (commandID, result);
 }
 
 bool GuiController::perform (const InvocationInfo& info)

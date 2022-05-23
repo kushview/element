@@ -31,7 +31,6 @@
 #include "controllers/SessionController.h"
 #include "controllers/PresetsController.h"
 #include "controllers/ScriptingController.h"
-#include "controllers/WorkspacesController.h"
 
 #include "engine/nodes/NodeTypes.h"
 
