@@ -157,7 +157,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         if (index >= 100000)
         {
-            if (auto* const cc = getContentComponent())
+            if (auto* const cc = dynamic_cast<WorkspacesContentComponent*> (getContentComponent()))
                 cc->handleWorkspaceMenuResult (index);
         }
     }

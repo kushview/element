@@ -364,17 +364,9 @@ void GuiController::run()
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commander().getKeyMappings());
-    
-    {
-        const auto stateName = settings.getWorkspace();
-        WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
-        if (! state.isValid())
-            state = WorkspaceState::loadByName ("Classic");
-        getContentComponent()->applyWorkspaceState (state);
-    }
-
     getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();
+
     Desktop::getInstance().setGlobalScaleFactor (
         getWorld().getSettings().getDesktopScale());
 
@@ -874,12 +866,7 @@ bool GuiController::handleMessage (const AppMessage& msg)
             content.reset (nullptr);
             mainWindow->setContentNonOwned (getContentComponent(), true);
             mainWindow->restoreWindowStateFromString (ws);
-
-            const auto stateName = settings.getWorkspace();
-            WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
-            if (! state.isValid())
-                state = WorkspaceState::loadByName ("Classic");
-            getContentComponent()->applyWorkspaceState (state);
+            getContentComponent()->restoreState (pf);
             stabilizeContent();
         }
 

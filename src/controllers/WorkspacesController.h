@@ -23,7 +23,7 @@
 
 namespace Element {
 
-class ContentComponent;
+class WorkspacesContentComponent;
 
 class WorkspacesController final : public AppController::Child
 {
@@ -43,7 +43,7 @@ protected:
     bool perform (const InvocationInfo&) override;
 
 private:
-    Component::SafePointer<ContentComponent> content;
+    Component::SafePointer<WorkspacesContentComponent> content;
     File lastWorkspaceBrowsePath;
     void saveCurrentWorkspace();
     void saveCurrentAndLoadWorkspace (const String& name);

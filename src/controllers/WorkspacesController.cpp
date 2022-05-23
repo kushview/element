@@ -19,14 +19,15 @@
 
 #include "Common.h"
 #include "controllers/WorkspacesController.h"
-#include "gui/ContentComponent.h"
+#include "gui/WorkspacesContentComponent.h"
 #include "gui/Workspace.h"
 
 namespace Element {
 
 void WorkspacesController::activate()
 {
-    content = findSibling<GuiController>()->getContentComponent();
+    content = dynamic_cast<WorkspacesContentComponent*> (
+        findSibling<GuiController>()->getContentComponent());
     if (lastWorkspaceBrowsePath == File())
         lastWorkspaceBrowsePath = DataPath::workspacesDir();
 }

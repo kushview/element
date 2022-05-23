@@ -39,11 +39,11 @@ public:
     void stabilizeViews() override;
 
     //=========================================================================
-    String getWorkspaceName() const override;
-    WorkspaceState getWorkspaceState() override;
-    void applyWorkspaceState (const WorkspaceState&) override;
-    void addWorkspaceItemsToMenu (PopupMenu&) override;
-    void handleWorkspaceMenuResult (int) override;
+    String getWorkspaceName() const;
+    WorkspaceState getWorkspaceState();
+    void applyWorkspaceState (const WorkspaceState&);
+    void addWorkspaceItemsToMenu (PopupMenu&);
+    void handleWorkspaceMenuResult (int);
 
     //=========================================================================
     void saveState (PropertiesFile*) override;
