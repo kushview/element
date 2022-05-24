@@ -92,11 +92,7 @@ Colour PortComponent::getColor() const noexcept
 }
 
 void PortComponent::paint (Graphics& g)
-{
-    g.setColour (getColor());
-    // g.fillEllipse (getLocalBounds().toFloat());
-    // g.setColour (Colours::black);
-    // g.drawEllipse (getLocalBounds().toFloat(), 0.5f);
+{   
     Path path;
     
     float start = 0.0, end = 0.0;
@@ -113,6 +109,7 @@ void PortComponent::paint (Graphics& g)
 
     path.addPieSegment(getLocalBounds().toFloat(), 
         degreesToRadians(start), degreesToRadians (end), 0);
+    g.setColour (getColor());
     g.fillPath(path);
 }
 
@@ -505,28 +502,40 @@ void BlockComponent::paint (Graphics& g)
     const float cornerSize = 2.4f;
     const auto box (getBoxRectangle());
     const int colorBarHeight = vertical ? 20 : 18;
-    bool colorize = color != Colour(0x00000000) && ! collapsed;
+    bool colorize = color != Colour(0x00000000);
     Colour bgc = isEnabled() && node.isEnabled()
             ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
             : LookAndFeel::widgetBackgroundColor.brighter (0.2);
+    auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1);
     if (getGraphPanel()->selectedNodes.getItemArray().contains (node.getNodeId()))
+    {
         bgc = bgc.brighter (0.55);
+        barColor = barColor.brighter (.25);
+    }
 
     if (colorize)
     {
-        auto b1 = box;
-        auto b2 = b1.removeFromTop (colorBarHeight);
-        g.setColour (isEnabled() && node.isEnabled() ? color : color.darker (.1));
-        Path path;
-        path.addRoundedRectangle (b2.getX(), b2.getY(), b2.getWidth(), b2.getHeight(),
-            cornerSize, cornerSize, true, true, false, false);
-        g.fillPath (path);
+        if (collapsed)
+        {
+            g.setColour (barColor);
+            g.fillRoundedRectangle (box.toFloat(), cornerSize);
+        }
+        else
+        {
+            auto b1 = box;
+            auto b2 = b1.removeFromTop (colorBarHeight);
+            g.setColour (barColor);
+            Path path;
+            path.addRoundedRectangle (b2.getX(), b2.getY(), b2.getWidth(), b2.getHeight(),
+                cornerSize, cornerSize, true, true, false, false);
+            g.fillPath (path);
 
-        path.clear();
-        g.setColour (bgc);
-        path.addRoundedRectangle (b1.getX(), b1.getY(), b1.getWidth(), b1.getHeight(),
-            cornerSize, cornerSize, false, false, true, true);
-        g.fillPath (path);
+            path.clear();
+            g.setColour (bgc);
+            path.addRoundedRectangle (b1.getX(), b1.getY(), b1.getWidth(), b1.getHeight(),
+                cornerSize, cornerSize, false, false, true, true);
+            g.fillPath (path);
+        }
     }
     else
     {
@@ -561,7 +570,7 @@ void BlockComponent::paint (Graphics& g)
         }
         else if (node.isMidiInputNode())
         {
-            auto mode = ViewHelpers::getGuiController (this)->getRunMode();
+            auto mode  = ViewHelpers::getGuiController (this)->getRunMode();
             auto& midi = ViewHelpers::getGlobals (this)->getMidiEngine();
             if (mode != RunMode::Plugin && midi.getNumActiveMidiInputs() <= 0)
                 subName = "(no device)";
@@ -570,16 +579,24 @@ void BlockComponent::paint (Graphics& g)
 
     if (vertical)
     {
-        int y = box.getY() + 2;
-        g.drawFittedText (displayName, box.getX(), y, box.getWidth(), 18, Justification::centred, 2);
-
-        if (subName.isNotEmpty())
+        if (! collapsed)
         {
-            g.setColour (Colours::black);
-            g.setFont (Font (9.f));
-            y += colorBarHeight;
-            g.drawFittedText (subName, box.getX(), y, 
-                box.getWidth(), 9, Justification::centred, 2);
+            int y = box.getY() + 2;
+            g.drawFittedText (displayName, box.getX(), y, box.getWidth(), 18, Justification::centred, 2);
+
+            if (subName.isNotEmpty())
+            {
+                g.setColour (Colours::black);
+                g.setFont (Font (9.f));
+                y += colorBarHeight;
+                g.drawFittedText (subName, box.getX(), y, 
+                    box.getWidth(), 9, Justification::centred, 2);
+            }
+        }
+        else
+        {
+            g.drawFittedText (displayName, box.getX(), box.getY(), 
+                box.getWidth(), box.getHeight(), Justification::centred, 2);
         }
     }
     else
@@ -621,14 +638,15 @@ void BlockComponent::resized()
     {
         Rectangle<int> pri (box.getX() + 9, 0, getWidth(), pinSize);
         Rectangle<int> pro (box.getX() + 9, getHeight() - pinSize, getWidth(), pinSize);
+        float scale = collapsed ? 0.5f : 1.25f;
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (PortComponent* const pc = dynamic_cast<PortComponent*> (getChildComponent (i)))
             {
                 pc->setBounds (pc->isInput() ? pri.removeFromLeft (pinSize)
                                              : pro.removeFromLeft (pinSize));
-                pc->isInput() ? pri.removeFromLeft (pinSize * 1.25)
-                              : pro.removeFromLeft (pinSize * 1.25);
+                pc->isInput() ? pri.removeFromLeft (pinSize * scale)
+                              : pro.removeFromLeft (pinSize * scale);
             }
         }
     }
@@ -698,7 +716,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     if (collapsed != (bool) compact.getValue())
     {
         collapsed = (bool) compact.getValue();
-        if (collapsed && ! vertical)
+        if (collapsed)
         {
             setMuteButtonVisible (false);
             setConfigButtonVisible (false);
@@ -745,22 +763,28 @@ void BlockComponent::updateSize()
     if (! ged)
         return;
     
-    int w = roundToInt (120.0 * ged->getZoomScale());
+    int w = roundToInt ((!vertical ? 120.0 : 90) * ged->getZoomScale());
     int h = roundToInt (46.0 * ged->getZoomScale());
     const int maxPorts = jmax (numIns, numOuts) + 1;
     font.setHeight (11.f * ged->getZoomScale());
     int textWidth = font.getStringWidth (node.getDisplayName());
     textWidth += (vertical) ? 20 : 36;
-    
+    float scale = collapsed ? 0.5f : 1.125f;
+
     if (vertical)
     {
-        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSize * 1.25f));
-        w = jmax (w, textWidth);
+        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSize * scale));
         h = 60;
+
+        if (collapsed)
+        {
+            h = (pinSize * 2) + 20;
+        }
+
+        w = jmax (w, textWidth);
     }
     else
     {
-        float scale = collapsed ? 0.5f : 1.125f;
         int endcap = collapsed ? 9 : -5;
         h = jmax (h, int (maxPorts * pinSize) + int (maxPorts * jmax (int (pinSize * scale), 2)) + endcap);
     
