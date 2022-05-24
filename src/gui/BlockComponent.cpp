@@ -510,7 +510,7 @@ void BlockComponent::paint (Graphics& g)
     if (getGraphPanel()->selectedNodes.getItemArray().contains (node.getNodeId()))
     {
         bgc = bgc.brighter (0.55);
-        barColor = barColor.brighter (.25);
+        // barColor = barColor.brighter (.25);
     }
 
     if (colorize)
@@ -552,7 +552,7 @@ void BlockComponent::paint (Graphics& g)
         g.drawFittedText ("(placeholder)", pr, Justification::centred, 2);
     }
 
-    if (! collapsed)
+    if (colorize)
         g.setColour (Colours::white.overlaidWith(color).contrasting());
     else
         g.setColour (Colours::black);
