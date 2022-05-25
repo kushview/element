@@ -445,9 +445,22 @@ void WorkspacesContentComponent::setMainView (ContentView* v)
 {
     std::unique_ptr<ContentView> deleter (v);
     if (auto* sev = dynamic_cast<ScriptEditorView*> (v))
-        if (auto* item = impl->getDock().createItem (PanelIDs::codeEditor, DockPlacement::Top))
-            if (auto* ce = dynamic_cast<CodeEditorPanel*> (item->getPanel (0)))
+    {
+        if (auto* item = impl->getDock().createItem (PanelIDs::codeEditor, DockPlacement::Left))
+        {
+            auto* panel = item->getPanel(0);
+
+            if (auto* ce = dynamic_cast<CodeEditorPanel*> (panel))
                 { ce->setView (sev); deleter.release(); }
+
+            DockItem* selected = nullptr;
+            if (auto* p = impl->findPanel<CodeEditorPanel>())
+                selected = p->findParentComponentOfClass<DockItem>();
+            if (selected != nullptr)
+                item->dockTo (selected, DockPlacement::Center);
+            impl->getDock().selectPanel (panel);
+        }
+    }
 }
 
 } // namespace Element
