@@ -163,9 +163,58 @@ private:
     ScopedPointer<Component> embedded;
 
     Colour color { 0x00000000 };
-    ColourSelector colorSelector { ColourSelector::showColourAtTop | 
-                                   ColourSelector::showSliders | 
-                                   ColourSelector::showColourspace };
+    class BlockColorSelector : public juce::ColourSelector
+    {
+    public:
+        BlockColorSelector() : ColourSelector ({ ColourSelector::showColourAtTop | 
+                                                 ColourSelector::editableColour | 
+                                                 ColourSelector::showColourspace })
+        {
+            colors.addArray ({
+                Colour (0xFF800000), // Dark Red                
+                Colour (0xFFE24B00), // Dark Orange
+                Colour (0xFFEDED00), // Dark Yellow
+                Colour (0xFF247D21), // Pastel Green
+                Colour (0xFF2969BE), // Pastel Blue
+                Colour (0xFF5627A1), // Purple
+                Colour (0xFF363636), // Jet
+                Colour (0xFFFFFCFF)  // Snow
+            });
+
+            colors.addArray ({
+                Colour (0xFFE03636), // Light red
+                Colour (0xFFDB3069),
+                // Colour (0xFFF95738), // Orange Soda
+                Colour (0xFFEAC435), // Saffron
+                Colour (0xFF90BE6D),
+                Colour (0xFF43AA8B),
+                Colour (0xFF017798), // CG Blue
+                Colour (0xFF8C9A9E), // Cadet Grey                
+                Colour (0xFF475B63),                
+            });
+        }
+        
+        ~BlockColorSelector() = default;
+        
+        int getNumSwatches() const { return colors.size(); }
+        
+        Colour getSwatchColour (int index) const
+        {
+            return isPositiveAndBelow (index, colors.size()) 
+                ? colors.getReference(index) : fallback;
+        }
+
+        void setSwatchColour (int index, const Colour& color)
+        {
+            if (isPositiveAndBelow (index, colors.size()))
+                colors.set (index, color);
+        }
+    private:
+        Array<Colour> colors;
+        Colour fallback { 0xFF000000 };
+    };
+
+    BlockColorSelector colorSelector;
 
     void changeListenerCallback (ChangeBroadcaster*) override;
 
