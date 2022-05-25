@@ -164,13 +164,11 @@ public:
         type->singleton = true;
         type->showInMenu = false;
 
-#if 0
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::codeEditor;
         type->name = "Code Editor";
         type->description = "Script and config editor.";
         type->singleton = true;
-#endif
     }
 
     DockPanel* createPanel (const Identifier& panelType) override;

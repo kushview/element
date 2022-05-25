@@ -21,6 +21,7 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/widgets/ScriptEditorComponent.h"
+#include "scripting/ScriptSource.h"
 #include "session/Node.h"
 
 namespace Element {

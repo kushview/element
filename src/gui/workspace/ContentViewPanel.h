@@ -140,13 +140,36 @@ public:
     ~PluginManagerPanel() = default;
 };
 
-#if 0
-class CodeEditorPanel : public ContentViewPanel<ScriptNodeScriptEditorView>
+class CodeEditorPanel : public WorkspacePanel
 {
 public:
-    CodeEditorPanel() { setName ("Code Editor"); }
+    explicit CodeEditorPanel (ScriptEditorView* sev = nullptr)
+        : view (sev)
+    {
+        setName ("Code Editor");
+        setView (view);
+    }
+
     ~CodeEditorPanel() = default;
+    
+    void setView (ScriptEditorView* newView)
+    {
+        view.reset (newView);
+        resized();
+    }
+
+    void resized() override
+    {
+        if (view)
+            view->resized();
+    }
+
+    void initializeView (AppController& app) override { if (view) view->initializeView (app); }
+    void didBecomeActive() override { if (view) view->didBecomeActive(); }
+    void stabilizeContent() override { if (view) view->stabilizeContent(); }
+
+protected:
+    std::unique_ptr<ScriptEditorView> view;
 };
-#endif
 
 } // namespace Element

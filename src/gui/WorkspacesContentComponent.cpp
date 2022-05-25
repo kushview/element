@@ -441,4 +441,10 @@ VirtualKeyboardView* WorkspacesContentComponent::getVirtualKeyboardView() const
     return nullptr;
 }
 
+void WorkspacesContentComponent::setMainView (ContentView* v)
+{
+    if (auto* sev = dynamic_cast<ScriptEditorView*> (v))
+        if (auto* panel = impl->getDock().createItem)
+}
+
 } // namespace Element
