@@ -443,8 +443,11 @@ VirtualKeyboardView* WorkspacesContentComponent::getVirtualKeyboardView() const
 
 void WorkspacesContentComponent::setMainView (ContentView* v)
 {
+    std::unique_ptr<ContentView> deleter (v);
     if (auto* sev = dynamic_cast<ScriptEditorView*> (v))
-        if (auto* panel = impl->getDock().createItem)
+        if (auto* item = impl->getDock().createItem (PanelIDs::codeEditor, DockPlacement::Top))
+            if (auto* ce = dynamic_cast<CodeEditorPanel*> (item->getPanel (0)))
+                { ce->setView (sev); deleter.release(); }
 }
 
 } // namespace Element

@@ -30,6 +30,7 @@
 #include "gui/views/SessionTreeContentView.h"
 #include "gui/views/SessionSettingsView.h"
 #include "gui/views/LuaConsoleView.h"
+#include "gui/ViewHelpers.h"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/views/ScriptEditorView.h"
@@ -143,25 +144,35 @@ public:
 class CodeEditorPanel : public WorkspacePanel
 {
 public:
-    explicit CodeEditorPanel (ScriptEditorView* sev = nullptr)
-        : view (sev)
+    explicit CodeEditorPanel (ScriptEditorView* editor = nullptr)
+        : view (editor)
     {
         setName ("Code Editor");
-        setView (view);
     }
 
     ~CodeEditorPanel() = default;
     
     void setView (ScriptEditorView* newView)
     {
+        if (view)
+            view->willBeRemoved();
+
         view.reset (newView);
+        addAndMakeVisible (view.get());
         resized();
+        if (auto* cc = ViewHelpers::findContentComponent (this))
+        {
+            view->initializeView (cc->getAppController());
+            view->willBecomeActive();
+            view->didBecomeActive();
+            view->stabilizeContent();
+        }
     }
 
     void resized() override
     {
         if (view)
-            view->resized();
+            view->setBounds (getLocalBounds());
     }
 
     void initializeView (AppController& app) override { if (view) view->initializeView (app); }
