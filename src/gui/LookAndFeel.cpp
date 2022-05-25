@@ -149,7 +149,7 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
                 defaultMonospaceName = names[0];
         }
 
-        f.setTypefaceName (defaultSansSerifName);
+        f.setTypefaceName (defaultMonospaceName);
         f.setTypefaceStyle ("Regular");
         return Typeface::createSystemTypefaceFor (f);
     }
