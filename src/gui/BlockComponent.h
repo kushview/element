@@ -118,6 +118,8 @@ public:
     /** @internal */
     void mouseUp (const MouseEvent& e) override;
     /** @internal */
+    void mouseMove (const MouseEvent& e) override;
+    /** @internal */
     void paint (Graphics& g) override;
     /** @internal */
     void paintOverChildren (Graphics& g) override;
@@ -144,6 +146,7 @@ private:
     double relativeY = 0.5f;
 
     int pinSize = 9;
+    int pinSpacing = 9;
     Font font;
 
     Point<int> originalPos;

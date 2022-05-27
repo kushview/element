@@ -379,6 +379,11 @@ void BlockComponent::mouseDown (const MouseEvent& e)
     getGraphPanel()->updateSelection();
 }
 
+void BlockComponent::mouseMove (const MouseEvent& e)
+{
+    Component::mouseMove (e);
+}
+
 void BlockComponent::mouseDrag (const MouseEvent& e)
 {
     if (! isEnabled())
@@ -447,49 +452,12 @@ bool BlockComponent::hitTest (int x, int y)
     for (int i = getNumChildComponents(); --i >= 0;)
         if (getChildComponent (i)->getBounds().contains (x, y))
             return true;
-
-    return vertical ? x >= 3 && x < getWidth() - 6 && y >= pinSize && y < getHeight() - pinSize
-                    : y >= 3 && y < getHeight() - 6 && x >= pinSize && x < getWidth() - pinSize;
+    return getBoxRectangle().contains (x, y);
 }
 
 Rectangle<int> BlockComponent::getBoxRectangle() const
 {
-#if 0
-    // for pins with stems
-    if (vertical)
-    {
-        const int x = 4;
-        const int y = pinSize;
-        const int w = getWidth() - x * 2;
-        const int h = getHeight() - pinSize * 2;
-        
-        return Rectangle<int> (x, y, w, h);
-    }
-
-    const int x = pinSize;
-    const int y = 4;
-    const int w = getWidth() - pinSize * 2;
-    const int h = getHeight() - y * 2;
-    
-    return { x, y, w, h };
-#else
-    if (vertical)
-    {
-        return Rectangle<int> (
-                   0,
-                   pinSize / 2,
-                   getWidth(),
-                   getHeight() - pinSize)
-            .reduced (2, 0);
-    }
-
-    return Rectangle<int> (
-               pinSize / 2,
-               0,
-               getWidth() - pinSize,
-               getHeight())
-        .reduced (0, 2);
-#endif
+    return getLocalBounds().reduced (pinSize / 2);
 }
 
 void BlockComponent::paintOverChildren (Graphics& g)
@@ -619,6 +587,13 @@ void BlockComponent::paint (Graphics& g)
             Artist::drawVerticalText (g, displayName, getLocalBounds(), Justification::centred);
         }
     }
+
+    bool doCornerResizer = false;
+    if (doCornerResizer)
+    {
+        g.setOrigin (box.getRight() - 14, box.getBottom() - 14);
+        getLookAndFeel().drawCornerResizer (g, 12, 12, true, false);
+    }
 }
 
 void BlockComponent::resized()
@@ -638,15 +613,15 @@ void BlockComponent::resized()
     {
         Rectangle<int> pri (box.getX() + 9, 0, getWidth(), pinSize);
         Rectangle<int> pro (box.getX() + 9, getHeight() - pinSize, getWidth(), pinSize);
-        float scale = collapsed ? 0.5f : 1.25f;
+
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (PortComponent* const pc = dynamic_cast<PortComponent*> (getChildComponent (i)))
             {
                 pc->setBounds (pc->isInput() ? pri.removeFromLeft (pinSize)
                                              : pro.removeFromLeft (pinSize));
-                pc->isInput() ? pri.removeFromLeft (pinSize * scale)
-                              : pro.removeFromLeft (pinSize * scale);
+                pc->isInput() ? pri.removeFromLeft (pinSpacing)
+                              : pro.removeFromLeft (pinSpacing);
             }
         }
     }
@@ -656,20 +631,16 @@ void BlockComponent::resized()
                             box.getY() + (collapsed ? 9 : 22),
                             pinSize,
                             box.getHeight());
-        Rectangle<int> pro (box.getWidth(),
-                            box.getY() + (collapsed ? 9 : 22),
-                            pinSize,
-                            box.getHeight());
-        float scale = collapsed ? 0.5f : 0.75f;
-        int spacing = jmax (2, int (pinSize * scale));
+        Rectangle<int> pro (pri.withX (box.getWidth() - 1));
+        
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (PortComponent* const pc = dynamic_cast<PortComponent*> (getChildComponent (i)))
             {
                 pc->setBounds (pc->isInput() ? pri.removeFromTop (pinSize)
                                              : pro.removeFromTop (pinSize));
-                pc->isInput() ? pri.removeFromTop (spacing)
-                              : pro.removeFromTop (spacing);
+                pc->isInput() ? pri.removeFromTop (pinSpacing)
+                              : pro.removeFromTop (pinSpacing);
             }
         }
     }
@@ -769,11 +740,12 @@ void BlockComponent::updateSize()
     font.setHeight (11.f * ged->getZoomScale());
     int textWidth = font.getStringWidth (node.getDisplayName());
     textWidth += (vertical) ? 20 : 36;
-    float scale = collapsed ? 0.5f : 1.125f;
+    pinSpacing = int (pinSize * (collapsed ? 0.5f : 0.9f));
+    int pinSpaceNeeded = int (maxPorts * pinSize) + int (maxPorts * pinSpacing);
 
     if (vertical)
     {
-        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSize * scale));
+        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSpacing));
         h = 60;
 
         if (collapsed)
@@ -785,17 +757,20 @@ void BlockComponent::updateSize()
     }
     else
     {
-        int endcap = collapsed ? 9 : -5;
-        h = jmax (h, int (maxPorts * pinSize) + int (maxPorts * jmax (int (pinSize * scale), 2)) + endcap);
-    
         if (collapsed)
         {
             w = (pinSize * 2) + 24;
-            h = jmax (h, textWidth);
+            auto pinSpace = pinSpaceNeeded + pinSize;
+            if (pinSpace >= textWidth)
+                h = pinSpace;
+            else
+                h = textWidth;
         }
         else
         {
+            int endcap = collapsed ? 9 : 12;
             w = jmax (w, textWidth);
+            h = jmax (h, (maxPorts * pinSize) + (maxPorts * jmax (pinSpacing, 2) + endcap));
         }
     }
 
