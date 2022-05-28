@@ -382,6 +382,22 @@ void BlockComponent::mouseDown (const MouseEvent& e)
 void BlockComponent::mouseMove (const MouseEvent& e)
 {
     Component::mouseMove (e);
+    if (getCornerResizeBox().toFloat().contains (e.position))
+    {
+        if (! mouseInCornerResize)
+        {
+            mouseInCornerResize = true;
+            repaint();
+        }
+    }
+    else
+    {
+        if (mouseInCornerResize)
+        {
+            mouseInCornerResize = false;
+            repaint();
+        }
+    }
 }
 
 void BlockComponent::mouseDrag (const MouseEvent& e)
@@ -393,6 +409,15 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
         return;
     dragging = true;
     Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
+
+    if (mouseInCornerResize)
+    {
+        // DBG("resize w: " << e.getDistanceFromDragStartX());
+        // DBG("resize h: " << e.getDistanceFromDragStartY());
+        // setSize (getWidth() + e.getDistanceFromDragStartX(),
+        //          getHeight() + e.getDistanceFromDragStartY());
+        return;
+    }
 
     if (getParentComponent() != nullptr)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
@@ -458,6 +483,12 @@ bool BlockComponent::hitTest (int x, int y)
 Rectangle<int> BlockComponent::getBoxRectangle() const
 {
     return getLocalBounds().reduced (pinSize / 2);
+}
+
+Rectangle<int> BlockComponent::getCornerResizeBox() const
+{
+    auto r = getBoxRectangle();
+    return { r.getRight() - 14, r.getBottom() - 14, 12, 12 };
 }
 
 void BlockComponent::paintOverChildren (Graphics& g)
@@ -588,10 +619,10 @@ void BlockComponent::paint (Graphics& g)
         }
     }
 
-    bool doCornerResizer = false;
-    if (doCornerResizer)
+    if (mouseInCornerResize)
     {
-        g.setOrigin (box.getRight() - 14, box.getBottom() - 14);
+        auto cbox = getCornerResizeBox();
+        g.setOrigin (cbox.getPosition());
         getLookAndFeel().drawCornerResizer (g, 12, 12, true, false);
     }
 }

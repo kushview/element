@@ -222,7 +222,11 @@ private:
     void changeListenerCallback (ChangeBroadcaster*) override;
 
     void deleteAllPins();
+    
+    bool mouseInCornerResize = false;
     Rectangle<int> getBoxRectangle() const;
+    Rectangle<int> getCornerResizeBox() const;
+
     GraphEditorComponent* getGraphPanel() const noexcept;
     void setButtonVisible (Button&, bool);
 
