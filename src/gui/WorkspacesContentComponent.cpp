@@ -450,22 +450,17 @@ void WorkspacesContentComponent::setMainView (ContentView* v)
         if (auto* existingPanel = impl->findPanel<CodeEditorPanel>())
         {
             existingPanel->setView (sev);
-            impl->getDock().selectPanel (existingPanel);
+            impl->getDock().showPanel (existingPanel);
             deleter.release();
         }
         else if (auto* item = impl->getDock().createItem (PanelIDs::codeEditor, DockPlacement::Left))
         {
             auto* panel = item->getPanel (0);
-
             if (auto* ce = dynamic_cast<CodeEditorPanel*> (panel))
                 { ce->setView (sev); deleter.release(); }
-
-            DockItem* selected = nullptr;
-            if (auto* p = impl->findPanel<CodeEditorPanel>())
-                selected = p->findParentComponentOfClass<DockItem>();
-            if (selected != nullptr)
-                item->dockTo (selected, DockPlacement::Center);
-            impl->getDock().selectPanel (panel);
+            // if (auto* selected = impl->getDock().getSelectedItem())
+            //     item->dockTo (selected, DockPlacement::Center);
+            impl->getDock().showPanel (panel);
         }
     }
 }
