@@ -444,11 +444,18 @@ VirtualKeyboardView* WorkspacesContentComponent::getVirtualKeyboardView() const
 void WorkspacesContentComponent::setMainView (ContentView* v)
 {
     std::unique_ptr<ContentView> deleter (v);
+
     if (auto* sev = dynamic_cast<ScriptEditorView*> (v))
     {
-        if (auto* item = impl->getDock().createItem (PanelIDs::codeEditor, DockPlacement::Left))
+        if (auto* existingPanel = impl->findPanel<CodeEditorPanel>())
         {
-            auto* panel = item->getPanel(0);
+            existingPanel->setView (sev);
+            impl->getDock().selectPanel (existingPanel);
+            deleter.release();
+        }
+        else if (auto* item = impl->getDock().createItem (PanelIDs::codeEditor, DockPlacement::Left))
+        {
+            auto* panel = item->getPanel (0);
 
             if (auto* ce = dynamic_cast<CodeEditorPanel*> (panel))
                 { ce->setView (sev); deleter.release(); }
