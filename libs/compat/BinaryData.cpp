@@ -2667,6 +2667,133 @@ static const unsigned char temp_binary_data_9[] =
 
 const char* ElementIconTemplate_png = (const char*) temp_binary_data_9;
 
+//================== amp.lua ==================
+static const unsigned char temp_binary_data_10[] =
+"--- Stereo Amplifier in Lua.\n"
+"--\n"
+"-- The code contained implements a simple stereo amplifier plugin. It does not\n"
+"-- try to smooth the volume parameter and could cause zipper noise.\n"
+"--\n"
+"-- @script      amp\n"
+"-- @kind        DSP\n"
+"-- @license     GPL v3\n"
+"-- @author      Michael Fisher\n"
+"\n"
+"local audio  = require ('el.audio')\n"
+"\n"
+"--- Gain parameters.\n"
+"-- Used for fading between changes in volume\n"
+"local gain1 = 1.0\n"
+"local gain2 = 1.0\n"
+"\n"
+"--- Return a table of audio/midi inputs and outputs.\n"
+"-- This plugin supports stereo in/out with no MIDI\n"
+"local function amp_layout()\n"
+"    return {\n"
+"        audio = { 2, 2 },\n"
+"        midi  = { 0, 0 }\n"
+"    }\n"
+"end\n"
+"\n"
+"--- Return parameters table.\n"
+"local function amp_parameters()\n"
+"    return {\n"
+"        {\n"
+"            name        = \"Volume\",\n"
+"            label       = \"dB\",\n"
+"            min         = -90.0,\n"
+"            max         = 24.0,\n"
+"            default     = 0.0\n"
+"        }\n"
+"    }\n"
+"end\n"
+"\n"
+"--- Render audio and midi.\n"
+"-- Use the provided audio and midi objects to process your plugin\n"
+"-- @param a The source el.AudioBuffer\n"
+"-- @param m The source el.MidiPipe\n"
+"-- @param params DSP parameters\n"
+"local function amp_process (a, m, params)\n"
+"    gain2 = audio.togain (params [1])\n"
+"    a:fade (gain1, gain2)\n"
+"    gain1 = gain2\n"
+"end\n"
+"\n"
+"return {\n"
+"    type        = 'DSP',\n"
+"    layout      = amp_layout,\n"
+"    parameters  = amp_parameters,\n"
+"    process     = amp_process\n"
+"}\n";
+
+const char* amp_lua = (const char*) temp_binary_data_10;
+
+//================== ampui.lua ==================
+static const unsigned char temp_binary_data_11[] =
+"--- Editor for `amp` DSP script.\n"
+"-- @script ampui\n"
+"-- @kind DSPUI amp\n"
+"\n"
+"local Widget        = require ('el.Widget')\n"
+"local Slider        = require ('el.Slider')\n"
+"local object        = require ('el.object')\n"
+"local script        = require ('el.script')\n"
+"\n"
+"local bgcolor       = 0xff545454\n"
+"local fgcolor       = 0xffffffff\n"
+"\n"
+"-- Derive a new widget type for the amp editor.\n"
+"local Editor = object (Widget)\n"
+"\n"
+"function Editor:init (ctx)\n"
+"    -- Invoke the parent class' init method\n"
+"    Widget.init (self)\n"
+"\n"
+"    local volume = ctx.params [1]\n"
+"\n"
+"    self.knob = self:add (object.new (Slider))\n"
+"    self.knob.style = Slider.ROTARY\n"
+"    self.knob:settextboxstyle (Slider.TEXT_BOX_BELOW, true, 52, 26)\n"
+"    self.knob:setrange (-90, 24, 0.01)\n"
+"    self.knob:setvalue (volume:get(), false)\n"
+"    self.knob.dragging  = false\n"
+"    self.knob.dragstart = function() self.knob.dragging = true end\n"
+"    self.knob.dragend   = function() self.knob.dragging = false end\n"
+"    self.knob.valuechanged   = function()\n"
+"        if not self.knob.dragging then return end\n"
+"        volume:set (self.knob:value(), false)\n"
+"    end\n"
+"\n"
+"    volume.valuechanged = function()\n"
+"        self.knob:setvalue (volume:get(), false)\n"
+"    end\n"
+"\n"
+"    self:resize (180, 170)\n"
+"end\n"
+"\n"
+"function Editor:paint (g)\n"
+"    g:fillall (bgcolor)\n"
+"    g:setcolor (fgcolor)\n"
+"    g:drawtext (\"AMP\", 0, 0, self.width, 30)\n"
+"end\n"
+"\n"
+"function Editor:resized()\n"
+"    local r = self:localbounds()\n"
+"    self.knob:setbounds (r:reduced (20))\n"
+"end\n"
+"\n"
+"-- Editor factory function.\n"
+"local function create_editor (ctx)\n"
+"    return object.new (Editor, ctx)\n"
+"end\n"
+"\n"
+"return {\n"
+"    type    = 'DSPUI',\n"
+"    editor  = create_editor\n"
+"}\n";
+
+const char* ampui_lua = (const char*) temp_binary_data_11;
+
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 {
@@ -2688,6 +2815,8 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x117be71a:  numBytes = 249; return developers_txt;
         case 0x9eb8b85f:  numBytes = 11697; return ElementIcon_png;
         case 0xcd7846f9:  numBytes = 7122; return ElementIconTemplate_png;
+        case 0xcb93cafd:  numBytes = 1349; return amp_lua;
+        case 0x5b238e91:  numBytes = 1596; return ampui_lua;
         default: break;
     }
 
@@ -2706,7 +2835,9 @@ const char* namedResourceList[] =
     "acknowledgements_txt",
     "developers_txt",
     "ElementIcon_png",
-    "ElementIconTemplate_png"
+    "ElementIconTemplate_png",
+    "amp_lua",
+    "ampui_lua"
 };
 
 const char* originalFilenames[] =
@@ -2720,7 +2851,9 @@ const char* originalFilenames[] =
     "acknowledgements.txt",
     "developers.txt",
     "ElementIcon.png",
-    "ElementIconTemplate.png"
+    "ElementIconTemplate.png",
+    "amp.lua",
+    "ampui.lua"
 };
 
 const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8)

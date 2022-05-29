@@ -184,8 +184,8 @@
             <FILE id="EvUIjP" name="lzio.h" compile="0" resource="0" file="../../../libs/element/lua/src/lzio.h"/>
             <FILE id="FwQ4uE" name="Makefile" compile="0" resource="0" file="../../../libs/element/lua/src/Makefile"/>
           </GROUP>
-          <FILE id="PA2mxz" name="Makefile" compile="0" resource="1" file="../../../libs/element/lua/Makefile"/>
-          <FILE id="Dmm2lR" name="README" compile="0" resource="1" file="../../../libs/element/lua/README"/>
+          <FILE id="PA2mxz" name="Makefile" compile="0" resource="0" file="../../../libs/element/lua/Makefile"/>
+          <FILE id="Dmm2lR" name="README" compile="0" resource="0" file="../../../libs/element/lua/README"/>
         </GROUP>
         <GROUP id="{FC6A9132-0B0C-FA00-D3F4-511FC50BB2C1}" name="src">
           <FILE id="dTEvw9" name="bindings.cpp" compile="1" resource="0" file="../../../libs/element/src/bindings.cpp"/>
@@ -208,6 +208,10 @@
         </GROUP>
         <FILE id="m9hPLj" name="element.pc.in" compile="0" resource="0" file="../../../libs/element/element.pc.in"/>
       </GROUP>
+    </GROUP>
+    <GROUP id="{500E2179-4412-C7D9-EA91-83227D0BA173}" name="scripts">
+      <FILE id="ty6GPv" name="amp.lua" compile="0" resource="1" file="../../../scripts/amp.lua"/>
+      <FILE id="YS9gGM" name="ampui.lua" compile="0" resource="1" file="../../../scripts/ampui.lua"/>
     </GROUP>
     <GROUP id="{A6208D82-F1C5-B816-540F-C5F3211C35F2}" name="src">
       <GROUP id="{25036A3C-4C31-9F45-4424-0FD2303B93E3}" name="controllers">

@@ -38,8 +38,14 @@ namespace BinaryData
     extern const char*   ElementIconTemplate_png;
     const int            ElementIconTemplate_pngSize = 7122;
 
+    extern const char*   amp_lua;
+    const int            amp_luaSize = 1349;
+
+    extern const char*   ampui_lua;
+    const int            ampui_luaSize = 1596;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 10;
+    const int namedResourceListSize = 12;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
