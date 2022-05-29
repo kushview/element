@@ -52,18 +52,11 @@ ScriptNode::ScriptNode() noexcept
 {
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
-    
-    auto sdir = ScriptManager::getSystemScriptsDir();
-    if (auto amp = sdir.getChildFile("amp.lua").createInputStream())
-    {
-        dspCode.replaceAllContent (amp->readEntireStreamAsString());
-        loadScript (dspCode.getAllContent());        
-    }
-    if (auto ampui = sdir.getChildFile("ampui.lua").createInputStream())
-    {
-        edCode.replaceAllContent (ampui->readEntireStreamAsString());
-    }
-
+    dspCode.replaceAllContent (String::fromUTF8 (
+        BinaryData::amp_lua, BinaryData::amp_luaSize));
+    loadScript (dspCode.getAllContent());
+    edCode.replaceAllContent (String::fromUTF8 (
+        BinaryData::ampui_lua, BinaryData::ampui_luaSize));
     refreshPorts();
 }
 
