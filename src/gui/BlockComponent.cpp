@@ -225,6 +225,9 @@ void BlockComponent::valueChanged (Value& value)
     else if (compact.refersToSameSourceAs (value))
     {
         customWidth = customHeight = 0;
+        node.getBlockValueTree()
+            .setProperty(Tags::width, 0, nullptr)
+            .setProperty (Tags::height, 0, nullptr);
         update (false, false);
         if (auto* gp = getGraphPanel())
         {
