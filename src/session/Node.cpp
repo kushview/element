@@ -462,7 +462,8 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::tempo, (double) 120.0);
     objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
     objectData.getOrCreateChildWithName (Tags::ports, nullptr);
-    objectData.getOrCreateChildWithName (Tags::ui, nullptr);
+    auto ui = objectData.getOrCreateChildWithName (Tags::ui, nullptr);
+    ui.getOrCreateChildWithName (Tags::block, nullptr);
 }
 
 NodeObject* Node::getObject() const

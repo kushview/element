@@ -150,6 +150,9 @@ private:
     Font font;
 
     Point<int> originalPos;
+    Rectangle<int> originalBounds;
+    int customWidth = 0,
+        customHeight = 0;
     bool selectionMouseDownResult = false;
     bool vertical = true;
     bool dragging = false;
@@ -230,6 +233,8 @@ private:
     GraphEditorComponent* getGraphPanel() const noexcept;
     void setButtonVisible (Button&, bool);
 
+    void getMinimumSize (int& width, int& height);
+    void setCustomSize (int width, int height);
     void setNodePosition (const int x, const int y);
     template <typename T>
     void setNodePosition (const Point<T>& pt)

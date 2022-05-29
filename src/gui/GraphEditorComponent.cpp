@@ -374,6 +374,8 @@ GraphEditorComponent::~GraphEditorComponent()
 
 void GraphEditorComponent::setNode (const Node& n)
 {
+    if (n == graph)
+        return;
     bool isGraph = n.isGraph();
     bool isValid = n.isValid();
     graph = isValid && isGraph ? n : Node (Tags::graph);

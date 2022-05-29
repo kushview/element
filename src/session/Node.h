@@ -474,11 +474,14 @@ public:
     void setMidiProgramName (int program, const String& name);
 
     //=========================================================================
-    ValueTree getArcsValueTree() const { return objectData.getChildWithName (Tags::arcs); }
+    ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
     ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
     ValueTree getParentArcsNode() const;
     ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
-    ValueTree getUIValueTree() const { return objectData.getChildWithName (Tags::ui); }
+    ValueTree getUIValueTree()    const { return objectData.getChildWithName (Tags::ui); }
+    ValueTree getBlockValueTree() const noexcept { return getUIValueTree().getChildWithName (Tags::block); }
+    
+    //=========================================================================
     const bool operator== (const Node& o) const { return this->objectData == o.objectData; }
     const bool operator!= (const Node& o) const { return this->objectData != o.objectData; }
 

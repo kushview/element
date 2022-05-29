@@ -172,16 +172,19 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     muteButton.setClickingTogglesState (true);
     muteButton.addListener (this);
 
-    hiddenPorts = node.getUIValueTree()
-                      .getOrCreateChildWithName ("block", nullptr)
-                      .getPropertyAsValue ("hiddenPorts", nullptr);
+    hiddenPorts = node.getBlockValueTree()
+        .getPropertyAsValue ("hiddenPorts", nullptr);
     hiddenPorts.addListener (this);
 
-    compact =  node.getUIValueTree()
-                    .getOrCreateChildWithName (Tags::block, nullptr)
-                    .getPropertyAsValue (Tags::collapsed, nullptr);
+    compact =  node.getBlockValueTree()
+        .getPropertyAsValue (Tags::collapsed, nullptr);
+    collapsed = (bool) compact.getValue();
     compact.addListener (this);
-    setSize (170, 60);
+
+    customWidth  = node.getBlockValueTree().getProperty (Tags::width, customWidth);
+    customHeight = node.getBlockValueTree().getProperty (Tags::height, customHeight);
+    setSize (customWidth > 0 ? customWidth : 170, 
+             customHeight > 0 ? customHeight : 60);
 }
 
 BlockComponent::~BlockComponent() noexcept
@@ -189,6 +192,7 @@ BlockComponent::~BlockComponent() noexcept
     nodeEnabled.removeListener (this);
     nodeName.removeListener (this);
     hiddenPorts.removeListener (this);
+    compact.removeListener (this);
     deleteAllPins();
 }
 
@@ -220,6 +224,7 @@ void BlockComponent::valueChanged (Value& value)
     }
     else if (compact.refersToSameSourceAs (value))
     {
+        customWidth = customHeight = 0;
         update (false, false);
         if (auto* gp = getGraphPanel())
         {
@@ -293,6 +298,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
     bool collapsedToggled = false;
 
     originalPos = localPointToGlobal (Point<int>());
+    originalBounds = getBounds();
     toFront (true);
     dragging = false;
     auto* const panel = getGraphPanel();
@@ -407,17 +413,16 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
 
     if (e.mods.isPopupMenu() || blockDrag)
         return;
-    dragging = true;
-    Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
-
+    
     if (mouseInCornerResize)
     {
-        // DBG("resize w: " << e.getDistanceFromDragStartX());
-        // DBG("resize h: " << e.getDistanceFromDragStartY());
-        // setSize (getWidth() + e.getDistanceFromDragStartX(),
-        //          getHeight() + e.getDistanceFromDragStartY());
+        setCustomSize (originalBounds.getWidth()  + e.getDistanceFromDragStartX(),
+                       originalBounds.getHeight() + e.getDistanceFromDragStartY());
         return;
     }
+
+    dragging = true;
+    Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
 
     if (getParentComponent() != nullptr)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
@@ -636,7 +641,7 @@ void BlockComponent::resized()
         Component* buttons[] = { &configButton, &muteButton, &powerButton };
         for (int i = 0; i < 3; ++i)
             if (buttons[i]->isVisible())
-                buttons[i]->setBounds (r.removeFromRight (16));
+                buttons[i]->setBounds (r.removeFromLeft (16));
     }
 
     const int halfPinSize = pinSize / 2;
@@ -759,7 +764,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     repaint();
 }
 
-void BlockComponent::updateSize()
+void BlockComponent::getMinimumSize (int& width, int& height)
 {
     auto *ged = getGraphPanel();
     if (! ged)
@@ -805,7 +810,49 @@ void BlockComponent::updateSize()
         }
     }
 
+    width = w;
+    height = h;
+}
+
+void BlockComponent::updateSize()
+{
+    auto *ged = getGraphPanel();
+    if (! ged)
+        return;
+    
+    customWidth = (int) node.getBlockValueTree()
+        .getProperty (Tags::width, customWidth);
+    customHeight = (int) node.getBlockValueTree()
+        .getProperty (Tags::height, customHeight);
+    if (customWidth > 0 && customHeight > 0)
+        return;
+
+    int w = 0, h = 0;
+    getMinimumSize (w, h);
+    jassert (w > 0 && h > 0);
     setSize (w, h);
+}
+
+void BlockComponent::setCustomSize (int width, int height)
+{
+    int mw = width, mh = height;
+    getMinimumSize (mw, mh);
+    if (width < mw)     width = mw;
+    if (height < mh)    height = mh;
+
+    if (customWidth != width || customHeight != height)
+    {
+        customWidth = width;
+        customHeight = height;
+        node.getBlockValueTree()
+            .setProperty (Tags::width, customWidth, nullptr)
+            .setProperty (Tags::height, customHeight, nullptr);
+        compact.removeListener (this);
+        compact.setValue (false);
+        compact.addListener (this);
+        collapsed = false;
+        setSize (customWidth, customHeight);
+    }
 }
 
 void BlockComponent::setNodePosition (const int x, const int y)
