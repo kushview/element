@@ -392,20 +392,21 @@ void WorkspacesContentComponent::saveState (PropertiesFile*)
     if (auto* props = getAppController().getWorld().getSettings().getUserSettings())
         if (auto* vk = getVirtualKeyboardView())
             vk->saveState (props);
+    impl->saveCurrentWorkspace();
 }
 
 void WorkspacesContentComponent::restoreState (PropertiesFile*)
 {
-    auto& settings = getAppController().getWorld().getSettings();
-    if (auto* props = settings.getUserSettings())
-        if (auto* vk = getVirtualKeyboardView())
-            vk->restoreState (props);
-
     const auto stateName = settings.getWorkspace();
     WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
     if (! state.isValid())
         state = WorkspaceState::loadByName ("Classic");
     applyWorkspaceState (state);
+
+    auto& settings = getAppController().getWorld().getSettings();
+    if (auto* props = settings.getUserSettings())
+        if (auto* vk = getVirtualKeyboardView())
+            vk->restoreState (props);
 }
 
 void WorkspacesContentComponent::getSessionState (String&)
