@@ -397,13 +397,13 @@ void WorkspacesContentComponent::saveState (PropertiesFile*)
 
 void WorkspacesContentComponent::restoreState (PropertiesFile*)
 {
+    auto& settings = getAppController().getWorld().getSettings();
     const auto stateName = settings.getWorkspace();
     WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
     if (! state.isValid())
         state = WorkspaceState::loadByName ("Classic");
     applyWorkspaceState (state);
-
-    auto& settings = getAppController().getWorld().getSettings();
+    
     if (auto* props = settings.getUserSettings())
         if (auto* vk = getVirtualKeyboardView())
             vk->restoreState (props);
