@@ -739,21 +739,18 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     vertical = ged->isLayoutVertical();
 
-    if (displayMode != getDisplayModeFromString (displayModeValue.getValue()))
+    displayMode = getDisplayModeFromString (displayModeValue.getValue());
+    if (displayMode == Compact || displayMode == Small)
     {
-        displayMode = getDisplayModeFromString (displayModeValue.getValue());
-        if (displayMode == Compact || displayMode == Small)
-        {
-            setMuteButtonVisible (false);
-            setConfigButtonVisible (false);
-            setPowerButtonVisible (false);
-        }
-        else 
-        {
-            setMuteButtonVisible (true);
-            setConfigButtonVisible (true);
-            setPowerButtonVisible (true);
-        }
+        setMuteButtonVisible (false);
+        setConfigButtonVisible (false);
+        setPowerButtonVisible (false);
+    }
+    else 
+    {
+        setMuteButtonVisible (true);
+        setConfigButtonVisible (true);
+        setPowerButtonVisible (true);
     }
     
     updatePins (forcePins);
@@ -848,12 +845,23 @@ void BlockComponent::updateSize()
         .getProperty (Tags::width, customWidth);
     customHeight = (int) node.getBlockValueTree()
         .getProperty (Tags::height, customHeight);
-    if (displayMode == Compact || displayMode == Small)
+    
+    int minW = 0, minH = 0;
+    getMinimumSize (minW, minH);
+    jassert (minW > 0 && minH > 0);
+    switch (displayMode)
     {
-        int w = 0, h = 0;
-        getMinimumSize (w, h);
-        jassert (w > 0 && h > 0);
-        setSize (w, h);
+        case Compact:
+        case Small: {
+            setSize (minW, minH);
+            break;
+        }
+        case Normal:
+        case Embed: {
+            setSize (customWidth > 0 ? customWidth : minW,
+                     customHeight > 0 ? customHeight : minH);
+            break;
+        }
     }
 }
 
