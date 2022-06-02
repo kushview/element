@@ -1089,6 +1089,7 @@ void GraphEditorComponent::deleteSelectedNodes()
 
 void GraphEditorComponent::setSelectedNodesCompact (bool selected)
 {
+#if 0
     int nchanged = 0;
     for (int i = 0; i < getNumChildComponents(); ++i)
     {
@@ -1106,6 +1107,7 @@ void GraphEditorComponent::setSelectedNodesCompact (bool selected)
 
     if (nchanged > 0)
         updateConnectorComponents();
+#endif
 }
 
 void GraphEditorComponent::setZoomScale (float scale)

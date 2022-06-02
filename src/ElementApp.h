@@ -44,10 +44,12 @@ namespace Tags {
     const Identifier controllers = "controllers";
     const Identifier collapsed = "collapsed";
     const Identifier delayCompensation = "delayCompensation";
+    const Identifier displayMode = "displayMode";
     const Identifier enabled = "enabled";
     const Identifier gain = "gain";
     const Identifier graph = "graph";
     const Identifier graphs = "graphs";
+    const Identifier hiddenPorts = "hiddenPorts";
     const Identifier mappingData = "mappingData";
     const Identifier map = "map";
     const Identifier maps = "maps";

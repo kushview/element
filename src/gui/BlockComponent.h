@@ -78,6 +78,48 @@ public:
     BlockComponent (const Node& graph_, const Node& node_, const bool vertical_);
     ~BlockComponent() noexcept;
 
+    enum DisplayMode {
+        Compact, Small, Normal, Embed
+    };
+
+    inline static DisplayMode getDisplayModeFromString (const String& str) {
+        auto s = str.toLowerCase().trim();
+        if (str == "normal")    return Normal;
+        if (str == "compact")   return Compact;
+        if (str == "small")     return Small;
+        if (str == "embed")     return Embed;
+        return Normal;
+    }
+
+    inline static String getDisplayModeKey (BlockComponent::DisplayMode mode)
+    {
+        String key = "";
+        switch (mode)
+        {
+            case Normal:  key = "normal"; break;
+            case Compact: key = "compact"; break;
+            case Small:   key = "small"; break;
+            case Embed:   key = "embed"; break;
+        }
+        return key;
+    }
+
+    inline static String getDisplayModeName (BlockComponent::DisplayMode mode)
+    {
+        String name = "";
+        switch (mode)
+        {
+            case Normal:  name = "Normal"; break;
+            case Compact: name = "Compact"; break;
+            case Small:   name = "Small"; break;
+            case Embed:   name = "Embed"; break;
+        }
+        return name;
+    }
+
+    void setDisplayMode (DisplayMode mode);
+    DisplayMode getDisplayMode() const noexcept { return displayMode; }
+
     //=========================================================================
     void moveBlockTo (double x, double y);
 
@@ -135,10 +177,10 @@ private:
     Node graph;
     Node node;
 
-    Value nodeEnabled;
-    Value nodeName;
-    Value hiddenPorts;
-    Value compact;
+    Value nodeEnabled,
+          nodeName,
+          hiddenPorts,
+          displayModeValue;
 
     int numIns = 0, numOuts = 0;
 
@@ -221,6 +263,8 @@ private:
     };
 
     BlockColorSelector colorSelector;
+
+    DisplayMode displayMode { Normal };
 
     void changeListenerCallback (ChangeBroadcaster*) override;
 

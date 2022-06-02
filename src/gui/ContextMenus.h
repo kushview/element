@@ -20,6 +20,7 @@
 #pragma once
 
 #include "gui/GuiCommon.h"
+#include "gui/BlockComponent.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "Utils.h"
@@ -217,9 +218,13 @@ public:
         int index = 50000;
 
         const auto block = node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
-        const bool compact = (bool) block.getProperty (Tags::collapsed);
-        dMenu.addItem (index++, TRANS("Normal"), true, ! compact);
-        dMenu.addItem (index++, TRANS("Compact"), true, compact);
+        const auto mode =  BlockComponent::getDisplayModeFromString(
+            block.getProperty (Tags::displayMode).toString());
+        for (int i = 0; i <= BlockComponent::Embed; ++i)
+        {
+            auto m = static_cast<BlockComponent::DisplayMode> (i);
+            dMenu.addItem (index++, BlockComponent::getDisplayModeName (m), true, mode == m);
+        }
         menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
     }
 
@@ -388,9 +393,9 @@ public:
         }
         else if (result >= 50000 && result < 60000)
         {
-            bool compact = result == 50001;
+            auto mode = static_cast<BlockComponent::DisplayMode> (result - 50000);
             node.getUIValueTree().getChildWithName (Tags::block)
-                .setProperty (Tags::collapsed, compact, nullptr);
+                .setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (mode), nullptr);
         }
 
         return nullptr;
