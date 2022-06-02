@@ -154,6 +154,10 @@ private:
             auto* const midiRouterEditor = new MidiRouterEditor (node);
             return midiRouterEditor;
         }
+        else if (node.getIdentifier() == EL_INTERNAL_ID_SCRIPT)
+        {
+            return new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node);
+        }
 
         NodeObjectPtr object = node.getObject();
         auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
