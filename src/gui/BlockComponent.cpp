@@ -437,7 +437,6 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
         
         int dx = deltaX - lastDragDeltaX;
         int dy = deltaY - lastDragDeltaY;
-        // if (! vertical) std::swap (dx, dy);
 
         for (int i = 0; i < panel->getNumChildComponents(); ++i)
         {
@@ -451,7 +450,6 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
             block->setNodePosition (
                 int (bx + dx), int (by + dy));
             block->updatePosition();
-            DBG ("dx=" <<dx << " dy="<<dy);
         }
 
         panel->updateConnectorComponents();
