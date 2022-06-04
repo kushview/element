@@ -289,6 +289,8 @@ private:
         const auto pti = pt.toInt();
         setNodePosition (pti.x, pti.y);
     }
+    
+    Point<double> getNodePosition() const noexcept;
 
     void makeEditorActive();
     

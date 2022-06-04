@@ -206,7 +206,7 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
 
 void BlockComponent::moveBlockTo (double x, double y)
 {
-    node.setPosition (x, y);
+    setNodePosition (x, y);
     updatePosition();
 }
 
@@ -427,8 +427,7 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     if (getParentComponent() != nullptr)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
 
-    setNodePosition (pos.getX(), pos.getY());
-    updatePosition();
+    moveBlockTo (pos.getX(), pos.getY());
 
     if (auto* const panel = getGraphPanel())
     {
@@ -444,12 +443,12 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
             if (block == nullptr || block == this || !panel->selectedNodes.isSelected (block->node.getNodeId()))
                 continue;
             
-            double bx, by;
-            block->node.getPosition (bx, by);
-            if (! vertical) std::swap (bx, by);
-            block->setNodePosition (
-                int (bx + dx), int (by + dy));
-            block->updatePosition();
+            auto bp = block->getNodePosition();
+            if (! vertical) 
+                std::swap (bp.x, bp.y);
+        
+            block->moveBlockTo (roundToIntAccurate (bp.x + dx), 
+                                roundToIntAccurate (bp.y + dy));
         }
 
         panel->updateConnectorComponents();
@@ -472,8 +471,6 @@ void BlockComponent::mouseUp (const MouseEvent& e)
 
     if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         makeEditorActive();
-
-    
 }
 
 void BlockComponent::makeEditorActive()
@@ -933,6 +930,13 @@ void BlockComponent::setNodePosition (const int x, const int y)
         node.setProperty (Tags::y, (double) x);
         node.setProperty (Tags::x, (double) y);
     }
+}
+
+Point<double> BlockComponent::getNodePosition() const noexcept
+{
+    Point<double> pos;
+    node.getPosition (pos.x, pos.y);
+    return pos;
 }
 
 void BlockComponent::updatePosition()
