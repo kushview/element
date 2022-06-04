@@ -416,9 +416,14 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
         return;
     }
 
-    dragging = true;
-    Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
+    // if (std::abs (e.getDistanceFromDragStartX()) < 2 && abs (e.getDistanceFromDragStartY()) < 2)
+    //     return;
 
+    dragging = true;
+    int deltaX = e.getDistanceFromDragStartX();
+    int deltaY = e.getDistanceFromDragStartY();
+
+    Point<int> pos (originalPos + Point<int> (deltaX, deltaY));
     if (getParentComponent() != nullptr)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
 
@@ -429,12 +434,37 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     {
         if (panel->onBlockMoved)
             panel->onBlockMoved (*this);
+        
+        int dx = deltaX - lastDragDeltaX;
+        int dy = deltaY - lastDragDeltaY;
+        // if (! vertical) std::swap (dx, dy);
+
+        for (int i = 0; i < panel->getNumChildComponents(); ++i)
+        {
+            auto* block = dynamic_cast<BlockComponent*> (panel->getChildComponent (i));
+            if (block == nullptr || block == this || !panel->selectedNodes.isSelected (block->node.getNodeId()))
+                continue;
+            
+            double bx, by;
+            block->node.getPosition (bx, by);
+            if (! vertical) std::swap (bx, by);
+            block->setNodePosition (
+                int (bx + dx), int (by + dy));
+            block->updatePosition();
+            DBG ("dx=" <<dx << " dy="<<dy);
+        }
+
         panel->updateConnectorComponents();
     }
+
+    lastDragDeltaX = deltaX;
+    lastDragDeltaY = deltaY;
 }
 
 void BlockComponent::mouseUp (const MouseEvent& e)
 {
+    dragging = selectionMouseDownResult = blockDrag = false;
+    lastDragDeltaX = lastDragDeltaY = 0;
     if (! isEnabled())
         return;
     auto* panel = getGraphPanel();
@@ -445,7 +475,7 @@ void BlockComponent::mouseUp (const MouseEvent& e)
     if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         makeEditorActive();
 
-    dragging = selectionMouseDownResult = blockDrag = false;
+    
 }
 
 void BlockComponent::makeEditorActive()
@@ -505,11 +535,13 @@ void BlockComponent::paint (Graphics& g)
     Colour bgc = isEnabled() && node.isEnabled()
             ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
             : LookAndFeel::widgetBackgroundColor.brighter (0.2);
+    
     auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1);
-    if (getGraphPanel()->selectedNodes.isSelected (node.getNodeId()))
+    const bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
+
+    if (selected)
     {
         bgc = bgc.brighter (0.55);
-        // barColor = barColor.brighter (.25);
     }
 
     if (colorize)
@@ -518,7 +550,7 @@ void BlockComponent::paint (Graphics& g)
         {
             case Compact:
             case Small: {
-                g.setColour (barColor);
+                g.setColour (selected ? barColor.brighter (0.275) : barColor);
                 g.fillRoundedRectangle (box.toFloat(), cornerSize);
                 break;
             }

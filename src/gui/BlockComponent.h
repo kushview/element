@@ -201,6 +201,9 @@ private:
     bool blockDrag = false;
     bool collapsed = false;
 
+    int lastDragDeltaX = 0;
+    int lastDragDeltaY = 0;
+
     SettingButton configButton;
     PowerButton powerButton;
     SettingButton muteButton;
