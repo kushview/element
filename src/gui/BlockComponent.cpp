@@ -506,7 +506,7 @@ void BlockComponent::paint (Graphics& g)
             ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
             : LookAndFeel::widgetBackgroundColor.brighter (0.2);
     auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1);
-    if (getGraphPanel()->selectedNodes.getItemArray().contains (node.getNodeId()))
+    if (getGraphPanel()->selectedNodes.isSelected (node.getNodeId()))
     {
         bgc = bgc.brighter (0.55);
         // barColor = barColor.brighter (.25);

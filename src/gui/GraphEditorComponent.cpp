@@ -352,8 +352,26 @@ private:
 };
 
 //=============================================================================
+void GraphEditorComponent::SelectedNodes::itemSelected (uint32 nodeId)
+{
+    for (int i = 0; i < editor.getNumChildComponents(); ++i)
+        if (auto* block = dynamic_cast<BlockComponent*> (editor.getChildComponent (i)))
+            if (nodeId == block->node.getNodeId())
+                block->repaint();
+}
+
+void GraphEditorComponent::SelectedNodes::itemDeselected (uint32 nodeId)
+{
+    for (int i = 0; i < editor.getNumChildComponents(); ++i)
+        if (auto* block = dynamic_cast<BlockComponent*> (editor.getChildComponent (i)))
+            if (nodeId == block->node.getNodeId())
+                block->repaint();
+}
+
+//=============================================================================
 GraphEditorComponent::GraphEditorComponent()
-    : ViewHelperMixin (this)
+    : ViewHelperMixin (this),
+      selectedNodes (*this)
 {
     factory.reset (new DefaultBlockFactory (*this));
     setOpaque (true);
@@ -632,6 +650,22 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             }
         }
     }
+    else
+    {
+        addAndMakeVisible (lasso);
+        lasso.beginLasso (e, this);
+    }
+}
+
+void GraphEditorComponent::mouseUp (const MouseEvent& e)
+{
+    lasso.endLasso();
+    removeChildComponent (&lasso);
+}
+
+void GraphEditorComponent::mouseDrag (const MouseEvent& e)
+{
+    lasso.dragLasso (e);
 }
 
 void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
@@ -1047,6 +1081,17 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
             if (auto* const filter = dynamic_cast<BlockComponent*> (getChildComponent (i)))
                 filter->update();
         updateConnectorComponents();
+    }
+}
+
+void GraphEditorComponent::findLassoItemsInArea (Array<uint32>& itemsFound, 
+                                                 const Rectangle<int>& area)
+{
+    for (int i = 0; i < getNumChildComponents(); ++i)
+    {
+        if (auto* block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
+            if (area.intersects (block->getBounds()))
+                { itemsFound.add (block->node.getNodeId()); block->repaint(); }
     }
 }
 

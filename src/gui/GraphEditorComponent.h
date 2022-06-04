@@ -35,7 +35,8 @@ class GraphEditorComponent : public Component,
                              public ChangeListener,
                              public DragAndDropTarget,
                              private ValueTree::Listener,
-                             public ViewHelperMixin
+                             public ViewHelperMixin,
+                             public LassoSource<uint32>
 {
 public:
     GraphEditorComponent();
@@ -48,6 +49,9 @@ public:
     Node getGraph() const { return graph; }
 
     //=========================================================================
+    void findLassoItemsInArea (Array<uint32>& itemsFound, const Rectangle<int>& area) override;
+    SelectedItemSet<uint32>& getLassoSelection() override { return selectedNodes; }
+
     /** Selects the given node */
     void selectNode (const Node& n);
 
@@ -91,6 +95,8 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void mouseDown (const MouseEvent& e) override;
+    void mouseUp (const MouseEvent& e) override;
+    void mouseDrag (const MouseEvent& e) override;
 
     bool isInterestedInDragSource (const SourceDetails&) override;
     void itemDropped (const SourceDetails& details) override;
@@ -121,7 +127,18 @@ private:
 
     bool verticalLayout = true;
 
-    SelectedItemSet<uint32> selectedNodes;
+    LassoComponent<uint32> lasso;
+    friend class SelectedNodes;
+    class SelectedNodes : public SelectedItemSet<uint32>
+    {
+    public:
+        SelectedNodes (GraphEditorComponent& owner)
+            : editor (owner) {}
+        void itemSelected (uint32 nodeId) override;
+        void itemDeselected (uint32 nodeId) override;
+        GraphEditorComponent& editor;
+    } selectedNodes;
+
     bool ignoreNodeSelected = false;
 
     float zoomScale = 1.0;
