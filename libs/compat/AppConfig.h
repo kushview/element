@@ -21,6 +21,7 @@
 #endif
 
 #include <element/config.h>
+#define JUCE_MODAL_LOOPS_PERMITTED 1
 // [END_USER_CODE_SECTION]
 
 /*

@@ -176,7 +176,7 @@ void PluginsPanelView::updateTreeView()
     tree.setRootItem (new PluginsPanelTreeRootItem (*this, plugins));
     auto* root = tree.getRootItem();
     for (int i = 0; i < root->getNumSubItems(); ++i)
-        root->getSubItem (i)->setOpenness (TreeViewItem::opennessOpen);
+        root->getSubItem (i)->setOpenness (TreeViewItem::Openness::opennessOpen);
 }
 
 void PluginsPanelView::timerCallback()

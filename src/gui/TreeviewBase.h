@@ -57,7 +57,7 @@ public:
     int getItemWidth() const override { return -1; }
     int getItemHeight() const override { return 20; }
 
-    Component* createItemComponent() override;
+    std::unique_ptr<Component> createItemComponent() override;
 
     void itemClicked (const MouseEvent& e) override;
     void itemDoubleClicked (const MouseEvent&) override;

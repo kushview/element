@@ -139,7 +139,7 @@ struct Alert
     inline static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
     {
         const auto message = productLockedMessage (msg);
-        if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
+        if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel", nullptr, nullptr))
             URL ("https://kushview.net/products/element/").launchInDefaultBrowser();
     }
 

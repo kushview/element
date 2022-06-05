@@ -155,9 +155,9 @@ void TreeItemBase::paintContent (Graphics& g, const Rectangle<int>& area)
     g.drawFittedText (getDisplayName(), area, Justification::centredLeft, 1, 0.8f);
 }
 
-Component* TreeItemBase::createItemComponent()
+std::unique_ptr<Component> TreeItemBase::createItemComponent()
 {
-    return new TreeItemComponent (*this);
+    return std::make_unique<TreeItemComponent> (*this);
 }
 
 class RenameTreeItemCallback : public ModalComponentManager::Callback,
