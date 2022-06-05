@@ -156,7 +156,9 @@ private:
         }
         else if (node.getIdentifier() == EL_INTERNAL_ID_SCRIPT)
         {
-            return new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node);
+            auto* se = new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node);
+            se->setToolbarVisible (false);
+            return se;
         }
 
         NodeObjectPtr object = node.getObject();

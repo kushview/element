@@ -38,6 +38,7 @@ public:
     void resized() override;
     void paint (Graphics&) override;
 
+    void setToolbarVisible (bool);
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 private:
@@ -47,6 +48,7 @@ private:
     sol::table widget;
     Component* comp = nullptr;
 
+    bool showToolbar = false;
     TextButton paramsButton;
 
     PropertyPanel props;

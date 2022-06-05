@@ -936,8 +936,14 @@ void BlockComponent::updateSize()
             setSize (minW, minH);
             break;
         }
-        case Normal:
         case Embed: {
+            if (embedded != nullptr) {
+                setSize (embedded->getWidth() + pinSize,
+                         embedded->getHeight() + 18 + 18);
+            }
+            break;
+        }
+        case Normal: {
             setSize (customWidth > 0 ? customWidth : minW,
                      customHeight > 0 ? customHeight : minH);
             break;

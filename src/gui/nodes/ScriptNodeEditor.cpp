@@ -280,6 +280,16 @@ ScriptNodeEditor::~ScriptNodeEditor()
     SNE.setProperty ("showParams", paramsButton.getToggleState(), nullptr);
 }
 
+void ScriptNodeEditor::setToolbarVisible (bool visible)
+{
+    if (showToolbar == visible)
+        return;
+    showToolbar = visible;
+    props.setVisible (showToolbar);
+    paramsButton.setVisible (showToolbar);
+    updateSize();
+}
+
 //==============================================================================
 sol::table ScriptNodeEditor::createContext()
 {
@@ -328,13 +338,14 @@ void ScriptNodeEditor::updateSize()
     if (comp != nullptr)
     {
         int w = comp->getWidth(), h = comp->getHeight();
-        if (props.isVisible())
+        if (showToolbar && props.isVisible())
         {
             w += propsGap;
             w += propsWidth;
         }
 
-        h += 22; // toolbarsize
+        if (showToolbar)
+            h += 22; // toolbarsize
         setSize (w, h);
         return;
     }
@@ -442,17 +453,22 @@ void ScriptNodeEditor::resized()
     auto r1 = getLocalBounds().reduced (4);
     auto r2 = r1.removeFromTop (toolbarSize);
 
-    fileBrowser.setBounds (r1.reduced (8));
-
-    paramsButton.changeWidthToFitText (r2.getHeight());
-    paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
+    if (fileBrowser.isVisible())
+        fileBrowser.setBounds (r1.reduced (8));
+    
+    if (showToolbar)
+    {    
+        paramsButton.changeWidthToFitText (r2.getHeight());
+        paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
+    }
 
     if (comp != nullptr)
     {
-        comp->setBounds (0, r2.getBottom(), comp->getWidth(), comp->getHeight());
+        auto compY = showToolbar ? r2.getBottom() : 0;
+        comp->setBounds (0, compY, comp->getWidth(), comp->getHeight());
     }
 
-    if (props.isVisible())
+    if (showToolbar && props.isVisible())
     {
         props.setBounds (comp != nullptr ? comp->getRight() + propsGap : 0,
                          comp != nullptr ? comp->getY() : 0,
