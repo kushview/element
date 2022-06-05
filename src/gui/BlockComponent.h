@@ -123,6 +123,10 @@ public:
     //=========================================================================
     void moveBlockTo (double x, double y);
 
+    //=========================================================================
+    bool isSelected() const noexcept;
+
+    //=========================================================================
     /** Change the power button's visibility */
     void setPowerButtonVisible (bool);
 
@@ -167,6 +171,18 @@ public:
     void paintOverChildren (Graphics& g) override;
     /** @internal */
     void resized() override;
+
+protected:
+    inline void forEachSibling (std::function<void (BlockComponent&)> callback)
+    {
+        if (! callback)
+            return;
+        if (auto* parent = getParentComponent())
+            for (int i = 0; i < parent->getNumChildComponents(); ++i)
+                if (auto* block = dynamic_cast<BlockComponent*> (parent->getChildComponent (i)))
+                    if (block != nullptr && block != this)
+                        callback (*block);
+    }
 
 private:
     friend class GraphEditorComponent;

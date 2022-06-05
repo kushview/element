@@ -27,6 +27,7 @@
 #include "gui/ContextMenus.h"
 #include "gui/GraphEditorComponent.h"
 #include "gui/NodeIOConfiguration.h"
+#include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
 #include "session/Node.h"
 #include "Globals.h"
@@ -210,6 +211,13 @@ void BlockComponent::moveBlockTo (double x, double y)
     updatePosition();
 }
 
+bool BlockComponent::isSelected() const noexcept
+{
+    if (auto* panel = getGraphPanel())
+        return panel->selectedNodes.isSelected (node.getNodeId());
+    return false;
+}
+
 void BlockComponent::setPowerButtonVisible (bool visible) { setButtonVisible (powerButton, visible); }
 void BlockComponent::setConfigButtonVisible (bool visible) { setButtonVisible (configButton, visible); }
 void BlockComponent::setMuteButtonVisible (bool visible) { setButtonVisible (muteButton, visible); }
@@ -283,11 +291,25 @@ void BlockComponent::deleteAllPins()
             delete c;
 }
 
-void BlockComponent::changeListenerCallback (ChangeBroadcaster*)
+void BlockComponent::changeListenerCallback (ChangeBroadcaster* broadcaster)
 {
-    color = colorSelector.getCurrentColour().withAlpha (1.0f);
-    node.getUIValueTree().setProperty ("color", color.toString(), nullptr);
-    repaint();
+    if (broadcaster == &colorSelector)
+    {
+        color = colorSelector.getCurrentColour().withAlpha (1.0f);
+        node.getUIValueTree().setProperty ("color", color.toString(), nullptr);
+        
+        forEachSibling ([this] (BlockComponent& sibling) {
+            if (!sibling.isSelected() || sibling.color == color)
+                return;
+            sibling.color = color;
+            sibling.node.getUIValueTree().setProperty ("color",
+                                                       sibling.color.toString(),
+                                                       nullptr);
+            sibling.repaint();
+        });
+
+        repaint();
+    }
 }
 
 void BlockComponent::mouseDown (const MouseEvent& e)
@@ -675,7 +697,8 @@ void BlockComponent::resized()
 {
     const auto box (getBoxRectangle());
     auto r = box.reduced (4, 2).removeFromBottom (14);
-
+    const int halfPinSize = pinSize / 2;
+    
     {
         Component* buttons[] = { &configButton, &muteButton, &powerButton };
         for (int i = 0; i < 3; ++i)
@@ -683,7 +706,13 @@ void BlockComponent::resized()
                 buttons[i]->setBounds (r.removeFromLeft (16));
     }
 
-    const int halfPinSize = pinSize / 2;
+    if (displayMode == Embed && embedded) {
+        auto er = box;
+        er.removeFromTop (vertical ? 20 : 18);
+        er.removeFromBottom (18);
+        embedded->setBounds (er.reduced (1));
+    }
+
     if (vertical)
     {
         Rectangle<int> pri (box.getX() + 9, 0, getWidth(), pinSize);
@@ -766,6 +795,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     vertical = ged->isLayoutVertical();
 
+    auto displayModeChanged = displayMode != getDisplayModeFromString (displayModeValue.getValue());
     displayMode = getDisplayModeFromString (displayModeValue.getValue());
     if (displayMode == Compact || displayMode == Small)
     {
@@ -780,6 +810,28 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         setPowerButtonVisible (true);
     }
     
+    if (displayMode == Embed)
+    {
+        if (embedded == nullptr)
+        {
+            if (auto* ui = ViewHelpers::getGuiController(this))
+            {
+                NodeEditorFactory factory (*ui);
+                if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
+                    embedded = e.release();
+                // else
+                //     embedded = NodeEditorFactory::createAudioProcessorEditor (node).release();
+            }
+            if (embedded != nullptr)
+                addAndMakeVisible (embedded.get());
+        }
+    }
+    else
+    {
+        if (embedded != nullptr)
+            embedded = nullptr;
+    }
+
     updatePins (forcePins);
     updateSize();
     setName (node.getDisplayName());
@@ -805,6 +857,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
 
     repaint();
+    resized();
 }
 
 void BlockComponent::getMinimumSize (int& width, int& height)
@@ -906,10 +959,15 @@ void BlockComponent::setCustomSize (int width, int height)
         node.getBlockValueTree()
             .setProperty (Tags::width, customWidth, nullptr)
             .setProperty (Tags::height, customHeight, nullptr);
-        displayModeValue.removeListener (this);
-        displayModeValue.setValue (getDisplayModeKey (Normal));
-        displayModeValue.addListener (this);
-        displayMode = Normal;
+        
+        if (displayMode == Small || displayMode == Compact)
+        {
+            displayModeValue.removeListener (this);
+            displayModeValue.setValue (getDisplayModeKey (Normal));
+            displayModeValue.addListener (this);
+            displayMode = Normal;
+        }
+        
         setSize (customWidth, customHeight);
     }
 }
