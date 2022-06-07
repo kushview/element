@@ -1,7 +1,7 @@
 /*
     This file is part of Element.
     Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
-    - Author Michael Fisher <mfisher@kushvie.net>
+    - Author Michael Fisher <mfisher@kushview.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
