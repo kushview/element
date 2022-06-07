@@ -223,7 +223,12 @@ public:
         for (int i = 0; i <= BlockComponent::Embed; ++i)
         {
             auto m = static_cast<BlockComponent::DisplayMode> (i);
-            dMenu.addItem (index++, BlockComponent::getDisplayModeName (m), true, mode == m);
+            dMenu.addItem (BlockComponent::getDisplayModeName(m), true, mode == m, 
+                           [block, m]()
+            {
+                auto b = block;
+                b.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
+            });
         }
         menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
     }
@@ -390,12 +395,6 @@ public:
                 // graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
                 // graph->suspendProcessing (wasSuspended);
             }
-        }
-        else if (result >= 50000 && result < 60000)
-        {
-            auto mode = static_cast<BlockComponent::DisplayMode> (result - 50000);
-            node.getUIValueTree().getChildWithName (Tags::block)
-                .setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (mode), nullptr);
         }
 
         return nullptr;
