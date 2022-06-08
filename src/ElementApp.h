@@ -127,40 +127,6 @@ namespace Tags {
     const Identifier updater = "updater";
 } // namespace Tags
 
-struct Alert
-{
-    inline static String productLockedMessage (const String& msg = String())
-    {
-        String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature." : msg;
-        message << "\nGrab a copy at https://kushview.net, or enter your license key in preferences.";
-        return message;
-    }
-
-    inline static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
-    {
-        const auto message = productLockedMessage (msg);
-        if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel", nullptr, nullptr))
-            URL ("https://kushview.net/products/element/").launchInDefaultBrowser();
-    }
-
-    inline static void showProductLockedAlertAsync (const String& msg = String(),
-                                                    const String& title = "Feature not Available")
-    {
-        const auto message = productLockedMessage (msg);
-        class Callback : public ModalComponentManager::Callback
-        {
-        public:
-            void modalStateFinished (int returnValue)
-            {
-                if (returnValue > 0)
-                    URL ("https://kushview.net/products/element/").launchInDefaultBrowser();
-            }
-        };
-
-        AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel", nullptr, new Callback());
-    }
-};
-
 inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
 {
     if (msg.isMidiClock())
