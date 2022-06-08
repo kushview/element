@@ -284,6 +284,7 @@ private:
     BlockColorSelector colorSelector;
 
     DisplayMode displayMode { Normal };
+    bool selected { false };
 
     void changeListenerCallback (ChangeBroadcaster*) override;
 
@@ -305,8 +306,11 @@ private:
         const auto pti = pt.toInt();
         setNodePosition (pti.x, pti.y);
     }
+
     
     Point<double> getNodePosition() const noexcept;
+
+    void setSelectedInternal (bool status);
 
     void makeEditorActive();
     

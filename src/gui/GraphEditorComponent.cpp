@@ -357,7 +357,7 @@ void GraphEditorComponent::SelectedNodes::itemSelected (uint32 nodeId)
     for (int i = 0; i < editor.getNumChildComponents(); ++i)
         if (auto* block = dynamic_cast<BlockComponent*> (editor.getChildComponent (i)))
             if (nodeId == block->node.getNodeId())
-                block->repaint();
+                block->setSelectedInternal (true);
 }
 
 void GraphEditorComponent::SelectedNodes::itemDeselected (uint32 nodeId)
@@ -365,7 +365,7 @@ void GraphEditorComponent::SelectedNodes::itemDeselected (uint32 nodeId)
     for (int i = 0; i < editor.getNumChildComponents(); ++i)
         if (auto* block = dynamic_cast<BlockComponent*> (editor.getChildComponent (i)))
             if (nodeId == block->node.getNodeId())
-                block->repaint();
+                block->setSelectedInternal (false);
 }
 
 //=============================================================================
