@@ -178,6 +178,7 @@ def configure (conf):
         conf.env.FRAMEWORK_QUARTZ_CORE    = 'QuartzCore'
         conf.env.FRAMEWORK_WEB_KIT        = 'WebKit'
         conf.env.FRAMEWORK_PYTHON         = 'Python'
+        conf.env.FRAMEWORK_METAL          = 'Metal'
     
     elif is_win32(): 
         pass

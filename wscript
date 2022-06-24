@@ -498,7 +498,7 @@ def build_element_juce (bld):
 
     elif bld.host_is_mac():
         JUCE.use += [
-            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
+            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 'METAL',
             'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
             'TEMPLATES'
         ]
