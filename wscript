@@ -463,14 +463,13 @@ def build_element_juce (bld):
             'build/include',
             'libs/compat',
             'libs/JUCE/modules',
-            'libs/kv/modules',
-            'libs/jlv2/modules'            
+            'libs/kv/modules'
         ],
         target          = 'lib/element_juce',
         name            = 'LIBJUCE',
-        vnum            = '6.0.8',
+        vnum            = '7.0.0',
         env             = env,
-        use             = [ 'DEPENDS', 'LILV', 'SUIL', 'ASIO', 'VST3' ],
+        use             = [ 'DEPENDS', 'ASIO', 'VST3', 'LV2' ],
         defines         = [],
         cxxflags        = [],
         linkflags       = [],
@@ -492,6 +491,9 @@ def build_element_juce (bld):
         CFLAGS_EXTRA  = '-I${includedir}/element/juce/modules',
         install_path  = os.path.join (JUCE.install_path, 'pkgconfig')
     )
+
+    if bld.env.LV2:
+        JUCE.source.append ('libs/compat/include_juce_audio_processors_lv2_libs.cpp')
 
     if bld.host_is_linux():
         JUCE.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
@@ -566,7 +568,6 @@ def build_app_objects (bld):
         library.defines += [ 'EL_SOLO=1' ]
     
     if bld.env.LUA:     library.use += [ 'LUA' ]
-    if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
     if bld.env.JACK:    library.use += [ 'JACK' ]
 
     if bld.host_is_linux():

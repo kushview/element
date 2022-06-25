@@ -42,7 +42,7 @@ namespace Util {
 #if JUCE_PLUGINHOST_LADSPA
         fmts.add ("LADSPA");
 #endif
-#if JLV2_PLUGINHOST_LV2
+#if JUCE_PLUGINHOST_LV2
         fmts.add ("LV2");
 #endif
 

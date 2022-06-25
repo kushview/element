@@ -13,6 +13,7 @@ VERSION_LAST="0.46.4"
 PLUGIN_VERSION="1.47.0"
 
 JUCE_VST3SDK_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
+JUCE_LV2_SDK_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK'
 
 juce_modules = '''
     juce_audio_basics juce_audio_devices juce_audio_formats
@@ -22,7 +23,7 @@ juce_modules = '''
 '''
 
 extra_juce_modules = '''
-    jlv2_host kv_core kv_engines kv_gui kv_models
+    kv_core kv_engines kv_gui kv_models
 '''
 
 mingw_libs = '''
@@ -126,30 +127,13 @@ def check_common (self):
         self.line_just = line_just
 
     # LV2 Support
-    self.env.LV2 = not bool(self.options.no_lv2)
+    self.env.LV2 = not bool (self.options.no_lv2)
+    self.define ('JUCE_PLUGINHOST_LV2', self.env.LV2)
     if self.env.LV2:
-        self.check_cfg(package='lv2',    uselib_store="LV2", args='--cflags', mandatory=False)
-        self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
-        self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
-        if bool(self.env.HAVE_SUIL):
-            self.check_cxx (
-                msg = "Checking for suil_init(...)",
-                fragment = '''
-                    #include <suil/suil.h>
-                    int main(int, char**) {
-                        suil_init (nullptr, nullptr, SUIL_ARG_NONE);
-                        return 0;
-                    }
-                ''',
-                execute = False,
-                use = [ 'SUIL' ],
-                uselib_store = 'SUIL_INIT',
-                define_name = 'HAVE_SUIL_INIT',
-                mandatory = False
-            )
-            self.define('JLV2_SUIL_INIT', bool(self.env.HAVE_SUIL_INIT))
-        self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_SUIL)
-    self.define('JLV2_PLUGINHOST_LV2', self.env.LV2)
+        self.env.INCLUDES_LV2 = [ JUCE_LV2_SDK_PATH ]
+        for lib in 'serd serd/src sord sord/src sratom sratom/src lilv lilv/src lv2'.split():
+            self.env.INCLUDES_LV2.append (os.path.join (JUCE_LV2_SDK_PATH, lib))
+            
 
     # ALSA
     self.env.ALSA = False
@@ -238,8 +222,6 @@ def check_linux (self):
     self.define ('JUCE_USE_XSHM', True)
     self.define ('JUCE_USE_XRENDER', True)
     self.define ('JUCE_USE_XCURSOR', True)
-
-    self.define ('JLV2_GTKUI', False)
 
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]
