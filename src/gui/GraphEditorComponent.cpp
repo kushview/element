@@ -970,8 +970,8 @@ bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& detail
 
 void GraphEditorComponent::itemDropped (const SourceDetails& details)
 {
-    lastDropX = (float) details.localPosition.x / (float) getWidth();
-    lastDropY = (float) details.localPosition.y / (float) getHeight();
+    lastDropX = (float) details.localPosition.x;
+    lastDropY = (float) details.localPosition.y;
 
     if (const auto* a = details.description.getArray())
     {
@@ -1064,8 +1064,8 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
 {
     if (child.hasType (Tags::node))
     {
-        child.setProperty ("relativeX", verticalLayout ? lastDropX : lastDropY, 0);
-        child.setProperty ("relativeY", verticalLayout ? lastDropY : lastDropX, 0);
+        child.setProperty (Tags::x, verticalLayout ? lastDropX : lastDropY, 0);
+        child.setProperty (Tags::y, verticalLayout ? lastDropY : lastDropX, 0);
         auto* comp = createBlock (Node (child, false));
         addAndMakeVisible (comp, 20000);
         comp->update();
