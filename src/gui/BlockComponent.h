@@ -321,6 +321,9 @@ private:
 
     void handleAsyncUpdate() override;
     void valueChanged (Value& value) override;
+
+    void addDisplaySubmenu (PopupMenu& menuToAddTo);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent);
 };
 

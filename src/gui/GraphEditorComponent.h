@@ -151,7 +151,7 @@ private:
     PluginWindow* getOrCreateWindowForNode (NodeObjectPtr f, bool useGeneric);
 
     void updateBlockComponents (const bool doPosition = true);
-    void updateConnectorComponents();
+    void updateConnectorComponents (bool async = false);
 
     void beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel, const uint32 destFilterID, const int destFilterChannel, const MouseEvent& e);
     void dragConnector (const MouseEvent& e);

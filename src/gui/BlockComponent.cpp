@@ -343,7 +343,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
 
         menu.addSeparator();
         menu.addColorSubmenu (colorSelector);
-        menu.addDisplaySubmenu (menu);
+        addDisplaySubmenu (menu);
 
         menu.addOptionsSubmenu();
 
@@ -1088,6 +1088,35 @@ void BlockComponent::setButtonVisible (Button& b, bool v)
 GraphEditorComponent* BlockComponent::getGraphPanel() const noexcept
 {
     return findParentComponentOfClass<GraphEditorComponent>();
+}
+
+
+void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
+{
+    PopupMenu dMenu;
+    const auto block = node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
+    const auto mode =  BlockComponent::getDisplayModeFromString(
+        block.getProperty (Tags::displayMode).toString());
+    for (int i = 0; i <= BlockComponent::Embed; ++i)
+    {
+        auto m = static_cast<BlockComponent::DisplayMode> (i);
+        dMenu.addItem (BlockComponent::getDisplayModeName(m), true, mode == m, 
+                        [this, block, m]()
+        {
+            auto b = block;
+            b.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
+            forEachSibling ([this, m](BlockComponent& sibling) {
+                if (! sibling.isSelected())
+                    return;
+                auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
+                sb.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
+            });
+
+            if (auto* gp = getGraphPanel())
+                gp->updateConnectorComponents (true);
+        });
+    }
+    menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
 }
 
 } // namespace Element

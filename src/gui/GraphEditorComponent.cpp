@@ -726,8 +726,23 @@ void GraphEditorComponent::changeListenerCallback (ChangeBroadcaster*)
     updateComponents();
 }
 
-void GraphEditorComponent::updateConnectorComponents()
+void GraphEditorComponent::updateConnectorComponents (bool async)
 {
+    struct UpdateConnectors : public juce::MessageManager::MessageBase
+    {
+        UpdateConnectors (GraphEditorComponent* g) : editor(g) {}
+        void messageCallback() override {
+            if (auto* g = editor.getComponent())
+                g->updateConnectorComponents (false);
+        };
+        Component::SafePointer<GraphEditorComponent> editor;
+    };
+
+    if (async) {
+        (new UpdateConnectors(this))->post();
+        return;
+    }
+
     const ValueTree arcs = graph.getArcsValueTree();
     for (int i = getNumChildComponents(); --i >= 0;)
     {

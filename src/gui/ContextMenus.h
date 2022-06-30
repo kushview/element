@@ -212,27 +212,6 @@ public:
         addSubMenu (TRANS ("Color"), color, true);
     }
 
-    inline void addDisplaySubmenu (PopupMenu& menuToAddTo)
-    {
-        PopupMenu dMenu;
-        int index = 50000;
-
-        const auto block = node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
-        const auto mode =  BlockComponent::getDisplayModeFromString(
-            block.getProperty (Tags::displayMode).toString());
-        for (int i = 0; i <= BlockComponent::Embed; ++i)
-        {
-            auto m = static_cast<BlockComponent::DisplayMode> (i);
-            dMenu.addItem (BlockComponent::getDisplayModeName(m), true, mode == m, 
-                           [block, m]()
-            {
-                auto b = block;
-                b.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
-            });
-        }
-        menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
-    }
-
     inline void addOversamplingSubmenu (PopupMenu& menuToAddTo)
     {
         PopupMenu osMenu;
