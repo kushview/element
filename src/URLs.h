@@ -27,7 +27,8 @@
 #define EL_URL_HELP_LICENSE_MANAGEMENT  EL_URL_HELP_HOME "/article/35-license-management"
 #define EL_URL_HELP_ACTIVATION          EL_URL_HELP_HOME "/article/61-online-activation"
 
-#define EL_URL_BUG_TRACKER              "https://github.com/kushview/element/issues"
+#define EL_URL_BUG_TRACKER "https://github.com/kushview/element/issues"
+#define EL_URL_DONATE EL_URL_HOME "/donate/"
 
 //==============================================================================
 #define EL_URL_API_HOME                 "https://api.kushview.net"
