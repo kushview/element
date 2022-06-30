@@ -142,6 +142,10 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         URL (EL_URL_BUG_TRACKER).launchInDefaultBrowser();
     }
+    else if (index == 7001)
+    {
+        URL (EL_URL_DONATE).launchInDefaultBrowser();
+    }
     else if (index == 2000 && menu == Window)
     {
         ViewHelpers::closePluginWindows (&owner, false);
@@ -365,16 +369,13 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
 
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
-    menu.addItem (6000, "User Manual");
+    menu.addItem (6000, TRANS("User's Manual"));
     menu.addSeparator();
-#ifdef EL_URL_API_LUA_EL
-    menu.addItem (6500, "Element Lua API");
-#endif
-    menu.addSeparator();
-    menu.addItem (7000, "Submit Feedback");
+    menu.addItem (7000, TRANS("Report a Bug..."));
+    menu.addItem (7001, TRANS("Donate..."));
 #if ! JUCE_MAC
+    menu.addCommandItem (&cmd, Commands::showAbout, TRANS("About Element"));
     menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
 #endif
 }
 
