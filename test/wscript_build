@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 # Build the unit tests
 
-bld.program (
+progs = []
+progs.append (bld.program (
     source = bld.path.ant_glob ("juce/**/*.cpp"),
     includes = [ 'juce' ],
     target = '../bin/test_juce',
     use = [ 'LUA_KV_objects', 'APP_objects', 'ELEMENT', 'LIBJUCE' ],
     install_path = None
-)
+))
 
-bld.program (
+progs.append (bld.program (
     source = bld.path.ant_glob ("*.cpp") + \
              bld.path.ant_glob ("scripting/*.cpp"),
     includes = [ '.' ],
     target = '../bin/test_element',
     use = [ 'APP_objects', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE', 'BOOST_TEST' ],
     install_path = None
-)
+))
+
+for p in progs:
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        p.env.append_unique (k, [ '-fvisibility=hidden' ])
