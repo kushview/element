@@ -438,8 +438,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
     if (! isEnabled())
         return;
 
-    lastDropX = (float) e.getMouseDownX() / (float) getWidth();
-    lastDropY = (float) e.getMouseDownY() / (float) getHeight();
+    lastDropX = (float) e.getMouseDownX();
+    lastDropY = (float) e.getMouseDownY();
 
     if (selectedNodes.getNumSelected() > 0)
     {
