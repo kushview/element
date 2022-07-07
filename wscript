@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
 from subprocess import call
-import os, sys
-sys.path.insert (0, os.path.join (os.getcwd(), 'tools/waf'))
-import element, juce
-
 from waflib.extras import repo
+import os, sys, element, juce
 
 APPNAME         = element.APPNAME
 VERSION         = element.VERSION

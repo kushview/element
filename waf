@@ -4,6 +4,7 @@ import inspect, os, sys
 submodule_help  = "Are submodules up to date? Try 'git submodule update --init --recursive'\n"
 waflib_path     = os.path.join (os.getcwd(), 'libs/waf')
 sys.path.insert (0, waflib_path)
+sys.path.insert (1, os.path.join (os.getcwd(), 'tools/waf'))
 
 try:
     from waflib import Context, Scripting
