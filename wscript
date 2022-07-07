@@ -167,7 +167,7 @@ def common_includes():
         'libs/jlv2/modules', \
         'libs/compat', \
         'libs/element/lua', \
-        'build/include', \
+        'include', \
         'src'
     ]
 
@@ -301,7 +301,7 @@ def build_libelement (bld):
         install_path    = bld.env.LIBDIR,
         defines         = [],
         includes        = [
-            'build/include',
+            'include',
             'libs/element/include',
             'libs/element/lua',
             'libs/element/src'
@@ -457,7 +457,7 @@ def build_element_juce (bld):
         features        = 'cxx cxxshlib' if bld.env.JUCE_DLL else 'cxx cxxstlib',
         source          = juce_sources (bld),
         includes        = [
-            'build/include',
+            'include',
             'libs/compat',
             'libs/JUCE/modules',
             'libs/kv/modules'
