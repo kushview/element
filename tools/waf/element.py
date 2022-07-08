@@ -28,7 +28,7 @@ extra_juce_modules = '''
 
 mingw_libs = '''
     uuid wsock32 wininet version ole32 ws2_32 oleaut32
-    imm32 comdlg32 shlwapi rpcrt4 winmm gdi32 dxgi
+    imm32 comdlg32 shlwapi rpcrt4 winmm gdi32 dxgi setupapi
 '''
 
 @conf
