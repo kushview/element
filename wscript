@@ -589,6 +589,16 @@ def build_app_objects (bld):
     bld.add_group()
 
 def build_app (bld):
+    res = None
+    if bld.host_is_mingw():
+        res = bld(
+            rule   = '%s -O coff -i ${SRC} -o ${TGT}' % ' '.join (bld.env.WINDRES),
+            source = bld.path.make_node ('tools/windeploy/resources.rc'),
+            target = bld.path.get_bld().make_node ('resources.res'),
+            name = 'RESOURCES_res',
+            install_path = None
+        )
+
     appEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         appEnv.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
@@ -626,13 +636,6 @@ def build_app (bld):
         if bld.env.JUCE_DLL:
             app.defines.append ('JUCE_DLL_BUILD=1')
         app.linkflags.append ('-mwindows')
-        res = bld(
-            rule   = '%s -O coff -i ${SRC} -o ${TGT}' % ' '.join (bld.env.WINDRES),
-            source = bld.path.make_node ('tools/windeploy/resources.rc'),
-            target = bld.path.get_bld().make_node ('resources.res'),
-            name = 'RESOURCES_res'
-        )
-
         app.linkflags.append (res.target.abspath())
         app.use.append ('RESOURCES_res')
         bld (features='subst', source='tools/element.bat',
