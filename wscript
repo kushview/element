@@ -633,7 +633,7 @@ def build_app (bld):
             name = 'RESOURCES_res'
         )
 
-        app.linkflags.append (os.path.join (bld.out_dir, 'resources.res'))
+        app.linkflags.append (res.target.abspath())
         app.use.append ('RESOURCES_res')
         bld (features='subst', source='tools/element.bat',
              target='element.bat', install_path=None)
