@@ -598,6 +598,7 @@ def build_app (bld):
             name = 'RESOURCES_res',
             install_path = None
         )
+        bld.add_group()
 
     appEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
