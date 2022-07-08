@@ -590,7 +590,7 @@ def build_app_objects (bld):
 
 def build_app (bld):
     res = None
-    if bld.host_is_mingw():
+    if bld.host_is_mingw32():
         res = bld(
             rule   = '%s -O coff -i ${SRC} -o ${TGT}' % ' '.join (bld.env.WINDRES),
             source = bld.path.make_node ('tools/windeploy/resources.rc'),
