@@ -146,12 +146,16 @@ def check_asio (self):
     asio_includes = []
     if len(self.options.asiosdk) > 0:
         asio_includes.append (os.path.join (self.options.asiosdk, 'common'))
+        asio_includes.append (os.path.join (self.options.asiosdk, 'host'))
+        asio_includes.append (os.path.join (self.options.asiosdk, 'host/pc'))
 
     return self.check_cxx (
         msg = "Checking for ASIO SDK",
         fragment = '''
             #include <windows.h>
             #include <iasiodrv.h>
+            #include <asiolist.h>
+            #include <asiodrivers.h>
             int main() { return 0; }
         ''',
         execute         = False,
