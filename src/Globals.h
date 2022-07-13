@@ -48,11 +48,11 @@ struct CommandLine
     const String commandLine;
 };
 
-class Globals final
+class Globals
 {
 public:
     explicit Globals (const String& commandLine = String());
-    ~Globals();
+    virtual ~Globals();
 
     const CommandLine cli;
 
