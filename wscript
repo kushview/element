@@ -702,6 +702,11 @@ def build (bld):
     build_element_juce (bld)
     build_el_module (bld)
     build_app_objects (bld)
+    build_plugins (bld)
+
+    if bld.env.ELEMENT_SUBPROJECT:
+        return
+
     build_app (bld)
     build_vst (bld)
     # build_vst3 (bld)
@@ -710,8 +715,6 @@ def build (bld):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:
         bld.recurse ('test')
-
-    build_plugins (bld)
 
     install_lua_files (bld)
 
