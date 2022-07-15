@@ -6,7 +6,7 @@ progs.append (bld.program (
     source = bld.path.ant_glob ("juce/**/*.cpp"),
     includes = [ 'juce' ],
     target = '../bin/test_juce',
-    use = [ 'LUA_KV_objects', 'APP_objects', 'ELEMENT', 'LIBJUCE' ],
+    use = [ 'LUA_KV_objects', 'ELEMENT_APP_static', 'ELEMENT', 'LIBJUCE' ],
     install_path = None
 ))
 
@@ -15,7 +15,7 @@ progs.append (bld.program (
              bld.path.ant_glob ("scripting/*.cpp"),
     includes = [ '.' ],
     target = '../bin/test_element',
-    use = [ 'APP_objects', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE', 'BOOST_TEST' ],
+    use = [ 'ELEMENT_APP_static', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE', 'BOOST_TEST' ],
     install_path = None
 ))
 

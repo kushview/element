@@ -6,7 +6,7 @@ lua_el = bld.program (
     name = 'lua-el',
     target = '../../bin/lua-el',
     includes = [ '.', ],
-    use = [ 'APP_objects', 'LUA_KV_objects', 'ELEMENT', 'READLINE', 'LIBJUCE' ],
+    use = [ 'ELEMENT_APP_static', 'LUA_KV_objects', 'ELEMENT', 'READLINE', 'LIBJUCE' ],
     install_path = None,
     env = bld.env.derive()
 )

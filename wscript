@@ -294,7 +294,7 @@ def build_libelement (bld):
     library = bld (
         name            = 'ELEMENT',
         target          = 'lib/element',
-        features        = 'cxx cxxshlib',
+        features        = 'cxx cxxstlib',
         use             = [ 'LUA_objects', 'DEPENDS', 'FILESYSTEM' ],
         vnum            = element.VERSION,
         env             = bld.env.derive(),
@@ -392,7 +392,7 @@ def build_vst_linux (bld, plugin):
         target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
-        use             = [ 'APP_objects', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE' ],
+        use             = [ 'ELEMENT_APP_static', 'LUA_KV_objects', 'ELEMENT', 'LIBJUCE' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
 
@@ -547,12 +547,12 @@ def build_app_objects (bld):
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
     
-    library = bld.objects (
-        features    = 'cxx',
+    library = bld(
+        features    = 'cxx cxxstlib',
         source      = element_sources (bld) + juce_extra_sources (bld),
         includes    = common_includes() + [ 'libs/element/lua/el' ],
-        target      = 'lib/app-objects',
-        name        = 'APP_objects',
+        target      = 'lib/element-app',
+        name        = 'ELEMENT_APP_static',
         env         = env,
         use         = [ 'ELEMENT', 'BOOST_SIGNALS', 'DEPENDS' ],
         cxxflags    = [],
@@ -610,7 +610,7 @@ def build_app (bld):
         name        = 'ELEMENT_APP',
         env         = appEnv,
         defines     = [],
-        use         = [ 'APP_objects', 'LUA_KV_objects', 'LIBJUCE', 'ELEMENT' ],
+        use         = [ 'ELEMENT_APP_static', 'LUA_KV_objects', 'LIBJUCE', 'ELEMENT' ],
         linkflags   = []
     )
 
