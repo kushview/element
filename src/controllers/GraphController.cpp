@@ -163,6 +163,8 @@ void GraphController::saveGraph (const bool saveAs)
         // ensure change messages are flushed so the changed flag doesn't reset
         document.setChangedFlag (false);
         jassert (! hasGraphChanged());
+        if (auto* us = getWorld().getSettings().getUserSettings())
+            us->setValue (Settings::lastGraphKey, document.getFile().getFullPathName());
     }
 }
 

@@ -131,8 +131,8 @@ void AppController::run()
 
         if (world.getSettings().openLastUsedSession())
         {
-            const auto lastSession = getWorld().getSettings().getUserSettings()->getValue ("lastSession");
-            if (File::isAbsolutePath(lastSession) && File(lastSession).existsAsFile())
+            const auto lastSession = getWorld().getSettings().getUserSettings()->getValue (Settings::lastSessionKey);
+            if (File::isAbsolutePath (lastSession) && File (lastSession).existsAsFile())
             {
                 sc->openFile (File (lastSession));
                 loadDefault = false;

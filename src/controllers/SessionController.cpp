@@ -209,6 +209,8 @@ void SessionController::saveSession (const bool saveAs, const bool askForFile, c
         currentSession->dispatchPendingMessages();
         document->setChangedFlag (false);
         jassert (! hasSessionChanged());
+        if (auto* us = getWorld().getSettings().getUserSettings())
+            us->setValue (Settings::lastSessionKey, document->getFile().getFullPathName());
     }
 }
 
