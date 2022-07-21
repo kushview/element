@@ -279,7 +279,8 @@ def build_libelement (bld):
     )
     lua.export_includes = lua.includes
     if bld.host_is_windows():
-        lua.defines.append ('LUA_BUILD_AS_DLL=1')
+        # lua.defines.append ('LUA_BUILD_AS_DLL=1')
+        pass
     
     for lh in 'lua.h lauxlib.h lualib.h luaconf.h'.split():
         bld (
@@ -335,7 +336,7 @@ def build_libelement (bld):
         library.source.append ('libs/element/src/native_unix.cpp')
     elif bld.host_is_windows():
         library.source.append ('libs/element/src/dlfcn-win32.c')
-        library.defines.append ('EL_DLLEXPORT=1')
+        # library.defines.append ('EL_SHARED_BUILD')
     elif bld.host_is_mac():
         library.install_path = None
         pcfile.install_path = None
@@ -547,7 +548,7 @@ def build_app_objects (bld):
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         env.append_unique (k, [ '-fPIC', '-fvisibility=hidden' ])
     
-    library = bld(
+    library = bld (
         features    = 'cxx cxxstlib',
         source      = element_sources (bld) + juce_extra_sources (bld),
         includes    = common_includes() + [ 'libs/element/lua/el' ],
@@ -610,7 +611,7 @@ def build_app (bld):
         name        = 'ELEMENT_APP',
         env         = appEnv,
         defines     = [],
-        use         = [ 'ELEMENT_APP_static', 'LUA_KV_objects', 'LIBJUCE', 'ELEMENT' ],
+        use         = [ 'ELEMENT_APP_static', 'ELEMENT', 'LUA_KV_objects', 'LIBJUCE' ],
         linkflags   = []
     )
 

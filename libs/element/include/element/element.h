@@ -15,18 +15,25 @@ extern "C" {
 
 #ifdef _WIN32
     // windows exports
-    #ifdef EL_DLLEXPORT
+    #if defined (EL_SHARED_BUILD)
         #define EL_API __declspec(dllexport)
-    #else
+        #pragma warning (disable: 4251)
+    #elif defined (EL_SHARED)
         #define EL_API __declspec(dllimport)
+        #pragma warning (disable: 4251)
     #endif
-    #define EL_EXPORT        EL_EXTERN EL_API
     #define EL_PLUGIN_EXPORT EL_EXTERN __declspec(dllexport)
-#else
-    // *nix exports
-    #define EL_API           __attribute__ ((visibility ("default")))
-    #define EL_EXPORT        EL_EXTERN EL_API
-    #define EL_PLUGIN_EXPORT EL_EXTERN EL_API
+#else 
+    #if defined (EL_SHARED) || defined (EL_SHARED_BUILD)
+        #define EL_API  __attribute__ ((visibility ("default")))
+    #endif
+    #define EL_PLUGIN_EXPORT EL_EXTERN __attribute__ ((visibility ("default")))
+#endif
+
+#define EL_EXPORT EL_EXTERN EL_API
+
+#ifndef EL_API
+    #define EL_API
 #endif
 
 // export macro: includes extern C if needed followed by visibility attribute;
