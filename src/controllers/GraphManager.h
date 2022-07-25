@@ -140,7 +140,7 @@ public:
     RootGraphManager (RootGraph& graph, PluginManager& plugins);
     ~RootGraphManager();
 
-    /** REturn the underlying RootGraph processor */
+    /** Return the underlying RootGraph processor */
     RootGraph& getRootGraph() const { return root; }
 
     /** Unload graph nodes without clearing the model */
