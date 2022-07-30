@@ -62,10 +62,9 @@ bool Module::open()
             // mids.push_back ("el.GraphicsDevice");
             for (auto& s : mids) {
                 if (auto data = mod->extension (handle, s.c_str())) {
-                    elFeature feature = {
-                        .ID = s.c_str(),
-                        .data = (void*) data
-                    };
+                    elFeature feature;
+                    feature.ID = s.c_str();
+                    feature.data = (void*) data;
                     handle_module_extension (feature);
                 }
             }

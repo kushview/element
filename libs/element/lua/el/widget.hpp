@@ -105,7 +105,7 @@ new_widgettype (lua_State* L, const char* name, Args&& ...args) {
         // })
         "setbounds", sol::overload (
             [](Widget& self, double x, double y, double w, double h) {
-                self.setBounds (x, y, w, h);
+                self.setBounds (Rectangle<double> (x, y, w, h).toNearestInt());
             },
             [](Widget& self, const sol::object& obj) {
                 widget_setbounds (self, obj);

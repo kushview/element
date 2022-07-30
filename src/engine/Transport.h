@@ -62,9 +62,9 @@ public:
         inline void getBarsAndBeats (int& bars, int& beats, int& subBeats, int subDivisions = 4)
         {
             float t = getPositionBeats();
-            bars = std::floor (t / beatsPerBar.get());
-            beats = (int) std::floor (t) % beatsPerBar.get();
-            subBeats = (int) std::floor (t * subDivisions) % subDivisions;
+            bars = juce::roundFloatToInt (std::floor (t / beatsPerBar.get()));
+            beats = juce::roundFloatToInt (std::floor (t)) % beatsPerBar.get();
+            subBeats = juce::roundFloatToInt (std::floor (t * subDivisions)) % subDivisions;
         }
     };
 

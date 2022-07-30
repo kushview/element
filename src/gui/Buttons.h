@@ -66,7 +66,7 @@ public:
     inline void setPath (const Path& p, float reduceby = 2.f)
     {
         path = p;
-        pathReduction = jmax (2.f, reduceby);
+        pathReduction = juce::roundToInt (jmax (2.f, reduceby));
     }
 
 protected:

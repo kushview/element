@@ -77,8 +77,9 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     }
     else
     {
-        const Rectangle<float> area (0.f, 0.f, getWidth(), getHeight());
-        g.drawImage (icon, area.reduced (2), RectanglePlacement::onlyReduceInSize);
+        const Rectangle<int> area (0, 0, getWidth(), getHeight());
+        g.drawImage (icon, area.reduced (2).toFloat(), 
+            RectanglePlacement::onlyReduceInSize);
     }
 
     g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
