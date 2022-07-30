@@ -136,24 +136,29 @@
             "cppStandard": "c++17"
         },
         {
-            "name": "Windows",
+            "name": "Win32",
             "includePath": [
-                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
-                "${workspaceRoot}"
+                "${workspaceFolder}/build/include/*",
+                "${workspaceFolder}/libs/element/src/*",
+                "${workspaceFolder}/libs/element/include/*",
+                "${workspaceFolder}/libs/element/lua/*",
+                "${workspaceFolder}/libs/JUCE/modules/*",
+                "${workspaceFolder}/libs/kv/modules/*",
+                "${workspaceFolder}/libs/compat/*",
+                "${workspaceFolder}/src/*",
+                "${workspaceFolder}/test/*"
             ],
             "defines": [
                 "_DEBUG",
-                "UNICODE"
+                "UNICODE",
+                "_UNICODE",
+                "_MSC_VER=1929"
             ],
-            "intelliSenseMode": "msvc-x64",
-            "browse": {
-                "path": [
-                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
-                    "${workspaceRoot}"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            }
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
         }
     ]
 }
