@@ -128,7 +128,6 @@ public:
     
     
     void shutdown() override {
-        Logger::writeToLog ("shutdown()");
         comp.reset();
     }
 
