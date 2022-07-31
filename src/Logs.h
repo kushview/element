@@ -81,7 +81,7 @@ public:
         if (history.size() > maxLines)
             history.remove (0);
 
-        listeners.call ([this, &message] (Listener& l) {
+        listeners.call ([&message] (Listener& l) {
             l.messageLogged (message);
         });
     }

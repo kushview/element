@@ -116,7 +116,7 @@ bool Session::loadData (const ValueTree& data)
     return true;
 }
 
-std::unique_ptr<XmlElement> Session::createXml()
+std::unique_ptr<XmlElement> Session::createXml() const
 {
     ValueTree saveData = objectData.createCopy();
     Node::sanitizeProperties (saveData, true);

@@ -77,7 +77,7 @@ public:
 
     inline bool notificationsFrozen() const { return freezeChangeNotification; }
 
-    std::unique_ptr<XmlElement> createXml();
+    std::unique_ptr<XmlElement> createXml() const;
 
     void saveGraphState();
     void restoreGraphState();
