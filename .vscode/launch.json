@@ -2,6 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(Windows) Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build-native/element.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [
+                { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
+                { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/element/lua/?.lua" },
+                { "name": "ELEMENT_SCRIPTS_PATH", "value": "${workspaceRoot}/scripts/?.lua" }
+            ],
+            "console": "externalTerminal"
+        },
+        {
             "name": "Element",
             "type": "cppdbg",
             "request": "launch",
@@ -45,18 +60,7 @@
                     "moduleLoad": false,
                     "exceptions": false,
                 }
-            },
-            "windows": {
-                "MIMode": "gdb",
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ],
-                "program": "${workspaceRoot}/build/Element.exe",
-            },
+            }
         },
         {
             "name": "JUCE Unit Tests",

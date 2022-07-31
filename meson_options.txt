@@ -1,0 +1,1 @@
+option ('vst2sdk', type : 'string', value : 'auto', description : 'Path to VST2 SDK v2.4')
