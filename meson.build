@@ -93,7 +93,6 @@ juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
 juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
 juce_conf_data.set10 ('JUCE_ASIO', false)
 
-
 juce_conf_data.set10 ('KV_DOCKING_WINDOWS', true)
 
 vst2_includes = []
@@ -109,7 +108,6 @@ aeffectx_h_found = cpp.check_header ('pluginterfaces/vst2.x/aeffectx.h',
     include_directories : vst2_includes, required : false)
 vstfxstore_h_found = cpp.check_header ('pluginterfaces/vst2.x/vstfxstore.h',
     include_directories : vst2_includes, required : false)
-
 juce_conf_data.set10 ('JUCE_PLUGINHOST_VST', aeffect_h_found and aeffectx_h_found)
 
 vst3_includes = include_directories ('libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
@@ -120,12 +118,44 @@ lv2_includes = include_directories (
     'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2',
     'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/serd',
     'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord',
+    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord/src',
     'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv',
     'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv/src',
     'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sratom')
-juce_sources += 'libs\compat\include_juce_audio_processors_lv2_libs.cpp'
+juce_sources += 'libs/compat/include_juce_audio_processors_lv2_libs.cpp'
 juce_conf_data.set10 ('JUCE_PLUGINHOST_LV2', true)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_LADSPA', cpp.check_header ('ladspa.h'))
+
+deps = [ boost_dep ]
+if host_machine.system() == 'linux'
+    alsa_dep = dependency ('alsa', required : false)
+    juce_conf_data.set10 ('JUCE_ALSA', alsa_dep.found())
+    deps += alsa_dep
+
+    deps += [ 
+        dependency ('freetype2', required : true),
+        dependency ('x11', required : true),
+        dependency ('xext', required : true),
+        dependency ('xrandr', required : true),
+        dependency ('xcomposite', required : true),
+        dependency ('xinerama', required : true),
+        dependency ('xcursor', required : true)
+    ]
+    juce_conf_data.set10 ('JUCE_USE_XRANDR', true)
+    juce_conf_data.set10 ('JUCE_USE_XINERAMA', true)
+    juce_conf_data.set10 ('JUCE_USE_XSHM', true)
+    juce_conf_data.set10 ('JUCE_USE_XRENDER', true)
+    juce_conf_data.set10 ('JUCE_USE_XCURSOR', true)
+    
+    curl_dep = dependency ('libcurl', required : false)
+    juce_conf_data.set10 ('JUCE_USE_CURL', curl_dep.found())
+    deps += curl_dep
+
+    deps += [
+        cpp.find_library ('dl', required : true),
+        cpp.find_library ('pthread', required : true) 
+    ]
+endif
 
 configure_file (output : 'juce_config.h', 
                 configuration : juce_conf_data)
@@ -341,19 +371,19 @@ libelement_includes += vst2_includes
 libelement_includes += lv2_includes
 
 if host_machine.system() == 'windows'
-    libelement_sources += [ 'libs\element\src\dlfcn-win32.c' ]
+    libelement_sources += [ 'libs/element/src/dlfcn-win32.c' ]
 endif
 
 libelement = static_library ('element', 
     libelement_sources, 
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
-    dependencies : boost_dep,
+    dependencies : deps,
     install : false)
 
 # Element Program
-element = executable ('element', 'src/Main.cc',
+element_app = executable ('element', 'src/Main.cc',
     win_subsystem : 'windows',
-    dependencies : [ boost_dep ],
+    dependencies : deps,
     include_directories : libelement_includes,
     link_with : [ libelement, libelement_lua ])
