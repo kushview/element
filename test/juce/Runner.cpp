@@ -46,7 +46,6 @@ public:
     void handleAsyncUpdate() override
     {
         runUnitTests();
-        comp.reset();
     }
 
     void initialise (const String& cli ) override
@@ -128,11 +127,15 @@ public:
     }
     
     
-    void shutdown() override {}
+    void shutdown() override {
+        Logger::writeToLog ("shutdown()");
+        comp.reset();
+    }
 
     void systemRequestedQuit() override
     {
         TestApp::quit();
+        MessageManager::getInstance()->runDispatchLoopUntil(14);
     }
 
     void anotherInstanceStarted (const String& commandLine) override

@@ -117,7 +117,7 @@ def configure (conf):
     for m in element.juce_modules.split():
         conf.define ('JUCE_MODULE_AVAILABLE_%s' % m, True)
     
-    conf.write_config_header (configfile='include/element/config.h',
+    conf.write_config_header (configfile='include/juce_config.h',
                               guard='EL_CONFIG_H')
     
     print
