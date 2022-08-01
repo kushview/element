@@ -1,4 +1,4 @@
-project ('element', ['c', 'cpp'],
+project ('element', ['c', 'cpp', 'objc', 'objcpp'],
     version : '0.47.0',
     meson_version : '>= 0.56.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
@@ -7,7 +7,9 @@ fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
 # Global Arguments
-add_global_arguments ([], language : 'cpp')
+add_global_arguments ([
+
+], language : 'cpp')
 
 # Boost
 boost_dep = dependency ('boost', required : true)
@@ -86,6 +88,12 @@ foreach m : juce_modules
     juce_conf_data.set10 ('JUCE_MODULE_AVAILABLE_@0@'.format (m), true)
 endforeach
 
+if get_option ('debug')
+    juce_conf_data.set10 ('_DEBUG', true)
+else
+    juce_conf_data.set10 ('NDEBUG', true)
+endif
+
 juce_conf_data.set10 ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', true)
 juce_conf_data.set10 ('JUCE_STANDALONE_APPLICATION', true)
 juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
@@ -155,6 +163,12 @@ if host_machine.system() == 'linux'
         cpp.find_library ('dl', required : true),
         cpp.find_library ('pthread', required : true) 
     ]
+elif host_machine.system() == 'darwin'
+    deps += dependency ('appleframeworks', modules : [
+        'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
+         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
+         'discrecording', 'iokit', 'quartzcore', 'metal' ])  
+    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)     
 endif
 
 configure_file (output : 'juce_config.h', 
@@ -383,7 +397,17 @@ libelement = static_library ('element',
 
 # Element Program
 element_app = executable ('element', 'src/Main.cc',
+    install : true,
     win_subsystem : 'windows',
     dependencies : deps,
     include_directories : libelement_includes,
+    gnu_symbol_visibility : 'hidden',
     link_with : [ libelement, libelement_lua ])
+
+if host_machine.system() == 'darwin'
+    install_data ('data/Icon.icns', install_dir : 'Contents/Resources')
+    install_data ('tools/macdeploy/Info.plist', install_dir : 'Contents')
+    meson.add_install_script ('tools/macdeploy/appbundle.py', 
+        '/tmp/Element.app') #, '-volname', '"Element"',
+        # '-dmg', '"element-osx-0.47.0"', '-verbose', '4')
+endif
