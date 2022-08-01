@@ -13,7 +13,7 @@ resources="${bundle}/Contents/Resources"
 scripts="${resources}/Scripts"
 modules="${resources}/Modules"
 scriptsrc="scripts"
-elsrc="libs/element/lua"
+elsrc="libs/lua"
 kvsrc="libs/lua-kv/src"
 
 if [ -d "${bundle}" ]; then

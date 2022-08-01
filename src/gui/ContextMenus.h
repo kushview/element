@@ -361,19 +361,21 @@ public:
         }
         else if (result >= 40000 && result < 50000)
         {
-            const int osFactor = (int) powf (2, float (result - 40000));
+#if 0
+            const int osFactor = (int) powf (2, float (result - 40000));            
             if (auto gNode = node.getObject())
             {
                 // FIXME:
-                // auto* graph = gNode->getParentGraph();
-                // // TODO: don't reload the entire graph
-                // bool wasSuspended = graph->isSuspended();
-                // graph->suspendProcessing (true);
-                // graph->releaseResources();
-                // gNode->setOversamplingFactor (osFactor);
-                // graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
-                // graph->suspendProcessing (wasSuspended);
+                auto* graph = gNode->getParentGraph();
+                // TODO: don't reload the entire graph
+                bool wasSuspended = graph->isSuspended();
+                graph->suspendProcessing (true);
+                graph->releaseResources();
+                gNode->setOversamplingFactor (osFactor);
+                graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
+                graph->suspendProcessing (wasSuspended);
             }
+#endif
         }
 
         return nullptr;

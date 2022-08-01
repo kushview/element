@@ -14,7 +14,7 @@ def element_binary():
     return binary
 
 def set_local_lua_paths():
-    os.environ ['LUA_PATH']             = "libs/element/lua/?.lua"
+    os.environ ['LUA_PATH']             = "libs/lua/?.lua"
     os.environ ['LUA_CPATH']            = "build/lib/lua/?.so"
     os.environ ['ELEMENT_SCRIPTS_PATH'] = "scripts/?.lua"
 

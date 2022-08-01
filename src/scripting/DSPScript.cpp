@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "../../libs/element/lua/el/factories.hpp"
+#include "../../libs/lua/el/factories.hpp"
 #include "engine/MidiPipe.h"
 #include "scripting/DSPScript.h"
 

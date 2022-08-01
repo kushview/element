@@ -151,7 +151,7 @@ namespace Lua {
         if (topdir.exists() && topdir.isDirectory())
         {
             dirs.add (topdir.getChildFile ("libs/lua-kv/src").getFullPathName());
-            dirs.add (topdir.getChildFile ("libs/element/lua").getFullPathName());
+            dirs.add (topdir.getChildFile ("libs/lua").getFullPathName());
         }
 #endif
         return dirs;

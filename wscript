@@ -166,14 +166,14 @@ def common_includes():
         'libs/kv/modules', \
         'libs/jlv2/modules', \
         'libs/compat', \
-        'libs/element/lua', \
+        'libs/lua', \
         'include', \
         'src'
     ]
 
 def lua_kv_sources (ctx):
-    return ctx.path.ant_glob ('libs/element/lua/el/**/*.c') + \
-           ctx.path.ant_glob ('libs/element/lua/el/**/*.cpp')
+    return ctx.path.ant_glob ('libs/lua/el/**/*.c') + \
+           ctx.path.ant_glob ('libs/lua/el/**/*.cpp')
 
 def juce_sources (ctx):
     return element.get_juce_library_code ("libs/compat")
@@ -240,41 +240,41 @@ def build_libelement (bld):
         install_path    = None,
         defines         = [],
         includes = [
-            'libs/element/lua/src'
+            'libs/lua/src'
         ],
         source = '''
-            libs/element/lua/src/lauxlib.c
-            libs/element/lua/src/liolib.c
-            libs/element/lua/src/lopcodes.c
-            libs/element/lua/src/lstate.c
-            libs/element/lua/src/lobject.c
-            libs/element/lua/src/lmathlib.c
-            libs/element/lua/src/loadlib.c
-            libs/element/lua/src/lvm.c
-            libs/element/lua/src/lfunc.c
-            libs/element/lua/src/lstrlib.c
-            libs/element/lua/src/linit.c
-            libs/element/lua/src/lstring.c
-            libs/element/lua/src/lundump.c
-            libs/element/lua/src/lctype.c
-            libs/element/lua/src/ltable.c
-            libs/element/lua/src/ldump.c
-            libs/element/lua/src/loslib.c
-            libs/element/lua/src/lgc.c
-            libs/element/lua/src/lzio.c
-            libs/element/lua/src/ldblib.c
-            libs/element/lua/src/lutf8lib.c
-            libs/element/lua/src/lmem.c
-            libs/element/lua/src/lcorolib.c
-            libs/element/lua/src/lcode.c
-            libs/element/lua/src/ltablib.c
-            libs/element/lua/src/lapi.c
-            libs/element/lua/src/lbaselib.c
-            libs/element/lua/src/ldebug.c
-            libs/element/lua/src/lparser.c
-            libs/element/lua/src/llex.c
-            libs/element/lua/src/ltm.c
-            libs/element/lua/src/ldo.c
+            libs/lua/src/lauxlib.c
+            libs/lua/src/liolib.c
+            libs/lua/src/lopcodes.c
+            libs/lua/src/lstate.c
+            libs/lua/src/lobject.c
+            libs/lua/src/lmathlib.c
+            libs/lua/src/loadlib.c
+            libs/lua/src/lvm.c
+            libs/lua/src/lfunc.c
+            libs/lua/src/lstrlib.c
+            libs/lua/src/linit.c
+            libs/lua/src/lstring.c
+            libs/lua/src/lundump.c
+            libs/lua/src/lctype.c
+            libs/lua/src/ltable.c
+            libs/lua/src/ldump.c
+            libs/lua/src/loslib.c
+            libs/lua/src/lgc.c
+            libs/lua/src/lzio.c
+            libs/lua/src/ldblib.c
+            libs/lua/src/lutf8lib.c
+            libs/lua/src/lmem.c
+            libs/lua/src/lcorolib.c
+            libs/lua/src/lcode.c
+            libs/lua/src/ltablib.c
+            libs/lua/src/lapi.c
+            libs/lua/src/lbaselib.c
+            libs/lua/src/ldebug.c
+            libs/lua/src/lparser.c
+            libs/lua/src/llex.c
+            libs/lua/src/ltm.c
+            libs/lua/src/ldo.c
         '''.split()
     )
     lua.export_includes = lua.includes
@@ -285,7 +285,7 @@ def build_libelement (bld):
     for lh in 'lua.h lauxlib.h lualib.h luaconf.h'.split():
         bld (
             features        = 'subst',
-            source          = 'libs/element/lua/src/%s' % lh,
+            source          = 'libs/lua/src/%s' % lh,
             target          = 'include/element/detail/%s' % lh,
             install_path    = None
         )
@@ -304,7 +304,7 @@ def build_libelement (bld):
         includes        = [
             'include',
             'libs/element/include',
-            'libs/element/lua',
+            'libs/lua',
             'libs/element/src'
         ],
         source = [
@@ -359,7 +359,7 @@ def build_libelement (bld):
 def add_scripts_to (bld, builddir, instdir, 
                     modsdir='Modules', 
                     scriptsdir='Scripts'):
-    for node in bld.path.ant_glob ('libs/element/lua/el/*.lua'):
+    for node in bld.path.ant_glob ('libs/lua/el/*.lua'):
         s = bld (
             features    ='subst', 
             source      = node,
@@ -533,8 +533,8 @@ def build_el_module (bld):
         features = 'cxx',
         use      = [ 'DEPENDS' ],
         includes = common_includes() + [
-            'libs/element/lua/src',
-            'libs/element/lua/el', 
+            'libs/lua/src',
+            'libs/lua/el', 
             'libs/element/include'
         ],
         source = lua_kv_sources (bld)
@@ -551,7 +551,7 @@ def build_app_objects (bld):
     library = bld (
         features    = 'cxx cxxstlib',
         source      = element_sources (bld) + juce_extra_sources (bld),
-        includes    = common_includes() + [ 'libs/element/lua/el' ],
+        includes    = common_includes() + [ 'libs/lua/el' ],
         target      = 'lib/element-app',
         name        = 'ELEMENT_APP_static',
         env         = env,
@@ -659,9 +659,9 @@ def install_lua_files (bld):
                        cwd=path.find_dir ('build/doc/lua'))
 
     bld.install_files (bld.env.LUADIR,
-                       path.ant_glob ("libs/element/lua/**/*.lua"),
+                       path.ant_glob ("libs/lua/**/*.lua"),
                        relative_trick=True,
-                       cwd=path.find_dir ('libs/element/lua'))
+                       cwd=path.find_dir ('libs/lua'))
 
 def build_plugins (bld):
     import glob
@@ -728,7 +728,7 @@ def check (ctx):
         return
     os.environ["LD_LIBRARY_PATH"] = "build/lib"
     os.environ["DYLD_LIBRARY_PATH"] = "build/lib"
-    os.environ["LUA_PATH"] = "libs/element/lua/?.lua"
+    os.environ["LUA_PATH"] = "libs/lua/?.lua"
     failed = 0
     print ("JUCE Tests")
     if 0 != call (["build/bin/test_juce"]):

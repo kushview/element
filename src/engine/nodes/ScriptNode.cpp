@@ -20,7 +20,7 @@
 #include <math.h>
 #include "sol/sol.hpp"
 #include "element/element.h"
-#include "../../../libs/element/lua/el/factories.hpp"
+#include "../../../libs/lua/el/factories.hpp"
 
 #include "ElementApp.h"
 #include "engine/nodes/ScriptNode.h"

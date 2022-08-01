@@ -11,7 +11,7 @@
             "cwd": "${fileDirname}",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
-                { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/element/lua/?.lua" },
+                { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },
                 { "name": "ELEMENT_SCRIPTS_PATH", "value": "${workspaceRoot}/scripts/?.lua" }
             ],
             "console": "externalTerminal"
@@ -21,16 +21,16 @@
             "type": "cppdbg",
             "request": "launch",
             "args": [],
-            "program": "${workspaceRoot}/build/bin/element",
+            "program": "${workspaceRoot}/build-native/element",
             "cwd": "${workspaceRoot}",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
-                { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/element/lua/?.lua" },
+                { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },
                 { "name": "ELEMENT_SCRIPTS_PATH", "value": "${workspaceRoot}/scripts/?.lua" }
             ],
             "externalConsole": false,
             "stopAtEntry": false,
-            "preLaunchTask": "Waf Build",
+            // "preLaunchTask": "Waf Build",
             "linux": {
                 "MIMode": "gdb",
                 "logging": {

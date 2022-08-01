@@ -5,7 +5,7 @@
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2021 Kushview, LLC"
-              defines="EL_USE_LUA=1&#10;EL_LUA_AMALGAMATED=1&#10;" headerPath="../../../../../src&#10;../../../../../libs/element/include&#10;../../../../../libs/element/lua&#10;../../../../../libs/element/lua/src&#10;../../../../../libs/element/lua/el&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../build/include"
+              defines="EL_USE_LUA=1&#10;EL_LUA_AMALGAMATED=1&#10;" headerPath="../../../../../src&#10;../../../../../libs/element/include&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua/el&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
@@ -50,142 +50,142 @@
         </GROUP>
         <GROUP id="{0702B16A-59F8-110D-6835-2946A739A3A1}" name="lua">
           <GROUP id="{BBB1E3EC-88F6-42D9-653F-101FF6DDBAF7}" name="doc">
-            <FILE id="ZCXVNi" name="contents.html" compile="0" resource="0" file="../../../libs/element/lua/doc/contents.html"/>
-            <FILE id="WZtSU7" name="index.css" compile="0" resource="0" file="../../../libs/element/lua/doc/index.css"/>
-            <FILE id="ks2LZd" name="logo.gif" compile="0" resource="0" file="../../../libs/element/lua/doc/logo.gif"/>
-            <FILE id="ewJmH3" name="lua.1" compile="0" resource="0" file="../../../libs/element/lua/doc/lua.1"/>
-            <FILE id="PaJc4h" name="lua.css" compile="0" resource="0" file="../../../libs/element/lua/doc/lua.css"/>
-            <FILE id="VU2Uqo" name="luac.1" compile="0" resource="0" file="../../../libs/element/lua/doc/luac.1"/>
-            <FILE id="lc8VMM" name="manual.css" compile="0" resource="0" file="../../../libs/element/lua/doc/manual.css"/>
-            <FILE id="HRMlLU" name="manual.html" compile="0" resource="0" file="../../../libs/element/lua/doc/manual.html"/>
+            <FILE id="ZCXVNi" name="contents.html" compile="0" resource="0" file="../../../libs/lua/doc/contents.html"/>
+            <FILE id="WZtSU7" name="index.css" compile="0" resource="0" file="../../../libs/lua/doc/index.css"/>
+            <FILE id="ks2LZd" name="logo.gif" compile="0" resource="0" file="../../../libs/lua/doc/logo.gif"/>
+            <FILE id="ewJmH3" name="lua.1" compile="0" resource="0" file="../../../libs/lua/doc/lua.1"/>
+            <FILE id="PaJc4h" name="lua.css" compile="0" resource="0" file="../../../libs/lua/doc/lua.css"/>
+            <FILE id="VU2Uqo" name="luac.1" compile="0" resource="0" file="../../../libs/lua/doc/luac.1"/>
+            <FILE id="lc8VMM" name="manual.css" compile="0" resource="0" file="../../../libs/lua/doc/manual.css"/>
+            <FILE id="HRMlLU" name="manual.html" compile="0" resource="0" file="../../../libs/lua/doc/manual.html"/>
             <FILE id="B4RavP" name="osi-certified-72x60.png" compile="0" resource="0"
-                  file="../../../libs/element/lua/doc/osi-certified-72x60.png"/>
-            <FILE id="HLih9t" name="readme.html" compile="0" resource="0" file="../../../libs/element/lua/doc/readme.html"/>
+                  file="../../../libs/lua/doc/osi-certified-72x60.png"/>
+            <FILE id="HLih9t" name="readme.html" compile="0" resource="0" file="../../../libs/lua/doc/readme.html"/>
           </GROUP>
           <GROUP id="{CA7D9102-96E4-AD49-F490-CEA4FABDB938}" name="el">
-            <FILE id="nBKYQ9" name="audio.c" compile="1" resource="0" file="../../../libs/element/lua/el/audio.c"/>
+            <FILE id="nBKYQ9" name="audio.c" compile="1" resource="0" file="../../../libs/lua/el/audio.c"/>
             <FILE id="yvtzTv" name="audio_buffer.hpp" compile="0" resource="0"
-                  file="../../../libs/element/lua/el/audio_buffer.hpp"/>
-            <FILE id="bChsGM" name="AudioBuffer.lua" compile="0" resource="0" file="../../../libs/element/lua/el/AudioBuffer.lua"/>
+                  file="../../../libs/lua/el/audio_buffer.hpp"/>
+            <FILE id="bChsGM" name="AudioBuffer.lua" compile="0" resource="0" file="../../../libs/lua/el/AudioBuffer.lua"/>
             <FILE id="Ivo7Kc" name="AudioBuffer32.cpp" compile="1" resource="0"
-                  file="../../../libs/element/lua/el/AudioBuffer32.cpp"/>
+                  file="../../../libs/lua/el/AudioBuffer32.cpp"/>
             <FILE id="lspadC" name="AudioBuffer64.cpp" compile="1" resource="0"
-                  file="../../../libs/element/lua/el/AudioBuffer64.cpp"/>
+                  file="../../../libs/lua/el/AudioBuffer64.cpp"/>
             <FILE id="uMgvco" name="AudioBufferImpl.ipp" compile="0" resource="0"
-                  file="../../../libs/element/lua/el/AudioBufferImpl.ipp"/>
-            <FILE id="ypUUWm" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Bounds.cpp"/>
-            <FILE id="bsLtlF" name="bytes.c" compile="1" resource="0" file="../../../libs/element/lua/el/bytes.c"/>
-            <FILE id="UClqRn" name="bytes.h" compile="0" resource="0" file="../../../libs/element/lua/el/bytes.h"/>
-            <FILE id="SYjATu" name="command.lua" compile="0" resource="0" file="../../../libs/element/lua/el/command.lua"/>
+                  file="../../../libs/lua/el/AudioBufferImpl.ipp"/>
+            <FILE id="ypUUWm" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/lua/el/Bounds.cpp"/>
+            <FILE id="bsLtlF" name="bytes.c" compile="1" resource="0" file="../../../libs/lua/el/bytes.c"/>
+            <FILE id="UClqRn" name="bytes.h" compile="0" resource="0" file="../../../libs/lua/el/bytes.h"/>
+            <FILE id="SYjATu" name="command.lua" compile="0" resource="0" file="../../../libs/lua/el/command.lua"/>
             <FILE id="SUSTkr" name="CommandManager.cpp" compile="1" resource="0"
-                  file="../../../libs/element/lua/el/CommandManager.cpp"/>
-            <FILE id="OBzjsu" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Desktop.cpp"/>
+                  file="../../../libs/lua/el/CommandManager.cpp"/>
+            <FILE id="OBzjsu" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/lua/el/Desktop.cpp"/>
             <FILE id="qxOkjn" name="DocumentWindow.cpp" compile="1" resource="0"
-                  file="../../../libs/element/lua/el/DocumentWindow.cpp"/>
-            <FILE id="qudVlW" name="factories.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/factories.hpp"/>
-            <FILE id="ndCZxA" name="File.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/File.cpp"/>
-            <FILE id="niXI5L" name="Globals.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Globals.cpp"/>
-            <FILE id="znX60d" name="Graphics.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Graphics.cpp"/>
-            <FILE id="d4M04p" name="lua-kv.h" compile="0" resource="0" file="../../../libs/element/lua/el/lua-kv.h"/>
-            <FILE id="sQPoZ9" name="lua-kv.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/lua-kv.hpp"/>
-            <FILE id="y14mHR" name="midi.c" compile="1" resource="0" file="../../../libs/element/lua/el/midi.c"/>
-            <FILE id="olbosa" name="midi_buffer.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/midi_buffer.hpp"/>
-            <FILE id="wqF93m" name="MidiBuffer.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/MidiBuffer.cpp"/>
-            <FILE id="ijBnTu" name="MidiMessage.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/MidiMessage.cpp"/>
-            <FILE id="BR7HAO" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/MouseEvent.cpp"/>
-            <FILE id="P7bKCm" name="Node.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Node.cpp"/>
-            <FILE id="ExyYhC" name="object.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/object.hpp"/>
-            <FILE id="NZ3rpZ" name="object.lua" compile="0" resource="0" file="../../../libs/element/lua/el/object.lua"/>
-            <FILE id="YCxiJh" name="packed.h" compile="0" resource="0" file="../../../libs/element/lua/el/packed.h"/>
-            <FILE id="HrK67c" name="Parameter.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Parameter.cpp"/>
-            <FILE id="Sf0zXf" name="Point.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Point.cpp"/>
-            <FILE id="sjN5J0" name="Range.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Range.cpp"/>
-            <FILE id="Wnfu3Y" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Rectangle.cpp"/>
-            <FILE id="dyPfIO" name="rectangle.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/rectangle.hpp"/>
-            <FILE id="HGSRbm" name="round.c" compile="1" resource="0" file="../../../libs/element/lua/el/round.c"/>
-            <FILE id="GmCC4m" name="script.lua" compile="0" resource="0" file="../../../libs/element/lua/el/script.lua"/>
-            <FILE id="EbUpJ4" name="Session.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Session.cpp"/>
-            <FILE id="vfWmsO" name="Slider.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Slider.cpp"/>
-            <FILE id="Bskewt" name="slug.lua" compile="0" resource="0" file="../../../libs/element/lua/el/slug.lua"/>
-            <FILE id="h02J2i" name="sol_helpers.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/sol_helpers.hpp"/>
-            <FILE id="BlLdib" name="TextButton.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/TextButton.cpp"/>
-            <FILE id="GbS8NQ" name="util.h" compile="0" resource="0" file="../../../libs/element/lua/el/util.h"/>
-            <FILE id="gMIPAQ" name="vector.c" compile="1" resource="0" file="../../../libs/element/lua/el/vector.c"/>
-            <FILE id="eXH0C6" name="Widget.cpp" compile="1" resource="0" file="../../../libs/element/lua/el/Widget.cpp"/>
-            <FILE id="NRbQRh" name="widget.hpp" compile="0" resource="0" file="../../../libs/element/lua/el/widget.hpp"/>
+                  file="../../../libs/lua/el/DocumentWindow.cpp"/>
+            <FILE id="qudVlW" name="factories.hpp" compile="0" resource="0" file="../../../libs/lua/el/factories.hpp"/>
+            <FILE id="ndCZxA" name="File.cpp" compile="1" resource="0" file="../../../libs/lua/el/File.cpp"/>
+            <FILE id="niXI5L" name="Globals.cpp" compile="1" resource="0" file="../../../libs/lua/el/Globals.cpp"/>
+            <FILE id="znX60d" name="Graphics.cpp" compile="1" resource="0" file="../../../libs/lua/el/Graphics.cpp"/>
+            <FILE id="d4M04p" name="lua-kv.h" compile="0" resource="0" file="../../../libs/lua/el/lua-kv.h"/>
+            <FILE id="sQPoZ9" name="lua-kv.hpp" compile="0" resource="0" file="../../../libs/lua/el/lua-kv.hpp"/>
+            <FILE id="y14mHR" name="midi.c" compile="1" resource="0" file="../../../libs/lua/el/midi.c"/>
+            <FILE id="olbosa" name="midi_buffer.hpp" compile="0" resource="0" file="../../../libs/lua/el/midi_buffer.hpp"/>
+            <FILE id="wqF93m" name="MidiBuffer.cpp" compile="1" resource="0" file="../../../libs/lua/el/MidiBuffer.cpp"/>
+            <FILE id="ijBnTu" name="MidiMessage.cpp" compile="1" resource="0" file="../../../libs/lua/el/MidiMessage.cpp"/>
+            <FILE id="BR7HAO" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/lua/el/MouseEvent.cpp"/>
+            <FILE id="P7bKCm" name="Node.cpp" compile="1" resource="0" file="../../../libs/lua/el/Node.cpp"/>
+            <FILE id="ExyYhC" name="object.hpp" compile="0" resource="0" file="../../../libs/lua/el/object.hpp"/>
+            <FILE id="NZ3rpZ" name="object.lua" compile="0" resource="0" file="../../../libs/lua/el/object.lua"/>
+            <FILE id="YCxiJh" name="packed.h" compile="0" resource="0" file="../../../libs/lua/el/packed.h"/>
+            <FILE id="HrK67c" name="Parameter.cpp" compile="1" resource="0" file="../../../libs/lua/el/Parameter.cpp"/>
+            <FILE id="Sf0zXf" name="Point.cpp" compile="1" resource="0" file="../../../libs/lua/el/Point.cpp"/>
+            <FILE id="sjN5J0" name="Range.cpp" compile="1" resource="0" file="../../../libs/lua/el/Range.cpp"/>
+            <FILE id="Wnfu3Y" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/lua/el/Rectangle.cpp"/>
+            <FILE id="dyPfIO" name="rectangle.hpp" compile="0" resource="0" file="../../../libs/lua/el/rectangle.hpp"/>
+            <FILE id="HGSRbm" name="round.c" compile="1" resource="0" file="../../../libs/lua/el/round.c"/>
+            <FILE id="GmCC4m" name="script.lua" compile="0" resource="0" file="../../../libs/lua/el/script.lua"/>
+            <FILE id="EbUpJ4" name="Session.cpp" compile="1" resource="0" file="../../../libs/lua/el/Session.cpp"/>
+            <FILE id="vfWmsO" name="Slider.cpp" compile="1" resource="0" file="../../../libs/lua/el/Slider.cpp"/>
+            <FILE id="Bskewt" name="slug.lua" compile="0" resource="0" file="../../../libs/lua/el/slug.lua"/>
+            <FILE id="h02J2i" name="sol_helpers.hpp" compile="0" resource="0" file="../../../libs/lua/el/sol_helpers.hpp"/>
+            <FILE id="BlLdib" name="TextButton.cpp" compile="1" resource="0" file="../../../libs/lua/el/TextButton.cpp"/>
+            <FILE id="GbS8NQ" name="util.h" compile="0" resource="0" file="../../../libs/lua/el/util.h"/>
+            <FILE id="gMIPAQ" name="vector.c" compile="1" resource="0" file="../../../libs/lua/el/vector.c"/>
+            <FILE id="eXH0C6" name="Widget.cpp" compile="1" resource="0" file="../../../libs/lua/el/Widget.cpp"/>
+            <FILE id="NRbQRh" name="widget.hpp" compile="0" resource="0" file="../../../libs/lua/el/widget.hpp"/>
           </GROUP>
           <GROUP id="{A064E805-2755-3855-1B48-E9743CD05A46}" name="sol">
-            <FILE id="nSEy8y" name="config.hpp" compile="0" resource="0" file="../../../libs/element/lua/sol/config.hpp"/>
-            <FILE id="CHZ5Wl" name="forward.hpp" compile="0" resource="0" file="../../../libs/element/lua/sol/forward.hpp"/>
-            <FILE id="pbVR0b" name="sol.hpp" compile="0" resource="0" file="../../../libs/element/lua/sol/sol.hpp"/>
+            <FILE id="nSEy8y" name="config.hpp" compile="0" resource="0" file="../../../libs/lua/sol/config.hpp"/>
+            <FILE id="CHZ5Wl" name="forward.hpp" compile="0" resource="0" file="../../../libs/lua/sol/forward.hpp"/>
+            <FILE id="pbVR0b" name="sol.hpp" compile="0" resource="0" file="../../../libs/lua/sol/sol.hpp"/>
           </GROUP>
           <GROUP id="{48FEFA28-592A-961A-9FED-29CE38699FF7}" name="src">
-            <FILE id="iCjMXr" name="lapi.c" compile="0" resource="0" file="../../../libs/element/lua/src/lapi.c"/>
-            <FILE id="hkSr7t" name="lapi.h" compile="0" resource="0" file="../../../libs/element/lua/src/lapi.h"/>
-            <FILE id="vTeGvj" name="lauxlib.c" compile="0" resource="0" file="../../../libs/element/lua/src/lauxlib.c"/>
-            <FILE id="UI62kr" name="lauxlib.h" compile="0" resource="0" file="../../../libs/element/lua/src/lauxlib.h"/>
-            <FILE id="pk2ZvO" name="lbaselib.c" compile="0" resource="0" file="../../../libs/element/lua/src/lbaselib.c"/>
-            <FILE id="H75ycH" name="lcode.c" compile="0" resource="0" file="../../../libs/element/lua/src/lcode.c"/>
-            <FILE id="S9ZlGY" name="lcode.h" compile="0" resource="0" file="../../../libs/element/lua/src/lcode.h"/>
-            <FILE id="Tb1Qq1" name="lcorolib.c" compile="0" resource="0" file="../../../libs/element/lua/src/lcorolib.c"/>
-            <FILE id="IJ4Jny" name="lctype.c" compile="0" resource="0" file="../../../libs/element/lua/src/lctype.c"/>
-            <FILE id="M5FwEB" name="lctype.h" compile="0" resource="0" file="../../../libs/element/lua/src/lctype.h"/>
-            <FILE id="FuN8Gn" name="ldblib.c" compile="0" resource="0" file="../../../libs/element/lua/src/ldblib.c"/>
-            <FILE id="hiSX2W" name="ldebug.c" compile="0" resource="0" file="../../../libs/element/lua/src/ldebug.c"/>
-            <FILE id="oKkiGQ" name="ldebug.h" compile="0" resource="0" file="../../../libs/element/lua/src/ldebug.h"/>
-            <FILE id="zMKeX3" name="ldo.c" compile="0" resource="0" file="../../../libs/element/lua/src/ldo.c"/>
-            <FILE id="WR4R2f" name="ldo.h" compile="0" resource="0" file="../../../libs/element/lua/src/ldo.h"/>
-            <FILE id="G69vYZ" name="ldump.c" compile="0" resource="0" file="../../../libs/element/lua/src/ldump.c"/>
-            <FILE id="tBzPi6" name="lfunc.c" compile="0" resource="0" file="../../../libs/element/lua/src/lfunc.c"/>
-            <FILE id="MJAirQ" name="lfunc.h" compile="0" resource="0" file="../../../libs/element/lua/src/lfunc.h"/>
-            <FILE id="yM47vx" name="lgc.c" compile="0" resource="0" file="../../../libs/element/lua/src/lgc.c"/>
-            <FILE id="cAGIEm" name="lgc.h" compile="0" resource="0" file="../../../libs/element/lua/src/lgc.h"/>
-            <FILE id="KKZTfa" name="linit.c" compile="0" resource="0" file="../../../libs/element/lua/src/linit.c"/>
-            <FILE id="GSmzID" name="liolib.c" compile="0" resource="0" file="../../../libs/element/lua/src/liolib.c"/>
-            <FILE id="IJoR0L" name="ljumptab.h" compile="0" resource="0" file="../../../libs/element/lua/src/ljumptab.h"/>
-            <FILE id="ZqGvll" name="llex.c" compile="0" resource="0" file="../../../libs/element/lua/src/llex.c"/>
-            <FILE id="DLrrBb" name="llex.h" compile="0" resource="0" file="../../../libs/element/lua/src/llex.h"/>
-            <FILE id="AHCI9U" name="llimits.h" compile="0" resource="0" file="../../../libs/element/lua/src/llimits.h"/>
-            <FILE id="T6a3eu" name="lmathlib.c" compile="0" resource="0" file="../../../libs/element/lua/src/lmathlib.c"/>
-            <FILE id="JCZpAK" name="lmem.c" compile="0" resource="0" file="../../../libs/element/lua/src/lmem.c"/>
-            <FILE id="vYpW2i" name="lmem.h" compile="0" resource="0" file="../../../libs/element/lua/src/lmem.h"/>
-            <FILE id="rH0dXp" name="loadlib.c" compile="0" resource="0" file="../../../libs/element/lua/src/loadlib.c"/>
-            <FILE id="iTQXw1" name="lobject.c" compile="0" resource="0" file="../../../libs/element/lua/src/lobject.c"/>
-            <FILE id="homYcq" name="lobject.h" compile="0" resource="0" file="../../../libs/element/lua/src/lobject.h"/>
-            <FILE id="AzFXq3" name="lopcodes.c" compile="0" resource="0" file="../../../libs/element/lua/src/lopcodes.c"/>
-            <FILE id="dIU70v" name="lopcodes.h" compile="0" resource="0" file="../../../libs/element/lua/src/lopcodes.h"/>
-            <FILE id="QcRJTh" name="lopnames.h" compile="0" resource="0" file="../../../libs/element/lua/src/lopnames.h"/>
-            <FILE id="rxwfVa" name="loslib.c" compile="0" resource="0" file="../../../libs/element/lua/src/loslib.c"/>
-            <FILE id="WdZAQ5" name="lparser.c" compile="0" resource="0" file="../../../libs/element/lua/src/lparser.c"/>
-            <FILE id="pGVdiS" name="lparser.h" compile="0" resource="0" file="../../../libs/element/lua/src/lparser.h"/>
-            <FILE id="SY4YyK" name="lprefix.h" compile="0" resource="0" file="../../../libs/element/lua/src/lprefix.h"/>
-            <FILE id="Oyd5dh" name="lstate.c" compile="0" resource="0" file="../../../libs/element/lua/src/lstate.c"/>
-            <FILE id="jrF5MK" name="lstate.h" compile="0" resource="0" file="../../../libs/element/lua/src/lstate.h"/>
-            <FILE id="Ea9zx4" name="lstring.c" compile="0" resource="0" file="../../../libs/element/lua/src/lstring.c"/>
-            <FILE id="IrIHCl" name="lstring.h" compile="0" resource="0" file="../../../libs/element/lua/src/lstring.h"/>
-            <FILE id="CHt9kk" name="lstrlib.c" compile="0" resource="0" file="../../../libs/element/lua/src/lstrlib.c"/>
-            <FILE id="x4VMBA" name="ltable.c" compile="0" resource="0" file="../../../libs/element/lua/src/ltable.c"/>
-            <FILE id="VhjEjg" name="ltable.h" compile="0" resource="0" file="../../../libs/element/lua/src/ltable.h"/>
-            <FILE id="UERng1" name="ltablib.c" compile="0" resource="0" file="../../../libs/element/lua/src/ltablib.c"/>
-            <FILE id="YE72t5" name="ltm.c" compile="0" resource="0" file="../../../libs/element/lua/src/ltm.c"/>
-            <FILE id="iiB6lb" name="ltm.h" compile="0" resource="0" file="../../../libs/element/lua/src/ltm.h"/>
-            <FILE id="msv1BE" name="lua.c" compile="0" resource="0" file="../../../libs/element/lua/src/lua.c"/>
-            <FILE id="puGzWa" name="lua.h" compile="0" resource="0" file="../../../libs/element/lua/src/lua.h"/>
-            <FILE id="YI4rxc" name="lua.hpp" compile="0" resource="0" file="../../../libs/element/lua/src/lua.hpp"/>
-            <FILE id="Vb38eu" name="luac.c" compile="0" resource="0" file="../../../libs/element/lua/src/luac.c"/>
-            <FILE id="PsOZc3" name="luaconf.h" compile="0" resource="0" file="../../../libs/element/lua/src/luaconf.h"/>
-            <FILE id="LfV5VU" name="lualib.h" compile="0" resource="0" file="../../../libs/element/lua/src/lualib.h"/>
-            <FILE id="MV7SD6" name="lundump.c" compile="0" resource="0" file="../../../libs/element/lua/src/lundump.c"/>
-            <FILE id="eMCHOx" name="lundump.h" compile="0" resource="0" file="../../../libs/element/lua/src/lundump.h"/>
-            <FILE id="TB5gsf" name="lutf8lib.c" compile="0" resource="0" file="../../../libs/element/lua/src/lutf8lib.c"/>
-            <FILE id="rEVhLx" name="lvm.c" compile="0" resource="0" file="../../../libs/element/lua/src/lvm.c"/>
-            <FILE id="lzazKy" name="lvm.h" compile="0" resource="0" file="../../../libs/element/lua/src/lvm.h"/>
-            <FILE id="T2PYz0" name="lzio.c" compile="0" resource="0" file="../../../libs/element/lua/src/lzio.c"/>
-            <FILE id="EvUIjP" name="lzio.h" compile="0" resource="0" file="../../../libs/element/lua/src/lzio.h"/>
-            <FILE id="FwQ4uE" name="Makefile" compile="0" resource="0" file="../../../libs/element/lua/src/Makefile"/>
+            <FILE id="iCjMXr" name="lapi.c" compile="0" resource="0" file="../../../libs/lua/src/lapi.c"/>
+            <FILE id="hkSr7t" name="lapi.h" compile="0" resource="0" file="../../../libs/lua/src/lapi.h"/>
+            <FILE id="vTeGvj" name="lauxlib.c" compile="0" resource="0" file="../../../libs/lua/src/lauxlib.c"/>
+            <FILE id="UI62kr" name="lauxlib.h" compile="0" resource="0" file="../../../libs/lua/src/lauxlib.h"/>
+            <FILE id="pk2ZvO" name="lbaselib.c" compile="0" resource="0" file="../../../libs/lua/src/lbaselib.c"/>
+            <FILE id="H75ycH" name="lcode.c" compile="0" resource="0" file="../../../libs/lua/src/lcode.c"/>
+            <FILE id="S9ZlGY" name="lcode.h" compile="0" resource="0" file="../../../libs/lua/src/lcode.h"/>
+            <FILE id="Tb1Qq1" name="lcorolib.c" compile="0" resource="0" file="../../../libs/lua/src/lcorolib.c"/>
+            <FILE id="IJ4Jny" name="lctype.c" compile="0" resource="0" file="../../../libs/lua/src/lctype.c"/>
+            <FILE id="M5FwEB" name="lctype.h" compile="0" resource="0" file="../../../libs/lua/src/lctype.h"/>
+            <FILE id="FuN8Gn" name="ldblib.c" compile="0" resource="0" file="../../../libs/lua/src/ldblib.c"/>
+            <FILE id="hiSX2W" name="ldebug.c" compile="0" resource="0" file="../../../libs/lua/src/ldebug.c"/>
+            <FILE id="oKkiGQ" name="ldebug.h" compile="0" resource="0" file="../../../libs/lua/src/ldebug.h"/>
+            <FILE id="zMKeX3" name="ldo.c" compile="0" resource="0" file="../../../libs/lua/src/ldo.c"/>
+            <FILE id="WR4R2f" name="ldo.h" compile="0" resource="0" file="../../../libs/lua/src/ldo.h"/>
+            <FILE id="G69vYZ" name="ldump.c" compile="0" resource="0" file="../../../libs/lua/src/ldump.c"/>
+            <FILE id="tBzPi6" name="lfunc.c" compile="0" resource="0" file="../../../libs/lua/src/lfunc.c"/>
+            <FILE id="MJAirQ" name="lfunc.h" compile="0" resource="0" file="../../../libs/lua/src/lfunc.h"/>
+            <FILE id="yM47vx" name="lgc.c" compile="0" resource="0" file="../../../libs/lua/src/lgc.c"/>
+            <FILE id="cAGIEm" name="lgc.h" compile="0" resource="0" file="../../../libs/lua/src/lgc.h"/>
+            <FILE id="KKZTfa" name="linit.c" compile="0" resource="0" file="../../../libs/lua/src/linit.c"/>
+            <FILE id="GSmzID" name="liolib.c" compile="0" resource="0" file="../../../libs/lua/src/liolib.c"/>
+            <FILE id="IJoR0L" name="ljumptab.h" compile="0" resource="0" file="../../../libs/lua/src/ljumptab.h"/>
+            <FILE id="ZqGvll" name="llex.c" compile="0" resource="0" file="../../../libs/lua/src/llex.c"/>
+            <FILE id="DLrrBb" name="llex.h" compile="0" resource="0" file="../../../libs/lua/src/llex.h"/>
+            <FILE id="AHCI9U" name="llimits.h" compile="0" resource="0" file="../../../libs/lua/src/llimits.h"/>
+            <FILE id="T6a3eu" name="lmathlib.c" compile="0" resource="0" file="../../../libs/lua/src/lmathlib.c"/>
+            <FILE id="JCZpAK" name="lmem.c" compile="0" resource="0" file="../../../libs/lua/src/lmem.c"/>
+            <FILE id="vYpW2i" name="lmem.h" compile="0" resource="0" file="../../../libs/lua/src/lmem.h"/>
+            <FILE id="rH0dXp" name="loadlib.c" compile="0" resource="0" file="../../../libs/lua/src/loadlib.c"/>
+            <FILE id="iTQXw1" name="lobject.c" compile="0" resource="0" file="../../../libs/lua/src/lobject.c"/>
+            <FILE id="homYcq" name="lobject.h" compile="0" resource="0" file="../../../libs/lua/src/lobject.h"/>
+            <FILE id="AzFXq3" name="lopcodes.c" compile="0" resource="0" file="../../../libs/lua/src/lopcodes.c"/>
+            <FILE id="dIU70v" name="lopcodes.h" compile="0" resource="0" file="../../../libs/lua/src/lopcodes.h"/>
+            <FILE id="QcRJTh" name="lopnames.h" compile="0" resource="0" file="../../../libs/lua/src/lopnames.h"/>
+            <FILE id="rxwfVa" name="loslib.c" compile="0" resource="0" file="../../../libs/lua/src/loslib.c"/>
+            <FILE id="WdZAQ5" name="lparser.c" compile="0" resource="0" file="../../../libs/lua/src/lparser.c"/>
+            <FILE id="pGVdiS" name="lparser.h" compile="0" resource="0" file="../../../libs/lua/src/lparser.h"/>
+            <FILE id="SY4YyK" name="lprefix.h" compile="0" resource="0" file="../../../libs/lua/src/lprefix.h"/>
+            <FILE id="Oyd5dh" name="lstate.c" compile="0" resource="0" file="../../../libs/lua/src/lstate.c"/>
+            <FILE id="jrF5MK" name="lstate.h" compile="0" resource="0" file="../../../libs/lua/src/lstate.h"/>
+            <FILE id="Ea9zx4" name="lstring.c" compile="0" resource="0" file="../../../libs/lua/src/lstring.c"/>
+            <FILE id="IrIHCl" name="lstring.h" compile="0" resource="0" file="../../../libs/lua/src/lstring.h"/>
+            <FILE id="CHt9kk" name="lstrlib.c" compile="0" resource="0" file="../../../libs/lua/src/lstrlib.c"/>
+            <FILE id="x4VMBA" name="ltable.c" compile="0" resource="0" file="../../../libs/lua/src/ltable.c"/>
+            <FILE id="VhjEjg" name="ltable.h" compile="0" resource="0" file="../../../libs/lua/src/ltable.h"/>
+            <FILE id="UERng1" name="ltablib.c" compile="0" resource="0" file="../../../libs/lua/src/ltablib.c"/>
+            <FILE id="YE72t5" name="ltm.c" compile="0" resource="0" file="../../../libs/lua/src/ltm.c"/>
+            <FILE id="iiB6lb" name="ltm.h" compile="0" resource="0" file="../../../libs/lua/src/ltm.h"/>
+            <FILE id="msv1BE" name="lua.c" compile="0" resource="0" file="../../../libs/lua/src/lua.c"/>
+            <FILE id="puGzWa" name="lua.h" compile="0" resource="0" file="../../../libs/lua/src/lua.h"/>
+            <FILE id="YI4rxc" name="lua.hpp" compile="0" resource="0" file="../../../libs/lua/src/lua.hpp"/>
+            <FILE id="Vb38eu" name="luac.c" compile="0" resource="0" file="../../../libs/lua/src/luac.c"/>
+            <FILE id="PsOZc3" name="luaconf.h" compile="0" resource="0" file="../../../libs/lua/src/luaconf.h"/>
+            <FILE id="LfV5VU" name="lualib.h" compile="0" resource="0" file="../../../libs/lua/src/lualib.h"/>
+            <FILE id="MV7SD6" name="lundump.c" compile="0" resource="0" file="../../../libs/lua/src/lundump.c"/>
+            <FILE id="eMCHOx" name="lundump.h" compile="0" resource="0" file="../../../libs/lua/src/lundump.h"/>
+            <FILE id="TB5gsf" name="lutf8lib.c" compile="0" resource="0" file="../../../libs/lua/src/lutf8lib.c"/>
+            <FILE id="rEVhLx" name="lvm.c" compile="0" resource="0" file="../../../libs/lua/src/lvm.c"/>
+            <FILE id="lzazKy" name="lvm.h" compile="0" resource="0" file="../../../libs/lua/src/lvm.h"/>
+            <FILE id="T2PYz0" name="lzio.c" compile="0" resource="0" file="../../../libs/lua/src/lzio.c"/>
+            <FILE id="EvUIjP" name="lzio.h" compile="0" resource="0" file="../../../libs/lua/src/lzio.h"/>
+            <FILE id="FwQ4uE" name="Makefile" compile="0" resource="0" file="../../../libs/lua/src/Makefile"/>
           </GROUP>
-          <FILE id="PA2mxz" name="Makefile" compile="0" resource="0" file="../../../libs/element/lua/Makefile"/>
-          <FILE id="Dmm2lR" name="README" compile="0" resource="0" file="../../../libs/element/lua/README"/>
+          <FILE id="PA2mxz" name="Makefile" compile="0" resource="0" file="../../../libs/lua/Makefile"/>
+          <FILE id="Dmm2lR" name="README" compile="0" resource="0" file="../../../libs/lua/README"/>
         </GROUP>
         <GROUP id="{FC6A9132-0B0C-FA00-D3F4-511FC50BB2C1}" name="src">
           <FILE id="dTEvw9" name="bindings.cpp" compile="1" resource="0" file="../../../libs/element/src/bindings.cpp"/>

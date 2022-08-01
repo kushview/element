@@ -40,7 +40,7 @@ extensions = [
 
 # a list of lua source root
 lua_source_path = [ 
-    "../libs/element/lua/el",
+    "../libs/lua/el",
     "../src/engine" 
 ]
 

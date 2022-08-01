@@ -2,17 +2,17 @@ project     = 'Element'
 title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
 file = {
-    'libs/element/lua',
+    'libs/lua',
     'scripts',
     'src/engine/MidiPipe.cpp',
     exclude = {
         'docs/examples',
-        'libs/element/lua/element.lua',
-        'libs/element/lua/el/audio_buffer.hpp',
-        'libs/element/lua/el/midi_buffer.hpp',
-        'libs/element/lua/el/sol_helpers.hpp',
-        'libs/element/lua/el/lua-kv.hpp',
-        'libs/element/lua/el/lua-kv.h',
+        'libs/lua/element.lua',
+        'libs/lua/el/audio_buffer.hpp',
+        'libs/lua/el/midi_buffer.hpp',
+        'libs/lua/el/sol_helpers.hpp',
+        'libs/lua/el/lua-kv.hpp',
+        'libs/lua/el/lua-kv.h',
     },
 }
 examples = {

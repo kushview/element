@@ -1,4 +1,4 @@
-project ('element', ['c', 'cpp', 'objc', 'objcpp'],
+project ('element', ['c', 'cpp', 'objc', 'objcpp' ],
     version : '0.47.0',
     meson_version : '>= 0.56.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
@@ -14,43 +14,7 @@ add_global_arguments ([
 # Boost
 boost_dep = dependency ('boost', required : true)
 
-# Lua
-libelement_lua = static_library ('lua', '''
-    libs/element/lua/src/lauxlib.c
-    libs/element/lua/src/liolib.c
-    libs/element/lua/src/lopcodes.c
-    libs/element/lua/src/lstate.c
-    libs/element/lua/src/lobject.c
-    libs/element/lua/src/lmathlib.c
-    libs/element/lua/src/loadlib.c
-    libs/element/lua/src/lvm.c
-    libs/element/lua/src/lfunc.c
-    libs/element/lua/src/lstrlib.c
-    libs/element/lua/src/linit.c
-    libs/element/lua/src/lstring.c
-    libs/element/lua/src/lundump.c
-    libs/element/lua/src/lctype.c
-    libs/element/lua/src/ltable.c
-    libs/element/lua/src/ldump.c
-    libs/element/lua/src/loslib.c
-    libs/element/lua/src/lgc.c
-    libs/element/lua/src/lzio.c
-    libs/element/lua/src/ldblib.c
-    libs/element/lua/src/lutf8lib.c
-    libs/element/lua/src/lmem.c
-    libs/element/lua/src/lcorolib.c
-    libs/element/lua/src/lcode.c
-    libs/element/lua/src/ltablib.c
-    libs/element/lua/src/lapi.c
-    libs/element/lua/src/lbaselib.c
-    libs/element/lua/src/ldebug.c
-    libs/element/lua/src/lparser.c
-    libs/element/lua/src/llex.c
-    libs/element/lua/src/ltm.c
-    libs/element/lua/src/ldo.c
-    '''.split(),
-    install : false,
-    gnu_symbol_visibility : 'default')
+subdir ('libs/lua')
 
 # JUCE
 juce_modules = '''
@@ -181,31 +145,31 @@ libelement_sources = '''
     libs/element/src/module.cpp
     libs/element/src/scripting.cpp
     libs/element/src/strings.cpp
-    libs/element/lua/el/audio.c
-    libs/element/lua/el/AudioBuffer32.cpp
-    libs/element/lua/el/AudioBuffer64.cpp
-    libs/element/lua/el/Bounds.cpp
-    libs/element/lua/el/bytes.c
-    libs/element/lua/el/CommandManager.cpp
-    libs/element/lua/el/Desktop.cpp
-    libs/element/lua/el/DocumentWindow.cpp
-    libs/element/lua/el/File.cpp
-    libs/element/lua/el/Globals.cpp
-    libs/element/lua/el/Graphics.cpp
-    libs/element/lua/el/midi.c
-    libs/element/lua/el/MidiBuffer.cpp
-    libs/element/lua/el/MidiMessage.cpp
-    libs/element/lua/el/MouseEvent.cpp
-    libs/element/lua/el/Node.cpp
-    libs/element/lua/el/Parameter.cpp
-    libs/element/lua/el/Point.cpp
-    libs/element/lua/el/Range.cpp
-    libs/element/lua/el/Rectangle.cpp
-    libs/element/lua/el/round.c
-    libs/element/lua/el/Session.cpp
-    libs/element/lua/el/Slider.cpp
-    libs/element/lua/el/TextButton.cpp
-    libs/element/lua/el/Widget.cpp
+    libs/lua/el/audio.c
+    libs/lua/el/AudioBuffer32.cpp
+    libs/lua/el/AudioBuffer64.cpp
+    libs/lua/el/Bounds.cpp
+    libs/lua/el/bytes.c
+    libs/lua/el/CommandManager.cpp
+    libs/lua/el/Desktop.cpp
+    libs/lua/el/DocumentWindow.cpp
+    libs/lua/el/File.cpp
+    libs/lua/el/Globals.cpp
+    libs/lua/el/Graphics.cpp
+    libs/lua/el/midi.c
+    libs/lua/el/MidiBuffer.cpp
+    libs/lua/el/MidiMessage.cpp
+    libs/lua/el/MouseEvent.cpp
+    libs/lua/el/Node.cpp
+    libs/lua/el/Parameter.cpp
+    libs/lua/el/Point.cpp
+    libs/lua/el/Range.cpp
+    libs/lua/el/Rectangle.cpp
+    libs/lua/el/round.c
+    libs/lua/el/Session.cpp
+    libs/lua/el/Slider.cpp
+    libs/lua/el/TextButton.cpp
+    libs/lua/el/Widget.cpp
     src/CapsLock.cpp
     src/Commands.cpp
     src/controllers/AppController.cpp
@@ -372,9 +336,9 @@ libelement_sources += juce_sources
 libelement_includes = '''
     libs/compat
     libs/element/include
-    libs/element/lua
-    libs/element/lua/src
-    libs/element/lua/el
+    libs/lua
+    libs/lua/src
+    libs/lua/el
     libs/element/src
     libs/JUCE/modules
     libs/kv/modules
