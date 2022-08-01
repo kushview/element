@@ -129,7 +129,7 @@ std::vector<std::string> Scripting::available_packages() const noexcept
     for (const auto& pkg : state->packages)
         v.push_back (pkg.first);
     std::sort (v.begin(), v.end());
-    return std::move (v);
+    return v;
 }
 
 lua_State* Scripting::root_state() const { return *state; }

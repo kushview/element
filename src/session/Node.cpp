@@ -963,7 +963,7 @@ bool Node::hasEditor() const
 {
     if (Tags::plugin == getNodeType())
         if (auto gn = getObject())
-            if (auto* const proc = getObject()->getAudioProcessor())
+            if (auto* const proc = gn->getAudioProcessor())
                 return proc->hasEditor();
     return false;
 }
