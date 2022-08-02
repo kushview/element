@@ -1,4 +1,5 @@
 
+lua_includes = include_directories ('.', 'src')
 libelement_lua = static_library ('element_lua', '''
     src/lauxlib.c
     src/liolib.c
@@ -32,6 +33,7 @@ libelement_lua = static_library ('element_lua', '''
     src/llex.c
     src/ltm.c
     src/ldo.c'''.split(),
+    include_directories : lua_includes,
     install : false,
     gnu_symbol_visibility : 'default'
 )

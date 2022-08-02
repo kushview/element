@@ -23,9 +23,9 @@
 // @classmod el.MidiPipe
 // @pragma nostrip
 
-#include "lua.hpp"
-#include "../../libs/lua/el/midi_buffer.hpp"
-#include "../../libs/lua/el/factories.hpp"
+#include  <element/lua.hpp>
+#include "el/midi_buffer.hpp"
+#include "el/factories.hpp"
 #include "engine/MidiPipe.h"
 
 namespace Element {

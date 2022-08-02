@@ -54,8 +54,8 @@ public:
     void paint (Graphics&) override;
 
 private:
-    friend class Content;
     class Content;
+    friend class Content;
     std::unique_ptr<Content> content;
     void handleTextEntry (const String& text);
 };

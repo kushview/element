@@ -1,4 +1,4 @@
-project ('element', ['c', 'cpp', 'objc', 'objcpp' ],
+project ('element', ['c', 'cpp' ],
     version : '0.47.0',
     meson_version : '>= 0.56.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
@@ -13,130 +13,11 @@ add_global_arguments ([
 
 # Boost
 boost_dep = dependency ('boost', required : true)
+deps = [ boost_dep ]
 
 subdir ('libs/lua')
-
-# JUCE
-juce_modules = '''
-    juce_audio_basics 
-    juce_audio_devices 
-    juce_audio_formats
-    juce_audio_processors 
-    juce_audio_utils 
-    juce_core 
-    juce_cryptography
-    juce_data_structures 
-    juce_dsp juce_events 
-    juce_graphics 
-    juce_gui_basics
-    juce_gui_extra 
-    juce_osc
-    kv_core 
-    kv_engines 
-    kv_gui 
-    kv_models
-'''.split()
-
-juce_conf_data = configuration_data()
-
-juce_ext = host_machine.system() == 'darwin' ? 'mm' : 'cpp'
-juce_sources = []
-foreach m : juce_modules
-    pat = 'libs/compat/include_@0@'.format (m)
-    pat = pat + '.@0@'
-    juce_file = pat.format (juce_ext)
-    if not fs.exists (juce_file)
-        juce_file = pat.format ('cpp')
-    endif
-    juce_sources += juce_file
-    juce_conf_data.set10 ('JUCE_MODULE_AVAILABLE_@0@'.format (m), true)
-endforeach
-
-if get_option ('debug')
-    juce_conf_data.set10 ('_DEBUG', true)
-else
-    juce_conf_data.set10 ('NDEBUG', true)
-endif
-
-juce_conf_data.set10 ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', true)
-juce_conf_data.set10 ('JUCE_STANDALONE_APPLICATION', true)
-juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
-juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
-juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
-juce_conf_data.set10 ('JUCE_ASIO', false)
-
-juce_conf_data.set10 ('KV_DOCKING_WINDOWS', true)
-
-vst2_includes = []
-if get_option ('vst2sdk') == 'auto'
-    # noop
-else
-    vst2_includes += include_directories (get_option ('vst2sdk'))
-endif
-
-aeffect_h_found = cpp.check_header ('pluginterfaces/vst2.x/aeffect.h',
-    include_directories : vst2_includes, required : false)
-aeffectx_h_found = cpp.check_header ('pluginterfaces/vst2.x/aeffectx.h',
-    include_directories : vst2_includes, required : false)
-vstfxstore_h_found = cpp.check_header ('pluginterfaces/vst2.x/vstfxstore.h',
-    include_directories : vst2_includes, required : false)
-juce_conf_data.set10 ('JUCE_PLUGINHOST_VST', aeffect_h_found and aeffectx_h_found)
-
-vst3_includes = include_directories ('libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
-juce_conf_data.set10 ('JUCE_VST3_CAN_REPLACE_VST2', vstfxstore_h_found)
-juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', true)
-lv2_includes = include_directories (
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/serd',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord/src',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv/src',
-    'libs/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sratom')
-juce_sources += 'libs/compat/include_juce_audio_processors_lv2_libs.cpp'
-juce_conf_data.set10 ('JUCE_PLUGINHOST_LV2', true)
-juce_conf_data.set10 ('JUCE_PLUGINHOST_LADSPA', cpp.check_header ('ladspa.h'))
-
-deps = [ boost_dep ]
-if host_machine.system() == 'linux'
-    alsa_dep = dependency ('alsa', required : false)
-    juce_conf_data.set10 ('JUCE_ALSA', alsa_dep.found())
-    deps += alsa_dep
-
-    deps += [ 
-        dependency ('freetype2', required : true),
-        dependency ('x11', required : true),
-        dependency ('xext', required : true),
-        dependency ('xrandr', required : true),
-        dependency ('xcomposite', required : true),
-        dependency ('xinerama', required : true),
-        dependency ('xcursor', required : true)
-    ]
-    juce_conf_data.set10 ('JUCE_USE_XRANDR', true)
-    juce_conf_data.set10 ('JUCE_USE_XINERAMA', true)
-    juce_conf_data.set10 ('JUCE_USE_XSHM', true)
-    juce_conf_data.set10 ('JUCE_USE_XRENDER', true)
-    juce_conf_data.set10 ('JUCE_USE_XCURSOR', true)
-    
-    curl_dep = dependency ('libcurl', required : false)
-    juce_conf_data.set10 ('JUCE_USE_CURL', curl_dep.found())
-    deps += curl_dep
-
-    deps += [
-        cpp.find_library ('dl', required : true),
-        cpp.find_library ('pthread', required : true) 
-    ]
-elif host_machine.system() == 'darwin'
-    deps += dependency ('appleframeworks', modules : [
-        'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
-         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
-         'discrecording', 'iokit', 'quartzcore', 'metal' ])  
-    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)     
-endif
-
-configure_file (output : 'juce_config.h', 
-                configuration : juce_conf_data)
+subdir ('libs/compat')
+subdir ('scripts')
 
 # libelement
 libelement_sources = '''
@@ -145,31 +26,31 @@ libelement_sources = '''
     libs/element/src/module.cpp
     libs/element/src/scripting.cpp
     libs/element/src/strings.cpp
-    libs/lua/el/audio.c
-    libs/lua/el/AudioBuffer32.cpp
-    libs/lua/el/AudioBuffer64.cpp
-    libs/lua/el/Bounds.cpp
-    libs/lua/el/bytes.c
-    libs/lua/el/CommandManager.cpp
-    libs/lua/el/Desktop.cpp
-    libs/lua/el/DocumentWindow.cpp
-    libs/lua/el/File.cpp
-    libs/lua/el/Globals.cpp
-    libs/lua/el/Graphics.cpp
-    libs/lua/el/midi.c
-    libs/lua/el/MidiBuffer.cpp
-    libs/lua/el/MidiMessage.cpp
-    libs/lua/el/MouseEvent.cpp
-    libs/lua/el/Node.cpp
-    libs/lua/el/Parameter.cpp
-    libs/lua/el/Point.cpp
-    libs/lua/el/Range.cpp
-    libs/lua/el/Rectangle.cpp
-    libs/lua/el/round.c
-    libs/lua/el/Session.cpp
-    libs/lua/el/Slider.cpp
-    libs/lua/el/TextButton.cpp
-    libs/lua/el/Widget.cpp
+    src/el/audio.c
+    src/el/AudioBuffer32.cpp
+    src/el/AudioBuffer64.cpp
+    src/el/Bounds.cpp
+    src/el/bytes.c
+    src/el/CommandManager.cpp
+    src/el/Desktop.cpp
+    src/el/DocumentWindow.cpp
+    src/el/File.cpp
+    src/el/Globals.cpp
+    src/el/Graphics.cpp
+    src/el/midi.c
+    src/el/MidiBuffer.cpp
+    src/el/MidiMessage.cpp
+    src/el/MouseEvent.cpp
+    src/el/Node.cpp
+    src/el/Parameter.cpp
+    src/el/Point.cpp
+    src/el/Range.cpp
+    src/el/Rectangle.cpp
+    src/el/round.c
+    src/el/Session.cpp
+    src/el/Slider.cpp
+    src/el/TextButton.cpp
+    src/el/Widget.cpp
     src/CapsLock.cpp
     src/Commands.cpp
     src/controllers/AppController.cpp
@@ -331,33 +212,50 @@ libelement_sources = '''
     src/Version.cpp
     libs/compat/BinaryData.cpp
 '''.split()
-libelement_sources += juce_sources
 
-libelement_includes = '''
-    libs/compat
-    libs/element/include
-    libs/lua
-    libs/lua/src
-    libs/lua/el
-    libs/element/src
-    libs/JUCE/modules
-    libs/kv/modules
-    src
-    '''.split()
-libelement_includes += vst3_includes
-libelement_includes += vst2_includes
-libelement_includes += lv2_includes
+libelement_includes =  [ 
+    include_directories (
+        'libs/element/include',
+        'libs/element/src',
+        'libs/sol',
+        'src',
+        'src/el'       
+    ),
+    lua_includes, 
+    juce_includes, 
+    vst3_includes, 
+    vst2_includes, 
+    lv2_includes 
+]
 
 if host_machine.system() == 'windows'
     libelement_sources += [ 'libs/element/src/dlfcn-win32.c' ]
 endif
+
+modules_install_dir = get_option('datadir') / 'element/lua/el'
+if host_machine.system() == 'windows'
+    modules_install_dir = get_option('bindir') / 'lua/el'
+endif
+
+install_data (
+    sources : [
+        'src/el/AudioBuffer.lua',
+        'src/el/command.lua',
+        'src/el/object.lua',
+        'src/el/script.lua',
+        'src/el/slug.lua'
+    ], 
+    install_dir : modules_install_dir
+)
 
 libelement = static_library ('element', 
     libelement_sources, 
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
     dependencies : deps,
-    install : false)
+    install : false,
+    objects : [ libelement_lua.extract_all_objects(),
+                libelement_juce.extract_all_objects() ])
 
 # Element Program
 element_app = executable ('element', 'src/Main.cc',
@@ -366,7 +264,7 @@ element_app = executable ('element', 'src/Main.cc',
     dependencies : deps,
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
-    link_with : [ libelement, libelement_lua ])
+    link_with : [ libelement ])
 
 if host_machine.system() == 'darwin'
     install_data ('data/Icon.icns', install_dir : 'Contents/Resources')
