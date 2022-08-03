@@ -164,9 +164,9 @@ def common_includes():
     return [
         'libs/JUCE/modules', \
         'libs/kv/modules', \
-        'libs/jlv2/modules', \
         'libs/compat', \
-        'libs/lua', \
+        'libs/lua/src', \
+        'libs/sol', \
         'include', \
         'src'
     ]
@@ -183,6 +183,7 @@ def juce_extra_sources (ctx):
 
 def element_sources (ctx):
     return ctx.path.ant_glob ('src/**/*.cpp') + \
+           ctx.path.ant_glob ('src/el/*.c') + \
            ctx.path.ant_glob ('libs/compat/BinaryData*.cpp')
 
 def build_desktop (bld, slug='element'):
@@ -291,6 +292,7 @@ def build_libelement (bld):
         )
 
     bld.add_group()
+    return
 
     library = bld (
         name            = 'ELEMENT',
@@ -303,16 +305,15 @@ def build_libelement (bld):
         defines         = [],
         includes        = [
             'include',
-            'libs/element/include',
             'libs/lua',
-            'libs/element/src'
+            'src'
         ],
         source = [
-            'libs/element/src/bindings.cpp',
-            'libs/element/src/context.cpp',
-            'libs/element/src/module.cpp',
-            'libs/element/src/scripting.cpp',
-            'libs/element/src/strings.cpp'
+            'src/bindings.cpp',
+            'src/context.cpp',
+            'src/module.cpp',
+            'src/scripting.cpp',
+            'src/strings.cpp'
         ]
     )
 
@@ -333,7 +334,7 @@ def build_libelement (bld):
     )
 
     if bld.host_is_linux():
-        library.source.append ('libs/element/src/native_unix.cpp')
+        pass
     elif bld.host_is_windows():
         library.source.append ('libs/element/src/dlfcn-win32.c')
         # library.defines.append ('EL_SHARED_BUILD')
@@ -474,22 +475,6 @@ def build_element_juce (bld):
         install_path    = bld.env.LIBDIR
     )
     
-    pcfile = bld (
-        features      = 'subst',
-        source        = 'libs/element/element.pc.in',
-        target        = 'lib/pkgconfig/element-juce.pc',
-        name          = 'element-juce_pc',
-        NAME          = 'element-juce',
-        DESCRIPTION   = 'The JUCE library (element)',
-        LIBNAME       = os.path.basename (JUCE.target),
-        PREFIX        = bld.env.PREFIX,
-        VERSION       = JUCE.vnum,
-        REQUIRES_PRIVATE = '',
-        INCLUDEDIR    = os.path.join (bld.env.PREFIX, 'include'),
-        CFLAGS_EXTRA  = '-I${includedir}/element/juce/modules',
-        install_path  = os.path.join (JUCE.install_path, 'pkgconfig')
-    )
-
     if bld.env.LV2:
         JUCE.source.append ('libs/compat/include_juce_audio_processors_lv2_libs.cpp')
 
@@ -534,7 +519,6 @@ def build_el_module (bld):
         use      = [ 'DEPENDS' ],
         includes = common_includes() + [
             'libs/lua/src',
-            'libs/lua/el', 
             'libs/element/include'
         ],
         source = lua_kv_sources (bld)
@@ -550,7 +534,8 @@ def build_app_objects (bld):
     
     library = bld (
         features    = 'cxx cxxstlib',
-        source      = element_sources (bld) + juce_extra_sources (bld),
+        source      = element_sources (bld) +
+                      juce_extra_sources (bld),
         includes    = common_includes() + [ 'libs/lua/el' ],
         target      = 'lib/element-app',
         name        = 'ELEMENT_APP_static',
@@ -581,6 +566,7 @@ def build_app_objects (bld):
         pass
 
     elif bld.host_is_mingw32():
+        library.source.append ('src/dlfcn-win32.c')
         if bld.env.JUCE_DLL:
             library.defines.append ('JUCE_DLL_BUILD=1')
         if bld.env.DEBUG:
@@ -611,7 +597,7 @@ def build_app (bld):
         name        = 'ELEMENT_APP',
         env         = appEnv,
         defines     = [],
-        use         = [ 'ELEMENT_APP_static', 'ELEMENT', 'LUA_KV_objects', 'LIBJUCE' ],
+        use         = [ 'ELEMENT_APP_static', 'ELEMENT', 'LUA_objects', 'LIBJUCE' ],
         linkflags   = []
     )
 
@@ -701,19 +687,20 @@ def build (bld):
 
     build_libelement (bld)
     build_element_juce (bld)
-    build_el_module (bld)
+    # build_el_module (bld)
     build_app_objects (bld)
-    build_plugins (bld)
+    # build_plugins (bld)
 
     if bld.env.ELEMENT_SUBPROJECT:
         return
 
     build_app (bld)
-    build_vst (bld)
+
+    # build_vst (bld)
     # build_vst3 (bld)
 
-    if bld.env.LUA and bool (bld.env.LIB_READLINE):
-        bld.recurse ('tools/lua-el')
+    # if bld.env.LUA and bool (bld.env.LIB_READLINE):
+    #     bld.recurse ('tools/lua-el')
     if bld.env.TEST:
         bld.recurse ('test')
 
@@ -728,7 +715,7 @@ def check (ctx):
         return
     os.environ["LD_LIBRARY_PATH"] = "build/lib"
     os.environ["DYLD_LIBRARY_PATH"] = "build/lib"
-    os.environ["LUA_PATH"] = "libs/lua/?.lua"
+    os.environ["LUA_PATH"] = "src/?.lua"
     failed = 0
     print ("JUCE Tests")
     if 0 != call (["build/bin/test_juce"]):

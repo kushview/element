@@ -35,7 +35,7 @@
 #include "Globals.h"
 #include "Settings.h"
 #include "sol/sol.hpp"
-#include "lua-kv.hpp"
+#include "el/lua-kv.hpp"
 
 #ifndef EL_LOCAL_LUA_PATHS
 #define EL_LOCAL_LUA_PATHS 0
