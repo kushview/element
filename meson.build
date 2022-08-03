@@ -267,7 +267,23 @@ element_app = executable ('element', 'src/Main.cc',
     gnu_symbol_visibility : 'hidden',
     link_with : [ libelement ])
 
-if host_machine.system() == 'darwin'
+if host_machine.system() == 'linux'
+    custom_target ('linux desktop icon',
+        command : [ 'cp', '-f', '@INPUT@', '@OUTPUT@' ],
+        input   : 'data/ElementIcon_512x512.png',
+        output  : 'net.kushview.element.png',
+        install : true,
+        install_dir : get_option('datadir') / 'icons/hicolor/512x512/apps')
+    configure_file (
+        input: 'data/net.kushview.element.desktop.in',
+        output: 'net.kushview.element.desktop',
+        configuration : {
+            'ELEMENT_ICON' : 'net.kushview.element',
+            'ELEMENT_EXE'  : 'element'
+        },
+        install : true,
+        install_dir : get_option('datadir') / 'applications')
+elif host_machine.system() == 'darwin'
     install_data ('data/Icon.icns', install_dir : 'Contents/Resources')
     install_data ('tools/macdeploy/Info.plist', install_dir : 'Contents')
     meson.add_install_script ('tools/macdeploy/appbundle.py', 
