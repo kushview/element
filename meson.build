@@ -21,11 +21,11 @@ subdir ('scripts')
 
 # libelement
 libelement_sources = '''
-    libs/element/src/bindings.cpp
-    libs/element/src/context.cpp
-    libs/element/src/module.cpp
-    libs/element/src/scripting.cpp
-    libs/element/src/strings.cpp
+    src/bindings.cpp
+    src/context.cpp
+    src/module.cpp
+    src/scripting.cpp
+    src/strings.cpp
     src/el/audio.c
     src/el/AudioBuffer32.cpp
     src/el/AudioBuffer64.cpp
@@ -215,9 +215,8 @@ libelement_sources = '''
 
 libelement_includes =  [ 
     include_directories (
-        'libs/element/include',
-        'libs/element/src',
         'libs/sol',
+        'include',
         'src',
         'src/el'       
     ),
@@ -229,7 +228,7 @@ libelement_includes =  [
 ]
 
 if host_machine.system() == 'windows'
-    libelement_sources += [ 'libs/element/src/dlfcn-win32.c' ]
+    libelement_sources += [ 'src/dlfcn-win32.c' ]
 endif
 
 modules_install_dir = get_option('datadir') / 'element/lua/el'
@@ -254,8 +253,8 @@ libelement = static_library ('element',
     gnu_symbol_visibility : 'hidden',
     dependencies : deps,
     install : false,
-    objects : [ libelement_lua.extract_all_objects(),
-                libelement_juce.extract_all_objects() ])
+    objects : [ libelement_lua.extract_all_objects (recursive : false),
+                libelement_juce.extract_all_objects (recursive : false) ])
 
 # Element Program
 element_app = executable ('element', 'src/Main.cc',
