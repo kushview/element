@@ -249,11 +249,22 @@ install_data (
     install_dir : modules_install_dir
 )
 
+host_cpp_args = []
+if host_machine.system() == 'linux'
+    absdatadir = get_option('prefix') / get_option('datadir')
+    host_cpp_args += [
+        '-DEL_LUADIR="@0@"'.format (absdatadir / 'element' / 'lua'),
+        '-DEL_SCRIPTSDIR="@0@"'.format (absdatadir / 'element' / 'scripts')
+    ]
+endif
+
+libelement_cpp_args = host_cpp_args
 libelement = static_library ('element', 
     libelement_sources, 
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
     dependencies : deps,
+    cpp_args : libelement_cpp_args,
     install : false,
     objects : [ libelement_lua.extract_all_objects (recursive : false),
                 libelement_juce.extract_all_objects (recursive : false) ])
@@ -268,12 +279,12 @@ element_app = executable ('element', 'src/Main.cc',
     link_with : [ libelement ])
 
 if host_machine.system() == 'linux'
-    custom_target ('linux desktop icon',
+    custom_target ('desktop icon',
         command : [ 'cp', '-f', '@INPUT@', '@OUTPUT@' ],
-        input   : 'data/ElementIcon_512x512.png',
+        input   : 'data/ElementIcon_256x256.png',
         output  : 'net.kushview.element.png',
         install : true,
-        install_dir : get_option('datadir') / 'icons/hicolor/512x512/apps')
+        install_dir : get_option('datadir') / 'icons/hicolor/256x256/apps')
     configure_file (
         input: 'data/net.kushview.element.desktop.in',
         output: 'net.kushview.element.desktop',
