@@ -82,7 +82,7 @@ private:
     bool handleVirtualKeyboardPressed (const KeyPress& key, Component* component)
     {
         if (auto* vcv = getVirtualKeyboardView())
-            return vcv->keyPressed (key, component);
+            return vcv->keyPressed (key);
         return false;
     }
 
@@ -856,7 +856,7 @@ KeyListener* GuiController::getKeyListener() const { return keys.get(); }
 
 bool GuiController::handleMessage (const AppMessage& msg)
 {
-    if (auto m = dynamic_cast<const ReloadMainContentMessage*> (&msg))
+    if (nullptr != dynamic_cast<const ReloadMainContentMessage*> (&msg))
     {
         auto& settings = getWorld().getSettings();
         PropertiesFile* const pf = settings.getUserSettings();

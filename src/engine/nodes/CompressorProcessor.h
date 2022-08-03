@@ -234,8 +234,8 @@ public:
         virtual void updateInGainDB (float /*inDB*/) {}
     };
 
-    void addListener (Listener* l) { listeners.add (l); }
-    void removeListener (Listener* l) { listeners.remove (l); }
+    void addCompressorListener (Listener* l) { listeners.add (l); }
+    void removeCompressorListener (Listener* l) { listeners.remove (l); }
 
 protected:
     inline bool isBusesLayoutSupported (const BusesLayout& layout) const override

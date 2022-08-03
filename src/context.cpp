@@ -15,14 +15,6 @@
 
 namespace element {
 
-static FeatureMap map_features (elFeatures features)
-{
-    FeatureMap fm;
-    EL_FEATURES_FOREACH (features, f)
-        fm.insert ({ f->ID, f->data });
-    return std::move (fm);
-}
-
 } // namespace element
 
 //=============================================================================

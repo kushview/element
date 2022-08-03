@@ -104,7 +104,7 @@ public:
         slider.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
         slider.setRange (0.001, 2.0);
 
-        slider.onValueChange = [this] {};
+        slider.onValueChange = [] {};
 
         setSize (padding + labelWidth + matrix->getWidth(),
                  padding + labelWidth + matrix->getHeight());

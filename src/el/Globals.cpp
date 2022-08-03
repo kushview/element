@@ -12,14 +12,6 @@
 #include "Globals.h"
 #include "Settings.h"
 
-static Element::Globals* el_Globals_instance (lua_State* L)
-{
-    sol::state_view lua (L);
-    auto& _G = lua.globals();
-    auto g = _G.get_or<sol::userdata> ("el.globals", sol::lua_nil);
-    return g.valid() ? (Element::Globals*) g.pointer() : nullptr;
-}
-
 static int el_Globals_userdata (lua_State* L)
 {
     sol::state_view lua (L);

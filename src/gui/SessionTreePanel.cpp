@@ -487,7 +487,6 @@ public:
 
         // Paint the program number if it is enabled
         const auto h = area.getHeight();
-        const auto w = h;
         const int p = (int) node.getProperty (Tags::midiProgram, -1);
         if (p >= 0)
         {

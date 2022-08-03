@@ -22,9 +22,6 @@ void RootGraph::setPlayConfigFor (DeviceManager& devices)
 void RootGraph::setPlayConfigFor (AudioIODevice* device)
 {
     jassert (device);
-
-    const int numIns = device->getActiveInputChannels().countNumberOfSetBits();
-    const int numOuts = device->getActiveOutputChannels().countNumberOfSetBits();
     const int bufferSize = device->getCurrentBufferSizeSamples();
     const double sampleRate = device->getCurrentSampleRate();
 

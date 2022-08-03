@@ -153,11 +153,11 @@ public:
     void testSetTempo (double tempo);
 
     /** @internal */
-    void timerCallback();
+    void timerCallback() override;
 
     inline UndoManager* undoManager() { return nullptr; }
 
-    std::unique_ptr<XmlElement> createXml();
+    std::unique_ptr<XmlElement> createSequenceXml();
 
 protected:
     Sequence (Globals&);
@@ -177,12 +177,12 @@ protected:
 
     friend class ValueTree;
     ValueTree projectState;
-    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
-    virtual void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
-    virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int);
-    virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved, int, int);
-    virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged);
-    virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged);
+    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
+    virtual void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
+    virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int) override;
+    virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved, int, int) override;
+    virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
+    virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override;
 
 private:
     Globals& owner;

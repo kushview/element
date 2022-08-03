@@ -277,10 +277,10 @@ void VirtualKeyboardView::didBecomeActive()
     }
 }
 
-bool VirtualKeyboardView::keyPressed (const KeyPress& key, Component* c)
+bool VirtualKeyboardView::keyPressed (const KeyPress& key)
 {
     if (! keyboard)
-        return ContentView::keyPressed (key, c);
+        return ContentView::keyPressed (key);
 
     const auto isShiftDown = key.getModifiers().isShiftDown();
     const auto isCtrlDown = key.getModifiers().isCommandDown();

@@ -44,7 +44,7 @@ GraphEditorView::GraphEditorView()
         // save top left
         const auto revertTopLeftPos = pos;
         const bool revertTopLeft = pos.getX() != block.getX() || pos.getY() != block.getY();
-        ScopedCallback defer ([this, &block, &revertTopLeftPos, &revertTopLeft]() {
+        ScopedCallback defer ([&block, &revertTopLeftPos, &revertTopLeft]() {
             if (revertTopLeft)
             {
                 block.setNodePosition (revertTopLeftPos);
@@ -133,7 +133,7 @@ void GraphEditorView::willBeRemoved()
     graph.setNode (Node());
 }
 
-bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
+bool GraphEditorView::keyPressed (const KeyPress& key)
 {
     if (key.getKeyCode() == KeyPress::backspaceKey || key.getKeyCode() == KeyPress::deleteKey)
     {
@@ -141,7 +141,7 @@ bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
         return true;
     }
 
-    return ContentView::keyPressed (key, c);
+    return ContentView::keyPressed (key);
 }
 
 void GraphEditorView::stabilizeContent()

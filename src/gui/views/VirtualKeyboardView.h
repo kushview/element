@@ -56,7 +56,7 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
-    bool keyPressed (const KeyPress&, Component*) override;
+    bool keyPressed (const KeyPress&) override;
     bool keyStateChanged (bool) override;
 
 private:

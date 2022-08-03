@@ -63,6 +63,7 @@ def configure (self):
             includes = [
                 self.path.find_node ('libs/lua').abspath(),
                 self.path.find_node ('libs/lua/src').abspath(),
+                self.path.find_node ('libs/sol').abspath(),
             ],
             fragment = '''
                 #include <sol/forward.hpp>

@@ -865,7 +865,7 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
 {
     StringArray shortNames;
 
-    if (auto* world = ViewHelpers::getGlobals (this))
+    if (nullptr != ViewHelpers::getGlobals (this))
     {
         const auto file = PluginScanner::getSlavePluginListFile();
         plugins.restoreAudioPlugins (file);

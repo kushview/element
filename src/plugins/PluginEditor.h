@@ -28,8 +28,7 @@ class ContentComponent;
 class PluginProcessor;
 
 /** The audio processor editor used for Element plugins */
-class PluginEditor : public AudioProcessorEditor,
-                     public KeyListener
+class PluginEditor : public AudioProcessorEditor
 {
 public:
     PluginEditor (PluginProcessor&);
@@ -53,8 +52,8 @@ public:
     //==========================================================================
     void paint (Graphics&) override;
     void resized() override;
-    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
-    bool keyStateChanged (bool isKeyDown, Component* originatingComponent) override { return true; }
+    bool keyPressed (const KeyPress& key) override;
+    bool keyStateChanged (bool) override { return true; }
 
 private:
     PluginProcessor& processor;

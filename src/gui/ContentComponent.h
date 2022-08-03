@@ -41,8 +41,7 @@ class VirtualKeyboardView;
 class NodeChannelStripView;
 
 class ContentView : public Component,
-                    public ApplicationCommandTarget,
-                    public KeyListener
+                    public ApplicationCommandTarget
 {
 public:
     ContentView();
@@ -80,7 +79,7 @@ public:
     /** @internal */
     virtual void paint (Graphics& g) override;
     /** @internal */
-    virtual bool keyPressed (const KeyPress& k, Component*) override;
+    virtual bool keyPressed (const KeyPress& k) override;
 
 private:
     bool escapeTriggersClose = false;

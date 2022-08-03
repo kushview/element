@@ -111,7 +111,7 @@ public:
             return true;
         };
 
-        prompt.onTextChange = [this]() {};
+        prompt.onTextChange = []() {};
 
         prompt.onReturnKey = [this] {
             auto text = prompt.getText();

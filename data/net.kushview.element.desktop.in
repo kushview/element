@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Element
-Comment=Element Advanced Sequencer
+Comment=Element modular plugin host
 Exec=@ELEMENT_EXE@
 Icon=@ELEMENT_ICON@
 Terminal=false

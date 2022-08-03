@@ -42,7 +42,7 @@ public:
     void restoreSettings();
 
     void paint (Graphics& g) override;
-    bool keyPressed (const KeyPress& key, Component* c) override;
+    bool keyPressed (const KeyPress& key) override;
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 protected:

@@ -1,4 +1,14 @@
 
+lua_includes = include_directories ('.', 'src')
+lua_c_args = []
+if host_machine.system() == 'linux'
+    lua_c_args += '-DLUA_USE_LINUX'
+elif host_machine.system() == 'darwin'
+    lua_c_args += '-DLUA_USE_MACOSX'
+elif host_machine.system() == 'windows'
+    lua_c_args += '-DLUA_USE_WINDOWS'
+endif
+
 libelement_lua = static_library ('element_lua', '''
     src/lauxlib.c
     src/liolib.c
@@ -32,6 +42,8 @@ libelement_lua = static_library ('element_lua', '''
     src/llex.c
     src/ltm.c
     src/ldo.c'''.split(),
+    include_directories : lua_includes,
     install : false,
-    gnu_symbol_visibility : 'default'
+    gnu_symbol_visibility : 'default',
+    c_args : lua_c_args
 )

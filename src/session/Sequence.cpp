@@ -25,6 +25,8 @@
 #include "MediaManager.h"
 #include "Globals.h"
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wparentheses")
+
 namespace Element {
 
 class Sequence::Private
@@ -190,7 +192,7 @@ bool Sequence::loadData (const ValueTree& data)
     return true;
 }
 
-std::unique_ptr<XmlElement> Sequence::createXml()
+std::unique_ptr<XmlElement> Sequence::createSequenceXml()
 {
     auto e = getValueTree().createXml();
     if (nullptr != e)
@@ -239,8 +241,9 @@ void Sequence::polishXml (XmlElement& e)
     StringArray trackAtts (sa);
 
     forEachXmlChildElementWithTagName (e, s, "sequence")
-        forEachXmlChildElementWithTagName (*s, t, "track") for (const auto& a : trackAtts)
-            t->removeAttribute (a);
+        forEachXmlChildElementWithTagName (*s, t, "track") 
+            for (const auto& a : trackAtts)
+                t->removeAttribute (a);
 }
 
 void Sequence::setMissingProperties (bool resetExisting)
@@ -318,3 +321,5 @@ ValueTree Sequence::trackNode (int trackIndex) const
     return ValueTree();
 }
 } // namespace Element
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

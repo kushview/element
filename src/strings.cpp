@@ -32,7 +32,7 @@ std::string wildcard_to_regex (const std::string& wildcard)
     auto input = wildcard;
     escape_regex (input);
     transform_wildcard (input);
-    return std::move (input);
+    return input;
 }
 
 } // namespace element

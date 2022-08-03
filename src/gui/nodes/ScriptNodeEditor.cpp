@@ -18,7 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "../../../libs/lua/el/object.hpp"
+#include "el/object.hpp"
 #include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/LookAndFeel.h"
 #include "scripting/LuaBindings.h"
@@ -293,7 +293,6 @@ void ScriptNodeEditor::setToolbarVisible (bool visible)
 //==============================================================================
 sol::table ScriptNodeEditor::createContext()
 {
-    using CPP = ControlPortParameter;
     sol::state_view view (state.lua_state());
     sol::table ctx = view.create_table();
 

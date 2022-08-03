@@ -8,7 +8,7 @@
     <key>CFBundleIdentifier</key>
     <string>net.kushview.Element</string>
     <key>CFBundleName</key>
-    <string>element</string>
+    <string>Element</string>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
@@ -17,7 +17,7 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>This app requires audio input. If you do not have an audio interface connected it will use the built-in microphone.</string>
     <key>CFBundleExecutable</key>
-    <string>Element</string>
+    <string>element</string>
     <key>CFBundleIconFile</key>
     <string>Icon.icns</string>
     <key>CFBundlePackageType</key>
