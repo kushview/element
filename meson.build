@@ -234,6 +234,8 @@ endif
 modules_install_dir = get_option('datadir') / 'element/lua/el'
 if host_machine.system() == 'windows'
     modules_install_dir = get_option('bindir') / 'lua/el'
+elif host_machine.system() == 'darwin'
+    modules_install_dir = 'Contents/Resources/Modules/el'
 endif
 
 install_data (
@@ -271,7 +273,7 @@ if host_machine.system() == 'darwin'
     meson.add_install_script ('tools/macdeploy/appbundle.py', 
         'tmp/Element.app', 
         '-volname', 'Element',
-        '-dmg', 'element-osx-0.47.0', 
-        '-verbose', '4', 
+        '-dmg', 'element-osx-@0@'.format (meson.project_version()), 
+        '-verbose', '0', 
         '-distdir', 'dist')
 endif
