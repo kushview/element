@@ -800,7 +800,6 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     vertical = ged->isLayoutVertical();
 
-    auto displayModeChanged = displayMode != getDisplayModeFromString (displayModeValue.getValue());
     displayMode = getDisplayModeFromString (displayModeValue.getValue());
     if (displayMode == Compact || displayMode == Small)
     {

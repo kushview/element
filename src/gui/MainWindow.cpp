@@ -74,7 +74,7 @@ void MainWindow::nameChangedSession()
 
     auto session = world.getSession();
     SessionController* controller = nullptr;
-    if (auto* cc = dynamic_cast<ContentComponent*> (getContentComponent()))
+    if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
         controller = getAppController().findChild<SessionController>();
 
     if (nullptr == session || nullptr == controller)

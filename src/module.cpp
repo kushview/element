@@ -11,9 +11,9 @@ namespace fs = std::filesystem;
 namespace element {
 
 Module::Module (const std::string& bp, Context& b, Scripting& s)
-    : m_bundle_path (bp),
-      backend (b),
-      scripting (s)
+    : backend (b),
+      scripting (s),
+      m_bundle_path (bp)     
 {
     manifest = read_module_manifest (bundle_path());
 }
@@ -135,7 +135,7 @@ FeatureMap Module::public_extensions() const
     for (const auto& exp : manifest.provides)
         if (auto data = mod->extension (handle, exp.c_str()))
             e.insert ({ exp, data });
-    return std::move (e);
+    return e;
 }
 
 void Module::close()

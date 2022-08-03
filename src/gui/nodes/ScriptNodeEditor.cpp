@@ -293,7 +293,6 @@ void ScriptNodeEditor::setToolbarVisible (bool visible)
 //==============================================================================
 sol::table ScriptNodeEditor::createContext()
 {
-    using CPP = ControlPortParameter;
     sol::state_view view (state.lua_state());
     sol::table ctx = view.create_table();
 

@@ -75,49 +75,21 @@ namespace Element {
 namespace Lua {
 
     //==============================================================================
+#if defined(EL_APPIMAGE)
     static File getAppImageLuaPath()
     {
-#if defined(EL_APPIMAGE)
         return File::getSpecialLocation (File::currentExecutableFile)
             .getParentDirectory() // bin
             .getParentDirectory() // usr
             .getChildFile ("share/element/modules");
+    }
 #endif
-        jassertfalse;
-        return File();
-    }
-
-    static File getTopDirectory()
-    {
-        File topdir = File::getSpecialLocation (File::currentExecutableFile).getParentDirectory();
-        while (topdir.exists() && topdir.isDirectory())
-        {
-            if (topdir.getChildFile ("tools/waf/element.py").existsAsFile())
-                return topdir;
-            topdir = topdir.getParentDirectory();
-        }
-        return File();
-    }
 
     //==============================================================================
     static String getLocalScriptsDir()
     {
         File dir;
-
-#if JUCE_DEBUG && EL_LOCAL_LUA_PATHS
-        File topdir = getTopDirectory();
-        if (topdir.exists() && topdir.isDirectory())
-            dir = topdir.getChildFile ("scripts");
-#endif
-
         return dir.exists() ? dir.getFullPathName() : String();
-    }
-
-    static String getHomeScriptsDir()
-    {
-        return File::getSpecialLocation (File::userHomeDirectory)
-            .getChildFile (".local/share/element/scripts")
-            .getFullPathName();
     }
 
     static String getApplicationScriptsDir()
@@ -136,24 +108,9 @@ namespace Lua {
     }
 
     //==============================================================================
-    static String getHomeLuaDir()
-    {
-        return File::getSpecialLocation (File::userHomeDirectory)
-            .getChildFile (".local/share/element/modules")
-            .getFullPathName();
-    }
-
     static StringArray getLocalLuaDirs()
     {
         StringArray dirs;
-#if JUCE_DEBUG && EL_LOCAL_LUA_PATHS
-        auto topdir = getTopDirectory();
-        if (topdir.exists() && topdir.isDirectory())
-        {
-            dirs.add (topdir.getChildFile ("libs/lua-kv/src").getFullPathName());
-            dirs.add (topdir.getChildFile ("libs/lua").getFullPathName());
-        }
-#endif
         return dirs;
     }
 

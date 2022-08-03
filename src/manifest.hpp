@@ -56,7 +56,7 @@ static Manifest read_module_manifest (Tx&& bundle_path)
         std::clog << "config error: " << e.what() << std::endl;
     }
 
-    return std::move (result);
+    return result;
 }
 
 } // namespace element

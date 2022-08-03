@@ -60,7 +60,8 @@ public:
             capturedObject = object;
             capturedProcessor = processor;
             capturedParameter = parameter;
-
+            ignoreUnused (capturedProcessor);
+            
             node = Node();
             object = nullptr;
             processor = nullptr;

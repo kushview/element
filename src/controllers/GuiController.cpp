@@ -856,7 +856,7 @@ KeyListener* GuiController::getKeyListener() const { return keys.get(); }
 
 bool GuiController::handleMessage (const AppMessage& msg)
 {
-    if (auto m = dynamic_cast<const ReloadMainContentMessage*> (&msg))
+    if (nullptr != dynamic_cast<const ReloadMainContentMessage*> (&msg))
     {
         auto& settings = getWorld().getSettings();
         PropertiesFile* const pf = settings.getUserSettings();

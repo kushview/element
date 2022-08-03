@@ -24,19 +24,6 @@
 using namespace kv;
 namespace Element {
 
-namespace SymbolHelpers {
-    static String formatSymbol (const String& input)
-    {
-        // todo
-        return input;
-    }
-
-    static bool isValidSymbol (const String& input)
-    {
-        return input.isNotEmpty() && input.containsOnly ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
-    }
-} // namespace SymbolHelpers
-
 //==============================================================================
 class DSPScript::Parameter : public ControlPortParameter,
                              public Element::Parameter::Listener
