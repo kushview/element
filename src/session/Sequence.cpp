@@ -192,7 +192,7 @@ bool Sequence::loadData (const ValueTree& data)
     return true;
 }
 
-std::unique_ptr<XmlElement> Sequence::createXml()
+std::unique_ptr<XmlElement> Sequence::createSequenceXml()
 {
     auto e = getValueTree().createXml();
     if (nullptr != e)

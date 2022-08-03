@@ -57,7 +57,7 @@ public:
                 return "Off";
             return String (roundToInt (value));
         };
-        program.slider.valueFromTextFunction = [this] (const String& text) -> double {
+        program.slider.valueFromTextFunction = [] (const String& text) -> double {
             return text.getDoubleValue();
         };
 
@@ -203,7 +203,7 @@ public:
         : SliderPropertyComponent (value, name, 0.0, 127.0, 1.0, 1.0, false)
     {
         slider.textFromValueFunction = Util::noteValueToString;
-        slider.valueFromTextFunction = [this] (const String& text) -> double {
+        slider.valueFromTextFunction = [] (const String& text) -> double {
             return 0.0;
         };
 
@@ -223,7 +223,7 @@ public:
             return str;
         };
 
-        slider.valueFromTextFunction = [this] (const String& text) -> double {
+        slider.valueFromTextFunction = [] (const String& text) -> double {
             return text.replace ("ms", "", false).trim().getFloatValue();
         };
 

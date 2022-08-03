@@ -301,7 +301,7 @@ public:
         tempMidi.clear();
         // End MIDI filters
 
-        auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended) {
+        auto pluginProcessBlock = [=] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended) {
             if (node->wantsMidiPipe())
             {
                 if (! node->isSuspended())

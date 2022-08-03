@@ -52,12 +52,10 @@ namespace Element {
 
 ContentView::ContentView()
 {
-    addKeyListener (this);
 }
 
 ContentView::~ContentView()
 {
-    removeKeyListener (this);
 }
 
 ContentComponent* ContentComponent::create (AppController& controller)
@@ -79,7 +77,7 @@ void ContentView::paint (Graphics& g)
     g.fillAll (LookAndFeel::backgroundColor);
 }
 
-bool ContentView::keyPressed (const KeyPress& k, Component*)
+bool ContentView::keyPressed (const KeyPress& k)
 {
     if (escapeTriggersClose && k == KeyPress::escapeKey)
     {

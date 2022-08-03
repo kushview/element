@@ -162,7 +162,7 @@ public:
         portLabel.setFont (Font (12.0, Font::bold));
         portLabel.setText ("OSC Host Port", dontSendNotification);
         addAndMakeVisible (portSlider);
-        portSlider.textFromValueFunction = [this] (double value) -> String {
+        portSlider.textFromValueFunction = [] (double value) -> String {
             return String (roundToInt (value));
         };
         portSlider.setRange (1.0, 65535.0, 1.0);
@@ -443,7 +443,7 @@ public:
         desktopScaleLabel.setText ("Desktop scale", dontSendNotification);
         desktopScaleLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (desktopScale);
-        desktopScale.textFromValueFunction = [this] (double value) -> String {
+        desktopScale.textFromValueFunction = [] (double value) -> String {
             return String (value, 2);
         };
         desktopScale.setRange (0.1, 8.0, 0.01);
@@ -745,7 +745,7 @@ public:
         addAndMakeVisible (midiOutLatencyLabel);
         
         addAndMakeVisible (midiOutLatency);
-        midiOutLatency.textFromValueFunction = [this](double value) -> String {
+        midiOutLatency.textFromValueFunction = [](double value) -> String {
             return String(roundToInt(value));
         };
         midiOutLatency.setRange (-1000.0, 1000.0, 1.0);

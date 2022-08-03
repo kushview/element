@@ -50,7 +50,7 @@ public:
             addAndMakeVisible (midiOutLatency);
             midiOutLatency.setRange (-1000.0, 1000.0, 1.0);
             midiOutLatency.setValue (proc.getLatency(), dontSendNotification);
-            midiOutLatency.textFromValueFunction = [this] (double value) -> juce::String { return String (roundToInt (value)) + " ms"; };
+            midiOutLatency.textFromValueFunction = [] (double value) -> juce::String { return String (roundToInt (value)) + " ms"; };
             midiOutLatency.onValueChange = [this]() { proc.setLatency (midiOutLatency.getValue()); };
             midiOutLatency.updateText();
 

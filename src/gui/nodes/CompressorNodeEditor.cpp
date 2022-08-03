@@ -30,12 +30,12 @@ CompressorNodeEditor::CompViz::CompViz (CompressorProcessor& proc) : proc (proc)
 
     updateCurve();
 
-    proc.addListener (this);
+    proc.addCompressorListener (this);
 }
 
 CompressorNodeEditor::CompViz::~CompViz()
 {
-    proc.removeListener (this);
+    proc.removeCompressorListener (this);
 }
 
 float CompressorNodeEditor::CompViz::getDBForX (float x)

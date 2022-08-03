@@ -1104,7 +1104,7 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
         {
             auto b = block;
             b.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
-            forEachSibling ([this, m](BlockComponent& sibling) {
+            forEachSibling ([m](BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
                 auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);

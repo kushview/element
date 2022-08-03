@@ -1,4 +1,4 @@
-project ('element', ['c', 'cpp' ],
+project ('element', ['c', 'cpp' ] + meson.get_external_property ('extra_languages', []),
     version : '0.47.0',
     meson_version : '>= 0.56.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])

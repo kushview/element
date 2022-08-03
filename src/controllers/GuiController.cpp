@@ -82,7 +82,7 @@ private:
     bool handleVirtualKeyboardPressed (const KeyPress& key, Component* component)
     {
         if (auto* vcv = getVirtualKeyboardView())
-            return vcv->keyPressed (key, component);
+            return vcv->keyPressed (key);
         return false;
     }
 

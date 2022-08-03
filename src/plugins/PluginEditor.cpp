@@ -413,15 +413,6 @@ void PluginEditor::setWantsPluginKeyboardFocus (bool focus)
 
     setWantsKeyboardFocus (focus);
     processor.setEditorWantsKeyboard (focus);
-
-    if (getWantsKeyboardFocus())
-    {
-        addKeyListener (this);
-    }
-    else
-    {
-        removeKeyListener (this);
-    }
 }
 
 bool PluginEditor::getWantsPluginKeyboardFocus() const
@@ -459,9 +450,8 @@ void PluginEditor::resized()
         content->setBounds (bounds);
 }
 
-bool PluginEditor::keyPressed (const KeyPress& key, Component* originatingComponent)
+bool PluginEditor::keyPressed (const KeyPress& key)
 {
-    ignoreUnused (originatingComponent);
     auto* app = processor.getAppController();
     auto& cmd (app->getWorld().getCommandManager());
 
