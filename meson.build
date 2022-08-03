@@ -269,6 +269,9 @@ if host_machine.system() == 'darwin'
     install_data ('data/Icon.icns', install_dir : 'Contents/Resources')
     install_data ('tools/macdeploy/Info.plist', install_dir : 'Contents')
     meson.add_install_script ('tools/macdeploy/appbundle.py', 
-        '/tmp/Element.app') #, '-volname', '"Element"',
-        # '-dmg', '"element-osx-0.47.0"', '-verbose', '4')
+        'tmp/Element.app', 
+        '-volname', 'Element',
+        '-dmg', 'element-osx-0.47.0', 
+        '-verbose', '4', 
+        '-distdir', 'dist')
 endif
