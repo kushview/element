@@ -6,7 +6,8 @@ if host_machine.system() == 'linux'
 elif host_machine.system() == 'darwin'
     lua_c_args += '-DLUA_USE_MACOSX'
 elif host_machine.system() == 'windows'
-    lua_c_args += '-DLUA_USE_WINDOWS'
+    # not actually needed
+    # lua_c_args += '-DLUA_USE_WINDOWS'
 endif
 
 libelement_lua = static_library ('element_lua', '''

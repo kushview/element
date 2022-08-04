@@ -70,9 +70,15 @@ vstfxstore_h_found = cpp.check_header ('pluginterfaces/vst2.x/vstfxstore.h',
     include_directories : vst2_includes, required : false)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_VST', aeffect_h_found and aeffectx_h_found)
 
-vst3_includes = include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
+if get_option('vst3sdk') == 'auto'
+    vst3_includes = include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
+else
+    vst3_includes = include_directories (get_option ('vst3sdk'))
+endif
+
 juce_conf_data.set10 ('JUCE_VST3_CAN_REPLACE_VST2', vstfxstore_h_found)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', true)
+
 lv2_includes = include_directories (
     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK',
     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2',

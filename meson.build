@@ -14,6 +14,7 @@ add_global_arguments ([
 # Boost
 boost_dep = dependency ('boost', required : true)
 deps = [ boost_dep ]
+ldflags = []
 
 subdir ('libs/lua')
 subdir ('libs/compat')
@@ -258,6 +259,19 @@ if host_machine.system() == 'linux'
     ]
 endif
 
+if host_machine.system() == 'windows'
+    if meson.is_cross_build()
+        foreach l : 'uuid wsock32 wininet version ole32 ws2_32 oleaut32 imm32 comdlg32 shlwapi rpcrt4 winmm dxgi'.split()
+            deps += cpp.find_library (l)
+        endforeach
+        ldflags += [ '-static-libgcc', '-static-libstdc++',
+                     '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
+                     '-Wl,--no-whole-archive' ]
+    else
+        # MSVC...
+    endif
+endif
+
 libelement_cpp_args = host_cpp_args
 libelement = static_library ('element', 
     libelement_sources, 
@@ -276,6 +290,7 @@ element_app = executable ('element', 'src/Main.cc',
     dependencies : deps,
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
+    link_args : ldflags,
     link_with : [ libelement ])
 
 if host_machine.system() == 'linux'
