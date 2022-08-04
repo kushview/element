@@ -100,7 +100,7 @@ void KnobsComponent::paint (Graphics& g)
     // Print names for sliders and combo boxes
     g.setColour (Colours::white);
     const int height = 20;
-    auto makeName = [&g] (const Component& comp, String name) {
+    auto makeName = [=, &g] (const Component& comp, String name) {
         Rectangle<int> nameBox (comp.getX(), 2, comp.getWidth(), height);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
