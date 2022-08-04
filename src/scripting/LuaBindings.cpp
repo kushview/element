@@ -135,11 +135,20 @@ namespace Lua {
                   .getFullPathName();
 
 #elif JUCE_WINDOWS
-        const auto installDir = DataPath::installDir();
-        if (installDir.isDirectory())
-            dir = installDir.getChildFile ("Modules").getFullPathName();
+        auto windowsDir = File::getSpecialLocation (File::currentExecutableFile)
+            .getParentDirectory().getChildFile ("lua");
+        
+        if (windowsDir.exists() && windowsDir.isDirectory())
+        {
+            dir = windowsDir.getFullPathName();
+        }
+        else
+        {
+            windowsDir = DataPath::installDir();
+            if (windowsDir.exists() && windowsDir.isDirectory())
+                dir = windowsDir.getChildFile("lua").getFullPathName();
+        }
 #endif
-
         return dir;
     }
 
