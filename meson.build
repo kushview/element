@@ -259,7 +259,10 @@ if host_machine.system() == 'linux'
     ]
 endif
 
+element_app_sources = [ 'src/Main.cc' ]
+
 if host_machine.system() == 'windows'
+    windows = import ('windows')
     if meson.is_cross_build()
         foreach l : 'uuid wsock32 wininet version ole32 ws2_32 oleaut32 imm32 comdlg32 shlwapi rpcrt4 winmm dxgi'.split()
             deps += cpp.find_library (l)
@@ -268,8 +271,11 @@ if host_machine.system() == 'windows'
                      '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
                      '-Wl,--no-whole-archive' ]
     else
-        # MSVC...
+        # MSVC
+        
     endif
+    element_app_sources += windows.compile_resources ('tools/windeploy/resources.rc',
+        include_directories :  ['tools/windeploy'])
 endif
 
 libelement_cpp_args = host_cpp_args
@@ -284,7 +290,7 @@ libelement = static_library ('element',
                 libelement_juce.extract_all_objects (recursive : false) ])
 
 # Element Program
-element_app = executable ('element', 'src/Main.cc',
+element_app = executable ('element', element_app_sources,
     install : true,
     win_subsystem : 'windows',
     dependencies : deps,
