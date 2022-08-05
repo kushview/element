@@ -20,7 +20,7 @@ codesign = os.path.exists(certfile) and len(password) > 0
 print ("Element Installer Maker")
 print ("[info] processing uninstaller")
 call (['makensis', '/DINNER', '/V0', script])
-call ([tempinstaller])
+input ("Run 'tempinstaller.exe' as admin, then press enter...")
 if codesign:
     print("[info] code sign uninstaller")
 
