@@ -2,17 +2,17 @@
 # generates a linux AppImage and moves to the build directory.
 
 set -ex
-
+builddir="$1"
 appdir="AppDir"
-rm -rf "build-native/$appdir"
-mkdir -p "build-native/$appdir"
-meson install --destdir="${appdir}" -C build-native
+rm -rf "$builddir/$appdir"
+mkdir -p "$builddir/$appdir"
+meson install --destdir="${appdir}" -C "$builddir"
 
 if [ -z "${VERSION}" ]; then
     export VERSION="$(python waf version --revision)"
 fi
 
-cd build-native
+cd "$builddir"
 export LD_LIBRARY_PATH="build/lib:${LD_LIBRARY_PATH}"
 linuxdeploy --appimage-extract-and-run \
     --appdir ${appdir} --output appimage \
