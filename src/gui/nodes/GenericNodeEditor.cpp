@@ -22,17 +22,6 @@
 
 namespace Element {
 
-namespace GenericEditorHelpers {
-
-    static AudioProcessor* getAudioProcessor (const Node& node)
-    {
-        if (auto* obj = node.getObject())
-            return obj->getAudioProcessor();
-        return nullptr;
-    }
-
-} // namespace GenericEditorHelpers
-
 class BooleanParameterComponent final : public Component,
                                         private ParameterListener
 {
