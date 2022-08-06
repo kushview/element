@@ -15,6 +15,16 @@ add_global_arguments ([
 boost_dep = dependency ('boost', required : true)
 deps = [ boost_dep ]
 
+# Filesystem
+if not cpp.check_header ('filesystem', required : false)
+    cpp.check_header ('experimental/filesystem', required : true)
+    if host_machine.system() == 'darwin'
+        deps += cpp.find_library ('c++fs', required : true)
+    elif cpp.get_argument_syntax() == 'gcc'
+        deps += cpp.find_library ('stdc++fs', required : true)
+    endif
+endif
+
 subdir ('libs/lua')
 subdir ('libs/compat')
 subdir ('scripts')
@@ -255,7 +265,7 @@ libelement = static_library ('element',
 ###############################################################################
 # Element Application
 element_app_link_args = []
-element_app_deps = [ boost_dep ]
+element_app_deps = deps
 element_app_sources = [ 'src/Main.cc' ]
 
 if host_machine.system() == 'windows'
