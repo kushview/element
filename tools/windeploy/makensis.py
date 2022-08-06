@@ -17,15 +17,16 @@ certfile = config.certificate[0].strip()
 password = config.password[0].strip()
 codesign = os.path.exists(certfile) and len(password) > 0
 
-print ("Element Installer Maker")
-print ("[info] processing uninstaller")
-call (['makensis', '/DINNER', '/V0', script])
-input ("Run 'tempinstaller.exe' as admin, then press enter...")
+print ("Generating uninstaller")
+if os.path.exists (os.path.join (builddir, 'uninstall.exe')):
+    os.remove (os.path.join (builddir, 'uninstall.exe'))
+call (['makensis', '/DINNER', '/V1', script])
+call ([os.path.join (builddir, 'tools\\windeploy\\uninstaller.bat')])
 if codesign:
     print("[info] code sign uninstaller")
 
-print ("[info] processing installer")
-call (['makensis', '/V0', script])
+print ("Creating installer")
+call (['makensis', '/V2', script])
 if codesign:
     print("[info] code sign installer")
 
