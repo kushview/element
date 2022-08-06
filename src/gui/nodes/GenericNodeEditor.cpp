@@ -447,7 +447,6 @@ struct GenericNodeEditor::Pimpl
 GenericNodeEditor::GenericNodeEditor (const Node& node)
     : NodeEditorComponent (node), pimpl (new Pimpl (*this))
 {
-    jassert (nullptr != GenericEditorHelpers::getAudioProcessor (node)); // only nodes with real parameters are supported
     setSize (pimpl->view.getViewedComponent()->getWidth() + pimpl->view.getVerticalScrollBar().getWidth(),
              jmin (pimpl->view.getViewedComponent()->getHeight(), 400));
 }
