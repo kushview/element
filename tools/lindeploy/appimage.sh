@@ -9,7 +9,7 @@ mkdir -p "$builddir/$appdir"
 meson install --destdir="${appdir}" -C "$builddir"
 
 if [ -z "${VERSION}" ]; then
-    export VERSION="$(python waf version --revision)"
+    export VERSION="$(python tools/version.py --revision)"
 fi
 
 cd "$builddir"
