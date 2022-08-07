@@ -262,6 +262,13 @@ libelement = static_library ('element',
     objects : [ libelement_lua.extract_all_objects (recursive : false),
                 libelement_juce.extract_all_objects (recursive : false) ])
 
+if meson.is_subproject()
+
+element_dep = declare_dependency ('element',
+    include_directories : libelement_includes,
+    link_with : libelement)
+
+else
 ###############################################################################
 # Element Application
 element_app_link_args = []
@@ -331,4 +338,5 @@ elif host_machine.system() == 'darwin'
     install_data ('tools/macdeploy/Info.plist', install_dir : 'Contents')
 elif host_machine.system() == 'windows'
     subdir ('tools/windeploy')
+endif
 endif
