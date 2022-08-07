@@ -37,9 +37,11 @@
 #include "sol/sol.hpp"
 #include "el/lua-kv.hpp"
 
-#ifndef EL_LOCAL_LUA_PATHS
-#define EL_LOCAL_LUA_PATHS 0
-#endif
+#include "libelement.a.p/AudioBuffer.h"
+#include "libelement.a.p/command.h"
+#include "libelement.a.p/object.h"
+#include "libelement.a.p/script.h"
+#include "libelement.a.p/slug.h"
 
 extern "C" {
 extern int luaopen_el_audio (lua_State* L);
@@ -136,8 +138,9 @@ namespace Lua {
 
 #elif JUCE_WINDOWS
         auto windowsDir = File::getSpecialLocation (File::currentExecutableFile)
-            .getParentDirectory().getChildFile ("lua");
-        
+                              .getParentDirectory()
+                              .getChildFile ("lua");
+
         if (windowsDir.exists() && windowsDir.isDirectory())
         {
             dir = windowsDir.getFullPathName();
@@ -146,7 +149,7 @@ namespace Lua {
         {
             windowsDir = DataPath::installDir();
             if (windowsDir.exists() && windowsDir.isDirectory())
-                dir = windowsDir.getChildFile("lua").getFullPathName();
+                dir = windowsDir.getChildFile ("lua").getFullPathName();
         }
 #endif
         return dir;
@@ -228,12 +231,47 @@ namespace Lua {
         return path.joinIntoString (";");
     }
 
-    //==============================================================================
+//==============================================================================
+#define DEFINE_LUA_TXT_LOADER(pkgname)                                                              \
+    static int load_el_##pkgname (lua_State* L)                                                     \
+    {                                                                                               \
+        sol::state_view view (L);                                                                   \
+        sol::stack::push (L, view.script (BinaryData::pkgname##_lua, (String ("el.") + #pkgname).toStdString())); \
+        return 1;                                                                                   \
+    }
+
+    DEFINE_LUA_TXT_LOADER (AudioBuffer)
+    DEFINE_LUA_TXT_LOADER (command)
+    DEFINE_LUA_TXT_LOADER (object)
+    DEFINE_LUA_TXT_LOADER (script)
+    DEFINE_LUA_TXT_LOADER (slug)
+#undef DEFINE_LUA_TXT_LOADER
+
     static int searchInternalModules (lua_State* L)
     {
         const auto mod = sol::stack::get<std::string> (L);
+        if (mod == "el.AudioBuffer")
+        {
+            sol::stack::push (L, load_el_AudioBuffer);
+        }
+        else if (mod == "el.command")
+        {
+            sol::stack::push (L, load_el_command);
+        }
+        else if (mod == "el.object")
+        {
+            sol::stack::push (L, load_el_object);
+        }
+        else if (mod == "el.script")
+        {
+            sol::stack::push (L, load_el_script);
+        }
+        else if (mod == "el.slug")
+        {
+            sol::stack::push (L, load_el_slug);
+        }
 
-        if (mod == "el.CommandManager")
+        else if (mod == "el.CommandManager")
         {
             sol::stack::push (L, luaopen_el_CommandManager);
         }

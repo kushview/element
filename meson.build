@@ -248,6 +248,17 @@ if host_machine.system() == 'windows'
     libelement_sources += [ 'src/dlfcn-win32.c' ]
 endif
 
+luael_gen = generator (jrc,
+    output : [ '@BASENAME@.cpp', '@BASENAME@.h'],
+    arguments : [ '@INPUT@', '@BUILD_DIR@', 'BinaryData' ])
+libelement_sources += luael_gen.process (
+    'src/el/AudioBuffer.lua',
+    'src/el/command.lua',
+    'src/el/object.lua',
+    'src/el/script.lua',
+    'src/el/slug.lua'
+)
+
 libelement_cpp_args = host_cpp_args
 libelement = static_library ('element', 
     libelement_sources, 
@@ -300,17 +311,11 @@ modules_install_dir = get_option('datadir') / 'element/lua/el'
 if host_machine.system() == 'windows'
     modules_install_dir = get_option('bindir') / 'lua/el'
 elif host_machine.system() == 'darwin'
-    modules_install_dir = 'Contents/Resources/Modules/el'
+    modules_install_dir = 'Contents/Resources/lua/el'
 endif
 
 install_data (
-    sources : [
-        'src/el/AudioBuffer.lua',
-        'src/el/command.lua',
-        'src/el/object.lua',
-        'src/el/script.lua',
-        'src/el/slug.lua'
-    ], 
+    sources : , 
     install_dir : modules_install_dir
 )
 
