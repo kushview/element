@@ -488,7 +488,6 @@ def build_element_juce (bld):
             'TEMPLATES'
         ]
         JUCE.install_path = None
-        pcfile.install_path = None
 
     elif bld.host_is_windows():
         if bld.env.JUCE_DLL:
