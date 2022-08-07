@@ -329,12 +329,6 @@ if host_machine.system() == 'linux'
 elif host_machine.system() == 'darwin'
     install_data ('data/Icon.icns', install_dir : 'Contents/Resources')
     install_data ('tools/macdeploy/Info.plist', install_dir : 'Contents')
-    meson.add_install_script ('tools/macdeploy/appbundle.py', 
-        'tmp/Element.app', 
-        '-volname', 'Element',
-        '-dmg', 'element-osx-@0@'.format (meson.project_version()), 
-        '-verbose', '0', 
-        '-distdir', 'dist')
 elif host_machine.system() == 'windows'
     subdir ('tools/windeploy')
 endif
