@@ -133,7 +133,8 @@
                 "databaseFilename": ""
             },
             "cStandard": "c11",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "compileCommands": "${workspaceFolder}/build-native/compile_commands.json"
         },
         {
             "name": "Win32",
