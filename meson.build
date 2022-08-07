@@ -7,9 +7,6 @@ fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
 # Global Arguments
-add_global_arguments ([
-
-], language : 'cpp')
 
 # Boost
 boost_dep = dependency ('boost', required : true)
@@ -264,7 +261,7 @@ libelement = static_library ('element',
 
 if meson.is_subproject()
 
-element_dep = declare_dependency ('element',
+element_dep = declare_dependency (
     include_directories : libelement_includes,
     link_with : libelement)
 
