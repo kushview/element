@@ -145,23 +145,33 @@ else
     jrc_sources += '../JUCE/modules/juce_core/juce_core.cpp'
 endif
 
-jrc_deps = [
-    cpp.find_library ('dl', required : true),
-    cpp.find_library ('pthread', required : true)
-]
+jrc_deps = []
 
+if host_machine.system() == 'linux'
+    jrc_deps += [
+        cpp.find_library ('dl', required : true),
+        cpp.find_library ('pthread', required : true)
+    ]
+elif host_machine.system() == 'darwin'
+    jrc_deps += dependency ('appleframeworks', modules :
+        'Cocoa Foundation IOKit'.split())
+endif
+
+jrc_cpp_args = '''
+    -DJUCE_DISPLAY_SPLASH_SCREEN=0
+    -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
+    -DJUCE_MODULE_AVAILABLE_juce_core=1
+    -DJUCE_STANDALONE_APPLICATION=1
+    -DJUCE_USE_CURL=0
+    -DNDEBUG'''.split()
+    
 jrc = executable ('jrc', jrc_sources,
     install : false,
     win_subsystem : 'console',
     gnu_symbol_visibility : 'hidden',
     dependencies : jrc_deps,
     include_directories : [ '.', '../JUCE/modules' ],
-    cpp_args : '''
-        -DJUCE_DISPLAY_SPLASH_SCREEN=0
-        -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
-        -DJUCE_MODULE_AVAILABLE_juce_core=1
-        -DJUCE_STANDALONE_APPLICATION=1
-        -DJUCE_USE_CURL=0
-        -DNDEBUG'''.split(),
+    cpp_args : jrc_cpp_args,
+    objcpp_args : jrc_cpp_args,
     link_args : [],
     link_with : [])
