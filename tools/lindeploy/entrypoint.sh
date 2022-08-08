@@ -14,7 +14,7 @@ export BOOST_ROOT="/depends/x86_64-pc-linux-gnu/include"
 nativefiles="--native-file=tools/machine/linux.ini"
 builddir="build-docker"
 
-rm -rf build-docker
-meson setup -Dbuildtype=release $nativefiles $builddir
+# rm -rf build-docker
+# meson setup -Dbuildtype=release $nativefiles $builddir
 meson compile -C $builddir
-sh tools/lindeploy/appimage.sh "$builddir"
+# sh tools/lindeploy/appimage.sh "$builddir"

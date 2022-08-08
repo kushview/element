@@ -23,9 +23,6 @@ endif
 scripts_gen = generator (jrc,
     output : [ '@BASENAME@.cpp', '@BASENAME@.h'],
     arguments : [ '@INPUT@', '@BUILD_DIR@', 'scripts' ])
-scripts_includes = include_directories ('.')
+scripts_includes = include_directories ('.', '../scripts')
 scripts_sources = scripts_gen.process (
     'ampui.lua', 'amp.lua', 'console.lua')
-libelement_scripts = static_library ('element_scripts', 
-    scripts_sources, include_directories : scripts_includes,
-    install : false)

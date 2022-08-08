@@ -4,6 +4,3 @@
 [submodule "libs/JUCE"]
 	path = libs/JUCE
 	url = https://github.com/kushview/JUCE
-[submodule "libs/waf"]
-	path = libs/waf
-	url = https://gitlab.com/kushview/waf.git

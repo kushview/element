@@ -231,8 +231,8 @@ libelement_sources += luael_gen.process (
 )
 
 libelement_includes += scripts_includes
-# libelement_sources += scripts_sources
-libelement_cpp_args = host_cpp_args
+libelement_sources  += scripts_sources
+libelement_cpp_args  = host_cpp_args
 
 libelement = static_library ('element', 
     libelement_sources, 
@@ -242,8 +242,7 @@ libelement = static_library ('element',
     cpp_args : libelement_cpp_args,
     install : false,
     objects : [ libelement_lua.extract_all_objects (recursive : false),
-                libelement_juce.extract_all_objects (recursive : false),
-                libelement_scripts.extract_all_objects (recursive : false) ])
+                libelement_juce.extract_all_objects (recursive : false) ])
 
 if meson.is_subproject()
     element_dep = declare_dependency (

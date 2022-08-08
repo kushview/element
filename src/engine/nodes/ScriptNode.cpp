@@ -17,6 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "amp.h"
+#include "ampui.h"
+
 #include <math.h>
 #include "sol/sol.hpp"
 #include "element/element.h"
@@ -43,10 +46,6 @@ require ('el.midi')
 require ('el.audio')
 require ('el.MidiPipe')
 )";
-
-#include "liblibelement_scripts.a.p/amp.h"
-#include "liblibelement_scripts.a.p/ampui.h"
-
 
 namespace Element {
 
