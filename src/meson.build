@@ -197,7 +197,8 @@ libelement_includes =  [
         '../libs/sol',
         '../include',
         '../scripts',
-        'el'       
+        'el',
+        '.'
     ),
     lua_includes, 
     juce_includes, 
