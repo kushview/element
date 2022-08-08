@@ -83,6 +83,7 @@ static int addFile (const File& file,
     return (int) mb.getSize();
 }
 
+#if 0
 static bool isHiddenFile (const File& f, const File& root)
 {
     return f.getFileName().endsWithIgnoreCase (".scc")
@@ -91,6 +92,7 @@ static bool isHiddenFile (const File& f, const File& root)
          || (f.getSize() == 0 && ! f.isDirectory())
          || (f.getParentDirectory() != root && isHiddenFile (f.getParentDirectory(), root));
 }
+#endif
 
 //==============================================================================
 int main (int argc, char* argv[])
