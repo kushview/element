@@ -1,7 +1,8 @@
-# Building Element with Meson
-A simple guide on building Element with meson.
+# Building Element
+A simple guide on building Element with meson.  Pease see [mesonbuild.com](https://mesonbuild.com/Getting-meson.html) for how to install meson on your platform.
 
 __Sub Modules__
+
 This project uses submodules. Be sure to do this on a fresh clone, or when pulling changes.
 ```
 git submodule update --init
@@ -36,6 +37,7 @@ sudo pacman -S git lilv suil lv2 ladspa boost ttf-mswin10
 
 ## Mac OSX
 __Dependencies__
+
 Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
 ```
 brew install boost
@@ -52,6 +54,7 @@ meson install --destdir="." -C builddir
 The command above will produce a universal binary as `builddir/tmp/Element.app`
 
 ## Windows (MSVC)
+
 ```
 meson setup --native-file="tools/machine/msvc.ini" builddir
 meson compile -C builddir
