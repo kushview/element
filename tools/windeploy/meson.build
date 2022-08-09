@@ -3,10 +3,10 @@ uninstall_exe = 'uninstall.exe'
 # this ensures windows style slashes are used for NSIS
 uninstaller_to_write = meson.global_build_root() + '\@0@'.format (uninstall_exe)
 
-installer_outfile = get_option ('nsis-outfile')
-if not fs.is_absolute (installer_outfile)
-    installer_outfile  = meson.global_build_root() + '\@0@'.format (installer_outfile)
-endif
+installer_outfile = run_command (
+    '../version.py', '--revision', '--before=element-w64-', '--after=.exe',
+    '--cwd=@0@'.format (meson.global_source_root()), capture : true, check : true).stdout().strip()
+installer_outfile = meson.global_build_root() + '\@0@'.format (installer_outfile)
 
 configure_file (
     input: 'setup.nsi.in',
