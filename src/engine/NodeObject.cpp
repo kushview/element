@@ -832,7 +832,7 @@ void NodeObject::triggerPortReset()
 //=========================================================================
 int NodeObject::getLatencySamples() const
 {
-    return latencySamples + delayCompSamples + roundFloatToInt (osLatency);
+    return latencySamples + delayCompSamples + roundToInt (osLatency);
 }
 
 void NodeObject::setLatencySamples (int latency)
