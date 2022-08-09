@@ -70,9 +70,15 @@ vstfxstore_h_found = cpp.check_header ('pluginterfaces/vst2.x/vstfxstore.h',
     include_directories : vst2_includes, required : false)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_VST', aeffect_h_found and aeffectx_h_found)
 
-vst3_includes = include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
+if get_option('vst3sdk') == 'auto'
+    vst3_includes = include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
+else
+    vst3_includes = include_directories (get_option ('vst3sdk'))
+endif
+
 juce_conf_data.set10 ('JUCE_VST3_CAN_REPLACE_VST2', vstfxstore_h_found)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', true)
+
 lv2_includes = include_directories (
     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK',
     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2',
@@ -131,3 +137,41 @@ libelement_juce = static_library ('element_juce',
     gnu_symbol_visibility : 'hidden',
     dependencies : deps,
     install : false)
+
+jrc_sources = ['jrc.cpp']
+if host_machine.system() == 'darwin'
+    jrc_sources += '../JUCE/modules/juce_core/juce_core.mm'
+else
+    jrc_sources += '../JUCE/modules/juce_core/juce_core.cpp'
+endif
+
+jrc_deps = []
+
+if host_machine.system() == 'linux'
+    jrc_deps += [
+        cpp.find_library ('dl', required : true),
+        cpp.find_library ('pthread', required : true)
+    ]
+elif host_machine.system() == 'darwin'
+    jrc_deps += dependency ('appleframeworks', modules :
+        'Cocoa Foundation IOKit'.split())
+endif
+
+jrc_cpp_args = '''
+    -DJUCE_DISPLAY_SPLASH_SCREEN=0
+    -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
+    -DJUCE_MODULE_AVAILABLE_juce_core=1
+    -DJUCE_STANDALONE_APPLICATION=1
+    -DJUCE_USE_CURL=0
+    -DNDEBUG'''.split()
+    
+jrc = executable ('jrc', jrc_sources,
+    install : false,
+    win_subsystem : 'console',
+    gnu_symbol_visibility : 'hidden',
+    dependencies : jrc_deps,
+    include_directories : [ '.', '../JUCE/modules' ],
+    cpp_args : jrc_cpp_args,
+    objcpp_args : jrc_cpp_args,
+    link_args : [],
+    link_with : [])

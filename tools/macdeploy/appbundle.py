@@ -157,7 +157,10 @@ class ApplicationBundleInfo(object):
         appName = os.path.basename(path).replace('.app', '')
         self.binaryPath = os.path.join(path, "Contents", "MacOS", appName)
         if not os.path.exists(self.binaryPath):
-            raise RuntimeError("Could not find bundle binary for " + path)
+            appName = appName.replace (' ', '-').lower()
+            self.binaryPath = os.path.join(path, "Contents", "MacOS", appName)
+            if not os.path.exists(self.binaryPath):
+                raise RuntimeError("Could not find bundle binary for " + path)
         self.resourcesPath = os.path.join(path, "Contents", "Resources")
         self.pluginPath = os.path.join(path, "Contents", "PlugIns")
 

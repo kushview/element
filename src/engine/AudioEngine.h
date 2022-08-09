@@ -102,7 +102,7 @@ public:
 
 private:
     class Private;
-    ScopedPointer<Private> priv;
+    std::unique_ptr<Private> priv;
     Globals& world;
     RunMode runMode;
 };

@@ -22,17 +22,6 @@
 
 namespace Element {
 
-namespace GenericEditorHelpers {
-
-    static AudioProcessor* getAudioProcessor (const Node& node)
-    {
-        if (auto* obj = node.getObject())
-            return obj->getAudioProcessor();
-        return nullptr;
-    }
-
-} // namespace GenericEditorHelpers
-
 class BooleanParameterComponent final : public Component,
                                         private ParameterListener
 {
@@ -458,7 +447,6 @@ struct GenericNodeEditor::Pimpl
 GenericNodeEditor::GenericNodeEditor (const Node& node)
     : NodeEditorComponent (node), pimpl (new Pimpl (*this))
 {
-    jassert (nullptr != GenericEditorHelpers::getAudioProcessor (node)); // only nodes with real parameters are supported
     setSize (pimpl->view.getViewedComponent()->getWidth() + pimpl->view.getVerticalScrollBar().getWidth(),
              jmin (pimpl->view.getViewedComponent()->getHeight(), 400));
 }

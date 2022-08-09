@@ -17,6 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "amp.h"
+#include "ampui.h"
+
 #include <math.h>
 #include "sol/sol.hpp"
 #include "element/element.h"
@@ -53,10 +56,10 @@ ScriptNode::ScriptNode() noexcept
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
     dspCode.replaceAllContent (String::fromUTF8 (
-        BinaryData::amp_lua, BinaryData::amp_luaSize));
+        scripts::amp_lua, scripts::amp_luaSize));
     loadScript (dspCode.getAllContent());
     edCode.replaceAllContent (String::fromUTF8 (
-        BinaryData::ampui_lua, BinaryData::ampui_luaSize));
+        scripts::ampui_lua, scripts::ampui_luaSize));
     refreshPorts();
 }
 

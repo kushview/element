@@ -761,13 +761,13 @@ private:
 AudioEngine::AudioEngine (Globals& g, RunMode m)
     : world (g), runMode (m)
 {
-    priv = new Private (*this);
+    priv = std::make_unique<Private> (*this);
 }
 
 AudioEngine::~AudioEngine() noexcept
 {
     deactivate();
-    priv = nullptr;
+    priv.reset();
 }
 
 void AudioEngine::activate()

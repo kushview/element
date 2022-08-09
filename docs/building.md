@@ -1,5 +1,5 @@
-# Building Element with Waf
-The instructions below are for *nix based system such as Ubuntu. Usage of `sudo` is optional depending on your system. There are also [projucer projects](building-projucer.md), if you prefer.
+# Building Element with Meson
+A simple guide on building Element with meson.
 
 __Sub Modules__
 This project uses submodules. Be sure to do this on a fresh clone, or when pulling changes.
@@ -7,44 +7,28 @@ This project uses submodules. Be sure to do this on a fresh clone, or when pulli
 git submodule update --init
 ```
 
+## Debian/Ubuntu
 __Dependencies__
 
 The following packages are needed...
 ```
-sudo apt-get install python git build-essential pkg-config libboost-dev libfreetype6-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev libxinerama-dev libxcursor-dev libasound2-dev lv2-dev liblilv-dev libsuil-dev ladspa-sdk libcurl4-openssl-dev fonts-roboto
-```
-
-__Optional__
-
-Waf will use clang by default if installed
-```
-sudo apt-get install clang
+sudo apt-get install python git build-essential pkg-config libboost-dev libfreetype6-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev libxinerama-dev libxcursor-dev libasound2-dev lv2-dev liblilv-dev libsuil-dev ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
 ```
 
 __Compiling__
 ```
-./waf configure
-./waf build
-```
-
-__Testing__
-```
-./waf check
-```
-
-__Running__
-```
-LD_LIBRARY_PATH="`pwd`/build/lib" build/bin/element
+meson setup builddir
+meson compile -C builddir
 ```
 
 __Installing__
 ```
-sudo ./waf install
+sudo meson install -C builddir
 sudo ldconfig
 ```
 
 ## Arch Linux
-Install these packages, then run the `waf` commands described above.
+Install these packages, then run the `meson` commands described above.
 
 ```
 sudo pacman -S git lilv suil lv2 ladspa boost ttf-mswin10
@@ -56,36 +40,25 @@ Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
 ```
 brew install boost
 ```
-If you want LV2 support on OSX, you'll also need....
-```
-brew install pkg-config lilv suil
-```
 
 __Build__
 ```
-./waf configure
-./waf build
-```
-This produces `build/Applications/Element.app`. 
-```
-# To run it...
-open build/Applications/Element.app
+BOOST_ROOT="/usr/local/include" meson setup --native-file="tools/machine/osx.ini" builddir
+meson compile -C builddir
+# install is needed to assemble the app bundle.
+meson install --destdir="." -C builddir
 ```
 
-__Apple Silicon__
+The command above will produce a universal binary as `builddir/tmp/Element.app`
 
-Replace the `./waf configure` command above with this:
+## Windows (MSVC)
 ```
-./waf configure CPPFLAGS="-I/opt/homebrew/include"
-```
-
-__Test__
-```
-./waf check
+meson setup --native-file="tools/machine/msvc.ini" builddir
+meson compile -C builddir
 ```
 
-__Install__
-```
-./waf install
-```
-Install the app to `/Applications` or another prefix of your choice. see `./waf --help`
+After this, you should have `builddir/element.exe`.  If it complains about missing boost
+and vstsdk paths, copy the `msvc.ini`, edit the paths, then use it in `meson setup`. 
+
+If you don't have the vstsdk2.4, it can be removed from the .ini file, but there won't be
+support for VST2

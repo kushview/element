@@ -1,1 +1,4 @@
+option ('nsis-outfile', type : 'string', value : 'element-setup.exe', description : 'Path to NSIS installer output exe')
+option ('asiosdk', type : 'string', value : 'auto', description : 'Path to ASIO SDK')
 option ('vst2sdk', type : 'string', value : 'auto', description : 'Path to VST2 SDK v2.4')
+option ('vst3sdk', type : 'string', value : 'auto', description : 'Path to VST3 SDK')
