@@ -59,22 +59,7 @@ public:
 
         updateSettingsIfNeeded();
 
-        DeviceManager& devices (world.getDeviceManager());
-        auto* props = settings.getUserSettings();
-        if (auto dxml = props->getXmlValue ("devices"))
-        {
-            devices.initialise (DeviceManager::maxAudioChannels,
-                                DeviceManager::maxAudioChannels,
-                                dxml.get(),
-                                true,
-                                "default",
-                                nullptr);
-        }
-        else
-        {
-            devices.initialiseWithDefaultDevices (DeviceManager::maxAudioChannels,
-                                                  DeviceManager::maxAudioChannels);
-        }
+        
 
         if (usingThread)
         {
@@ -139,16 +124,10 @@ private:
 
     void run() override
     {
-        Settings& settings (world.getSettings());
-        AudioEnginePtr engine = new AudioEngine (world);
-        engine->applySettings (settings);
-        world.setEngine (engine); // this will also instantiate the session
-        controller = new AppController (world);
-
         setupLogging();
-        setupPlugins();
         setupKeyMappings();
         setupAudioEngine();
+        setupPlugins();
         setupMidiEngine();
         setupScripting();
 
@@ -157,6 +136,33 @@ private:
 
     void setupAudioEngine()
     {
+        auto& settings = world.getSettings();
+        DeviceManager& devices (world.getDeviceManager());
+        String tp = devices.getCurrentAudioDeviceType();
+
+        AudioEnginePtr engine = new AudioEngine (world);
+        engine->applySettings (settings);
+        world.setEngine (engine); // this will also instantiate the session
+        controller = std::make_unique<AppController> (world);
+
+        auto* props = settings.getUserSettings();
+        
+        if (auto dxml = props->getXmlValue ("devices"))
+        {
+            devices.initialise (DeviceManager::maxAudioChannels,
+                                DeviceManager::maxAudioChannels,
+                                dxml.get(),
+                                true,
+                                "default",
+                                nullptr);
+            auto setup = devices.getAudioDeviceSetup();
+            devices.setAudioDeviceSetup (setup, true);
+        }
+        else
+        {
+            devices.initialiseWithDefaultDevices (DeviceManager::maxAudioChannels,
+                                                  DeviceManager::maxAudioChannels);
+        }
     }
 
     void setupMidiEngine()
