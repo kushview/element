@@ -51,7 +51,27 @@ juce_conf_data.set10 ('JUCE_STANDALONE_APPLICATION', true)
 juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
 juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
 juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
+
+asio_includes = []
 juce_conf_data.set10 ('JUCE_ASIO', false)
+if host_machine.system() == 'windows'
+    base = get_option ('asiosdk')
+    if base == 'auto'
+        # noop
+    else
+        base += '/@0@'
+        foreach d : 'common host host\\pc'.split()
+            asio_includes += include_directories (base.format (d))
+        endforeach
+        foreach h : 'asiosys.h'.split()
+            cpp.check_header (h,
+                include_directories : asio_includes,
+                required : true
+            )
+        endforeach
+    endif
+    juce_conf_data.set10 ('JUCE_ASIO', true)
+endif
 
 juce_conf_data.set10 ('KV_DOCKING_WINDOWS', true)
 
@@ -133,7 +153,7 @@ configure_file (output : 'juce_config.h',
 
 libelement_juce = static_library ('element_juce', 
     juce_sources,
-    include_directories : [ juce_includes, vst3_includes, vst2_includes, lv2_includes ],
+    include_directories : [ juce_includes, asio_includes, vst3_includes, vst2_includes, lv2_includes ],
     gnu_symbol_visibility : 'hidden',
     dependencies : deps,
     install : false)
