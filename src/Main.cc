@@ -90,7 +90,7 @@ public:
         }
     }
 
-    ScopedPointer<AppController> controller;
+    std::unique_ptr<AppController> controller;
 
     const bool isUsingThread() const { return usingThread; }
 
@@ -368,12 +368,12 @@ public:
 #endif
     }
 
+    void suspended() override {}
+
     void resumed() override
     {
-#if JUCE_WINDOWS
         auto& devices (world->getDeviceManager());
         devices.restartLastAudioDevice();
-#endif
     }
 
     void finishLaunching()
