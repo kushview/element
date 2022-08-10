@@ -139,13 +139,11 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/build/include/*",
-                "${workspaceFolder}/libs/element/src/*",
-                "${workspaceFolder}/libs/element/include/*",
                 "${workspaceFolder}/libs/lua/*",
                 "${workspaceFolder}/libs/JUCE/modules/*",
                 "${workspaceFolder}/libs/kv/modules/*",
                 "${workspaceFolder}/libs/compat/*",
+                "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
                 "${workspaceFolder}/test/*"
             ],
@@ -159,7 +157,8 @@
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64"
+            "intelliSenseMode": "windows-msvc-x64",
+            "compileCommands": "build-native/compile_commands.json"
         }
     ]
 }
