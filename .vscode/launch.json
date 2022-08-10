@@ -14,7 +14,7 @@
                 { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },
                 { "name": "ELEMENT_SCRIPTS_PATH", "value": "${workspaceRoot}/scripts/?.lua" }
             ],
-            "console": "externalTerminal"
+            "console": "internalConsole"
         },
         {
             "name": "Element",
