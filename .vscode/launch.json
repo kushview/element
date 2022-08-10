@@ -22,7 +22,7 @@
             "request": "launch",
             "args": [],
             "program": "${workspaceRoot}/build-native/element",
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}/build-native",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
                 { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },
@@ -60,96 +60,6 @@
                     "moduleLoad": false,
                     "exceptions": false,
                 }
-            }
-        },
-        {
-            "name": "JUCE Unit Tests",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/build/bin/test_juce",
-            "args": [],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Waf Build",
-            "linux": {
-                "MIMode": "gdb",
-                "logging": {
-                    "engineLogging": false,
-                    "exceptions": false,
-                    "moduleLoad": false,
-                    "programOutput": true,
-                    "trace": false,
-                    "traceResponse": false
-                },
-                "environment": [ { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" } ],
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ]
-            },
-            "osx": {
-                "MIMode": "lldb",
-                "logging": {
-                    "moduleLoad": false,
-                    "exceptions": false,
-                }
-            },
-            "windows": {
-                "MIMode": "gdb",
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ]
-            }
-        },
-        {
-            "name": "Lua Console",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/build/bin/lua-el",
-            "args": [],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Waf Build",
-            "linux": {
-                "MIMode": "gdb",
-                "logging": {
-                    "engineLogging": false,
-                    "exceptions": false,
-                    "moduleLoad": false,
-                    "programOutput": true,
-                    "trace": false,
-                    "traceResponse": false
-                },
-                "environment": [ { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" } ],
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ]
-            },
-            "osx": {
-                "MIMode": "lldb",
-                "logging": {
-                    "moduleLoad": false,
-                    "exceptions": false,
-                }
-            },
-            "windows": {
-                "MIMode": "gdb",
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ]
             }
         }
     ]
