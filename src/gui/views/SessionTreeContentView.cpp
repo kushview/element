@@ -19,7 +19,7 @@
 
 #include "gui/views/SessionTreeContentView.h"
 #include "gui/SessionTreePanel.h"
-#include "Common.h"
+#include "common.hpp"
 
 namespace Element {
 

@@ -30,8 +30,8 @@ libelement_sources = '''
     el/Slider.cpp
     el/TextButton.cpp
     el/Widget.cpp
-    CapsLock.cpp
-    Commands.cpp
+    capslock.cpp
+    commands.cpp
     controllers/AppController.cpp
     controllers/Controller.cpp
     controllers/DevicesController.cpp
@@ -188,7 +188,7 @@ libelement_sources = '''
     session/SessionTrack.cpp
     Settings.cpp
     Utils.cpp
-    Version.cpp
+    version.cpp
     ../libs/compat/BinaryData.cpp
 '''.split()
 

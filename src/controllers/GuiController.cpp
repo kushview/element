@@ -31,8 +31,8 @@
 #include "gui/SystemTray.h"
 #include "gui/views/VirtualKeyboardView.h"
 
-#include "CapsLock.h"
-#include "Version.h"
+#include "capslock.hpp"
+#include "version.hpp"
 
 namespace Element {
 

@@ -36,7 +36,7 @@
 #include "session/Node.h"
 #include "session/PluginManager.h"
 
-#include "Commands.h"
+#include "commands.hpp"
 #include "Globals.h"
 #include "Settings.h"
 

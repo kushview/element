@@ -22,7 +22,7 @@
 #include "engine/nodes/NodeTypes.h"
 #include "engine/NodeFactory.h"
 #include "engine//IONode.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "Settings.h"
 #include "Utils.h"
 

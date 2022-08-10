@@ -4,7 +4,7 @@
 
 #include "lua-kv.hpp"
 #include "session/CommandManager.h"
-#include "Commands.h"
+#include "commands.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_CommandManager (lua_State* L)
 {

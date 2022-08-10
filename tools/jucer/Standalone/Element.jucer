@@ -830,17 +830,17 @@
         <FILE id="DSsBdG" name="TrackModel.h" compile="0" resource="0" file="../../../src/session/TrackModel.h"/>
       </GROUP>
       <FILE id="SOf344" name="CapsLock.cpp" compile="1" resource="0" file="../../../src/CapsLock.cpp"/>
-      <FILE id="Q1ODJO" name="CapsLock.h" compile="0" resource="0" file="../../../src/CapsLock.h"/>
+      <FILE id="Q1ODJO" name="capslock.hpp" compile="0" resource="0" file="../../../src/CapsLock.h"/>
       <FILE id="BXJFw1" name="Commands.cpp" compile="1" resource="0" file="../../../src/Commands.cpp"/>
-      <FILE id="MMDDhc" name="Commands.h" compile="0" resource="0" file="../../../src/Commands.h"/>
-      <FILE id="wrcoQ3" name="Common.h" compile="0" resource="0" file="../../../src/Common.h"/>
+      <FILE id="MMDDhc" name="commands.hpp" compile="0" resource="0" file="../../../src/Commands.h"/>
+      <FILE id="wrcoQ3" name="common.hpp" compile="0" resource="0" file="../../../src/Common.h"/>
       <FILE id="otqhqE" name="DataPath.cpp" compile="1" resource="0" file="../../../src/DataPath.cpp"/>
-      <FILE id="DNVlC4" name="DataPath.h" compile="0" resource="0" file="../../../src/DataPath.h"/>
+      <FILE id="DNVlC4" name="datapath.hpp" compile="0" resource="0" file="../../../src/datapath.hpp"/>
       <FILE id="ypfYUI" name="ElementApp.h" compile="0" resource="0" file="../../../src/ElementApp.h"/>
       <FILE id="sNmxOZ" name="Globals.cpp" compile="1" resource="0" file="../../../src/Globals.cpp"/>
       <FILE id="V697UP" name="Globals.h" compile="0" resource="0" file="../../../src/Globals.h"/>
       <FILE id="IxMkrG" name="Logs.h" compile="0" resource="0" file="../../../src/Logs.h"/>
-      <FILE id="eA07L5" name="Main.cc" compile="1" resource="0" file="../../../src/Main.cc"/>
+      <FILE id="eA07L5" name="main.cpp" compile="1" resource="0" file="../../../src/main.cpp"/>
       <FILE id="Oy98hp" name="Messages.cpp" compile="1" resource="0" file="../../../src/Messages.cpp"/>
       <FILE id="xzl7SH" name="Messages.h" compile="0" resource="0" file="../../../src/Messages.h"/>
       <FILE id="RGybdc" name="Module.h" compile="0" resource="0" file="../../../src/Module.h"/>
@@ -856,8 +856,8 @@
       <FILE id="uqEpyt" name="URLs.h" compile="0" resource="0" file="../../../src/URLs.h"/>
       <FILE id="rnSkMW" name="Utils.cpp" compile="1" resource="0" file="../../../src/Utils.cpp"/>
       <FILE id="FAtALo" name="Utils.h" compile="0" resource="0" file="../../../src/Utils.h"/>
-      <FILE id="TF4RAH" name="Version.cpp" compile="1" resource="0" file="../../../src/Version.cpp"/>
-      <FILE id="RK9Dtn" name="Version.h" compile="0" resource="0" file="../../../src/Version.h"/>
+      <FILE id="TF4RAH" name="version.cpp" compile="1" resource="0" file="../../../src/version.cpp"/>
+      <FILE id="RK9Dtn" name="version.hpp" compile="0" resource="0" file="../../../src/version.hpp"/>
     </GROUP>
     <GROUP id="{4C0CA2D9-7E14-3C17-C3F1-4FF581D4DAE9}" name="Templates">
       <FILE id="qrZXVE" name="ElementTemplate.cpp" compile="0" resource="0"

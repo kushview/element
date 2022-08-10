@@ -23,7 +23,7 @@
 #include "controllers/GuiController.h"
 #include "gui/LookAndFeel.h"
 #include "session/CommandManager.h"
-#include "Commands.h"
+#include "commands.hpp"
 #include "Globals.h"
 #include "Utils.h"
 

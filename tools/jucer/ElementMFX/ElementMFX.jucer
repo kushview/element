@@ -702,13 +702,13 @@
         <FILE id="rqJzl2" name="TrackModel.h" compile="0" resource="0" file="../../../src/session/TrackModel.h"/>
       </GROUP>
       <FILE id="W4LGIC" name="CapsLock.cpp" compile="1" resource="0" file="../../../src/CapsLock.cpp"/>
-      <FILE id="os5KoB" name="CapsLock.h" compile="0" resource="0" file="../../../src/CapsLock.h"/>
+      <FILE id="os5KoB" name="capslock.hpp" compile="0" resource="0" file="../../../src/CapsLock.h"/>
       <FILE id="n68QmO" name="Commands.cpp" compile="1" resource="0" file="../../../src/Commands.cpp"/>
-      <FILE id="UbfeU1" name="Commands.h" compile="0" resource="0" file="../../../src/Commands.h"/>
-      <FILE id="sPkKfY" name="Common.h" compile="0" resource="0" file="../../../src/Common.h"/>
+      <FILE id="UbfeU1" name="commands.hpp" compile="0" resource="0" file="../../../src/Commands.h"/>
+      <FILE id="sPkKfY" name="common.hpp" compile="0" resource="0" file="../../../src/Common.h"/>
       <FILE id="PwabOV" name="CommonConfig.h" compile="0" resource="0" file="../../../src/CommonConfig.h"/>
       <FILE id="Ut9nsD" name="DataPath.cpp" compile="1" resource="0" file="../../../src/DataPath.cpp"/>
-      <FILE id="vHCFkS" name="DataPath.h" compile="0" resource="0" file="../../../src/DataPath.h"/>
+      <FILE id="vHCFkS" name="datapath.hpp" compile="0" resource="0" file="../../../src/datapath.hpp"/>
       <FILE id="e0dA6G" name="ElementApp.h" compile="0" resource="0" file="../../../src/ElementApp.h"/>
       <FILE id="XZq6Kg" name="Globals.cpp" compile="1" resource="0" file="../../../src/Globals.cpp"/>
       <FILE id="TZjOt6" name="Globals.h" compile="0" resource="0" file="../../../src/Globals.h"/>
@@ -727,8 +727,8 @@
       <FILE id="kBCMt8" name="URLs.h" compile="0" resource="0" file="../../../src/URLs.h"/>
       <FILE id="kiLqzH" name="Utils.cpp" compile="1" resource="0" file="../../../src/Utils.cpp"/>
       <FILE id="hHIdfm" name="Utils.h" compile="0" resource="0" file="../../../src/Utils.h"/>
-      <FILE id="AeuwkG" name="Version.cpp" compile="1" resource="0" file="../../../src/Version.cpp"/>
-      <FILE id="Cf9r7Q" name="Version.h" compile="0" resource="0" file="../../../src/Version.h"/>
+      <FILE id="AeuwkG" name="version.cpp" compile="1" resource="0" file="../../../src/version.cpp"/>
+      <FILE id="Cf9r7Q" name="version.hpp" compile="0" resource="0" file="../../../src/version.hpp"/>
     </GROUP>
     <FILE id="lsuqJS" name="ElementMFX.cpp" compile="1" resource="0" file="Source/ElementMFX.cpp"/>
   </MAINGROUP>

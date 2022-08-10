@@ -21,7 +21,7 @@
 #include "scripting/LuaBindings.h"
 #include "scripting/ScriptDescription.h"
 #include "scripting/ScriptManager.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "sol/sol.hpp"
 
 namespace Element {

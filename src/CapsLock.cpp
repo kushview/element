@@ -24,7 +24,7 @@
  #warning "Caps lock detection not yet implemented on Linux"
 #endif
 
-#include "CapsLock.h"
+#include "capslock.hpp"
 
 namespace Element {
 

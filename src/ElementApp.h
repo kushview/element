@@ -19,7 +19,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "Signals.h"
 
 #include <element/element.hpp>

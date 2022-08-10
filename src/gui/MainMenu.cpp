@@ -32,7 +32,7 @@
 #include "session/Session.h"
 #include "session/CommandManager.h"
 #include "session/Node.h"
-#include "Commands.h"
+#include "commands.hpp"
 #include "Globals.h"
 #include "Settings.h"
 #include "Utils.h"

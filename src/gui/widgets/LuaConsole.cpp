@@ -21,7 +21,7 @@
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
 #include "scripting/LuaBindings.h"
-#include "Commands.h"
+#include "commands.hpp"
 
 #include "sol/sol.hpp"
 

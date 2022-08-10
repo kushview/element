@@ -31,7 +31,7 @@
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Session.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "Globals.h"
 #include "Settings.h"
 #include "sol/sol.hpp"

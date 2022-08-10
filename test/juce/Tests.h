@@ -40,7 +40,7 @@
 #include "session/Session.h"
 #include "Globals.h"
 #include "Settings.h"
-#include "Common.h"
+#include "common.hpp"
 
 namespace Element  {
 

@@ -28,7 +28,7 @@
 #include "gui/widgets/SessionGraphsListBox.h"
 #include "session/Session.h"
 #include "session/Node.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "Globals.h"
 
 namespace Element {

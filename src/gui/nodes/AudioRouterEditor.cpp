@@ -21,7 +21,7 @@
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/LookAndFeel.h"
 #include "gui/Artist.h"
-#include "Common.h"
+#include "common.hpp"
 
 namespace Element {
 

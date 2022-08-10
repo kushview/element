@@ -33,11 +33,11 @@
 #include "gui/GuiCommon.h"
 
 #include "session/Presets.h"
-#include "Commands.h"
+#include "commands.hpp"
 #include "Globals.h"
 #include "Messages.h"
 #include "Settings.h"
-#include "Version.h"
+#include "version.hpp"
 
 namespace Element {
 

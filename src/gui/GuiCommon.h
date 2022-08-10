@@ -29,7 +29,7 @@
 #include "session/Session.h"
 #include "session/Node.h"
 
-#include "Commands.h"
+#include "commands.hpp"
 #include "Messages.h"
 #include "Globals.h"
 #include "Settings.h"

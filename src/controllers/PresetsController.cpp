@@ -23,7 +23,7 @@
 #include "session/Session.h"
 #include "session/Presets.h"
 #include "Globals.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 
 namespace Element {
 

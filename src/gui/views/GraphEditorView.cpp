@@ -20,7 +20,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/BlockComponent.h"
 #include "gui/views/GraphEditorView.h"
-#include "Common.h"
+#include "common.hpp"
 #include "ScopedCallback.h"
 
 namespace Element {

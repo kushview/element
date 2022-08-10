@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Version.h"
+#include "version.hpp"
 
 #ifndef TEST_CURRENT_VERSION
 #define TEST_CURRENT_VERSION 0

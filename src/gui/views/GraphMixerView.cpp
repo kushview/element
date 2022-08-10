@@ -25,7 +25,7 @@
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
 
-#include "Common.h"
+#include "common.hpp"
 
 namespace Element {
 

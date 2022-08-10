@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "session/Node.h"
 
 namespace Element {

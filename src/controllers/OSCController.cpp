@@ -20,7 +20,7 @@
 #include "controllers/OSCController.h"
 #include "session/CommandManager.h"
 #include "session/DeviceManager.h"
-#include "Commands.h"
+#include "commands.hpp"
 #include "Globals.h"
 #include "Settings.h"
 

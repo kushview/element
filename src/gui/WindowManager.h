@@ -24,7 +24,7 @@
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include "session/Node.h"
-#include "Commands.h"
+#include "commands.hpp"
 
 namespace Element {
 

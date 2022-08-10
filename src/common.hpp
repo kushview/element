@@ -37,9 +37,9 @@
 #include "session/Node.h"
 #include "session/Session.h"
 
-#include "Commands.h"
+#include "commands.hpp"
 #include "Messages.h"
 #include "Globals.h"
 #include "Settings.h"
 #include "Utils.h"
-#include "Version.h"
+#include "version.hpp"

@@ -49,7 +49,7 @@
 #include "session/PluginManager.h"
 #include "session/Node.h"
 
-#include "Commands.h"
+#include "commands.hpp"
 #include "Globals.h"
 #include "Settings.h"
 

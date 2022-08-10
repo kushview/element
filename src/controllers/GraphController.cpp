@@ -26,7 +26,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/SessionImportWizard.h"
 #include "session/Session.h"
-#include "DataPath.h"
+#include "datapath.hpp"
 #include "Globals.h"
 #include "Settings.h"
 

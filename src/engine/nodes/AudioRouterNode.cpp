@@ -19,7 +19,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/AudioRouterNode.h"
-#include "Common.h"
+#include "common.hpp"
 
 #define TRACE_AUDIO_ROUTER(output)
 
