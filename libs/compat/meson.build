@@ -69,8 +69,8 @@ if host_machine.system() == 'windows'
                 required : true
             )
         endforeach
+        juce_conf_data.set10 ('JUCE_ASIO', true)
     endif
-    juce_conf_data.set10 ('JUCE_ASIO', true)
 endif
 
 juce_conf_data.set10 ('KV_DOCKING_WINDOWS', true)
