@@ -143,6 +143,7 @@
                 "${workspaceFolder}/libs/JUCE/modules/*",
                 "${workspaceFolder}/libs/kv/modules/*",
                 "${workspaceFolder}/libs/compat/*",
+                "${workspaceFolder}/libs/lua/src/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
                 "${workspaceFolder}/test/*"
