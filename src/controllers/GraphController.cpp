@@ -150,7 +150,10 @@ void GraphController::saveGraph (const bool saveAs)
 
     if (saveAs)
     {
-        result = document.saveAs (File(), true, true, true);
+        result = document.saveAsInteractive (true);
+        if (result == FileBasedDocument::savedOk)
+            document.getGraph().setProperty (Tags::name, 
+                document.getFile().getFileNameWithoutExtension());
     }
     else
     {
