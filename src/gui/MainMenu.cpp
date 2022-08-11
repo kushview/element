@@ -33,10 +33,10 @@
 #include "session/CommandManager.h"
 #include "session/Node.h"
 #include "commands.hpp"
-#include "Globals.h"
-#include "Settings.h"
-#include "Utils.h"
-#include "URLs.h"
+#include "globals.hpp"
+#include "settings.hpp"
+#include "utils.hpp"
+#include "urls.hpp"
 
 #include "gui/MainMenu.h"
 

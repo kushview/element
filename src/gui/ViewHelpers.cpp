@@ -28,8 +28,8 @@
 #include "gui/ViewHelpers.h"
 #include "session/Node.h"
 #include "session/CommandManager.h"
-#include "Globals.h"
-#include "Messages.h"
+#include "globals.hpp"
+#include "messages.hpp"
 
 #include "plugins/PluginEditor.h"
 

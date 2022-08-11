@@ -27,7 +27,7 @@
 #include "session/CommandManager.h"
 #include "session/Node.h"
 #include "session/Session.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

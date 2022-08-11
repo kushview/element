@@ -25,8 +25,8 @@
 #include "engine/MidiTranspose.h"
 #include "engine/Transport.h"
 #include "engine/RootGraph.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 namespace Element {
 

@@ -47,7 +47,7 @@
 
 #include "session/Session.h"
 
-#include "Globals.h"
+#include "globals.hpp"
 
 namespace Element {
 

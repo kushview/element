@@ -26,12 +26,12 @@
 #include "session/PluginManager.h"
 #include "commands.hpp"
 #include "datapath.hpp"
-#include "Globals.h"
-#include "Logs.h"
-#include "Messages.h"
+#include "globals.hpp"
+#include "log.hpp"
+#include "messages.hpp"
 #include "version.hpp"
-#include "Settings.h"
-#include "Utils.h"
+#include "settings.hpp"
+#include "utils.hpp"
 
 namespace Element {
 

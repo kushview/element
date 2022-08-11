@@ -23,8 +23,8 @@
 #include "engine/NodeFactory.h"
 #include "engine//IONode.h"
 #include "datapath.hpp"
-#include "Settings.h"
-#include "Utils.h"
+#include "settings.hpp"
+#include "utils.hpp"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME "DeadAudioPlugins.txt"
 #define EL_PLUGIN_SCANNER_SLAVE_LIST_PATH "Temp/SlavePluginList.xml"

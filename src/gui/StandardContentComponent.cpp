@@ -50,8 +50,8 @@
 #include "session/Node.h"
 
 #include "commands.hpp"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 #include "gui/StandardContentComponent.h"
 

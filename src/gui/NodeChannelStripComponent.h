@@ -23,7 +23,7 @@
 #include "controllers/GuiController.h"
 #include "engine/NodeObject.h"
 #include "gui/ChannelStripComponent.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

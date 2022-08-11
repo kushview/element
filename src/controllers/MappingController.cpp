@@ -22,8 +22,8 @@
 #include "controllers/GuiController.h"
 #include "engine/MappingEngine.h"
 #include "session/ControllerDevice.h"
-#include "Globals.h"
-#include "Signals.h"
+#include "globals.hpp"
+#include "signals.hpp"
 
 namespace Element {
 

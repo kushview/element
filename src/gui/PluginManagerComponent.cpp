@@ -20,9 +20,9 @@
 #include "gui/GuiCommon.h"
 #include "gui/PluginManagerComponent.h"
 #include "session/PluginManager.h"
-#include "Globals.h"
-#include "Settings.h"
-#include "Utils.h"
+#include "globals.hpp"
+#include "settings.hpp"
+#include "utils.hpp"
 
 namespace Element {
 

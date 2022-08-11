@@ -28,8 +28,8 @@
 #include "gui/ContentComponent.h"
 
 #include "session/Node.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 namespace Element {
 

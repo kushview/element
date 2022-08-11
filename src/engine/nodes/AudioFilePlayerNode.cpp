@@ -28,7 +28,7 @@
 #include "gui/views/PluginsPanelView.h"
 #include "gui/NavigationConcertinaPanel.h"
 
-#include "Utils.h"
+#include "utils.hpp"
 
 namespace Element {
 

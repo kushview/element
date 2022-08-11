@@ -24,7 +24,7 @@
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"
-#include "ScopedFlag.h"
+#include "scopedflag.hpp"
 
 namespace Element {
 typedef Array<PropertyComponent*> PropertyArray;

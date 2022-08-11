@@ -9,8 +9,8 @@
 #include "session/CommandManager.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 static int el_Globals_userdata (lua_State* L)
 {

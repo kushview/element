@@ -38,8 +38,8 @@
 #include "session/Session.h"
 
 #include "commands.hpp"
-#include "Messages.h"
-#include "Globals.h"
-#include "Settings.h"
-#include "Utils.h"
+#include "messages.hpp"
+#include "globals.hpp"
+#include "settings.hpp"
+#include "utils.hpp"
 #include "version.hpp"

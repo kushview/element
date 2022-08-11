@@ -22,8 +22,8 @@
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
 #include "session/ControllerDevice.h"
-#include "Messages.h"
-#include "Globals.h"
+#include "messages.hpp"
+#include "globals.hpp"
 
 namespace Element {
 

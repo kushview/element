@@ -44,7 +44,7 @@ libelement_sources = '''
     controllers/PresetsController.cpp
     controllers/ScriptingController.cpp
     controllers/SessionController.cpp
-    DataPath.cpp
+    datapath.cpp
     db/Database.cpp
     documents/GraphDocument.cpp
     documents/SessionDocument.cpp
@@ -81,7 +81,7 @@ libelement_sources = '''
     engine/Parameter.cpp
     engine/RootGraph.cpp
     engine/Transport.cpp
-    Globals.cpp
+    globals.cpp
     gui/AboutComponent.cpp
     gui/AssetTreeView.cpp
     gui/AudioIOPanelView.cpp
@@ -160,7 +160,7 @@ libelement_sources = '''
     gui/workspace/PluginsPanel.cpp
     gui/Workspace.cpp
     gui/WorkspacesContentComponent.cpp
-    Messages.cpp
+    messages.cpp
     plugins/PluginEditor.cpp
     plugins/PluginProcessor.cpp
     scripting/DSPScript.cpp
@@ -186,8 +186,8 @@ libelement_sources = '''
     session/Sequence.cpp
     session/Session.cpp
     session/SessionTrack.cpp
-    Settings.cpp
-    Utils.cpp
+    settings.cpp
+    utils.cpp
     version.cpp
     ../libs/compat/BinaryData.cpp
 '''.split()

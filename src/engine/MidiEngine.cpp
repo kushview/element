@@ -18,7 +18,7 @@
 */
 
 #include "engine/MidiEngine.h"
-#include "Settings.h"
+#include "settings.hpp"
 
 namespace Element {
 

@@ -22,7 +22,7 @@
 #include "gui/ContentComponent.h"
 #include "session/Session.h"
 #include "session/Presets.h"
-#include "Globals.h"
+#include "globals.hpp"
 #include "datapath.hpp"
 
 namespace Element {

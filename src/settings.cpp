@@ -18,8 +18,8 @@
 
 #include "gui/Workspace.h"
 #include "session/DeviceManager.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 namespace Element {
 

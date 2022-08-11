@@ -24,7 +24,7 @@
 #include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/widgets/LogListBox.h"
-#include "Utils.h"
+#include "utils.hpp"
 
 namespace Element {
 

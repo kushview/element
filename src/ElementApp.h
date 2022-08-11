@@ -20,7 +20,7 @@
 
 #include "JuceHeader.h"
 #include "datapath.hpp"
-#include "Signals.h"
+#include "signals.hpp"
 
 #include <element/element.hpp>
 

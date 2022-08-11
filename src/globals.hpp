@@ -23,7 +23,6 @@
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
 #include "session/Session.h"
-#include "URIs.h"
 
 namespace element { class Context; }
 

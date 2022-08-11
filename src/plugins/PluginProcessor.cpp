@@ -26,7 +26,7 @@
 #include "session/PluginManager.h"
 #include "session/Session.h"
 #include "ElementApp.h"
-#include "Settings.h"
+#include "settings.hpp"
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"

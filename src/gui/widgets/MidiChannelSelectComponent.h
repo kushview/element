@@ -21,7 +21,7 @@
 
 #include "gui/Buttons.h"
 #include "gui/LookAndFeel.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

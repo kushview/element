@@ -21,7 +21,7 @@
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
 #include "session/Session.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 namespace Element {
 

@@ -21,7 +21,7 @@
 #include "session/Node.h"
 #include "session/Session.h"
 #include "controllers/GraphManager.h"
-#include "ScopedFlag.h"
+#include "scopedflag.hpp"
 
 namespace Element {
 

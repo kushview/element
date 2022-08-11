@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "engine/NodeObject.h"
 #include "engine/VelocityCurve.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

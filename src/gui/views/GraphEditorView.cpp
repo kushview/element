@@ -21,7 +21,7 @@
 #include "gui/BlockComponent.h"
 #include "gui/views/GraphEditorView.h"
 #include "common.hpp"
-#include "ScopedCallback.h"
+#include "scopedcallback.hpp"
 
 namespace Element {
 

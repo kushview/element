@@ -20,7 +20,7 @@
 #include "controllers/AppController.h"
 #include "engine/NodeObject.h"
 #include "session/ControllerDevice.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

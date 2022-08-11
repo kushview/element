@@ -25,8 +25,8 @@
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/RootGraph.h"
 #include "session/PluginManager.h"
-#include "Globals.h"
-#include "Utils.h"
+#include "globals.hpp"
+#include "utils.hpp"
 
 namespace Element {
 

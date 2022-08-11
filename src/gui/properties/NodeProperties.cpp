@@ -21,7 +21,7 @@
 #include "gui/properties/NodeProperties.h"
 #include "gui/widgets/NodeMidiProgramComponent.h"
 #include "session/Node.h"
-#include "Utils.h"
+#include "utils.hpp"
 
 #ifndef EL_PROGRAM_NAME_PLACEHOLDER
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."

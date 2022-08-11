@@ -29,7 +29,7 @@
 #include "session/Session.h"
 #include "session/Node.h"
 #include "datapath.hpp"
-#include "Globals.h"
+#include "globals.hpp"
 
 namespace Element {
 

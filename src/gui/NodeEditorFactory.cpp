@@ -17,7 +17,7 @@
 
 #include "gui/NodeEditorFactory.h"
 #include "scripting/ScriptingEngine.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 namespace Element {
 

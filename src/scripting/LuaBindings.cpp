@@ -32,8 +32,8 @@
 #include "session/Presets.h"
 #include "session/Session.h"
 #include "datapath.hpp"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 #include "sol/sol.hpp"
 #include "el/lua-kv.hpp"
 

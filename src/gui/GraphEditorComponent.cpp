@@ -41,7 +41,7 @@
 
 #include "gui/GraphEditorComponent.h"
 
-#include "ScopedFlag.h"
+#include "scopedflag.hpp"
 
 namespace Element {
 

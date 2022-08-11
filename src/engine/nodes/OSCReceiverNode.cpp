@@ -19,7 +19,7 @@
 */
 
 #include "engine/nodes/OSCReceiverNode.h"
-#include "Utils.h"
+#include "utils.hpp"
 
 namespace Element {
 

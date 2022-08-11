@@ -21,8 +21,8 @@
 #include "gui/SystemTray.h"
 #include "session/CommandManager.h"
 #include "commands.hpp"
-#include "Globals.h"
-#include "Utils.h"
+#include "globals.hpp"
+#include "utils.hpp"
 
 #define EL_USE_NEW_SYSTRAY_ICON 0
 #define EL_SYSTRAY_MIN_SIZE 22

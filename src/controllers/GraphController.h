@@ -21,7 +21,7 @@
 
 #include "controllers/AppController.h"
 #include "documents/GraphDocument.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

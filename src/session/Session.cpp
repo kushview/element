@@ -21,7 +21,7 @@
 #include "engine/Transport.h"
 #include "session/Node.h"
 #include "MediaManager.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 #include "session/Session.h"
 

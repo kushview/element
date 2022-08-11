@@ -20,7 +20,7 @@
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
-#include "ScopedFlag.h"
+#include "scopedflag.hpp"
 
 namespace Element {
 

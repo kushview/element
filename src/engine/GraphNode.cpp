@@ -25,7 +25,7 @@
 #include "engine/MidiTranspose.h"
 #include "engine/nodes/NodeTypes.h"
 #include "session/Node.h"
-#include "PortCount.h"
+#include "portcount.hpp"
 
 #include "engine/GraphNode.h"
 

@@ -22,7 +22,7 @@
 #include "gui/properties/NodePropertyPanel.h"
 #include "gui/views/GraphDisplayView.h"
 #include "gui/GraphEditorComponent.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

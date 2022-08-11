@@ -24,9 +24,9 @@
 #include "gui/MainWindow.h"
 #include "session/CommandManager.h"
 #include "commands.hpp"
-#include "Globals.h"
-#include "Settings.h"
-#include "Utils.h"
+#include "globals.hpp"
+#include "settings.hpp"
+#include "utils.hpp"
 
 namespace Element {
 

@@ -21,7 +21,7 @@
 #define ELEMENT_WINDOW_H
 
 #include "ElementApp.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 

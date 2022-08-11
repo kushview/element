@@ -30,6 +30,6 @@
 #include "session/Node.h"
 
 #include "commands.hpp"
-#include "Messages.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "messages.hpp"
+#include "globals.hpp"
+#include "settings.hpp"

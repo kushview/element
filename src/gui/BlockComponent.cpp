@@ -30,8 +30,8 @@
 #include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
 #include "session/Node.h"
-#include "Globals.h"
-#include "ScopedFlag.h"
+#include "globals.hpp"
+#include "scopedflag.hpp"
 
 namespace Element {
 

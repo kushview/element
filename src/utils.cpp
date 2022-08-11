@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Utils.h"
+#include "utils.hpp"
 #include "engine/nodes/BaseProcessor.h"
 
 #if JUCE_WINDOWS

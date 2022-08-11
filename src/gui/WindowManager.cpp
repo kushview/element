@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "Globals.h"
+#include "globals.hpp"
 #include "controllers/GuiController.h"
 #include "engine/NodeObject.h"
 #include "engine///GraphNode.h"

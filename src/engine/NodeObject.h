@@ -23,7 +23,7 @@
 #include "engine/MidiPipe.h"
 #include "engine/Oversampler.h"
 #include "engine/Parameter.h"
-#include "PortCount.h"
+#include "portcount.hpp"
 
 namespace Element {
 

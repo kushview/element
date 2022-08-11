@@ -19,7 +19,7 @@
 
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "gui/LookAndFeel.h"
-#include "Utils.h"
+#include "utils.hpp"
 
 namespace Element {
 

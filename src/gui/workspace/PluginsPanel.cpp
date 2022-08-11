@@ -20,7 +20,7 @@
 #include "controllers/AppController.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
-#include "Globals.h"
+#include "globals.hpp"
 #include "session/PluginManager.h"
 
 namespace Element {

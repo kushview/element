@@ -27,8 +27,8 @@
 #include "gui/SessionImportWizard.h"
 #include "session/Session.h"
 #include "datapath.hpp"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 namespace Element {
 

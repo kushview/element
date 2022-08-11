@@ -19,7 +19,7 @@
 #include "controllers/AppController.h"
 #include "scripting/ScriptingEngine.h"
 #include "gui/views/LuaConsoleView.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 namespace Element {
 

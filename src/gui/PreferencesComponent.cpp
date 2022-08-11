@@ -26,8 +26,8 @@
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "controllers/OSCController.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 #define EL_GENERAL_SETTINGS_NAME "General"
 #define EL_AUDIO_SETTINGS_NAME "Audio"

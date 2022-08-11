@@ -24,8 +24,8 @@
 #include "gui/LookAndFeel.h"
 #include "session/CommandManager.h"
 #include "commands.hpp"
-#include "Globals.h"
-#include "Utils.h"
+#include "globals.hpp"
+#include "utils.hpp"
 
 namespace Element {
 

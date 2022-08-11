@@ -202,7 +202,7 @@ CommandManager& GuiController::commander() { return world.getCommandManager(); }
 
 void GuiController::runDialog (const String& uri)
 {
-    if (uri == ELEMENT_PREFERENCES)
+    if (uri == "preferences")
     {
         if (auto* const dialog = windowManager->findDialogByName ("Preferences"))
         {
@@ -744,7 +744,7 @@ bool GuiController::perform (const InvocationInfo& info)
             toggleAboutScreen();
             break;
         case Commands::showPreferences:
-            runDialog (ELEMENT_PREFERENCES);
+            runDialog ("preferences");
             break;
         case Commands::showAllPluginWindows: {
             if (auto s = getWorld().getSession())

@@ -21,8 +21,8 @@
 #include "session/CommandManager.h"
 #include "session/DeviceManager.h"
 #include "commands.hpp"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
 #define EL_OSC_ADDRESS_ENGINE "/element/engine"

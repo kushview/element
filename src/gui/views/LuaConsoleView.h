@@ -20,7 +20,7 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/widgets/LuaConsole.h"
-#include "Logs.h"
+#include "log.hpp"
 
 namespace Element {
 

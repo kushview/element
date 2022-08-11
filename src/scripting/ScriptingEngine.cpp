@@ -24,7 +24,7 @@
 #include "scripting/ScriptingEngine.h"
 #include "scripting/ScriptManager.h"
 #include "scripting/LuaBindings.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 #ifndef EL_LUA_SPATH
 #define EL_LUA_SPATH ""

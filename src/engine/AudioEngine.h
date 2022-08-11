@@ -25,7 +25,7 @@
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
-#include "RunMode.h"
+#include "runmode.hpp"
 
 namespace Element {
 

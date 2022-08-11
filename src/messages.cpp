@@ -16,9 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Signals.h"
+#include "signals.hpp"
 #include "controllers/EngineController.h"
-#include "Messages.h"
+#include "messages.hpp"
 
 namespace Element {
 

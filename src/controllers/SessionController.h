@@ -22,7 +22,7 @@
 #include "controllers/AppController.h"
 #include "documents/SessionDocument.h"
 #include "session/Session.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 class SessionController : public AppController::Child

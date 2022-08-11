@@ -26,8 +26,8 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
-#include "Globals.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "settings.hpp"
 
 #include "controllers/EngineController.h"
 

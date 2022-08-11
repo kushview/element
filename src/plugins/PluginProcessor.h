@@ -23,7 +23,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/Parameter.h"
 #include "ElementApp.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 namespace Element {
 

@@ -34,9 +34,9 @@
 
 #include "session/Presets.h"
 #include "commands.hpp"
-#include "Globals.h"
-#include "Messages.h"
-#include "Settings.h"
+#include "globals.hpp"
+#include "messages.hpp"
+#include "settings.hpp"
 #include "version.hpp"
 
 namespace Element {

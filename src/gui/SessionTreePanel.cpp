@@ -33,7 +33,7 @@
 
 #include "gui/ViewHelpers.h"
 #include "session/Node.h"
-#include "ScopedFlag.h"
+#include "scopedflag.hpp"
 
 namespace Element {
 

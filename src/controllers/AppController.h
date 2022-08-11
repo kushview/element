@@ -21,7 +21,7 @@
 
 #include "controllers/Controller.h"
 #include "session/CommandManager.h"
-#include "RunMode.h"
+#include "runmode.hpp"
 
 namespace Element {
 

@@ -23,7 +23,7 @@
 #include "session/Session.h"
 #include "session/Sequence.h"
 #include "MediaManager.h"
-#include "Globals.h"
+#include "globals.hpp"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wparentheses")
 

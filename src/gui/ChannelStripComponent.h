@@ -19,7 +19,7 @@
 
 #include "ElementApp.h"
 #include "gui/Buttons.h"
-#include "Signals.h"
+#include "signals.hpp"
 
 namespace Element {
 
