@@ -18,6 +18,7 @@ test_element_app = executable ('test_element',
     include_directories : [ '.', libelement_includes ],
     dependencies : element_app_deps,
     link_with : [ libelement ],
+    gnu_symbol_visibility : 'hidden',
     cpp_args : [ '-Wno-unused-function', '-Wno-unused-variable' ],
     install : false
 )
