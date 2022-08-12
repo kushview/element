@@ -171,7 +171,11 @@ void GraphController::saveGraph (const bool saveAs)
         if (auto* us = getWorld().getSettings().getUserSettings())
             us->setValue (Settings::lastGraphKey, document.getFile().getFullPathName());
         if (saveAs)
+        {
             getAppController().addRecentFile (document.getFile());
+            document.getGraph().setProperty (Tags::name, 
+                document.getFile().getFileNameWithoutExtension());
+        }
     }
 }
 
