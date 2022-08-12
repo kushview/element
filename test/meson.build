@@ -12,6 +12,11 @@ test_element_sources = '''
     scripting/ScriptDescriptionTests.cpp
     scripting/ScriptManagerTests.cpp
 '''.split()
+test_element_cpp_args = []
+
+if cpp.get_argument_syntax() == 'gcc'
+    test_element_cpp_args += [ '-Wno-unused-function', '-Wno-unused-variable' ]
+endif
 
 test_element_app = executable ('test_element', 
     test_element_sources,
@@ -19,7 +24,7 @@ test_element_app = executable ('test_element',
     dependencies : element_app_deps,
     link_with : [ libelement ],
     gnu_symbol_visibility : 'hidden',
-    cpp_args : [ '-Wno-unused-function', '-Wno-unused-variable' ],
+    cpp_args : test_element_cpp_args,
     install : false
 )
 
