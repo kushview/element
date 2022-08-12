@@ -223,7 +223,6 @@ private:
     {
         resetScannerVariables();
         auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
-        DBG("launching " << scannerExe.getFullPathName());
         return launchSlaveProcess (scannerExe,
                                    EL_PLUGIN_SCANNER_PROCESS_ID,
                                    timeout,
