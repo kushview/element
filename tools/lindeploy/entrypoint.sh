@@ -17,4 +17,5 @@ builddir="build-docker"
 rm -rf build-docker
 meson setup -Dbuildtype=release $nativefiles $builddir
 meson compile -C $builddir
+meson test -C $builddir
 sh tools/lindeploy/appimage.sh "$builddir"
