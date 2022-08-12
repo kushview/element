@@ -141,7 +141,7 @@ libelement_sources = '''
     gui/views/NodeChannelStripView.cpp
     gui/views/NodeEditorContentView.cpp
     gui/views/NodeMidiContentView.cpp
-    gui/views/NodePortsTableView.cpp
+    gui/views/NodePortsTable.cpp
     gui/views/PluginsPanelView.cpp
     gui/views/ScriptEditorView.cpp
     gui/views/SessionSettingsView.cpp

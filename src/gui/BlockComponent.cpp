@@ -19,7 +19,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "gui/views/NodePortsTableView.h"
+#include "gui/views/NodePortsTable.h"
 #include "gui/Artist.h"
 #include "gui/BlockComponent.h"
 #include "gui/Buttons.h"

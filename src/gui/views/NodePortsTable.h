@@ -24,8 +24,6 @@
 
 namespace Element {
 
-class NodePortsTableListBoxModel;
-
 //==============================================================================
 class NodePortsTable : public juce::Component
 {
@@ -40,7 +38,8 @@ public:
     void resized() override;
 
 private:
-    std::unique_ptr<NodePortsTableListBoxModel> model;
+    class TableModel;
+    std::unique_ptr<TableModel> model;
     juce::TableListBox table;
     juce::TextButton showAllButton, hideAllButton,
         saveAsDefaultButton;
