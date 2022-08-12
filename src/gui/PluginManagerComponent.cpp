@@ -892,6 +892,12 @@ PluginManagerContentView::PluginManagerContentView()
 
 PluginManagerContentView::~PluginManagerContentView() {}
 
+Settings* PluginManagerContentView::getSettings() {
+    if (auto world = ViewHelpers::getGlobals (this))
+        return &world->getSettings();
+    return nullptr;
+}
+
 void PluginManagerContentView::didBecomeActive()
 {
     jassert (ViewHelpers::getGlobals (this));
@@ -900,19 +906,45 @@ void PluginManagerContentView::didBecomeActive()
     auto& settings (world.getSettings());
 
     if (pluginList)
-        pluginList = nullptr;
+        pluginList.reset();
 
-    pluginList = new Element::PluginListComponent (plugins, settings.getUserSettings());
-    addAndMakeVisible (pluginList);
+    pluginList = std::make_unique<Element::PluginListComponent> (plugins, settings.getUserSettings());
+    addAndMakeVisible (pluginList.get());
     resized();
 
+    restoreSettings();
     grabKeyboardFocus();
+}
+
+void PluginManagerContentView::willBeRemoved()
+{
+    saveSettings();
 }
 
 void PluginManagerContentView::resized()
 {
     if (pluginList)
         pluginList->setBounds (getLocalBounds().reduced (2));
+}
+
+void PluginManagerContentView::saveSettings()
+{
+    if (nullptr == pluginList)
+        return;
+    auto& header = pluginList->getTableListBox().getHeader();
+    if (auto settings = getSettings())
+        if (auto props = settings->getUserSettings())
+            props->setValue (Settings::pluginListHeaderKey, header.toString());
+}
+
+void PluginManagerContentView::restoreSettings()
+{
+    if (nullptr == pluginList)
+        return;
+    auto& header = pluginList->getTableListBox().getHeader();
+    if (auto settings = getSettings())
+        if (auto props = settings->getUserSettings())
+            header.restoreFromString (props->getValue (Settings::pluginListHeaderKey));
 }
 
 void PluginListComponent::scanWithBackgroundScanner()

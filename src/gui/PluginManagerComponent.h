@@ -23,7 +23,10 @@
 #include "gui/ContentComponent.h"
 
 namespace Element {
+
 class PluginManager;
+class Settings;
+
 //==============================================================================
 /**
      A component displaying a list of plugins, with options to scan for them,
@@ -140,8 +143,12 @@ public:
     ~PluginManagerContentView();
     void resized() override;
     void didBecomeActive() override;
+    void willBeRemoved() override;
 
 private:
-    ScopedPointer<PluginListComponent> pluginList;
+    std::unique_ptr<PluginListComponent> pluginList;
+    Settings* getSettings();
+    void saveSettings();
+    void restoreSettings();
 };
 } // namespace Element

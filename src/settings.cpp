@@ -45,6 +45,7 @@ const char* Settings::systrayKey = "systrayKey";
 const char* Settings::midiOutLatencyKey = "midiOutLatency";
 const char* Settings::desktopScaleKey = "desktopScale";
 const char* Settings::mainContentTypeKey = "mainContentType";
+const char* Settings::pluginListHeaderKey = "pluginListHeader";
 
 //=============================================================================
 enum OptionsMenuItemId
