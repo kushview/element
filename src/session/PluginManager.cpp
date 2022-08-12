@@ -222,7 +222,9 @@ private:
     bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
         resetScannerVariables();
-        return launchSlaveProcess (File::getSpecialLocation (File::invokedExecutableFile),
+        auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
+        DBG("launching " << scannerExe.getFullPathName());
+        return launchSlaveProcess (scannerExe,
                                    EL_PLUGIN_SCANNER_PROCESS_ID,
                                    timeout,
                                    flags);
