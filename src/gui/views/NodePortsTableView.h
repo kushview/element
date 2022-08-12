@@ -24,67 +24,26 @@
 
 namespace Element {
 
-class NodePortsTable : public juce::TableListBox,
-                       public juce::TableListBoxModel
+class NodePortsTableListBoxModel;
+
+//==============================================================================
+class NodePortsTable : public juce::Component
 {
 public:
-    enum Columns
-    {
-        VisibleColumn = 1,
-        NameColumn,
-        TypeColumn
-    };
-
     NodePortsTable();
     ~NodePortsTable() override;
 
-    //==========================================================================
-    void setNode (const Node& newNode);
-    Node getNode() const { return node; }
+    void setNode (const Node& node);
+    void refresh (int row = -1);
 
-    //==========================================================================
-    int getNumRows() override { return node.getNumPorts(); }
-    void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override;
-    void paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
-    void cellClicked (int rowNumber, int columnId, const MouseEvent&) override;
-
-#if 0
-    virtual Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
-                                                Component* existingComponentToUpdate);
-    virtual void cellClicked (int rowNumber, int columnId, const MouseEvent&);
-    virtual void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&);
-    virtual void backgroundClicked (const MouseEvent&);
-    virtual void sortOrderChanged (int newSortColumnId, bool isForwards);
-    virtual int getColumnAutoSizeWidth (int columnId);
-    virtual String getCellTooltip (int rowNumber, int columnId);
-    virtual void selectedRowsChanged (int lastRowSelected);
-    virtual void deleteKeyPressed (int lastRowSelected);
-    virtual void returnKeyPressed (int lastRowSelected);
-    virtual void listWasScrolled();
-    virtual var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
-#endif
+    void paint (juce::Graphics& g) override;
+    void resized() override;
 
 private:
-    Node node;
-};
-
-//==============================================================================
-class NodePortsTableView : public ContentView
-{
-public:
-    NodePortsTableView();
-    ~NodePortsTableView() override;
-
-    void initializeView (AppController&) override {}
-    void willBeRemoved() override {}
-    void willBecomeActive() override {}
-    void didBecomeActive() override {}
-    void stabilizeContent() override {}
-
-private:
-    class Content;
-    friend class Content;
-    std::unique_ptr<Content> content;
+    std::unique_ptr<NodePortsTableListBoxModel> model;
+    juce::TableListBox table;
+    juce::TextButton showAllButton, hideAllButton,
+        saveAsDefaultButton;
 };
 
 } // namespace Element
