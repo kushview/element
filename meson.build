@@ -27,7 +27,6 @@ subdir ('libs/compat')
 subdir ('scripts')
 subdir ('src')
 
-if not meson.is_subproject()
 ###############################################################################
 # Element Application
 element_app_link_args = []
@@ -49,6 +48,9 @@ if host_machine.system() == 'windows'
     endif
 endif
 
+subdir ('test')
+
+if not meson.is_subproject()
 element_app = executable ('element', element_app_sources,
     install : true,
     win_subsystem : 'windows',

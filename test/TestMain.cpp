@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE Element
 #include <boost/test/included/unit_test.hpp>
-#include "JuceHeader.h"
+#include <element/juce.hpp>
+using namespace juce;
 
 struct JuceMessageManagerFixture
 {

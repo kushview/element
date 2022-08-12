@@ -19,7 +19,10 @@
 #include <boost/test/unit_test.hpp>
 #include "scripting/ScriptDescription.h"
 
+#include "testutil.hpp"
+
 using namespace Element;
+namespace et = element::test;
 
 //=============================================================================
 const static String sDummyScript = 
@@ -55,10 +58,6 @@ static String toString (const ScriptDescription& desc) {
     return result;
 }
 
-static void print (const ScriptDescription& desc) {
-    DBG (toString (desc));
-}
-
 BOOST_AUTO_TEST_SUITE(ScriptDescriptionTests)
 
 BOOST_AUTO_TEST_CASE (ParseBuffer) {
@@ -76,7 +75,7 @@ BOOST_AUTO_TEST_CASE (ParseBuffer) {
 }
 
 BOOST_AUTO_TEST_CASE (ParseFile) {
-    const auto sfile = File::getCurrentWorkingDirectory().getChildFile ("scripts/amp.lua");
+    const auto sfile = et::getSourceRoot().getChildFile ("scripts/amp.lua");
     auto info = ScriptDescription::parse (sfile);
     BOOST_REQUIRE (info.isValid());
     BOOST_REQUIRE (info.name   == "amp");

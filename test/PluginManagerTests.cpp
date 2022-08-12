@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include "session/PluginManager.h"
-#include "Utils.h"
+#include "utils.hpp"
 
 using namespace Element;
 

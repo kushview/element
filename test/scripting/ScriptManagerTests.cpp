@@ -21,11 +21,15 @@
 #include "scripting/LuaBindings.h"
 #include "sol/sol.hpp"
 
+#include "testutil.hpp"
+
+namespace et = element::test;
+
 BOOST_AUTO_TEST_SUITE (ScriptManagerTests)
 
 BOOST_AUTO_TEST_CASE (ScanDirectory) {
     Element::ScriptManager scripts;
-    auto d = File::getCurrentWorkingDirectory().getChildFile ("scripts");
+    auto d = et::getSourceRoot().getChildFile ("scripts");
     scripts.scanDirectory (d);
     BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 5);
 }

@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
-#include "engine//GraphNode.h"
-#include "Utils.h"
+#include "engine/GraphNode.h"
+#include "utils.hpp"
 
 using namespace Element;
 
