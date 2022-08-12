@@ -41,7 +41,6 @@
                     "trace": false,
                     "traceResponse": false
                 },
-                "program": "${workspaceRoot}/build/bin/element",
                 "setupCommands": [
                     {
                         "description": "Enable pretty-printing for gdb",

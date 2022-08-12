@@ -108,15 +108,14 @@
                 "/usr/include/serd-0/*",
                 "/usr/include/sord-0/*",
                 "/usr/include/sratom-0/*",
-                "${workspaceRoot}/build/include/*",
-                "${workspaceRoot}/libs/element/src/*",
-                "${workspaceRoot}/libs/element/include/*",
-                "${workspaceRoot}/libs/lua/*",
-                "${workspaceRoot}/libs/JUCE/modules/*",
-                "${workspaceRoot}/libs/kv/modules/*",
-                "${workspaceRoot}/libs/compat/*",
-                "${workspaceRoot}/src/*",
-                "${workspaceRoot}/test/*"
+                "${workspaceFolder}/libs/lua/*",
+                "${workspaceFolder}/libs/sol/*",
+                "${workspaceFolder}/libs/JUCE/modules/*",
+                "${workspaceFolder}/libs/kv/modules/*",
+                "${workspaceFolder}/libs/compat/*",
+                "${workspaceFolder}/include/*",
+                "${workspaceFolder}/src/*",
+                "${workspaceFolder}/test/*"
             ],
             "defines": [
                 "LUA_USE_READLINE=1",
