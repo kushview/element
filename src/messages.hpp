@@ -74,6 +74,14 @@ struct AddPresetMessage : public AppMessage
     const String name;
 };
 
+/** Send this to add a preset for a node */
+struct SaveDefaultNodeMessage : public AppMessage
+{
+    SaveDefaultNodeMessage (const Node& n) : node (n) {}
+   ~SaveDefaultNodeMessage() noexcept {}
+    const Node node;
+};
+
 /** Send this to remove a node from the current graph */
 struct RemoveNodeMessage : public AppMessage
 {

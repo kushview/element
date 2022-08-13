@@ -18,6 +18,8 @@
 
 #include "signals.hpp"
 #include "controllers/EngineController.h"
+#include "globals.hpp"
+#include "session/PluginManager.h"
 #include "messages.hpp"
 
 namespace Element {
@@ -34,7 +36,7 @@ public:
         addedNode = Node();
         if (auto* ec = app.findChild<EngineController>())
             if (graph.isGraph())
-                addedNode = ec->addPlugin (graph, description, builder, verified);
+                addedNode = addPlugin (*ec);
         return addedNode.isValid();
     }
 
@@ -60,6 +62,14 @@ private:
     double x, y;
     bool havePosition = false;
     Node addedNode;
+
+    Node addPlugin (EngineController& ec)
+    {
+        auto node = app.getWorld().getPluginManager().getDefaultNode (description);
+        if (! node.isValid())
+            return ec.addPlugin (graph, description, builder, verified);
+        return ec.addNode (node, graph, builder);
+    }
 };
 
 class RemoveNodeAction : public UndoableAction

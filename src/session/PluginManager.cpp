@@ -973,12 +973,6 @@ PluginDescription PluginManager::findDescriptionFor (const Node& node) const
 {
     PluginDescription desc;
 
-    if (node.getFormat() != "VST3")
-    {
-        node.getPluginDescription (desc);
-        return desc;
-    }
-
     const String identifierString (node.getProperty (Tags::pluginIdentifierString).toString());
     bool wasFound = false;
 
@@ -1013,6 +1007,32 @@ PluginDescription PluginManager::findDescriptionFor (const Node& node) const
     }
 
     return desc;
+}
+
+void PluginManager::saveDefaultNode (const Node& node)
+{
+    if (! node.isValid())
+        return;
+    auto desc = findDescriptionFor (node);
+    auto file = DataPath::applicationDataDir().getChildFile ("nodes");
+    file = file.getChildFile (desc.createIdentifierString());
+    file.createDirectory();
+    file = file.getChildFile ("default.eln");
+    node.writeToFile (file);
+}
+
+Node PluginManager::getDefaultNode (const PluginDescription& desc) const
+{
+    auto file = DataPath::applicationDataDir().getChildFile ("nodes");
+    file = file.getChildFile (desc.createIdentifierString());
+    file = file.getChildFile ("default.eln");
+    if (! file.existsAsFile())
+        return Node();
+    auto data = Node::parse (file);
+    auto node = Node (Node::resetIds (data), false);
+    Node::sanitizeProperties (data);
+    data.removeProperty (Tags::name, nullptr);
+    return node;
 }
 
 } // namespace Element

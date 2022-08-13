@@ -126,6 +126,12 @@ public:
     /** Get a PluginDescription for a Node */
     PluginDescription findDescriptionFor (const Node&) const;
 
+    /** Saves the default node state */
+    void saveDefaultNode (const Node& node);
+
+    /** Returns the last saved default node state */
+    Node getDefaultNode (const PluginDescription& desc) const;
+
 private:
     PropertiesFile* props = nullptr;
     class Private;

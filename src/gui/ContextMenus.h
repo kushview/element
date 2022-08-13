@@ -259,7 +259,8 @@ public:
             return;
         const String format = node.getProperty (Tags::format).toString();
         addItemInternal (menu, "Add Preset", new AddPresetOp (node));
-
+        addItemInternal (menu, "Save as default...", new SaveDefaultNodeOp (node));
+        addItemInternal (menu, "Reset default...", new ResetDefaultNodeOp (node));
         menu.addSeparator();
 
         {
@@ -474,6 +475,34 @@ private:
         Message* createMessage()
         {
             return new AddPresetMessage (node);
+        }
+    };
+
+    struct SaveDefaultNodeOp : public ResultOp
+    {
+        SaveDefaultNodeOp (const Node& n)
+            : node (n) {}
+        const Node node;       
+        Message* createMessage()
+        {
+            return new SaveDefaultNodeMessage (node);
+        } 
+    };
+
+    struct ResetDefaultNodeOp : public ResultOp
+    {
+        ResetDefaultNodeOp (const Node& n)
+            : node (n) {}
+        const Node node;
+        bool perform() override
+        {
+            String subpath = "nodes/";
+            subpath << node.getProperty (Tags::pluginIdentifierString).toString()
+                    << "/default.eln";
+            auto file = DataPath::applicationDataDir().getChildFile (subpath);
+            if (file.existsAsFile())
+                file.deleteFile();
+            return true;
         }
     };
 

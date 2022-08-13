@@ -32,6 +32,7 @@
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
 
+#include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "commands.hpp"
 #include "globals.hpp"
@@ -214,7 +215,7 @@ void AppController::handleMessage (const Message& msg)
     handled = true; // final else condition will set false
     if (const auto* lpm = dynamic_cast<const LoadPluginMessage*> (&msg))
     {
-        ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);
+            ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);
     }
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))
     {
@@ -260,6 +261,12 @@ void AppController::handleMessage (const Message& msg)
             presets->add (node, name);
             node.setProperty (Tags::name, name);
         }
+    }
+    else if (const auto* sdnm = dynamic_cast<const SaveDefaultNodeMessage*> (&msg))
+    {
+        auto node = sdnm->node;
+        node.savePluginState();
+        getWorld().getPluginManager().saveDefaultNode (node);
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
