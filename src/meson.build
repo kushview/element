@@ -83,7 +83,6 @@ libelement_sources = '''
     engine/Transport.cpp
     globals.cpp
     gui/AboutComponent.cpp
-    gui/AssetTreeView.cpp
     gui/AudioIOPanelView.cpp
     gui/BlockComponent.cpp
     gui/Buttons.cpp
@@ -172,20 +171,11 @@ libelement_sources = '''
     scripting/ScriptDescription.cpp
     scripting/ScriptingEngine.cpp
     scripting/ScriptManager.cpp
-    session/Asset.cpp
-    session/AssetTree.cpp
     session/ControllerDevice.cpp
     session/DeviceManager.cpp
-    session/Graph.cpp
-    session/MediaManager.cpp
-    session/MidiClip.cpp
     session/Node.cpp
-    session/Note.cpp
-    session/NoteSequence.cpp
     session/PluginManager.cpp
-    session/Sequence.cpp
     session/Session.cpp
-    session/SessionTrack.cpp
     settings.cpp
     utils.cpp
     version.cpp

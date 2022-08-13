@@ -26,7 +26,6 @@
 #include "gui/SystemTray.h"
 #include "scripting/ScriptManager.h"
 #include "session/CommandManager.h"
-#include "session/MediaManager.h"
 #include "session/Node.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"

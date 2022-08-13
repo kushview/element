@@ -22,7 +22,6 @@
 #include "engine/InternalFormat.h"
 #include "scripting/ScriptingEngine.h"
 #include "session/DeviceManager.h"
-#include "session/MediaManager.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Session.h"
@@ -67,7 +66,6 @@ public:
     std::unique_ptr<Context> context;
     std::unique_ptr<CommandManager> commands;
     std::unique_ptr<DeviceManager> devices;
-    std::unique_ptr<MediaManager> media;
     std::unique_ptr<PluginManager> plugins;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<MappingEngine> mapping;
@@ -85,7 +83,6 @@ private:
         log.reset (new Log());
         plugins.reset (new PluginManager());
         devices.reset (new DeviceManager());
-        media.reset (new MediaManager());
         settings.reset (new Settings());
         commands.reset (new CommandManager());
         mapping.reset (new MappingEngine());
@@ -104,7 +101,6 @@ private:
         settings = nullptr;
         engine = nullptr;
         session = nullptr;
-        media = nullptr;
         devices = nullptr;
         midi = nullptr;
         presets = nullptr;
@@ -161,12 +157,6 @@ MidiEngine& Globals::getMidiEngine()
 {
     jassert (impl != nullptr && impl->midi != nullptr);
     return *impl->midi;
-}
-
-MediaManager& Globals::getMediaManager()
-{
-    jassert (impl->media != nullptr);
-    return *impl->media;
 }
 
 ScriptingEngine& Globals::getScriptingEngine()

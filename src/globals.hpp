@@ -32,7 +32,6 @@ class CommandManager;
 class DeviceManager;
 class ScriptingEngine;
 class Log;
-class MediaManager;
 class PluginManager;
 class PresetCollection;
 class Settings;
@@ -65,7 +64,6 @@ public:
     PluginManager& getPluginManager();
     PresetCollection& getPresetCollection();
     Settings& getSettings();
-    MediaManager& getMediaManager();
     ScriptingEngine& getScriptingEngine();
     SessionPtr getSession();
 
