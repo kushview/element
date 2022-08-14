@@ -1,5 +1,5 @@
 {
-    "terminal.integrated.gpuAcceleration": "off",
+    "terminal.integrated.gpuAcceleration": "auto",
     "cmake.configureOnOpen": false,
     "files.exclude": {
         "**/.git": true,
