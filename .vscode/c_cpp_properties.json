@@ -115,7 +115,8 @@
                 "${workspaceFolder}/libs/compat/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*"
+                "${workspaceFolder}/test/*",
+                "${workspaceFolder}/build-native/libs/compat/*"
             ],
             "defines": [
                 "LUA_USE_READLINE=1",
