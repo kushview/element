@@ -25,7 +25,7 @@
 */
 
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
-#include "session/DeviceManager.h"
+#include "session/devicemanager.hpp"
 
 namespace Element {
 

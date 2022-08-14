@@ -24,7 +24,7 @@
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/RootGraph.h"
-#include "session/PluginManager.h"
+#include "session/pluginmanager.hpp"
 #include "globals.hpp"
 #include "utils.hpp"
 

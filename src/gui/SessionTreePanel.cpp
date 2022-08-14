@@ -32,7 +32,7 @@
 #include "gui/NavigationConcertinaPanel.h"
 
 #include "gui/ViewHelpers.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 #include "scopedflag.hpp"
 
 namespace Element {

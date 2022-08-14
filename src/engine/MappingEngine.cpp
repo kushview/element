@@ -20,8 +20,8 @@
 #include "engine/NodeObject.h"
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
-#include "session/ControllerDevice.h"
-#include "session/Node.h"
+#include "session/controllerdevice.hpp"
+#include "session/node.hpp"
 
 namespace Element {
 

@@ -26,8 +26,8 @@
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/SessionGraphsListBox.h"
-#include "session/Session.h"
-#include "session/Node.h"
+#include "session/session.hpp"
+#include "session/node.hpp"
 #include "datapath.hpp"
 #include "globals.hpp"
 

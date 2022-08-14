@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
 #include "gui/LookAndFeel.h"
-#include "session/CommandManager.h"
+#include "session/commandmanager.hpp"
 #include "commands.hpp"
 #include "globals.hpp"
 #include "utils.hpp"

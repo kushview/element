@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2018-2019  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,13 +17,33 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "db/Database.h"
+#include "session/controllerdevice.hpp"
 
 namespace Element {
 
-Database::Database() {}
-Database::~Database() {}
+ControllerDevice::ControllerDevice (const ValueTree& data)
+    : ObjectModel (data)
+{
+    if (data.isValid())
+    {
+        jassert (data.hasType (Tags::controller));
+        jassert (data.hasProperty (Tags::uuid));
+        setMissingProperties();
+    }
+}
 
-void Database::exec (const String& sql) {}
+ControllerDevice::ControllerDevice (const String& name)
+    : ObjectModel (Tags::controller)
+{
+    setName (name);
+    setMissingProperties();
+}
+
+void ControllerDevice::setMissingProperties()
+{
+    stabilizePropertyString (Tags::uuid, Uuid().toString());
+    stabilizePropertyString (Tags::name, "New Device");
+    stabilizePropertyString ("inputDevice", "");
+}
 
 } // namespace Element

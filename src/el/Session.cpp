@@ -3,8 +3,8 @@
 // @pragma nostrip
 
 #include "lua-kv.hpp"
-#include "session/Node.h"
-#include "session/Session.h"
+#include "session/node.hpp"
+#include "session/session.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L) {
     using namespace Element;

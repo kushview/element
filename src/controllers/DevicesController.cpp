@@ -20,7 +20,7 @@
 #include "controllers/DevicesController.h"
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 #include "globals.hpp"
 
 namespace Element {

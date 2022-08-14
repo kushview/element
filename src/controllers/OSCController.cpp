@@ -18,8 +18,8 @@
 */
 
 #include "controllers/OSCController.h"
-#include "session/CommandManager.h"
-#include "session/DeviceManager.h"
+#include "session/commandmanager.hpp"
+#include "session/devicemanager.hpp"
 #include "commands.hpp"
 #include "globals.hpp"
 #include "settings.hpp"

@@ -19,8 +19,8 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "session/ControllerDevice.h"
-#include "session/Node.h"
+#include "session/controllerdevice.hpp"
+#include "session/node.hpp"
 
 namespace Element {
 

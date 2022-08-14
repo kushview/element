@@ -20,7 +20,7 @@
 #pragma once
 
 #include "engine/NodeObject.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 #include "Workspace.h"
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"

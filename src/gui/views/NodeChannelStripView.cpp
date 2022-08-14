@@ -22,7 +22,7 @@
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 #include "globals.hpp"
 #include "signals.hpp"
 

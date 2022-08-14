@@ -34,7 +34,7 @@
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
 #include "gui/NodeEditorFactory.h"
-#include "session/DeviceManager.h"
+#include "session/devicemanager.hpp"
 #include "globals.hpp"
 
 namespace Element {

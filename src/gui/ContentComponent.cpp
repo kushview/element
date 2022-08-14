@@ -32,9 +32,9 @@
 #include "gui/TransportBar.h"
 #include "gui/ViewHelpers.h"
 
-#include "session/DeviceManager.h"
-#include "session/Node.h"
-#include "session/PluginManager.h"
+#include "session/devicemanager.hpp"
+#include "session/node.hpp"
+#include "session/pluginmanager.hpp"
 
 #include "commands.hpp"
 #include "globals.hpp"

@@ -27,7 +27,7 @@
 
 #include "gui/ContentComponent.h"
 
-#include "session/Node.h"
+#include "session/node.hpp"
 #include "globals.hpp"
 #include "settings.hpp"
 

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "documents/GraphDocument.h"
+#include "documents/graphdocument.hpp"
 
 namespace Element {
 

@@ -29,7 +29,7 @@
 #include "gui/NodeIOConfiguration.h"
 #include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 #include "globals.hpp"
 #include "scopedflag.hpp"
 
@@ -348,7 +348,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         menu.addOptionsSubmenu();
 
         if (world)
-            menu.addPresetsMenu (world->getPresetCollection());
+            menu.addPresetsMenu (world->getPresetManager());
 
         colorSelector.setCurrentColour (Colour::fromString (
             node.getUIValueTree().getProperty ("color", color.toString()).toString()));

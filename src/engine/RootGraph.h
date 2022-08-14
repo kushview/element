@@ -3,7 +3,7 @@
 
 #include "engine/GraphNode.h"
 #include "engine/IONode.h"
-#include "session/DeviceManager.h"
+#include "session/devicemanager.hpp"
 
 namespace Element {
 

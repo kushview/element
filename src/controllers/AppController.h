@@ -20,7 +20,7 @@
 #pragma once
 
 #include "controllers/Controller.h"
-#include "session/CommandManager.h"
+#include "session/commandmanager.hpp"
 #include "runmode.hpp"
 
 namespace Element {

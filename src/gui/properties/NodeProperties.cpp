@@ -20,7 +20,7 @@
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/properties/NodeProperties.h"
 #include "gui/widgets/NodeMidiProgramComponent.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 #include "utils.hpp"
 
 #ifndef EL_PROGRAM_NAME_PLACEHOLDER

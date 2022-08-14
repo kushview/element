@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "session/Session.h"
+#include "session/session.hpp"
 
 namespace Element {
 

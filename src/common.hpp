@@ -34,8 +34,8 @@
 
 #include "engine/nodes/NodeTypes.h"
 
-#include "session/Node.h"
-#include "session/Session.h"
+#include "session/node.hpp"
+#include "session/session.hpp"
 
 #include "commands.hpp"
 #include "messages.hpp"

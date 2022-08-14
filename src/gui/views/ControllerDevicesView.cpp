@@ -21,7 +21,7 @@
 #include "gui/Buttons.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
-#include "session/ControllerDevice.h"
+#include "session/controllerdevice.hpp"
 #include "messages.hpp"
 #include "globals.hpp"
 

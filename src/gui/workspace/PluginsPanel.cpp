@@ -21,7 +21,7 @@
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
 #include "globals.hpp"
-#include "session/PluginManager.h"
+#include "session/pluginmanager.hpp"
 
 namespace Element {
 

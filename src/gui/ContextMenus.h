@@ -21,8 +21,8 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/BlockComponent.h"
-#include "session/PluginManager.h"
-#include "session/Presets.h"
+#include "session/pluginmanager.hpp"
+#include "session/presetmanager.hpp"
 #include "utils.hpp"
 
 namespace Element {
@@ -245,14 +245,14 @@ public:
         addSubMenu (subMenuName, programs);
     }
 
-    inline void addPresetsMenu (PresetCollection& collection, const String& subMenuName = "Presets")
+    inline void addPresetsMenu (PresetManager& collection, const String& subMenuName = "Presets")
     {
         PopupMenu presets;
         getPresetsMenu (collection, presets);
         addSubMenu (subMenuName, presets);
     }
 
-    inline void getPresetsMenu (PresetCollection& collection, PopupMenu& menu)
+    inline void getPresetsMenu (PresetManager& collection, PopupMenu& menu)
     {
         const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())

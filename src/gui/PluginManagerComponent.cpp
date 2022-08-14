@@ -19,7 +19,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/PluginManagerComponent.h"
-#include "session/PluginManager.h"
+#include "session/pluginmanager.hpp"
 #include "globals.hpp"
 #include "settings.hpp"
 #include "utils.hpp"

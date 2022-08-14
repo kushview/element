@@ -20,8 +20,8 @@
 #include "controllers/PresetsController.h"
 #include "controllers/GuiController.h"
 #include "gui/ContentComponent.h"
-#include "session/Session.h"
-#include "session/Presets.h"
+#include "session/session.hpp"
+#include "session/presetmanager.hpp"
 #include "globals.hpp"
 #include "datapath.hpp"
 
@@ -57,7 +57,7 @@ void PresetsController::deactivate()
 
 void PresetsController::refresh()
 {
-    getWorld().getPresetCollection().refresh();
+    getWorld().getPresetManager().refresh();
 }
 
 void PresetsController::add (const Node& node, const String& presetName)
@@ -71,7 +71,7 @@ void PresetsController::add (const Node& node, const String& presetName)
     }
     else
     {
-        getWorld().getPresetCollection().refresh();
+        getWorld().getPresetManager().refresh();
     }
 
     if (auto* gui = findSibling<GuiController>())

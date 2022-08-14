@@ -17,7 +17,7 @@
 */
 
 #include "gui/Workspace.h"
-#include "session/DeviceManager.h"
+#include "session/devicemanager.hpp"
 #include "globals.hpp"
 #include "settings.hpp"
 

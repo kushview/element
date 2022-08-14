@@ -23,9 +23,9 @@
 #include "controllers/GraphManager.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/RootGraph.h"
-#include "session/DeviceManager.h"
-#include "session/PluginManager.h"
-#include "session/Node.h"
+#include "session/devicemanager.hpp"
+#include "session/pluginmanager.hpp"
+#include "session/node.hpp"
 #include "globals.hpp"
 #include "settings.hpp"
 

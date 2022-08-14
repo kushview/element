@@ -22,7 +22,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 
 namespace element { class Context; }
 
@@ -33,7 +33,7 @@ class DeviceManager;
 class ScriptingEngine;
 class Log;
 class PluginManager;
-class PresetCollection;
+class PresetManager;
 class Settings;
 class Writer;
 
@@ -62,7 +62,7 @@ public:
     MappingEngine& getMappingEngine();
     MidiEngine& getMidiEngine();
     PluginManager& getPluginManager();
-    PresetCollection& getPresetCollection();
+    PresetManager& getPresetManager();
     Settings& getSettings();
     ScriptingEngine& getScriptingEngine();
     SessionPtr getSession();

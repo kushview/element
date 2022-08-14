@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 
 namespace Element {
 
@@ -32,7 +32,7 @@ struct PresetDescription
     File file;
 };
 
-class PresetCollection
+class PresetManager
 {
 public:
     struct SortByName
@@ -49,8 +49,8 @@ public:
         }
     };
 
-    PresetCollection() {}
-    ~PresetCollection() {}
+    PresetManager() {}
+    ~PresetManager() {}
 
     inline void clear()
     {

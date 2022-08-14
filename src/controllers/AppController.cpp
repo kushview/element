@@ -32,8 +32,8 @@
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
 
-#include "session/PluginManager.h"
-#include "session/Presets.h"
+#include "session/pluginmanager.hpp"
+#include "session/presetmanager.hpp"
 #include "commands.hpp"
 #include "globals.hpp"
 #include "messages.hpp"

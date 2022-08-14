@@ -22,7 +22,7 @@
 #include "controllers/Controller.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 
 namespace Element {
 

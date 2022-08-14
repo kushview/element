@@ -20,7 +20,7 @@
 #pragma once
 
 #include "controllers/AppController.h"
-#include "session/ControllerDevice.h"
+#include "session/controllerdevice.hpp"
 
 namespace Element {
 

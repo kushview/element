@@ -27,7 +27,7 @@
 #include "engine/MidiPipe.h"
 #include "engine/NodeObject.h"
 #include "engine/RootGraph.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 
 namespace Element {
 

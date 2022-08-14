@@ -21,7 +21,7 @@
 #include "controllers/DevicesController.h"
 #include "controllers/GuiController.h"
 #include "engine/MappingEngine.h"
-#include "session/ControllerDevice.h"
+#include "session/controllerdevice.hpp"
 #include "globals.hpp"
 #include "signals.hpp"
 

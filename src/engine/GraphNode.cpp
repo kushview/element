@@ -24,7 +24,7 @@
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
 #include "engine/nodes/NodeTypes.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 #include "portcount.hpp"
 
 #include "engine/GraphNode.h"

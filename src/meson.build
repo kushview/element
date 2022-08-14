@@ -45,13 +45,11 @@ libelement_sources = '''
     controllers/ScriptingController.cpp
     controllers/SessionController.cpp
     datapath.cpp
-    db/Database.cpp
-    documents/GraphDocument.cpp
-    documents/SessionDocument.cpp
+    documents/graphdocument.cpp
+    documents/sessiondocument.cpp
     engine/AudioEngine.cpp
     engine/GraphBuilder.cpp
     engine/GraphNode.cpp
-    engine/GraphPort.cpp
     engine/InternalFormat.cpp
     engine/IONode.cpp
     engine/MappingEngine.cpp
@@ -171,11 +169,11 @@ libelement_sources = '''
     scripting/ScriptDescription.cpp
     scripting/ScriptingEngine.cpp
     scripting/ScriptManager.cpp
-    session/ControllerDevice.cpp
-    session/DeviceManager.cpp
-    session/Node.cpp
-    session/PluginManager.cpp
-    session/Session.cpp
+    session/controllerdevice.cpp
+    session/devicemanager.cpp
+    session/node.cpp
+    session/pluginmanager.cpp
+    session/session.cpp
     settings.cpp
     utils.cpp
     version.cpp

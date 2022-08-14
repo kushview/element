@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "gui/Icons.h"
 #include "gui/LookAndFeel.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 
 namespace Element {
 

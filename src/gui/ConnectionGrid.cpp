@@ -21,8 +21,8 @@
 #include "gui/widgets/BreadCrumbComponent.h"
 #include "gui/ContextMenus.h"
 #include "gui/widgets/HorizontalListBox.h"
-#include "session/PluginManager.h"
-#include "session/Presets.h"
+#include "session/pluginmanager.hpp"
+#include "session/presetmanager.hpp"
 #include "gui/ConnectionGrid.h"
 #include "gui/Artist.h"
 
@@ -200,7 +200,7 @@ public:
         NodePopupMenu menu (node);
 
         if (world)
-            menu.addPresetsMenu (world->getPresetCollection());
+            menu.addPresetsMenu (world->getPresetManager());
 
         const int result = menu.show();
         if (auto* message = menu.createMessageForResultCode (result))
@@ -218,7 +218,7 @@ public:
         NodePopupMenu menu (n, p);
 
         if (world)
-            menu.addPresetsMenu (world->getPresetCollection());
+            menu.addPresetsMenu (world->getPresetManager());
         const int result = menu.show();
         if (auto* message = menu.createMessageForResultCode (result))
         {

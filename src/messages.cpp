@@ -19,7 +19,7 @@
 #include "signals.hpp"
 #include "controllers/EngineController.h"
 #include "globals.hpp"
-#include "session/PluginManager.h"
+#include "session/pluginmanager.hpp"
 #include "messages.hpp"
 
 namespace Element {

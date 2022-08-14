@@ -21,12 +21,12 @@
 #include "ElementApp.h"
 #include "engine/InternalFormat.h"
 #include "scripting/ScriptingEngine.h"
-#include "session/DeviceManager.h"
-#include "session/PluginManager.h"
-#include "session/Presets.h"
-#include "session/Session.h"
+#include "session/devicemanager.hpp"
+#include "session/pluginmanager.hpp"
+#include "session/presetmanager.hpp"
+#include "session/session.hpp"
 #include "settings.hpp"
-#include "session/CommandManager.h"
+#include "session/commandmanager.hpp"
 #include "globals.hpp"
 #include "log.hpp"
 
@@ -69,7 +69,7 @@ public:
     std::unique_ptr<PluginManager> plugins;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<MappingEngine> mapping;
-    std::unique_ptr<PresetCollection> presets;
+    std::unique_ptr<PresetManager> presets;
     std::unique_ptr<MidiEngine> midi;
     std::unique_ptr<ScriptingEngine> lua;
     std::unique_ptr<Log> log;
@@ -87,7 +87,7 @@ private:
         commands.reset (new CommandManager());
         mapping.reset (new MappingEngine());
         midi.reset (new MidiEngine());
-        presets.reset (new PresetCollection());
+        presets.reset (new PresetManager());
         session = new Session();
 
         lua.reset (new ScriptingEngine());
@@ -173,7 +173,7 @@ PluginManager& Globals::getPluginManager()
     return *impl->plugins;
 }
 
-PresetCollection& Globals::getPresetCollection()
+PresetManager& Globals::getPresetManager()
 {
     jassert (impl->presets != nullptr);
     return *impl->presets;

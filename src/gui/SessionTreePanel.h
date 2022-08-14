@@ -24,7 +24,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 
 namespace Element {
 

@@ -23,7 +23,7 @@
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"
 #include "gui/nodes/VolumeNodeEditor.h"
-#include "session/Presets.h"
+#include "session/presetmanager.hpp"
 
 namespace Element {
 static Array<PluginWindow*> activePluginWindows;
@@ -159,7 +159,7 @@ public:
             menu.addSeparator();
             menu.addOptionsSubmenu();
             if (world)
-                menu.addPresetsMenu (world->getPresetCollection());
+                menu.addPresetsMenu (world->getPresetManager());
             menu.show (0, 0, 0, 0, callback);
         }
         else if (button == &onTopButton)

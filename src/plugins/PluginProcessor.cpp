@@ -23,8 +23,8 @@
 #include "controllers/MappingController.h"
 #include "controllers/DevicesController.h"
 #include "engine/InternalFormat.h"
-#include "session/PluginManager.h"
-#include "session/Session.h"
+#include "session/pluginmanager.hpp"
+#include "session/session.hpp"
 #include "ElementApp.h"
 #include "settings.hpp"
 

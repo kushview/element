@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "session/PluginManager.h"
+#include "session/pluginmanager.hpp"
 #include "utils.hpp"
 
 using namespace Element;

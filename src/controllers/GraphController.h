@@ -20,7 +20,7 @@
 #pragma once
 
 #include "controllers/AppController.h"
-#include "documents/GraphDocument.h"
+#include "documents/graphdocument.hpp"
 #include "signals.hpp"
 
 namespace Element {

@@ -26,8 +26,8 @@
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
-#include "session/Session.h"
-#include "session/Node.h"
+#include "session/session.hpp"
+#include "session/node.hpp"
 
 #include "commands.hpp"
 #include "messages.hpp"

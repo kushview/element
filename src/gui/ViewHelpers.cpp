@@ -26,8 +26,8 @@
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/ViewHelpers.h"
-#include "session/Node.h"
-#include "session/CommandManager.h"
+#include "session/node.hpp"
+#include "session/commandmanager.hpp"
 #include "globals.hpp"
 #include "messages.hpp"
 

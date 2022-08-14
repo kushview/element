@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 
 #define EL_OBJECT_GETTER(a, b) \
     inline const var& get##a() const { return objectData.getProperty (b); }

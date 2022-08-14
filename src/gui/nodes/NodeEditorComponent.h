@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 #include "engine/NodeObject.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 
 #define EL_NODE_EDITOR_DEFAULT_ID "el.DefaultNodeEditor"
 

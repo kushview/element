@@ -45,9 +45,9 @@
 #include "gui/TransportBar.h"
 #include "gui/NavigationConcertinaPanel.h"
 
-#include "session/DeviceManager.h"
-#include "session/PluginManager.h"
-#include "session/Node.h"
+#include "session/devicemanager.hpp"
+#include "session/pluginmanager.hpp"
+#include "session/node.hpp"
 
 #include "commands.hpp"
 #include "globals.hpp"

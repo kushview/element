@@ -23,7 +23,7 @@
 #include "gui/SequencerComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 
 namespace Element {
 

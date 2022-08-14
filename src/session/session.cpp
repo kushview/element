@@ -19,10 +19,10 @@
 
 #include "engine/InternalFormat.h"
 #include "engine/Transport.h"
-#include "session/Node.h"
+#include "session/node.hpp"
 #include "globals.hpp"
 
-#include "session/Session.h"
+#include "session/session.hpp"
 
 namespace Element {
 

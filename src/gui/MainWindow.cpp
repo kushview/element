@@ -22,7 +22,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
-#include "session/CommandManager.h"
+#include "session/commandmanager.hpp"
 #include "commands.hpp"
 #include "globals.hpp"
 #include "settings.hpp"

@@ -20,8 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "session/Node.h"
-#include "session/Session.h"
+#include "session/node.hpp"
+#include "session/session.hpp"
 
 namespace Element {
 

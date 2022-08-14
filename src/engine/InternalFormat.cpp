@@ -45,7 +45,7 @@
 #include "engine/InternalFormat.h"
 #include "engine/IONode.h"
 
-#include "session/Session.h"
+#include "session/session.hpp"
 
 #include "globals.hpp"
 

@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "engine/AudioEngine.h"
 #include "engine/NodeObject.h"
-#include "session/Session.h"
+#include "session/session.hpp"
 
 namespace Element {
 

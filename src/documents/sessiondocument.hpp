@@ -19,17 +19,29 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include "ElementApp.h"
+#include "session/session.hpp"
 
 namespace Element {
-
-class Database
+class SessionDocument : public FileBasedDocument,
+                        public ChangeListener
 {
 public:
-    Database();
-    virtual ~Database();
+    SessionDocument (SessionPtr);
+    ~SessionDocument();
 
-    void exec (const String& sql);
+    String getDocumentTitle() override;
+    Result loadDocument (const File& file) override;
+    Result saveDocument (const File& file) override;
+    File getLastDocumentOpened() override;
+    void setLastDocumentOpened (const File& file) override;
+
+    void changeListenerCallback (ChangeBroadcaster*) override;
+
+private:
+    SessionPtr session;
+    File lastSession;
+    friend class Session;
+    void onSessionChanged();
 };
-
 } // namespace Element

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "session/ControllerDevice.h"
+#include "session/controllerdevice.hpp"
 
 namespace Element {
 

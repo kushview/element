@@ -6,9 +6,9 @@
 #include "lua.hpp"
 #include "sol_helpers.hpp"
 
-#include "session/CommandManager.h"
-#include "session/PluginManager.h"
-#include "session/Presets.h"
+#include "session/commandmanager.hpp"
+#include "session/pluginmanager.hpp"
+#include "session/presetmanager.hpp"
 #include "globals.hpp"
 #include "settings.hpp"
 
@@ -70,7 +70,7 @@ EL_PLUGIN_EXPORT int luaopen_el_Globals (lua_State* L)
         /// Returns the preset manager
         // @function Globals:presetmanager
         // @treturn el.PresetManager
-        "presetmanager", &Globals::getPresetCollection,
+        "presetmanager", &Globals::getPresetManager,
 
         /// Returns the preset manager
         // @function Globals:session

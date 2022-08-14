@@ -19,7 +19,7 @@
 
 #include "gui/MainWindow.h"
 #include "gui/SystemTray.h"
-#include "session/CommandManager.h"
+#include "session/commandmanager.hpp"
 #include "commands.hpp"
 #include "globals.hpp"
 #include "utils.hpp"
