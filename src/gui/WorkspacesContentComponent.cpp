@@ -23,10 +23,10 @@
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
-#include "messages.hpp"
-#include "messages/GuiMessages.h"
 #include "gui/Workspace.h"
 #include "globals.hpp"
+
+#include "messages.hpp"
 #include "settings.hpp"
 #include "BinaryData.h"
 

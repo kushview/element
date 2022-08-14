@@ -25,6 +25,7 @@
 namespace Element {
 
 class AppController;
+class ContentView;
 class Globals;
 
 class Action : public UndoableAction
@@ -271,7 +272,81 @@ struct OpenSessionMessage : public AppMessage
     const File file;
 };
 
-} // namespace Element
+//=============================================================================
+struct RefreshControllerDeviceMessage : public AppMessage
+{
+    RefreshControllerDeviceMessage (const ControllerDevice& d)
+        : device (d) {}
+    ~RefreshControllerDeviceMessage() {}
+    const ControllerDevice device;
+};
 
-#include "messages/ControllerDeviceMessages.h"
-#include "messages/GuiMessages.h"
+struct AddControllerDeviceMessage : public AppMessage
+{
+    AddControllerDeviceMessage (const ControllerDevice& d)
+        : device (d) {}
+    AddControllerDeviceMessage (const File& f)
+        : file (f) {}
+    ~AddControllerDeviceMessage() noexcept {}
+    const ControllerDevice device;
+    const File file;
+};
+
+struct RemoveControllerDeviceMessage : public AppMessage
+{
+    RemoveControllerDeviceMessage (const ControllerDevice& d)
+        : device (d) {}
+    ~RemoveControllerDeviceMessage() noexcept {}
+    const ControllerDevice device;
+};
+
+struct AddControlMessage : public AppMessage
+{
+    AddControlMessage (const ControllerDevice& d, const ControllerDevice::Control& c)
+        : device (d), control (c) {}
+    ~AddControlMessage() noexcept {}
+    const ControllerDevice device;
+    const ControllerDevice::Control control;
+};
+
+struct RemoveControlMessage : public AppMessage
+{
+    RemoveControlMessage (const ControllerDevice& d, const ControllerDevice::Control& c)
+        : device (d), control (c) {}
+    ~RemoveControlMessage() noexcept {}
+    const ControllerDevice device;
+    const ControllerDevice::Control control;
+};
+
+struct RemoveControllerMapMessage : public AppMessage
+{
+    RemoveControllerMapMessage (const ControllerMap& mapp)
+        : controllerMap (mapp) {}
+    ~RemoveControllerMapMessage() noexcept {}
+    const ControllerMap controllerMap;
+};
+
+//=============================================================================
+struct WorkspaceOpenFileMessage : public AppMessage
+{
+    WorkspaceOpenFileMessage (const File& f) : file (f) {}
+    ~WorkspaceOpenFileMessage() noexcept {}
+    const File file;
+};
+
+struct ReloadMainContentMessage : public AppMessage
+{
+    explicit ReloadMainContentMessage (const String& t = String()) : type (t) {}
+    ~ReloadMainContentMessage() noexcept {}
+    const String type;
+};
+
+struct PresentViewMessage : public AppMessage
+{
+    using Factory = std::function<ContentView*()>;
+    PresentViewMessage (Factory f) : create (f) {}
+    PresentViewMessage() {}
+    Factory create;
+};
+
+}
