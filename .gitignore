@@ -23,6 +23,7 @@ node_modules
 !/.vscode/launch.json
 !/.vscode/c_cpp_properties.json
 !/.vscode/vscode.h
+!/.vscode/settings.json
 
 /libs/vstsdk2.4/
 /libs/ASIOSDK/
