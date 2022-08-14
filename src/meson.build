@@ -37,7 +37,6 @@ libelement_sources = '''
     controllers/DevicesController.cpp
     controllers/EngineController.cpp
     controllers/GraphController.cpp
-    controllers/GraphManager.cpp
     controllers/GuiController.cpp
     controllers/MappingController.cpp
     controllers/OSCController.cpp
@@ -49,6 +48,7 @@ libelement_sources = '''
     documents/sessiondocument.cpp
     engine/ionode.cpp
     engine/oversampler.cpp
+    engine/graphmanager.cpp
     engine/internalformat.cpp
     engine/midiengine.cpp
     engine/mappingengine.cpp

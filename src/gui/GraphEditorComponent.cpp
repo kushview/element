@@ -19,7 +19,7 @@
 
 #include "ElementApp.h"
 #include "controllers/GraphController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 
 #include "gui/GuiCommon.h"
 #include "gui/BlockComponent.h"

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"

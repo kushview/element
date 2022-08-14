@@ -21,7 +21,7 @@
 #include "controllers/DevicesController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "controllers/GraphController.h"
 #include "controllers/MappingController.h"
 #include "controllers/OSCController.h"

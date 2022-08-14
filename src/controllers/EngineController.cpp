@@ -20,7 +20,7 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
 #include "session/devicemanager.hpp"

@@ -19,7 +19,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/audioengine.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
