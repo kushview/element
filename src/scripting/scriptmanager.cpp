@@ -18,9 +18,9 @@
 */
 
 #include "JuceHeader.h"
-#include "scripting/LuaBindings.h"
-#include "scripting/ScriptDescription.h"
-#include "scripting/ScriptManager.h"
+#include "scripting/bindings.hpp"
+#include "scripting/scriptdescription.hpp"
+#include "scripting/scriptmanager.hpp"
 #include "datapath.hpp"
 #include "sol/sol.hpp"
 

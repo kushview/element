@@ -26,7 +26,7 @@
 #include "engine/nodes/LuaNode.h"
 #include "engine/midipipe.hpp"
 #include "engine/parameter.hpp"
-#include "scripting/LuaBindings.h"
+#include "scripting/bindings.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)

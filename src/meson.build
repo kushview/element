@@ -160,15 +160,13 @@ libelement_sources = '''
     messages.cpp
     plugins/PluginEditor.cpp
     plugins/PluginProcessor.cpp
-    scripting/DSPScript.cpp
-    scripting/DSPUIScript.cpp
-    scripting/JuceBindings.cpp
-    scripting/LuaBindings.cpp
-    scripting/LuaLib.cpp
-    scripting/Script.cpp
-    scripting/ScriptDescription.cpp
-    scripting/ScriptingEngine.cpp
-    scripting/ScriptManager.cpp
+    scripting/dspscript.cpp
+    scripting/dspuiscript.cpp
+    scripting/bindings.cpp
+    scripting/script.cpp
+    scripting/scriptdescription.cpp
+    scripting/scriptingengine.cpp
+    scripting/scriptmanager.cpp
     session/controllerdevice.cpp
     session/devicemanager.cpp
     session/node.cpp

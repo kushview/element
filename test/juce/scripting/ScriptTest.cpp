@@ -17,8 +17,8 @@
 */
 
 #include "LuaUnitTest.h"
-#include "scripting/DSPScript.h"
-#include "scripting/Script.h"
+#include "scripting/dspscript.hpp"
+#include "scripting/script.hpp"
 
 using namespace Element;
 

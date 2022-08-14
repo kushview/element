@@ -29,10 +29,10 @@
 #include "engine/nodes/ScriptNode.h"
 #include "engine/midipipe.hpp"
 #include "engine/parameter.hpp"
-#include "scripting/LuaBindings.h"
-#include "scripting/DSPScript.h"
-#include "scripting/Script.h"
-#include "scripting/ScriptManager.h"
+#include "scripting/bindings.hpp"
+#include "scripting/dspscript.hpp"
+#include "scripting/script.hpp"
+#include "scripting/scriptmanager.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)

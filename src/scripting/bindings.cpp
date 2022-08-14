@@ -24,7 +24,7 @@
 #include "engine/audioengine.hpp"
 #include "engine/midipipe.hpp"
 #include "gui/SystemTray.h"
-#include "scripting/ScriptManager.h"
+#include "scripting/scriptmanager.hpp"
 #include "session/commandmanager.hpp"
 #include "session/node.hpp"
 #include "session/pluginmanager.hpp"

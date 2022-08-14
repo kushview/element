@@ -17,7 +17,7 @@
 */
 
 #include <boost/test/unit_test.hpp>
-#include "scripting/ScriptDescription.h"
+#include "scripting/scriptdescription.hpp"
 
 #include "testutil.hpp"
 

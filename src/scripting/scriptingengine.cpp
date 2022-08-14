@@ -21,9 +21,9 @@
 #include <element/scripting.hpp>
 
 #include "sol/sol.hpp"
-#include "scripting/ScriptingEngine.h"
-#include "scripting/ScriptManager.h"
-#include "scripting/LuaBindings.h"
+#include "scripting/scriptingengine.hpp"
+#include "scripting/scriptmanager.hpp"
+#include "scripting/bindings.hpp"
 #include "globals.hpp"
 
 #ifndef EL_LUA_SPATH

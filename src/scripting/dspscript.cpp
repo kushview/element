@@ -19,7 +19,7 @@
 
 #include "el/factories.hpp"
 #include "engine/midipipe.hpp"
-#include "scripting/DSPScript.h"
+#include "scripting/dspscript.hpp"
 
 using namespace kv;
 namespace Element {

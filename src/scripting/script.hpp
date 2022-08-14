@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "scripting/ScriptDescription.h"
+#include "scripting/scriptdescription.hpp"
 #include "sol/sol.hpp"
 
 namespace Element {

@@ -21,7 +21,7 @@
 
 #include "sol/sol.hpp"
 #include "engine/parameter.hpp"
-#include "scripting/ScriptInstance.h"
+#include "scripting/scriptinstance.hpp"
 #include "JuceHeader.h"
 
 namespace Element {

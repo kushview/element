@@ -17,8 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "scripting/DSPUIScript.h"
+#pragma once
+
+#include "scripting/scriptinstance.hpp"
 
 namespace Element {
 
-}
+class DSPUIScript : public ScriptInstance
+{
+};
+
+} // namespace Element

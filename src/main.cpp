@@ -21,7 +21,7 @@
 #include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
 #include "engine/internalformat.hpp"
-#include "scripting/ScriptingEngine.h"
+#include "scripting/scriptingengine.hpp"
 #include "session/devicemanager.hpp"
 #include "session/pluginmanager.hpp"
 #include "commands.hpp"

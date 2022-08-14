@@ -1,7 +1,7 @@
 
 #pragma once
 #include "Tests.h"
-#include "scripting/LuaBindings.h"
+#include "scripting/bindings.hpp"
 #include "sol/sol.hpp"
 
 //=============================================================================

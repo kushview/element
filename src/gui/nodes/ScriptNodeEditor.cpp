@@ -21,10 +21,10 @@
 #include "el/object.hpp"
 #include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/LookAndFeel.h"
-#include "scripting/LuaBindings.h"
-#include "scripting/ScriptingEngine.h"
-#include "scripting/ScriptManager.h"
-#include "scripting/Script.h"
+#include "scripting/bindings.hpp"
+#include "scripting/scriptingengine.hpp"
+#include "scripting/scriptmanager.hpp"
+#include "scripting/script.hpp"
 
 namespace Element {
 

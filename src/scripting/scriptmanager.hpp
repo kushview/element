@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "scripting/ScriptDescription.h"
+#include "scripting/scriptdescription.hpp"
 
 namespace Element {
 

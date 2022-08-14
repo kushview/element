@@ -17,7 +17,7 @@
 */
 
 #include "controllers/AppController.h"
-#include "scripting/ScriptingEngine.h"
+#include "scripting/scriptingengine.hpp"
 #include "gui/views/LuaConsoleView.h"
 #include "globals.hpp"
 
