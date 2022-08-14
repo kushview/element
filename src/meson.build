@@ -47,38 +47,38 @@ libelement_sources = '''
     datapath.cpp
     documents/graphdocument.cpp
     documents/sessiondocument.cpp
-    engine/AudioEngine.cpp
-    engine/GraphBuilder.cpp
-    engine/GraphNode.cpp
-    engine/InternalFormat.cpp
-    engine/IONode.cpp
-    engine/MappingEngine.cpp
-    engine/MidiClock.cpp
-    engine/MidiEngine.cpp
-    engine/MidiPipe.cpp
-    engine/NodeFactory.cpp
-    engine/NodeObject.cpp
-    engine/nodes/AudioFilePlayerNode.cpp
-    engine/nodes/AudioMixerProcessor.cpp
-    engine/nodes/AudioProcessorNode.cpp
-    engine/nodes/AudioRouterNode.cpp
-    engine/nodes/CompressorProcessor.cpp
-    engine/nodes/EQFilterProcessor.cpp
-    engine/nodes/LuaNode.cpp
-    engine/nodes/MediaPlayerProcessor.cpp
-    engine/nodes/MidiChannelSplitterNode.cpp
-    engine/nodes/MidiDeviceProcessor.cpp
-    engine/nodes/MidiFilterNode.cpp
-    engine/nodes/MidiMonitorNode.cpp
-    engine/nodes/MidiProgramMapNode.cpp
-    engine/nodes/MidiRouterNode.cpp
-    engine/nodes/OSCReceiverNode.cpp
-    engine/nodes/OSCSenderNode.cpp
+    engine/ionode.cpp
+    engine/oversampler.cpp
+    engine/internalformat.cpp
+    engine/midiengine.cpp
+    engine/mappingengine.cpp
+    engine/nodeobject.cpp
+    engine/midipipe.cpp
     engine/nodes/ScriptNode.cpp
-    engine/Oversampler.cpp
-    engine/Parameter.cpp
-    engine/RootGraph.cpp
-    engine/Transport.cpp
+    engine/nodes/MidiProgramMapNode.cpp
+    engine/nodes/AudioRouterNode.cpp
+    engine/nodes/MidiRouterNode.cpp
+    engine/nodes/MediaPlayerProcessor.cpp
+    engine/nodes/OSCReceiverNode.cpp
+    engine/nodes/LuaNode.cpp
+    engine/nodes/MidiMonitorNode.cpp
+    engine/nodes/MidiFilterNode.cpp
+    engine/nodes/MidiChannelSplitterNode.cpp
+    engine/nodes/CompressorProcessor.cpp
+    engine/nodes/MidiDeviceProcessor.cpp
+    engine/nodes/AudioMixerProcessor.cpp
+    engine/nodes/EQFilterProcessor.cpp
+    engine/nodes/AudioFilePlayerNode.cpp
+    engine/nodes/OSCSenderNode.cpp
+    engine/nodes/AudioProcessorNode.cpp
+    engine/graphnode.cpp
+    engine/transport.cpp
+    engine/graphbuilder.cpp
+    engine/parameter.cpp
+    engine/midiclock.cpp
+    engine/nodefactory.cpp
+    engine/audioengine.cpp
+    engine/rootgraph.cpp
     globals.cpp
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp

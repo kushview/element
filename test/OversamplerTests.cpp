@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "engine/Oversampler.h"
+#include "engine/oversampler.hpp"
 
 using namespace Element;
 

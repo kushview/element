@@ -21,7 +21,7 @@
 #include "controllers/GuiController.h"
 #include "controllers/SessionController.h"
 
-#include "engine/AudioEngine.h"
+#include "engine/audioengine.hpp"
 
 #include "gui/AboutComponent.h"
 #include "gui/ContentComponent.h"

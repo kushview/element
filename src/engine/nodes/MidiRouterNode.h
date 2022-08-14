@@ -20,9 +20,9 @@
 #pragma once
 
 #include "engine/nodes/NodeTypes.h"
-#include "engine/NodeObject.h"
-#include "engine/LinearFade.h"
-#include "engine/ToggleGrid.h"
+#include "engine/nodeobject.hpp"
+#include "engine/linearfade.hpp"
+#include "engine/togglegrid.hpp"
 
 namespace Element {
 

@@ -20,8 +20,8 @@
 #pragma once
 
 #include "controllers/AppController.h"
-#include "engine/AudioEngine.h"
-#include "engine/Parameter.h"
+#include "engine/audioengine.hpp"
+#include "engine/parameter.hpp"
 #include "ElementApp.h"
 #include "globals.hpp"
 

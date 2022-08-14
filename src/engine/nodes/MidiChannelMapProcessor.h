@@ -20,7 +20,7 @@
 #pragma once
 
 #include "engine/nodes/BaseProcessor.h"
-#include "engine/MidiChannelMap.h"
+#include "engine/midichannelmap.hpp"
 
 namespace Element {
 

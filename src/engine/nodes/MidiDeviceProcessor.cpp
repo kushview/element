@@ -18,7 +18,7 @@
 */
 
 #include "engine/nodes/MidiDeviceProcessor.h"
-#include "engine/MidiEngine.h"
+#include "engine/midiengine.hpp"
 #include "gui/LookAndFeel.h"
 
 namespace Element {

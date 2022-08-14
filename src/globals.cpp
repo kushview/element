@@ -19,7 +19,7 @@
 #include <element/context.hpp>
 
 #include "ElementApp.h"
-#include "engine/InternalFormat.h"
+#include "engine/internalformat.hpp"
 #include "scripting/ScriptingEngine.h"
 #include "session/devicemanager.hpp"
 #include "session/pluginmanager.hpp"

@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
-#include "engine/IONode.h"
-#include "engine/NodeObject.h"
+#include "engine/ionode.hpp"
+#include "engine/nodeobject.hpp"
 
 using namespace Element;
 

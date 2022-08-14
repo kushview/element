@@ -20,9 +20,9 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/MidiPipe.h"
-#include "engine/Oversampler.h"
-#include "engine/Parameter.h"
+#include "engine/midipipe.hpp"
+#include "engine/oversampler.hpp"
+#include "engine/parameter.hpp"
 #include "portcount.hpp"
 
 namespace Element {

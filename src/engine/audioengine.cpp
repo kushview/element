@@ -17,14 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/AudioEngine.h"
-#include "engine/InternalFormat.h"
-#include "engine/MidiClock.h"
-#include "engine/MidiChannelMap.h"
-#include "engine/MidiEngine.h"
-#include "engine/MidiTranspose.h"
-#include "engine/Transport.h"
-#include "engine/RootGraph.h"
+#include "engine/audioengine.hpp"
+#include "engine/internalformat.hpp"
+#include "engine/midiclock.hpp"
+#include "engine/midichannelmap.hpp"
+#include "engine/midiengine.hpp"
+#include "engine/miditranspose.hpp"
+#include "engine/transport.hpp"
+#include "engine/rootgraph.hpp"
 #include "globals.hpp"
 #include "settings.hpp"
 

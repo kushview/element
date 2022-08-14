@@ -1,7 +1,7 @@
 
 #include "controllers/GuiController.h"
 #include "engine/nodes/NodeTypes.h"
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 
 #include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "engine/MidiEngine.h"
+#include "engine/midiengine.hpp"
 #include "gui/nodes/NodeEditorComponent.h"
 
 namespace Element {

@@ -18,8 +18,8 @@
 */
 
 #include "controllers/DevicesController.h"
-#include "engine/MappingEngine.h"
-#include "engine/MidiEngine.h"
+#include "engine/mappingengine.hpp"
+#include "engine/midiengine.hpp"
 #include "session/session.hpp"
 #include "globals.hpp"
 

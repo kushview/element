@@ -1,4 +1,4 @@
-#include "engine/Oversampler.h"
+#include "engine/oversampler.hpp"
 
 namespace Element {
 

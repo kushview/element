@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 
 namespace Element {
 

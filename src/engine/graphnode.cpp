@@ -17,17 +17,17 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/GraphBuilder.h"
-#include "engine/IONode.h"
+#include "engine/graphbuilder.hpp"
+#include "engine/ionode.hpp"
 #include "engine/nodes/AudioProcessorNode.h"
-#include "engine/AudioEngine.h"
-#include "engine/MidiPipe.h"
-#include "engine/MidiTranspose.h"
+#include "engine/audioengine.hpp"
+#include "engine/midipipe.hpp"
+#include "engine/miditranspose.hpp"
 #include "engine/nodes/NodeTypes.h"
 #include "session/node.hpp"
 #include "portcount.hpp"
 
-#include "engine/GraphNode.h"
+#include "engine/graphnode.hpp"
 
 namespace Element {
 

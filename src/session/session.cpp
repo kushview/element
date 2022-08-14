@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/InternalFormat.h"
-#include "engine/Transport.h"
+#include "engine/internalformat.hpp"
+#include "engine/transport.hpp"
 #include "session/node.hpp"
 #include "globals.hpp"
 

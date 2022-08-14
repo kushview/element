@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/AudioEngine.h"
+#include "engine/audioengine.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/views/NavigationView.h"
 #include "gui/TreeviewBase.h"

@@ -20,8 +20,8 @@
 #pragma once
 
 #include "controllers/Controller.h"
-#include "engine/AudioEngine.h"
-#include "engine/GraphNode.h"
+#include "engine/audioengine.hpp"
+#include "engine/graphnode.hpp"
 #include "session/node.hpp"
 
 namespace Element {

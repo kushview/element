@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "engine/IONode.h"
+#include "engine/ionode.hpp"
 
 using namespace Element;
 

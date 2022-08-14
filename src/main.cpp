@@ -20,7 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
-#include "engine/InternalFormat.h"
+#include "engine/internalformat.hpp"
 #include "scripting/ScriptingEngine.h"
 #include "session/devicemanager.hpp"
 #include "session/pluginmanager.hpp"

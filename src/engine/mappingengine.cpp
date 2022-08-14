@@ -17,9 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/NodeObject.h"
-#include "engine/MappingEngine.h"
-#include "engine/MidiEngine.h"
+#include "engine/nodeobject.hpp"
+#include "engine/mappingengine.hpp"
+#include "engine/midiengine.hpp"
 #include "session/controllerdevice.hpp"
 #include "session/node.hpp"
 

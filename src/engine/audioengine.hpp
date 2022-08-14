@@ -20,9 +20,9 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/Engine.h"
-#include "engine/MidiIOMonitor.h"
-#include "engine/Transport.h"
+#include "engine/engine.hpp"
+#include "engine/midiiomonitor.hpp"
+#include "engine/transport.hpp"
 #include "session/devicemanager.hpp"
 #include "session/session.hpp"
 #include "runmode.hpp"

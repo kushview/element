@@ -1,7 +1,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "engine/nodes/NodeTypes.h"
-#include "engine/NodeFactory.h"
+#include "engine/nodefactory.hpp"
 
 using namespace Element;
 

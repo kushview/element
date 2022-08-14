@@ -23,7 +23,7 @@
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
-#include "engine/GraphNode.h"
+#include "engine/graphnode.hpp"
 #include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"

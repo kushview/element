@@ -28,7 +28,7 @@
 #include "gui/PluginWindow.h"
 #include "gui/Workspace.h"
 #include "gui/WorkspacesContentComponent.h"
-#include "engine/AudioEngine.h"
+#include "engine/audioengine.hpp"
 #include "session/session.hpp"
 #include "session/commandmanager.hpp"
 #include "session/node.hpp"

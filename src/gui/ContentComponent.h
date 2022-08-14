@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 #include "session/session.hpp"
 #include "Workspace.h"
 

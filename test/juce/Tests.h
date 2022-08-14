@@ -23,17 +23,17 @@
 #include "controllers/AppController.h"
 #include "controllers/SessionController.h"
 
-#include "engine/AudioEngine.h"
-#include "engine/MappingEngine.h"
-#include "engine/InternalFormat.h"
+#include "engine/audioengine.hpp"
+#include "engine/mappingengine.hpp"
+#include "engine/internalformat.hpp"
 #include "engine/LinearFade.h"
-#include "engine/VelocityCurve.h"
+#include "engine/velocitycurve.hpp"
 #include "engine/ToggleGrid.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/nodes/VolumeProcessor.h"
 
-#include "engine/GraphNode.h"
-#include "engine/IONode.h"
+#include "engine/graphnode.hpp"
+#include "engine/ionode.hpp"
 
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"

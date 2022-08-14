@@ -20,8 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/AudioEngine.h"
-#include "engine/NodeObject.h"
+#include "engine/audioengine.hpp"
+#include "engine/nodeobject.hpp"
 #include "session/session.hpp"
 
 namespace Element {

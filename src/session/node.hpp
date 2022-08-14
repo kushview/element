@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 
 namespace Element {
 

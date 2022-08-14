@@ -19,9 +19,9 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/AudioEngine.h"
-#include "engine/MappingEngine.h"
-#include "engine/MidiEngine.h"
+#include "engine/audioengine.hpp"
+#include "engine/mappingengine.hpp"
+#include "engine/midiengine.hpp"
 #include "session/session.hpp"
 
 namespace element { class Context; }

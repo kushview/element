@@ -19,8 +19,8 @@
 
 #include "globals.hpp"
 #include "controllers/GuiController.h"
-#include "engine/NodeObject.h"
-#include "engine///GraphNode.h"
+#include "engine/nodeobject.hpp"
+#include "engine/graphnode.hpp"
 #include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"

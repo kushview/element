@@ -18,7 +18,7 @@
 */
 
 #include "controllers/GuiController.h"
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"

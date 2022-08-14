@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine///GraphNode.h"
+#include "engine/graphnode.hpp"
 #include "gui/GuiCommon.h"
 #include "gui/NodeIOConfiguration.h"
 #include "gui/MainWindow.h"

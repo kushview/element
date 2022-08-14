@@ -20,7 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphManager.h"
-#include "engine/AudioEngine.h"
+#include "engine/audioengine.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"

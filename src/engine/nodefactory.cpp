@@ -29,8 +29,8 @@
 #include "engine/nodes/OSCReceiverNode.h"
 #include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ScriptNode.h"
-#include "engine/NodeFactory.h"
-#include "engine/GraphNode.h"
+#include "engine/nodefactory.hpp"
+#include "engine/graphnode.hpp"
 
 namespace Element {
 

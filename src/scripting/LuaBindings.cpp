@@ -21,8 +21,8 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "engine/AudioEngine.h"
-#include "engine/MidiPipe.h"
+#include "engine/audioengine.hpp"
+#include "engine/midipipe.hpp"
 #include "gui/SystemTray.h"
 #include "scripting/ScriptManager.h"
 #include "session/commandmanager.hpp"

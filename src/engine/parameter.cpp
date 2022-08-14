@@ -19,7 +19,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/Parameter.h"
+#include "engine/parameter.hpp"
 
 namespace Element {
 

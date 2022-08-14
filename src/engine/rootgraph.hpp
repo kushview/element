@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "engine/GraphNode.h"
-#include "engine/IONode.h"
+#include "engine/graphnode.hpp"
+#include "engine/ionode.hpp"
 #include "session/devicemanager.hpp"
 
 namespace Element {

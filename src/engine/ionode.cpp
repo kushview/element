@@ -1,6 +1,6 @@
 
-#include "engine/IONode.h"
-#include "engine/GraphNode.h"
+#include "engine/ionode.hpp"
+#include "engine/graphnode.hpp"
 
 namespace Element {
 

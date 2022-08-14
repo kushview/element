@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "engine/NodeObject.h"
-#include "engine/LinearFade.h"
-#include "engine/ToggleGrid.h"
+#include "engine/nodeobject.hpp"
+#include "engine/linearfade.hpp"
+#include "engine/togglegrid.hpp"
 #include "engine/nodes/BaseProcessor.h"
 
 namespace Element {

@@ -23,7 +23,7 @@
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/RootGraph.h"
+#include "engine/rootgraph.hpp"
 #include "session/pluginmanager.hpp"
 #include "globals.hpp"
 #include "utils.hpp"

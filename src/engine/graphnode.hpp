@@ -20,8 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/NodeObject.h"
-#include "engine/VelocityCurve.h"
+#include "engine/nodeobject.hpp"
+#include "engine/velocitycurve.hpp"
 #include "signals.hpp"
 
 namespace Element {

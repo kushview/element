@@ -19,8 +19,8 @@
 
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
-#include "engine/RootGraph.h"
-#include "engine/VelocityCurve.h"
+#include "engine/rootgraph.hpp"
+#include "engine/velocitycurve.hpp"
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"

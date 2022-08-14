@@ -1,10 +1,9 @@
 
-#include "engine/NodeObject.h"
-#include "engine/MidiTranspose.h"
-#include "engine/BaseNode.h"
-#include "engine/GraphNode.h"
-#include "engine/GraphBuilder.h"
-#include "engine/IONode.h"
+#include "engine/nodeobject.hpp"
+#include "engine/miditranspose.hpp"
+#include "engine/graphnode.hpp"
+#include "engine/graphbuilder.hpp"
+#include "engine/ionode.hpp"
 
 namespace Element {
 

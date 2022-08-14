@@ -22,7 +22,7 @@
 #include "controllers/SessionController.h"
 #include "controllers/MappingController.h"
 #include "controllers/DevicesController.h"
-#include "engine/InternalFormat.h"
+#include "engine/internalformat.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/session.hpp"
 #include "ElementApp.h"

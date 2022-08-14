@@ -20,7 +20,7 @@
 #pragma once
 
 #include "sol/sol.hpp"
-#include "engine/Parameter.h"
+#include "engine/parameter.hpp"
 #include "scripting/ScriptInstance.h"
 #include "JuceHeader.h"
 

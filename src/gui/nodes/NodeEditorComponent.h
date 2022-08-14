@@ -20,7 +20,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 #include "session/node.hpp"
 
 #define EL_NODE_EDITOR_DEFAULT_ID "el.DefaultNodeEditor"

@@ -18,7 +18,7 @@
 */
 
 #include "el/factories.hpp"
-#include "engine/MidiPipe.h"
+#include "engine/midipipe.hpp"
 #include "scripting/DSPScript.h"
 
 using namespace kv;

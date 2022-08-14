@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 #include "gui/nodes/GenericNodeEditor.h"
 
 namespace Element {

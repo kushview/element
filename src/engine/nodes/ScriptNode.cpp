@@ -27,8 +27,8 @@
 
 #include "ElementApp.h"
 #include "engine/nodes/ScriptNode.h"
-#include "engine/MidiPipe.h"
-#include "engine/Parameter.h"
+#include "engine/midipipe.hpp"
+#include "engine/parameter.hpp"
 #include "scripting/LuaBindings.h"
 #include "scripting/DSPScript.h"
 #include "scripting/Script.h"

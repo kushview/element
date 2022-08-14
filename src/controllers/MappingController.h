@@ -18,7 +18,7 @@
 */
 
 #include "controllers/AppController.h"
-#include "engine/NodeObject.h"
+#include "engine/nodeobject.hpp"
 #include "session/controllerdevice.hpp"
 #include "signals.hpp"
 

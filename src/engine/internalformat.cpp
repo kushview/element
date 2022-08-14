@@ -41,9 +41,9 @@
 #include "engine/nodes/ScriptNode.h"
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
-#include "engine/AudioEngine.h"
-#include "engine/InternalFormat.h"
-#include "engine/IONode.h"
+#include "engine/audioengine.hpp"
+#include "engine/internalformat.hpp"
+#include "engine/ionode.hpp"
 
 #include "session/session.hpp"
 

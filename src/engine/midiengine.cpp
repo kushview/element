@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/MidiEngine.h"
+#include "engine/midiengine.hpp"
 #include "settings.hpp"
 
 namespace Element {
