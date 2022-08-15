@@ -21,111 +21,17 @@
 #include "JuceHeader.h"
 #include "datapath.hpp"
 #include "signals.hpp"
+#include "tags.hpp"
 
 #include <element/element.hpp>
 
-namespace kv {
-}
+namespace kv {}
 using namespace kv;
 
 //=============================================================================
 namespace element {
 
 using PortType = kv::PortType;
-
-namespace Tags {
-    using namespace kv::Slugs;
-    const Identifier active = "active";
-    const Identifier arc = "arc";
-    const Identifier arcs = "arcs";
-    const Identifier bypass = "bypass";
-    const Identifier control = "control";
-    const Identifier controller = "controller";
-    const Identifier controllers = "controllers";
-    const Identifier collapsed = "collapsed";
-    const Identifier delayCompensation = "delayCompensation";
-    const Identifier displayMode = "displayMode";
-    const Identifier enabled = "enabled";
-    const Identifier gain = "gain";
-    const Identifier graph = "graph";
-    const Identifier graphs = "graphs";
-    const Identifier hiddenPorts = "hiddenPorts";
-    const Identifier mappingData = "mappingData";
-    const Identifier map = "map";
-    const Identifier maps = "maps";
-    const Identifier missing = "missing";
-    const Identifier mute = "mute";
-    const Identifier node = "node";
-    const Identifier nodes = "nodes";
-    const Identifier notes = "notes";
-    const Identifier oversamplingFactor = "oversamplingFactor";
-    const Identifier persistent = "persistent";
-    const Identifier placeholder = "placeholder";
-    const Identifier port = "port";
-    const Identifier ports = "ports";
-    const Identifier preset = "preset";
-    const Identifier program = "program";
-    const Identifier sourceNode = "sourceNode";
-    const Identifier sourcePort = "sourcePort";
-    const Identifier sourceChannel = "sourceChannel";
-    const Identifier destNode = "destNode";
-    const Identifier destPort = "destPort";
-    const Identifier destChannel = "destChannel";
-
-    const Identifier identifier = "identifier";
-    const Identifier symbol = "symbol";
-    const Identifier format = "format";
-    const Identifier flow = "flow";
-    const Identifier input = "input";
-    const Identifier object = "object";
-    const Identifier output = "output";
-
-    const Identifier session = "session";
-    const Identifier state = "state";
-    const Identifier programState = "programState";
-    const Identifier beatsPerBar = "beatsPerBar";
-    const Identifier beatDivisor = "beatDivisor";
-    const Identifier midiChannel = "midiChannel";
-    const Identifier midiChannels = "midiChannels";
-    const Identifier midiProgram = "midiProgram";
-    const Identifier midiProgramsEnabled = "midiProgramsEnabled";
-    const Identifier globalMidiPrograms = "globalMidiPrograms";
-    const Identifier midiProgramsState = "midiProgramsState";
-    const Identifier renderMode = "renderMode";
-
-    const Identifier vertical = "vertical";
-    const Identifier staticPos = "staticPos";
-
-    const Identifier plugin = "plugin";
-
-    const Identifier windowOnTop = "windowOnTop";
-    const Identifier windowVisible = "windowVisible";
-    const Identifier x = "x";
-    const Identifier y = "y";
-    const Identifier windowX = "windowX";
-    const Identifier windowY = "windowY";
-    const Identifier relativeX = "relativeX";
-    const Identifier relativeY = "relativeY";
-    const Identifier width = "width";
-    const Identifier height = "height";
-    const Identifier pluginName = "pluginName";
-    const Identifier pluginIdentifierString = "pluginIdentifierString";
-    const Identifier uuid = "uuid";
-    const Identifier ui = "ui";
-    const Identifier parameter = "parameter";
-    const Identifier offline = "offline";
-
-    const Identifier transpose = "transpose";
-    const Identifier keyStart = "keyStart";
-    const Identifier keyEnd = "keyEnd";
-
-    const Identifier velocityCurveMode = "velocityCurveMode";
-    const Identifier workspace = "workspace";
-
-    const Identifier externalSync = "externalSync";
-
-    const Identifier updater = "updater";
-} // namespace Tags
 
 inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
 {

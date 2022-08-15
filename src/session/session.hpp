@@ -69,9 +69,9 @@ public:
     bool loadData (const ValueTree& data);
     void clear();
 
-    inline void setName (const String& name) { setProperty (Slugs::name, name); }
-    inline String getName() const { return objectData.getProperty (Slugs::name, "Invalid Session"); }
-    inline Value getNameValue() { return getPropertyAsValue (Slugs::name); }
+    inline void setName (const String& name) { setProperty (Tags::name, name); }
+    inline String getName() const { return objectData.getProperty (Tags::name, "Invalid Session"); }
+    inline Value getNameValue() { return getPropertyAsValue (Tags::name); }
 
     inline bool useExternalClock() const { return (bool) getProperty ("externalSync", false); }
 

@@ -278,7 +278,7 @@ private:
 
     void getSessionProperties (PropertyArray& props, Node g)
     {
-        props.add (new TextPropertyComponent (g.getPropertyAsValue (Slugs::name),
+        props.add (new TextPropertyComponent (g.getPropertyAsValue (Tags::name),
                                               TRANS ("Name"),
                                               256,
                                               false));

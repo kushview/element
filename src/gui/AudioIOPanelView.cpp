@@ -198,7 +198,7 @@ void AudioIOPanelView::labelTextChanged (Label* labelThatHasChanged)
 void AudioIOPanelView::setNode (const Node& node)
 {
     ValueTree n = node.node();
-    nodeNameLabel->getTextValue().referTo (n.getPropertyAsValue (Slugs::name, nullptr));
+    nodeNameLabel->getTextValue().referTo (n.getPropertyAsValue (Tags::name, nullptr));
 }
 //[/MiscUserCode]
 

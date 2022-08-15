@@ -179,7 +179,7 @@ public:
     /** Returns an Identifier indicating this nodes type */
     const Identifier getNodeType() const
     {
-        auto type = getProperty (Slugs::type).toString();
+        auto type = getProperty (Tags::type).toString();
         return type.isNotEmpty() ? type : Identifier ("unknown");
     }
 

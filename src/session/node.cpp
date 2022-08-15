@@ -138,7 +138,7 @@ Node::Node (const ValueTree& data, const bool setMissing)
 Node::Node (const Identifier& nodeType)
     : ObjectModel (Tags::node)
 {
-    objectData.setProperty (Slugs::type, nodeType.toString(), nullptr);
+    objectData.setProperty (Tags::type, nodeType.toString(), nullptr);
     setMissingProperties();
 }
 
