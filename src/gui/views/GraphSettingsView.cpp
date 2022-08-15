@@ -26,7 +26,7 @@
 #include "gui/views/GraphSettingsView.h"
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 typedef Array<PropertyComponent*> PropertyArray;
 
 class MidiChannelPropertyComponent : public ChoicePropertyComponent
@@ -378,4 +378,4 @@ void GraphSettingsView::valueChanged (Value& value)
     if (updateWhenActiveGraphChanges && value.refersToSameSourceAs (value))
         stabilizeContent();
 }
-} // namespace Element
+} // namespace element

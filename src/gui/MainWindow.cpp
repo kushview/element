@@ -28,7 +28,7 @@
 #include "settings.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 MainWindow::MainWindow (Context& g)
     : DocumentWindow (Util::appName(), Colours::darkgrey, DocumentWindow::allButtons, false),
@@ -171,4 +171,4 @@ AppController& MainWindow::getAppController()
         ->getAppController();
 }
 
-} // namespace Element
+} // namespace element

@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class Console : public Component
 {
@@ -60,4 +60,4 @@ private:
     void handleTextEntry (const String& text);
 };
 
-} // namespace Element
+} // namespace element

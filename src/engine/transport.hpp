@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 class Transport : public Shuttle
 {
 public:
@@ -114,4 +114,4 @@ private:
 
     MonitorPtr monitor;
 };
-} // namespace Element
+} // namespace element

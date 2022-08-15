@@ -43,7 +43,7 @@
 
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 static bool elNodeIsAudioMixer (const Node& node)
 {
@@ -1196,4 +1196,4 @@ BlockComponent* GraphEditorComponent::createBlock (const Node& node)
     return nullptr;
 }
 
-} // namespace Element
+} // namespace element

@@ -25,7 +25,7 @@
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"
 
-namespace Element {
+namespace element {
 
 WindowManager::WindowManager (GuiController& g) : gui (g) {}
 
@@ -94,4 +94,4 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
     return (editor != nullptr) ? createPluginWindowFor (node, editor.release()) : nullptr;
 }
 
-} // namespace Element
+} // namespace element

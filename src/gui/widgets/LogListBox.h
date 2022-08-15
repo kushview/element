@@ -22,7 +22,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class LogListBox : public ListBox,
                    public ListBoxModel,
@@ -97,4 +97,4 @@ private:
     StringArray logList;
 };
 
-} // namespace Element
+} // namespace element

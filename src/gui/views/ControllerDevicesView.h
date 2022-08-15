@@ -21,7 +21,7 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class ControllerDevicesView : public ContentView
 {
@@ -38,4 +38,4 @@ private:
     std::unique_ptr<Content> content;
 };
 
-} // namespace Element
+} // namespace element

@@ -21,7 +21,7 @@
 #include "engine/nodes/OSCReceiverNode.h"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 OSCReceiverNode::OSCReceiverNode()
     : MidiFilterNode (0)
@@ -211,4 +211,4 @@ void OSCReceiverNode::removeMessageLoopListener (OSCReceiver::Listener<OSCReceiv
     oscReceiver.removeListener (callback);
 }
 
-} // namespace Element
+} // namespace element

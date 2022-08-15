@@ -23,7 +23,7 @@
 #include "session/node.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphDocument : public FileBasedDocument,
                       private ValueTree::Listener
@@ -140,4 +140,4 @@ private:
     inline void valueTreeRedirected (ValueTree&) override {}
 };
 
-} // namespace Element
+} // namespace element

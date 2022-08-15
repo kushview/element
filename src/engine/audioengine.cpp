@@ -28,7 +28,7 @@
 #include "context.hpp"
 #include "settings.hpp"
 
-namespace Element {
+namespace element {
 
 struct RootGraphRender : public AsyncUpdater
 {
@@ -986,4 +986,4 @@ MidiIOMonitorPtr AudioEngine::getMidiIOMonitor() const
     return priv != nullptr ? priv->midiIOMonitor : nullptr;
 }
 
-} // namespace Element
+} // namespace element

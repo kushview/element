@@ -22,7 +22,7 @@
 #include "session/node.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class SessionGraphsListBox : public ListBox,
                              public ListBoxModel
@@ -66,4 +66,4 @@ private:
     SessionPtr session;
 };
 
-} // namespace Element
+} // namespace element

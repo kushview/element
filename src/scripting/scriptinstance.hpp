@@ -21,7 +21,7 @@
 
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 class ScriptInstance
 {
@@ -51,4 +51,4 @@ private:
     sol::object object;
 };
 
-} // namespace Element
+} // namespace element

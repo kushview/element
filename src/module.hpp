@@ -11,7 +11,7 @@
 #include "manifest.hpp"
 #include "search_path.hpp"
 
-namespace Element {
+namespace element {
 
 using FeatureMap = std::map<std::string, const void*>;
 
@@ -124,4 +124,4 @@ private:
     std::map<std::string, std::string> discovered;
 };
 
-} // namespace Element
+} // namespace element

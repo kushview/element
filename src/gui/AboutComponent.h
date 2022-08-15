@@ -27,7 +27,7 @@
 #include "context.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class AboutComponent : public Component
 {
@@ -71,4 +71,4 @@ private:
     GuiController& gui;
 };
 
-} // namespace Element
+} // namespace element

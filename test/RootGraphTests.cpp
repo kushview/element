@@ -2,7 +2,7 @@
 #include "engine/rootgraph.hpp"
 #include "utils.hpp"
 
-using namespace Element;
+using namespace element;
 
 struct DummyAudioDeviceSetup : DeviceManager::AudioDeviceSetup
 {

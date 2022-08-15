@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Element {
+namespace element {
 namespace test {
 
 inline static File getSourceRoot()
@@ -9,4 +9,4 @@ inline static File getSourceRoot()
 }
 
 } // namespace test
-} // namespace Element
+} // namespace element

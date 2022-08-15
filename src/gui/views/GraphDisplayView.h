@@ -23,7 +23,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/widgets/BreadCrumbComponent.h"
 
-namespace Element {
+namespace element {
 
 /** This is a simple container which displays a breadcrumb above a content area */
 class GraphDisplayView : public ContentView,
@@ -139,4 +139,4 @@ private:
     ConfigButton configButton, sessionConfigButton;
 };
 
-} // namespace Element
+} // namespace element

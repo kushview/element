@@ -6,7 +6,7 @@
 
 #include "filesystem.hpp"
 
-namespace Element {
+namespace element {
 
 extern std::string wildcard_to_regex (const std::string& wildcard);
 
@@ -90,4 +90,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

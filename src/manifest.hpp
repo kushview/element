@@ -7,7 +7,7 @@
 #include "filesystem.hpp"
 #include <sol/sol.hpp>
 
-namespace Element {
+namespace element {
 
 static constexpr const char* MANIFEST_FILENAME = "manifest.lua";
 
@@ -59,4 +59,4 @@ static Manifest read_module_manifest (Tx&& bundle_path)
     return result;
 }
 
-} // namespace Element
+} // namespace element

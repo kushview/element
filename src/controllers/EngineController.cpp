@@ -31,7 +31,7 @@
 
 #include "controllers/EngineController.h"
 
-namespace Element {
+namespace element {
 
 struct RootGraphHolder
 {
@@ -973,4 +973,4 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
     findSibling<GuiController>()->stabilizeViews();
 }
 
-} // namespace Element
+} // namespace element

@@ -24,7 +24,7 @@
 #include "gui/LookAndFeel.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class IconButton : public Button
 {
@@ -397,4 +397,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

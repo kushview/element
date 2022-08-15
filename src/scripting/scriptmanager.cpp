@@ -24,7 +24,7 @@
 #include "datapath.hpp"
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 static void scanForScripts (File dir, Array<ScriptDescription>& results, bool recursive = true)
 {
@@ -185,4 +185,4 @@ File ScriptManager::getUserScriptsDir()
     return DataPath::defaultScriptsDir().getFullPathName();
 }
 
-} // namespace Element
+} // namespace element

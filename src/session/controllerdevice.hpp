@@ -30,7 +30,7 @@
     EL_OBJECT_GETTER (a, b)               \
     EL_OBJECT_SETTER (a, b)
 
-namespace Element {
+namespace element {
 
 class ControllerDevice : public ObjectModel
 {
@@ -203,4 +203,4 @@ public:
     inline int getParameterIndex() const { return (int) objectData.getProperty (Tags::parameter, -1); }
 };
 
-} // namespace Element
+} // namespace element

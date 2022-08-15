@@ -21,7 +21,7 @@
 #include "gui/LookAndFeel.h"
 #include "gui/nodes/OSCSenderNodeEditor.h"
 
-namespace Element {
+namespace element {
 
 OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
     : NodeEditorComponent (node)
@@ -297,4 +297,4 @@ void OSCSenderNodeEditor::updatePauseButton()
     pauseButton.setButtonText (paused ? "Resume" : "Pause");
 };
 
-}; // namespace Element
+}; // namespace element

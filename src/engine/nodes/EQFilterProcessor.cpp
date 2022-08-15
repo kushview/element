@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "EQFilterProcessor.h"
 #include "gui/nodes/EQFilterNodeEditor.h"
 
-namespace Element {
+namespace element {
 
 EQFilterProcessor::EQFilterProcessor (const int _numChannels)
     : BaseProcessor (BusesProperties()
@@ -127,4 +127,4 @@ void EQFilterProcessor::numChannelsChanged()
     numChannels = getTotalNumInputChannels();
 }
 
-} // namespace Element
+} // namespace element

@@ -25,7 +25,7 @@
 #include "messages.hpp"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class ControllerMapsTable : public TableListBox,
                             public TableListBoxModel
@@ -443,7 +443,7 @@ private:
         ControllerRow (ControlListBox& l) : list (l)
         {
             status.setJustificationType (Justification::centredRight);
-            status.setColour (Label::textColourId, Element::LookAndFeel::textColor.darker());
+            status.setColour (Label::textColourId, element::LookAndFeel::textColor.darker());
             status.setInterceptsMouseClicks (false, false);
             addAndMakeVisible (status);
         }
@@ -1141,4 +1141,4 @@ void ControllerDevicesView::stabilizeContent()
     content->stabilizeContent();
 }
 
-} // namespace Element
+} // namespace element

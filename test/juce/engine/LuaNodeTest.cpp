@@ -2,7 +2,7 @@
 #include "engine/nodes/LuaNode.h"
 #include "LuaUnitTest.h"
 
-using namespace Element;
+using namespace element;
 
 static const String nodeScript = R"(
 function node_io_ports()

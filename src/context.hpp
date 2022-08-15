@@ -24,7 +24,7 @@
 #include "engine/midiengine.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class CommandManager;
 class DeviceManager;
@@ -68,4 +68,4 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
-} // namespace Element
+} // namespace element

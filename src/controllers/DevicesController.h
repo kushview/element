@@ -22,7 +22,7 @@
 #include "controllers/AppController.h"
 #include "session/controllerdevice.hpp"
 
-namespace Element {
+namespace element {
 
 class DevicesController : public AppController::Child
 {
@@ -47,4 +47,4 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
-} // namespace Element
+} // namespace element

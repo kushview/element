@@ -21,7 +21,7 @@
 #include "gui/views/LuaConsoleView.h"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 LuaConsoleView::~LuaConsoleView()
 {
@@ -48,4 +48,4 @@ void LuaConsoleView::initializeView (AppController& app)
     console.addText (buffer.trimEnd(), false);
 }
 
-} // namespace Element
+} // namespace element

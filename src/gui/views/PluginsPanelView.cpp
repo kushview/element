@@ -21,7 +21,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/views/PluginsPanelView.h"
 
-namespace Element {
+namespace element {
 
 class PluginTreeViewItem : public TreeViewItem
 {
@@ -51,7 +51,7 @@ public:
     }
     void paintItem (Graphics& g, int width, int height) override
     {
-        g.setColour (Element::LookAndFeel::textColor.darker (0.22f));
+        g.setColour (element::LookAndFeel::textColor.darker (0.22f));
         String text = desc->name;
         String extra = shortFormatName (desc->pluginFormatName);
 
@@ -59,7 +59,7 @@ public:
         g.drawText (text, 0, 0, leftSide, height, Justification::centredLeft);
         if (extra.isNotEmpty())
         {
-            g.setColour (Element::LookAndFeel::textColor.withAlpha (0.8f));
+            g.setColour (element::LookAndFeel::textColor.withAlpha (0.8f));
             extra = String ("(") + extra + String (")");
             g.setFont (Font (12.f));
             g.drawText (extra, leftSide, 0, width - leftSide - 3, height, Justification::centredRight);
@@ -80,7 +80,7 @@ public:
     PluginsPanelView& panel;
     void paintItem (Graphics& g, int width, int height) override
     {
-        g.setColour (Element::LookAndFeel::textColor);
+        g.setColour (element::LookAndFeel::textColor);
         g.drawText (tree.folder, 6, 0, width - 6, height, Justification::centredLeft);
     }
 
@@ -197,4 +197,4 @@ void PluginsPanelView::changeListenerCallback (ChangeBroadcaster* src)
     tree.setRootItem (new PluginsPanelTreeRootItem (*this, plugins));
 }
 
-} // namespace Element
+} // namespace element

@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 namespace Midi {
 
@@ -181,4 +181,4 @@ private:
     MidiBuffer tempMidi;
 };
 
-} // namespace Element
+} // namespace element

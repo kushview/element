@@ -25,7 +25,7 @@
 #include "engine/nodes/MidiFilterNode.h"
 #include "engine/nodes/NodeTypes.h"
 
-namespace Element {
+namespace element {
 
 class OSCSenderNode : public MidiFilterNode,
                       public ChangeBroadcaster,
@@ -113,4 +113,4 @@ private:
     bool midiMessageQueueInitDone = false;
 };
 
-} // namespace Element
+} // namespace element

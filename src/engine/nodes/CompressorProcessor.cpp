@@ -20,7 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "CompressorProcessor.h"
 #include "gui/nodes/CompressorNodeEditor.h"
 
-namespace Element {
+namespace element {
 
 CompressorProcessor::CompressorProcessor (const int _numChannels)
     : BaseProcessor (BusesProperties()
@@ -170,4 +170,4 @@ void CompressorProcessor::numChannelsChanged()
     numChannels = getTotalNumInputChannels();
 }
 
-} // namespace Element
+} // namespace element

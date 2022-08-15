@@ -37,7 +37,7 @@
     "along with this program; if not, write to the Free Software\r\n"          \
     "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\r\n"
 
-namespace Element {
+namespace element {
 namespace About {
 
     static StringArray getDevelopers()
@@ -258,4 +258,4 @@ void AboutComponent::paint (Graphics& g)
         elementLogo->drawWithin (g, elementLogoBounds, RectanglePlacement::centred, 1.0);
 }
 
-} // namespace Element
+} // namespace element

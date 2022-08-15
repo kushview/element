@@ -23,7 +23,7 @@
 #include "session/session.hpp"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class DevicesController::Impl
 {
@@ -195,4 +195,4 @@ void DevicesController::refresh()
     mapping.startMapping();
 }
 
-} // namespace Element
+} // namespace element

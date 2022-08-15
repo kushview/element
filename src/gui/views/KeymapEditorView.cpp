@@ -22,7 +22,7 @@
 #include "context.hpp"
 #include "gui/views/KeymapEditorView.h"
 
-namespace Element {
+namespace element {
 
 class KeymapEditor : public KeyMappingEditorComponent
 {
@@ -107,4 +107,4 @@ void KeymapEditorView::saveMappings()
                     "keymappings", xml.get());
 }
 
-} // namespace Element
+} // namespace element

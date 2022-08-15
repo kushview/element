@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class BreadCrumbComponent;
 class Node;
@@ -77,4 +77,4 @@ private:
     ScopedPointer<QuadrantLayout> quads;
 };
 
-} // namespace Element
+} // namespace element

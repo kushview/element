@@ -29,7 +29,7 @@
 
 #include "engine/graphnode.hpp"
 
-namespace Element {
+namespace element {
 
 GraphNode::Connection::Connection (const uint32 sourceNode_, const uint32 sourcePort_, const uint32 destNode_, const uint32 destPort_) noexcept
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_) {}
@@ -578,4 +578,4 @@ void GraphNode::setPlayHead (AudioPlayHead* newPlayHead)
         node->setPlayHead (playhead);
 }
 
-} // namespace Element
+} // namespace element

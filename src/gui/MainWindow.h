@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class Context;
@@ -53,4 +53,4 @@ private:
     void nameChangedSingleGraph();
 };
 
-} // namespace Element
+} // namespace element

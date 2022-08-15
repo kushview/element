@@ -20,7 +20,7 @@
 #include "engine/midiengine.hpp"
 #include "settings.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 void MidiEngine::applySettings (Settings& settings)
@@ -330,4 +330,4 @@ void MidiEngine::setDefaultMidiOutput (const String& deviceName)
     }
 }
 
-} // namespace Element
+} // namespace element

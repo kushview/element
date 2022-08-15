@@ -21,7 +21,7 @@
 #include "context.hpp"
 #include "settings.hpp"
 
-namespace Element {
+namespace element {
 
 const char* Settings::checkForUpdatesKey = "checkForUpdates";
 const char* Settings::pluginFormatsKey = "pluginFormatsKey";
@@ -649,4 +649,4 @@ bool Settings::performMenuResult (Context& world, const int result)
     return handled;
 }
 
-} // namespace Element
+} // namespace element

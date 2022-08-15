@@ -33,7 +33,7 @@
 #include "settings.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class Startup : public ActionBroadcaster,
                 private Thread
@@ -58,8 +58,6 @@ public:
         ignoreUnused (path);
 
         updateSettingsIfNeeded();
-
-        
 
         if (usingThread)
         {
@@ -401,7 +399,7 @@ public:
 #ifndef EL_SOLO
         if (auto* sc = controller->findChild<SessionController>())
         {
-            const auto path = world->cli.commandLine.unquoted().trim();
+            const auto path = getCommandLineParameters();
             if (File::isAbsolutePath (path))
             {
                 const File file (path);
@@ -482,6 +480,6 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element
 
-START_JUCE_APPLICATION (Element::Application)
+START_JUCE_APPLICATION (element::Application)

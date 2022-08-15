@@ -29,7 +29,7 @@
 #include "session/session.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class EngineControl;
@@ -120,7 +120,7 @@ public:
     void closePluginWindow (PluginWindow*);
 
     /** Get the look and feel used by this instance */
-    Element::LookAndFeel& getLookAndFeel();
+    element::LookAndFeel& getLookAndFeel();
 
     /** Clears the current content component */
     void clearContentComponent();
@@ -161,4 +161,4 @@ private:
     void saveProperties (PropertiesFile* props);
 };
 
-} // namespace Element
+} // namespace element

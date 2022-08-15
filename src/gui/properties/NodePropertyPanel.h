@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class Node;
 class NodeObjectSync;
@@ -60,4 +60,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePropertyPanel)
 };
 
-} // namespace Element
+} // namespace element

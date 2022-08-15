@@ -23,7 +23,7 @@
 #include "session/commandmanager.hpp"
 #include "runmode.hpp"
 
-namespace Element {
+namespace element {
 
 class Context;
 class Settings;
@@ -129,4 +129,4 @@ private:
     void run();
 };
 
-} // namespace Element
+} // namespace element

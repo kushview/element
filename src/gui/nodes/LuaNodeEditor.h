@@ -24,7 +24,7 @@
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/LuaTokeniser.h"
 
-namespace Element {
+namespace element {
 
 class LuaNodeEditor : public NodeEditorComponent,
                       public ChangeListener
@@ -52,4 +52,4 @@ private:
     void onPortsChanged();
 };
 
-} // namespace Element
+} // namespace element

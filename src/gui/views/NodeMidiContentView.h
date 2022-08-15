@@ -23,7 +23,7 @@
 #include "gui/widgets/MidiChannelSelectComponent.h"
 #include "gui/widgets/NodeMidiProgramComponent.h"
 
-namespace Element {
+namespace element {
 
 class NodeMidiContentView : public ContentView
 {
@@ -62,4 +62,4 @@ private:
     void updateMidiProgram();
 };
 
-} // namespace Element
+} // namespace element

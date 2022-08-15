@@ -25,7 +25,7 @@
 #include "context.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 enum LearnState
 {
@@ -367,4 +367,4 @@ void MappingController::remove (const ControllerMap& controllerMap)
     }
 }
 
-} // namespace Element
+} // namespace element

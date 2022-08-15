@@ -72,7 +72,7 @@ extern int luaopen_el_Session (lua_State*);
 
 using namespace sol;
 
-namespace Element {
+namespace element {
 namespace Lua {
 
     //==============================================================================
@@ -423,4 +423,4 @@ namespace Lua {
     }
 
 } // namespace Lua
-} // namespace Element
+} // namespace element

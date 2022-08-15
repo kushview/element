@@ -20,7 +20,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 namespace Commands {
 
     using namespace StandardApplicationCommandIDs;
@@ -375,4 +375,4 @@ namespace Commands {
     }
 
 } // namespace Commands
-} // namespace Element
+} // namespace element

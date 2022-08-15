@@ -22,7 +22,7 @@
 
 #include "gui/Timeline.h"
 
-namespace Element {
+namespace element {
 
 class SequencerComponent;
 
@@ -76,6 +76,6 @@ private:
     Range<double> timespan;
 };
 
-} // namespace Element
+} // namespace element
 
 #endif /* ELEMENT_SEQUENCER_CLIP_ITEM_H */

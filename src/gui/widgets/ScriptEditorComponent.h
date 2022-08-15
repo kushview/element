@@ -21,7 +21,7 @@
 
 #include "gui/LuaTokeniser.h"
 
-namespace Element {
+namespace element {
 
 /** A juce::CodeEditorComponent that sets some default options and color scheme */
 class ScriptEditorComponent : public CodeEditorComponent
@@ -58,4 +58,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptEditorComponent)
 };
 
-} // namespace Element
+} // namespace element

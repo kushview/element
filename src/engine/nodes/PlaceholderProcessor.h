@@ -22,7 +22,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class PlaceholderProcessor : public BaseProcessor
 {
@@ -177,4 +177,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlaceholderProcessor)
 };
 
-} // namespace Element
+} // namespace element

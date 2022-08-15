@@ -3,7 +3,7 @@
 
 #include "engine/nodeobject.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphNode;
 
@@ -86,4 +86,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IONode)
 };
 
-} // namespace Element
+} // namespace element

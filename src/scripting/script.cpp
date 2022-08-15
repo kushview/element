@@ -22,7 +22,7 @@
 #include "scripting/scriptdescription.hpp"
 #include "scripting/script.hpp"
 
-namespace Element {
+namespace element {
 
 Script::Script (lua_State* state)
 {
@@ -114,4 +114,4 @@ bool Script::load (const String& buffer)
     return hasloaded;
 }
 
-} // namespace Element
+} // namespace element

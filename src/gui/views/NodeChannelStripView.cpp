@@ -26,7 +26,7 @@
 #include "context.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class NodeChannelStripView::Content : public NodeChannelStripComponent
 {
@@ -80,4 +80,4 @@ void NodeChannelStripView::initializeView (AppController& app)
     repaint();
 }
 
-} // namespace Element
+} // namespace element

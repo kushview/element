@@ -37,7 +37,7 @@
 
 #define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT 20000 // 20 Seconds
 
-namespace Element {
+namespace element {
 
 static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
@@ -1035,4 +1035,4 @@ Node PluginManager::getDefaultNode (const PluginDescription& desc) const
     return node;
 }
 
-} // namespace Element
+} // namespace element

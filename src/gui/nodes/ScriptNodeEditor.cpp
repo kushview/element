@@ -26,7 +26,7 @@
 #include "scripting/scriptmanager.hpp"
 #include "scripting/script.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 class ControlPort : private ParameterListener
@@ -443,7 +443,7 @@ void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void ScriptNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::widgetBackgroundColor.darker());
+    g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker());
 }
 
 void ScriptNodeEditor::resized()
@@ -476,4 +476,4 @@ void ScriptNodeEditor::resized()
     }
 }
 
-} // namespace Element
+} // namespace element

@@ -24,7 +24,7 @@
 #include "engine/nodeobject.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class ContentComponent;
 class Context;
@@ -114,4 +114,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ViewHelperMixin);
 };
 
-} // namespace Element
+} // namespace element

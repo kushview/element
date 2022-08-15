@@ -21,7 +21,7 @@
 
 #include "scripting/scriptdescription.hpp"
 
-namespace Element {
+namespace element {
 
 using ScriptArray = Array<ScriptDescription>;
 
@@ -61,4 +61,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptManager);
 };
 
-} // namespace Element
+} // namespace element

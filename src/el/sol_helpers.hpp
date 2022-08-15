@@ -20,7 +20,7 @@ struct unique_usertype_traits<ReferenceCountedObjectPtr<T>>
 };
 } // namespace sol
 
-namespace Element {
+namespace element {
 namespace lua {
     /** Removes a field from the table then clears it.
         @param tbl Input table

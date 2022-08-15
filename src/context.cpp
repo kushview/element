@@ -31,7 +31,7 @@
 #include "module.hpp"
 #include "settings.hpp"
 
-namespace Element {
+namespace element {
 
 class Context::Impl
 {
@@ -240,4 +240,4 @@ void Context::discoverModules()
     impl->modules->discover();
 }
 
-} // namespace Element
+} // namespace element

@@ -22,7 +22,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/midichannelmap.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiChannelMapProcessor : public BaseProcessor,
                                 public AudioProcessorParameter::Listener
@@ -196,4 +196,4 @@ private:
     MidiBuffer tempMidi;
 };
 
-} // namespace Element
+} // namespace element

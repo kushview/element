@@ -23,12 +23,12 @@
 
 #include "testutil.hpp"
 
-namespace et = Element::test;
+namespace et = element::test;
 
 BOOST_AUTO_TEST_SUITE (ScriptManagerTests)
 
 BOOST_AUTO_TEST_CASE (ScanDirectory) {
-    Element::ScriptManager scripts;
+    element::ScriptManager scripts;
     auto d = et::getSourceRoot().getChildFile ("scripts");
     scripts.scanDirectory (d);
     BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 5);

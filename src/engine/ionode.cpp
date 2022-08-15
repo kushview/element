@@ -2,7 +2,7 @@
 #include "engine/ionode.hpp"
 #include "engine/graphnode.hpp"
 
-namespace Element {
+namespace element {
 
 IONode::IONode (const IODeviceType type_)
     : NodeObject (0),
@@ -175,4 +175,4 @@ void IONode::setParentGraph (GraphNode* const newGraph)
     refreshPorts();
 }
 
-} // namespace Element
+} // namespace element

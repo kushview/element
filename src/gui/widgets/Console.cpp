@@ -20,7 +20,7 @@
 #include "gui/widgets/Console.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 static void setupEditor (TextEditor& editor)
 {
@@ -203,7 +203,7 @@ private:
         prompt.moveCaretToEnd();
     }
 
-    struct Style : public Element::LookAndFeel
+    struct Style : public element::LookAndFeel
     {
         void fillTextEditorBackground (Graphics& g, int w, int h, TextEditor& e) override
         {
@@ -272,4 +272,4 @@ void Console::handleTextEntry (const String& text)
     textEntered (text);
 }
 
-} // namespace Element
+} // namespace element

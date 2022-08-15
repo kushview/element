@@ -33,10 +33,10 @@
 
 #include "plugins/PluginEditor.h"
 
-namespace Element {
+namespace element {
 namespace ViewHelpers {
 
-    typedef Element::LookAndFeel LF;
+    typedef element::LookAndFeel LF;
 
     void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding, Justification alignment)
     {
@@ -218,4 +218,4 @@ void ViewHelperMixin::disconnectPorts (const Port& src, const Port& dst)
     postMessage (new RemoveConnectionMessage (srcNode.getNodeId(), src.getIndex(), dstNode.getNodeId(), dst.getIndex(), graph));
 }
 
-} // namespace Element
+} // namespace element

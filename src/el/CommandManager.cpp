@@ -8,7 +8,7 @@
 
 EL_PLUGIN_EXPORT int luaopen_el_CommandManager (lua_State* L)
 {
-    using namespace Element;
+    using namespace element;
     sol::state_view lua (L);
     auto M = lua.create_table();
     M.new_usertype<CommandManager> ("CommandManager", sol::no_constructor,

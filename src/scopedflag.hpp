@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** Utility class that will set a boolean to a a new value, then
     reset it back when this class goes out of scope 
@@ -44,4 +44,4 @@ private:
     bool previousValue;
 };
 
-} // namespace Element
+} // namespace element

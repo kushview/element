@@ -18,9 +18,9 @@
 
 #include "Tests.h"
 
-using namespace Element;
+using namespace element;
 
-namespace Element {
+namespace element {
 
 class NodeTests : public UnitTestBase
 {

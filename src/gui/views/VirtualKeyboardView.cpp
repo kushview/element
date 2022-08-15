@@ -21,7 +21,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/views/VirtualKeyboardView.h"
 
-namespace Element {
+namespace element {
 
 static int getOctaveOffsetForKeyPress (const KeyPress& key, const int fallback = 6)
 {
@@ -347,4 +347,4 @@ bool VirtualKeyboardView::keyStateChanged (bool isDown)
     return keyboard != nullptr ? keyboard->keyStateChanged (isDown) : false;
 }
 
-} // namespace Element
+} // namespace element

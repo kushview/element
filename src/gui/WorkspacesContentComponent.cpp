@@ -30,7 +30,7 @@
 #include "settings.hpp"
 #include "BinaryData.h"
 
-namespace Element {
+namespace element {
 
 class WorkspacesContentComponent::Impl
 {
@@ -466,4 +466,4 @@ void WorkspacesContentComponent::setMainView (ContentView* v)
     }
 }
 
-} // namespace Element
+} // namespace element

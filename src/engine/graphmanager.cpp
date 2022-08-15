@@ -28,7 +28,7 @@
 #include "context.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
@@ -789,4 +789,4 @@ void RootGraphManager::unloadGraph()
     getRootGraph().clear();
 }
 
-} // namespace Element
+} // namespace element

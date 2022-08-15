@@ -21,7 +21,7 @@
 
 #include "controllers/AppController.h"
 
-namespace Element {
+namespace element {
 
 class ScriptingController : public AppController::Child
 {
@@ -32,4 +32,4 @@ public:
     void deactivate() override;
 };
 
-} // namespace Element
+} // namespace element

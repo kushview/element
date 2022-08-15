@@ -28,7 +28,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 /**
@@ -122,4 +122,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioDeviceSelectorComponent)
 };
 
-} // namespace Element
+} // namespace element

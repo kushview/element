@@ -22,7 +22,7 @@
 #include "gui/nodes/NodeEditorComponent.h"
 #include "session/devicemanager.hpp"
 
-namespace Element {
+namespace element {
 
 class AudioIONodeEditor : public NodeEditorComponent,
                           public ChangeListener
@@ -127,4 +127,4 @@ private:
     std::unique_ptr<Content> content;
 };
 
-} // namespace Element
+} // namespace element

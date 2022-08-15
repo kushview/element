@@ -19,7 +19,7 @@
 
 #include "gui/Window.h"
 
-namespace Element {
+namespace element {
 
 Dialog::Dialog (const String& name)
     : DialogWindow (name, Colours::darkgrey, true, true)
@@ -57,4 +57,4 @@ void Window::closeButtonPressed()
     closedSignal();
 }
 
-} /* namespace Element */
+} /* namespace element */

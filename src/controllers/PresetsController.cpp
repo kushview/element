@@ -25,7 +25,7 @@
 #include "context.hpp"
 #include "datapath.hpp"
 
-namespace Element {
+namespace element {
 
 struct PresetsController::Pimpl
 {
@@ -79,4 +79,4 @@ void PresetsController::add (const Node& node, const String& presetName)
             cc->stabilize (true);
 }
 
-} // namespace Element
+} // namespace element

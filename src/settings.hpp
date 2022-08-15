@@ -20,7 +20,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class Context;
 
@@ -133,4 +133,4 @@ private:
     PropertiesFile* getProps() const;
 };
 
-} // namespace Element
+} // namespace element

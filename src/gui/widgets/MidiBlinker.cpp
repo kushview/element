@@ -20,7 +20,7 @@
 #include "gui/widgets/MidiBlinker.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 MidiBlinker::MidiBlinker()
 {
@@ -73,4 +73,4 @@ void MidiBlinker::timerCallback()
     repaint();
 }
 
-} // namespace Element
+} // namespace element

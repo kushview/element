@@ -22,7 +22,7 @@
 #include "gui/nodes/MidiMonitorNodeEditor.h"
 #include "gui/ViewHelpers.h"
 
-namespace Element {
+namespace element {
 
 using MidiMonitorNodePtr = ReferenceCountedObjectPtr<MidiMonitorNode>;
 
@@ -105,4 +105,4 @@ void MidiMonitorNodeEditor::resized()
     logger->setBounds (r1);
 }
 
-}; // namespace Element
+}; // namespace element

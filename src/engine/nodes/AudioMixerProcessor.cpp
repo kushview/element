@@ -24,7 +24,7 @@
 #define EL_FADER_MIN_DB -90.0
 #define EL_FADER_MAX_DB 12.0
 
-namespace Element {
+namespace element {
 
 typedef AudioMixerProcessor::MonitorPtr MonitorPtr;
 
@@ -657,4 +657,4 @@ void AudioMixerProcessor::setStateInformation (const void* data, int size)
     newTracks.clear();
 }
 
-} // namespace Element
+} // namespace element

@@ -3,7 +3,7 @@
 #include "engine/nodes/NodeTypes.h"
 #include "engine/nodefactory.hpp"
 
-using namespace Element;
+using namespace element;
 
 BOOST_AUTO_TEST_SUITE (NodeFactoryTests)
 

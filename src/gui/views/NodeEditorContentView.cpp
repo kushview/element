@@ -37,7 +37,7 @@
 #include "session/devicemanager.hpp"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class NodeEditorContentView::NodeWatcher : private ValueTree::Listener
 {
@@ -228,7 +228,7 @@ void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView*
 
 void NodeEditorContentView::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::backgroundColor);
+    g.fillAll (element::LookAndFeel::backgroundColor);
 }
 
 void NodeEditorContentView::comboBoxChanged (ComboBox*)
@@ -384,7 +384,7 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             if (node.isChildOfRootGraph())
             {
-                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(),
+                return new element::AudioDeviceSelectorComponent (world->getDeviceManager(),
                                                                   1,
                                                                   DeviceManager::maxAudioChannels,
                                                                   0,
@@ -409,7 +409,7 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             if (node.isChildOfRootGraph())
             {
-                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(),
+                return new element::AudioDeviceSelectorComponent (world->getDeviceManager(),
                                                                   0,
                                                                   0,
                                                                   1,
@@ -440,4 +440,4 @@ Component* NodeEditorContentView::createEmbededEditor()
     return proc != nullptr ? new GenericNodeEditor (node) : nullptr;
 }
 
-} // namespace Element
+} // namespace element

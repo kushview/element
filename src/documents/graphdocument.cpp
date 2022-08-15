@@ -19,7 +19,7 @@
 
 #include "documents/graphdocument.hpp"
 
-namespace Element {
+namespace element {
 
 GraphDocument::GraphDocument()
     : FileBasedDocument (".elg", "*.elg", "Open Graph", "Save Graph")
@@ -95,4 +95,4 @@ void GraphDocument::setLastDocumentOpened (const File& file)
     lastGraph = file;
 }
 
-} // namespace Element
+} // namespace element

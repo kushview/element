@@ -22,7 +22,7 @@
 #include "JuceHeader.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 /** Monitors MIDI input/output from device IO in the audio engine */
 class MidiIOMonitor : public ReferenceCountedObject
@@ -65,4 +65,4 @@ private:
 
 typedef ReferenceCountedObjectPtr<MidiIOMonitor> MidiIOMonitorPtr;
 
-} // namespace Element
+} // namespace element

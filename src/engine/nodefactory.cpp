@@ -32,7 +32,7 @@
 #include "engine/nodefactory.hpp"
 #include "engine/graphnode.hpp"
 
-namespace Element {
+namespace element {
 
 NodeFactory::NodeFactory()
 {
@@ -115,4 +115,4 @@ NodeObject* NodeFactory::wrap (AudioProcessor* processor)
     return node.release();
 }
 
-} // namespace Element
+} // namespace element

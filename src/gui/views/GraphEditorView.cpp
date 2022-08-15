@@ -23,7 +23,7 @@
 #include "common.hpp"
 #include "scopedcallback.hpp"
 
-namespace Element {
+namespace element {
 
 GraphEditorView::GraphEditorView()
 {
@@ -319,4 +319,4 @@ void GraphEditorView::saveSettings()
     s.setProperty ("nodePropsVisible", nodeProps.isVisible(), nullptr);
 }
 
-} /* namespace Element */
+} /* namespace element */

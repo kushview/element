@@ -4,7 +4,7 @@
 #include "engine/graphnode.hpp"
 #include "utils.hpp"
 
-using namespace Element;
+using namespace element;
 
 BOOST_AUTO_TEST_SUITE (GraphNodeTests)
 

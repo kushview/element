@@ -22,7 +22,7 @@
 #include "gui/Icons.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 class TreeItemBase : public TreeViewItem
 {
@@ -206,4 +206,4 @@ public:
     TreeItemBase& item;
 };
 
-} // namespace Element
+} // namespace element

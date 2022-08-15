@@ -24,7 +24,7 @@
 #include "gui/GraphEditorComponent.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphEditorView : public GraphDisplayView,
                         public ChangeListener
@@ -81,4 +81,4 @@ private:
     void updateSizeInternal (const bool force = true);
 };
 
-} // namespace Element
+} // namespace element

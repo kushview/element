@@ -34,7 +34,7 @@
 // #define PLUGIN_DBG(msg) DBG(msg)
 #define PLUGIN_DBG(msg)
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 static void setPluginMissingNodeProperties (const ValueTree& tree)
@@ -584,4 +584,4 @@ AudioProcessor::BusesProperties PluginProcessor::createDefaultBuses (PluginProce
     return buses;
 }
 
-} // namespace Element
+} // namespace element

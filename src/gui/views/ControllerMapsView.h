@@ -21,7 +21,7 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class ControllerMapsView : public ContentView
 {
@@ -30,4 +30,4 @@ public:
     virtual ~ControllerMapsView();
 };
 
-} // namespace Element
+} // namespace element

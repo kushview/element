@@ -33,7 +33,7 @@
 #include "context.hpp"
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 PortComponent::PortComponent (const Node& g, const Node& n, const uint32 nid, const uint32 i, const bool dir, const PortType t, const bool v)
@@ -1118,4 +1118,4 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
     menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
 }
 
-} // namespace Element
+} // namespace element

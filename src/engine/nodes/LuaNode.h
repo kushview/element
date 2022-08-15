@@ -22,7 +22,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodeobject.hpp"
 
-namespace Element {
+namespace element {
 
 class LuaNode : public NodeObject,
                 public ChangeBroadcaster
@@ -71,4 +71,4 @@ private:
     ParameterArray inParams, outParams;
 };
 
-} // namespace Element
+} // namespace element

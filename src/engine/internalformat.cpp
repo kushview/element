@@ -49,7 +49,7 @@
 
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 typedef IONode IONode;
 
@@ -305,4 +305,4 @@ bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (con
     return false;
 }
 
-} // namespace Element
+} // namespace element

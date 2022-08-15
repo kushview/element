@@ -19,7 +19,7 @@
 
 #include "gui/Buttons.h"
 
-namespace Element {
+namespace element {
 
 IconButton::IconButton (const String& buttonName)
     : Button (buttonName) {}
@@ -86,4 +86,4 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     g.drawRect (0, 0, getWidth(), getHeight());
 }
 
-} // namespace Element
+} // namespace element

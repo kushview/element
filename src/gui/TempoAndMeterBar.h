@@ -23,7 +23,7 @@
 #include "gui/ViewHelpers.h"
 #include "engine/transport.hpp"
 
-namespace Element {
+namespace element {
 
 class TempoAndMeterBar : public Component,
                          public Value::Listener,
@@ -425,4 +425,4 @@ private:
     ScopedPointer<TopMeter> meter;
 };
 
-} // namespace Element
+} // namespace element

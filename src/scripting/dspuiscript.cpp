@@ -19,6 +19,6 @@
 
 #include "scripting/dspuiscript.hpp"
 
-namespace Element {
+namespace element {
 
 }

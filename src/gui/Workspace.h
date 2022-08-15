@@ -25,7 +25,7 @@
 #define EL_WORKSPACE_EDITING "Editing"
 #define EL_WORKSPACE_MIXING "Mixing"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class GuiController;
@@ -96,4 +96,4 @@ private:
     GuiController& gui;
 };
 
-} // namespace Element
+} // namespace element

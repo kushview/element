@@ -23,7 +23,7 @@
 
 #define TRACE_AUDIO_ROUTER(output)
 
-namespace Element {
+namespace element {
 
 AudioRouterNode::AudioRouterNode (int ins, int outs)
     : NodeObject (0),
@@ -380,4 +380,4 @@ void AudioRouterNode::clearPatches()
             state.set (r, c, false);
 }
 
-} // namespace Element
+} // namespace element

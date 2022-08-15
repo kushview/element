@@ -19,7 +19,7 @@
 #include "datapath.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 namespace DataPathHelpers {
     StringArray getSubDirs()
     {
@@ -152,4 +152,4 @@ const File DataPath::installDir()
 
     return dir;
 }
-} // namespace Element
+} // namespace element

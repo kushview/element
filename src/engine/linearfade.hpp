@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class LinearFade
 {
@@ -120,4 +120,4 @@ private:
     float fadeRate { 0.f };
 };
 
-} // namespace Element
+} // namespace element

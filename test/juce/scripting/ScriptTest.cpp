@@ -20,7 +20,7 @@
 #include "scripting/dspscript.hpp"
 #include "scripting/script.hpp"
 
-using namespace Element;
+using namespace element;
 
 static const String sSyntaxError = R"(--- comment
 this should trigger a syntax error

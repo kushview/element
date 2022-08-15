@@ -22,7 +22,7 @@
 #include "gui/GuiCommon.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class BreadCrumbComponent : public Component
 {
@@ -83,4 +83,4 @@ private:
     OwnedArray<Label> segments;
     OwnedArray<Label> dividers;
 };
-} // namespace Element
+} // namespace element

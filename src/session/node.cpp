@@ -23,7 +23,7 @@
 #include "engine/graphmanager.hpp"
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 struct NameSorter
@@ -1178,4 +1178,4 @@ void NodeObjectSync::valueTreeRedirected (ValueTree& tree)
     ignoreUnused (tree);
 }
 
-} // namespace Element
+} // namespace element

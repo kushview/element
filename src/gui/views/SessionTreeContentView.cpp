@@ -21,7 +21,7 @@
 #include "gui/SessionTreePanel.h"
 #include "common.hpp"
 
-namespace Element {
+namespace element {
 
 SessionTreeContentView::SessionTreeContentView()
 {
@@ -51,4 +51,4 @@ void SessionTreeContentView::resized()
     tree->setBounds (getLocalBounds());
 }
 
-} // namespace Element
+} // namespace element

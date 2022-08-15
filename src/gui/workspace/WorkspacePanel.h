@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class AppController;
 
@@ -62,4 +62,4 @@ public:
     }
 };
 
-} // namespace Element
+} // namespace element

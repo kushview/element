@@ -29,7 +29,7 @@
 #include "engine/rootgraph.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 NodeObject::NodeObject (const PortList& portList)
     : nodeId (0),
@@ -865,4 +865,4 @@ Parameter::Ptr NodeObject::getOrCreateParameter (const PortDescription& port)
     return param;
 }
 
-} // namespace Element
+} // namespace element

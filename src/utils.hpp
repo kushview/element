@@ -20,7 +20,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 namespace Util {
 
     inline static juce_wchar defaultPasswordChar() noexcept
@@ -509,4 +509,4 @@ namespace gzip {
     }
 
 } // namespace gzip
-} // namespace Element
+} // namespace element

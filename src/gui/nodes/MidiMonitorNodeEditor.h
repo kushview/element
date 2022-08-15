@@ -22,7 +22,7 @@
 
 #include "gui/nodes/NodeEditorComponent.h"
 
-namespace Element {
+namespace element {
 
 class MidiMonitorNodeEditor : public NodeEditorComponent
 {
@@ -38,4 +38,4 @@ private:
     TextButton clearButton;
 };
 
-} // namespace Element
+} // namespace element

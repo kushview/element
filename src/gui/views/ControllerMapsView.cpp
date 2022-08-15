@@ -19,9 +19,9 @@
 
 #include "gui/views/ControllerMapsView.h"
 
-namespace Element {
+namespace element {
 
 ControllerMapsView::ControllerMapsView() {}
 ControllerMapsView::~ControllerMapsView() {}
 
-} // namespace Element
+} // namespace element

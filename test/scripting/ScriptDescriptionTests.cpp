@@ -21,8 +21,8 @@
 
 #include "testutil.hpp"
 
-using namespace Element;
-namespace et = Element::test;
+using namespace element;
+namespace et = element::test;
 
 //=============================================================================
 const static String sDummyScript = 

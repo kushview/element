@@ -23,7 +23,7 @@
 #include "gui/NodeIOConfiguration.h"
 #include "engine/nodes/VolumeProcessor.h"
 
-namespace Element {
+namespace element {
 
 class VolumeNodeEditor::ChannelStrip : public NodeChannelStripComponent,
                                        public AudioProcessorParameter::Listener
@@ -157,4 +157,4 @@ void VolumeNodeEditor::resized()
         strip->setBounds (getLocalBounds());
 }
 
-} // namespace Element
+} // namespace element

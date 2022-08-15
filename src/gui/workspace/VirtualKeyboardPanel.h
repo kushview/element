@@ -22,7 +22,7 @@
 #include "gui/views/VirtualKeyboardView.h"
 #include "gui/workspace/ContentViewPanel.h"
 
-namespace Element {
+namespace element {
 
 class VirtualKeyboardPanel : public ContentViewPanel<VirtualKeyboardView>
 {
@@ -31,4 +31,4 @@ public:
     ~VirtualKeyboardPanel() = default;
 };
 
-} // namespace Element
+} // namespace element

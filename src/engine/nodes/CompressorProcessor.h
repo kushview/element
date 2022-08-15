@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "engine/nodes/BaseProcessor.h"
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 /**
     A simple level detector with exponential attack characteristic,
@@ -293,4 +293,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorProcessor)
 };
 
-} // namespace Element
+} // namespace element

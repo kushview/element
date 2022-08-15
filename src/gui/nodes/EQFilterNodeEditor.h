@@ -24,7 +24,7 @@
 #include "engine/nodes/EQFilterProcessor.h"
 #include "KnobsComponent.h"
 
-namespace Element {
+namespace element {
 
 class EQFilterNodeEditor : public AudioProcessorEditor
 {
@@ -63,4 +63,4 @@ private:
     FreqViz viz;
 };
 
-} // namespace Element
+} // namespace element

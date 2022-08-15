@@ -24,7 +24,7 @@
 #include "session/session.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 class SessionController : public AppController::Child
 {
 public:
@@ -60,4 +60,4 @@ private:
     void refreshOtherControllers();
 };
 
-} // namespace Element
+} // namespace element

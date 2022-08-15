@@ -19,10 +19,10 @@
 
 #include "engine/nodes/MidiFilterNode.h"
 
-namespace Element {
+namespace element {
 
 MidiFilterNode::MidiFilterNode (uint32 nodeId)
     : NodeObject (nodeId) {}
 MidiFilterNode::~MidiFilterNode() {}
 
-} // namespace Element
+} // namespace element

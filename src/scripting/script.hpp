@@ -20,7 +20,7 @@
 #include "scripting/scriptdescription.hpp"
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 class Script final : public ReferenceCountedObject
 {
@@ -150,4 +150,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Script);
 };
 
-} // namespace Element
+} // namespace element

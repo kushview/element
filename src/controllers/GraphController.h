@@ -23,7 +23,7 @@
 #include "documents/graphdocument.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 /** Responsible for creating new, opening, and saving graph files in
     Element SE */
@@ -53,4 +53,4 @@ private:
     void refreshOtherControllers();
 };
 
-} // namespace Element
+} // namespace element

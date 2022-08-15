@@ -23,7 +23,7 @@
 #include "engine/midipipe.hpp"
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class MidiChannelSplitterNode : public MidiFilterNode
 {
@@ -117,4 +117,4 @@ protected:
     }
 };
 
-} // namespace Element
+} // namespace element

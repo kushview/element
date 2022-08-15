@@ -34,13 +34,13 @@
 #include "capslock.hpp"
 #include "version.hpp"
 
-namespace Element {
+namespace element {
 
 struct GlobalLookAndFeel
 {
     GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (&look); }
     ~GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (nullptr); }
-    Element::LookAndFeel look;
+    element::LookAndFeel look;
 };
 
 struct GuiController::KeyPressManager : public KeyListener
@@ -120,7 +120,7 @@ GuiController::~GuiController()
         sGlobalLookAndFeel = nullptr;
 }
 
-Element::LookAndFeel& GuiController::getLookAndFeel()
+element::LookAndFeel& GuiController::getLookAndFeel()
 {
     jassert (sGlobalLookAndFeel);
     return sGlobalLookAndFeel->look;
@@ -913,4 +913,4 @@ void GuiController::clearContentComponent()
     content = nullptr;
 }
 
-} // namespace Element
+} // namespace element

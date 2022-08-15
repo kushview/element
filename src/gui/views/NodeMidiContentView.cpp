@@ -26,7 +26,7 @@
 
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
 
-namespace Element {
+namespace element {
 
 NodeMidiContentView::NodeMidiContentView()
 {
@@ -45,7 +45,7 @@ NodeMidiContentView::~NodeMidiContentView()
 
 void NodeMidiContentView::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::backgroundColor);
+    g.fillAll (element::LookAndFeel::backgroundColor);
 }
 
 void NodeMidiContentView::resized()
@@ -99,4 +99,4 @@ void NodeMidiContentView::updateMidiProgram()
     updateProperties();
 }
 
-} // namespace Element
+} // namespace element

@@ -23,7 +23,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** An abstract base class for parameter objects that can be added to a Node
     Based on juce::AudioProcessorParameter, but designed for GraphNodes which 
@@ -402,4 +402,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
 };
 
-} // namespace Element
+} // namespace element

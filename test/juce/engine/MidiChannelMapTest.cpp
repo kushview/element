@@ -22,9 +22,9 @@
 #include "engine/MidiChannelMap.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 
-using namespace Element;
+using namespace element;
 
-namespace Element {
+namespace element {
 
 class MidiChannelMapTest : public UnitTestBase
 {
@@ -135,7 +135,7 @@ private:
 
         expect (node->getPortType (18) == PortType::Unknown);
 
-        NodeObjectPtr midiIn = proc.addNode (new Element::IONode (Element::IONode::midiInputNode));
+        NodeObjectPtr midiIn = proc.addNode (new element::IONode (element::IONode::midiInputNode));
 
         beginTest ("connectivity");
         expect (midiIn->getNumPorts() == 1);

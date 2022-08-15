@@ -19,7 +19,7 @@
 #include "scripting.hpp"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class FallbackNodeEditorSource : public NodeEditorSource
 {
@@ -204,4 +204,4 @@ std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEdi
     return editor;
 }
 
-} // namespace Element
+} // namespace element

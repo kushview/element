@@ -23,7 +23,7 @@
 #include "session/controllerdevice.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class ControllerMapHandler;
 class ControllerMapInput;
@@ -79,4 +79,4 @@ private:
     bool captureNextEvent (ControllerMapInput&, const ControllerDevice::Control&, const MidiMessage&);
 };
 
-} // namespace Element
+} // namespace element

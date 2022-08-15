@@ -19,7 +19,7 @@
 
 #include "session/devicemanager.hpp"
 
-namespace Element {
+namespace element {
 
 const int DeviceManager::maxAudioChannels = 128;
 
@@ -117,4 +117,4 @@ kv::JackClient& DeviceManager::getJackClient()
 }
 #endif
 
-} // namespace Element
+} // namespace element

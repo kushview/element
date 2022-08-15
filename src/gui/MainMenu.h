@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class CommandManager;
 class ContentComponent;
@@ -88,4 +88,4 @@ private:
     void addRecentFiles (PopupMenu& menu);
 };
 
-} // namespace Element
+} // namespace element

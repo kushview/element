@@ -130,7 +130,7 @@ function node_restore()
 end
 )";
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class LuaParameter : public ControlPortParameter,
@@ -873,4 +873,4 @@ void LuaNode::setParameter (int index, float value)
     context->setParameter (index, value);
 }
 
-} // namespace Element
+} // namespace element

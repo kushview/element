@@ -19,7 +19,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** Similar to a kv::MatrixState but is intended to be used in a realtime context */
 class ToggleGrid
@@ -133,4 +133,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

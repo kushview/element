@@ -21,7 +21,7 @@
 
 #include "sol/forward.hpp"
 
-namespace Element {
+namespace element {
 
 class Context;
 
@@ -32,4 +32,4 @@ namespace Lua {
     extern void clearGlobals (sol::state_view&);
 } // namespace Lua
 
-} // namespace Element
+} // namespace element

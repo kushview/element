@@ -19,7 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "session/node.hpp"
-using namespace Element;
+using namespace element;
 //[/Headers]
 
 #include "AudioIOPanelView.h"

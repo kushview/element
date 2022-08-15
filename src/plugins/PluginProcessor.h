@@ -25,11 +25,11 @@
 #include "ElementApp.h"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class PerformanceParameter : public AudioProcessorParameter,
-                             public Element::Parameter::Listener
+                             public element::Parameter::Listener
 {
 public:
     std::function<void()> onCleared;
@@ -56,7 +56,7 @@ public:
     void clearNode()
     {
         NodeObjectPtr oldNode;
-        Element::Parameter::Ptr oldParam;
+        element::Parameter::Ptr oldParam;
 
         if (parameter)
             parameter->removeListener (this);
@@ -330,7 +330,7 @@ private:
     Node model;
     NodeObjectPtr node;
     AudioProcessor* processor = nullptr;
-    Element::Parameter::Ptr parameter = nullptr;
+    element::Parameter::Ptr parameter = nullptr;
     int parameterIdx = -1;
     bool special = false;
     bool recursionBlock = false;
@@ -480,4 +480,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
 
-} // namespace Element
+} // namespace element

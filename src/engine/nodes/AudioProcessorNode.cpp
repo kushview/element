@@ -22,7 +22,7 @@
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class AudioProcessorNodeParameter : public Parameter,
@@ -267,4 +267,4 @@ Parameter::Ptr AudioProcessorNode::getParameter (const PortDescription& port)
     return param;
 }
 
-} // namespace Element
+} // namespace element

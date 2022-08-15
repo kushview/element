@@ -8,7 +8,7 @@
 
 namespace fs = std::filesystem;
 
-namespace Element {
+namespace element {
 
 Module::Module (const std::string& bp, Context& b, ScriptingEngine& s)
     : backend (b),
@@ -157,4 +157,4 @@ void Module::close()
     }
 }
 
-} // namespace Element
+} // namespace element

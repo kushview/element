@@ -28,7 +28,7 @@
 #include "el/factories.hpp"
 #include "engine/midipipe.hpp"
 
-namespace Element {
+namespace element {
 
 MidiPipe::MidiPipe()
 {
@@ -182,20 +182,20 @@ int LuaMidiPipe::clear (lua_State* L)
     return 0;
 }
 
-} // namespace Element
+} // namespace element
 
 static int midipipe_new (lua_State* L)
 {
     lua_Integer nbufs = (lua_gettop (L) > 1 && lua_isinteger (L, 2))
                             ? jmax (lua_Integer(), lua_tointeger (L, 2))
                             : 0;
-    Element::LuaMidiPipe::create (L, static_cast<int> (nbufs));
+    element::LuaMidiPipe::create (L, static_cast<int> (nbufs));
     return 1;
 }
 
 static int midipipe_gc (lua_State* L)
 {
-    auto** pipe = (Element::LuaMidiPipe**) lua_touserdata (L, 1);
+    auto** pipe = (element::LuaMidiPipe**) lua_touserdata (L, 1);
     if (nullptr != *pipe)
         deleteAndZero (*pipe);
     return 0;
@@ -215,25 +215,25 @@ static const luaL_Reg methods[] = {
     // @treturn kv.MidiBuffer A midi buffer
     // @within Methods
     // @function MidiPipe:get
-    { "get", Element::LuaMidiPipe::get },
+    { "get", element::LuaMidiPipe::get },
 
     /// Get a MidiBuffer from the pipe.
     // @int nbuffers New number of buffers to store
     // @within Methods
     // @function MidiPipe:resize
-    { "resize", Element::LuaMidiPipe::resize },
+    { "resize", element::LuaMidiPipe::resize },
 
     /// Returns the number of buffers in this pipe.
     // @treturn int The number of buffers
     // @within Methods
     // @function MidiPipe:size
-    { "size", Element::LuaMidiPipe::size },
+    { "size", element::LuaMidiPipe::size },
 
     /// Clears all buffers in the pipe.
     // Note this doesn't remove buffers, it just clears their contents.
     // @within Methods
     // @function MidiPipe:clear
-    { "clear", Element::LuaMidiPipe::clear },
+    { "clear", element::LuaMidiPipe::clear },
 
     { nullptr, nullptr }
 };

@@ -21,10 +21,10 @@
 
 #include "scripting/scriptinstance.hpp"
 
-namespace Element {
+namespace element {
 
 class DSPUIScript : public ScriptInstance
 {
 };
 
-} // namespace Element
+} // namespace element

@@ -3,7 +3,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class GraphNode;
 class NodeObject;
@@ -70,4 +70,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphBuilder)
 };
 
-} // namespace Element
+} // namespace element

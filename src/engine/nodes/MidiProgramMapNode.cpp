@@ -19,7 +19,7 @@
 
 #include "engine/nodes/MidiProgramMapNode.h"
 
-namespace Element {
+namespace element {
 
 MidiProgramMapNode::MidiProgramMapNode()
     : MidiFilterNode (0) {}
@@ -183,4 +183,4 @@ MidiProgramMapNode::ProgramEntry MidiProgramMapNode::getProgramEntry (int index)
     return {};
 }
 
-} // namespace Element
+} // namespace element

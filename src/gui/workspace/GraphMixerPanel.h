@@ -22,7 +22,7 @@
 #include "gui/views/GraphMixerView.h"
 #include "gui/workspace/ContentViewPanel.h"
 
-namespace Element {
+namespace element {
 
 class GraphMixerPanel : public ContentViewPanel<GraphMixerView>
 {
@@ -31,4 +31,4 @@ public:
     ~GraphMixerPanel() = default;
 };
 
-} // namespace Element
+} // namespace element

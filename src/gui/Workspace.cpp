@@ -23,7 +23,7 @@
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
 
-namespace Element {
+namespace element {
 
 WorkspaceState::WorkspaceState()
     : ObjectModel()
@@ -216,4 +216,4 @@ void Workspace::resized()
     dock.setBounds (getLocalBounds());
 }
 
-} // namespace Element
+} // namespace element

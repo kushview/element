@@ -35,7 +35,7 @@
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/views/ScriptEditorView.h"
 
-namespace Element {
+namespace element {
 
 template <class ViewType>
 class ContentViewPanel : public WorkspacePanel
@@ -183,4 +183,4 @@ protected:
     std::unique_ptr<ScriptEditorView> view;
 };
 
-} // namespace Element
+} // namespace element

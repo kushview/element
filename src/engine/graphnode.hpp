@@ -24,7 +24,7 @@
 #include "engine/velocitycurve.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphNode : public NodeObject,
                   private AsyncUpdater
@@ -236,4 +236,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
 
-} // namespace Element
+} // namespace element

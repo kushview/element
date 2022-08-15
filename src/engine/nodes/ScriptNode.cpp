@@ -47,7 +47,7 @@ require ('el.audio')
 require ('el.MidiPipe')
 )";
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
@@ -209,4 +209,4 @@ void ScriptNode::setParameter (int index, float value)
     ScopedLock sl (lock);
 }
 
-} // namespace Element
+} // namespace element

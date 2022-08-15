@@ -24,7 +24,7 @@
 #include "element/lua.hpp"
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 class Context;
 class ScriptManager;
@@ -61,4 +61,4 @@ private:
 
 using Scripting = ScriptingEngine;
 
-} // namespace Element
+} // namespace element

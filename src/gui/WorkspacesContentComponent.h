@@ -22,7 +22,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/Workspace.h"
 
-namespace Element {
+namespace element {
 
 class AppController;
 
@@ -68,4 +68,4 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
-} // namespace Element
+} // namespace element

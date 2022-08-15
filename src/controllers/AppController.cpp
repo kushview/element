@@ -40,7 +40,7 @@
 #include "settings.hpp"
 #include "version.hpp"
 
-namespace Element {
+namespace element {
 
 Context& AppController::Child::getWorld() { return getAppController().getWorld(); }
 Settings& AppController::Child::getSettings() { return getWorld().getSettings(); }
@@ -615,4 +615,4 @@ void AppController::checkForegroundStatus()
     foregroundCheck.startTimer (50);
 }
 
-} // namespace Element
+} // namespace element

@@ -1,6 +1,6 @@
 #include "engine/oversampler.hpp"
 
-namespace Element {
+namespace element {
 
 template <typename T>
 Oversampler<T>::~Oversampler()
@@ -55,4 +55,4 @@ void Oversampler<T>::reset()
 template class Oversampler<float>;
 template class Oversampler<double>;
 
-} // namespace Element
+} // namespace element

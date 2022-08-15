@@ -22,7 +22,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class AudioFilePlayerNode : public BaseProcessor,
                             public AudioProcessorParameter::Listener,
@@ -178,4 +178,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioFilePlayerNode)
 };
 
-} // namespace Element
+} // namespace element

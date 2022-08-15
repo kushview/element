@@ -21,7 +21,7 @@
 
 #include "gui/Buttons.h"
 
-namespace Element {
+namespace element {
 
 struct NodeMidiProgramComponent : public Component
 {
@@ -37,4 +37,4 @@ struct NodeMidiProgramComponent : public Component
     void resized() override;
 };
 
-} // namespace Element
+} // namespace element

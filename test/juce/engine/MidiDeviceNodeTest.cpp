@@ -24,7 +24,7 @@
 
 #include "engine/nodes/AudioProcessorNode.h"
 
-namespace Element {
+namespace element {
 
 class MidiInputDeviceNodeTest : public UnitTestBase
 {

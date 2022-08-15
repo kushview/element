@@ -34,7 +34,7 @@ extern int luaopen_el_round (lua_State*);
 }
 #endif
 
-namespace Element {
+namespace element {
 namespace lua {
 
 void fill_builtins (PackageLoaderMap& pkgs)
@@ -53,4 +53,4 @@ void fill_builtins (PackageLoaderMap& pkgs)
 }
 
 } // namespace lua
-} // namespace Element
+} // namespace element

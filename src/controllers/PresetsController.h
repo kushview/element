@@ -23,7 +23,7 @@
 #include "documents/sessiondocument.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class PresetsController : public AppController::Child
 {
@@ -42,4 +42,4 @@ private:
     std::unique_ptr<Pimpl> pimpl;
 };
 
-} // namespace Element
+} // namespace element

@@ -23,7 +23,7 @@
 #include "context.hpp"
 #include "session/pluginmanager.hpp"
 
-namespace Element {
+namespace element {
 
 PluginsPanel::PluginsPanel() {}
 
@@ -44,4 +44,4 @@ void PluginsPanel::resized()
         view->setBounds (getLocalBounds());
 }
 
-} // namespace Element
+} // namespace element

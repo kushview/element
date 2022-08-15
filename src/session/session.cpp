@@ -24,7 +24,7 @@
 
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 static Node findNodeRecursive (const Node& start, const Uuid& uuid)
 {
@@ -325,4 +325,4 @@ ValueTree Session::readFromFile (const File& file)
 
     return data;
 }
-} // namespace Element
+} // namespace element

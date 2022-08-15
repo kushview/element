@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 class SessionDocument : public FileBasedDocument,
                         public ChangeListener
 {
@@ -44,4 +44,4 @@ private:
     friend class Session;
     void onSessionChanged();
 };
-} // namespace Element
+} // namespace element

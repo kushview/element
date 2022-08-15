@@ -58,6 +58,6 @@ int luaopen_el_Graphics (lua_State* L) {
             [](Graphics& g, int color)      { g.fillAll (Colour (color)); }
         )
     );
-    sol::stack::push (L, Element::lua::remove_and_clear (M, "Graphics"));
+    sol::stack::push (L, element::lua::remove_and_clear (M, "Graphics"));
     return 1;
 }

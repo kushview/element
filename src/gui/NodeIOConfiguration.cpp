@@ -22,7 +22,7 @@
 #include "gui/NodeIOConfiguration.h"
 #include "gui/MainWindow.h"
 
-namespace Element {
+namespace element {
 
 class NumberedBoxes : public TableListBox,
                       private TableListBoxModel,
@@ -574,4 +574,4 @@ GraphNode* NodeAudioBusesComponent::getGraph() const
     return nullptr;
 }
 
-} // namespace Element
+} // namespace element

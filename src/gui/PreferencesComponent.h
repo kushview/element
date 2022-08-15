@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 class GuiController;
 //[/Headers]
 
@@ -67,5 +67,5 @@ private:
 };
 
 //[EndFile] You can add extra defines here...
-} // namespace Element
+} // namespace element
 //[/EndFile]

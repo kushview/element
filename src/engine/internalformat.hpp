@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class AudioEngine;
 class MidiEngine;
@@ -106,4 +106,4 @@ private:
     AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
 };
 
-} // namespace Element
+} // namespace element

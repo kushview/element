@@ -26,7 +26,7 @@
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"
 #define EL_VIEW_CONSOLE "LuaConsoleViw"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class BreadCrumbComponent;
@@ -215,4 +215,4 @@ private:
     int toolBarSize;
 };
 
-} // namespace Element
+} // namespace element

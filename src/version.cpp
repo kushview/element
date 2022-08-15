@@ -22,7 +22,7 @@
 #define TEST_CURRENT_VERSION 0
 #endif
 
-namespace Element {
+namespace element {
 
 Version::Version() {}
 Version::~Version() {}
@@ -137,4 +137,4 @@ void CurrentVersion::timerCallback()
     delete this;
 }
 
-} // namespace Element
+} // namespace element

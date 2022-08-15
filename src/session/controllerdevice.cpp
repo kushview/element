@@ -19,7 +19,7 @@
 
 #include "session/controllerdevice.hpp"
 
-namespace Element {
+namespace element {
 
 ControllerDevice::ControllerDevice (const ValueTree& data)
     : ObjectModel (data)
@@ -46,4 +46,4 @@ void ControllerDevice::setMissingProperties()
     stabilizePropertyString ("inputDevice", "");
 }
 
-} // namespace Element
+} // namespace element

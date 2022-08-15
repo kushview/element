@@ -22,7 +22,7 @@
 #include "JuceHeader.h"
 #include "engine/nodes/NodeTypes.h"
 
-namespace Element {
+namespace element {
 
 class BaseProcessor : public AudioPluginInstance
 {
@@ -93,4 +93,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
 
-} // namespace Element
+} // namespace element

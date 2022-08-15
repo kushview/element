@@ -42,7 +42,7 @@
 #include "Settings.h"
 #include "common.hpp"
 
-namespace Element  {
+namespace element  {
 
 class UnitTestBase : public UnitTest
 {

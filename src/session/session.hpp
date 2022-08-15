@@ -26,7 +26,7 @@
 #define EL_TEMPO_MIN 20
 #define EL_TEMPO_MAX 999
 
-namespace Element {
+namespace element {
 class Session;
 class Context;
 
@@ -204,4 +204,4 @@ struct ControllerMapObjects
     ControllerDevice device;
     ControllerDevice::Control control;
 };
-} // namespace Element
+} // namespace element

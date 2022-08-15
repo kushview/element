@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class VelocityCurve
 {
@@ -194,4 +194,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

@@ -26,7 +26,7 @@
 #include "gui/ViewHelpers.h"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class SessionTreePanel : public TreePanelBase,
                          private ValueTree::Listener
@@ -66,4 +66,4 @@ private:
     void valueTreeRedirected (ValueTree& tree) override;
 };
 
-} // namespace Element
+} // namespace element

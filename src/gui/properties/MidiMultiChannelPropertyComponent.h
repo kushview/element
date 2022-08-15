@@ -23,7 +23,7 @@
 #include "gui/LookAndFeel.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiMultiChannelPropertyComponent : public PropertyComponent
 {
@@ -219,4 +219,4 @@ private:
     } layout;
 };
 
-} // namespace Element
+} // namespace element

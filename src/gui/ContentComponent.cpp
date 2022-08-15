@@ -48,7 +48,7 @@
 #define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
-namespace Element {
+namespace element {
 
 ContentView::ContentView()
 {
@@ -699,4 +699,4 @@ ApplicationCommandTarget* ContentComponent::getNextCommandTarget() { return null
 void ContentComponent::setShowAccessoryView (const bool) {}
 bool ContentComponent::showAccessoryView() const { return false; }
 
-} // namespace Element
+} // namespace element

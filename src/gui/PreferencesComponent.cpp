@@ -39,7 +39,7 @@
 #include "PreferencesComponent.h"
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-namespace Element {
+namespace element {
 
 class PreferencesComponent::PageList : public ListBox,
                                        public ListBoxModel
@@ -713,7 +713,7 @@ public:
     void resized() override { devs.setBounds (getLocalBounds()); }
 
 private:
-    Element::AudioDeviceSelectorComponent devs;
+    element::AudioDeviceSelectorComponent devs;
     DeviceManager& devices;
 };
 
@@ -1163,7 +1163,7 @@ void PreferencesComponent::updateSize()
     //          roundDoubleToInt (500.0 * Desktop::getInstance().getGlobalScaleFactor()));
 }
 
-} /* namespace Element */
+} /* namespace element */
 //[/MiscUserCode]
 
 //==============================================================================

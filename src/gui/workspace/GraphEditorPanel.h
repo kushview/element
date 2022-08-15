@@ -22,7 +22,7 @@
 #include "gui/views/GraphEditorView.h"
 #include "gui/workspace/ContentViewPanel.h"
 
-namespace Element {
+namespace element {
 
 class GraphEditorPanel : public ContentViewPanel<GraphEditorView>
 {
@@ -31,4 +31,4 @@ public:
     ~GraphEditorPanel() = default;
 };
 
-} // namespace Element
+} // namespace element

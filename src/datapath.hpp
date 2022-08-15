@@ -22,7 +22,7 @@
 
 #define EL_PRESET_FILE_EXTENSIONS "*.elp;*.elpreset"
 
-namespace Element {
+namespace element {
 
 class Node;
 class NodeArray;
@@ -82,4 +82,4 @@ private:
 class DataSearchPath
 {
 };
-} // namespace Element
+} // namespace element

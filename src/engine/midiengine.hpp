@@ -21,7 +21,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 class Settings;
 
@@ -161,4 +161,4 @@ private:
     void handleIncomingMidiMessageInt (MidiInput*, const MidiMessage&);
 };
 
-} // namespace Element
+} // namespace element

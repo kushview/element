@@ -19,7 +19,7 @@
 
 #include "engine/transport.hpp"
 
-namespace Element {
+namespace element {
 
 Transport::Transport()
     : playState (false),
@@ -115,4 +115,4 @@ void Transport::requestAudioFrame (const int64 frame)
     seekWanted.set (true);
 }
 
-} // namespace Element
+} // namespace element

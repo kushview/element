@@ -27,7 +27,7 @@
 #include "session/session.hpp"
 #include "runmode.hpp"
 
-namespace Element {
+namespace element {
 
 class ClipFactory;
 class EngineControl;
@@ -109,4 +109,4 @@ private:
 
 typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
 
-} // namespace Element
+} // namespace element

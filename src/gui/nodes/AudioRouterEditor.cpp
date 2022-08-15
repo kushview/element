@@ -23,7 +23,7 @@
 #include "gui/Artist.h"
 #include "common.hpp"
 
-namespace Element {
+namespace element {
 
 class AudioRouterMatrix : public kv::PatchMatrixComponent
 {
@@ -312,4 +312,4 @@ void AudioRouterEditor::paint (Graphics& g)
     g.fillAll (Colours::black);
 }
 
-} // namespace Element
+} // namespace element

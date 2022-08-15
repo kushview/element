@@ -23,7 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ElementApp.h"
 #include "EQFilterProcessor.h"
 
-namespace Element {
+namespace element {
 class FreqSplitterProcessor : public BaseProcessor
 {
 public:
@@ -212,4 +212,4 @@ private:
     EQFilter highHPF[2];
 };
 
-} // namespace Element
+} // namespace element

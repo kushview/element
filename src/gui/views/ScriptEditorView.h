@@ -24,7 +24,7 @@
 #include "scripting/scriptsource.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class ScriptNode;
 
@@ -105,4 +105,4 @@ private:
     TextButton applyButton;
 };
 
-} // namespace Element
+} // namespace element

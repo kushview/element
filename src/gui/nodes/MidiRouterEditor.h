@@ -21,7 +21,7 @@
 
 #include "gui/nodes/NodeEditorComponent.h"
 
-namespace Element {
+namespace element {
 
 class MidiRouterEditor : public NodeEditorComponent,
                          public ChangeListener
@@ -43,4 +43,4 @@ private:
     std::unique_ptr<Content> content;
 };
 
-} // namespace Element
+} // namespace element

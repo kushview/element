@@ -31,7 +31,7 @@
 #include "datapath.hpp"
 #include "context.hpp"
 
-namespace Element {
+namespace element {
 
 #if 1
 class ElementsNavigationPanel : public SessionGraphsListBox
@@ -596,7 +596,7 @@ public:
     }
 
 private:
-    typedef Element::LookAndFeel ELF;
+    typedef element::LookAndFeel ELF;
     Context& globals;
     int headerHeight;
     int defaultPanelHeight;
@@ -762,7 +762,7 @@ private:
         TextButton addButton;
     };
 
-    class LookAndFeel : public Element::LookAndFeel
+    class LookAndFeel : public element::LookAndFeel
     {
     public:
         LookAndFeel() {}
@@ -777,4 +777,4 @@ private:
         }
     } lookAndFeel;
 };
-} // namespace Element
+} // namespace element

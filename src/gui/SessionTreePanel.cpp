@@ -35,7 +35,7 @@
 #include "session/node.hpp"
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class SessionBaseTreeItem : public TreeItemBase
@@ -822,4 +822,4 @@ bool SessionTreePanel::keyPressed (const KeyPress& k)
     return TreePanelBase::keyPressed (k);
 }
 
-} // namespace Element
+} // namespace element

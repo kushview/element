@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "engine/oversampler.hpp"
 
-using namespace Element;
+using namespace element;
 
 BOOST_AUTO_TEST_SUITE (OversamplerTests)
 

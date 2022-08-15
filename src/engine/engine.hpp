@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class Engine : public ReferenceCountedObject
 {
@@ -33,4 +33,4 @@ public:
 
 typedef ReferenceCountedObjectPtr<Engine> EnginePtr;
 
-} // namespace Element
+} // namespace element

@@ -27,7 +27,7 @@
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
 #define EL_OSC_ADDRESS_ENGINE "/element/engine"
 
-namespace Element {
+namespace element {
 
 struct CommandOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
 {
@@ -228,4 +228,4 @@ void OSCController::deactivate()
     impl->shutdown();
 }
 
-} // namespace Element
+} // namespace element

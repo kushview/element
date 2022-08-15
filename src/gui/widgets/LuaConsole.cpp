@@ -25,7 +25,7 @@
 
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 LuaConsole::LuaConsole()
@@ -179,4 +179,4 @@ void LuaConsole::timerCallback()
     }
 }
 
-} // namespace Element
+} // namespace element

@@ -20,7 +20,7 @@
 #include "gui/widgets/SessionGraphsListBox.h"
 #include "gui/ViewHelpers.h"
 
-namespace Element {
+namespace element {
 
 SessionGraphsListBox::SessionGraphsListBox (Session* s)
     : session (nullptr)
@@ -48,4 +48,4 @@ void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int wid
     ViewHelpers::drawBasicTextRow ("  " + node.getName(), g, width, height, rowIsSelected);
 }
 
-} // namespace Element
+} // namespace element

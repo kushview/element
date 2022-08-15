@@ -27,7 +27,7 @@
 #define EL_LUA_SPATH ""
 #endif
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class ScriptingEngine::State {
@@ -61,8 +61,8 @@ private:
     friend class ScriptingEngine;
     ScriptingEngine& owner;
     sol::state state;
-    Element::lua::PackageLoaderMap builtins;
-    Element::lua::PackageLoaderMap packages;
+    element::lua::PackageLoaderMap builtins;
+    element::lua::PackageLoaderMap packages;
 
     /** global table key to state reference */
     static constexpr const char* refkey = "__state";
@@ -101,7 +101,7 @@ private:
         auto& state = getref (view);
 
         // if (state.builtins.empty())
-        //     Element::lua::fill_builtins (state.builtins);
+        //     element::lua::fill_builtins (state.builtins);
 
         const auto mid = sol::stack::get<std::string> (L);
         auto it = state.builtins.find (mid);
@@ -125,7 +125,7 @@ private:
     }
 };
 
-void ScriptingEngine::addPackage (const std::string& name, Element::lua::CFunction loader)
+void ScriptingEngine::addPackage (const std::string& name, element::lua::CFunction loader)
 {
     auto& pkgs = state->packages;
     if (pkgs.find (name) == pkgs.end()) {
@@ -200,4 +200,4 @@ ScriptManager& ScriptingEngine::getScriptManager()
     return impl->manager;
 }
 
-} // namespace Element
+} // namespace element
