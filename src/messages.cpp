@@ -18,7 +18,7 @@
 
 #include "signals.hpp"
 #include "controllers/EngineController.h"
-#include "globals.hpp"
+#include "context.hpp"
 #include "session/pluginmanager.hpp"
 #include "messages.hpp"
 

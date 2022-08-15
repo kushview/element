@@ -33,7 +33,7 @@
 #include "session/commandmanager.hpp"
 #include "session/node.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 #include "utils.hpp"
 #include "urls.hpp"

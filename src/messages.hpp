@@ -26,7 +26,7 @@ namespace Element {
 
 class AppController;
 class ContentView;
-class Globals;
+class Context;
 
 class Action : public UndoableAction
 {

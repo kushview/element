@@ -23,7 +23,7 @@
 #include "engine/audioengine.hpp"
 #include "engine/parameter.hpp"
 #include "ElementApp.h"
-#include "globals.hpp"
+#include "context.hpp"
 
 namespace Element {
 
@@ -421,7 +421,7 @@ private:
     const Variant variant;
 
     OwnedArray<PerfParamMenuItem> menuMap;
-    std::unique_ptr<Globals> world;
+    std::unique_ptr<Context> world;
     std::unique_ptr<AppController> controller;
     AudioEnginePtr engine;
 

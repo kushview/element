@@ -1,6 +1,6 @@
 
-#include "element/context.hpp"
-#include "element/scripting.hpp"
+#include "context.hpp"
+#include "scripting.hpp"
 
 #include "dynlib.h"
 #include "filesystem.hpp"
@@ -8,9 +8,9 @@
 
 namespace fs = std::filesystem;
 
-namespace element {
+namespace Element {
 
-Module::Module (const std::string& bp, Context& b, Scripting& s)
+Module::Module (const std::string& bp, Context& b, ScriptingEngine& s)
     : backend (b),
       scripting (s),
       m_bundle_path (bp)     
@@ -157,4 +157,4 @@ void Module::close()
     }
 }
 
-} // namespace element
+} // namespace Element

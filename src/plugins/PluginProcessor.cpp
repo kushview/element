@@ -74,7 +74,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     }
 
     prepared = controllerActive = false;
-    world.reset (new Globals());
+    world.reset (new Context());
     world->setEngine (new AudioEngine (*world, RunMode::Plugin));
     engine = world->getAudioEngine();
     SessionPtr session = world->getSession();

@@ -28,7 +28,7 @@
 #include "gui/ContentComponent.h"
 
 #include "session/node.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 namespace Element {

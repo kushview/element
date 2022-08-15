@@ -20,7 +20,7 @@
 #include "engine/internalformat.hpp"
 #include "engine/transport.hpp"
 #include "session/node.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 
 #include "session/session.hpp"
 

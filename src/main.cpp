@@ -21,12 +21,12 @@
 #include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
 #include "engine/internalformat.hpp"
-#include "scripting/scriptingengine.hpp"
+#include "scripting.hpp"
 #include "session/devicemanager.hpp"
 #include "session/pluginmanager.hpp"
 #include "commands.hpp"
 #include "datapath.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "log.hpp"
 #include "messages.hpp"
 #include "version.hpp"
@@ -39,7 +39,7 @@ class Startup : public ActionBroadcaster,
                 private Thread
 {
 public:
-    Startup (Globals& w, const bool useThread = false, const bool splash = false)
+    Startup (Context& w, const bool useThread = false, const bool splash = false)
         : Thread ("ElementStartup"),
           world (w),
           usingThread (useThread),
@@ -81,7 +81,7 @@ public:
 
 private:
     friend class Application;
-    Globals& world;
+    Context& world;
     const bool usingThread;
     const bool showSplash;
     bool isFirstRun;
@@ -225,7 +225,7 @@ public:
 
     void initialise (const String& commandLine) override
     {
-        world = new Globals (commandLine);
+        world = std::make_unique<Context> (commandLine);
         if (maybeLaunchSlave (commandLine))
             return;
 
@@ -390,7 +390,7 @@ public:
         if (world->getSettings().scanForPluginsOnStartup())
             world->getPluginManager().scanAudioPlugins();
 
-        controller = startup->controller.release();
+        controller.reset (startup->controller.release());
         startup = nullptr;
 
         controller->run();
@@ -414,9 +414,9 @@ public:
 
 private:
     String launchCommandLine;
-    ScopedPointer<Globals> world;
-    ScopedPointer<AppController> controller;
-    ScopedPointer<Startup> startup;
+    std::unique_ptr<Context> world;
+    std::unique_ptr<AppController> controller;
+    std::unique_ptr<Startup> startup;
     OwnedArray<kv::ChildProcessSlave> slaves;
 
     void printCopyNotice()
@@ -456,7 +456,7 @@ private:
         if (nullptr != controller)
             return;
 
-        startup = new Startup (*world, false, false);
+        startup = std::make_unique<Startup> (*world, false, false);
         startup->addActionListener (this);
         startup->launchApplication();
     }

@@ -28,7 +28,7 @@
 #include "gui/ViewHelpers.h"
 #include "session/node.hpp"
 #include "session/commandmanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "messages.hpp"
 
 #include "plugins/PluginEditor.h"
@@ -118,7 +118,7 @@ namespace ViewHelpers {
         return nullptr;
     }
 
-    Globals* getGlobals (Component* c)
+    Context* getGlobals (Component* c)
     {
         if (auto* cc = findContentComponent (c))
             return &cc->getGlobals();

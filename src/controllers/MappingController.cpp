@@ -22,7 +22,7 @@
 #include "controllers/GuiController.h"
 #include "engine/mappingengine.hpp"
 #include "session/controllerdevice.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "signals.hpp"
 
 namespace Element {

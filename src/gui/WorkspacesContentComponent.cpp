@@ -24,7 +24,7 @@
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
-#include "globals.hpp"
+#include "context.hpp"
 
 #include "messages.hpp"
 #include "settings.hpp"

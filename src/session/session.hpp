@@ -28,7 +28,7 @@
 
 namespace Element {
 class Session;
-class Globals;
+class Context;
 
 /** Session, the main interface between the engine and model layers */
 class Session : public ObjectModel,
@@ -128,7 +128,7 @@ protected:
     void forEach (const ValueTree tree, ValueTreeFunction handler) const;
 
     Session();
-    friend class Globals;
+    friend class Context;
 
     /** Set a property. */
     inline void setProperty (const Identifier& prop, const var& val) { objectData.setProperty (prop, val, nullptr); }

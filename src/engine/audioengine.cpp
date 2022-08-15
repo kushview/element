@@ -25,7 +25,7 @@
 #include "engine/miditranspose.hpp"
 #include "engine/transport.hpp"
 #include "engine/rootgraph.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 namespace Element {
@@ -758,7 +758,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Private)
 };
 
-AudioEngine::AudioEngine (Globals& g, RunMode m)
+AudioEngine::AudioEngine (Context& g, RunMode m)
     : world (g), runMode (m)
 {
     priv = std::make_unique<Private> (*this);
@@ -947,7 +947,7 @@ void AudioEngine::releaseExternalResources()
         priv->audioStopped();
 }
 
-Globals& AudioEngine::getWorld() const { return world; }
+Context& AudioEngine::getWorld() const { return world; }
 
 void AudioEngine::updateExternalLatencySamples()
 {

@@ -31,7 +31,7 @@ namespace Element {
 
 class ClipFactory;
 class EngineControl;
-class Globals;
+class Context;
 class Settings;
 class RootGraph;
 
@@ -39,7 +39,7 @@ class AudioEngine : public Engine
 {
 public:
     Signal<void()> sampleLatencyChanged;
-    AudioEngine (Globals&, RunMode mode = RunMode::Standalone);
+    AudioEngine (Context&, RunMode mode = RunMode::Standalone);
     virtual ~AudioEngine() noexcept;
 
     //==========================================================================
@@ -97,13 +97,13 @@ public:
     void updateExternalLatencySamples();
     int getExternalLatencySamples() const;
 
-    Globals& getWorld() const;
+    Context& getWorld() const;
     MidiIOMonitorPtr getMidiIOMonitor() const;
 
 private:
     class Private;
     std::unique_ptr<Private> priv;
-    Globals& world;
+    Context& world;
     RunMode runMode;
 };
 

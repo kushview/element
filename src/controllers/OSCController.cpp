@@ -21,7 +21,7 @@
 #include "session/commandmanager.hpp"
 #include "session/devicemanager.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
@@ -31,7 +31,7 @@ namespace Element {
 
 struct CommandOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
 {
-    CommandOSCListener (Globals& w)
+    CommandOSCListener (Context& w)
         : world (w)
     {
     }
@@ -51,13 +51,13 @@ struct CommandOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
     }
 
 private:
-    Globals& world;
+    Context& world;
 };
 
 //=============================================================================
 struct EngineOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
 {
-    EngineOSCListener (Globals& g)
+    EngineOSCListener (Context& g)
         : globals (g)
     {
     }
@@ -73,7 +73,7 @@ struct EngineOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
     }
 
 private:
-    Globals& globals;
+    Context& globals;
 
     void handleSampleRate (const OSCArgument& arg)
     {

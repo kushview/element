@@ -26,7 +26,7 @@
 #include "session/devicemanager.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/node.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 #include "controllers/EngineController.h"
@@ -35,7 +35,7 @@ namespace Element {
 
 struct RootGraphHolder
 {
-    RootGraphHolder (const Node& n, Globals& world)
+    RootGraphHolder (const Node& n, Context& world)
         : plugins (world.getPluginManager()),
           devices (world.getDeviceManager()),
           model (n)

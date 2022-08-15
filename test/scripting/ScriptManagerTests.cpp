@@ -23,7 +23,7 @@
 
 #include "testutil.hpp"
 
-namespace et = element::test;
+namespace et = Element::test;
 
 BOOST_AUTO_TEST_SUITE (ScriptManagerTests)
 

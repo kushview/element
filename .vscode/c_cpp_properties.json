@@ -108,7 +108,7 @@
                 "/usr/include/serd-0/*",
                 "/usr/include/sord-0/*",
                 "/usr/include/sratom-0/*",
-                "${workspaceFolder}/libs/lua/*",
+                "${workspaceFolder}/libs/lua/src/*",
                 "${workspaceFolder}/libs/sol/*",
                 "${workspaceFolder}/libs/JUCE/modules/*",
                 "${workspaceFolder}/libs/kv/modules/*",

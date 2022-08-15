@@ -18,7 +18,7 @@
 
 #include "gui/Workspace.h"
 #include "session/devicemanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 namespace Element {
@@ -436,7 +436,7 @@ void Settings::setMainContentType (const String& tp)
 }
 
 //=============================================================================
-void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
+void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
 {
     auto& devices (world.getDeviceManager());
     auto& midi (world.getMidiEngine());
@@ -517,7 +517,7 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
     }
 }
 
-bool Settings::performMenuResult (Globals& world, const int result)
+bool Settings::performMenuResult (Context& world, const int result)
 {
     auto& devices (world.getDeviceManager());
     auto& midi (world.getMidiEngine());

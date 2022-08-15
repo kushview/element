@@ -99,7 +99,7 @@ private:
 static std::unique_ptr<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> sGuiControllerInstances;
 
-GuiController::GuiController (Globals& w, AppController& a)
+GuiController::GuiController (Context& w, AppController& a)
     : AppController::Child(),
       controller (a),
       world (w),

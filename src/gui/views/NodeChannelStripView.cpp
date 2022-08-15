@@ -23,7 +23,7 @@
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"
 #include "session/session.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "signals.hpp"
 
 namespace Element {

@@ -6,10 +6,12 @@
 #include <vector>
 
 #include "element/element.hpp"
+#include "scripting.hpp"
+#include "context.hpp"
 #include "manifest.hpp"
 #include "search_path.hpp"
 
-namespace element {
+namespace Element {
 
 using FeatureMap = std::map<std::string, const void*>;
 
@@ -122,4 +124,4 @@ private:
     std::map<std::string, std::string> discovered;
 };
 
-} // namespace element
+} // namespace Element

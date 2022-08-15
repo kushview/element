@@ -25,7 +25,7 @@
 
 namespace Element {
 
-class Globals;
+class Context;
 class Settings;
 class UnlockStatus;
 
@@ -36,7 +36,7 @@ class AppController : public Controller,
                       protected ApplicationCommandTarget
 {
 public:
-    AppController (Globals&, RunMode mode = RunMode::Standalone);
+    AppController (Context&, RunMode mode = RunMode::Standalone);
     ~AppController();
 
     /** Returns the running mode of this instance */
@@ -46,10 +46,10 @@ public:
     inline CommandManager& getCommandManager() { return commands; }
 
     /** Access to global data */
-    inline Globals& getWorld() { return getGlobals(); }
+    inline Context& getWorld() { return getGlobals(); }
 
     /** Alias of getWorld() */
-    inline Globals& getGlobals() { return world; }
+    inline Context& getGlobals() { return world; }
 
     /** Returns the undo manager */
     inline UndoManager& getUndoManager() { return undo; }
@@ -82,7 +82,7 @@ public:
         }
 
         Settings& getSettings();
-        Globals& getWorld();
+        Context& getWorld();
         RunMode getRunMode() const { return getAppController().getRunMode(); }
 
     protected:
@@ -113,7 +113,7 @@ private:
     friend class Application;
     File lastSavedFile;
     File lastExportedGraph;
-    Globals& world;
+    Context& world;
     CommandManager commands;
     RecentlyOpenedFilesList recentFiles;
     UndoManager undo;

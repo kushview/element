@@ -30,7 +30,7 @@
 #include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
 #include "session/node.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "scopedflag.hpp"
 
 namespace Element {

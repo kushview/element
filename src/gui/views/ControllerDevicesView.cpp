@@ -23,7 +23,7 @@
 #include "gui/ViewHelpers.h"
 #include "session/controllerdevice.hpp"
 #include "messages.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 
 namespace Element {
 

@@ -35,7 +35,7 @@
 #include "gui/ContextMenus.h"
 #include "gui/NodeEditorFactory.h"
 #include "session/devicemanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 
 namespace Element {
 

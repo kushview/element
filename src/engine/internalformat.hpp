@@ -25,12 +25,9 @@ namespace Element {
 
 class AudioEngine;
 class MidiEngine;
-class Globals;
+class Context;
 
-/** Manages the internal plugin types.
-    @warning Usage of this format before AudioEngine is added to Globals
-    will yield unexpected results
-*/
+/** Manages the internal plugin types. */
 class InternalFormat : public AudioPluginFormat
 {
 public:
@@ -79,7 +76,7 @@ private:
 class ElementAudioPluginFormat : public AudioPluginFormat
 {
 public:
-    ElementAudioPluginFormat (Globals&);
+    ElementAudioPluginFormat (Context&);
     ~ElementAudioPluginFormat() {}
 
     // AudioPluginFormat
@@ -102,7 +99,7 @@ protected:
     bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
 
 private:
-    Globals& world;
+    Context& world;
     PluginDescription reverbDesc;
     PluginDescription combFilterDesc;
     PluginDescription allPassFilterDesc;

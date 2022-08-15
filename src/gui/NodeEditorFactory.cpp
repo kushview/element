@@ -16,8 +16,8 @@
 #include "gui/nodes/ScriptNodeEditor.h"
 
 #include "gui/NodeEditorFactory.h"
-#include "scripting/scriptingengine.hpp"
-#include "globals.hpp"
+#include "scripting.hpp"
+#include "context.hpp"
 
 namespace Element {
 

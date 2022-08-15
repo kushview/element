@@ -35,17 +35,17 @@
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "messages.hpp"
 #include "settings.hpp"
 #include "version.hpp"
 
 namespace Element {
 
-Globals& AppController::Child::getWorld() { return getAppController().getWorld(); }
+Context& AppController::Child::getWorld() { return getAppController().getWorld(); }
 Settings& AppController::Child::getSettings() { return getWorld().getSettings(); }
 
-AppController::AppController (Globals& g, RunMode m)
+AppController::AppController (Context& g, RunMode m)
     : world (g), runMode (m), foregroundCheck (*this)
 {
     addChild (new GuiController (g, *this));

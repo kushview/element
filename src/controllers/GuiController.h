@@ -33,7 +33,7 @@ namespace Element {
 
 class AppController;
 class EngineControl;
-class Globals;
+class Context;
 class ContentComponent;
 class MainWindow;
 class PluginWindow;
@@ -44,7 +44,7 @@ class GuiController : public AppController::Child,
 {
 public:
     Signal<void()> nodeSelected;
-    GuiController (Globals& w, AppController& a);
+    GuiController (Context& w, AppController& a);
     ~GuiController();
 
     void activate() override;
@@ -139,7 +139,7 @@ public:
 
 private:
     AppController& controller;
-    Globals& world;
+    Context& world;
     SessionRef sessionRef;
     OwnedArray<PluginWindow> pluginWindows;
     std::unique_ptr<WindowManager> windowManager;

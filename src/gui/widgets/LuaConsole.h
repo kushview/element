@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/widgets/Console.h"
-#include "scripting/scriptingengine.hpp"
+#include "scripting.hpp"
 
 namespace Element {
 

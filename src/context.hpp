@@ -1,5 +1,5 @@
 /*
-    Globals.h - This file is part of Element
+    context.h - This file is part of Element
     Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,8 @@
 #include "engine/midiengine.hpp"
 #include "session/session.hpp"
 
-namespace element { class Context; }
-
 namespace Element {
-using Context = element::Context;
+
 class CommandManager;
 class DeviceManager;
 class ScriptingEngine;
@@ -35,26 +33,13 @@ class Log;
 class PluginManager;
 class PresetManager;
 class Settings;
-class Writer;
 
-struct CommandLine
-{
-    explicit CommandLine (const String& cli = String());
-    bool fullScreen;
-    int port;
-
-    const String commandLine;
-};
-
-class Globals
+class Context
 {
 public:
-    explicit Globals (const String& commandLine = String());
-    virtual ~Globals();
+    explicit Context (const String& commandLine = String());
+    virtual ~Context();
 
-    const CommandLine cli;
-
-    Context& getContext();
     AudioEnginePtr getAudioEngine() const;
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();
@@ -67,13 +52,19 @@ public:
     ScriptingEngine& getScriptingEngine();
     SessionPtr getSession();
 
-    const String& getAppName() const { return appName; }
+    const std::string& getAppName() const { return appName; }
     void setEngine (AudioEnginePtr engine);
+
+    //=========================================================================
+    void openModule (const std::string& path);
+    void loadModules();
+    void addModulePath (const std::string& path);
+    void discoverModules();
 
 private:
     friend class Application;
+    std::string appName;
     class Impl;
-    String appName;
     std::unique_ptr<Impl> impl;
 };
 

@@ -17,9 +17,9 @@
 */
 
 #include "controllers/AppController.h"
-#include "scripting/scriptingengine.hpp"
+#include "scripting.hpp"
 #include "gui/views/LuaConsoleView.h"
-#include "globals.hpp"
+#include "context.hpp"
 
 namespace Element {
 

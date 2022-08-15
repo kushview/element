@@ -31,5 +31,5 @@
 
 #include "commands.hpp"
 #include "messages.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"

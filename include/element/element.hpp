@@ -9,6 +9,6 @@
     ClassName (const ClassName&&) = delete; \
     ClassName& operator= (const ClassName&&) = delete;
 
-namespace element {
+namespace Element {
 template <typename... Args> void ignore_unused (Args&&...) noexcept {}
 }

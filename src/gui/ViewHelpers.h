@@ -27,7 +27,7 @@
 namespace Element {
 
 class ContentComponent;
-class Globals;
+class Context;
 class Node;
 class NavigationConcertinaPanel;
 class GuiController;
@@ -55,7 +55,7 @@ namespace ViewHelpers {
     GuiController* getGuiController (Component* c);
 
     /** Get World */
-    Globals* getGlobals (Component* c);
+    Context* getGlobals (Component* c);
 
     /** Get Session */
     SessionPtr getSession (Component* c);

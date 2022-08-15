@@ -1,7 +1,7 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
-namespace element {
+namespace Element {
 static void escape_regex (std::string& input)
 {
     boost::replace_all (input, "\\", "\\\\");
@@ -35,4 +35,4 @@ std::string wildcard_to_regex (const std::string& wildcard)
     return input;
 }
 
-} // namespace element
+} // namespace Element

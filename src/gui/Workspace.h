@@ -29,7 +29,7 @@ namespace Element {
 
 class AppController;
 class GuiController;
-class Globals;
+class Context;
 
 class Workspace;
 
@@ -78,7 +78,7 @@ private:
 class Workspace : public Component
 {
 public:
-    Workspace (Globals&, AppController&, GuiController&);
+    Workspace (Context&, AppController&, GuiController&);
     virtual ~Workspace();
 
     Dock& getDock();
@@ -91,7 +91,7 @@ public:
 
 private:
     Dock dock;
-    Globals& world;
+    Context& world;
     AppController& app;
     GuiController& gui;
 };

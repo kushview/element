@@ -29,7 +29,7 @@
 #include "session/session.hpp"
 #include "session/node.hpp"
 #include "datapath.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 
 namespace Element {
 
@@ -449,7 +449,7 @@ private:
 class NavigationConcertinaPanel : public ConcertinaPanel
 {
 public:
-    NavigationConcertinaPanel (Globals& g)
+    NavigationConcertinaPanel (Context& g)
         : globals (g), headerHeight (30), defaultPanelHeight (80)
     {
         setLookAndFeel (&lookAndFeel);
@@ -597,7 +597,7 @@ public:
 
 private:
     typedef Element::LookAndFeel ELF;
-    Globals& globals;
+    Context& globals;
     int headerHeight;
     int defaultPanelHeight;
 

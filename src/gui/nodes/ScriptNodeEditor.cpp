@@ -22,7 +22,7 @@
 #include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/LookAndFeel.h"
 #include "scripting/bindings.hpp"
-#include "scripting/scriptingengine.hpp"
+#include "scripting.hpp"
 #include "scripting/scriptmanager.hpp"
 #include "scripting/script.hpp"
 

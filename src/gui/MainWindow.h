@@ -25,20 +25,20 @@
 namespace Element {
 
 class AppController;
-class Globals;
+class Context;
 class MainMenu;
 
 class MainWindow : public DocumentWindow,
                    public ChangeListener
 {
 public:
-    MainWindow (Globals&);
+    MainWindow (Context&);
     virtual ~MainWindow();
     void closeButtonPressed() override;
     void minimiseButtonPressed() override;
 
     void refreshMenu();
-    Globals& getWorld() { return world; }
+    Context& getWorld() { return world; }
     AppController& getAppController();
 
     void changeListenerCallback (ChangeBroadcaster* source) override;
@@ -46,7 +46,7 @@ public:
     void refreshName();
 
 private:
-    Globals& world;
+    Context& world;
     std::unique_ptr<MainMenu> mainMenu;
     void nameChanged();
     void nameChangedSession();

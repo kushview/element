@@ -35,7 +35,7 @@ class PreferencesComponent : public Component
 {
 public:
     //==============================================================================
-    PreferencesComponent (Globals& g, GuiController& _gui);
+    PreferencesComponent (Context& g, GuiController& _gui);
     ~PreferencesComponent();
 
     //==============================================================================
@@ -52,7 +52,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     class PageList;
-    Globals& world;
+    Context& world;
     GuiController& gui;
     OwnedArray<Component> pages;
     //[/UserVariables]

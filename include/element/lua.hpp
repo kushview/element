@@ -9,11 +9,11 @@ extern "C" {
 #include <map>
 #include <string>
 
-namespace element {
+namespace Element {
 namespace lua {
 
 using CFunction = lua_CFunction;
 using PackageLoaderMap = std::map<std::string, CFunction>;
 
 } // namespace lua
-} // namespace element
+} // namespace Element

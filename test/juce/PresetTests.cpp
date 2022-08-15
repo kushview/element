@@ -26,7 +26,7 @@ public:
 
     virtual void initialise() override
     {
-        globals.reset (new Globals());
+        globals.reset (new Context());
         globals->getPluginManager().addDefaultFormats();
     }
 
@@ -45,7 +45,7 @@ public:
     }
 
 private:
-    std::unique_ptr<Globals> globals;
+    std::unique_ptr<Context> globals;
     AudioPluginFormatManager plugins;
     AudioProcessor* createPluginProcessor()
     {

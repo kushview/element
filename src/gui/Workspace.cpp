@@ -163,7 +163,7 @@ void WorkspaceState::setMissing()
     stabilizePropertyString (Tags::name, "New Workspace");
 }
 
-Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
+Workspace::Workspace (Context& w, AppController& a, GuiController& g)
     : world (w), app (a), gui (g)
 {
     // dock.registerPanelType (new GenericPanelType());

@@ -20,11 +20,13 @@
 #pragma once
 
 #include "JuceHeader.h"
+
+#include "element/lua.hpp"
 #include "sol/sol.hpp"
 
 namespace Element {
 
-class Globals;
+class Context;
 class ScriptManager;
 
 class ScriptingEngine
@@ -36,18 +38,27 @@ public:
     ScriptManager& getScriptManager();
 
     //==========================================================================
-    lua_State* getLuaState() const { return L; }
+    lua_State* getLuaState() const;
     
     //==========================================================================
     Result execute (const String& code);
 
+    std::vector<std::string> getPackageNames() const noexcept;
+    void addPackage (const std::string& name, lua::CFunction loader);
+
 private:
-    friend Globals;
+    friend Context;
     class Impl;
     std::unique_ptr<Impl> impl;
-    Globals* world = nullptr;
+    Context* world = nullptr;
     lua_State* L = nullptr;
-    void initialize (Globals&);
+    class State;
+    std::unique_ptr<State> state;
+
+    ScriptingEngine (const ScriptingEngine&) = delete;
+    void initialize (Context&);
 };
+
+using Scripting = ScriptingEngine;
 
 } // namespace Element
