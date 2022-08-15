@@ -42,9 +42,6 @@ public:
     /** Returns the running mode of this instance */
     RunMode getRunMode() const { return runMode; }
 
-    /** Returns the CommandManager */
-    inline CommandManager& getCommandManager() { return commands; }
-
     /** Access to global data */
     inline Context& getWorld() { return getGlobals(); }
 
@@ -114,7 +111,6 @@ private:
     File lastSavedFile;
     File lastExportedGraph;
     Context& world;
-    CommandManager commands;
     RecentlyOpenedFilesList recentFiles;
     UndoManager undo;
     RunMode runMode;
