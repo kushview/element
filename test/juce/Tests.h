@@ -42,7 +42,7 @@
 #include "Settings.h"
 #include "common.hpp"
 
-namespace Element  {
+namespace element  {
 
 class UnitTestBase : public UnitTest
 {
@@ -67,7 +67,7 @@ protected:
     void initializeWorld()
     {
         if (world) return;
-        world.reset (new Globals ());
+        world.reset (new Context ());
         world->setEngine (new AudioEngine (*world));
         world->getPluginManager().addDefaultFormats();
         world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
@@ -110,12 +110,12 @@ protected:
         MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor); 
     }
     
-    Globals& getWorld() { initializeWorld(); return *world; }
+    Context& getWorld() { initializeWorld(); return *world; }
     AppController& getAppController() { initializeWorld(); return *app; }
 
 private:
     const String slug;
-    std::unique_ptr<Globals> world;
+    std::unique_ptr<Context> world;
     std::unique_ptr<AppController> app;
 };
 

@@ -21,7 +21,7 @@
 
 #include "gui/nodes/NodeEditorComponent.h"
 
-namespace Element {
+namespace element {
 
 class Node;
 class GuiController;
@@ -41,4 +41,4 @@ private:
     std::unique_ptr<ChannelStrip> strip;
 };
 
-} // namespace Element
+} // namespace element

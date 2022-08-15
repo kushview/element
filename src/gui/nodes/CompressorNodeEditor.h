@@ -24,7 +24,7 @@
 #include "engine/nodes/CompressorProcessor.h"
 #include "KnobsComponent.h"
 
-namespace Element {
+namespace element {
 
 class CompressorNodeEditor : public AudioProcessorEditor
 {
@@ -74,4 +74,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorNodeEditor)
 };
 
-} // namespace Element
+} // namespace element

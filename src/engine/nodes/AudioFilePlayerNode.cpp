@@ -30,7 +30,7 @@
 
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class AudioFilePlayerEditor : public AudioProcessorEditor,
                               public FileComboBoxListener,
@@ -626,4 +626,4 @@ bool AudioFilePlayerNode::isBusesLayoutSupported (const BusesLayout& layout) con
     return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() || layout.getMainOutputChannelSet() == AudioChannelSet::mono();
 }
 
-} // namespace Element
+} // namespace element

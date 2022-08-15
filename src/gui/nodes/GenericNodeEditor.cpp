@@ -20,7 +20,7 @@
 #include "gui/nodes/GenericNodeEditor.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 class BooleanParameterComponent final : public Component,
                                         private ParameterListener
@@ -455,7 +455,7 @@ GenericNodeEditor::~GenericNodeEditor() {}
 
 void GenericNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::backgroundColor);
+    g.fillAll (element::LookAndFeel::backgroundColor);
 }
 
 void GenericNodeEditor::resized()
@@ -465,4 +465,4 @@ void GenericNodeEditor::resized()
     pimpl->view.setBounds (getLocalBounds());
 }
 
-} // namespace Element
+} // namespace element

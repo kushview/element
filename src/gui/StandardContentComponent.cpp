@@ -50,7 +50,7 @@
 #include "session/node.hpp"
 
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 #include "gui/StandardContentComponent.h"
@@ -70,7 +70,7 @@
 #define EL_NAV_MIN_WIDTH 100
 #define EL_NAV_MAX_WIDTH 440
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class GraphEditorViewSE : public GraphEditorView
@@ -1090,4 +1090,4 @@ void StandardContentComponent::setMainView (ContentView* view)
     setContentView (view, false);
 }
 
-} // namespace Element
+} // namespace element

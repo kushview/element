@@ -23,7 +23,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class KnobsComponent : public Component
 {
@@ -41,4 +41,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnobsComponent)
 };
 
-} // namespace Element
+} // namespace element

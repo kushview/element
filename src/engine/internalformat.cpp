@@ -47,9 +47,9 @@
 
 #include "session/session.hpp"
 
-#include "globals.hpp"
+#include "context.hpp"
 
-namespace Element {
+namespace element {
 
 typedef IONode IONode;
 
@@ -111,7 +111,7 @@ bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginD
 }
 
 // MARK: Element Format
-ElementAudioPluginFormat::ElementAudioPluginFormat (Globals& g)
+ElementAudioPluginFormat::ElementAudioPluginFormat (Context& g)
     : world (g) {}
 
 void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription>& ds, const String& fileOrId)
@@ -305,4 +305,4 @@ bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (con
     return false;
 }
 
-} // namespace Element
+} // namespace element

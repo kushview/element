@@ -18,7 +18,7 @@
 */
 
 #include "gui/widgets/NodeMidiProgramComponent.h"
-namespace Element {
+namespace element {
 
 NodeMidiProgramComponent::NodeMidiProgramComponent()
 {
@@ -72,4 +72,4 @@ void NodeMidiProgramComponent::resized()
     name.setBounds (r2);
 }
 
-} // namespace Element
+} // namespace element

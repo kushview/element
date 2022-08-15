@@ -21,10 +21,10 @@
 
 #include "sol/sol.hpp"
 #include "engine/parameter.hpp"
-#include "scripting/ScriptInstance.h"
+#include "scripting/scriptinstance.hpp"
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class LuaMidiPipe;
 
@@ -71,7 +71,7 @@ public:
 
     //==========================================================================
     int getNumParameters() const { return numParams; }
-    Element::Parameter::Ptr getParameterObject (int index, bool input = true) const;
+    element::Parameter::Ptr getParameterObject (int index, bool input = true) const;
     void copyParameterValues (const DSPScript&);
 
     //==========================================================================
@@ -109,4 +109,4 @@ private:
     void setParameter (int, float);
 };
 
-} // namespace Element
+} // namespace element

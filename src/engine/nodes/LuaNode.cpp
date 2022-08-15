@@ -26,7 +26,7 @@
 #include "engine/nodes/LuaNode.h"
 #include "engine/midipipe.hpp"
 #include "engine/parameter.hpp"
-#include "scripting/LuaBindings.h"
+#include "scripting/bindings.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -130,7 +130,7 @@ function node_restore()
 end
 )";
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class LuaParameter : public ControlPortParameter,
@@ -873,4 +873,4 @@ void LuaNode::setParameter (int index, float value)
     context->setParameter (index, value);
 }
 
-} // namespace Element
+} // namespace element

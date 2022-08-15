@@ -22,11 +22,11 @@
 #include "session/controllerdevice.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class ContentView;
-class Globals;
+class Context;
 
 class Action : public UndoableAction
 {

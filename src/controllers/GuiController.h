@@ -29,11 +29,11 @@
 #include "session/session.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class EngineControl;
-class Globals;
+class Context;
 class ContentComponent;
 class MainWindow;
 class PluginWindow;
@@ -44,7 +44,7 @@ class GuiController : public AppController::Child,
 {
 public:
     Signal<void()> nodeSelected;
-    GuiController (Globals& w, AppController& a);
+    GuiController (Context& w, AppController& a);
     ~GuiController();
 
     void activate() override;
@@ -120,7 +120,7 @@ public:
     void closePluginWindow (PluginWindow*);
 
     /** Get the look and feel used by this instance */
-    Element::LookAndFeel& getLookAndFeel();
+    element::LookAndFeel& getLookAndFeel();
 
     /** Clears the current content component */
     void clearContentComponent();
@@ -139,7 +139,7 @@ public:
 
 private:
     AppController& controller;
-    Globals& world;
+    Context& world;
     SessionRef sessionRef;
     OwnedArray<PluginWindow> pluginWindows;
     std::unique_ptr<WindowManager> windowManager;
@@ -161,4 +161,4 @@ private:
     void saveProperties (PropertiesFile* props);
 };
 
-} // namespace Element
+} // namespace element

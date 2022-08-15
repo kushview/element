@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class AudioMixerProcessor : public BaseProcessor
 {
@@ -212,4 +212,4 @@ private:
     void addStereoTrack();
 };
 
-} // namespace Element
+} // namespace element

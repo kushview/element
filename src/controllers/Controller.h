@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class Controller
 {
@@ -125,4 +125,4 @@ private:
     Controller* parent;
 };
 
-} // namespace Element
+} // namespace element

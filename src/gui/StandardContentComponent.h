@@ -21,7 +21,7 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class StandardContentComponent : public ContentComponent
 {
@@ -107,4 +107,4 @@ private:
     void setContentView (ContentView* view, const bool accessory = false);
 };
 
-} // namespace Element
+} // namespace element

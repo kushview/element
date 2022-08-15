@@ -20,12 +20,12 @@
 #include "gui/widgets/LuaConsole.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
-#include "scripting/LuaBindings.h"
+#include "scripting/bindings.hpp"
 #include "commands.hpp"
 
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 LuaConsole::LuaConsole()
@@ -179,4 +179,4 @@ void LuaConsole::timerCallback()
     }
 }
 
-} // namespace Element
+} // namespace element

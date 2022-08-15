@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,35 +19,17 @@
 
 #pragma once
 
-#include "JuceHeader.h"
-#include "sol/sol.hpp"
+#include "sol/forward.hpp"
 
-namespace Element {
+namespace element {
 
-class Globals;
-class ScriptManager;
+class Context;
 
-class ScriptingEngine
-{
-public:
-    ScriptingEngine();
-    ~ScriptingEngine();
+namespace Lua {
+    extern void initializeState (sol::state_view&);
+    extern void initializeState (sol::state_view&, Context&);
+    extern void setGlobals (sol::state_view&, Context&);
+    extern void clearGlobals (sol::state_view&);
+} // namespace Lua
 
-    ScriptManager& getScriptManager();
-
-    //==========================================================================
-    lua_State* getLuaState() const { return L; }
-    
-    //==========================================================================
-    Result execute (const String& code);
-
-private:
-    friend Globals;
-    class Impl;
-    std::unique_ptr<Impl> impl;
-    Globals* world = nullptr;
-    lua_State* L = nullptr;
-    void initialize (Globals&);
-};
-
-} // namespace Element
+} // namespace element

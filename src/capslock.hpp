@@ -18,9 +18,9 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** Returns true if caps lock is currently down */
 bool isCapsLockOn();
 
-} // namespace Element
+} // namespace element

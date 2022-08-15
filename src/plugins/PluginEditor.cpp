@@ -30,8 +30,8 @@
 #define EL_PLUGIN_DEFAULT_WIDTH 760
 #define EL_PLUGIN_DEFAULT_HEIGHT 480
 
-namespace Element {
-using Element::LookAndFeel;
+namespace element {
+using element::LookAndFeel;
 
 //==============================================================================
 class PerformanceParameterSlider : public Slider,
@@ -205,7 +205,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (Element::LookAndFeel::widgetBackgroundColor.darker (0.29));
+        g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker (0.29));
     }
 
     void resized() override
@@ -395,13 +395,13 @@ PluginEditor::~PluginEditor()
 }
 
 //==============================================================================
-Element::ContentComponent* PluginEditor::getContentComponent()
+element::ContentComponent* PluginEditor::getContentComponent()
 {
     if (nullptr == content)
         if (auto* app = processor.getAppController())
             if (auto* gui = app->findChild<GuiController>())
                 content = gui->getContentComponent();
-    return nullptr != content ? dynamic_cast<Element::ContentComponent*> (content.getComponent())
+    return nullptr != content ? dynamic_cast<element::ContentComponent*> (content.getComponent())
                               : nullptr;
 }
 
@@ -428,10 +428,10 @@ bool PluginEditor::isReportingZeroLatency() const { return processor.isForcingZe
 //==============================================================================
 void PluginEditor::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::widgetBackgroundColor.darker (0.29));
+    g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker (0.29));
     if (! content)
     {
-        g.setColour (Element::LookAndFeel::textColor);
+        g.setColour (element::LookAndFeel::textColor);
         g.drawFittedText ("Unauthorized: Please activate your license in the application.",
                           0,
                           0,
@@ -474,4 +474,4 @@ void PluginEditor::updatePerformanceParamEnablements()
             ps->update();
 }
 
-} // namespace Element
+} // namespace element

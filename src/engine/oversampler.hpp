@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 template <typename SampleType>
 class Oversampler final
@@ -50,4 +50,4 @@ private:
     OwnedArray<ProcessorType> processors;
 };
 
-} // namespace Element
+} // namespace element

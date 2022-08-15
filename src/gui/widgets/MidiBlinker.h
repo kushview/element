@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class MidiBlinker : public Component,
                     public SettableTooltipClient,
@@ -51,4 +51,4 @@ private:
     void timerCallback() override;
 };
 
-} // namespace Element
+} // namespace element

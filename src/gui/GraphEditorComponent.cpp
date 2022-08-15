@@ -19,7 +19,7 @@
 
 #include "ElementApp.h"
 #include "controllers/GraphController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 
 #include "gui/GuiCommon.h"
 #include "gui/BlockComponent.h"
@@ -43,7 +43,7 @@
 
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 static bool elNodeIsAudioMixer (const Node& node)
 {
@@ -1196,4 +1196,4 @@ BlockComponent* GraphEditorComponent::createBlock (const Node& node)
     return nullptr;
 }
 
-} // namespace Element
+} // namespace element

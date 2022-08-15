@@ -24,7 +24,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiFilterNode.h"
 
-namespace Element {
+namespace element {
 
 class OSCReceiverNode : public MidiFilterNode,
                         public ChangeBroadcaster,
@@ -91,4 +91,4 @@ private:
     void oscBundleReceived (const OSCBundle& bundle) override;
 };
 
-} // namespace Element
+} // namespace element

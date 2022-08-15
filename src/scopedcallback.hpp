@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** A scoped function callback. Similar to goto, this calls a function when it goes out of scope.
  
@@ -44,4 +44,4 @@ private:
     std::function<void()> callback;
 };
 
-} // namespace Element
+} // namespace element

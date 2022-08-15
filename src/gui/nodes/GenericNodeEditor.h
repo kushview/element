@@ -21,7 +21,7 @@
 
 #include "gui/nodes/NodeEditorComponent.h"
 
-namespace Element {
+namespace element {
 
 class GenericNodeEditor : public NodeEditorComponent
 {
@@ -36,4 +36,4 @@ private:
     std::unique_ptr<Pimpl> pimpl;
 };
 
-} // namespace Element
+} // namespace element

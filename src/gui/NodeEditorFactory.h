@@ -22,7 +22,7 @@
 #include "engine/nodeobject.hpp"
 #include "gui/nodes/GenericNodeEditor.h"
 
-namespace Element {
+namespace element {
 
 class GuiController;
 class Node;
@@ -141,4 +141,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeEditorFactory)
 };
 
-} // namespace Element
+} // namespace element

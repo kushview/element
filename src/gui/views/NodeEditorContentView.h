@@ -23,7 +23,7 @@
 #include "gui/widgets/NodeListComboBox.h"
 #include "gui/Buttons.h"
 
-namespace Element {
+namespace element {
 
 class NodeEditorContentView : public ContentView,
                               public ComboBox::Listener,
@@ -71,4 +71,4 @@ private:
     std::unique_ptr<NodeWatcher> watcher;
 };
 
-} // namespace Element
+} // namespace element

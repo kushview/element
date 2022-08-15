@@ -2,7 +2,7 @@
 #pragma once
 #include "engine/nodeobject.hpp"
 
-namespace Element {
+namespace element {
 
 class TestNode : public NodeObject
 {

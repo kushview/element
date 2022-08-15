@@ -22,7 +22,7 @@
 #include "SequencerClipItem.h"
 #include "SequencerComponent.h"
 
-namespace Element {
+namespace element {
 
 SequencerClipItem::SequencerClipItem (SequencerComponent& owner,
                                       const ClipModel& m)

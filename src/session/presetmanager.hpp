@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 struct PresetDescription
 {
@@ -105,4 +105,4 @@ private:
     OwnedArray<PresetDescription> presets;
 };
 
-} // namespace Element
+} // namespace element

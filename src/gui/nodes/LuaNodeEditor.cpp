@@ -21,7 +21,7 @@
 #include "gui/nodes/LuaNodeEditor.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 static CodeEditorComponent::ColourScheme luaColors()
 {
@@ -214,7 +214,7 @@ void LuaNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void LuaNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::backgroundColor);
+    g.fillAll (element::LookAndFeel::backgroundColor);
 }
 
 void LuaNodeEditor::resized()
@@ -237,4 +237,4 @@ void LuaNodeEditor::resized()
     editor->setBounds (r1);
 }
 
-} // namespace Element
+} // namespace element

@@ -21,7 +21,7 @@
 
 #include "engine/parameter.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 Parameter::Parameter() noexcept {}
@@ -167,4 +167,4 @@ ControlPortParameter& ControlPortParameter::operator= (float newValue)
     return *this;
 }
 
-} // namespace Element
+} // namespace element

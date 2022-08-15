@@ -33,14 +33,14 @@
 #include "session/commandmanager.hpp"
 #include "session/node.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 #include "utils.hpp"
 #include "urls.hpp"
 
 #include "gui/MainMenu.h"
 
-namespace Element {
+namespace element {
 
 MainMenu::MainMenu (MainWindow& parent, CommandManager& c)
     : owner (parent), world (parent.getWorld()), cmd (c) {}
@@ -450,4 +450,4 @@ void MainMenu::buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
 #endif
 }
-} // namespace Element
+} // namespace element

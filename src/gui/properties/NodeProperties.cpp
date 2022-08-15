@@ -27,7 +27,7 @@
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
 #endif
 
-namespace Element {
+namespace element {
 
 class NodeMidiProgramPropertyComponent : public PropertyComponent
 {
@@ -269,4 +269,4 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
     }
 }
 
-} // namespace Element
+} // namespace element

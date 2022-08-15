@@ -1,7 +1,7 @@
 #pragma once
 #include "engine/graphnode.hpp"
 
-namespace Element {
+namespace element {
 
 struct PreparedGraph
 {

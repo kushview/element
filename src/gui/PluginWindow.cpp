@@ -25,7 +25,7 @@
 #include "gui/nodes/VolumeNodeEditor.h"
 #include "session/presetmanager.hpp"
 
-namespace Element {
+namespace element {
 static Array<PluginWindow*> activePluginWindows;
 
 class PluginWindowToolbar : public Toolbar
@@ -382,4 +382,4 @@ void PluginWindow::closeButtonPressed()
     gui.closePluginWindow (this);
 }
 
-} // namespace Element
+} // namespace element

@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "gui/ViewHelpers.h"
 
-namespace Element {
+namespace element {
 
 class BlockComponent;
 class BlockFactory;
@@ -177,4 +177,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorComponent)
 };
 
-} // namespace Element
+} // namespace element

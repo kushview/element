@@ -22,7 +22,7 @@
 #include "gui/nodes/NodeEditorComponent.h"
 #include "engine/nodes/MidiProgramMapNode.h"
 
-namespace Element {
+namespace element {
 
 class AudioRouterEditor : public NodeEditorComponent,
                           public ChangeListener
@@ -50,4 +50,4 @@ private:
     std::unique_ptr<Content> content;
 };
 
-} // namespace Element
+} // namespace element

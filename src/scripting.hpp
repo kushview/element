@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2021  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,43 +21,44 @@
 
 #include "JuceHeader.h"
 
+#include "element/lua.hpp"
+#include "sol/sol.hpp"
+
 namespace element {
 
-class Node;
-class NodeObjectSync;
+class Context;
+class ScriptManager;
 
-/** A PropertyPanel which display node properties */
-class NodePropertyPanel : public PropertyPanel
+class ScriptingEngine
 {
 public:
-    NodePropertyPanel()
-        : PropertyPanel()
-    {
-        initialize();
-    }
+    ScriptingEngine();
+    ~ScriptingEngine();
 
-    NodePropertyPanel (const Node& node)
-        : PropertyPanel()
-    {
-        initialize();
-        addProperties (node);
-    }
-
-    ~NodePropertyPanel() override = default;
+    ScriptManager& getScriptManager();
 
     //==========================================================================
-    /** Add properties from the given node. This will clear the panel before 
-        adding
+    lua_State* getLuaState() const;
+    
+    //==========================================================================
+    Result execute (const String& code);
 
-        @param node The node to get properties from
-        @param extraSpace Extra space between properties (forwarded to juce::PropertyPanel)
-     */
-    void addProperties (const Node& node, int extraSpace = 0);
+    std::vector<std::string> getPackageNames() const noexcept;
+    void addPackage (const std::string& name, lua::CFunction loader);
 
 private:
-    std::unique_ptr<NodeObjectSync> sync;
-    void initialize();
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePropertyPanel)
+    friend Context;
+    class Impl;
+    std::unique_ptr<Impl> impl;
+    Context* world = nullptr;
+    lua_State* L = nullptr;
+    class State;
+    std::unique_ptr<State> state;
+
+    ScriptingEngine (const ScriptingEngine&) = delete;
+    void initialize (Context&);
 };
+
+using Scripting = ScriptingEngine;
 
 } // namespace element

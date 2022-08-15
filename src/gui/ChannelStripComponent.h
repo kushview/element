@@ -21,7 +21,7 @@
 #include "gui/Buttons.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class ChannelStripComponent : public Component,
                               public Button::Listener,
@@ -117,4 +117,4 @@ private:
     void stabilizeContent();
 };
 
-} // namespace Element
+} // namespace element

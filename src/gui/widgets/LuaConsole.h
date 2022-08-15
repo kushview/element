@@ -20,9 +20,9 @@
 #pragma once
 
 #include "gui/widgets/Console.h"
-#include "scripting/ScriptingEngine.h"
+#include "scripting.hpp"
 
-namespace Element {
+namespace element {
 
 class LuaConsole : public Console,
                    private Timer
@@ -45,4 +45,4 @@ private:
     void timerCallback() override;
 };
 
-} // namespace Element
+} // namespace element

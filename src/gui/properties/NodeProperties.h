@@ -19,7 +19,7 @@
 
 #pragma once
 #include "ElementApp.h"
-namespace Element {
+namespace element {
 
 class Node;
 
@@ -36,4 +36,4 @@ struct NodeProperties : public Array<PropertyComponent*>
     NodeProperties (const Node& n, bool nodeProps = true, bool midiProps = false);
 };
 
-} // namespace Element
+} // namespace element

@@ -23,7 +23,7 @@
 #include "engine/nodeobject.hpp"
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 class DSPScript;
 
@@ -74,4 +74,4 @@ private:
     bool prepared = false;
 };
 
-} // namespace Element
+} // namespace element

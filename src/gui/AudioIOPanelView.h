@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 class Node;
 }
 //[/Headers]
@@ -43,7 +43,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setNode (const Element::Node& node);
+    void setNode (const element::Node& node);
     //[/UserMethods]
 
     void paint (Graphics& g) override;

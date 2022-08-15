@@ -24,7 +24,7 @@
 #include "engine/togglegrid.hpp"
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class AudioRouterNode : public NodeObject,
                         public ChangeBroadcaster
@@ -142,4 +142,4 @@ private:
     void applyMatrix (const MatrixState&);
 };
 
-} // namespace Element
+} // namespace element

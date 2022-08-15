@@ -6,7 +6,7 @@
 #include "session/node.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L) {
-    using namespace Element;
+    using namespace element;
     using namespace sol;
 
     sol::state_view lua (L);

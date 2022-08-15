@@ -29,7 +29,7 @@ namespace kv {
 using namespace kv;
 
 //=============================================================================
-namespace Element {
+namespace element {
 
 using PortType = kv::PortType;
 
@@ -187,4 +187,4 @@ inline static bool areMajorWebsitesAvailable()
     return false;
 }
 
-} // namespace Element
+} // namespace element

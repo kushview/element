@@ -26,7 +26,7 @@
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "controllers/OSCController.h"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 #define EL_GENERAL_SETTINGS_NAME "General"
@@ -39,7 +39,7 @@
 #include "PreferencesComponent.h"
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-namespace Element {
+namespace element {
 
 class PreferencesComponent::PageList : public ListBox,
                                        public ListBoxModel
@@ -135,7 +135,7 @@ class OSCSettingsPage : public SettingsPage,
                         private AsyncUpdater
 {
 public:
-    OSCSettingsPage (Globals& w, GuiController& g)
+    OSCSettingsPage (Context& w, GuiController& g)
         : world (w), gui (g)
     {
         auto& settings = world.getSettings();
@@ -186,7 +186,7 @@ public:
     }
 
 private:
-    Globals& world;
+    Context& world;
     GuiController& gui;
     Label enabledLabel;
     SettingButton enabledButton;
@@ -220,7 +220,7 @@ class PluginSettingsComponent : public SettingsPage,
                                 public Button::Listener
 {
 public:
-    PluginSettingsComponent (Globals& w)
+    PluginSettingsComponent (Context& w)
         : plugins (w.getPluginManager()),
           settings (w.getSettings())
 
@@ -340,7 +340,7 @@ public:
         ClockSourceMidiClock = 2
     };
 
-    GeneralSettingsPage (Globals& world, GuiController& g)
+    GeneralSettingsPage (Context& world, GuiController& g)
         : pluginSettings (world),
 #ifndef EL_SOLO
           defaultSessionFile ("Default Session", File(), true, false,
@@ -713,7 +713,7 @@ public:
     void resized() override { devs.setBounds (getLocalBounds()); }
 
 private:
-    Element::AudioDeviceSelectorComponent devs;
+    element::AudioDeviceSelectorComponent devs;
     DeviceManager& devices;
 };
 
@@ -726,7 +726,7 @@ class MidiSettingsPage : public SettingsPage,
                          public Timer
 {
 public:
-    MidiSettingsPage (Globals& g)
+    MidiSettingsPage (Context& g)
         : devices (g.getDeviceManager()),
             settings (g.getSettings()),
             midi (g.getMidiEngine()),
@@ -867,7 +867,7 @@ private:
     DeviceManager& devices;
     Settings& settings;
     MidiEngine& midi;
-    Globals& world;
+    Context& world;
 
     Label midiOutputLabel;
     ComboBox midiOutput;
@@ -1029,7 +1029,7 @@ private:
 //[/MiscUserDefs]
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
+PreferencesComponent::PreferencesComponent (Context& g, GuiController& _gui)
     : world (g), gui (_gui)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -1163,7 +1163,7 @@ void PreferencesComponent::updateSize()
     //          roundDoubleToInt (500.0 * Desktop::getInstance().getGlobalScaleFactor()));
 }
 
-} /* namespace Element */
+} /* namespace element */
 //[/MiscUserCode]
 
 //==============================================================================
@@ -1176,7 +1176,7 @@ void PreferencesComponent::updateSize()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Globals&amp; g, GuiController&amp; _gui"
+                 parentClasses="public Component" constructorParams="Context&amp; g, GuiController&amp; _gui"
                  variableInitialisers="world (g), gui(_gui)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">

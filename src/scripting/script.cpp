@@ -18,11 +18,11 @@
 */
 
 #include "sol/sol.hpp"
-#include "scripting/LuaBindings.h"
-#include "scripting/ScriptDescription.h"
-#include "scripting/Script.h"
+#include "scripting/bindings.hpp"
+#include "scripting/scriptdescription.hpp"
+#include "scripting/script.hpp"
 
-namespace Element {
+namespace element {
 
 Script::Script (lua_State* state)
 {
@@ -114,4 +114,4 @@ bool Script::load (const String& buffer)
     return hasloaded;
 }
 
-} // namespace Element
+} // namespace element

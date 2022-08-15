@@ -22,7 +22,7 @@
 #include "JuceHeader.h"
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class PluginManager;
 class Settings;
@@ -151,4 +151,4 @@ private:
     void saveSettings();
     void restoreSettings();
 };
-} // namespace Element
+} // namespace element

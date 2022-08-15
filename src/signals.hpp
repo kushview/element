@@ -20,9 +20,9 @@
 
 #include <boost/signals2.hpp>
 
-namespace Element {
+namespace element {
 template <typename T>
 using Signal = boost::signals2::signal<T>;
 using SignalConnection = boost::signals2::connection;
 using SharedConnectionBlock = boost::signals2::shared_connection_block;
-} // namespace Element
+} // namespace element

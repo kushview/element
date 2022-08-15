@@ -21,13 +21,13 @@
 #include "gui/SystemTray.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "utils.hpp"
 
 #define EL_USE_NEW_SYSTRAY_ICON 0
 #define EL_SYSTRAY_MIN_SIZE 22
 
-namespace Element {
+namespace element {
 
 enum SystemTrayMouseAction
 {
@@ -74,7 +74,7 @@ SystemTray::SystemTray()
 
 void SystemTray::setEnabled (bool enabled)
 {
-    if (Element::Util::isRunningInWine())
+    if (element::Util::isRunningInWine())
         return;
     
     if (enabled)
@@ -164,4 +164,4 @@ void SystemTray::mouseDown (const MouseEvent& ev)
 #endif
 }
 
-} // namespace Element
+} // namespace element

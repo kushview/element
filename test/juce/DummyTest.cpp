@@ -18,7 +18,7 @@
 
 #include "Tests.h"
 
-using namespace Element;
+using namespace element;
 
 class DummyTest : public UnitTest
 {

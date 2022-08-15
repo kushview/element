@@ -23,9 +23,9 @@
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
 #include "session/pluginmanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class NavigationList : public ListBox,
                        public ListBoxModel
@@ -220,7 +220,7 @@ private:
             if (! cc)
                 return;
 
-            ReferenceCountedArray<Element::NodeObject> nodes;
+            ReferenceCountedArray<element::NodeObject> nodes;
             for (int i = 0; i < nodes.size(); ++i)
                 addSubItem (new PluginInstanceItem (nodes.getUnchecked (i)));
         }
@@ -370,4 +370,4 @@ void NavigationView::updateLayout()
     layout.setItemLayout (2, 50.0, 200.0, 100.0);
 }
 
-} // namespace Element
+} // namespace element

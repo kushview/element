@@ -19,12 +19,12 @@
 #if 0
 
 #include "Tests.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 
 #include "engine/nodes/AudioProcessorNode.h"
 
-namespace Element {
+namespace element {
 
 class MidiInputDeviceNodeTest : public UnitTestBase
 {

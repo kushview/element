@@ -23,7 +23,7 @@
  #include <windows.h>
 #endif
 
-namespace Element {
+namespace element {
 namespace Util {
 
     StringArray getSupportedAudioPluginFormats()
@@ -60,4 +60,4 @@ bool isRunningInWine()
 }
 
 } // namespace Util
-} // namespace Element
+} // namespace element

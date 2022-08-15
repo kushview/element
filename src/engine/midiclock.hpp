@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class MidiClock
 {
@@ -124,4 +124,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

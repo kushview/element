@@ -20,11 +20,11 @@
 #include "gui/GuiCommon.h"
 #include "gui/PluginManagerComponent.h"
 #include "session/pluginmanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 static void removeNonElementPlugins (KnownPluginList& list);
 
@@ -908,7 +908,7 @@ void PluginManagerContentView::didBecomeActive()
     if (pluginList)
         pluginList.reset();
 
-    pluginList = std::make_unique<Element::PluginListComponent> (plugins, settings.getUserSettings());
+    pluginList = std::make_unique<element::PluginListComponent> (plugins, settings.getUserSettings());
     addAndMakeVisible (pluginList.get());
     resized();
 
@@ -963,4 +963,4 @@ bool PluginListComponent::isPluginVersion()
     return false;
 }
 
-} // namespace Element
+} // namespace element

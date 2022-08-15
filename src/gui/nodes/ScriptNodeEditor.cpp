@@ -21,12 +21,12 @@
 #include "el/object.hpp"
 #include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/LookAndFeel.h"
-#include "scripting/LuaBindings.h"
-#include "scripting/ScriptingEngine.h"
-#include "scripting/ScriptManager.h"
-#include "scripting/Script.h"
+#include "scripting/bindings.hpp"
+#include "scripting.hpp"
+#include "scripting/scriptmanager.hpp"
+#include "scripting/script.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 class ControlPort : private ParameterListener
@@ -443,7 +443,7 @@ void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void ScriptNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::widgetBackgroundColor.darker());
+    g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker());
 }
 
 void ScriptNodeEditor::resized()
@@ -476,4 +476,4 @@ void ScriptNodeEditor::resized()
     }
 }
 
-} // namespace Element
+} // namespace element

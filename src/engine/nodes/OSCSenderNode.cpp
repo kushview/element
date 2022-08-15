@@ -21,7 +21,7 @@
 #include "engine/nodes/OSCSenderNode.h"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 OSCSenderNode::OSCSenderNode()
     : MidiFilterNode (0),
@@ -259,4 +259,4 @@ std::vector<OSCMessage> OSCSenderNode::getOscMessages()
     return copied;
 }
 
-} // namespace Element
+} // namespace element

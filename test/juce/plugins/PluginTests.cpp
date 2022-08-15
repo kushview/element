@@ -19,7 +19,7 @@
 #include "Tests.h"
 #include "plugins/PluginProcessor.h"
 
-namespace Element {
+namespace element {
 
 class PluginTests : public UnitTestBase
 {

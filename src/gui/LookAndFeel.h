@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 struct Style
 {
@@ -116,4 +116,4 @@ private:
         defaultMonospaceName;
 };
 
-} // namespace Element
+} // namespace element

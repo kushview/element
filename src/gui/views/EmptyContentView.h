@@ -22,7 +22,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 class EmptyContentView : public ContentView
 {
@@ -47,4 +47,4 @@ public:
     }
 };
 
-} // namespace Element
+} // namespace element

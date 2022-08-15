@@ -24,7 +24,7 @@
 #include "gui/workspace/ContentViewPanel.h"
 #include "gui/workspace/PluginsPanel.h"
 
-namespace Element {
+namespace element {
 
 class GenericDockPanel : public DockPanel
 {
@@ -117,4 +117,4 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
     return nullptr;
 }
 
-} // namespace Element
+} // namespace element

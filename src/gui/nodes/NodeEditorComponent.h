@@ -25,7 +25,7 @@
 
 #define EL_NODE_EDITOR_DEFAULT_ID "el.DefaultNodeEditor"
 
-namespace Element {
+namespace element {
 
 class NodeEditorComponent : public Component
 {
@@ -50,4 +50,4 @@ private:
     Node node;
 };
 
-} // namespace Element
+} // namespace element

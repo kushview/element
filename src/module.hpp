@@ -6,6 +6,8 @@
 #include <vector>
 
 #include "element/element.hpp"
+#include "scripting.hpp"
+#include "context.hpp"
 #include "manifest.hpp"
 #include "search_path.hpp"
 

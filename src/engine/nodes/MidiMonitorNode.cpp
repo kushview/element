@@ -20,7 +20,7 @@
 
 #include "engine/nodes/MidiMonitorNode.h"
 
-namespace Element {
+namespace element {
 
 MidiMonitorNode::MidiMonitorNode()
     : MidiFilterNode (0)
@@ -130,4 +130,4 @@ void MidiMonitorNode::timerCallback()
         messagesLogged();
 }
 
-}; // namespace Element
+}; // namespace element

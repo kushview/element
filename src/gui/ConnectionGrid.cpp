@@ -28,7 +28,7 @@
 
 #define EL_MATRIX_SIZE 30
 
-namespace Element {
+namespace element {
 // Spacing between each patch point
 static const int gridPadding = 1;
 
@@ -868,4 +868,4 @@ void ConnectionGrid::didBecomeActive()
     auto session = ViewHelpers::findContentComponent (this)->getSession();
     setNode (session->getCurrentGraph());
 }
-} // namespace Element
+} // namespace element

@@ -17,11 +17,11 @@
 */
 
 #include "controllers/AppController.h"
-#include "scripting/ScriptingEngine.h"
+#include "scripting.hpp"
 #include "gui/views/LuaConsoleView.h"
-#include "globals.hpp"
+#include "context.hpp"
 
-namespace Element {
+namespace element {
 
 LuaConsoleView::~LuaConsoleView()
 {
@@ -48,4 +48,4 @@ void LuaConsoleView::initializeView (AppController& app)
     console.addText (buffer.trimEnd(), false);
 }
 
-} // namespace Element
+} // namespace element

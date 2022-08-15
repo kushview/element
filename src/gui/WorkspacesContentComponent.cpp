@@ -24,13 +24,13 @@
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
-#include "globals.hpp"
+#include "context.hpp"
 
 #include "messages.hpp"
 #include "settings.hpp"
 #include "BinaryData.h"
 
-namespace Element {
+namespace element {
 
 class WorkspacesContentComponent::Impl
 {
@@ -466,4 +466,4 @@ void WorkspacesContentComponent::setMainView (ContentView* v)
     }
 }
 
-} // namespace Element
+} // namespace element

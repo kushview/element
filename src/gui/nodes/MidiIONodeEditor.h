@@ -22,7 +22,7 @@
 #include "engine/midiengine.hpp"
 #include "gui/nodes/NodeEditorComponent.h"
 
-namespace Element {
+namespace element {
 
 class MidiIONodeEditor : public NodeEditorComponent,
                          public ChangeListener,
@@ -266,4 +266,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

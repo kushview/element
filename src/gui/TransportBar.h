@@ -24,7 +24,7 @@
 #include "engine/audioengine.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class BarLabel;
 class TransportBar : public Component,
@@ -64,4 +64,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransportBar)
 };
 
-} // namespace Element
+} // namespace element

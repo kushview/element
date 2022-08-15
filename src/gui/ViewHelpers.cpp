@@ -19,7 +19,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/audioengine.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
@@ -28,15 +28,15 @@
 #include "gui/ViewHelpers.h"
 #include "session/node.hpp"
 #include "session/commandmanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "messages.hpp"
 
 #include "plugins/PluginEditor.h"
 
-namespace Element {
+namespace element {
 namespace ViewHelpers {
 
-    typedef Element::LookAndFeel LF;
+    typedef element::LookAndFeel LF;
 
     void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding, Justification alignment)
     {
@@ -118,7 +118,7 @@ namespace ViewHelpers {
         return nullptr;
     }
 
-    Globals* getGlobals (Component* c)
+    Context* getGlobals (Component* c)
     {
         if (auto* cc = findContentComponent (c))
             return &cc->getGlobals();
@@ -218,4 +218,4 @@ void ViewHelperMixin::disconnectPorts (const Port& src, const Port& dst)
     postMessage (new RemoveConnectionMessage (srcNode.getNodeId(), src.getIndex(), dstNode.getNodeId(), dst.getIndex(), graph));
 }
 
-} // namespace Element
+} // namespace element

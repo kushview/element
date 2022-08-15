@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 struct Icon
 {
@@ -83,4 +83,4 @@ private:
 
 const Icons& getIcons();
 
-} // namespace Element
+} // namespace element

@@ -23,7 +23,7 @@
 
 #define EL_PLUGIN_SCANNER_PROCESS_ID "pspelbg"
 
-namespace Element {
+namespace element {
 
 class NodeObject;
 class Node;
@@ -193,4 +193,4 @@ private:
     void timerCallback() override;
 };
 
-} // namespace Element
+} // namespace element

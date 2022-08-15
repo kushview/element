@@ -21,7 +21,7 @@
 #include "gui/Buttons.h"
 #include "gui/widgets/MidiBlinker.h"
 
-namespace Element {
+namespace element {
 
 LookAndFeel::LookAndFeel()
 {
@@ -487,4 +487,4 @@ void LookAndFeel::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float>&
     LookAndFeel_KV1::drawTreeviewPlusMinusBox (g, area, backgroundColour, isOpen, isMouseOver);
 }
 
-} // namespace Element
+} // namespace element

@@ -24,7 +24,7 @@
 #include "engine/linearfade.hpp"
 #include "engine/togglegrid.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiRouterNode : public NodeObject,
                        public ChangeBroadcaster
@@ -120,4 +120,4 @@ private:
     void initMidiOuts (OwnedArray<MidiBuffer>& outs);
 };
 
-} // namespace Element
+} // namespace element

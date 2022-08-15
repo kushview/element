@@ -20,7 +20,7 @@
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
 
-namespace Element {
+namespace element {
 
 TreePanelBase::TreePanelBase (const String& treeviewID)
     : opennessStateKey (treeviewID)
@@ -284,4 +284,4 @@ void TreeItemBase::cancelDelayedSelectionTimer()
     delayedSelectionTimer = nullptr;
 }
 
-} // namespace Element
+} // namespace element

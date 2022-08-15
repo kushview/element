@@ -21,10 +21,10 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/widgets/ScriptEditorComponent.h"
-#include "scripting/ScriptSource.h"
+#include "scripting/scriptsource.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class ScriptNode;
 
@@ -105,4 +105,4 @@ private:
     TextButton applyButton;
 };
 
-} // namespace Element
+} // namespace element

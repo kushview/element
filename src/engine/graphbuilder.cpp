@@ -5,7 +5,7 @@
 #include "engine/graphbuilder.hpp"
 #include "engine/ionode.hpp"
 
-namespace Element {
+namespace element {
 
 class ClearChannelOp : public GraphOp
 {
@@ -829,4 +829,4 @@ void GraphBuilder::markBufferAsContaining (int bufferNum, PortType type, uint32 
     ports.set (bufferNum, portIndex);
 }
 
-} // namespace Element
+} // namespace element

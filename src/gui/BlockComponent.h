@@ -22,7 +22,7 @@
 #include "session/node.hpp"
 #include "gui/Buttons.h"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class GraphEditorComponent;
@@ -338,4 +338,4 @@ protected:
     BlockFactory() = default;
 };
 
-} // namespace Element
+} // namespace element

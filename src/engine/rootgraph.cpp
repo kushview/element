@@ -1,7 +1,7 @@
 
 #include "engine/rootgraph.hpp"
 
-namespace Element {
+namespace element {
 
 RootGraph::RootGraph() {}
 
@@ -72,4 +72,4 @@ void RootGraph::updateChannelNames (AudioIODevice* device)
             audioOutputNames.add (namesOut[i]);
 }
 
-} // namespace Element
+} // namespace element

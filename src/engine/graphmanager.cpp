@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
@@ -25,10 +25,10 @@
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/rootgraph.hpp"
 #include "session/pluginmanager.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
@@ -789,4 +789,4 @@ void RootGraphManager::unloadGraph()
     getRootGraph().clear();
 }
 
-} // namespace Element
+} // namespace element

@@ -23,7 +23,7 @@
 #include "gui/Artist.h"
 #include "common.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiRouterMatrix : public kv::PatchMatrixComponent
 {
@@ -203,4 +203,4 @@ void MidiRouterEditor::paint (Graphics& g)
     g.fillAll (Colours::black);
 }
 
-} // namespace Element
+} // namespace element

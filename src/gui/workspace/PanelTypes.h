@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 namespace PanelIDs {
     static const Identifier controllers = "controllers";
@@ -174,4 +174,4 @@ public:
     DockPanel* createPanel (const Identifier& panelType) override;
 };
 
-}; // namespace Element
+}; // namespace element

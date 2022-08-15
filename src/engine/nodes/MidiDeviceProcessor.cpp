@@ -21,7 +21,7 @@
 #include "engine/midiengine.hpp"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 class MidiDeviceEditor : public AudioProcessorEditor,
                          public ComboBox::Listener,
@@ -92,7 +92,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (Element::LookAndFeel::backgroundColor);
+        g.fillAll (element::LookAndFeel::backgroundColor);
     }
 
     void resized() override
@@ -314,4 +314,4 @@ void MidiDeviceProcessor::handlePartialSysexMessage (MidiInput* source, const ui
     ignoreUnused (source, messageData, numBytesSoFar, timestamp);
 }
 
-} // namespace Element
+} // namespace element

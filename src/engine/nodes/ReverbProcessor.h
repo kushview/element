@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class ReverbProcessor : public BaseProcessor
 {
@@ -152,4 +152,4 @@ private:
         return params.roomSize != (float) *roomSize || params.damping != (float) *damping || params.wetLevel != (float) *wetLevel || params.dryLevel != (float) *dryLevel || params.width != (float) *width;
     }
 };
-} // namespace Element
+} // namespace element

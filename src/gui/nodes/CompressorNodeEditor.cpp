@@ -22,7 +22,7 @@
 #include "CompressorNodeEditor.h"
 #include "../LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 CompressorNodeEditor::CompViz::CompViz (CompressorProcessor& proc) : proc (proc)
 {
@@ -145,4 +145,4 @@ void CompressorNodeEditor::resized()
     compViz.updateCurve();
 }
 
-} // namespace Element
+} // namespace element

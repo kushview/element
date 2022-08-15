@@ -19,11 +19,11 @@
 
 #include "controllers/ScriptingController.h"
 
-namespace Element {
+namespace element {
 
 ScriptingController::ScriptingController() {}
 ScriptingController::~ScriptingController() {}
 void ScriptingController::activate() {}
 void ScriptingController::deactivate() {}
 
-} // namespace Element
+} // namespace element

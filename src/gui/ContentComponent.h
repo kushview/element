@@ -26,12 +26,12 @@
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"
 #define EL_VIEW_CONSOLE "LuaConsoleViw"
 
-namespace Element {
+namespace element {
 
 class AppController;
 class BreadCrumbComponent;
 class ContentContainer;
-class Globals;
+class Context;
 class GraphEditorView;
 class NavigationConcertinaPanel;
 class Node;
@@ -108,7 +108,7 @@ public:
     AppController& getAppController() { return controller; }
 
     /** Access to global objects */
-    Globals& getGlobals();
+    Context& getGlobals();
 
     /** Access to the currently opened session */
     SessionPtr getSession();
@@ -215,4 +215,4 @@ private:
     int toolBarSize;
 };
 
-} // namespace Element
+} // namespace element

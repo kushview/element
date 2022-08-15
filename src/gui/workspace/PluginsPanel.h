@@ -21,7 +21,7 @@
 
 #include "gui/workspace/WorkspacePanel.h"
 
-namespace Element {
+namespace element {
 
 class PluginsPanelView;
 
@@ -41,4 +41,4 @@ private:
     std::unique_ptr<PluginsPanelView> view;
 };
 
-} // namespace Element
+} // namespace element

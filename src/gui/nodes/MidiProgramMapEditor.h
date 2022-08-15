@@ -22,7 +22,7 @@
 #include "gui/nodes/NodeEditorComponent.h"
 #include "engine/nodes/MidiProgramMapNode.h"
 
-namespace Element {
+namespace element {
 
 class MidiProgramMapEditor : public NodeEditorComponent,
                              public ChangeListener
@@ -69,4 +69,4 @@ private:
     void selectLastProgram();
 };
 
-} // namespace Element
+} // namespace element

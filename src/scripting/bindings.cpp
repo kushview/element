@@ -24,14 +24,14 @@
 #include "engine/audioengine.hpp"
 #include "engine/midipipe.hpp"
 #include "gui/SystemTray.h"
-#include "scripting/ScriptManager.h"
+#include "scripting/scriptmanager.hpp"
 #include "session/commandmanager.hpp"
 #include "session/node.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
 #include "session/session.hpp"
 #include "datapath.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 #include "sol/sol.hpp"
 #include "el/lua-kv.hpp"
@@ -65,14 +65,14 @@ extern int luaopen_el_Rectangle (lua_State*);
 extern int luaopen_el_Slider (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
 extern int luaopen_el_CommandManager (lua_State*);
-extern int luaopen_el_Globals (lua_State*);
+extern int luaopen_el_Context (lua_State*);
 extern int luaopen_el_Node (lua_State*);
 extern int luaopen_el_Session (lua_State*);
 }
 
 using namespace sol;
 
-namespace Element {
+namespace element {
 namespace Lua {
 
     //==============================================================================
@@ -274,9 +274,9 @@ namespace Lua {
         {
             sol::stack::push (L, luaopen_el_CommandManager);
         }
-        else if (mod == "el.Globals")
+        else if (mod == "el.Context")
         {
-            sol::stack::push (L, luaopen_el_Globals);
+            sol::stack::push (L, luaopen_el_Context);
         }
         else if (mod == "el.MidiPipe")
         {
@@ -387,14 +387,14 @@ namespace Lua {
     }
 
     //==============================================================================
-    void setGlobals (sol::state_view& view, Globals& g)
+    void setGlobals (sol::state_view& view, Context& g)
     {
-        view.globals().set ("el.globals", std::ref<Globals> (g));
+        view.globals().set ("el.context", std::ref<Context> (g));
     }
 
     void clearGlobals (sol::state_view& view)
     {
-        view.globals().set ("el.globals", sol::lua_nil);
+        view.globals().set ("el.context", sol::lua_nil);
     }
 
     //==============================================================================
@@ -416,11 +416,11 @@ namespace Lua {
         package["spath"] = getScriptSearchPath().toStdString();
     }
 
-    void initializeState (sol::state_view& view, Globals& g)
+    void initializeState (sol::state_view& view, Context& g)
     {
         initializeState (view);
         setGlobals (view, g);
     }
 
 } // namespace Lua
-} // namespace Element
+} // namespace element

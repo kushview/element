@@ -21,7 +21,7 @@
 #include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/ViewHelpers.h"
 
-namespace Element {
+namespace element {
 
 typedef MidiProgramMapEditor PGCME;
 typedef ReferenceCountedObjectPtr<MidiProgramMapNode> MidiProgramMapNodePtr;
@@ -495,4 +495,4 @@ void MidiProgramMapEditor::selectLastProgram()
     }
 }
 
-} // namespace Element
+} // namespace element

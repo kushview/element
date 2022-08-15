@@ -17,11 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "scripting/ScriptDescription.h"
-#include "scripting/LuaBindings.h"
+#include "scripting/scriptdescription.hpp"
+#include "scripting/bindings.hpp"
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 static ScriptDescription parseScriptComments (const String& buffer)
 {
@@ -121,7 +121,7 @@ ScriptDescription ScriptDescription::read (const String& buffer)
 {
     ScriptDescription desc;
     sol::state lua;
-    Element::Lua::initializeState (lua);
+    element::Lua::initializeState (lua);
     return read (lua, buffer);
 }
 
@@ -150,4 +150,4 @@ ScriptDescription ScriptDescription::parse (File file)
     return desc;
 }
 
-} // namespace Element
+} // namespace element

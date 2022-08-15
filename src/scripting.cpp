@@ -1,19 +1,39 @@
+/*
+    This file is part of Element
+    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
 
-#include <iostream>
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-#include "element/context.hpp"
-#include "element/scripting.hpp"
-#include <sol/sol.hpp>
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "sol/sol.hpp"
+#include "scripting.hpp"
+#include "scripting/scriptmanager.hpp"
+#include "scripting/bindings.hpp"
+#include "context.hpp"
+
+#ifndef EL_LUA_SPATH
+#define EL_LUA_SPATH ""
+#endif
 
 namespace element {
-namespace lua {
-extern void fill_builtins (PackageLoaderMap& pkgs);
-}
 
-class Scripting::State {
+//=============================================================================
+class ScriptingEngine::State {
 public:
     State() = delete;
-    State (Scripting& s)
+    State (ScriptingEngine& s)
         : owner (s)
     {
         state.open_libraries (sol::lib::base, sol::lib::string);
@@ -33,12 +53,16 @@ public:
         return state.lua_state();
     }
 
+    void collectGarbage() {
+        state.collect_garbage();
+    }
+
 private:
-    friend class Scripting;
-    Scripting& owner;
+    friend class ScriptingEngine;
+    ScriptingEngine& owner;
     sol::state state;
-    lua::PackageLoaderMap builtins;
-    lua::PackageLoaderMap packages;
+    element::lua::PackageLoaderMap builtins;
+    element::lua::PackageLoaderMap packages;
 
     /** global table key to state reference */
     static constexpr const char* refkey = "__state";
@@ -76,8 +100,8 @@ private:
         sol::state_view view (L);
         auto& state = getref (view);
 
-        if (state.builtins.empty())
-            lua::fill_builtins (state.builtins);
+        // if (state.builtins.empty())
+        //     element::lua::fill_builtins (state.builtins);
 
         const auto mid = sol::stack::get<std::string> (L);
         auto it = state.builtins.find (mid);
@@ -101,18 +125,7 @@ private:
     }
 };
 
-Scripting::Scripting()
-{
-    state = std::make_unique<State> (*this);
-    sol::state_view view (*state);
-    view.collect_garbage();
-}
-
-Scripting::~Scripting()
-{
-}
-
-void Scripting::add_package (const std::string& name, lua::CFunction loader)
+void ScriptingEngine::addPackage (const std::string& name, element::lua::CFunction loader)
 {
     auto& pkgs = state->packages;
     if (pkgs.find (name) == pkgs.end()) {
@@ -121,7 +134,7 @@ void Scripting::add_package (const std::string& name, lua::CFunction loader)
     }
 }
 
-std::vector<std::string> Scripting::available_packages() const noexcept
+std::vector<std::string> ScriptingEngine::getPackageNames() const noexcept
 {
     std::vector<std::string> v;
     for (const auto& pkg : state->builtins)
@@ -132,6 +145,59 @@ std::vector<std::string> Scripting::available_packages() const noexcept
     return v;
 }
 
-lua_State* Scripting::root_state() const { return *state; }
+lua_State* ScriptingEngine::getLuaState() const { return *state; }
+
+//=============================================================================
+class ScriptingEngine::Impl
+{
+public:
+    Impl (ScriptingEngine& e)
+        : owner (e)
+    {
+    }
+
+    ~Impl() {}
+
+    void scanDefaultLoctaion()
+    {
+        manager.scanDefaultLocation();
+    }
+
+    ScriptManager& getManager() { return manager; }
+
+private:
+    friend class ScriptingEngine;
+    ScriptingEngine& owner;
+    ScriptManager manager;
+};
+
+//=============================================================================
+ScriptingEngine::ScriptingEngine()
+{
+    state = std::make_unique<State> (*this);
+    impl.reset (new Impl (*this));
+    state->collectGarbage();
+}
+
+ScriptingEngine::~ScriptingEngine()
+{
+    if (state != nullptr) {
+        Lua::clearGlobals (state->state);
+        state->collectGarbage();
+        state.reset();
+    }
+    world = nullptr;
+}
+
+void ScriptingEngine::initialize (Context& g)
+{
+    world = &g;
+    Lua::initializeState (state->state, g);
+}
+
+ScriptManager& ScriptingEngine::getScriptManager()
+{
+    return impl->manager;
+}
 
 } // namespace element

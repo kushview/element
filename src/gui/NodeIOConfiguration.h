@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphNode;
 class ContentComponent;
@@ -63,4 +63,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeAudioBusesComponent)
 };
-} // namespace Element
+} // namespace element

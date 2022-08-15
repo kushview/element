@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 struct Artist
 {
@@ -81,4 +81,4 @@ struct Artist
     }
 };
 
-} // namespace Element
+} // namespace element

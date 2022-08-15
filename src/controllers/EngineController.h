@@ -22,7 +22,7 @@
 #include "controllers/AppController.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 struct ConnectionBuilder;
 class GraphManager;
@@ -132,4 +132,4 @@ private:
     Node addPlugin (GraphManager& controller, const PluginDescription& desc);
 };
 
-} // namespace Element
+} // namespace element

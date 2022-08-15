@@ -28,10 +28,10 @@
 #include "gui/ContentComponent.h"
 
 #include "session/node.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
-namespace Element {
+namespace element {
 
 class SessionController::ChangeResetter : public AsyncUpdater
 {
@@ -272,4 +272,4 @@ void SessionController::refreshOtherControllers()
     sessionLoaded();
 }
 
-} // namespace Element
+} // namespace element

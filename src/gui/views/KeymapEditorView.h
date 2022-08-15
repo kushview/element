@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 class KeymapEditorView : public ContentView, public Button::Listener
 {
 public:
@@ -43,4 +43,4 @@ private:
 
     void saveMappings();
 };
-} // namespace Element
+} // namespace element

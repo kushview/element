@@ -37,7 +37,7 @@
 #include "session/pluginmanager.hpp"
 
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 #include "gui/ContentComponent.h"
@@ -48,7 +48,7 @@
 #define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
-namespace Element {
+namespace element {
 
 ContentView::ContentView()
 {
@@ -343,7 +343,7 @@ class ContentComponent::StatusBar : public Component,
                                     private Timer
 {
 public:
-    StatusBar (Globals& g)
+    StatusBar (Context& g)
         : world (g),
           devices (world.getDeviceManager()),
           plugins (world.getPluginManager())
@@ -473,7 +473,7 @@ public:
     }
 
 private:
-    Globals& world;
+    Context& world;
     DeviceManager& devices;
     PluginManager& plugins;
 
@@ -671,7 +671,7 @@ void ContentComponent::refreshStatusBar()
     statusBar->updateLabels();
 }
 
-Globals& ContentComponent::getGlobals() { return controller.getGlobals(); }
+Context& ContentComponent::getGlobals() { return controller.getGlobals(); }
 SessionPtr ContentComponent::getSession() { return getGlobals().getSession(); }
 String ContentComponent::getMainViewName() const { return String(); }
 String ContentComponent::getAccessoryViewName() const { return String(); }
@@ -699,4 +699,4 @@ ApplicationCommandTarget* ContentComponent::getNextCommandTarget() { return null
 void ContentComponent::setShowAccessoryView (const bool) {}
 bool ContentComponent::showAccessoryView() const { return false; }
 
-} // namespace Element
+} // namespace element

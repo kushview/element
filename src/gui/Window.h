@@ -23,7 +23,7 @@
 #include "ElementApp.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class GuiApp;
 
@@ -77,5 +77,5 @@ public:
     virtual ~Window();
     void closeButtonPressed();
 };
-} // namespace Element
+} // namespace element
 #endif

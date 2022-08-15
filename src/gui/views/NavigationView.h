@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "gui/TreeviewBase.h"
 
-namespace Element {
+namespace element {
 
 class NavigationList;
 class NavigationTree;
@@ -64,4 +64,4 @@ private:
     PluginManager& plugins;
 };
 
-} // namespace Element
+} // namespace element

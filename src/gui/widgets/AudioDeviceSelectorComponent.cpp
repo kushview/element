@@ -27,7 +27,7 @@
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "session/devicemanager.hpp"
 
-namespace Element {
+namespace element {
 
 struct SimpleDeviceManagerInputLevelMeter : public Component,
                                             public Timer
@@ -1307,4 +1307,4 @@ ListBox* AudioDeviceSelectorComponent::getMidiInputSelectorListBox() const noexc
     return midiInputsList.get();
 }
 
-} // namespace Element
+} // namespace element

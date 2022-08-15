@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** Aggregation of logs for Element.
     Currently only one log context is supported which is the main application
@@ -94,4 +94,4 @@ private:
     ListenerList<Listener> listeners;
 };
 
-} // namespace Element
+} // namespace element

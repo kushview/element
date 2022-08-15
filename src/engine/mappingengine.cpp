@@ -23,7 +23,7 @@
 #include "session/controllerdevice.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class ControllerMapHandler
 {
@@ -695,4 +695,4 @@ bool MappingEngine::captureNextEvent (ControllerMapInput& input,
     return true;
 }
 
-} // namespace Element
+} // namespace element

@@ -24,10 +24,10 @@
 #include "gui/LookAndFeel.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class AboutComponent : public Component
 {
@@ -71,4 +71,4 @@ private:
     GuiController& gui;
 };
 
-} // namespace Element
+} // namespace element

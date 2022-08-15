@@ -21,7 +21,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/TransportBar.h"
 
-namespace Element {
+namespace element {
 
 class BarLabel : public DragableIntLabel
 {
@@ -195,4 +195,4 @@ void TransportBar::updateWidth()
     setSize (record->getRight(), getHeight());
 }
 
-} // namespace Element
+} // namespace element

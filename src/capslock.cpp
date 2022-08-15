@@ -26,7 +26,7 @@
 
 #include "capslock.hpp"
 
-namespace Element {
+namespace element {
 
 bool isCapsLockOn()
 {
@@ -42,4 +42,4 @@ bool isCapsLockOn()
     return result;
 }
 
-} // namespace Element
+} // namespace element

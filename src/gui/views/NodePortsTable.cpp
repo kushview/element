@@ -3,7 +3,7 @@
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 class NodePortsTable::TableModel : public juce::TableListBoxModel
@@ -180,4 +180,4 @@ void NodePortsTable::resized()
     table.setBounds (r);
 }
 
-} // namespace Element
+} // namespace element

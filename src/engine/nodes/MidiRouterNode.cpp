@@ -24,7 +24,7 @@
 
 #define TRACE_MIDI_ROUTER(output)
 
-namespace Element {
+namespace element {
 
 MidiRouterNode::MidiRouterNode (int ins, int outs)
     : NodeObject (0),
@@ -181,4 +181,4 @@ void MidiRouterNode::initMidiOuts (OwnedArray<MidiBuffer>& outs)
     }
 }
 
-} // namespace Element
+} // namespace element

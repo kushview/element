@@ -2,7 +2,7 @@
 -- @module el.command
 
 local CommandManager    = require ('el.CommandManager')
-local Globals           = require ('el.Globals')
+local Globals           = require ('el.Context')
 
 local M = {}
 

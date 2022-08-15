@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class MidiTranspose
 {
@@ -84,4 +84,4 @@ private:
     MidiBuffer output;
 };
 
-} // namespace Element
+} // namespace element

@@ -21,7 +21,7 @@
 #include "controllers/DevicesController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "controllers/GraphController.h"
 #include "controllers/MappingController.h"
 #include "controllers/OSCController.h"
@@ -35,17 +35,17 @@
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "messages.hpp"
 #include "settings.hpp"
 #include "version.hpp"
 
-namespace Element {
+namespace element {
 
-Globals& AppController::Child::getWorld() { return getAppController().getWorld(); }
+Context& AppController::Child::getWorld() { return getAppController().getWorld(); }
 Settings& AppController::Child::getSettings() { return getWorld().getSettings(); }
 
-AppController::AppController (Globals& g, RunMode m)
+AppController::AppController (Context& g, RunMode m)
     : world (g), runMode (m), foregroundCheck (*this)
 {
     addChild (new GuiController (g, *this));
@@ -615,4 +615,4 @@ void AppController::checkForegroundStatus()
     foregroundCheck.startTimer (50);
 }
 
-} // namespace Element
+} // namespace element

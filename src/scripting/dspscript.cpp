@@ -19,14 +19,14 @@
 
 #include "el/factories.hpp"
 #include "engine/midipipe.hpp"
-#include "scripting/DSPScript.h"
+#include "scripting/dspscript.hpp"
 
 using namespace kv;
-namespace Element {
+namespace element {
 
 //==============================================================================
 class DSPScript::Parameter : public ControlPortParameter,
-                             public Element::Parameter::Listener
+                             public element::Parameter::Listener
 {
 public:
     Parameter (DSPScript* c, const PortDescription& port)
@@ -517,7 +517,7 @@ void DSPScript::addAudioMidiPorts()
     }
 }
 
-Element::Parameter::Ptr
+element::Parameter::Ptr
     DSPScript::getParameterObject (int index, bool input) const
 {
     return input ? inParams[index] : outParams[index];
@@ -599,4 +599,4 @@ void DSPScript::unlinkParams()
     outParams.clearQuick();
 }
 
-} // namespace Element
+} // namespace element

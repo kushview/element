@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class CombFilter
 {
@@ -215,4 +215,4 @@ private:
     float lastLength;
 };
 
-} // namespace Element
+} // namespace element

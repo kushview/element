@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 struct Spinner : public Component,
                  private Timer
@@ -35,4 +35,4 @@ struct Spinner : public Component,
     }
 };
 
-} // namespace Element
+} // namespace element

@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "engine/engine.hpp"
 
-namespace Element {
+namespace element {
 
 class DeviceManager : public AudioDeviceManager
 {
@@ -49,4 +49,4 @@ private:
     std::unique_ptr<Private> impl;
 };
 
-} // namespace Element
+} // namespace element

@@ -20,7 +20,7 @@
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/PluginWindow.h"
 
-namespace Element {
+namespace element {
 
 NodeEditorComponent::NodeEditorComponent (const Node& _node) noexcept
     : node (_node) {}
@@ -31,4 +31,4 @@ bool NodeEditorComponent::isRunningInPluginWindow() const
     return nullptr != findParentComponentOfClass<PluginWindow>();
 }
 
-} // namespace Element
+} // namespace element

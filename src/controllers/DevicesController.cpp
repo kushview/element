@@ -21,9 +21,9 @@
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
 #include "session/session.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class DevicesController::Impl
 {
@@ -195,4 +195,4 @@ void DevicesController::refresh()
     mapping.startMapping();
 }
 
-} // namespace Element
+} // namespace element

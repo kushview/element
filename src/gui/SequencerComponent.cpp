@@ -25,7 +25,7 @@
 #include "gui/ContentComponent.h"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 SequencerComponent::SequencerComponent (GuiApp &g)
     : gui (g)

@@ -27,7 +27,7 @@
 
 #include "common.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphMixerChannelStrip : public NodeChannelStripComponent,
                                public DragAndDropTarget,
@@ -353,4 +353,4 @@ void GraphMixerView::initializeView (AppController& app)
     content->stabilize();
 }
 
-} // namespace Element
+} // namespace element

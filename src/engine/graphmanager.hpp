@@ -24,7 +24,7 @@
 #include "engine/graphnode.hpp"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class PluginManager;
 class RootGraph;
@@ -150,4 +150,4 @@ private:
     RootGraph& root;
 };
 
-} // namespace Element
+} // namespace element

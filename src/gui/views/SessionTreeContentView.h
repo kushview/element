@@ -21,7 +21,7 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class SessionTreePanel;
 
@@ -39,4 +39,4 @@ private:
     std::unique_ptr<SessionTreePanel> tree;
 };
 
-} // namespace Element
+} // namespace element

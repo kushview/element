@@ -22,7 +22,7 @@
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 class SessionPropertyPanel;
 class SessionContentView : public ContentView
 {
@@ -40,4 +40,4 @@ private:
 };
 
 typedef SessionContentView SessionSettingsView;
-} // namespace Element
+} // namespace element

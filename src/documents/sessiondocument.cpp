@@ -20,7 +20,7 @@
 #include "session/session.hpp"
 #include "documents/sessiondocument.hpp"
 
-namespace Element {
+namespace element {
 
 static void setMissingNodeProperties (const ValueTree& tree)
 {
@@ -118,4 +118,4 @@ void SessionDocument::changeListenerCallback (ChangeBroadcaster* cb)
     if (cb == session.get())
         onSessionChanged();
 }
-} // namespace Element
+} // namespace element

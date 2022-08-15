@@ -21,7 +21,7 @@
 
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class AppController;
 
@@ -58,4 +58,4 @@ private:
     std::unique_ptr<Component>& holder;
 };
 
-} // namespace Element
+} // namespace element

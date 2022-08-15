@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class VolumeProcessor : public BaseProcessor
 {
@@ -144,4 +144,4 @@ protected:
     bool canApplyBusCountChange (bool, bool, BusProperties&) override { return false; }
 };
 
-} // namespace Element
+} // namespace element

@@ -22,7 +22,7 @@
 #include "gui/ContentComponent.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 class NodePortsTable : public juce::Component
@@ -45,4 +45,4 @@ private:
         saveAsDefaultButton;
 };
 
-} // namespace Element
+} // namespace element

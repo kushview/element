@@ -23,7 +23,7 @@
 #include "session/session.hpp"
 #include "gui/Timeline.h"
 
-namespace Element {
+namespace element {
 
 class GuiApp;
 class SequencerClipItem;
@@ -77,6 +77,6 @@ private:
     void recycleSequencerClip (SequencerClipItem* clip);
 };
 
-} // namespace Element
+} // namespace element
 
 #endif /* ELEMENT_SEQUENCER_COMPONENT_H */

@@ -19,7 +19,7 @@
 
 #include "engine/midiclock.hpp"
 
-namespace Element {
+namespace element {
 
 void MidiClock::process (const MidiMessage& msg)
 {
@@ -75,4 +75,4 @@ void MidiClock::removeListener (Listener* listener)
         listeners.removeFirstMatchingValue (listener);
 }
 
-} // namespace Element
+} // namespace element

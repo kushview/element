@@ -21,7 +21,7 @@
 
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class NodeListComboBox : public ComboBox
 {
@@ -60,4 +60,4 @@ public:
     }
 };
 
-} // namespace Element
+} // namespace element

@@ -21,11 +21,11 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class CommandManager;
 class ContentComponent;
-class Globals;
+class Context;
 class MainWindow;
 
 class MainMenu : public MenuBarModel,
@@ -71,7 +71,7 @@ public:
 
 private:
     MainWindow& owner;
-    Globals& world;
+    Context& world;
     CommandManager& cmd;
     std::unique_ptr<PopupMenu> macMenu;
     const int recentMenuOffset = 20000;
@@ -88,4 +88,4 @@ private:
     void addRecentFiles (PopupMenu& menu);
 };
 
-} // namespace Element
+} // namespace element

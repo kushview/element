@@ -19,7 +19,7 @@
 
 #include "gui/Icons.h"
 
-namespace Element {
+namespace element {
 static Icons* __icons = nullptr;
 const Icons& getIcons()
 {
@@ -180,4 +180,4 @@ Icons::~Icons()
     __icons = nullptr;
 }
 
-} // namespace Element
+} // namespace element

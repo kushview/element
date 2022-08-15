@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class CommandManager : public ApplicationCommandManager
 {
@@ -33,4 +33,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommandManager);
 };
 
-} // namespace Element
+} // namespace element

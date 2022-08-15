@@ -25,7 +25,7 @@
 #include "gui/widgets/LuaConsole.h"
 #include "gui/LuaTokeniser.h"
 
-namespace Element {
+namespace element {
 
 class ScriptingEngine;
 class ScriptNodeEditor : public NodeEditorComponent,
@@ -71,4 +71,4 @@ private:
     void log (const String& txt) { Logger::writeToLog (txt); }
 };
 
-} // namespace Element
+} // namespace element

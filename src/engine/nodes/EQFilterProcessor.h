@@ -22,7 +22,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 /* Filter for a single EQ band */
 class EQFilter
@@ -404,4 +404,4 @@ private:
     EQFilter eqFilter[2];
 };
 
-} // namespace Element
+} // namespace element

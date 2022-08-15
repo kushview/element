@@ -7,7 +7,7 @@
 #include "session/session.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L) {
-    using namespace Element;
+    using namespace element;
     
     sol::state_view lua (L);
     auto M = lua.create_table();

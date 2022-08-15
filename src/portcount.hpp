@@ -20,7 +20,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 struct PortCount
 {
@@ -129,4 +129,4 @@ private:
     int outputs[PortType::Unknown];
 };
 
-} // namespace Element
+} // namespace element

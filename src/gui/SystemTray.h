@@ -19,7 +19,7 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
 class SystemTray : public SystemTrayIconComponent,
                    public DeletedAtShutdown
@@ -39,4 +39,4 @@ private:
     void runMenu();
 };
 
-} // namespace Element
+} // namespace element

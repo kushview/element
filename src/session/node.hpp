@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "engine/nodeobject.hpp"
 
-namespace Element {
+namespace element {
 
 class GraphManager;
 class NodeArray;
@@ -622,4 +622,4 @@ private:
     OwnedArray<ConnectionMap> portChannelMap;
 };
 
-} // namespace Element
+} // namespace element

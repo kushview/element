@@ -20,22 +20,22 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
 #include "session/devicemanager.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/node.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 
 #include "controllers/EngineController.h"
 
-namespace Element {
+namespace element {
 
 struct RootGraphHolder
 {
-    RootGraphHolder (const Node& n, Globals& world)
+    RootGraphHolder (const Node& n, Context& world)
         : plugins (world.getPluginManager()),
           devices (world.getDeviceManager()),
           model (n)
@@ -973,4 +973,4 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
     findSibling<GuiController>()->stabilizeViews();
 }
 
-} // namespace Element
+} // namespace element

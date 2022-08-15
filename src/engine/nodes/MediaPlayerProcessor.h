@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class MediaPlayerProcessor : public BaseProcessor,
                              public AudioProcessorParameter::Listener
@@ -136,4 +136,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MediaPlayerProcessor)
 };
 
-} // namespace Element
+} // namespace element

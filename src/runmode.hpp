@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace Element {
+namespace element {
 
 /** The runtime mode of Element */
 enum struct RunMode : int
@@ -29,4 +29,4 @@ enum struct RunMode : int
     Plugin = 1
 };
 
-} // namespace Element
+} // namespace element

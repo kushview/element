@@ -20,7 +20,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/views/SessionSettingsView.h"
 
-namespace Element {
+namespace element {
 typedef Array<PropertyComponent*> PropertyArray;
 
 class SessionPropertyPanel : public PropertyPanel
@@ -100,4 +100,4 @@ void SessionContentView::resized()
     const int configButtonSize = 14;
     graphButton.setBounds (getWidth() - configButtonSize - 4, 4, configButtonSize, configButtonSize);
 }
-} // namespace Element
+} // namespace element

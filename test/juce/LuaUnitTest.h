@@ -1,11 +1,11 @@
 
 #pragma once
 #include "Tests.h"
-#include "scripting/LuaBindings.h"
+#include "scripting/bindings.hpp"
 #include "sol/sol.hpp"
 
 //=============================================================================
-class LuaUnitTest : public Element::UnitTestBase
+class LuaUnitTest : public element::UnitTestBase
 {
 public:
     LuaUnitTest (const String& n, const String& c, const String& s)
@@ -15,7 +15,7 @@ public:
 
     void initialise() override
     {
-        Element::Lua::initializeState (lua);
+        element::Lua::initializeState (lua);
         lua ["begintest"] = sol::overload (
             [this](const char* name) {
                 beginTest (String::fromUTF8 (name));

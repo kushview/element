@@ -23,13 +23,13 @@
 #include "engine/audioengine.hpp"
 #include "engine/parameter.hpp"
 #include "ElementApp.h"
-#include "globals.hpp"
+#include "context.hpp"
 
-namespace Element {
+namespace element {
 
 //=============================================================================
 class PerformanceParameter : public AudioProcessorParameter,
-                             public Element::Parameter::Listener
+                             public element::Parameter::Listener
 {
 public:
     std::function<void()> onCleared;
@@ -56,7 +56,7 @@ public:
     void clearNode()
     {
         NodeObjectPtr oldNode;
-        Element::Parameter::Ptr oldParam;
+        element::Parameter::Ptr oldParam;
 
         if (parameter)
             parameter->removeListener (this);
@@ -330,7 +330,7 @@ private:
     Node model;
     NodeObjectPtr node;
     AudioProcessor* processor = nullptr;
-    Element::Parameter::Ptr parameter = nullptr;
+    element::Parameter::Ptr parameter = nullptr;
     int parameterIdx = -1;
     bool special = false;
     bool recursionBlock = false;
@@ -421,7 +421,7 @@ private:
     const Variant variant;
 
     OwnedArray<PerfParamMenuItem> menuMap;
-    std::unique_ptr<Globals> world;
+    std::unique_ptr<Context> world;
     std::unique_ptr<AppController> controller;
     AudioEnginePtr engine;
 
@@ -480,4 +480,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
 
-} // namespace Element
+} // namespace element

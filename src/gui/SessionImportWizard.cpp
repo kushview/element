@@ -19,9 +19,9 @@
 
 #include "gui/SessionImportWizard.h"
 #include "gui/GuiCommon.h"
-#include "globals.hpp"
+#include "context.hpp"
 
-namespace Element {
+namespace element {
 
 class SessionImportListBox : public ListBox,
                              public ListBoxModel
@@ -235,4 +235,4 @@ void SessionImportWizardDialog::closeButtonPressed()
     holder.reset();
 }
 
-} // namespace Element
+} // namespace element

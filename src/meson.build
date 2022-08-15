@@ -1,54 +1,36 @@
 
 libelement_sources = '''
     bindings.cpp
-    context.cpp
-    module.cpp
-    scripting.cpp
-    strings.cpp
-    el/audio.c
-    el/AudioBuffer32.cpp
-    el/AudioBuffer64.cpp
-    el/Bounds.cpp
-    el/bytes.c
-    el/CommandManager.cpp
-    el/Desktop.cpp
-    el/DocumentWindow.cpp
-    el/File.cpp
-    el/Globals.cpp
-    el/Graphics.cpp
-    el/midi.c
-    el/MidiBuffer.cpp
-    el/MidiMessage.cpp
-    el/MouseEvent.cpp
-    el/Node.cpp
-    el/Parameter.cpp
-    el/Point.cpp
-    el/Range.cpp
-    el/Rectangle.cpp
-    el/round.c
-    el/Session.cpp
-    el/Slider.cpp
-    el/TextButton.cpp
-    el/Widget.cpp
     capslock.cpp
     commands.cpp
+    context.cpp
+    datapath.cpp
+    messages.cpp
+    module.cpp
+    scripting.cpp
+    settings.cpp
+    strings.cpp
+    utils.cpp
+    version.cpp
+    
     controllers/AppController.cpp
     controllers/Controller.cpp
     controllers/DevicesController.cpp
     controllers/EngineController.cpp
     controllers/GraphController.cpp
-    controllers/GraphManager.cpp
     controllers/GuiController.cpp
     controllers/MappingController.cpp
     controllers/OSCController.cpp
     controllers/PresetsController.cpp
     controllers/ScriptingController.cpp
     controllers/SessionController.cpp
-    datapath.cpp
+    
     documents/graphdocument.cpp
     documents/sessiondocument.cpp
+
     engine/ionode.cpp
     engine/oversampler.cpp
+    engine/graphmanager.cpp
     engine/internalformat.cpp
     engine/midiengine.cpp
     engine/mappingengine.cpp
@@ -79,7 +61,7 @@ libelement_sources = '''
     engine/nodefactory.cpp
     engine/audioengine.cpp
     engine/rootgraph.cpp
-    globals.cpp
+
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp
     gui/BlockComponent.cpp
@@ -157,26 +139,49 @@ libelement_sources = '''
     gui/workspace/PluginsPanel.cpp
     gui/Workspace.cpp
     gui/WorkspacesContentComponent.cpp
-    messages.cpp
+    
     plugins/PluginEditor.cpp
     plugins/PluginProcessor.cpp
-    scripting/DSPScript.cpp
-    scripting/DSPUIScript.cpp
-    scripting/JuceBindings.cpp
-    scripting/LuaBindings.cpp
-    scripting/LuaLib.cpp
-    scripting/Script.cpp
-    scripting/ScriptDescription.cpp
-    scripting/ScriptingEngine.cpp
-    scripting/ScriptManager.cpp
+    
+    scripting/dspscript.cpp
+    scripting/dspuiscript.cpp
+    scripting/bindings.cpp
+    scripting/script.cpp
+    scripting/scriptdescription.cpp
+    scripting/scriptmanager.cpp
+
     session/controllerdevice.cpp
     session/devicemanager.cpp
     session/node.cpp
     session/pluginmanager.cpp
     session/session.cpp
-    settings.cpp
-    utils.cpp
-    version.cpp
+
+    el/audio.c
+    el/AudioBuffer32.cpp
+    el/AudioBuffer64.cpp
+    el/Bounds.cpp
+    el/bytes.c
+    el/CommandManager.cpp
+    el/Desktop.cpp
+    el/DocumentWindow.cpp
+    el/File.cpp
+    el/Context.cpp
+    el/Graphics.cpp
+    el/midi.c
+    el/MidiBuffer.cpp
+    el/MidiMessage.cpp
+    el/MouseEvent.cpp
+    el/Node.cpp
+    el/Parameter.cpp
+    el/Point.cpp
+    el/Range.cpp
+    el/Rectangle.cpp
+    el/round.c
+    el/Session.cpp
+    el/Slider.cpp
+    el/TextButton.cpp
+    el/Widget.cpp
+
     ../libs/compat/BinaryData.cpp
 '''.split()
 

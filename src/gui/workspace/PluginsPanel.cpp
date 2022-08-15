@@ -20,10 +20,10 @@
 #include "controllers/AppController.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
-#include "globals.hpp"
+#include "context.hpp"
 #include "session/pluginmanager.hpp"
 
-namespace Element {
+namespace element {
 
 PluginsPanel::PluginsPanel() {}
 
@@ -44,4 +44,4 @@ void PluginsPanel::resized()
         view->setBounds (getLocalBounds());
 }
 
-} // namespace Element
+} // namespace element

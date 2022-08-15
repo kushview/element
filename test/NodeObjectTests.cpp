@@ -4,7 +4,7 @@
 #include "engine/ionode.hpp"
 #include "engine/nodeobject.hpp"
 
-using namespace Element;
+using namespace element;
 
 BOOST_AUTO_TEST_SUITE (NodeObjectTests)
 
@@ -53,9 +53,9 @@ BOOST_AUTO_TEST_CASE (PortChannelMapping)
     graph.setRenderDetails (44100.0, 512);
     graph.prepareToRender (44100.0, 512);
     
-    NodeObjectPtr midiIn = graph.addNode (new Element::IONode (
+    NodeObjectPtr midiIn = graph.addNode (new element::IONode (
         IONode::midiInputNode));
-    NodeObjectPtr midiOut = graph.addNode (new Element::IONode (
+    NodeObjectPtr midiOut = graph.addNode (new element::IONode (
         IONode::midiOutputNode));
     NodeObjectPtr filter = graph.addNode (new TestNode (0,0,1, 16));
     MessageManager::getInstance()->runDispatchLoopUntil (14);

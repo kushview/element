@@ -17,11 +17,11 @@
 */
 
 #include <boost/test/unit_test.hpp>
-#include "scripting/ScriptDescription.h"
+#include "scripting/scriptdescription.hpp"
 
 #include "testutil.hpp"
 
-using namespace Element;
+using namespace element;
 namespace et = element::test;
 
 //=============================================================================

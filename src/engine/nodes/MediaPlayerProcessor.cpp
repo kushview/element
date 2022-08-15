@@ -21,7 +21,7 @@
 #include "gui/LookAndFeel.h"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class MediaPlayerEditor : public AudioProcessorEditor,
                           public FilenameComponentListener,
@@ -335,4 +335,4 @@ bool MediaPlayerProcessor::isBusesLayoutSupported (const BusesLayout& layout) co
     return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() || layout.getMainOutputChannelSet() == AudioChannelSet::mono();
 }
 
-} // namespace Element
+} // namespace element

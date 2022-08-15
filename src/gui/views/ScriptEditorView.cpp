@@ -20,7 +20,7 @@
 #include "engine/nodes/ScriptNode.h"
 #include "gui/views/ScriptEditorView.h"
 
-namespace Element {
+namespace element {
 
 #if 0
 //==============================================================================
@@ -198,4 +198,4 @@ void ScriptNodeScriptEditorView::resized()
         applyButton.getHeight());
 }
 
-} // namespace Element
+} // namespace element

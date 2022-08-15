@@ -20,7 +20,7 @@
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/graphnode.hpp"
 
-namespace Element {
+namespace element {
 
 class ProgramChangeMapTest : public UnitTestBase
 {

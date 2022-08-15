@@ -22,7 +22,7 @@
 #include "session/controllerdevice.hpp"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class MappingController : public AppController::Child
 {
@@ -46,4 +46,4 @@ private:
     void onParameterCaptured (const Node&, int);
 };
 
-} // namespace Element
+} // namespace element

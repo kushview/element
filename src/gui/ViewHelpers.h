@@ -24,10 +24,10 @@
 #include "engine/nodeobject.hpp"
 #include "session/session.hpp"
 
-namespace Element {
+namespace element {
 
 class ContentComponent;
-class Globals;
+class Context;
 class Node;
 class NavigationConcertinaPanel;
 class GuiController;
@@ -55,7 +55,7 @@ namespace ViewHelpers {
     GuiController* getGuiController (Component* c);
 
     /** Get World */
-    Globals* getGlobals (Component* c);
+    Context* getGlobals (Component* c);
 
     /** Get Session */
     SessionPtr getSession (Component* c);
@@ -114,4 +114,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ViewHelperMixin);
 };
 
-} // namespace Element
+} // namespace element

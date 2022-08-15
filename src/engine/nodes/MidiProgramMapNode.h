@@ -24,7 +24,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiProgramMapNode : public MidiFilterNode,
                            public AsyncUpdater,
@@ -175,4 +175,4 @@ protected:
     }
 };
 
-} // namespace Element
+} // namespace element

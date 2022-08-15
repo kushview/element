@@ -25,7 +25,7 @@
 #include "engine/parameter.hpp"
 #include "portcount.hpp"
 
-namespace Element {
+namespace element {
 
 /* So render tasks can be friends of graph node */
 namespace GraphRender {
@@ -513,4 +513,4 @@ private:
 /** A convenient typedef for referring to a pointer to a node object. */
 using NodeObjectPtr = ReferenceCountedObjectPtr<NodeObject>;
 
-} // namespace Element
+} // namespace element

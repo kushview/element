@@ -22,7 +22,7 @@
 #include "JuceHeader.h"
 #include "sol/forward.hpp"
 
-namespace Element {
+namespace element {
 
 struct ScriptDescription final
 {
@@ -56,4 +56,4 @@ struct ScriptDescription final
     bool isValid() const { return name.isNotEmpty(); }
 };
 
-} // namespace Element
+} // namespace element

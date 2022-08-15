@@ -21,7 +21,7 @@
 
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class ScriptSource
 {
@@ -67,4 +67,4 @@ private:
     Identifier key { "data" };
 };
 
-} // namespace Element
+} // namespace element

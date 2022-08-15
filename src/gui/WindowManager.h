@@ -26,7 +26,7 @@
 #include "session/node.hpp"
 #include "commands.hpp"
 
-namespace Element {
+namespace element {
 
 class GuiController;
 
@@ -172,4 +172,4 @@ private:
     PluginWindow* createPluginWindowFor (const Node& n, Component* e);
 };
 
-} // namespace Element
+} // namespace element

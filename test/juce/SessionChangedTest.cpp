@@ -18,7 +18,7 @@
 
 #include "Tests.h"
 
-namespace Element {
+namespace element {
 
 class SessionChangedTest : public UnitTestBase
 {

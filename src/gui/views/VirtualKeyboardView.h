@@ -21,7 +21,7 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class VirtualKeyboardComponent : public MidiKeyboardComponent
 {
@@ -79,4 +79,4 @@ private:
     void stabilizeWidthControls();
 };
 
-} // namespace Element
+} // namespace element

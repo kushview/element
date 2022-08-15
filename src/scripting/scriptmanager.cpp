@@ -18,13 +18,13 @@
 */
 
 #include "JuceHeader.h"
-#include "scripting/LuaBindings.h"
-#include "scripting/ScriptDescription.h"
-#include "scripting/ScriptManager.h"
+#include "scripting/bindings.hpp"
+#include "scripting/scriptdescription.hpp"
+#include "scripting/scriptmanager.hpp"
 #include "datapath.hpp"
 #include "sol/sol.hpp"
 
-namespace Element {
+namespace element {
 
 static void scanForScripts (File dir, Array<ScriptDescription>& results, bool recursive = true)
 {
@@ -185,4 +185,4 @@ File ScriptManager::getUserScriptsDir()
     return DataPath::defaultScriptsDir().getFullPathName();
 }
 
-} // namespace Element
+} // namespace element

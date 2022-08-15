@@ -24,13 +24,13 @@
 #include "gui/MainWindow.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "globals.hpp"
+#include "context.hpp"
 #include "settings.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
-MainWindow::MainWindow (Globals& g)
+MainWindow::MainWindow (Context& g)
     : DocumentWindow (Util::appName(), Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
@@ -171,4 +171,4 @@ AppController& MainWindow::getAppController()
         ->getAppController();
 }
 
-} // namespace Element
+} // namespace element

@@ -20,10 +20,10 @@
 #include "engine/nodes/BaseProcessor.h" // for internal id macros
 #include "session/node.hpp"
 #include "session/session.hpp"
-#include "controllers/GraphManager.h"
+#include "engine/graphmanager.hpp"
 #include "scopedflag.hpp"
 
-namespace Element {
+namespace element {
 
 //==============================================================================
 struct NameSorter
@@ -1178,4 +1178,4 @@ void NodeObjectSync::valueTreeRedirected (ValueTree& tree)
     ignoreUnused (tree);
 }
 
-} // namespace Element
+} // namespace element

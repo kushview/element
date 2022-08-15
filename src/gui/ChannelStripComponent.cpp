@@ -19,7 +19,7 @@
 
 #include "gui/ChannelStripComponent.h"
 
-namespace Element {
+namespace element {
 
 ChannelStripComponent::VolumeLabel::VolumeLabel() {}
 ChannelStripComponent::VolumeLabel::~VolumeLabel() {}
@@ -159,4 +159,4 @@ void ChannelStripComponent::stabilizeContent()
     volume.getValueObject().addListener (this);
 }
 
-} // namespace Element
+} // namespace element

@@ -22,7 +22,7 @@
 
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class PluginManager;
 
@@ -57,6 +57,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginsPanelView);
 };
 
-} // namespace Element
+} // namespace element
 
 #endif // EL_PLUGINS_PANEL_VIEW_H

@@ -22,7 +22,7 @@
 #include "KnobsComponent.h"
 #include "../LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> paramLambda)
 {
@@ -133,4 +133,4 @@ void KnobsComponent::resized()
     }
 }
 
-} // namespace Element
+} // namespace element

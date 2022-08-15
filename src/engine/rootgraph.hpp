@@ -5,7 +5,7 @@
 #include "engine/ionode.hpp"
 #include "session/devicemanager.hpp"
 
-namespace Element {
+namespace element {
 
 class RootGraph : public GraphNode
 {
@@ -92,4 +92,4 @@ private:
     bool locked = false;
     void updateChannelNames (AudioIODevice* device);
 };
-} // namespace Element
+} // namespace element

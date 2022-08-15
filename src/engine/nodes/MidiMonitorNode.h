@@ -25,7 +25,7 @@
 #include "engine/nodes/MidiFilterNode.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiMonitorNode : public MidiFilterNode,
                         private Timer
@@ -93,4 +93,4 @@ private:
     void timerCallback() override;
 };
 
-} // namespace Element
+} // namespace element

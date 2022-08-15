@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2014-2020  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,19 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#pragma once
+#include "scripting/dspuiscript.hpp"
 
-#include "sol/forward.hpp"
+namespace element {
 
-namespace Element {
-
-class Globals;
-
-namespace Lua {
-    extern void initializeState (sol::state_view&);
-    extern void initializeState (sol::state_view&, Globals&);
-    extern void setGlobals (sol::state_view&, Globals&);
-    extern void clearGlobals (sol::state_view&);
-} // namespace Lua
-
-} // namespace Element
+}

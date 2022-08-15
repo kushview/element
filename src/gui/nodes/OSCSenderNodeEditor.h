@@ -26,7 +26,7 @@
 #include "gui/widgets/LogListBox.h"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 class OSCSenderLogListBox : public LogListBox
 {
@@ -40,7 +40,7 @@ public:
     void paint (Graphics& g)
     {
         // In case parent background is different
-        g.fillAll (Element::LookAndFeel::backgroundColor);
+        g.fillAll (element::LookAndFeel::backgroundColor);
     }
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
@@ -129,4 +129,4 @@ private:
     void handleInvalidPortNumberEntered();
 };
 
-} // namespace Element
+} // namespace element

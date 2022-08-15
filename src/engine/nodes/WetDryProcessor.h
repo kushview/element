@@ -21,7 +21,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 
-namespace Element {
+namespace element {
 
 class WetDryProcessor : public BaseProcessor
 {
@@ -165,4 +165,4 @@ private:
     LinearSmoothedValue<float> dryGain, wetGain1, wetGain2;
 };
 
-} // namespace Element
+} // namespace element

@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 
-namespace Element {
+namespace element {
 
 class MidiChannelMap
 {
@@ -93,4 +93,4 @@ private:
     MidiBuffer tempMidi;
 };
 
-} // namespace Element
+} // namespace element

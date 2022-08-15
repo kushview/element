@@ -24,7 +24,7 @@
 #define EL_GIT_VERSION ""
 #endif
 
-namespace Element {
+namespace element {
 
 /** Representation of a version number */
 struct Version
@@ -81,4 +81,4 @@ private:
     void timerCallback() override;
     void run() override;
 };
-} // namespace Element
+} // namespace element

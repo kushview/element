@@ -3,7 +3,7 @@
 #include "gui/properties/NodeProperties.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 void NodePropertyPanel::initialize()
 {
@@ -31,4 +31,4 @@ void NodePropertyPanel::addProperties (const Node& node, int extraSpace)
     refreshAll();
 }
 
-} // namespace Element
+} // namespace element

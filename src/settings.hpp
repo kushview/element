@@ -20,9 +20,9 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace element {
 
-class Globals;
+class Context;
 
 class Settings : public ApplicationProperties
 {
@@ -93,8 +93,8 @@ public:
     const File getDefaultNewSessionFile() const;
     void setDefaultNewSessionFile (const File&);
 
-    void addItemsToMenu (Globals&, PopupMenu&);
-    bool performMenuResult (Globals&, const int result);
+    void addItemsToMenu (Context&, PopupMenu&);
+    bool performMenuResult (Context&, const int result);
 
     void setGenerateMidiClock (const bool);
     bool generateMidiClock() const;
@@ -133,4 +133,4 @@ private:
     PropertiesFile* getProps() const;
 };
 
-} // namespace Element
+} // namespace element

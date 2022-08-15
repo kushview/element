@@ -18,11 +18,11 @@
 
 #include "signals.hpp"
 #include "controllers/EngineController.h"
-#include "globals.hpp"
+#include "context.hpp"
 #include "session/pluginmanager.hpp"
 #include "messages.hpp"
 
-namespace Element {
+namespace element {
 
 class AddPluginAction : public UndoableAction
 {
@@ -218,4 +218,4 @@ void RemoveConnectionMessage::createActions (AppController& app, OwnedArray<Undo
     actions.add (new RemoveConnectionAction (app, target, sourceNode, sourcePort, destNode, destPort));
 }
 
-} // namespace Element
+} // namespace element

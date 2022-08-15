@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "session/node.hpp"
 
-namespace Element {
+namespace element {
 
 class ContentComponent;
 class GuiController;
@@ -86,4 +86,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

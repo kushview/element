@@ -21,7 +21,7 @@
 
 #include "engine/nodeobject.hpp"
 
-namespace Element {
+namespace element {
 
 class MidiFilterNode : public NodeObject
 {
@@ -33,4 +33,4 @@ protected:
     inline bool wantsMidiPipe() const override { return true; }
 };
 
-} // namespace Element
+} // namespace element

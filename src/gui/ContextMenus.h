@@ -25,7 +25,7 @@
 #include "session/presetmanager.hpp"
 #include "utils.hpp"
 
-namespace Element {
+namespace element {
 
 inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput, const int offset = 80000)
 {
@@ -656,4 +656,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

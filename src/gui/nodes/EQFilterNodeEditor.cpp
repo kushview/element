@@ -22,7 +22,7 @@
 #include "EQFilterNodeEditor.h"
 #include "../LookAndFeel.h"
 
-namespace Element {
+namespace element {
 
 EQFilterNodeEditor::FreqViz::FreqViz (EQFilterProcessor& proc)
     : proc (proc)
@@ -133,4 +133,4 @@ void EQFilterNodeEditor::resized()
     knobs.setBounds (0, getHeight() - 100, getWidth(), 100);
 }
 
-} // namespace Element
+} // namespace element

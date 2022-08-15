@@ -19,7 +19,7 @@
 
 #include "gui/RackContentView.h"
 
-namespace Element {
+namespace element {
 
 class RackView::Impl
 {
@@ -73,4 +73,4 @@ void RackView::setMainComponent (Component* comp)
     resized();
 }
 
-} // namespace Element
+} // namespace element

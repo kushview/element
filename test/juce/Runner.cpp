@@ -91,7 +91,7 @@ public:
             const String slug (opts [1]);
             Array<UnitTest*> testsToRun;
             for (auto* const unitTest : UnitTest::getAllTests())
-                if (auto* const test = dynamic_cast<Element::UnitTestBase*> (unitTest))
+                if (auto* const test = dynamic_cast<element::UnitTestBase*> (unitTest))
                     if (category == test->getCategory() && slug == test->getSlug())
                         testsToRun.add (unitTest);
             if (testsToRun.isEmpty())

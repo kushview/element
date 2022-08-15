@@ -22,7 +22,7 @@
 #include "gui/widgets/LuaConsole.h"
 #include "log.hpp"
 
-namespace Element {
+namespace element {
 
 class AppController;
 
@@ -59,4 +59,4 @@ private:
     Log* log = nullptr;
 };
 
-} // namespace Element
+} // namespace element

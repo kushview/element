@@ -25,7 +25,7 @@
 #include "gui/ChannelStripComponent.h"
 #include "signals.hpp"
 
-namespace Element {
+namespace element {
 
 class NodeChannelStripComponent : public Component,
                                   public Timer,
@@ -407,4 +407,4 @@ private:
     }
 };
 
-} // namespace Element
+} // namespace element

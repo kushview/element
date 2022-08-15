@@ -22,7 +22,7 @@
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 
-namespace Element {
+namespace element {
 
 class GraphPropertyPanel;
 class GraphSettingsView : public ContentView,
@@ -51,4 +51,4 @@ private:
     void valueChanged (Value& value) override;
 };
 
-} // namespace Element
+} // namespace element

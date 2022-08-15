@@ -17,7 +17,7 @@
 */
 
 #include "LuaUnitTest.h"
-using namespace Element;
+using namespace element;
 
 class LuaStream : public LuaUnitTest
 {

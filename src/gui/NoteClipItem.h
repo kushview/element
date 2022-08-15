@@ -21,7 +21,7 @@
 
 #include "session/Note.h"
 
-namespace Element {
+namespace element {
 class NoteClipItem : public TimelineClip
 {
 public:
@@ -134,4 +134,4 @@ private:
         return colour.getColourAtPosition (velocity);
     }
 };
-} // namespace Element
+} // namespace element
