@@ -196,7 +196,7 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
 
     if (saveAs)
     {
-        result = document->saveAs (File(), true, askForFile, showError);
+        result = document->saveAsInteractive (true);
     }
     else
     {
@@ -214,6 +214,13 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
         jassert (! hasSessionChanged());
         if (auto* us = getWorld().getSettings().getUserSettings())
             us->setValue (Settings::lastSessionKey, document->getFile().getFullPathName());
+        if (saveAs)
+        {
+            getServices().addRecentFile (document->getFile());
+            currentSession->getValueTree().setProperty (Tags::name, 
+                document->getFile().getFileNameWithoutExtension(),
+                nullptr);
+        }
     }
 }
 

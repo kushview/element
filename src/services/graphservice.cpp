@@ -151,9 +151,6 @@ void GraphService::saveGraph (const bool saveAs)
     if (saveAs)
     {
         result = document.saveAsInteractive (true);
-        if (result == FileBasedDocument::savedOk)
-            document.getGraph().setProperty (Tags::name, 
-                document.getFile().getFileNameWithoutExtension());
     }
     else
     {
