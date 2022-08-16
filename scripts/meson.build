@@ -21,7 +21,7 @@ install_data (
 endif
 
 scripts_gen = generator (jrc,
-    output : [ '@BASENAME@.cpp', '@BASENAME@.h'],
+    output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
     arguments : [ '@INPUT@', '@BUILD_DIR@', 'scripts' ])
 scripts_includes = include_directories ('.', '../scripts')
 scripts_sources = scripts_gen.process (

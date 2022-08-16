@@ -212,7 +212,7 @@ if host_machine.system() == 'windows'
 endif
 
 luael_gen = generator (jrc,
-    output : [ '@BASENAME@.cpp', '@BASENAME@.h'],
+    output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
     arguments : [ '@INPUT@', '@BUILD_DIR@', 'BinaryData' ])
 libelement_sources += luael_gen.process (
     'el/AudioBuffer.lua',

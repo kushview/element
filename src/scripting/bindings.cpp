@@ -36,11 +36,11 @@
 #include "sol/sol.hpp"
 #include "el/lua-kv.hpp"
 
-#include "libelement.a.p/AudioBuffer.h"
-#include "libelement.a.p/command.h"
-#include "libelement.a.p/object.h"
-#include "libelement.a.p/script.h"
-#include "libelement.a.p/slug.h"
+#include "AudioBuffer.lua.h"
+#include "command.lua.h"
+#include "object.lua.h"
+#include "script.lua.h"
+#include "slug.lua.h"
 
 extern "C" {
 extern int luaopen_el_audio (lua_State* L);

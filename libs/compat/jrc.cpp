@@ -125,11 +125,11 @@ int main (int argc, char* argv[])
 
     String className (argv[3]);
     className = className.trim();
-    String baseName (sourceFile.getFileNameWithoutExtension());
+    String baseName (sourceFile.getFileName());
     baseName = baseName.trim();
 
-    const File headerFile (destDirectory.getChildFile (baseName).withFileExtension (".h"));
-    const File cppFile    (destDirectory.getChildFile (baseName).withFileExtension (".cpp"));
+    const File headerFile (destDirectory.getChildFile (baseName + ".h"));
+    const File cppFile    (destDirectory.getChildFile (baseName + ".cpp"));
 
     // std::cout << "Creating " << headerFile.getFullPathName()
     //           << " and " << cppFile.getFullPathName()

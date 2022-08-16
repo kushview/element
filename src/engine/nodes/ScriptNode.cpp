@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "amp.h"
-#include "ampui.h"
+#include "amp.lua.h"
+#include "ampui.lua.h"
 
 #include <math.h>
 #include "sol/sol.hpp"
