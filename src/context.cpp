@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "ElementApp.h"
+#include "controllers/AppController.h"
 
 #include "engine/internalformat.hpp"
 #include "scripting.hpp"
@@ -29,7 +29,7 @@
 #include "context.hpp"
 #include "log.hpp"
 #include "module.hpp"
-#include "settings.hpp"
+#include "settings.hpp"  
 
 namespace element {
 
@@ -42,6 +42,8 @@ public:
     ~Impl() {}
 
     Context& owner;
+
+    std::unique_ptr<AppController> services;
 
     AudioEnginePtr engine;
     SessionPtr session;
@@ -74,10 +76,14 @@ private:
 
         lua.reset (new ScriptingEngine());
         lua->initialize (owner);
+
+        owner.setEngine (new AudioEngine (owner, RunMode::Standalone));
+        services = std::make_unique<AppController> (owner, RunMode::Standalone);
     }
 
     void freeAll()
     {
+        services.reset();
         commands = nullptr;
         plugins = nullptr;
         settings = nullptr;
@@ -104,6 +110,12 @@ Context::~Context()
 }
 
 //=============================================================================
+AppController& Context::getServices()
+{
+    jassert (impl && impl->services);
+    return *impl->services;
+}
+
 CommandManager& Context::getCommandManager()
 {
     jassert (impl && impl->commands);

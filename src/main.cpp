@@ -73,8 +73,6 @@ public:
         }
     }
 
-    std::unique_ptr<AppController> controller;
-
     const bool isUsingThread() const { return usingThread; }
 
 private:
@@ -138,10 +136,8 @@ private:
         DeviceManager& devices (world.getDeviceManager());
         String tp = devices.getCurrentAudioDeviceType();
 
-        AudioEnginePtr engine = new AudioEngine (world);
+        AudioEnginePtr engine = world.getAudioEngine();
         engine->applySettings (settings);
-        world.setEngine (engine); // this will also instantiate the session
-        controller = std::make_unique<AppController> (world);
 
         auto* props = settings.getUserSettings();
         
@@ -246,7 +242,7 @@ public:
 
     void shutdown() override
     {
-        if (! world || ! controller)
+        if (! world)
             return;
 
         slaves.clearQuick (true);
@@ -258,8 +254,8 @@ public:
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
 
-        controller->saveSettings();
-        controller->deactivate();
+        world->getServices().saveSettings();
+        world->getServices().deactivate();
 
         plugins.saveUserPlugins (settings);
         midi.writeSettings (settings);
@@ -270,7 +266,6 @@ public:
             props->setValue ("keymappings", keymappings.get());
 
         engine = nullptr;
-        controller = nullptr;
         Logger::setCurrentLogger (nullptr);
         world->setEngine (nullptr);
         world = nullptr;
@@ -278,14 +273,14 @@ public:
 
     void systemRequestedQuit() override
     {
-        if (! controller)
+        if (! world)
         {
             Application::quit();
             return;
         }
 
 #ifndef EL_SOLO
-        auto* sc = controller->findChild<SessionController>();
+        auto* sc = world->getServices().findChild<SessionController>();
 
         if (world->getSettings().askToSaveSession())
         {
@@ -318,7 +313,7 @@ public:
         }
 
 #else // SE
-        auto* gc = controller->findChild<GraphController>();
+        auto* gc = world->getServices().findChild<GraphController>();
         if (world->getSettings().askToSaveSession())
         {
             // - 0 if the third button was pressed ('cancel')
@@ -342,11 +337,11 @@ public:
 
     void anotherInstanceStarted (const String& commandLine) override
     {
-        if (! controller)
+        if (! world)
             return;
 
 #ifndef EL_SOLO
-        if (auto* sc = controller->findChild<SessionController>())
+        if (auto* sc = world->getServices().findChild<SessionController>())
         {
             const auto path = commandLine.unquoted().trim();
             if (File::isAbsolutePath (path))
@@ -359,7 +354,7 @@ public:
             }
         }
 #else
-        if (auto* gc = controller->findChild<GraphController>())
+        if (auto* gc = world->getServices().findChild<GraphController>())
         {
             const auto path = commandLine.unquoted().trim();
             if (File::isAbsolutePath (path))
@@ -382,22 +377,21 @@ public:
 
     void finishLaunching()
     {
-        if (nullptr != controller || nullptr == startup)
+        if (nullptr == startup)
             return;
 
         if (world->getSettings().scanForPluginsOnStartup())
             world->getPluginManager().scanAudioPlugins();
 
-        controller.reset (startup->controller.release());
-        startup = nullptr;
+        startup.reset();
 
-        controller->run();
+        world->getServices().run();
 
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
 #ifndef EL_SOLO
-        if (auto* sc = controller->findChild<SessionController>())
+        if (auto* sc = world->getServices().findChild<SessionController>())
         {
             const auto path = getCommandLineParameters();
             if (File::isAbsolutePath (path))
@@ -413,7 +407,6 @@ public:
 private:
     String launchCommandLine;
     std::unique_ptr<Context> world;
-    std::unique_ptr<AppController> controller;
     std::unique_ptr<Startup> startup;
     OwnedArray<kv::ChildProcessSlave> slaves;
 
@@ -451,7 +444,7 @@ private:
 
     void launchApplication()
     {
-        if (nullptr != controller)
+        if (startup != nullptr)
             return;
 
         startup = std::make_unique<Startup> (*world, false, false);

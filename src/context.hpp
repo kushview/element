@@ -26,6 +26,7 @@
 
 namespace element {
 
+class AppController;
 class CommandManager;
 class DeviceManager;
 class ScriptingEngine;
@@ -40,6 +41,8 @@ public:
     explicit Context (const String& commandLine = String());
     virtual ~Context();
 
+    AppController& getServices();
+    
     AudioEnginePtr getAudioEngine() const;
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();
