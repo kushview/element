@@ -17,34 +17,33 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#pragma once
-
-#include "controllers/AppController.h"
+#include "services.hpp"
+#include "engine/nodeobject.hpp"
 #include "session/controllerdevice.hpp"
+#include "signals.hpp"
 
 namespace element {
 
-class DevicesController : public AppController::Child
+class MappingService : public Service
 {
 public:
-    DevicesController();
-    ~DevicesController();
+    MappingService();
+    ~MappingService();
 
     void activate() override;
     void deactivate() override;
-
-    void add (const ControllerDevice&);
-    void add (const ControllerDevice&, const ControllerDevice::Control&);
-    void add (const File& file);
-    void remove (const ControllerDevice&);
-    void remove (const ControllerDevice&, const ControllerDevice::Control&);
-    void refresh (const ControllerDevice&);
-    void refresh();
+    void learn (const bool shouldLearn = true);
+    bool isLearning() const;
+    void remove (const ControllerMap&);
 
 private:
     class Impl;
     friend class Impl;
     std::unique_ptr<Impl> impl;
+    SignalConnection capturedConnection;
+    SignalConnection capturedParamConnection;
+    void onControlCaptured();
+    void onParameterCaptured (const Node&, int);
 };
 
 } // namespace element

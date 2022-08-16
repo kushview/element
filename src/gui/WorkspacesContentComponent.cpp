@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "gui/WorkspacesContentComponent.h"
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
@@ -35,8 +35,8 @@ namespace element {
 class WorkspacesContentComponent::Impl
 {
 public:
-    Impl (WorkspacesContentComponent& o, AppController& a)
-        : app (a), owner (o), workspace (a.getGlobals(), a, *a.findChild<GuiController>())
+    Impl (WorkspacesContentComponent& o, ServiceManager& a)
+        : app (a), owner (o), workspace (a.getGlobals(), a, *a.findChild<GuiService>())
     {
         lastWorkspaceBrowsePath = DataPath::workspacesDir();
         owner.addAndMakeVisible (workspace);
@@ -201,13 +201,13 @@ public:
             workspace.applyState (state);
     }
 
-    AppController& app;
+    ServiceManager& app;
     WorkspacesContentComponent& owner;
     Workspace workspace;
     File lastWorkspaceBrowsePath;
 };
 
-WorkspacesContentComponent::WorkspacesContentComponent (AppController& controller)
+WorkspacesContentComponent::WorkspacesContentComponent (ServiceManager& controller)
     : ContentComponent (controller)
 {
     impl.reset (new Impl (*this, controller));
@@ -389,7 +389,7 @@ void WorkspacesContentComponent::handleWorkspaceMenuResult (int result)
 
 void WorkspacesContentComponent::saveState (PropertiesFile*)
 {
-    if (auto* props = getAppController().getWorld().getSettings().getUserSettings())
+    if (auto* props = getServices().getWorld().getSettings().getUserSettings())
         if (auto* vk = getVirtualKeyboardView())
             vk->saveState (props);
     impl->saveCurrentWorkspace();
@@ -397,7 +397,7 @@ void WorkspacesContentComponent::saveState (PropertiesFile*)
 
 void WorkspacesContentComponent::restoreState (PropertiesFile*)
 {
-    auto& settings = getAppController().getWorld().getSettings();
+    auto& settings = getServices().getWorld().getSettings();
     const auto stateName = settings.getWorkspace();
     WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
     if (! state.isValid())

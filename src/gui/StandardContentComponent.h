@@ -26,7 +26,7 @@ namespace element {
 class StandardContentComponent : public ContentComponent
 {
 public:
-    StandardContentComponent (AppController& app);
+    StandardContentComponent (ServiceManager& app);
     ~StandardContentComponent() noexcept;
 
     void resizeContent (const Rectangle<int>& area) override;

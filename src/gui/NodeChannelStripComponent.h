@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "controllers/GuiController.h"
+#include "services/guiservice.hpp"
 #include "engine/nodeobject.hpp"
 #include "gui/ChannelStripComponent.h"
 #include "signals.hpp"
@@ -34,7 +34,7 @@ class NodeChannelStripComponent : public Component,
 {
 public:
     std::function<void()> onNodeChanged;
-    NodeChannelStripComponent (GuiController& g, bool handleNodeSelected = true)
+    NodeChannelStripComponent (GuiService& g, bool handleNodeSelected = true)
         : gui (g), listenForNodeSelected (handleNodeSelected)
     {
         addAndMakeVisible (channelStrip);
@@ -249,7 +249,7 @@ protected:
 
 private:
     friend class NodeChannelStripView;
-    GuiController& gui;
+    GuiService& gui;
     Label nodeName;
     Node node;
     PortArray audioIns, audioOuts;

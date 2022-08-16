@@ -24,12 +24,12 @@
 namespace element {
 
 class Node;
-class GuiController;
+class GuiService;
 
 class VolumeNodeEditor : public NodeEditorComponent
 {
 public:
-    VolumeNodeEditor (const Node&, GuiController&);
+    VolumeNodeEditor (const Node&, GuiService&);
     ~VolumeNodeEditor();
 
     void paint (Graphics& g) override;

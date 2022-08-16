@@ -19,17 +19,17 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "documents/sessiondocument.hpp"
 #include "session/session.hpp"
 #include "signals.hpp"
 
 namespace element {
-class SessionController : public AppController::Child
+class SessionService : public Service
 {
 public:
-    SessionController();
-    ~SessionController();
+    SessionService();
+    ~SessionService();
 
     void activate() override;
     void deactivate() override;

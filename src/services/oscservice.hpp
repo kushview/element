@@ -19,15 +19,15 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 
 namespace element {
 
-class OSCController : public AppController::Child
+class OSCService : public Service
 {
 public:
-    OSCController();
-    ~OSCController();
+    OSCService();
+    ~OSCService();
 
     /** Sets the port and starts/stops the host accoding to Settings
         

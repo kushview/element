@@ -1,5 +1,5 @@
 
-#include "controllers/GuiController.h"
+#include "services/guiservice.hpp"
 #include "engine/nodes/NodeTypes.h"
 #include "engine/nodeobject.hpp"
 
@@ -23,10 +23,10 @@ namespace element {
 
 class FallbackNodeEditorSource : public NodeEditorSource
 {
-    GuiController& gui;
+    GuiService& gui;
 
 public:
-    FallbackNodeEditorSource (GuiController& g)
+    FallbackNodeEditorSource (GuiService& g)
         : gui (g) {}
 
     void findEditors (Array<NodeEditorDescription>&) override {}
@@ -178,7 +178,7 @@ NodeEditorFactory::NodeEditorFactory()
     add<AudioRouterEditor> (EL_INTERNAL_ID_AUDIO_ROUTER, NodeEditorPlacement::PluginWindow);
 }
 
-NodeEditorFactory::NodeEditorFactory (GuiController& g)
+NodeEditorFactory::NodeEditorFactory (GuiService& g)
     : NodeEditorFactory()
 {
     fallback.reset (new FallbackNodeEditorSource (g));

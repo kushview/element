@@ -27,8 +27,8 @@
 
 namespace element {
 
-class AppController;
-class GuiController;
+class ServiceManager;
+class GuiService;
 class Context;
 
 class Workspace;
@@ -78,7 +78,7 @@ private:
 class Workspace : public Component
 {
 public:
-    Workspace (Context&, AppController&, GuiController&);
+    Workspace (Context&, ServiceManager&, GuiService&);
     virtual ~Workspace();
 
     Dock& getDock();
@@ -92,8 +92,8 @@ public:
 private:
     Dock dock;
     Context& world;
-    AppController& app;
-    GuiController& gui;
+    ServiceManager& app;
+    GuiService& gui;
 };
 
 } // namespace element

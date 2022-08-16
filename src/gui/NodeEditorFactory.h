@@ -24,7 +24,7 @@
 
 namespace element {
 
-class GuiController;
+class GuiService;
 class Node;
 
 enum struct NodeEditorPlacement : uint32_t
@@ -53,7 +53,7 @@ class NodeEditorFactory final
 {
 public:
     NodeEditorFactory();
-    NodeEditorFactory (GuiController& g);
+    NodeEditorFactory (GuiService& g);
     ~NodeEditorFactory();
 
     const Array<NodeEditorDescription>& getEditors() const { return editors; }

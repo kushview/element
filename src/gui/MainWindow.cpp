@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/GraphController.h"
-#include "controllers/SessionController.h"
+#include "services/graphservice.hpp"
+#include "services/sessionservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
@@ -73,9 +73,9 @@ void MainWindow::nameChangedSession()
     String title = Util::appName();
 
     auto session = world.getSession();
-    SessionController* controller = nullptr;
+    SessionService* controller = nullptr;
     if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
-        controller = getAppController().findChild<SessionController>();
+        controller = getServices().findChild<SessionService>();
 
     if (nullptr == session || nullptr == controller)
     {
@@ -115,7 +115,7 @@ void MainWindow::nameChangedSingleGraph()
 
     if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
     {
-        if (auto* const gc = getAppController().findChild<GraphController>())
+        if (auto* const gc = getServices().findChild<GraphService>())
         {
             const auto file = gc->getGraphFile();
 
@@ -154,7 +154,7 @@ void MainWindow::activeWindowStatusChanged()
 {
     if (nullptr == getContentComponent())
         return;
-    auto& app (getAppController());
+    auto& app (getServices());
     app.checkForegroundStatus();
 }
 
@@ -164,11 +164,11 @@ void MainWindow::refreshMenu()
         mainMenu->menuItemsChanged();
 }
 
-AppController& MainWindow::getAppController()
+ServiceManager& MainWindow::getServices()
 {
     jassert (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()));
     return (dynamic_cast<ContentComponent*> (getContentComponent()))
-        ->getAppController();
+        ->getServices();
 }
 
 } // namespace element

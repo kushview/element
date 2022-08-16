@@ -22,7 +22,7 @@
 #include "gui/ViewHelpers.h"
 
 // nav panel needs these headers included
-#include "controllers/EngineController.h"
+#include "services/engineservice.hpp"
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/views/PluginsPanelView.h"

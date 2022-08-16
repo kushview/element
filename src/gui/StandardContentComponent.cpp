@@ -17,9 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/MappingController.h"
-#include "controllers/SessionController.h"
+#include "services.hpp"
+#include "services/mappingservice.hpp"
+#include "services/sessionservice.hpp"
 #include "gui/views/EmptyContentView.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/views/PluginsPanelView.h"
@@ -161,7 +161,7 @@ private:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (StandardContentComponent& cc, AppController& app)
+    ContentContainer (StandardContentComponent& cc, ServiceManager& app)
         : owner (cc)
     {
         content1.reset (new ContentView());
@@ -214,7 +214,7 @@ public:
     void setMainView (ContentView* view)
     {
         if (view)
-            view->initializeView (owner.getAppController());
+            view->initializeView (owner.getServices());
 
         if (content1)
         {
@@ -249,7 +249,7 @@ public:
     void setAccessoryView (ContentView* view)
     {
         if (view)
-            view->initializeView (owner.getAppController());
+            view->initializeView (owner.getServices());
         if (content2)
             removeChildComponent (content2.get());
 
@@ -307,7 +307,7 @@ public:
         }
 
         locked = false;
-        owner.getAppController().findChild<GuiController>()->refreshMainMenu();
+        owner.getServices().findChild<GuiService>()->refreshMainMenu();
     }
 
     void saveState (PropertiesFile* props)
@@ -482,7 +482,7 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
     }
 }
 
-StandardContentComponent::StandardContentComponent (AppController& ctl_)
+StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
     : ContentComponent (ctl_)
 {
     auto& settings (getGlobals().getSettings());
@@ -492,7 +492,7 @@ StandardContentComponent::StandardContentComponent (AppController& ctl_)
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
     nav->updateContent();
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
-    addAndMakeVisible (container = new ContentContainer (*this, getAppController()));
+    addAndMakeVisible (container = new ContentContainer (*this, getServices()));
 
     {
         int w, h;
@@ -716,35 +716,13 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
     for (const auto& path : files)
     {
         const File file (path);
-        if (file.hasFileExtension ("elc"))
-        {
-#if 0
-            auto& unlock (getGlobals().getUnlockStatus());
-            FileInputStream src (file);
-            if (unlock.applyKeyFile (src.readString()))
-            {
-                unlock.save();
-                unlock.loadAll();
-                unlock.refreshed();
-                stabilizeViews();
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
-                    "Your software has successfully been unlocked.");
-
-            }
-            else
-            {
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-                    "Apply License File", "Your software could not be unlocked.");
-            }
-#endif
-        }
-        else if (file.hasFileExtension ("els"))
+        if (file.hasFileExtension ("els"))
         {
             this->post (new OpenSessionMessage (file));
         }
         else if (file.hasFileExtension ("elg"))
         {
-            if (auto* sess = getAppController().findChild<SessionController>())
+            if (auto* sess = getServices().findChild<SessionService>())
                 sess->importGraph (file);
         }
         else if (file.hasFileExtension ("elpreset"))
@@ -925,7 +903,7 @@ void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
     if (! nodeStrip)
     {
         nodeStrip = new NodeChannelStripView();
-        nodeStrip->initializeView (getAppController());
+        nodeStrip->initializeView (getServices());
     }
 
     if (isVisible == nodeStrip->isVisible())

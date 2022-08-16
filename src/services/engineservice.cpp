@@ -18,8 +18,8 @@
 */
 
 #include "ElementApp.h"
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
@@ -29,7 +29,7 @@
 #include "context.hpp"
 #include "settings.hpp"
 
-#include "controllers/EngineController.h"
+#include "services/engineservice.hpp"
 
 namespace element {
 
@@ -131,8 +131,8 @@ struct RootGraphHolder
     }
 
 private:
-    friend class EngineController;
-    friend class EngineController::RootGraphs;
+    friend class EngineService;
+    friend class EngineService::RootGraphs;
     PluginManager& plugins;
     DeviceManager& devices;
     std::unique_ptr<RootGraphManager> controller;
@@ -142,10 +142,10 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RootGraphHolder);
 };
 
-class EngineController::RootGraphs
+class EngineService::RootGraphs
 {
 public:
-    RootGraphs (EngineController& e) : owner (e) {}
+    RootGraphs (EngineService& e) : owner (e) {}
     ~RootGraphs() {}
 
     RootGraphHolder* add (RootGraphHolder* item)
@@ -249,24 +249,24 @@ public:
     const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
 
 private:
-    EngineController& owner;
+    EngineService& owner;
     SessionPtr session;
     AudioEnginePtr engine;
     OwnedArray<RootGraphHolder> graphs;
 };
 
-EngineController::EngineController()
-    : AppController::Child()
+EngineService::EngineService()
+    : Service()
 {
     graphs = std::make_unique<RootGraphs> (*this);
 }
 
-EngineController::~EngineController()
+EngineService::~EngineService()
 {
     graphs = nullptr;
 }
 
-void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
+void EngineService::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
     if (auto session = getWorld().getSession())
         if (auto* h = graphs->findFor (session->getCurrentGraph()))
@@ -274,13 +274,13 @@ void EngineController::addConnection (const uint32 s, const uint32 sp, const uin
                 c->addConnection (s, sp, d, dp);
 }
 
-void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& graph)
+void EngineService::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& graph)
 {
     if (auto* controller = graphs->findGraphManagerFor (graph))
         controller->addConnection (s, sp, d, dp);
 }
 
-void EngineController::addGraph()
+void EngineService::addGraph()
 {
     auto& world = getWorld();
     auto engine = world.getAudioEngine();
@@ -289,10 +289,10 @@ void EngineController::addGraph()
     Node node (Node::createDefaultGraph ("Graph " + String (session->getNumGraphs() + 1)));
     addGraph (node);
 
-    findSibling<GuiController>()->stabilizeContent();
+    findSibling<GuiService>()->stabilizeContent();
 }
 
-void EngineController::addGraph (const Node& newGraph)
+void EngineService::addGraph (const Node& newGraph)
 {
     jassert (newGraph.isGraph());
 
@@ -330,10 +330,10 @@ void EngineController::addGraph (const Node& newGraph)
         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Audio Engine", err);
     }
 
-    findSibling<GuiController>()->stabilizeContent();
+    findSibling<GuiService>()->stabilizeContent();
 }
 
-void EngineController::duplicateGraph (const Node& graph)
+void EngineService::duplicateGraph (const Node& graph)
 {
     Node duplicate (graph.getValueTree().createCopy());
     duplicate.savePluginState(); // need objects present to update processor states
@@ -350,7 +350,7 @@ void EngineController::duplicateGraph (const Node& graph)
     addGraph (duplicate);
 }
 
-void EngineController::duplicateGraph()
+void EngineService::duplicateGraph()
 {
     auto& world = getWorld();
     auto engine = world.getAudioEngine();
@@ -359,7 +359,7 @@ void EngineController::duplicateGraph()
     duplicateGraph (current);
 }
 
-void EngineController::removeGraph (int index)
+void EngineService::removeGraph (int index)
 {
     auto& world = getWorld();
     auto engine = world.getAudioEngine();
@@ -412,10 +412,10 @@ void EngineController::removeGraph (int index)
         DBG ("[EL] could not find root graph index: " << index);
     }
 
-    findSibling<GuiController>()->stabilizeContent();
+    findSibling<GuiService>()->stabilizeContent();
 }
 
-void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
+void EngineService::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
 {
     if (auto* root = graphs->findActiveRootGraphManager())
     {
@@ -427,19 +427,19 @@ void EngineController::connectChannels (const uint32 s, const int sc, const uint
     }
 }
 
-void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
+void EngineService::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
     if (auto* root = graphs->findActiveRootGraphManager())
         root->removeConnection (s, sp, d, dp);
 }
 
-void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& target)
+void EngineService::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& target)
 {
     if (auto* controller = graphs->findGraphManagerFor (target))
         controller->removeConnection (s, sp, d, dp);
 }
 
-Node EngineController::addNode (const Node& node, const Node& target, const ConnectionBuilder& builder)
+Node EngineService::addNode (const Node& node, const Node& target, const ConnectionBuilder& builder)
 {
     if (auto* controller = graphs->findGraphManagerFor (target))
     {
@@ -455,7 +455,7 @@ Node EngineController::addNode (const Node& node, const Node& target, const Conn
     return Node();
 }
 
-void EngineController::addNode (const Node& node)
+void EngineService::addNode (const Node& node)
 {
     auto* root = graphs->findActiveRootGraphManager();
     const uint32 nodeId = (root != nullptr) ? root->addNode (node) : KV_INVALID_NODE;
@@ -463,7 +463,7 @@ void EngineController::addNode (const Node& node)
     {
         const Node actual (root->getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
-            findSibling<GuiController>()->presentPluginWindow (actual);
+            findSibling<GuiService>()->presentPluginWindow (actual);
     }
     else
     {
@@ -473,7 +473,7 @@ void EngineController::addNode (const Node& node)
     }
 }
 
-void EngineController::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
+void EngineService::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
 {
     auto* root = graphs->findActiveRootGraphManager();
     if (! root)
@@ -503,7 +503,7 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
         {
             const Node node (root->getNodeModelForId (nodeId));
             if (getWorld().getSettings().showPluginWindowsWhenAdded())
-                findSibling<GuiController>()->presentPluginWindow (node);
+                findSibling<GuiService>()->presentPluginWindow (node);
         }
     }
     else
@@ -512,13 +512,13 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     }
 }
 
-void EngineController::removeNode (const Node& node)
+void EngineService::removeNode (const Node& node)
 {
     const Node graph (node.getParentGraph());
     if (! graph.isGraph())
         return;
 
-    auto* const gui = findSibling<GuiController>();
+    auto* const gui = findSibling<GuiService>();
     if (auto* manager = graphs->findGraphManagerFor (graph))
     {
         jassert (manager->contains (node.getNodeId()));
@@ -530,7 +530,7 @@ void EngineController::removeNode (const Node& node)
     }
 }
 
-void EngineController::removeNode (const Uuid& uuid)
+void EngineService::removeNode (const Uuid& uuid)
 {
     auto session = getWorld().getSession();
     const auto node = session->findNodeById (uuid);
@@ -544,29 +544,28 @@ void EngineController::removeNode (const Uuid& uuid)
     }
 }
 
-void EngineController::removeNode (const uint32 nodeId)
+void EngineService::removeNode (const uint32 nodeId)
 {
     auto* root = graphs->findActiveRootGraphManager();
     if (! root)
         return;
-    if (auto* gui = findSibling<GuiController>())
+    if (auto* gui = findSibling<GuiService>())
         gui->closePluginWindowsFor (nodeId, true);
     root->removeNode (nodeId);
 }
 
-void EngineController::disconnectNode (const Node& node, const bool inputs, const bool outputs, const bool audio, const bool midi)
+void EngineService::disconnectNode (const Node& node, const bool inputs, const bool outputs, const bool audio, const bool midi)
 {
     const auto graph (node.getParentGraph());
     if (auto* controller = graphs->findGraphManagerFor (graph))
         controller->disconnectNode (node.getNodeId(), inputs, outputs, audio, midi);
 }
 
-void EngineController::activate()
+void EngineService::activate()
 {
-    Controller::activate();
+    Service::activate();
 
-    auto* app = dynamic_cast<AppController*> (getRoot());
-    auto& globals (app->getWorld());
+    auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine (globals.getAudioEngine());
     auto session (globals.getSession());
@@ -577,15 +576,15 @@ void EngineController::activate()
     devices.addChangeListener (this);
 }
 
-void EngineController::deactivate()
+void EngineService::deactivate()
 {
-    Controller::deactivate();
+    Service::deactivate();
     auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine (globals.getAudioEngine());
     auto session (globals.getSession());
 
-    if (auto* gui = findSibling<GuiController>())
+    if (auto* gui = findSibling<GuiService>())
     {
         // gui might not deactivate before the engine, so
         // close the windows here
@@ -600,12 +599,12 @@ void EngineController::deactivate()
     devices.removeChangeListener (this);
 }
 
-void EngineController::clear()
+void EngineService::clear()
 {
     graphs->clear();
 }
 
-void EngineController::setRootNode (const Node& newRootNode)
+void EngineService::setRootNode (const Node& newRootNode)
 {
     if (! newRootNode.isRootGraph())
     {
@@ -643,7 +642,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     auto* active = graphs->findActiveInEngine();
     if (active && active != holder)
     {
-        if (auto* gui = findSibling<GuiController>())
+        if (auto* gui = findSibling<GuiService>())
             gui->closeAllPluginWindows();
         
         if (! (bool) active->model.getProperty(Tags::persistent) && active->attached())
@@ -684,7 +683,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     engine->refreshSession();
 }
 
-void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
+void EngineService::changeListenerCallback (ChangeBroadcaster* cb)
 {
     auto& devices (getWorld().getDeviceManager());
     if (getRunMode() == RunMode::Plugin || cb != &devices)
@@ -713,7 +712,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     }
 }
 
-void EngineController::syncModels()
+void EngineService::syncModels()
 {
     for (auto* holder : graphs->getGraphs())
     {
@@ -733,7 +732,7 @@ void EngineController::syncModels()
     }
 }
 
-void EngineController::addPlugin (const Node& graph, const PluginDescription& desc)
+void EngineService::addPlugin (const Node& graph, const PluginDescription& desc)
 {
     if (! graph.isGraph())
         return;
@@ -744,7 +743,7 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     }
 }
 
-Node EngineController::addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified)
+Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified)
 {
     if (! graph.isGraph())
         return Node();
@@ -782,7 +781,7 @@ Node EngineController::addPlugin (const Node& graph, const PluginDescription& de
     return Node();
 }
 
-void EngineController::sessionReloaded()
+void EngineService::sessionReloaded()
 {
     graphs->clear();
 
@@ -808,7 +807,7 @@ void EngineController::sessionReloaded()
     }
 }
 
-Node EngineController::addPlugin (GraphManager& c, const PluginDescription& desc)
+Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
 {
     auto& plugins (getWorld().getPluginManager());
     const auto nodeId = c.addNode (&desc, 0.5f, 0.5f, 0);
@@ -819,7 +818,7 @@ Node EngineController::addPlugin (GraphManager& c, const PluginDescription& desc
 
         const Node node (c.getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
-            findSibling<GuiController>()->presentPluginWindow (node);
+            findSibling<GuiService>()->presentPluginWindow (node);
         if (! node.isValid())
         {
             jassertfalse; // fatal, but continue
@@ -837,7 +836,7 @@ Node EngineController::addPlugin (GraphManager& c, const PluginDescription& desc
     return Node();
 }
 
-void EngineController::addMidiDeviceNode (const String& device, const bool isInput)
+void EngineService::addMidiDeviceNode (const String& device, const bool isInput)
 {
     NodeObjectPtr ptr;
     Node graph;
@@ -874,7 +873,7 @@ void EngineController::addMidiDeviceNode (const String& device, const bool isInp
     }
 }
 
-void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& layout)
+void EngineService::changeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& layout)
 {
     Node node = n;
     Node graph = node.getParentGraph();
@@ -907,13 +906,13 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
                 controller->removeIllegalConnections();
                 controller->syncArcsModel();
 
-                findSibling<GuiController>()->stabilizeViews();
+                findSibling<GuiService>()->stabilizeViews();
             }
         }
     }
 }
 
-void EngineController::replace (const Node& node, const PluginDescription& desc)
+void EngineService::replace (const Node& node, const PluginDescription& desc)
 {
     const auto graph (node.getParentGraph());
     if (! graph.isGraph())
@@ -966,11 +965,11 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
 
             removeNode (node);
             if (wasWindowOpen)
-                findSibling<GuiController>()->presentPluginWindow (newNode);
+                findSibling<GuiService>()->presentPluginWindow (newNode);
         }
     }
 
-    findSibling<GuiController>()->stabilizeViews();
+    findSibling<GuiService>()->stabilizeViews();
 }
 
 } // namespace element

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
 #include "context.hpp"
@@ -27,7 +27,7 @@ namespace element {
 
 PluginsPanel::PluginsPanel() {}
 
-void PluginsPanel::initializeView (AppController& app)
+void PluginsPanel::initializeView (ServiceManager& app)
 {
     if (view != nullptr)
         return;

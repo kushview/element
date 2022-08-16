@@ -24,7 +24,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 
 class LuaConsoleView : public ContentView,
                        public Log::Listener
@@ -38,7 +38,7 @@ public:
 
     ~LuaConsoleView();
 
-    void initializeView (AppController&) override;
+    void initializeView (ServiceManager&) override;
     void didBecomeActive() override
     {
         console.grabKeyboardFocus();

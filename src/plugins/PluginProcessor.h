@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "engine/audioengine.hpp"
 #include "engine/parameter.hpp"
 #include "ElementApp.h"
@@ -391,7 +391,7 @@ public:
     void numBusesChanged() override;
     void processorLayoutsChanged() override;
 
-    AppController* getAppController() const { return controller.get(); }
+    ServiceManager* getServices() const { return controller.get(); }
 
     void setEditorBounds (const Rectangle<int>& bounds) { editorBounds = bounds; }
     const Rectangle<int>& getEditorBounds() const { return editorBounds; }
@@ -422,7 +422,7 @@ private:
 
     OwnedArray<PerfParamMenuItem> menuMap;
     std::unique_ptr<Context> world;
-    std::unique_ptr<AppController> controller;
+    std::unique_ptr<ServiceManager> controller;
     AudioEnginePtr engine;
 
     bool initialized = false;

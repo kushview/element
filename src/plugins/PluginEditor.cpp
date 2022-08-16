@@ -337,8 +337,8 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
         }
     };
 
-    auto* const app = processor.getAppController();
-    auto* const gui = app->findChild<GuiController>();
+    auto* const app = processor.getServices();
+    auto* const gui = app->findChild<GuiService>();
 
     addAndMakeVisible (content = gui->getContentComponent());
     jassert (content);
@@ -384,9 +384,9 @@ PluginEditor::~PluginEditor()
     perfParamChangedConnection.disconnect();
     removeChildComponent (content.getComponent());
     content = nullptr;
-    if (auto* const app = processor.getAppController())
+    if (auto* const app = processor.getServices())
     {
-        if (auto* gui = app->findChild<GuiController>())
+        if (auto* gui = app->findChild<GuiService>())
         {
             gui->closeAllPluginWindows();
             gui->clearContentComponent();
@@ -398,8 +398,8 @@ PluginEditor::~PluginEditor()
 element::ContentComponent* PluginEditor::getContentComponent()
 {
     if (nullptr == content)
-        if (auto* app = processor.getAppController())
-            if (auto* gui = app->findChild<GuiController>())
+        if (auto* app = processor.getServices())
+            if (auto* gui = app->findChild<GuiService>())
                 content = gui->getContentComponent();
     return nullptr != content ? dynamic_cast<element::ContentComponent*> (content.getComponent())
                               : nullptr;
@@ -452,7 +452,7 @@ void PluginEditor::resized()
 
 bool PluginEditor::keyPressed (const KeyPress& key)
 {
-    auto* app = processor.getAppController();
+    auto* app = processor.getServices();
     auto& cmd (app->getWorld().getCommandManager());
 
     for (int i = 0; i < cmd.getNumCommands(); ++i)

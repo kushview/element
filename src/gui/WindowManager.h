@@ -28,12 +28,12 @@
 
 namespace element {
 
-class GuiController;
+class GuiService;
 
 class WindowManager
 {
 public:
-    WindowManager (GuiController& g);
+    WindowManager (GuiService& g);
     ~WindowManager()
     {
         closeAll();
@@ -161,7 +161,7 @@ public:
     PluginWindow* createPluginWindowFor (const Node& node);
 
 private:
-    GuiController& gui;
+    GuiService& gui;
     OwnedArray<PluginWindow> activePluginWindows;
     OwnedArray<Window> activeWindows;
     OwnedArray<DialogWindow> activeDialogs;

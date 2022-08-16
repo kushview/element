@@ -20,8 +20,8 @@
 
 #include "JuceHeader.h"
 #include "ElementApp.h"
-#include "controllers/AppController.h"
-#include "controllers/SessionController.h"
+#include "services.hpp"
+#include "services/sessionservice.hpp"
 
 #include "engine/audioengine.hpp"
 #include "engine/mappingengine.hpp"
@@ -72,7 +72,7 @@ protected:
         world->getPluginManager().addDefaultFormats();
         world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
         world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine(), world->getMidiEngine()));
-        app.reset (new AppController (*world));
+        app.reset (new ServiceManager (*world));
         app->activate();
         auto& settings = getWorld().getSettings();
         PropertiesFile::Options opts = settings.getStorageParameters();
@@ -111,12 +111,12 @@ protected:
     }
     
     Context& getWorld() { initializeWorld(); return *world; }
-    AppController& getAppController() { initializeWorld(); return *app; }
+    ServiceManager& getServices() { initializeWorld(); return *app; }
 
 private:
     const String slug;
     std::unique_ptr<Context> world;
-    std::unique_ptr<AppController> app;
+    std::unique_ptr<ServiceManager> app;
 };
 
 }

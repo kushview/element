@@ -23,7 +23,7 @@
 #include "ElementApp.h"
 
 namespace element {
-class GuiController;
+class GuiService;
 //[/Headers]
 
 //==============================================================================
@@ -35,7 +35,7 @@ class PreferencesComponent : public Component
 {
 public:
     //==============================================================================
-    PreferencesComponent (Context& g, GuiController& _gui);
+    PreferencesComponent (Context& g, GuiService& _gui);
     ~PreferencesComponent();
 
     //==============================================================================
@@ -53,7 +53,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     class PageList;
     Context& world;
-    GuiController& gui;
+    GuiService& gui;
     OwnedArray<Component> pages;
     //[/UserVariables]
 

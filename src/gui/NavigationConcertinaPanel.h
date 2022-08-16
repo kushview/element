@@ -61,7 +61,7 @@ public:
             {
                 auto graphs = graph.getValueTree().getParent();
                 graphs.setProperty (Tags::active, graphs.indexOf (graph.node()), nullptr);
-                if (auto* ec = cc->getAppController().findChild<EngineController>())
+                if (auto* ec = cc->getServices().findChild<EngineService>())
                     ec->setRootNode (graph);
                 cc->stabilize();
             }

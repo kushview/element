@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/DevicesController.h"
+#include "services/deviceservice.hpp"
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
 #include "session/session.hpp"
@@ -25,37 +25,37 @@
 
 namespace element {
 
-class DevicesController::Impl
+class DeviceService::Impl
 {
 public:
-    Impl (DevicesController& o) : owner (o) {}
+    Impl (DeviceService& o) : owner (o) {}
     ~Impl() {}
 
 private:
-    DevicesController& owner;
+    DeviceService& owner;
 };
 
-DevicesController::DevicesController()
+DeviceService::DeviceService()
 {
     impl.reset (new Impl (*this));
 }
 
-DevicesController::~DevicesController()
+DeviceService::~DeviceService()
 {
     impl.reset (nullptr);
 }
 
-void DevicesController::activate()
+void DeviceService::activate()
 {
-    Controller::activate();
+    Service::activate();
 }
 
-void DevicesController::deactivate()
+void DeviceService::deactivate()
 {
-    Controller::deactivate();
+    Service::deactivate();
 }
 
-void DevicesController::add (const ControllerDevice& device)
+void DeviceService::add (const ControllerDevice& device)
 {
     auto& mapping (getWorld().getMappingEngine());
     auto& midi (getWorld().getMidiEngine());
@@ -73,7 +73,7 @@ void DevicesController::add (const ControllerDevice& device)
     }
 }
 
-void DevicesController::add (const ControllerDevice& device, const ControllerDevice::Control& control)
+void DeviceService::add (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
     auto session = getWorld().getSession();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) < 0)
@@ -88,7 +88,7 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
     }
 }
 
-void DevicesController::add (const File& file)
+void DeviceService::add (const File& file)
 {
     ValueTree data;
     if (auto xml = XmlDocument::parse (file))
@@ -113,7 +113,7 @@ void DevicesController::add (const File& file)
     }
 }
 
-void DevicesController::remove (const ControllerDevice& device)
+void DeviceService::remove (const ControllerDevice& device)
 {
     auto& mapping (getWorld().getMappingEngine());
     if (! mapping.removeInput (device))
@@ -122,7 +122,7 @@ void DevicesController::remove (const ControllerDevice& device)
         session->getValueTree().getChildWithName (Tags::controllers).removeChild (device.getValueTree(), nullptr);
 }
 
-void DevicesController::remove (const ControllerDevice& device, const ControllerDevice::Control& control)
+void DeviceService::remove (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
     auto session = getWorld().getSession();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) >= 0)
@@ -137,7 +137,7 @@ void DevicesController::remove (const ControllerDevice& device, const Controller
     }
 }
 
-void DevicesController::refresh (const ControllerDevice& device)
+void DeviceService::refresh (const ControllerDevice& device)
 {
     refresh();
     return;
@@ -162,7 +162,7 @@ void DevicesController::refresh (const ControllerDevice& device)
 #endif
 }
 
-void DevicesController::refresh()
+void DeviceService::refresh()
 {
     auto& mapping (getWorld().getMappingEngine());
     auto& midi (getWorld().getMidiEngine());

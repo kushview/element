@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "controllers/GuiController.h"
+#include "services/guiservice.hpp"
 #include "gui/LookAndFeel.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
@@ -50,7 +50,7 @@ private:
 class AboutDialog : public DialogWindow
 {
 public:
-    AboutDialog (GuiController& g)
+    AboutDialog (GuiService& g)
         : DialogWindow ("About Element",
                         g.getLookAndFeel().findColour (DocumentWindow::backgroundColourId),
                         true,
@@ -68,7 +68,7 @@ public:
     }
 
 private:
-    GuiController& gui;
+    GuiService& gui;
 };
 
 } // namespace element

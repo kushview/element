@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "scripting.hpp"
 #include "gui/views/LuaConsoleView.h"
 #include "context.hpp"
@@ -32,7 +32,7 @@ LuaConsoleView::~LuaConsoleView()
     }
 }
 
-void LuaConsoleView::initializeView (AppController& app)
+void LuaConsoleView::initializeView (ServiceManager& app)
 {
     auto& se = app.getWorld().getScriptingEngine();
     sol::state_view view (se.getLuaState());

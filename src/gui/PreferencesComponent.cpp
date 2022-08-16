@@ -25,7 +25,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
-#include "controllers/OSCController.h"
+#include "services/oscservice.hpp"
 #include "context.hpp"
 #include "settings.hpp"
 
@@ -135,7 +135,7 @@ class OSCSettingsPage : public SettingsPage,
                         private AsyncUpdater
 {
 public:
-    OSCSettingsPage (Context& w, GuiController& g)
+    OSCSettingsPage (Context& w, GuiService& g)
         : world (w), gui (g)
     {
         auto& settings = world.getSettings();
@@ -187,7 +187,7 @@ public:
 
 private:
     Context& world;
-    GuiController& gui;
+    GuiService& gui;
     Label enabledLabel;
     SettingButton enabledButton;
     Label hostLabel;
@@ -202,7 +202,7 @@ private:
 
     void requestServerUpdate()
     {
-        if (auto* const osc = gui.findSibling<OSCController>())
+        if (auto* const osc = gui.findSibling<OSCService>())
             osc->refreshWithSettings (true);
     }
 
@@ -340,7 +340,7 @@ public:
         ClockSourceMidiClock = 2
     };
 
-    GeneralSettingsPage (Context& world, GuiController& g)
+    GeneralSettingsPage (Context& world, GuiService& g)
         : pluginSettings (world),
 #ifndef EL_SOLO
           defaultSessionFile ("Default Session", File(), true, false,
@@ -689,7 +689,7 @@ private:
 
     Settings& settings;
     AudioEnginePtr engine;
-    GuiController& gui;
+    GuiService& gui;
 };
 
 // MARK: Audio Settings
@@ -1029,7 +1029,7 @@ private:
 //[/MiscUserDefs]
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent (Context& g, GuiController& _gui)
+PreferencesComponent::PreferencesComponent (Context& g, GuiService& _gui)
     : world (g), gui (_gui)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -1176,7 +1176,7 @@ void PreferencesComponent::updateSize()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Context&amp; g, GuiController&amp; _gui"
+                 parentClasses="public Component" constructorParams="Context&amp; g, GuiService&amp; _gui"
                  variableInitialisers="world (g), gui(_gui)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">

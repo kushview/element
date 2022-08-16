@@ -19,10 +19,10 @@
 
 #include "ElementApp.h"
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
-#include "controllers/GraphController.h"
-#include "controllers/SessionController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
+#include "services/graphservice.hpp"
+#include "services/sessionservice.hpp"
 #include "engine/graphnode.hpp"
 #include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"
@@ -238,7 +238,7 @@ void NodeEditorContentView::comboBoxChanged (ComboBox*)
     {
         if (sticky)
             setNode (selectedNode);
-        ViewHelpers::findContentComponent (this)->getAppController().findChild<GuiController>()->selectNode (selectedNode);
+        ViewHelpers::findContentComponent (this)->getServices().findChild<GuiService>()->selectNode (selectedNode);
     }
 }
 
@@ -272,7 +272,7 @@ void NodeEditorContentView::onGraphChanged()
 {
     auto* cc = ViewHelpers::findContentComponent (this);
     jassert (cc);
-    auto& graphs = *cc->getAppController().findChild<GraphController>();
+    auto& graphs = *cc->getServices().findChild<GraphService>();
     setNode (graphs.getGraph().getNode (0));
 }
 
@@ -287,9 +287,9 @@ void NodeEditorContentView::stabilizeContent()
     auto* cc = ViewHelpers::findContentComponent (this);
     auto session = ViewHelpers::getSession (this);
     jassert (cc && session);
-    auto& gui = *cc->getAppController().findChild<GuiController>();
-    auto& graphs = *cc->getAppController().findChild<GraphController>();
-    auto& sessions = *cc->getAppController().findChild<SessionController>();
+    auto& gui = *cc->getServices().findChild<GuiService>();
+    auto& graphs = *cc->getServices().findChild<GraphService>();
+    auto& sessions = *cc->getServices().findChild<SessionService>();
 
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
@@ -376,7 +376,7 @@ Component* NodeEditorContentView::createEmbededEditor()
 {
     auto* const world = ViewHelpers::getGlobals (this);
     jassert (world);
-    auto& app = ViewHelpers::findContentComponent (this)->getAppController();
+    auto& app = ViewHelpers::findContentComponent (this)->getServices();
 
     if (node.isAudioInputNode())
     {
@@ -428,7 +428,7 @@ Component* NodeEditorContentView::createEmbededEditor()
         return new AudioIONodeEditor (node, world->getDeviceManager(), false, true);
     }
 
-    NodeEditorFactory factory (*app.findChild<GuiController>());
+    NodeEditorFactory factory (*app.findChild<GuiService>());
     if (auto editor = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
         return editor.release();
 

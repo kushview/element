@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 
 #include "engine/internalformat.hpp"
 #include "scripting.hpp"
@@ -43,7 +43,7 @@ public:
 
     Context& owner;
 
-    std::unique_ptr<AppController> services;
+    std::unique_ptr<ServiceManager> services;
 
     AudioEnginePtr engine;
     SessionPtr session;
@@ -78,7 +78,7 @@ private:
         lua->initialize (owner);
 
         owner.setEngine (new AudioEngine (owner, RunMode::Standalone));
-        services = std::make_unique<AppController> (owner, RunMode::Standalone);
+        services = std::make_unique<ServiceManager> (owner, RunMode::Standalone);
     }
 
     void freeAll()
@@ -110,7 +110,7 @@ Context::~Context()
 }
 
 //=============================================================================
-AppController& Context::getServices()
+ServiceManager& Context::getServices()
 {
     jassert (impl && impl->services);
     return *impl->services;

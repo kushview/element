@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/PresetsController.h"
-#include "controllers/GuiController.h"
+#include "services/presetservice.hpp"
+#include "services/guiservice.hpp"
 #include "gui/ContentComponent.h"
 #include "session/session.hpp"
 #include "session/presetmanager.hpp"
@@ -27,7 +27,7 @@
 
 namespace element {
 
-struct PresetsController::Pimpl
+struct PresetService::Pimpl
 {
     Pimpl() {}
     ~Pimpl() {}
@@ -37,30 +37,30 @@ struct PresetsController::Pimpl
     }
 };
 
-PresetsController::PresetsController()
+PresetService::PresetService()
 {
     pimpl.reset (new Pimpl());
 }
 
-PresetsController::~PresetsController()
+PresetService::~PresetService()
 {
     pimpl.reset (nullptr);
 }
 
-void PresetsController::activate()
+void PresetService::activate()
 {
 }
 
-void PresetsController::deactivate()
+void PresetService::deactivate()
 {
 }
 
-void PresetsController::refresh()
+void PresetService::refresh()
 {
     getWorld().getPresetManager().refresh();
 }
 
-void PresetsController::add (const Node& node, const String& presetName)
+void PresetService::add (const Node& node, const String& presetName)
 {
     const DataPath path;
     if (! node.savePresetTo (path, presetName))
@@ -74,7 +74,7 @@ void PresetsController::add (const Node& node, const String& presetName)
         getWorld().getPresetManager().refresh();
     }
 
-    if (auto* gui = findSibling<GuiController>())
+    if (auto* gui = findSibling<GuiService>())
         if (auto* cc = gui->getContentComponent())
             cc->stabilize (true);
 }

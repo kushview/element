@@ -23,7 +23,7 @@
 
 namespace element {
 
-class GuiController;
+class GuiService;
 class Node;
 
 class NodeProvider

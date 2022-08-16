@@ -29,7 +29,7 @@ class VolumeNodeEditor::ChannelStrip : public NodeChannelStripComponent,
                                        public AudioProcessorParameter::Listener
 {
 public:
-    ChannelStrip (GuiController& g)
+    ChannelStrip (GuiService& g)
         : NodeChannelStripComponent (g, false)
     {
         setVolumeMinMax (-30, 12, 0.5);
@@ -127,7 +127,7 @@ private:
     OptionalScopedPointer<CallOutBox> ioBox;
 };
 
-VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiController& gui)
+VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiService& gui)
     : NodeEditorComponent (node)
 {
     setOpaque (true);

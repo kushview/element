@@ -24,7 +24,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 class GraphEditorComponent;
 
 //=============================================================================
@@ -332,7 +332,7 @@ class BlockFactory
 {
 public:
     virtual ~BlockFactory() = default;
-    virtual BlockComponent* createBlockComponent (AppController& app, const Node& node) = 0;
+    virtual BlockComponent* createBlockComponent (ServiceManager& app, const Node& node) = 0;
 
 protected:
     BlockFactory() = default;

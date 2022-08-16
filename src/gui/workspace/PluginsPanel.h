@@ -31,7 +31,7 @@ public:
     PluginsPanel();
     ~PluginsPanel() = default;
 
-    void initializeView (AppController&) override;
+    void initializeView (ServiceManager&) override;
     void didBecomeActive() override;
     void stabilizeContent() override;
 

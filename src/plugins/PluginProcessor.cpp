@@ -17,11 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/EngineController.h"
-#include "controllers/GuiController.h"
-#include "controllers/SessionController.h"
-#include "controllers/MappingController.h"
-#include "controllers/DevicesController.h"
+#include "services/engineservice.hpp"
+#include "services/guiservice.hpp"
+#include "services/sessionservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/deviceservice.hpp"
 #include "engine/internalformat.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/session.hpp"
@@ -51,11 +51,11 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 }
 
 //=============================================================================
-#define enginectl controller->findChild<EngineController>()
-#define guictl controller->findChild<GuiController>()
-#define sessionctl controller->findChild<SessionController>()
-#define mapsctl controller->findChild<MappingController>()
-#define devsctl controller->findChild<DevicesController>()
+#define enginectl controller->findChild<EngineService>()
+#define guictl controller->findChild<GuiService>()
+#define sessionctl controller->findChild<SessionService>()
+#define mapsctl controller->findChild<MappingService>()
+#define devsctl controller->findChild<DeviceService>()
 
 //=============================================================================
 PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
@@ -103,7 +103,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
         PLUGIN_DBG ("[EL] couldn't create default graph");
     }
 
-    controller.reset (new AppController (*world, RunMode::Plugin));
+    controller.reset (new ServiceManager (*world, RunMode::Plugin));
     controller->activate();
     controllerActive = true;
 
@@ -313,7 +313,7 @@ bool PluginProcessor::hasEditor() const { return true; }
 
 AudioProcessorEditor* PluginProcessor::createEditor()
 {
-    if (auto* gui = controller->findChild<GuiController>())
+    if (auto* gui = controller->findChild<GuiService>())
         gui->stabilizeContent();
     return new PluginEditor (*this);
 }

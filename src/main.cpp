@@ -17,9 +17,9 @@
 */
 
 #include "ElementApp.h"
-#include "controllers/AppController.h"
-#include "controllers/GraphController.h"
-#include "controllers/SessionController.h"
+#include "services.hpp"
+#include "services/graphservice.hpp"
+#include "services/sessionservice.hpp"
 #include "engine/internalformat.hpp"
 #include "scripting.hpp"
 #include "session/devicemanager.hpp"
@@ -280,7 +280,7 @@ public:
         }
 
 #ifndef EL_SOLO
-        auto* sc = world->getServices().findChild<SessionController>();
+        auto* sc = world->getServices().findChild<SessionService>();
 
         if (world->getSettings().askToSaveSession())
         {
@@ -313,7 +313,7 @@ public:
         }
 
 #else // SE
-        auto* gc = world->getServices().findChild<GraphController>();
+        auto* gc = world->getServices().findChild<GraphService>();
         if (world->getSettings().askToSaveSession())
         {
             // - 0 if the third button was pressed ('cancel')
@@ -341,7 +341,7 @@ public:
             return;
 
 #ifndef EL_SOLO
-        if (auto* sc = world->getServices().findChild<SessionController>())
+        if (auto* sc = world->getServices().findChild<SessionService>())
         {
             const auto path = commandLine.unquoted().trim();
             if (File::isAbsolutePath (path))
@@ -354,7 +354,7 @@ public:
             }
         }
 #else
-        if (auto* gc = world->getServices().findChild<GraphController>())
+        if (auto* gc = world->getServices().findChild<GraphService>())
         {
             const auto path = commandLine.unquoted().trim();
             if (File::isAbsolutePath (path))
@@ -391,7 +391,7 @@ public:
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
 #ifndef EL_SOLO
-        if (auto* sc = world->getServices().findChild<SessionController>())
+        if (auto* sc = world->getServices().findChild<SessionService>())
         {
             const auto path = getCommandLineParameters();
             if (File::isAbsolutePath (path))

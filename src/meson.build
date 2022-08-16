@@ -1,7 +1,7 @@
 
 libelement_sources = '''
     bindings.cpp
-    capslock.cpp
+    gui/capslock.cpp
     commands.cpp
     context.cpp
     datapath.cpp
@@ -9,21 +9,19 @@ libelement_sources = '''
     module.cpp
     scripting.cpp
     settings.cpp
+    services.cpp
     strings.cpp
     utils.cpp
     version.cpp
-    
-    controllers/AppController.cpp
-    controllers/Controller.cpp
-    controllers/DevicesController.cpp
-    controllers/EngineController.cpp
-    controllers/GraphController.cpp
-    controllers/GuiController.cpp
-    controllers/MappingController.cpp
-    controllers/OSCController.cpp
-    controllers/PresetsController.cpp
-    controllers/ScriptingController.cpp
-    controllers/SessionController.cpp
+
+    services/deviceservice.cpp
+    services/engineservice.cpp
+    services/graphservice.cpp
+    services/guiservice.cpp
+    services/mappingservice.cpp
+    services/oscservice.cpp
+    services/presetservice.cpp
+    services/sessionservice.cpp
     
     documents/graphdocument.cpp
     documents/sessiondocument.cpp

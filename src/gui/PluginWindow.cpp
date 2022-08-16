@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/GuiController.h"
+#include "services/guiservice.hpp"
 #include "engine/nodeobject.hpp"
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
@@ -245,12 +245,12 @@ void PluginWindow::DelayedNodeFocus::timerCallback()
     {
         auto node = window.getNode();
         if (node.isValid())
-            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+            if (auto* const gui = cc->getServices().findChild<GuiService>())
                 gui->selectNode (node);
     }
 }
 
-PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
+PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     : DocumentWindow (n.getName(), LookAndFeel::backgroundColor, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
       gui (g),
       owner (n.getObject()),
@@ -360,8 +360,7 @@ void PluginWindow::activeWindowStatusChanged()
 
     if (nullptr == getContentComponent() || isActiveWindow())
         return;
-    if (auto* app = dynamic_cast<AppController*> (gui.getRoot()))
-        app->checkForegroundStatus();
+    gui.getServices().checkForegroundStatus();
 }
 
 void PluginWindow::updateGraphNode (NodeObject* newNode, Component* newEditor)

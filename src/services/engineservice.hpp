@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "session/node.hpp"
 
 namespace element {
@@ -28,12 +28,12 @@ struct ConnectionBuilder;
 class GraphManager;
 class RootGraphManager;
 
-class EngineController : public AppController::Child,
+class EngineService : public Service,
                          private ChangeListener
 {
 public:
-    EngineController();
-    ~EngineController();
+    EngineService();
+    ~EngineService();
 
     /** sync models with engine */
     void syncModels();

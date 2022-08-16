@@ -421,7 +421,7 @@ protected:
     void triggerPortReset();
 
 private:
-    friend class EngineController;
+    friend class EngineService;
     friend class GraphRender::ProcessBufferOp;
     friend class ProcessBufferOp;
     friend class GraphManager;

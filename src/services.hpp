@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "controllers/Controller.h"
 #include "session/commandmanager.hpp"
 #include "runmode.hpp"
 
@@ -27,17 +26,46 @@ namespace element {
 
 class Context;
 class Settings;
-class UnlockStatus;
-
 struct AppMessage;
+class ServiceManager;
 
-class AppController : public Controller,
-                      public MessageListener,
-                      protected ApplicationCommandTarget
+class Service
 {
 public:
-    AppController (Context&, RunMode mode = RunMode::Standalone);
-    ~AppController();
+    Service() {}
+    virtual ~Service()
+    {
+        owner = nullptr;
+    }
+
+    template <class T> inline T* findSibling() const;
+
+    virtual void initialize() {}
+    virtual void activate() {}
+    virtual void deactivate() {}
+    virtual void shutdown() {}
+    virtual void saveSettings() {}
+
+    ServiceManager& getServices() const;
+    Settings& getSettings();
+    Context& getWorld();
+    RunMode getRunMode() const;
+
+protected:
+    virtual bool handleMessage (const AppMessage&) { return false; }
+
+private:
+    friend class ServiceManager;
+    ServiceManager* owner = nullptr;
+};
+
+//=============================================================================
+class ServiceManager : public MessageListener,
+                       protected ApplicationCommandTarget
+{
+public:
+    ServiceManager (Context&, RunMode mode = RunMode::Standalone);
+    ~ServiceManager();
 
     /** Returns the running mode of this instance */
     RunMode getRunMode() const { return runMode; }
@@ -51,47 +79,38 @@ public:
     /** Returns the undo manager */
     inline UndoManager& getUndoManager() { return undo; }
 
+    /** Add a service */
+    void addChild (Service* service)
+    { 
+        service->owner = this;
+        services.add (service);
+    }
+
+    template <class T>
+    inline T* findChild() const
+    {
+        for (auto const* c : services)
+            if (T* t = const_cast<T*> (dynamic_cast<const T*> (c)))
+                return t;
+        return nullptr;
+    }
+
+    inline void saveSettings()
+    {
+        for (auto* s : services)
+            s->saveSettings();
+    }
+
     /** Child controllers should use this when files are opened and need
         to be saved in recent files.
     */
     inline void addRecentFile (const File& file) { recentFiles.addFile (file); }
 
     /** Activate this and children */
-    void activate() override;
+    void activate();
 
     /** Deactivate this and children */
-    void deactivate() override;
-
-    /** Sub controllers of the main app should inherrit this */
-    class Child : public Controller,
-                  protected ApplicationCommandTarget
-    {
-    public:
-        Child() {}
-        virtual ~Child() {}
-
-        inline AppController& getAppController() const
-        {
-            auto* const app = dynamic_cast<AppController*> (getRoot());
-            jassert (app); // if you hit this then you're probably calling
-                // this before controller initialization
-            return *app;
-        }
-
-        Settings& getSettings();
-        Context& getWorld();
-        RunMode getRunMode() const { return getAppController().getRunMode(); }
-
-    protected:
-        friend class AppController;
-        virtual bool handleMessage (const AppMessage&) { return false; }
-
-        friend class ApplicationCommandTarget;
-        virtual ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; }
-        virtual void getAllCommands (Array<CommandID>&) override {}
-        virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
-        virtual bool perform (const InvocationInfo&) override { return false; }
-    };
+    void deactivate();
 
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
 
@@ -108,6 +127,7 @@ protected:
 
 private:
     friend class Application;
+    OwnedArray<Service> services;
     File lastSavedFile;
     File lastExportedGraph;
     Context& world;
@@ -117,12 +137,18 @@ private:
     
     struct ForegroundCheck : public Timer
     {
-        ForegroundCheck (AppController& a) : app (a) {}
+        ForegroundCheck (ServiceManager& a) : app (a) {}
         void timerCallback() override;
-        AppController& app;
+        ServiceManager& app;
     } foregroundCheck;
 
     void run();
 };
+
+template <class T>
+inline T* Service::findSibling() const
+{
+    return (owner != nullptr) ? owner->findChild<T>() : nullptr;
+}
 
 } // namespace element

@@ -24,12 +24,12 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 
 class WorkspacesContentComponent : public ContentComponent
 {
 public:
-    WorkspacesContentComponent (AppController& app);
+    WorkspacesContentComponent (ServiceManager& app);
     ~WorkspacesContentComponent() noexcept;
 
     void resizeContent (const Rectangle<int>& area) override;

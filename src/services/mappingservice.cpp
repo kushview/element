@@ -17,9 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/MappingController.h"
-#include "controllers/DevicesController.h"
-#include "controllers/GuiController.h"
+#include "services/mappingservice.hpp"
+#include "services/deviceservice.hpp"
+#include "services/guiservice.hpp"
 #include "engine/mappingengine.hpp"
 #include "session/controllerdevice.hpp"
 #include "context.hpp"
@@ -225,7 +225,7 @@ private:
     }
 };
 
-class MappingController::Impl
+class MappingService::Impl
 {
 public:
     Impl() {}
@@ -249,43 +249,43 @@ public:
     ControllerDevice::Control control;
 };
 
-MappingController::MappingController()
+MappingService::MappingService()
 {
     impl.reset (new Impl());
 }
 
-MappingController::~MappingController()
+MappingService::~MappingService()
 {
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
     impl = nullptr;
 }
 
-void MappingController::activate()
+void MappingService::activate()
 {
-    Controller::activate();
+    Service::activate();
     auto& capture (impl->capture);
     capturedConnection = getWorld().getMappingEngine().capturedSignal().connect (
-        std::bind (&MappingController::onControlCaptured, this));
+        std::bind (&MappingService::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
-        std::bind (&MappingController::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
+        std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
     getWorld().getMappingEngine().startMapping();
 }
 
-void MappingController::deactivate()
+void MappingService::deactivate()
 {
-    Controller::deactivate();
+    Service::deactivate();
     getWorld().getMappingEngine().stopMapping();
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
 }
 
-bool MappingController::isLearning() const
+bool MappingService::isLearning() const
 {
     return impl && impl->learnState != CaptureStopped;
 }
 
-void MappingController::learn (const bool shouldLearn)
+void MappingService::learn (const bool shouldLearn)
 {
     auto& capture (impl->capture);
     auto& mapping (getWorld().getMappingEngine());
@@ -296,17 +296,17 @@ void MappingController::learn (const bool shouldLearn)
 
     if (shouldLearn)
     {
-        DBG ("[EL] MappingController: start learning");
+        DBG ("[EL] MappingService: start learning");
         impl->learnState = CaptureParameter;
         capture.addNodes (getWorld().getSession());
     }
 }
 
-void MappingController::onParameterCaptured (const Node& node, int parameter)
+void MappingService::onParameterCaptured (const Node& node, int parameter)
 {
     if (impl->learnState == CaptureParameter)
     {
-        DBG ("[EL] MappingController: got parameter: " << parameter);
+        DBG ("[EL] MappingService: got parameter: " << parameter);
         auto& mapping (getWorld().getMappingEngine());
         impl->learnState = CaptureControl;
         impl->node = node;
@@ -319,7 +319,7 @@ void MappingController::onParameterCaptured (const Node& node, int parameter)
     }
 }
 
-void MappingController::onControlCaptured()
+void MappingService::onControlCaptured()
 {
     auto session = getWorld().getSession();
 
@@ -330,7 +330,7 @@ void MappingController::onControlCaptured()
         impl->message = mapping.getCapturedMidiMessage();
         impl->control = mapping.getCapturedControl();
 
-        DBG ("[EL] MappingController: got control: " << impl->control.getName().toString());
+        DBG ("[EL] MappingService: got control: " << impl->control.getName().toString());
 
         if (impl->isCaptureComplete())
         {
@@ -344,7 +344,7 @@ void MappingController::onControlCaptured()
                 auto maps = session->getValueTree().getChildWithName (Tags::maps);
                 maps.addChild (newMap, -1, nullptr);
 
-                if (auto* gui = findSibling<GuiController>())
+                if (auto* gui = findSibling<GuiService>())
                     gui->stabilizeViews();
             }
         }
@@ -355,14 +355,14 @@ void MappingController::onControlCaptured()
     }
 }
 
-void MappingController::remove (const ControllerMap& controllerMap)
+void MappingService::remove (const ControllerMap& controllerMap)
 {
     auto session = getWorld().getSession();
     auto maps = session->getValueTree().getChildWithName (Tags::maps);
     if (controllerMap.getValueTree().isAChildOf (maps))
     {
         maps.removeChild (controllerMap.getValueTree(), nullptr);
-        if (auto* devs = findSibling<DevicesController>())
+        if (auto* devs = findSibling<DeviceService>())
             devs->refresh();
     }
 }

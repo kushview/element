@@ -24,7 +24,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 class Context;
 class MainMenu;
 
@@ -39,7 +39,7 @@ public:
 
     void refreshMenu();
     Context& getWorld() { return world; }
-    AppController& getAppController();
+    ServiceManager& getServices();
 
     void changeListenerCallback (ChangeBroadcaster* source) override;
     void activeWindowStatusChanged() override;

@@ -20,8 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"

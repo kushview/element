@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "gui/views/NodePortsTable.h"
 #include "gui/Artist.h"
 #include "gui/BlockComponent.h"
@@ -325,7 +325,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
     if (auto* cc = ViewHelpers::findContentComponent (this))
     {
         ScopedFlag block (panel->ignoreNodeSelected, true);
-        cc->getAppController().findChild<GuiController>()->selectNode (node);
+        cc->getServices().findChild<GuiService>()->selectNode (node);
     }
 
     if (e.mods.isPopupMenu())

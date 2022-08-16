@@ -17,17 +17,16 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/DevicesController.h"
-#include "controllers/EngineController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/deviceservice.hpp"
+#include "services/engineservice.hpp"
+#include "services/guiservice.hpp"
 #include "engine/graphmanager.hpp"
-#include "controllers/GraphController.h"
-#include "controllers/MappingController.h"
-#include "controllers/OSCController.h"
-#include "controllers/SessionController.h"
-#include "controllers/PresetsController.h"
-#include "controllers/ScriptingController.h"
+#include "services/graphservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/oscservice.hpp"
+#include "services/sessionservice.hpp"
+#include "services/presetservice.hpp"
 
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
@@ -42,42 +41,49 @@
 
 namespace element {
 
-Context& AppController::Child::getWorld() { return getAppController().getWorld(); }
-Settings& AppController::Child::getSettings() { return getWorld().getSettings(); }
+ServiceManager& Service::getServices() const
+{
+    jassert (owner != nullptr); // if you hit this then you're probably calling
+                                // this before controller initialization
+    return *owner;
+}
 
-AppController::AppController (Context& g, RunMode m)
+Context& Service::getWorld() { return getServices().getWorld(); }
+Settings& Service::getSettings() { return getWorld().getSettings(); }
+RunMode Service::getRunMode() const { return getServices().getRunMode(); }
+
+ServiceManager::ServiceManager (Context& g, RunMode m)
     : world (g), runMode (m), foregroundCheck (*this)
 {
-    addChild (new GuiController (g, *this));
-    addChild (new DevicesController());
-    addChild (new EngineController());
-    addChild (new MappingController());
-    addChild (new PresetsController());
-    addChild (new SessionController());
-    addChild (new GraphController());
-    addChild (new ScriptingController());
-    addChild (new OSCController());
+    addChild (new GuiService (g, *this));
+    addChild (new DeviceService());
+    addChild (new EngineService());
+    addChild (new MappingService());
+    addChild (new PresetService());
+    addChild (new SessionService());
+    addChild (new GraphService());
+    addChild (new OSCService());
 
     lastExportedGraph = DataPath::defaultGraphDir();
 
     auto& commands = getWorld().getCommandManager();
     commands.registerAllCommandsForTarget (this);
 #if 1
-    commands.registerAllCommandsForTarget (findChild<GuiController>());
+    commands.registerAllCommandsForTarget (findChild<GuiService>());
 #else
     // can't do this yet until all controllers have a reliable way to
     // return the next command target
     for (auto* ctl : getChildren())
-        if (auto* child = dynamic_cast<AppController::Child*> (ctl))
+        if (auto* child = dynamic_cast<Controller*> (ctl))
             commands.registerAllCommandsForTarget (child);
 #endif
 
     commands.setFirstCommandTarget (this);
 }
 
-AppController::~AppController() {}
+ServiceManager::~ServiceManager() {}
 
-void AppController::activate()
+void ServiceManager::activate()
 {
     // migrate global node midi programs.
     auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
@@ -96,10 +102,11 @@ void AppController::activate()
         recentFiles.restoreFromString (stream.readEntireStreamAsString());
     }
 
-    Controller::activate();
+    for (auto* s : services)
+        s->activate();
 }
 
-void AppController::deactivate()
+void ServiceManager::deactivate()
 {
     const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
     if (! recentList.existsAsFile())
@@ -107,23 +114,24 @@ void AppController::deactivate()
     if (recentList.exists())
         recentList.replaceWithText (recentFiles.toString(), false, false);
 
-    Controller::deactivate();
+    for (auto* s : services)
+        s->deactivate();
 }
 
-void AppController::run()
+void ServiceManager::run()
 {
     activate();
 
     // need content component parented for the following init routines
     // TODO: better controlled startup procedure
-    if (auto* gui = findChild<GuiController>())
+    if (auto* gui = findChild<GuiService>())
         gui->run();
 
     auto session = getWorld().getSession();
     Session::ScopedFrozenLock freeze (*session);
 
 #ifndef EL_SOLO
-    if (auto* sc = findChild<SessionController>())
+    if (auto* sc = findChild<SessionService>())
     {
         bool loadDefault = true;
 
@@ -141,7 +149,7 @@ void AppController::run()
             sc->openDefaultSession();
     }
 #else
-    if (auto* gc = findChild<GraphController>())
+    if (auto* gc = findChild<GraphService>())
     {
         bool loadDefaultGraph = true;
         if (world.getSettings().openLastUsedSession())
@@ -158,7 +166,7 @@ void AppController::run()
     }
 #endif
 
-    if (auto* gui = findChild<GuiController>())
+    if (auto* gui = findChild<GuiService>())
     {
         gui->stabilizeContent();
         const Node graph (session->getCurrentGraph());
@@ -174,14 +182,14 @@ void AppController::run()
     }
 }
 
-void AppController::handleMessage (const Message& msg)
+void ServiceManager::handleMessage (const Message& msg)
 {
-    auto* ec = findChild<EngineController>();
-    auto* gui = findChild<GuiController>();
-    auto* sess = findChild<SessionController>();
-    auto* devs = findChild<DevicesController>();
-    auto* maps = findChild<MappingController>();
-    auto* presets = findChild<PresetsController>();
+    auto* ec = findChild<EngineService>();
+    auto* gui = findChild<GuiService>();
+    auto* sess = findChild<SessionService>();
+    auto* devs = findChild<DeviceService>();
+    auto* maps = findChild<MappingService>();
+    auto* presets = findChild<PresetService>();
     jassert (ec && gui && sess && devs && maps && presets);
 
     bool handled = false; // final else condition will set false
@@ -200,9 +208,9 @@ void AppController::handleMessage (const Message& msg)
             return;
         }
 
-        for (auto* const child : getChildren())
+        for (auto* const child : services)
         {
-            if (auto* const acc = dynamic_cast<AppController::Child*> (child))
+            if (auto* const acc = dynamic_cast<Service*> (child))
                 handled = acc->handleMessage (*message);
             if (handled)
                 break;
@@ -287,7 +295,7 @@ void AppController::handleMessage (const Message& msg)
 #ifndef EL_SOLO
         sess->openFile (osm->file);
 #else
-        findChild<GraphController>()->openGraph (osm->file);
+        findChild<GraphService>()->openGraph (osm->file);
 #endif
         recentFiles.addFile (osm->file);
     }
@@ -361,12 +369,12 @@ void AppController::handleMessage (const Message& msg)
     }
 }
 
-ApplicationCommandTarget* AppController::getNextCommandTarget()
+ApplicationCommandTarget* ServiceManager::getNextCommandTarget()
 {
-    return findChild<GuiController>();
+    return findChild<GuiService>();
 }
 
-void AppController::getAllCommands (Array<CommandID>& cids)
+void ServiceManager::getAllCommands (Array<CommandID>& cids)
 {
     cids.addArray ({
         Commands::mediaNew,
@@ -407,15 +415,15 @@ void AppController::getAllCommands (Array<CommandID>& cids)
     cids.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
 
-void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
+void ServiceManager::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
-    findChild<GuiController>()->getCommandInfo (commandID, result);
+    findChild<GuiService>()->getCommandInfo (commandID, result);
     // for (auto* const child : getChildren())
-    //     if (auto* const appChild = dynamic_cast<AppController::Child*> (child))
+    //     if (auto* const appChild = dynamic_cast<Controller*> (child))
     //         appChild->getCommandInfo (commandID, result);
 }
 
-bool AppController::perform (const InvocationInfo& info)
+bool ServiceManager::perform (const InvocationInfo& info)
 {
     bool res = true;
     switch (info.commandID)
@@ -423,18 +431,18 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::undo: {
             if (undo.canUndo())
                 undo.undo();
-            if (auto* cc = findChild<GuiController>()->getContentComponent())
+            if (auto* cc = findChild<GuiService>()->getContentComponent())
                 cc->stabilizeViews();
-            findChild<GuiController>()->refreshMainMenu();
+            findChild<GuiService>()->refreshMainMenu();
         }
         break;
 
         case Commands::redo: {
             if (undo.canRedo())
                 undo.redo();
-            if (auto* cc = findChild<GuiController>()->getContentComponent())
+            if (auto* cc = findChild<GuiService>()->getContentComponent())
                 cc->stabilizeViews();
-            findChild<GuiController>()->refreshMainMenu();
+            findChild<GuiService>()->refreshMainMenu();
         }
         break;
 
@@ -442,32 +450,32 @@ bool AppController::perform (const InvocationInfo& info)
             FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);
             if (chooser.browseForFileToOpen())
             {
-                findChild<SessionController>()->openFile (chooser.getResult());
+                findChild<SessionService>()->openFile (chooser.getResult());
                 recentFiles.addFile (chooser.getResult());
             }
         }
         break;
 
         case Commands::sessionNew:
-            findChild<SessionController>()->newSession();
+            findChild<SessionService>()->newSession();
             break;
         case Commands::sessionSave:
-            findChild<SessionController>()->saveSession (false);
+            findChild<SessionService>()->saveSession (false);
             break;
         case Commands::sessionSaveAs:
-            findChild<SessionController>()->saveSession (true);
+            findChild<SessionService>()->saveSession (true);
             break;
         case Commands::sessionClose:
-            findChild<SessionController>()->closeSession();
+            findChild<SessionService>()->closeSession();
             break;
         case Commands::sessionAddGraph:
-            findChild<EngineController>()->addGraph();
+            findChild<EngineService>()->addGraph();
             break;
         case Commands::sessionDuplicateGraph:
-            findChild<EngineController>()->duplicateGraph();
+            findChild<EngineService>()->duplicateGraph();
             break;
         case Commands::sessionDeleteGraph:
-            findChild<EngineController>()->removeGraph();
+            findChild<EngineService>()->removeGraph();
             break;
 
         case Commands::transportPlay:
@@ -477,7 +485,7 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::importGraph: {
             FileChooser chooser ("Import Graph", lastExportedGraph, "*.elg");
             if (chooser.browseForFileToOpen())
-                findChild<SessionController>()->importGraph (chooser.getResult());
+                findChild<SessionService>()->importGraph (chooser.getResult());
         }
         break;
 
@@ -497,8 +505,8 @@ bool AppController::perform (const InvocationInfo& info)
             {
                 FileChooser chooser ("Export Graph", lastExportedGraph, "*.elg");
                 if (chooser.browseForFileToSave (true))
-                    findChild<SessionController>()->exportGraph (node, chooser.getResult());
-                if (auto* gui = findChild<GuiController>())
+                    findChild<SessionService>()->exportGraph (node, chooser.getResult());
+                if (auto* gui = findChild<GuiService>())
                     gui->stabilizeContent();
             }
         }
@@ -537,37 +545,37 @@ bool AppController::perform (const InvocationInfo& info)
             break;
 
         case Commands::graphNew:
-            findChild<GraphController>()->newGraph();
+            findChild<GraphService>()->newGraph();
             break;
         case Commands::graphOpen: {
             FileChooser chooser ("Open Graph", lastSavedFile, "*.elg", true, false);
             if (chooser.browseForFileToOpen())
             {
-                findChild<GraphController>()->openGraph (chooser.getResult());
+                findChild<GraphService>()->openGraph (chooser.getResult());
                 recentFiles.addFile (chooser.getResult());
             }
         }
         break;
         case Commands::graphSave:
-            findChild<GraphController>()->saveGraph (false);
+            findChild<GraphService>()->saveGraph (false);
             break;
         case Commands::graphSaveAs:
-            findChild<GraphController>()->saveGraph (true);
+            findChild<GraphService>()->saveGraph (true);
             break;
         case Commands::importSession: {
             FileChooser chooser ("Import Session Graph", lastSavedFile, "*.els", true, false);
             if (chooser.browseForFileToOpen())
             {
-                findChild<GraphController>()->openGraph (chooser.getResult());
+                findChild<GraphService>()->openGraph (chooser.getResult());
                 recentFiles.addFile (chooser.getResult());
-                findChild<GuiController>()->refreshMainMenu();
+                findChild<GuiService>()->refreshMainMenu();
             }
         }
         break;
 
         case Commands::recentsClear: {
             recentFiles.clear();
-            findChild<GuiController>()->refreshMainMenu();
+            findChild<GuiService>()->refreshMainMenu();
         }
         break;
 
@@ -579,7 +587,7 @@ bool AppController::perform (const InvocationInfo& info)
     return res;
 }
 
-void AppController::ForegroundCheck::timerCallback()
+void ServiceManager::ForegroundCheck::timerCallback()
 {
     static bool sIsForeground = true;
     auto foreground = Process::isForegroundProcess();
@@ -590,7 +598,7 @@ void AppController::ForegroundCheck::timerCallback()
         return;
 
     auto session  = app.getWorld().getSession();
-    auto& gui     = *app.findChild<GuiController>();
+    auto& gui     = *app.findChild<GuiService>();
     
     jassert (session);
     if (foreground)
@@ -608,7 +616,7 @@ void AppController::ForegroundCheck::timerCallback()
     stopTimer();
 }
 
-void AppController::checkForegroundStatus()
+void ServiceManager::checkForegroundStatus()
 {
     if (runMode != RunMode::Standalone || foregroundCheck.isTimerRunning())
         return;

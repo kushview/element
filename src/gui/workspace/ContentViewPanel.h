@@ -48,7 +48,7 @@ public:
 
     ~ContentViewPanel() {}
 
-    void initializeView (AppController& app) override { view.initializeView (app); }
+    void initializeView (ServiceManager& app) override { view.initializeView (app); }
     void didBecomeActive() override { view.didBecomeActive(); }
     void stabilizeContent() override { view.stabilizeContent(); }
 
@@ -162,7 +162,7 @@ public:
         resized();
         if (auto* cc = ViewHelpers::findContentComponent (this))
         {
-            view->initializeView (cc->getAppController());
+            view->initializeView (cc->getServices());
             view->willBecomeActive();
             view->didBecomeActive();
             view->stabilizeContent();
@@ -175,7 +175,7 @@ public:
             view->setBounds (getLocalBounds());
     }
 
-    void initializeView (AppController& app) override { if (view) view->initializeView (app); }
+    void initializeView (ServiceManager& app) override { if (view) view->initializeView (app); }
     void didBecomeActive() override { if (view) view->didBecomeActive(); }
     void stabilizeContent() override { if (view) view->stabilizeContent(); }
 

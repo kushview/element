@@ -18,7 +18,7 @@
 */
 
 #include "ElementApp.h"
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
@@ -163,7 +163,7 @@ void WorkspaceState::setMissing()
     stabilizePropertyString (Tags::name, "New Workspace");
 }
 
-Workspace::Workspace (Context& w, AppController& a, GuiController& g)
+Workspace::Workspace (Context& w, ServiceManager& a, GuiService& g)
     : world (w), app (a), gui (g)
 {
     // dock.registerPanelType (new GenericPanelType());

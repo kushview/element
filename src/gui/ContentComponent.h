@@ -28,7 +28,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 class BreadCrumbComponent;
 class ContentContainer;
 class Context;
@@ -47,7 +47,7 @@ public:
     ContentView();
     virtual ~ContentView();
 
-    virtual void initializeView (AppController&) {}
+    virtual void initializeView (ServiceManager&) {}
     virtual void willBeRemoved() {}
     virtual void willBecomeActive() {}
     virtual void didBecomeActive() {}
@@ -93,19 +93,19 @@ class ContentComponent : public Component,
                          public FileDragAndDropTarget
 {
 protected:
-    ContentComponent (AppController& app);
+    ContentComponent (ServiceManager& app);
 
 public:
     virtual ~ContentComponent() noexcept;
 
     /** Creates an appropriate content component based on the product that is running */
-    static ContentComponent* create (AppController&);
+    static ContentComponent* create (ServiceManager&);
 
     /** Post a message to the app controller */
     void post (Message*);
 
     /** Access to the app controller */
-    AppController& getAppController() { return controller; }
+    ServiceManager& getServices() { return controller; }
 
     /** Access to global objects */
     Context& getGlobals();
@@ -193,7 +193,7 @@ public:
     ApplicationCommandTarget* getNextCommandTarget() override;
 
 private:
-    AppController& controller;
+    ServiceManager& controller;
 
     struct Tooltips;
     SharedResourcePointer<Tooltips> tips;

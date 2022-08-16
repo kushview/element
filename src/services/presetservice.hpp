@@ -19,38 +19,27 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
-#include "documents/graphdocument.hpp"
-#include "signals.hpp"
+#include "services.hpp"
+#include "documents/sessiondocument.hpp"
+#include "session/session.hpp"
 
 namespace element {
 
-/** Responsible for creating new, opening, and saving graph files in
-    Element SE */
-class GraphController final : public AppController::Child
+class PresetService : public Service
 {
 public:
-    GraphController() = default;
-    ~GraphController() = default;
-
+    PresetService();
+    ~PresetService();
     void activate() override;
     void deactivate() override;
 
-    bool hasGraphChanged() const { return document.hasChangedSinceSaved(); }
-    const File getGraphFile() const { return document.getFile(); }
-    Node getGraph() const { return document.getGraph(); }
-
-    void openDefaultGraph();
-    void openGraph (const File& file);
-    void newGraph();
-    void saveGraph (const bool saveAs);
-    void loadGraph (const Node& graph);
-    Signal<void()> graphChanged;
+    void refresh();
+    void add (const Node& Node, const String& presetName = String());
 
 private:
-    GraphDocument document;
-    std::unique_ptr<Component> wizard;
-    void refreshOtherControllers();
+    friend struct Pimpl;
+    struct Pimpl;
+    std::unique_ptr<Pimpl> pimpl;
 };
 
 } // namespace element

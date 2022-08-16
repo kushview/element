@@ -151,7 +151,7 @@ private:
     inline ValueTree getControllerDevicesValueTree() const { return objectData.getChildWithName (Tags::controllers); }
     inline ValueTree getControllerMapsValueTree() const { return objectData.getChildWithName (Tags::maps); }
 
-    friend class SessionController;
+    friend class SessionService;
     friend class SessionImportWizard;
     friend struct ScopedFrozenLock;
     mutable bool freezeChangeNotification = false;

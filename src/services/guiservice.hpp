@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PreferencesComponent.h"
@@ -31,7 +31,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 class EngineControl;
 class Context;
 class ContentComponent;
@@ -39,13 +39,14 @@ class MainWindow;
 class PluginWindow;
 class SessionDocument;
 
-class GuiController : public AppController::Child,
-                      private ChangeListener
+class GuiService : public Service,
+                      public juce::ApplicationCommandTarget,
+                      private juce::ChangeListener
 {
 public:
     Signal<void()> nodeSelected;
-    GuiController (Context& w, AppController& a);
-    ~GuiController();
+    GuiService (Context& w, ServiceManager& a);
+    ~GuiService();
 
     void activate() override;
     void deactivate() override;
@@ -54,7 +55,7 @@ public:
     void run();
     CommandManager& commander();
 
-    AppController& getAppController() const { return controller; }
+    ServiceManager& getServices() const { return controller; }
     KeyListener* getKeyListener() const;
 
     void closeAllWindows();
@@ -138,7 +139,7 @@ public:
     }
 
 private:
-    AppController& controller;
+    ServiceManager& controller;
     Context& world;
     SessionRef sessionRef;
     OwnedArray<PluginWindow> pluginWindows;

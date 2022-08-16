@@ -19,17 +19,32 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
+#include "services.hpp"
+#include "session/controllerdevice.hpp"
 
 namespace element {
 
-class ScriptingController : public AppController::Child
+class DeviceService : public Service
 {
 public:
-    ScriptingController();
-    ~ScriptingController();
+    DeviceService();
+    ~DeviceService();
+
     void activate() override;
     void deactivate() override;
+
+    void add (const ControllerDevice&);
+    void add (const ControllerDevice&, const ControllerDevice::Control&);
+    void add (const File& file);
+    void remove (const ControllerDevice&);
+    void remove (const ControllerDevice&, const ControllerDevice::Control&);
+    void refresh (const ControllerDevice&);
+    void refresh();
+
+private:
+    class Impl;
+    friend class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace element

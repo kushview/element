@@ -138,7 +138,7 @@ void ScriptEditorView::reload()
     code.setSavePoint();
 }
 
-void ScriptEditorView::initializeView (AppController&)
+void ScriptEditorView::initializeView (ServiceManager&)
 {
     reload();
 }

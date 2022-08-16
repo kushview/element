@@ -23,7 +23,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 
 class SessionImportWizard final : public Component
 {

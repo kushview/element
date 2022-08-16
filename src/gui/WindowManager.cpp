@@ -18,7 +18,7 @@
 */
 
 #include "context.hpp"
-#include "controllers/GuiController.h"
+#include "services/guiservice.hpp"
 #include "engine/nodeobject.hpp"
 #include "engine/graphnode.hpp"
 #include "gui/NodeEditorFactory.h"
@@ -27,7 +27,7 @@
 
 namespace element {
 
-WindowManager::WindowManager (GuiController& g) : gui (g) {}
+WindowManager::WindowManager (GuiService& g) : gui (g) {}
 
 void WindowManager::onWindowClosed (Window* c)
 {

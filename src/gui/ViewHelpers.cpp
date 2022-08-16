@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "engine/graphmanager.hpp"
 #include "engine/audioengine.hpp"
 #include "gui/ContentComponent.h"
@@ -104,10 +104,10 @@ namespace ViewHelpers {
         return nullptr;
     }
 
-    GuiController* getGuiController (Component* c)
+    GuiService* getGuiController (Component* c)
     {
         if (auto* const cc = findContentComponent (c))
-            return cc->getAppController().findChild<GuiController>();
+            return cc->getServices().findChild<GuiService>();
         return nullptr;
     }
 
@@ -163,21 +163,21 @@ namespace ViewHelpers {
     void presentPluginWindow (Component* c, const Node& node)
     {
         if (auto* cc = findContentComponent (c))
-            if (auto* gui = cc->getAppController().findChild<GuiController>())
+            if (auto* gui = cc->getServices().findChild<GuiService>())
                 gui->presentPluginWindow (node);
     }
 
     void closePluginWindows (Component* c, const bool visible)
     {
         if (auto* cc = findContentComponent (c))
-            if (auto* gui = cc->getAppController().findChild<GuiController>())
+            if (auto* gui = cc->getServices().findChild<GuiService>())
                 gui->closeAllPluginWindows (visible);
     }
 
     void closePluginWindowsFor (Component* c, Node& node, const bool visible)
     {
         if (auto* cc = findContentComponent (c))
-            if (auto* gui = cc->getAppController().findChild<GuiController>())
+            if (auto* gui = cc->getServices().findChild<GuiService>())
                 gui->closePluginWindowsFor (node, visible);
     }
 

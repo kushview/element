@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/GuiController.h"
+#include "services/guiservice.hpp"
 #include "gui/Buttons.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
@@ -822,7 +822,7 @@ public:
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
         jassert (ViewHelpers::findContentComponent (this) != nullptr);
-        auto& app = ViewHelpers::findContentComponent (this)->getAppController();
+        auto& app = ViewHelpers::findContentComponent (this)->getServices();
 
         StringArray keys;
         Array<var> values;
@@ -1120,7 +1120,7 @@ ControllerDevicesView::ControllerDevicesView()
     addAndMakeVisible (content.get());
 }
 
-void ControllerDevicesView::initializeView (AppController& app)
+void ControllerDevicesView::initializeView (ServiceManager& app)
 {
     if (content)
         content->setSession (app.getWorld().getSession(), false);

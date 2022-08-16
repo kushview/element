@@ -23,7 +23,7 @@
 
 namespace element {
 
-class AppController;
+class ServiceManager;
 
 class WorkspacePanel : public DockPanel
 {
@@ -33,7 +33,7 @@ protected:
 public:
     virtual ~WorkspacePanel() {}
 
-    virtual void initializeView (AppController&) {}
+    virtual void initializeView (ServiceManager&) {}
     virtual void didBecomeActive() {}
     virtual void stabilizeContent() {}
 

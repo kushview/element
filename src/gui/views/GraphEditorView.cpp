@@ -150,10 +150,10 @@ void GraphEditorView::stabilizeContent()
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
         {
-            auto& gui = *cc->getAppController().findChild<GuiController>();
+            auto& gui = *cc->getServices().findChild<GuiService>();
             nodeSelectedConnection = gui.nodeSelected.connect (
                 std::bind (&GraphEditorView::onNodeSelected, this));
-            auto& eng = *cc->getAppController().findChild<EngineController>();
+            auto& eng = *cc->getServices().findChild<EngineService>();
             nodeRemovedConnection = eng.nodeRemoved.connect (
                 std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
         }
@@ -241,7 +241,7 @@ void GraphEditorView::onNodeSelected()
     if (auto* const cc = ViewHelpers::findContentComponent (this))
     {
         auto session = cc->getSession();
-        auto& gui = *cc->getAppController().findChild<GuiController>();
+        auto& gui = *cc->getServices().findChild<GuiService>();
         const auto selected = gui.getSelectedNode();
         if (selected.descendsFrom (getGraph()))
         {

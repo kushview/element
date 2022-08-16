@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "controllers/AppController.h"
-#include "controllers/EngineController.h"
+#include "services.hpp"
+#include "services/engineservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"

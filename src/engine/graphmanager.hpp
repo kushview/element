@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "controllers/Controller.h"
 #include "engine/audioengine.hpp"
 #include "engine/graphnode.hpp"
 #include "session/node.hpp"
@@ -29,8 +28,7 @@ namespace element {
 class PluginManager;
 class RootGraph;
 
-class GraphManager : public ChangeBroadcaster,
-                     public Controller
+class GraphManager : public ChangeBroadcaster
 {
 public:
     static const uint32 invalidNodeId = KV_INVALID_PORT;

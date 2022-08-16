@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
+#include "services.hpp"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/views/GraphMixerView.h"
 #include "gui/views/GraphMixerView.h"
@@ -36,7 +36,7 @@ class GraphMixerChannelStrip : public NodeChannelStripComponent,
 public:
     std::function<void()> onReordered;
 
-    GraphMixerChannelStrip (GuiController& gui) : NodeChannelStripComponent (gui, false)
+    GraphMixerChannelStrip (GuiService& gui) : NodeChannelStripComponent (gui, false)
     {
         onNodeChanged = [this]() { setNodeNameEditable (! (getNode().isIONode())); };
         listener.reset (new ChildListener (*this));
@@ -52,7 +52,7 @@ public:
     void selectInGuiController()
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
-            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+            if (auto* const gui = cc->getServices().findChild<GuiService>())
                 if (getNode() != gui->getSelectedNode())
                     gui->selectNode (getNode());
     }
@@ -190,7 +190,7 @@ private:
 class GraphMixerListBoxModel : public ListBoxModel
 {
 public:
-    GraphMixerListBoxModel (GuiController& g, HorizontalListBox& b) : gui (g), box (b) { refreshNodes(); }
+    GraphMixerListBoxModel (GuiService& g, HorizontalListBox& b) : gui (g), box (b) { refreshNodes(); }
     ~GraphMixerListBoxModel() {}
 
     int getNumRows() override
@@ -254,7 +254,7 @@ public:
     virtual MouseCursor getMouseCursorForRow (int row);
 #endif
 private:
-    GuiController& gui;
+    GuiService& gui;
     HorizontalListBox& box;
     NodeArray nodes;
     bool dragging = false;
@@ -263,7 +263,7 @@ private:
 class GraphMixerView::Content : public Component, public DragAndDropContainer
 {
 public:
-    Content (GraphMixerView& v, GuiController& gui, Session* sess)
+    Content (GraphMixerView& v, GuiService& gui, Session* sess)
         : session (sess), view (v)
     {
         setOpaque (true);
@@ -346,9 +346,9 @@ void GraphMixerView::stabilizeContent()
         content->stabilize();
 }
 
-void GraphMixerView::initializeView (AppController& app)
+void GraphMixerView::initializeView (ServiceManager& app)
 {
-    content.reset (new Content (*this, *app.findChild<GuiController>(), app.getGlobals().getSession()));
+    content.reset (new Content (*this, *app.findChild<GuiService>(), app.getGlobals().getSession()));
     addAndMakeVisible (content.get());
     content->stabilize();
 }

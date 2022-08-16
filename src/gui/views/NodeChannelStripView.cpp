@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"
@@ -31,7 +31,7 @@ namespace element {
 class NodeChannelStripView::Content : public NodeChannelStripComponent
 {
 public:
-    Content (GuiController& g)
+    Content (GuiService& g)
         : NodeChannelStripComponent (g)
     {
         bindSignals();
@@ -71,9 +71,9 @@ void NodeChannelStripView::stabilizeContent()
         content->nodeSelected();
 }
 
-void NodeChannelStripView::initializeView (AppController& app)
+void NodeChannelStripView::initializeView (ServiceManager& app)
 {
-    auto& gui = *app.findChild<GuiController>();
+    auto& gui = *app.findChild<GuiService>();
     content.reset (new Content (gui));
     addAndMakeVisible (content.get());
     resized();

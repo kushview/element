@@ -22,15 +22,14 @@
 
 #include "ElementApp.h"
 
-#include "controllers/AppController.h"
-#include "controllers/DevicesController.h"
-#include "controllers/EngineController.h"
-#include "controllers/GuiController.h"
-#include "controllers/GraphController.h"
-#include "controllers/MappingController.h"
-#include "controllers/SessionController.h"
-#include "controllers/PresetsController.h"
-#include "controllers/ScriptingController.h"
+#include "services.hpp"
+#include "services/deviceservice.hpp"
+#include "services/engineservice.hpp"
+#include "services/guiservice.hpp"
+#include "services/graphservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/sessionservice.hpp"
+#include "services/presetservice.hpp"
 
 #include "engine/nodes/NodeTypes.h"
 

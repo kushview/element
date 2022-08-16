@@ -19,8 +19,8 @@
 
 #include <memory>
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "engine/audioengine.hpp"
 #include "engine/midipipe.hpp"
 #include "gui/SystemTray.h"

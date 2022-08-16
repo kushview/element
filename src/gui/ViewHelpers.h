@@ -30,7 +30,7 @@ class ContentComponent;
 class Context;
 class Node;
 class NavigationConcertinaPanel;
-class GuiController;
+class GuiService;
 
 namespace ViewHelpers {
 
@@ -52,7 +52,7 @@ namespace ViewHelpers {
     AudioEnginePtr getAudioEngine (Component*);
 
     /** Get the GUI controller */
-    GuiController* getGuiController (Component* c);
+    GuiService* getGuiController (Component* c);
 
     /** Get World */
     Context* getGlobals (Component* c);
@@ -65,7 +65,7 @@ namespace ViewHelpers {
     /** Invoke a command directly */
     bool invokeDirectly (Component* c, const int commandID, bool async);
 
-    /** Post a message to AppController
+    /** Post a message to ServiceManager
  
     This works by finding the ContentComponent and letting it handle message posting.
     If the content component wasn't found, then the passed in Message will be deleted

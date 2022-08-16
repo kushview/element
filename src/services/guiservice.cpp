@@ -17,9 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
-#include "controllers/SessionController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
+#include "services/sessionservice.hpp"
 
 #include "engine/audioengine.hpp"
 
@@ -31,7 +31,7 @@
 #include "gui/SystemTray.h"
 #include "gui/views/VirtualKeyboardView.h"
 
-#include "capslock.hpp"
+#include "gui/capslock.hpp"
 #include "version.hpp"
 
 namespace element {
@@ -43,9 +43,9 @@ struct GlobalLookAndFeel
     element::LookAndFeel look;
 };
 
-struct GuiController::KeyPressManager : public KeyListener
+struct GuiService::KeyPressManager : public KeyListener
 {
-    KeyPressManager (GuiController& g) : owner (g) {}
+    KeyPressManager (GuiService& g) : owner (g) {}
     ~KeyPressManager() {}
 
     bool keyPressed (const KeyPress& key, Component* component) override
@@ -93,14 +93,14 @@ private:
         return false;
     }
 
-    GuiController& owner;
+    GuiService& owner;
 };
 
 static std::unique_ptr<GlobalLookAndFeel> sGlobalLookAndFeel;
-static Array<GuiController*> sGuiControllerInstances;
+static Array<GuiService*> sGuiControllerInstances;
 
-GuiController::GuiController (Context& w, AppController& a)
-    : AppController::Child(),
+GuiService::GuiService (Context& w, ServiceManager& a)
+    : Service(),
       controller (a),
       world (w),
       windowManager (nullptr),
@@ -113,20 +113,20 @@ GuiController::GuiController (Context& w, AppController& a)
     windowManager.reset (new WindowManager (*this));
 }
 
-GuiController::~GuiController()
+GuiService::~GuiService()
 {
     sGuiControllerInstances.removeFirstMatchingValue (this);
     if (sGuiControllerInstances.size() <= 0)
         sGlobalLookAndFeel = nullptr;
 }
 
-element::LookAndFeel& GuiController::getLookAndFeel()
+element::LookAndFeel& GuiService::getLookAndFeel()
 {
     jassert (sGlobalLookAndFeel);
     return sGlobalLookAndFeel->look;
 }
 
-void GuiController::saveProperties (PropertiesFile* props)
+void GuiService::saveProperties (PropertiesFile* props)
 {
     jassert (props);
 
@@ -148,13 +148,13 @@ void GuiController::saveProperties (PropertiesFile* props)
     }
 }
 
-void GuiController::activate()
+void GuiService::activate()
 {
     getWorld().getDeviceManager().addChangeListener (this);
-    Controller::activate();
+    Service::activate();
 }
 
-void GuiController::deactivate()
+void GuiService::deactivate()
 {
     getWorld().getDeviceManager().removeChangeListener (this);
     nodeSelected.disconnect_all_slots();
@@ -188,19 +188,19 @@ void GuiController::deactivate()
         content = nullptr;
     }
 
-    Controller::deactivate();
+    Service::deactivate();
 }
 
-void GuiController::closeAllWindows()
+void GuiService::closeAllWindows()
 {
     if (! windowManager)
         return;
     windowManager->closeAll();
 }
 
-CommandManager& GuiController::commander() { return world.getCommandManager(); }
+CommandManager& GuiService::commander() { return world.getCommandManager(); }
 
-void GuiController::runDialog (const String& uri)
+void GuiService::runDialog (const String& uri)
 {
     if (uri == "preferences")
     {
@@ -230,29 +230,29 @@ void GuiController::runDialog (const String& uri)
     }
 }
 
-void GuiController::closePluginWindow (PluginWindow* w)
+void GuiService::closePluginWindow (PluginWindow* w)
 {
     if (windowManager)
         windowManager->closePluginWindow (w);
 }
-void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible)
+void GuiService::closePluginWindowsFor (uint32 nodeId, const bool visible)
 {
     if (windowManager)
         windowManager->closeOpenPluginWindowsFor (nodeId, visible);
 }
-void GuiController::closeAllPluginWindows (const bool visible)
+void GuiService::closeAllPluginWindows (const bool visible)
 {
     if (windowManager)
         windowManager->closeAllPluginWindows (visible);
 }
 
-void GuiController::closePluginWindowsFor (const Node& node, const bool visible)
+void GuiService::closePluginWindowsFor (const Node& node, const bool visible)
 {
     if (! node.isGraph() && windowManager)
         windowManager->closeOpenPluginWindowsFor (node, visible);
 }
 
-void GuiController::runDialog (Component* c, const String& title)
+void GuiService::runDialog (Component* c, const String& title)
 {
     DialogOptions opts;
     opts.content.set (c, true);
@@ -263,9 +263,9 @@ void GuiController::runDialog (Component* c, const String& title)
             windowManager->push (dw);
 }
 
-void GuiController::showSplash() {}
+void GuiService::showSplash() {}
 
-ContentComponent* GuiController::getContentComponent()
+ContentComponent* GuiService::getContentComponent()
 {
     if (! content)
     {
@@ -276,19 +276,19 @@ ContentComponent* GuiController::getContentComponent()
     return content.get();
 }
 
-int GuiController::getNumPluginWindows() const
+int GuiService::getNumPluginWindows() const
 {
     return (nullptr != windowManager) ? windowManager->getNumPluginWindows()
                                       : 0;
 }
 
-PluginWindow* GuiController::getPluginWindow (const int window) const
+PluginWindow* GuiService::getPluginWindow (const int window) const
 {
     return (nullptr != windowManager) ? windowManager->getPluginWindow (window)
                                       : nullptr;
 }
 
-PluginWindow* GuiController::getPluginWindow (const Node& node) const
+PluginWindow* GuiService::getPluginWindow (const Node& node) const
 {
     for (int i = 0; i < getNumPluginWindows(); ++i)
         if (auto* const window = getPluginWindow (i))
@@ -297,7 +297,7 @@ PluginWindow* GuiController::getPluginWindow (const Node& node) const
     return nullptr;
 }
 
-void GuiController::showPluginWindowsFor (const Node& node, const bool recursive, const bool force, const bool focus)
+void GuiService::showPluginWindowsFor (const Node& node, const bool recursive, const bool force, const bool focus)
 {
     if (! node.isGraph())
     {
@@ -311,7 +311,7 @@ void GuiController::showPluginWindowsFor (const Node& node, const bool recursive
             showPluginWindowsFor (node.getNode (i), recursive, force, focus);
 }
 
-void GuiController::presentPluginWindow (const Node& node, const bool focus)
+void GuiService::presentPluginWindow (const Node& node, const bool focus)
 {
     if (! windowManager)
         return;
@@ -342,7 +342,7 @@ void GuiController::presentPluginWindow (const Node& node, const bool focus)
     }
 }
 
-bool GuiController::haveActiveWindows() const
+bool GuiService::haveActiveWindows() const
 {
     if (mainWindow && mainWindow->isActiveWindow())
         return true;
@@ -352,7 +352,7 @@ bool GuiController::haveActiveWindows() const
     return false;
 }
 
-void GuiController::run()
+void GuiService::run()
 {
     auto& settings = getWorld().getSettings();
     PropertiesFile* const pf = settings.getUserSettings();
@@ -381,24 +381,24 @@ void GuiController::run()
         mainWindow->removeFromDesktop();
     }
 
-    findSibling<SessionController>()->resetChanges();
+    findSibling<SessionService>()->resetChanges();
     refreshSystemTray();
     stabilizeViews();
 }
 
-SessionRef GuiController::session()
+SessionRef GuiService::session()
 {
     if (! sessionRef)
         sessionRef = world.getSession();
     return sessionRef;
 }
 
-ApplicationCommandTarget* GuiController::getNextCommandTarget()
+ApplicationCommandTarget* GuiService::getNextCommandTarget()
 {
     return nullptr;
 }
 
-void GuiController::getAllCommands (Array<CommandID>& commands)
+void GuiService::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
 #ifndef EL_SOLO
@@ -427,10 +427,10 @@ void GuiController::getAllCommands (Array<CommandID>& commands)
     getContentComponent()->getAllCommands (commands);
 }
 
-void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
+void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
     typedef ApplicationCommandInfo Info;
-    auto& app = getAppController();
+    auto& app = getServices();
 
     switch (commandID)
     {
@@ -669,13 +669,13 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
 
         case Commands::undo: {
-            int flags = getAppController().getUndoManager().canUndo() ? 0 : Info::isDisabled;
+            int flags = getServices().getUndoManager().canUndo() ? 0 : Info::isDisabled;
             result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier);
         }
         break;
         case Commands::redo: {
-            bool canRedo = getAppController().getUndoManager().canRedo();
+            bool canRedo = getServices().getUndoManager().canRedo();
             int flags = canRedo ? 0 : Info::isDisabled;
             result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
@@ -728,7 +728,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
     getContentComponent()->getCommandInfo (commandID, result);
 }
 
-bool GuiController::perform (const InvocationInfo& info)
+bool GuiService::perform (const InvocationInfo& info)
 {
     if (content && content->perform (info))
     {
@@ -794,7 +794,7 @@ bool GuiController::perform (const InvocationInfo& info)
     return result;
 }
 
-void GuiController::stabilizeContent()
+void GuiService::stabilizeContent()
 {
     if (auto* cc = content.get())
         cc->stabilize();
@@ -803,7 +803,7 @@ void GuiController::stabilizeContent()
         mainWindow->refreshName();
 }
 
-void GuiController::stabilizeViews()
+void GuiService::stabilizeViews()
 {
     if (auto* cc = content.get())
     {
@@ -814,20 +814,20 @@ void GuiController::stabilizeViews()
     }
 }
 
-void GuiController::refreshSystemTray()
+void GuiService::refreshSystemTray()
 {
     // stabilize systray
     auto& settings = getWorld().getSettings();
     SystemTray::setEnabled (settings.isSystrayEnabled());
 }
 
-void GuiController::refreshMainMenu()
+void GuiService::refreshMainMenu()
 {
     if (auto* win = mainWindow.get())
         win->refreshMenu();
 }
 
-void GuiController::toggleAboutScreen()
+void GuiService::toggleAboutScreen()
 {
     if (! about)
     {
@@ -852,9 +852,9 @@ void GuiController::toggleAboutScreen()
     }
 }
 
-KeyListener* GuiController::getKeyListener() const { return keys.get(); }
+KeyListener* GuiService::getKeyListener() const { return keys.get(); }
 
-bool GuiController::handleMessage (const AppMessage& msg)
+bool GuiService::handleMessage (const AppMessage& msg)
 {
     if (nullptr != dynamic_cast<const ReloadMainContentMessage*> (&msg))
     {
@@ -886,14 +886,14 @@ bool GuiController::handleMessage (const AppMessage& msg)
     return false;
 }
 
-void GuiController::changeListenerCallback (ChangeBroadcaster* broadcaster)
+void GuiService::changeListenerCallback (ChangeBroadcaster* broadcaster)
 {
     if (broadcaster == &getWorld().getDeviceManager())
         if (auto* win = mainWindow.get())
             win->refreshMenu();
 }
 
-void GuiController::clearContentComponent()
+void GuiService::clearContentComponent()
 {
     if (about)
     {

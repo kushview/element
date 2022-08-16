@@ -22,11 +22,6 @@
 #define EL_URL_HOME "https://kushview.net"
 
 //==============================================================================
-#define EL_URL_HELP_HOME "https://help.kushview.net"
-#define EL_URL_HELP_ELEMENT EL_URL_HELP_HOME "/collection/10-element"
-#define EL_URL_HELP_LICENSE_MANAGEMENT EL_URL_HELP_HOME "/article/35-license-management"
-#define EL_URL_HELP_ACTIVATION EL_URL_HELP_HOME "/article/61-online-activation"
-
 #define EL_URL_BUG_TRACKER "https://github.com/kushview/element/issues"
 #define EL_URL_DONATE EL_URL_HOME "/donate/"
 

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/OSCController.h"
+#include "services/oscservice.hpp"
 #include "session/commandmanager.hpp"
 #include "session/devicemanager.hpp"
 #include "commands.hpp"
@@ -105,10 +105,10 @@ private:
 };
 
 //=============================================================================
-class OSCController::Impl
+class OSCService::Impl
 {
 public:
-    Impl (OSCController& o)
+    Impl (OSCService& o)
         : owner (o) {}
     ~Impl() {}
 
@@ -173,7 +173,7 @@ public:
     int getHostPort() const { return serverPort; }
 
 private:
-    OSCController& owner;
+    OSCService& owner;
     OSCSender sender;
     OSCReceiver receiver { "elosc" };
 
@@ -187,17 +187,17 @@ private:
 
 //=============================================================================
 
-OSCController::OSCController()
+OSCService::OSCService()
 {
     impl.reset (new Impl (*this));
 }
 
-OSCController::~OSCController()
+OSCService::~OSCService()
 {
     impl.reset();
 }
 
-void OSCController::refreshWithSettings (bool alertOnFail)
+void OSCService::refreshWithSettings (bool alertOnFail)
 {
     auto& settings = getWorld().getSettings();
     impl->stopServer();
@@ -216,13 +216,13 @@ void OSCController::refreshWithSettings (bool alertOnFail)
     }
 }
 
-void OSCController::activate()
+void OSCService::activate()
 {
     impl->initialize();
     refreshWithSettings (false);
 }
 
-void OSCController::deactivate()
+void OSCService::deactivate()
 {
     impl->stopServer();
     impl->shutdown();

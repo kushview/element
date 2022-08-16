@@ -25,7 +25,7 @@
 namespace element {
 
 class ContentComponent;
-class GuiController;
+class GuiService;
 class NodeObject;
 
 /** A desktop window containing a plugin's UI. */
@@ -61,10 +61,10 @@ public:
     }
 
 protected:
-    PluginWindow (GuiController&, Component* const uiComp, const Node& node);
+    PluginWindow (GuiService&, Component* const uiComp, const Node& node);
 
 private:
-    GuiController& gui;
+    GuiService& gui;
     friend class WindowManager;
     NodeObject* owner;
     Node node;

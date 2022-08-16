@@ -41,7 +41,7 @@ public:
         beginTest("not flagged changed after session open and save");
         const auto sessionFile = getDataDir().getChildFile ("Sessions/Default.els");
         expect (sessionFile.existsAsFile());
-        auto* const controller = getAppController().findChild<SessionController>();
+        auto* const controller = getServices().findChild<SessionService>();
         controller->openFile (sessionFile);
         runDispatchLoop (40);
         expect (! controller->hasSessionChanged());

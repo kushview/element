@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/SessionController.h"
+#include "services/sessionservice.hpp"
 
 #include "engine/nodes/NodeTypes.h"
 
@@ -117,7 +117,7 @@ public:
     void showPluginWindow (bool showIt = true)
     {
         auto* const cc = ViewHelpers::findContentComponent (getOwnerView());
-        auto* const gui = cc != nullptr ? cc->getAppController().findChild<GuiController>() : nullptr;
+        auto* const gui = cc != nullptr ? cc->getServices().findChild<GuiService>() : nullptr;
         if (nullptr == gui)
             return;
 
@@ -136,7 +136,7 @@ public:
     {
         if (auto* const cc = ViewHelpers::findContentComponent (getOwnerView()))
         {
-            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+            if (auto* const gui = cc->getServices().findChild<GuiService>())
             {
                 if (auto* const window = gui->getPluginWindow (node))
                     gui->closePluginWindow (window);
@@ -162,7 +162,7 @@ public:
     {
         auto session = ViewHelpers::getSession (getOwnerView());
         auto* cc = ViewHelpers::findContentComponent (getOwnerView());
-        auto* gui = cc->getAppController().findChild<GuiController>();
+        auto* gui = cc->getServices().findChild<GuiService>();
         auto* const view = getOwnerView();
         auto* const tree = dynamic_cast<SessionTreePanel*> (view->getParentComponent());
         const bool hadFocus = view && view->hasKeyboardFocus (true);
@@ -182,8 +182,8 @@ public:
             gui->closeAllPluginWindows (true);
             auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
             graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
-            auto& app (ViewHelpers::findContentComponent (getOwnerView())->getAppController());
-            app.findChild<EngineController>()->setRootNode (root);
+            auto& app (ViewHelpers::findContentComponent (getOwnerView())->getServices());
+            app.findChild<EngineService>()->setRootNode (root);
             gui->showPluginWindowsFor (root, true, false, false);
         }
 
@@ -471,12 +471,12 @@ public:
     void deleteItem() override
     {
         const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
-        ViewHelpers::findContentComponent (getOwnerView())->getAppController().findChild<EngineController>()->removeGraph (index);
+        ViewHelpers::findContentComponent (getOwnerView())->getServices().findChild<EngineService>()->removeGraph (index);
     }
 
     void duplicateItem() override
     {
-        ViewHelpers::findContentComponent (getOwnerView())->getAppController().findChild<EngineController>()->duplicateGraph (node);
+        ViewHelpers::findContentComponent (getOwnerView())->getServices().findChild<EngineService>()->duplicateGraph (node);
     }
 
     void paintContent (Graphics& g, const Rectangle<int>& area) override
@@ -619,7 +619,7 @@ public:
 
         auto* world = ViewHelpers::getGlobals (getOwnerView());
         auto session = world->getSession();
-        auto& app (ViewHelpers::findContentComponent (getOwnerView())->getAppController());
+        auto& app (ViewHelpers::findContentComponent (getOwnerView())->getServices());
         const auto& desc (details.description);
 
         if (desc.toString() == "ccNavConcertinaPanel")
@@ -629,7 +629,7 @@ public:
             const auto file ((panel) ? panel->getSelectedFile() : File());
             if (file.hasFileExtension ("elg"))
             {
-                if (auto* sess = app.findChild<SessionController>())
+                if (auto* sess = app.findChild<SessionService>())
                     sess->importGraph (file);
             }
         }

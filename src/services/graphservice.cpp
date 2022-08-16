@@ -17,12 +17,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/DevicesController.h"
-#include "controllers/EngineController.h"
-#include "controllers/GraphController.h"
-#include "controllers/GuiController.h"
-#include "controllers/MappingController.h"
-#include "controllers/PresetsController.h"
+#include "services/deviceservice.hpp"
+#include "services/engineservice.hpp"
+#include "services/graphservice.hpp"
+#include "services/guiservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/presetservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/SessionImportWizard.h"
 #include "session/session.hpp"
@@ -32,14 +32,14 @@
 
 namespace element {
 
-void GraphController::activate()
+void GraphService::activate()
 {
     document.setSession (getWorld().getSession());
     document.setLastDocumentOpened (
         DataPath::defaultGraphDir().getChildFile ("Untitled.elg"));
 }
 
-void GraphController::deactivate()
+void GraphService::deactivate()
 {
     wizard.reset();
     if (auto* const props = getWorld().getSettings().getUserSettings())
@@ -47,10 +47,10 @@ void GraphController::deactivate()
             props->setValue (Settings::lastGraphKey, document.getFile().getFullPathName());
 }
 
-void GraphController::openDefaultGraph()
+void GraphService::openDefaultGraph()
 {
     GraphDocument::ScopedChangeStopper freeze (document, false);
-    if (auto* gc = findSibling<GuiController>())
+    if (auto* gc = findSibling<GuiService>())
         gc->closeAllPluginWindows();
 
     auto newGraph = Node::createDefaultGraph();
@@ -58,17 +58,17 @@ void GraphController::openDefaultGraph()
     graphChanged();
 
     refreshOtherControllers();
-    findSibling<GuiController>()->stabilizeContent();
+    findSibling<GuiService>()->stabilizeContent();
 }
 
-void GraphController::openGraph (const File& file)
+void GraphService::openGraph (const File& file)
 {
     if (file.hasFileExtension ("els"))
     {
         if (wizard != nullptr)
             wizard.reset();
         auto* const dialog = new SessionImportWizardDialog (wizard, file);
-        dialog->onGraphChosen = std::bind (&GraphController::loadGraph, this, std::placeholders::_1);
+        dialog->onGraphChosen = std::bind (&GraphService::loadGraph, this, std::placeholders::_1);
         return;
     }
 
@@ -76,9 +76,9 @@ void GraphController::openGraph (const File& file)
 
     if (result.wasOk())
     {
-        auto& gui = *findSibling<GuiController>();
+        auto& gui = *findSibling<GuiService>();
         GraphDocument::ScopedChangeStopper freeze (document, false);
-        findSibling<GuiController>()->closeAllPluginWindows();
+        findSibling<GuiService>()->closeAllPluginWindows();
         graphChanged();
         refreshOtherControllers();
 
@@ -90,25 +90,25 @@ void GraphController::openGraph (const File& file)
             cc->applySessionState (ui.getProperty ("content").toString());
         }
 
-        findSibling<GuiController>()->stabilizeContent();
-        getAppController().addRecentFile (file);
+        findSibling<GuiService>()->stabilizeContent();
+        getServices().addRecentFile (file);
     }
 }
 
-void GraphController::loadGraph (const Node& graph)
+void GraphService::loadGraph (const Node& graph)
 {
     document.saveIfNeededAndUserAgrees();
     document.setGraph (graph);
     document.setFile (File());
 
     GraphDocument::ScopedChangeStopper freeze (document, false);
-    findSibling<GuiController>()->closeAllPluginWindows();
+    findSibling<GuiService>()->closeAllPluginWindows();
     graphChanged();
     refreshOtherControllers();
-    findSibling<GuiController>()->stabilizeContent();
+    findSibling<GuiService>()->stabilizeContent();
 }
 
-void GraphController::newGraph()
+void GraphService::newGraph()
 {
     // - 0 if the third button was pressed ('cancel')
     // - 1 if the first button was pressed ('yes')
@@ -122,7 +122,7 @@ void GraphController::newGraph()
     if (res == 1 || res == 2)
     {
         GraphDocument::ScopedChangeStopper freeze (document, false);
-        findSibling<GuiController>()->closeAllPluginWindows();
+        findSibling<GuiService>()->closeAllPluginWindows();
 
         auto newGraph = Node::createDefaultGraph();
         document.setGraph (newGraph);
@@ -130,15 +130,15 @@ void GraphController::newGraph()
         graphChanged();
 
         refreshOtherControllers();
-        findSibling<GuiController>()->stabilizeContent();
+        findSibling<GuiService>()->stabilizeContent();
     }
 }
 
-void GraphController::saveGraph (const bool saveAs)
+void GraphService::saveGraph (const bool saveAs)
 {
     auto result = FileBasedDocument::userCancelledSave;
     auto session = getWorld().getSession();
-    auto& gui = *findSibling<GuiController>();
+    auto& gui = *findSibling<GuiService>();
 
     if (auto* const cc = gui.getContentComponent())
     {
@@ -172,19 +172,19 @@ void GraphController::saveGraph (const bool saveAs)
             us->setValue (Settings::lastGraphKey, document.getFile().getFullPathName());
         if (saveAs)
         {
-            getAppController().addRecentFile (document.getFile());
+            getServices().addRecentFile (document.getFile());
             document.getGraph().setProperty (Tags::name, 
                 document.getFile().getFileNameWithoutExtension());
         }
     }
 }
 
-void GraphController::refreshOtherControllers()
+void GraphService::refreshOtherControllers()
 {
-    findSibling<EngineController>()->sessionReloaded();
-    findSibling<DevicesController>()->refresh();
-    findSibling<MappingController>()->learn (false);
-    findSibling<PresetsController>()->refresh();
+    findSibling<EngineService>()->sessionReloaded();
+    findSibling<DeviceService>()->refresh();
+    findSibling<MappingService>()->learn (false);
+    findSibling<PresetService>()->refresh();
 }
 
 } // namespace element

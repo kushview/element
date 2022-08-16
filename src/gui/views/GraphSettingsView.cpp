@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/EngineController.h"
+#include "services.hpp"
+#include "services/engineservice.hpp"
 #include "engine/rootgraph.hpp"
 #include "engine/velocitycurve.hpp"
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"

@@ -17,10 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GraphController.h"
-#include "controllers/MappingController.h"
-#include "controllers/SessionController.h"
+#include "services.hpp"
+#include "services/graphservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/sessionservice.hpp"
 
 #include "gui/widgets/MidiBlinker.h"
 #include "gui/WorkspacesContentComponent.h"
@@ -58,7 +58,7 @@ ContentView::~ContentView()
 {
 }
 
-ContentComponent* ContentComponent::create (AppController& controller)
+ContentComponent* ContentComponent::create (ServiceManager& controller)
 {
     auto& s = controller.getGlobals().getSettings();
 
@@ -296,7 +296,7 @@ public:
         }
         else if (btn == &mapButton)
         {
-            if (auto* mapping = owner.getAppController().findChild<MappingController>())
+            if (auto* mapping = owner.getServices().findChild<MappingService>())
             {
                 mapping->learn (! mapButton.getToggleState());
                 mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
@@ -310,7 +310,7 @@ public:
 
     void timerCallback() override
     {
-        if (auto* mapping = owner.getAppController().findChild<MappingController>())
+        if (auto* mapping = owner.getServices().findChild<MappingService>())
         {
             if (! mapping->isLearning())
             {
@@ -334,7 +334,7 @@ private:
     Array<SignalConnection> connections;
     bool isPluginVersion() const
     {
-        return owner.getAppController().getRunMode() == RunMode::Plugin;
+        return owner.getServices().getRunMode() == RunMode::Plugin;
     }
 };
 
@@ -491,7 +491,7 @@ private:
     bool isPluginVersion()
     {
         if (auto* cc = ViewHelpers::findContentComponent (this))
-            return cc->getAppController().getRunMode() == RunMode::Plugin;
+            return cc->getServices().getRunMode() == RunMode::Plugin;
         return false;
     }
 };
@@ -502,7 +502,7 @@ struct ContentComponent::Tooltips
     ScopedPointer<TooltipWindow> tooltipWindow;
 };
 
-ContentComponent::ContentComponent (AppController& ctl_)
+ContentComponent::ContentComponent (ServiceManager& ctl_)
     : controller (ctl_)
 {
     setOpaque (true);
@@ -621,10 +621,10 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
             if (true)
             {
 #ifndef EL_SOLO
-                if (auto* sess = controller.findChild<SessionController>())
+                if (auto* sess = controller.findChild<SessionService>())
                     sess->importGraph (file);
 #else
-                if (auto* gc = controller.findChild<GraphController>())
+                if (auto* gc = controller.findChild<GraphService>())
                     gc->openGraph (file);
 #endif
             }

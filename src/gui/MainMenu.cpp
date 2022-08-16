@@ -17,11 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/DevicesController.h"
-#include "controllers/MappingController.h"
-#include "controllers/SessionController.h"
-#include "controllers/GraphController.h"
-#include "controllers/GuiController.h"
+#include "services/deviceservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/sessionservice.hpp"
+#include "services/graphservice.hpp"
+#include "services/guiservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
@@ -183,23 +183,23 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 2222)
     {
-        auto& app = owner.getAppController();
-        DBG ("has changed: " << (int) app.findChild<SessionController>()->hasSessionChanged());
+        auto& app = owner.getServices();
+        DBG ("has changed: " << (int) app.findChild<SessionService>()->hasSessionChanged());
     }
     else if (index == 3333)
     {
-        auto& app = owner.getAppController();
-        if (auto* mapping = app.findChild<MappingController>())
+        auto& app = owner.getServices();
+        if (auto* mapping = app.findChild<MappingService>())
             mapping->learn (true);
     }
     else if (index == 4444)
     {
         if (session)
             session->cleanOrphanControllerMaps();
-        auto& app = owner.getAppController();
-        if (auto* devices = app.findChild<DevicesController>())
+        auto& app = owner.getServices();
+        if (auto* devices = app.findChild<DeviceService>())
             devices->refresh();
-        if (auto* gui = app.findChild<GuiController>())
+        if (auto* gui = app.findChild<GuiService>())
             gui->stabilizeContent();
     }
     else if (index == 5555)
@@ -242,11 +242,11 @@ void MainMenu::menuItemSelected (int index, int menu)
     if (menu == File && index >= recentMenuOffset)
     {
         const int fileIdx = index - recentMenuOffset;
-        class File f = owner.getAppController().getRecentlyOpenedFilesList().getFile (fileIdx);
+        class File f = owner.getServices().getRecentlyOpenedFilesList().getFile (fileIdx);
 #ifndef EL_SOLO
-        owner.getAppController().findChild<SessionController>()->openFile (f);
+        owner.getServices().findChild<SessionService>()->openFile (f);
 #else
-        owner.getAppController().findChild<GraphController>()->openGraph (f);
+        owner.getServices().findChild<GraphService>()->openGraph (f);
 #endif
     }
 }
@@ -256,7 +256,7 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
     if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
     {
         PopupMenu recents;
-        auto& app (cc->getAppController());
+        auto& app (cc->getServices());
         auto& list (app.getRecentlyOpenedFilesList());
         if (list.getNumFiles() > 0)
         {

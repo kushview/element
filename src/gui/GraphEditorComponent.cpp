@@ -18,7 +18,7 @@
 */
 
 #include "ElementApp.h"
-#include "controllers/GraphController.h"
+#include "services/graphservice.hpp"
 #include "engine/graphmanager.hpp"
 
 #include "gui/GuiCommon.h"
@@ -71,7 +71,7 @@ public:
     DefaultBlockFactory (GraphEditorComponent& e)
         : editor (e) {}
 
-    BlockComponent* createBlockComponent (AppController& app, const Node& node) override
+    BlockComponent* createBlockComponent (ServiceManager& app, const Node& node) override
     {
         ignoreUnused (app);
         auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
@@ -1040,7 +1040,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
                 if (file.hasFileExtension (".elg"))
                 {
                     if (auto* cc = ViewHelpers::findContentComponent (this))
-                        if (auto* gc = cc->getAppController().findChild<GraphController>())
+                        if (auto* gc = cc->getServices().findChild<GraphService>())
                             gc->openGraph (file);
                     wasHandled = true;
                 }
@@ -1124,7 +1124,7 @@ void GraphEditorComponent::selectNode (const Node& nodeToSelect)
             updateSelection();
             if (auto* cc = ViewHelpers::findContentComponent (this))
             {
-                auto* gui = cc->getAppController().findChild<GuiController>();
+                auto* gui = cc->getServices().findChild<GuiService>();
                 if (gui->getSelectedNode() != nodeToSelect)
                     gui->selectNode (nodeToSelect);
             }
@@ -1191,7 +1191,7 @@ void GraphEditorComponent::updateSelection()
 BlockComponent* GraphEditorComponent::createBlock (const Node& node)
 {
     if (auto* cc = ViewHelpers::findContentComponent (this))
-        return factory->createBlockComponent (cc->getAppController(), node);
+        return factory->createBlockComponent (cc->getServices(), node);
     jassertfalse;
     return nullptr;
 }

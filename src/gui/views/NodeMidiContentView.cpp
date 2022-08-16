@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/GuiController.h"
+#include "services.hpp"
+#include "services/guiservice.hpp"
 #include "gui/LookAndFeel.h"
 #include "gui/properties/NodeProperties.h"
 #include "gui/views/NodeMidiContentView.h"
@@ -58,7 +58,7 @@ void NodeMidiContentView::stabilizeContent()
 {
     auto* cc = ViewHelpers::findContentComponent (this);
     jassert (cc);
-    auto& gui = *cc->getAppController().findChild<GuiController>();
+    auto& gui = *cc->getServices().findChild<GuiService>();
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
             &NodeMidiContentView::stabilizeContent, this));
