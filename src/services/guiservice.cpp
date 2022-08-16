@@ -99,12 +99,49 @@ private:
 static std::unique_ptr<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiService*> sGuiControllerInstances;
 
+//=============================================================================
+void GuiService::ForegroundCheck::timerCallback()
+{
+    static bool sIsForeground = true;
+    auto foreground = Process::isForegroundProcess();
+    if (sIsForeground == foreground)
+        return;
+
+    if (! ui.getSettings().hidePluginWindowsWhenFocusLost())
+        return;
+
+    auto session = ui.getWorld().getSession();    
+    jassert (session);
+    if (foreground)
+    {
+        if (session)
+            ui.showPluginWindowsFor (session->getCurrentGraph(), true, false);
+        ui.getMainWindow()->toFront (true);
+    }
+    else if (! foreground)
+    {
+        ui.closeAllPluginWindows();
+    }
+    
+    sIsForeground = foreground;
+    stopTimer();
+}
+
+void GuiService::checkForegroundStatus()
+{
+    if (getRunMode() != RunMode::Standalone || foregroundCheck.isTimerRunning())
+        return;
+    foregroundCheck.startTimer (50);
+}
+
+//=============================================================================
 GuiService::GuiService (Context& w, ServiceManager& a)
     : Service(),
       controller (a),
       world (w),
       windowManager (nullptr),
-      mainWindow (nullptr)
+      mainWindow (nullptr),
+      foregroundCheck (*this)
 {
     keys.reset (new KeyPressManager (*this));
     if (sGuiControllerInstances.size() <= 0)

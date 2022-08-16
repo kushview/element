@@ -138,6 +138,8 @@ public:
         nodeSelected();
     }
 
+    void checkForegroundStatus();
+
 private:
     ServiceManager& controller;
     Context& world;
@@ -152,6 +154,13 @@ private:
 
     struct KeyPressManager;
     std::unique_ptr<KeyPressManager> keys;
+
+    struct ForegroundCheck : public Timer
+    {
+        ForegroundCheck (GuiService& _ui) : ui (_ui) {}
+        void timerCallback() override;
+        GuiService& ui;
+    } foregroundCheck;
 
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;

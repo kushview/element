@@ -360,7 +360,7 @@ void PluginWindow::activeWindowStatusChanged()
 
     if (nullptr == getContentComponent() || isActiveWindow())
         return;
-    gui.getServices().checkForegroundStatus();
+    gui.checkForegroundStatus();
 }
 
 void PluginWindow::updateGraphNode (NodeObject* newNode, Component* newEditor)

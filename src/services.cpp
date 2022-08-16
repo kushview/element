@@ -53,7 +53,7 @@ Settings& Service::getSettings() { return getWorld().getSettings(); }
 RunMode Service::getRunMode() const { return getServices().getRunMode(); }
 
 ServiceManager::ServiceManager (Context& g, RunMode m)
-    : world (g), runMode (m), foregroundCheck (*this)
+    : world (g), runMode (m)
 {
     addChild (new GuiService (g, *this));
     addChild (new DeviceService());
@@ -65,19 +65,9 @@ ServiceManager::ServiceManager (Context& g, RunMode m)
     addChild (new OSCService());
 
     lastExportedGraph = DataPath::defaultGraphDir();
-
     auto& commands = getWorld().getCommandManager();
     commands.registerAllCommandsForTarget (this);
-#if 1
     commands.registerAllCommandsForTarget (findChild<GuiService>());
-#else
-    // can't do this yet until all controllers have a reliable way to
-    // return the next command target
-    for (auto* ctl : getChildren())
-        if (auto* child = dynamic_cast<Controller*> (ctl))
-            commands.registerAllCommandsForTarget (child);
-#endif
-
     commands.setFirstCommandTarget (this);
 }
 
@@ -175,7 +165,6 @@ void ServiceManager::run()
         if (graph.isValid())
         {
             // don't show plugin windows on load if the UI was hidden
-            // TODO: cleanup the boot up process for UI visibility
             if (props->getBoolValue ("mainWindowVisible", true))
                 gui->showPluginWindowsFor (graph);
         }
@@ -585,42 +574,6 @@ bool ServiceManager::perform (const InvocationInfo& info)
     }
 
     return res;
-}
-
-void ServiceManager::ForegroundCheck::timerCallback()
-{
-    static bool sIsForeground = true;
-    auto foreground = Process::isForegroundProcess();
-    if (sIsForeground == foreground)
-        return;
-            
-    if (! app.getWorld().getSettings().hidePluginWindowsWhenFocusLost())
-        return;
-
-    auto session  = app.getWorld().getSession();
-    auto& gui     = *app.findChild<GuiService>();
-    
-    jassert (session);
-    if (foreground)
-    {
-        if (session)
-            gui.showPluginWindowsFor (session->getCurrentGraph(), true, false);
-        gui.getMainWindow()->toFront (true);
-    }
-    else if (! foreground)
-    {
-        gui.closeAllPluginWindows();
-    }
-    
-    sIsForeground = foreground;
-    stopTimer();
-}
-
-void ServiceManager::checkForegroundStatus()
-{
-    if (runMode != RunMode::Standalone || foregroundCheck.isTimerRunning())
-        return;
-    foregroundCheck.startTimer (50);
 }
 
 } // namespace element

@@ -114,8 +114,6 @@ public:
 
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
 
-    void checkForegroundStatus();
-
 protected:
     friend class ApplicationCommandTarget;
     ApplicationCommandTarget* getNextCommandTarget() override;
@@ -134,13 +132,6 @@ private:
     RecentlyOpenedFilesList recentFiles;
     UndoManager undo;
     RunMode runMode;
-    
-    struct ForegroundCheck : public Timer
-    {
-        ForegroundCheck (ServiceManager& a) : app (a) {}
-        void timerCallback() override;
-        ServiceManager& app;
-    } foregroundCheck;
 
     void run();
 };

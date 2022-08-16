@@ -18,6 +18,7 @@
 */
 
 #include "services/graphservice.hpp"
+#include "services/guiservice.hpp"
 #include "services/sessionservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
@@ -154,8 +155,8 @@ void MainWindow::activeWindowStatusChanged()
 {
     if (nullptr == getContentComponent())
         return;
-    auto& app (getServices());
-    app.checkForegroundStatus();
+    auto& gui = *getServices().findChild<GuiService>();
+    gui.checkForegroundStatus();
 }
 
 void MainWindow::refreshMenu()
