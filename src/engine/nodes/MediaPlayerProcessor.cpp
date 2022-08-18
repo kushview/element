@@ -259,8 +259,8 @@ void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&
     {
         if (auto* const playhead = getPlayHead())
         {
-            AudioPlayHead::CurrentPositionInfo pos;
-            playhead->getCurrentPosition (pos);
+            auto pos = playhead->getPosition();
+            ignoreUnused (pos);
         }
     }
 
