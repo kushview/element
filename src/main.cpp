@@ -391,16 +391,12 @@ public:
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
 #ifndef EL_SOLO
-        if (auto* sc = world->getServices().findChild<SessionService>())
-        {
-            const auto path = getCommandLineParameters();
-            if (File::isAbsolutePath (path))
-            {
-                const File file (path);
-                if (file.hasFileExtension ("els"))
-                    sc->openFile (File (path));
-            }
-        }
+        const auto path = getCommandLineParameters();
+        const File sessionFile = File::isAbsolutePath (path) ? File (path)
+            : File::getCurrentWorkingDirectory().getChildFile(path);
+        if (sessionFile.hasFileExtension ("els"))
+            if (auto* sc = world->getServices().findChild<SessionService>())
+                sc->openFile (sessionFile);
 #endif
     }
 
