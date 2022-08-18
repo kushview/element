@@ -61,24 +61,9 @@ element_app = executable ('element', element_app_sources,
     link_with : [ libelement ])
 
 if host_machine.system() == 'linux'
-    custom_target ('desktop icon',
-        command : [ 'cp', '-f', '@INPUT@', '@OUTPUT@' ],
-        input   : 'data/ElementIcon_256x256.png',
-        output  : 'net.kushview.element.png',
-        install : true,
-        install_dir : get_option('datadir') / 'icons/hicolor/256x256/apps')
-    configure_file (
-        input: 'data/net.kushview.element.desktop.in',
-        output: 'net.kushview.element.desktop',
-        configuration : {
-            'ELEMENT_ICON' : 'net.kushview.element',
-            'ELEMENT_EXE'  : 'element'
-        },
-        install : true,
-        install_dir : get_option('datadir') / 'applications')
+    subdir ('tools/lindeploy')
 elif host_machine.system() == 'darwin'
-    install_data ('data/Icon.icns', install_dir : 'Contents/Resources')
-    install_data ('tools/macdeploy/Info.plist', install_dir : 'Contents')
+    subdir ('tools/macdeploy')
 elif host_machine.system() == 'windows'
     subdir ('tools/windeploy')
 endif
