@@ -723,8 +723,6 @@ private:
     MidiClock midiClock;
     MidiClockMaster midiClockMaster;
 
-    AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
-
     int latencySamples = 0;
 
     // GraphRender::locked must match this default value
@@ -927,16 +925,21 @@ bool AudioEngine::isUsingExternalClock() const
 
 void AudioEngine::processExternalPlayhead (AudioPlayHead* playhead, const int nframes)
 {
-    auto& pos (priv->hostPos);
-    playhead->getCurrentPosition (pos);
     auto& transport (priv->transport);
-    transport.requestTempo (pos.bpm);
-    transport.requestMeter (pos.timeSigNumerator, BeatType::fromPosition (pos));
-    transport.requestPlayState (pos.isPlaying);
-    transport.requestRecordState (pos.isRecording);
-    if (transport.getPositionFrames() != pos.timeInSamples)
-        transport.requestAudioFrame (pos.timeInSamples);
-
+    if (auto pos = playhead->getPosition())
+    {
+        if (auto bpm = pos->getBpm())
+            transport.requestTempo (*pos->getBpm());
+        if (auto timesig = pos->getTimeSignature())
+        {
+            transport.requestMeter (timesig->numerator, BeatType::fromDivisor (timesig->denominator));
+        }
+        transport.requestPlayState (pos->getIsPlaying());
+        transport.requestRecordState (pos->getIsRecording());
+        if (auto frameTime = pos->getTimeInSamples())
+            if (transport.getPositionFrames() != *frameTime)
+                transport.requestAudioFrame (*frameTime);
+    }
     transport.preProcess (0);
     transport.postProcess (0);
 }
