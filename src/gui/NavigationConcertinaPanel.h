@@ -26,6 +26,7 @@
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/SessionGraphsListBox.h"
+#include "gui/widgets/FileTreeView.h"
 #include "session/session.hpp"
 #include "session/node.hpp"
 #include "datapath.hpp"
@@ -245,8 +246,9 @@ public:
         list.reset (new DirectoryContentsList (&filter, thread));
         list->setDirectory (DataPath::defaultLocation(), true, true);
 
-        tree.reset (new FileTreeComponent (*list));
+        tree.reset (new FileTreeView (*list));
         addAndMakeVisible (tree.get());
+        tree->setDragNativeFiles (true);
         tree->addListener (this);
         tree->setItemHeight (20);
         tree->setIndentSize (10);
@@ -271,18 +273,18 @@ public:
         tree->setBounds (getLocalBounds().reduced (2));
     }
 
-    FileTreeComponent& getFileTreeComponent()
+    FileTreeView& getFileTree()
     {
         jassert (tree != nullptr);
         return *tree;
     }
-    File getSelectedFile() { return getFileTreeComponent().getSelectedFile(); }
+    File getSelectedFile() { return getFileTree().getSelectedFile(); }
     File getDirectory() { return (list) ? list->getDirectory() : File(); }
 
     void refresh()
     {
         auto state = tree->getOpennessState (true);
-        getFileTreeComponent().refresh();
+        getFileTree().refresh();
         if (state)
             tree->restoreOpennessState (*state, true);
     }
@@ -332,7 +334,7 @@ private:
         }
     } filter;
 
-    std::unique_ptr<FileTreeComponent> tree;
+    std::unique_ptr<FileTreeView> tree;
     std::unique_ptr<DirectoryContentsList> list;
     TimeSliceThread thread;
 
@@ -573,7 +575,7 @@ public:
         auto* dp = new DataPathTreeComponent();
         dp->setName ("UserDataPath");
         dp->setComponentID ("UserDataPath");
-        dp->getFileTreeComponent().setDragAndDropDescription ("ccNavConcertinaPanel");
+        dp->getFileTree().setDragAndDropDescription ("ccNavConcertinaPanel");
         addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
     }
 

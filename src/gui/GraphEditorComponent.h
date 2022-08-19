@@ -34,6 +34,7 @@ class PluginWindow;
 class GraphEditorComponent : public Component,
                              public ChangeListener,
                              public DragAndDropTarget,
+                             public FileDragAndDropTarget,
                              private ValueTree::Listener,
                              public ViewHelperMixin,
                              public LassoSource<uint32>
@@ -101,6 +102,9 @@ public:
     bool isInterestedInDragSource (const SourceDetails&) override;
     void itemDropped (const SourceDetails& details) override;
     bool shouldDrawDragImageWhenOver() override { return true; }
+
+    bool isInterestedInFileDrag (const StringArray& files) override;
+    void filesDropped (const StringArray& files, int x, int y) override;
 
     //=========================================================================
     std::function<void (BlockComponent&)> onBlockMoved;
