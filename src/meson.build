@@ -126,6 +126,7 @@ libelement_sources = '''
     gui/views/VirtualKeyboardView.cpp
     gui/widgets/AudioDeviceSelectorComponent.cpp
     gui/widgets/Console.cpp
+    gui/widgets/FileTreeView.cpp
     gui/widgets/HorizontalListBox.cpp
     gui/widgets/LuaConsole.cpp
     gui/widgets/MidiBlinker.cpp

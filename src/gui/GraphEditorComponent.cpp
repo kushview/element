@@ -966,6 +966,7 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
     }
 }
 
+//=============================================================================
 bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& details)
 {
     if (details.description.toString() == "ccNavConcertinaPanel")
@@ -1032,49 +1033,69 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
             }
             else if (file.hasFileExtension ("elg") || file.hasFileExtension ("elpreset"))
             {
-                const Node node (Node::parse (file));
-                bool wasHandled = false;
-
-#if defined(EL_SOLO)
-                // SE and LT Should just open graphs instead of trying to embed them
-                if (file.hasFileExtension (".elg"))
-                {
-                    if (auto* cc = ViewHelpers::findContentComponent (this))
-                        if (auto* gc = cc->getServices().findChild<GraphService>())
-                            gc->openGraph (file);
-                    wasHandled = true;
-                }
-#endif
-
-                if (! wasHandled && node.isValid())
-                {
-                    std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph, file));
-
-                    auto& builder (message->builder);
-                    if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
-                    {
-                        const auto audioInputNode = graph.getIONode (PortType::Audio, true);
-                        const auto midiInputNode = graph.getIONode (PortType::Midi, true);
-                        builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
-                        builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
-                        builder.addChannel (midiInputNode, PortType::Midi, 0, 0, false);
-                    }
-
-                    if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
-                    {
-                        const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
-                        const auto midiOutNode = graph.getIONode (PortType::Midi, false);
-                        builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
-                        builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
-                        builder.addChannel (midiOutNode, PortType::Midi, 0, 0, true);
-                    }
-                    postMessage (message.release());
-                }
+                filesDropped (StringArray (file.getFullPathName()), lastDropX, lastDropY);
             }
         }
     }
 }
 
+bool GraphEditorComponent::isInterestedInFileDrag (const StringArray& files)
+{
+    for (const auto& path : files)
+        if (File(path).hasFileExtension ("elg;elpreset"))
+            return true;
+    return false;
+}
+
+void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
+{
+    lastDropX = x;
+    lastDropY = y;
+    for (const auto& path : files)
+    {
+        const auto file = File (path);
+        const Node node (Node::parse (file));
+        bool wasHandled = false;
+
+    #if defined(EL_SOLO)
+        // SE and LT Should just open graphs instead of trying to embed them
+        if (file.hasFileExtension (".elg"))
+        {
+            if (auto* cc = ViewHelpers::findContentComponent (this))
+                if (auto* gc = cc->getServices().findChild<GraphService>())
+                    gc->openGraph (file);
+            wasHandled = true;
+        }
+    #endif
+
+        if (! wasHandled && node.isValid())
+        {
+            std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph, file));
+
+            auto& builder (message->builder);
+            if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
+            {
+                const auto audioInputNode = graph.getIONode (PortType::Audio, true);
+                const auto midiInputNode = graph.getIONode (PortType::Midi, true);
+                builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
+                builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
+                builder.addChannel (midiInputNode, PortType::Midi, 0, 0, false);
+            }
+
+            if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
+            {
+                const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
+                const auto midiOutNode = graph.getIONode (PortType::Midi, false);
+                builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
+                builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
+                builder.addChannel (midiOutNode, PortType::Midi, 0, 0, true);
+            }
+            postMessage (message.release());
+        }
+    }
+}
+
+//=============================================================================
 void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (child.hasType (Tags::node))
