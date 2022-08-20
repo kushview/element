@@ -2,18 +2,17 @@ project     = 'Element'
 title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
 file = {
-    'libs/lua',
+    'src/el',
     'scripts',
-    'src/engine/MidiPipe.cpp',
+    'src/engine/midipipe.cpp',
     exclude = {
         'docs/examples',
-        'libs/lua/element.lua',
-        'libs/lua/el/audio_buffer.hpp',
-        'libs/lua/el/midi_buffer.hpp',
-        'libs/lua/el/sol_helpers.hpp',
-        'libs/lua/el/lua-kv.hpp',
-        'libs/lua/el/lua-kv.h',
-    },
+        'src/el/audio_buffer.hpp',
+        'src/el/midi_buffer.hpp',
+        'src/el/sol_helpers.hpp',
+        'src/el/lua-kv.hpp',
+        'src/el/lua-kv.h'
+    }
 }
 examples = {
     'docs/examples/helloworld.lua',
@@ -23,7 +22,7 @@ examples = {
     'scripts/ampui.lua',
     'scripts/channelize.lua'
 }
-dir         = 'build/doc/lua'
+dir         = 'build-native/docs/lua'
 output      = 'index'
 merge       = true
 all         = false
