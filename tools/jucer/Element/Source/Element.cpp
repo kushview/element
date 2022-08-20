@@ -22,6 +22,6 @@
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new Element::PluginProcessor (
-        Element::PluginProcessor::Instrument, 16);
+    return new element::PluginProcessor (
+        element::PluginProcessor::Instrument, 16);
 }
