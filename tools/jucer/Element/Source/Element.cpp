@@ -18,7 +18,6 @@
 */
 
 #include "plugins/PluginProcessor.h"
-// #include "../../../libs/compat/BinaryData.cpp"
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
