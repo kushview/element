@@ -5,6 +5,7 @@ if host_machine.system() == 'windows'
 elif host_machine.system() == 'linux'
     element_vst3_name_suffix = 'so'
     element_vst3_bindir = run_command ('uname', '-m', capture : true, check : true).stdout().strip()
+    element_vst3_bindir += '-linux'
 elif host_machine.system() == 'darwin'
     element_vst3_name_suffix = ''
     element_vst3_bindir = 'MacOS'
