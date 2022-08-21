@@ -146,7 +146,8 @@
                 "${workspaceFolder}/libs/lua/src/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*"
+                "${workspaceFolder}/test/*",
+                "${workspaceFolder}/build-native/libs/compat/*"
             ],
             "defines": [
                 "_DEBUG",
