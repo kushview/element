@@ -1,7 +1,7 @@
 if aeffect_h_found
 element_vst2 = shared_module ('KV_Element', [
         '../../../tools/jucer/Element/Source/Element.cpp',
-        'client.cpp'
+        '../../vst2client.cpp'
     ],
     name_prefix : '',
     install : true,
