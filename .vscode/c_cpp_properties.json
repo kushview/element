@@ -86,8 +86,7 @@
             ],
             "includePath": [
                 "${workspaceRoot}/build/include/*",
-                "${workspaceRoot}/libs/element/src/*",
-                "${workspaceRoot}/libs/element/include/*",
+                "${workspaceRoot}/build/libs/compat/*",
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/JUCE/modules/*",
                 "${workspaceRoot}/libs/kv/modules/*",
@@ -108,6 +107,7 @@
                 "/usr/include/serd-0/*",
                 "/usr/include/sord-0/*",
                 "/usr/include/sratom-0/*",
+                "${workspaceFolder}/build/libs/compat/*",
                 "${workspaceFolder}/libs/lua/src/*",
                 "${workspaceFolder}/libs/sol/*",
                 "${workspaceFolder}/libs/JUCE/modules/*",
@@ -115,8 +115,7 @@
                 "${workspaceFolder}/libs/compat/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*",
-                "${workspaceFolder}/build-native/libs/compat/*"
+                "${workspaceFolder}/test/*"                
             ],
             "defines": [
                 "LUA_USE_READLINE=1",
@@ -134,7 +133,7 @@
             },
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "compileCommands": "${workspaceFolder}/build-native/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         },
         {
             "name": "Win32",
@@ -147,7 +146,7 @@
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
                 "${workspaceFolder}/test/*",
-                "${workspaceFolder}/build-native/libs/compat/*"
+                "${workspaceFolder}/build/libs/compat/*"
             ],
             "defines": [
                 "_DEBUG",
@@ -160,7 +159,7 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64",
-            "compileCommands": "build-native/compile_commands.json"
+            "compileCommands": "build/compile_commands.json"
         }
     ]
 }
