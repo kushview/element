@@ -46,3 +46,17 @@ element_fx_vst3 = shared_module ('KV_ElementFX', [
     cpp_args : [ '-DJucePlugin_Build_VST3=1' ],
     link_args : element_app_link_args,
     link_with : [ libelement ])
+
+configure_file (
+    input: '../plugin.plist.in',
+    output: 'Info-ElementFX-VST3.plist',
+    configuration : {
+        'BUNDLE_EXECUTABLE'    : 'KV_ElementFX.dylib',
+        'BUNDLE_ID'            : 'net.kushview.plugins.ElementFX',
+        'BUNDLE_NAME'          : 'KV_ElementFX',
+        'BUNDLE_DISPLAY_NAME'  : 'Element FX',
+        'BUNDLE_VERSION'       : meson.project_version(),
+    },
+    install : true,
+    install_dir : 'lib' / 'vst3' / 'KV_ElementFX.vst3' / 'Contents'
+)
