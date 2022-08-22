@@ -1,6 +1,6 @@
 if aeffect_h_found
 element_fx_vst2 = shared_module ('KV_ElementFX', [
-        '../../plugin.cpp',
+        '../plugin.cpp',
         '../../vst2client.cpp'
     ],
     name_prefix : '',
