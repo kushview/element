@@ -5,7 +5,7 @@ scripts_install_dir = get_option('datadir') / 'element/scripts'
 if host_machine.system() == 'windows'
     scripts_install_dir = get_option('bindir') / 'scripts'
 elif host_machine.system() == 'darwin'
-    scripts_install_dir = 'Contents/Resources/Scripts'
+    scripts_install_dir = 'Element.app/Contents/Resources/scripts'
 endif
 
 install_data (
