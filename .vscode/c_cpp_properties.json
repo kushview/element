@@ -86,8 +86,7 @@
             ],
             "includePath": [
                 "${workspaceRoot}/build/include/*",
-                "${workspaceRoot}/libs/element/src/*",
-                "${workspaceRoot}/libs/element/include/*",
+                "${workspaceRoot}/build-native/libs/compat/*",
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/JUCE/modules/*",
                 "${workspaceRoot}/libs/kv/modules/*",
