@@ -1,16 +1,4 @@
 
-if host_machine.system() == 'windows'
-    element_vst3_name_suffix = 'vst3'
-    element_vst3_bindir = 'x86_64-win'
-elif host_machine.system() == 'linux'
-    element_vst3_name_suffix = 'so'
-    element_vst3_bindir = run_command ('uname', '-m', capture : true, check : true).stdout().strip()
-    element_vst3_bindir += '-linux'
-elif host_machine.system() == 'darwin'
-    element_vst3_name_suffix = 'dylib'
-    element_vst3_bindir = 'MacOS'
-endif
-
 # Element Instrument
 element_vst3_install_dir = 'lib' / 'vst3' / 'KV_Element.vst3' / 'Contents' / element_vst3_bindir
 element_vst3 = shared_module ('KV_Element', [
@@ -34,10 +22,10 @@ configure_file (
     input: '../../plugin.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_ElementFX.dylib',
-        'BUNDLE_ID'            : 'net.kushview.plugins.ElementFX',
-        'BUNDLE_NAME'          : 'KV_ElementFX',
-        'BUNDLE_DISPLAY_NAME'  : 'Element FX',
+        'BUNDLE_EXECUTABLE'    : 'KV_Element.dylib',
+        'BUNDLE_ID'            : 'net.kushview.plugins.Element',
+        'BUNDLE_NAME'          : 'KV_Element',
+        'BUNDLE_DISPLAY_NAME'  : 'Element',
         'BUNDLE_VERSION'       : meson.project_version(),
     },
     install : true,
