@@ -93,5 +93,6 @@
         "typeinfo": "cpp",
         "bit": "cpp"
     },
-    "C_Cpp.intelliSenseMemoryLimit": 1024
+    "C_Cpp.intelliSenseMemoryLimit": 1024,
+    "mesonbuild.buildFolder": "build"
 }

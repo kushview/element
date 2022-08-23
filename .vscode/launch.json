@@ -21,8 +21,8 @@
             "type": "cppdbg",
             "request": "launch",
             "args": [],
-            "program": "${workspaceRoot}/build-native/element",
-            "cwd": "${workspaceFolder}/build-native",
+            "program": "${workspaceRoot}/build/element",
+            "cwd": "${workspaceFolder}/build",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
                 { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },
