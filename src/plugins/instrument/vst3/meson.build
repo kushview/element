@@ -1,11 +1,18 @@
 
 # Element Instrument
+element_vst3_sources = [
+    '../plugin.cpp',
+    '../../vst3client.cpp',
+    '../../utilities.cpp'
+]
+
+if host_machine.system() == 'darwin'
+    element_vst3_sources += '../../macvstutils.mm'
+endif
+
 element_vst3_install_dir = 'lib' / 'vst3' / 'KV_Element.vst3' / 'Contents' / element_vst3_bindir
-element_vst3 = shared_module ('KV_Element', [
-        '../plugin.cpp',
-        '../../vst3client.cpp',
-        '../../utilities.cpp'
-    ],
+element_vst3 = shared_module ('KV_Element',
+    element_vst3_sources,
     name_prefix : '',
     name_suffix : element_vst3_name_suffix,
     install : true,
@@ -14,6 +21,7 @@ element_vst3 = shared_module ('KV_Element', [
     dependencies : element_app_deps,
     include_directories : [ '..', libelement_includes ],
     cpp_args : [ '-DJucePlugin_Build_VST3=1' ],
+    objcpp_args : [ '-DJucePlugin_Build_VST3=1' ],
     link_args : element_app_link_args,
     link_with : [ libelement ])
 
