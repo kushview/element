@@ -4,10 +4,9 @@ from argparse import ArgumentParser
 from subprocess import call
 
 ap = ArgumentParser(description="Make the NSIS installer package")
-ap.add_argument ("--builddir", nargs=1, metavar="builddir", default=['.'], help="Use custom dist dir")
+ap.add_argument ("--builddir", nargs=1, metavar="builddir", default=['build'], help="Use custom dist dir")
 ap.add_argument ("--certificate", nargs=1, metavar="certificate", default=[''])
 ap.add_argument ("--password", nargs=1, metavar="password", default=[''])
-
 config = ap.parse_args()
 
 builddir = config.builddir[0]

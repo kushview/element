@@ -95,7 +95,8 @@
                 "${workspaceRoot}/test/*",
                 "/opt/kushview/include/*",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
-            ]
+            ],
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         },
         {
             "name": "Linux",
@@ -115,7 +116,7 @@
                 "${workspaceFolder}/libs/compat/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*"                
+                "${workspaceFolder}/test/*"
             ],
             "defines": [
                 "LUA_USE_READLINE=1",
