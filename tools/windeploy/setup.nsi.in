@@ -20,16 +20,16 @@
 !define ELEMENT_INSTDIR "$ProgramFiles64\Kushview\Element"
 
 !define ELEMENT_VST_DIR "$ProgramFiles64\VstPlugins"
-!define ELEMENT_VST_FILE "${BUILD_ROOT}\stage\lib\vst\KV_Element.dll"
-!define ELEMENT_VST_FX_FILE "${BUILD_ROOT}\stage\lib\vst\KV_ElementFX.dll"
+!define ELEMENT_VST_FILE "${BUILD_ROOT}\stage\lib\vst\KV-Element.dll"
+!define ELEMENT_VST_FX_FILE "${BUILD_ROOT}\stage\lib\vst\KV-Element-FX.dll"
 
 !define ELEMENT_VST3_DIR "$ProgramFiles64\Common Files\VST3"
-!define ELEMENT_VST3_FILE "${BUILD_ROOT}\stage\lib\vst3\KV_Element.vst3"
-!define ELEMENT_VST3_FX_FILE "${BUILD_ROOT}\stage\lib\vst3\KV_ElementFX.vst3"
+!define ELEMENT_VST3_FILE "${BUILD_ROOT}\stage\lib\vst3\KV-Element.vst3"
+!define ELEMENT_VST3_FX_FILE "${BUILD_ROOT}\stage\lib\vst3\KV-Element-FX.vst3"
 
 !define ELEMENT_AAX_DIR "$ProgramFiles64\Common Files\Avid\Audio\Plug-Ins"
-!define ELEMENT_AAX_FILE "${TOPDIR}\build\x64\Release\AAX\KV_Element.aaxplugin"
-!define ELEMENT_AAX_FX_FILE "${TOPDIR}\build\x64\Release\AAX\KV_ElementFX.aaxplugin"
+!define ELEMENT_AAX_FILE "${TOPDIR}\build\x64\Release\AAX\KV-Element.aaxplugin"
+!define ELEMENT_AAX_FX_FILE "${TOPDIR}\build\x64\Release\AAX\KV-Element-FX.aaxplugin"
 
 !define INSTALLER_ICON "${TOPDIR}\tools\windeploy\icon.ico"
 !define UNINSTALLER "@UNINSTALLER@"
@@ -190,14 +190,14 @@ Section "VST Plugin" SecVST
 SectionEnd
 
 Section "VST3 Plugin" SecVST3
-    SetOutPath "$VST3DIR\KV_Element.vst3"
+    SetOutPath "$VST3DIR\KV-Element.vst3"
     File /r "${ELEMENT_VST3_FILE}\*.vst3"
-    SetOutPath "$VST3DIR\KV_ElementFX.vst3"
+    SetOutPath "$VST3DIR\KV-Element-FX.vst3"
     File /r "${ELEMENT_VST3_FX_FILE}\*.vst3"
 SectionEnd
 
 ; Section "AAX Plugin" SecAAX
-;     SetOutPath "${ELEMENT_AAX_DIR}\KV_Element.aaxplugin"
+;     SetOutPath "${ELEMENT_AAX_DIR}\KV-Element.aaxplugin"
 ;     File /r "${ELEMENT_AAX_FILE}\*.*"
 ;     File /r "${ELEMENT_AAX_FX_FILE}\*.*"
 ; SectionEnd
@@ -232,13 +232,13 @@ Section "Uninstall"
     RmDir /r "$INSTDIR\Modules"
 
    !ifdef ELEMENT_PLUGINS
-    Delete "${ELEMENT_VST_DIR}\KV_Element.*"
-    RmDir /r "${ELEMENT_VST3_DIR}\KV_Element.vst3"
-    RmDir /r "${ELEMENT_AAX_DIR}\KV_Element.aaxplugin"
+    Delete "${ELEMENT_VST_DIR}\KV-Element.*"
+    RmDir /r "${ELEMENT_VST3_DIR}\KV-Element.vst3"
+    RmDir /r "${ELEMENT_AAX_DIR}\KV-Element.aaxplugin"
 
-    Delete "${ELEMENT_VST_DIR}\KV_ElementFX.*"
-    RmDir /r "${ELEMENT_VST3_DIR}\KV_ElementFX.vst3"
-    RmDir /r "${ELEMENT_AAX_DIR}\KV_ElementFX.aaxplugin"
+    Delete "${ELEMENT_VST_DIR}\KV-Element-FX.*"
+    RmDir /r "${ELEMENT_VST3_DIR}\KV-Element-FX.vst3"
+    RmDir /r "${ELEMENT_AAX_DIR}\KV-Element-FX.aaxplugin"
    !endif
    
     RmDir /r "$SMPROGRAMS\Kushview\Element"
