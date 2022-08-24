@@ -74,45 +74,12 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     }
 
     prepared = controllerActive = false;
-    world.reset (new Context());
-    world->setEngine (new AudioEngine (*world, RunMode::Plugin));
-    engine = world->getAudioEngine();
-    SessionPtr session = world->getSession();
-    Settings& settings (world->getSettings());
-    PluginManager& plugins (world->getPluginManager());
-    engine->applySettings (settings);
-
-    plugins.addDefaultFormats();
-    plugins.addFormat (new InternalFormat (*engine, world->getMidiEngine()));
-    plugins.addFormat (new ElementAudioPluginFormat (*world));
-    plugins.restoreUserPlugins (settings);
-
-    // The hosts WILL release and prepare the plugin frequently at any given
-    // time. plugins are handled different by each one, so it's best to keep
-    // our engine running at all times to reduce massive plugin unloads and
-    // re-loads back to back.
-    engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
-    session->clear();
-    if (MessageManager::getInstance()->isThisTheMessageThread())
-    {
-        session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
-        PLUGIN_DBG ("[EL] default graph created");
-    }
-    else
-    {
-        PLUGIN_DBG ("[EL] couldn't create default graph");
-    }
-
-    controller.reset (new ServiceManager (*world, RunMode::Plugin));
-    controller->activate();
-    controllerActive = true;
-
-    enginectl->sessionReloaded();
-    mapsctl->learn (false);
-    devsctl->refresh();
-    shouldProcess.set (true);
-
+    shouldProcess.set (false);
     asyncPrepare.reset (new AsyncPrepare (*this));
+    if (! juce::MessageManager::getInstance()->isThisTheMessageThread())
+        triggerAsyncUpdate();
+    else
+        initialize();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -158,7 +125,7 @@ const String PluginProcessor::getName() const
     return "Element";
 }
 
-bool PluginProcessor::acceptsMidi() const { return true; }
+bool PluginProcessor::acceptsMidi()  const { return true; }
 bool PluginProcessor::producesMidi() const { return true; }
 bool PluginProcessor::isMidiEffect() const { return variant == MidiEffect; }
 
@@ -319,7 +286,9 @@ AudioProcessorEditor* PluginProcessor::createEditor()
 }
 
 void PluginProcessor::getStateInformation (MemoryBlock& destData)
-{
+{   
+    if (! controllerActive)
+        return;
     if (auto session = world->getSession())
     {
         session->saveGraphState();
@@ -354,7 +323,8 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     PLUGIN_DBG ("[EL] restore state: prepared: " << (int) prepared);
-
+    if (! controllerActive)
+        return;
     auto session = world->getSession();
     auto engine = world->getAudioEngine();
     if (! session || ! shouldProcess.get())
@@ -419,9 +389,54 @@ void PluginProcessor::processorLayoutsChanged()
     triggerAsyncUpdate();
 }
 
+void PluginProcessor::initialize()
+{
+    if (controllerActive || ! MessageManager::getInstance()->isThisTheMessageThread())
+        return;
+    
+    world.reset (new Context());
+    world->setEngine (new AudioEngine (*world, RunMode::Plugin));
+    engine = world->getAudioEngine();
+    SessionPtr session = world->getSession();
+    Settings& settings (world->getSettings());
+    PluginManager& plugins (world->getPluginManager());
+    engine->applySettings (settings);
+
+    plugins.addDefaultFormats();
+    plugins.addFormat (new InternalFormat (*engine, world->getMidiEngine()));
+    plugins.addFormat (new ElementAudioPluginFormat (*world));
+    plugins.restoreUserPlugins (settings);
+
+    // The hosts WILL release and prepare the plugin frequently at any given
+    // time. plugins are handled different by each one, so it's best to keep
+    // our engine running at all times to reduce massive plugin unloads and
+    // re-loads back to back.
+    engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
+    session->clear();
+    if (MessageManager::getInstance()->isThisTheMessageThread())
+    {
+        session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
+        PLUGIN_DBG ("[EL] default graph created");
+    }
+    else
+    {
+        PLUGIN_DBG ("[EL] couldn't create default graph");
+    }
+
+    controller.reset (new ServiceManager (*world, RunMode::Plugin));
+    controller->activate();
+    controllerActive = true;
+
+    enginectl->sessionReloaded();
+    mapsctl->learn (false);
+    devsctl->refresh();
+    shouldProcess.set (true);
+}
+
 void PluginProcessor::handleAsyncUpdate()
 {
     PLUGIN_DBG ("[EL] handle async update");
+    initialize();
     reloadEngine();
 
     auto session = world->getSession();
