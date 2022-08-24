@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "plugins/PluginProcessor.h"
+#include "plugins/pluginprocessor.hpp"
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
     return new element::PluginProcessor (

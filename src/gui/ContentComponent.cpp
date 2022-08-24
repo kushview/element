@@ -42,7 +42,7 @@
 
 #include "gui/ContentComponent.h"
 
-#include "plugins/PluginEditor.h"
+#include "plugins/plugineditor.hpp"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0

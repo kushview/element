@@ -28,8 +28,8 @@
 #include "ElementApp.h"
 #include "settings.hpp"
 
-#include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "pluginprocessor.hpp"
+#include "plugineditor.hpp"
 
 // #define PLUGIN_DBG(msg) DBG(msg)
 #define PLUGIN_DBG(msg)

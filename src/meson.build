@@ -139,8 +139,8 @@ libelement_sources = '''
     gui/Workspace.cpp
     gui/WorkspacesContentComponent.cpp
     
-    plugins/PluginEditor.cpp
-    plugins/PluginProcessor.cpp
+    plugins/plugineditor.cpp
+    plugins/pluginprocessor.cpp
     
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp
