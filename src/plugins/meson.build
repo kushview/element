@@ -7,7 +7,7 @@ elif host_machine.system() == 'linux'
     element_vst3_bindir = run_command ('uname', '-m', capture : true, check : true).stdout().strip()
     element_vst3_bindir += '-linux'
 elif host_machine.system() == 'darwin'
-    element_vst3_name_suffix = 'dylib'
+    element_vst3_name_suffix = 'bundle'
     element_vst3_bindir = 'MacOS'
 endif
 
