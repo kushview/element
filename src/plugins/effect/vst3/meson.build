@@ -30,7 +30,7 @@ configure_file (
     input: '../../plugin.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_ElementFX.dylib',
+        'BUNDLE_EXECUTABLE'    : 'KV_ElementFX.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.ElementFX',
         'BUNDLE_NAME'          : 'KV_ElementFX',
         'BUNDLE_DISPLAY_NAME'  : 'Element FX',

@@ -30,7 +30,7 @@ configure_file (
     input: '../../plugin.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_Element.dylib',
+        'BUNDLE_EXECUTABLE'    : 'KV_Element.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.Element',
         'BUNDLE_NAME'          : 'KV_Element',
         'BUNDLE_DISPLAY_NAME'  : 'Element',

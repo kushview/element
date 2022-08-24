@@ -11,7 +11,10 @@ elif host_machine.system() == 'darwin'
     element_vst3_bindir = 'MacOS'
 endif
 
+subdir ('instrument/au')
 subdir ('instrument/vst2')
 subdir ('instrument/vst3')
+subdir ('effect/au')
 subdir ('effect/vst2')
 subdir ('effect/vst3')
+subdir ('midieffect/au')
