@@ -3,77 +3,13 @@
     "configurations": [
         {
             "name": "OSX",
-            "includePath": [
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                "/opt/kushview/include",
-                "/usr/local/include",
-                "/usr/local/Cellar/jack/0.125.0_3/include",
-                "${workspaceRoot}/libs/JUCE/modules",
-                "${workspaceRoot}/libs/kv/modules",
-                "${workspaceRoot}/libs/jlv2/modules",
-                "${workspaceRoot}/libs/compat",
-                "${workspaceRoot}/libs/lua",
-                "${workspaceRoot}/libs/lua/src",
-                "${workspaceRoot}/src",
-                "${workspaceRoot}/tests"
-            ],
-            "defines": [
-                "JUCE_PLUGINHOST_VST=1",
-                "JLV2_PLUGINHOST_LV2=1",
-                "VSCODE=1",
-                "EL_DOCKING=1",
-                "KV_DOCKING_WINDOWS=1",
-                "KV_JACK_AUDIO=1",
-                "HAVE_PYTHON=1",
-                "EL_USE_LOCAL_AUTH=1",
-                "EL_PRO=1"
-            ],
-            "forcedInclude": [
-                "${workspaceRoot}/.vscode/vscode.h"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "browse": {
-                "path": [
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/include",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                    "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                    "/usr/local/include",
-                    "/usr/local/Cellar/jack/0.125.0_3/include",
-                    "${workspaceRoot}/build/include/*",
-                    "${workspaceRoot}/libs/element/src/*",
-                    "${workspaceRoot}/libs/element/include/*",
-                    "${workspaceRoot}/libs/lua/*",
-                    "${workspaceRoot}/libs/JUCE/modules/*",
-                    "${workspaceRoot}/libs/kv/modules/*",
-                    "${workspaceRoot}/libs/compat/*",
-                    "${workspaceRoot}/src/*",
-                    "${workspaceRoot}/test/*"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            },
-            "macFrameworkPath": [
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
-            ],
-            "compilerPath": "/usr/bin/clang",
-            "cStandard": "c11",
-            "cppStandard": "c++17"
-        },
-        {
-            "name": "OSX Generic",
-            "intelliSenseMode": "${default}",
+            "intelliSenseMode": "macos-clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "defines": [
                 "JUCE_PLUGINHOST_VST=1",
-                "JLV2_PLUGINHOST_LV2=1",
-                "VSCODE=1",
+                "JUCE_PLUGINHOST_VST3=1",
+                "JUCE_PLUGINHOST_AU=1",
                 "EL_DOCKING=1",
                 "KV_DOCKING_WINDOWS=1",
                 "KV_JACK_AUDIO=1",
@@ -85,7 +21,6 @@
                 "${workspaceRoot}/.vscode/vscode.h"
             ],
             "includePath": [
-                "${workspaceRoot}/build/include/*",
                 "${workspaceRoot}/build/libs/compat/*",
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/JUCE/modules/*",
@@ -94,6 +29,8 @@
                 "${workspaceRoot}/src/*",
                 "${workspaceRoot}/test/*",
                 "/opt/kushview/include/*",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
             ],
             "compileCommands": "${workspaceFolder}/build/compile_commands.json"
