@@ -8,11 +8,11 @@ element_vst2_install_dir = 'lib' / 'vst'
 
 if host_machine.system() == 'darwin'
     element_vst2_sources += '../../macvstutils.mm'
-    element_vst2_contents_dir = element_vst2_install_dir / 'KV_Element.vst' / 'Contents'
+    element_vst2_contents_dir = element_vst2_install_dir / 'KV-Element.vst' / 'Contents'
     element_vst2_install_dir = element_vst2_contents_dir / 'MacOS'
 endif
 
-element_vst2 = shared_module ('KV_Element',
+element_vst2 = shared_module ('KV-Element',
     element_vst2_sources,
     name_prefix : '',
     install : true,
@@ -30,9 +30,9 @@ configure_file (
     input: '../../plugin.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_Element.bundle',
+        'BUNDLE_EXECUTABLE'    : 'KV-Element.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.Element',
-        'BUNDLE_NAME'          : 'KV_Element',
+        'BUNDLE_NAME'          : 'KV-Element',
         'BUNDLE_DISPLAY_NAME'  : 'Element',
         'BUNDLE_VERSION'       : meson.project_version(),
     },

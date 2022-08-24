@@ -8,11 +8,11 @@ element_fx_vst2_install_dir = 'lib' / 'vst'
 
 if host_machine.system() == 'darwin'
     element_fx_vst2_sources += '../../macvstutils.mm'
-    element_fx_vst2_contents_dir = element_fx_vst2_install_dir / 'KV_ElementFX.vst' / 'Contents'
+    element_fx_vst2_contents_dir = element_fx_vst2_install_dir / 'KV-Element-FX.vst' / 'Contents'
     element_fx_vst2_install_dir = element_fx_vst2_contents_dir / 'MacOS'
 endif
 
-element_fx_vst2 = shared_module ('KV_ElementFX',
+element_fx_vst2 = shared_module ('KV-Element-FX',
     element_fx_vst2_sources,
     name_prefix : '',
     install : true,
@@ -30,9 +30,9 @@ configure_file (
     input: '../../plugin.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_ElementFX.bundle',
+        'BUNDLE_EXECUTABLE'    : 'KV-Element-FX.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.ElementFX',
-        'BUNDLE_NAME'          : 'KV_ElementFX',
+        'BUNDLE_NAME'          : 'KV-Element-FX',
         'BUNDLE_DISPLAY_NAME'  : 'Element FX',
         'BUNDLE_VERSION'       : meson.project_version(),
     },

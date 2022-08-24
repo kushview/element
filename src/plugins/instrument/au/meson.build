@@ -10,11 +10,11 @@ element_au_install_dir = 'lib' / 'au'
 
 if host_machine.system() == 'darwin'
     element_au_sources += '../../macvstutils.mm'
-    element_au_contents_dir = element_au_install_dir / 'KV_Element.component' / 'Contents'
+    element_au_contents_dir = element_au_install_dir / 'KV-Element.component' / 'Contents'
     element_au_install_dir = element_au_contents_dir / 'MacOS'
 endif
 
-element_au = shared_module ('KV_Element',
+element_au = shared_module ('KV-Element',
     element_au_sources,
     name_prefix : '',
     name_suffix : 'bundle',
@@ -32,9 +32,9 @@ configure_file (
     input: '../../audiounit.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_Element.bundle',
+        'BUNDLE_EXECUTABLE'    : 'KV-Element.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.Element',
-        'BUNDLE_NAME'          : 'KV_Element',
+        'BUNDLE_NAME'          : 'KV-Element',
         'BUNDLE_DISPLAY_NAME'  : 'Element',
         'BUNDLE_VERSION'       : meson.project_version(),
     },
@@ -42,9 +42,9 @@ configure_file (
     install_dir : element_au_contents_dir
 )
 
-# custom_target ('KV_Element_rsrc',
+# custom_target ('KV-Element_rsrc',
 #     input : '../../auclient.r',
-#     output : 'KV_Element.rsrc',
+#     output : 'KV-Element.rsrc',
 #     command :  [ '/usr/bin/rez', '-o', '@OUTPUT@',
 #         '-d', 'x86_64_YES', 
 #         '-d', 'ppc_\$ppc',  '-d', 'i386_\$i386', '-d', 'ppc64_\$ppc64',

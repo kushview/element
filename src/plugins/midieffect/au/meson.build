@@ -10,11 +10,11 @@ element_mfx_au_install_dir = 'lib' / 'au'
 
 if host_machine.system() == 'darwin'
     element_mfx_au_sources += '../../macvstutils.mm'
-    element_mfx_au_contents_dir = element_mfx_au_install_dir / 'KV_ElementMFX.component' / 'Contents'
+    element_mfx_au_contents_dir = element_mfx_au_install_dir / 'KV-Element-MFX.component' / 'Contents'
     element_mfx_au_install_dir = element_mfx_au_contents_dir / 'MacOS'
 endif
 
-element_au = shared_module ('KV_ElementMFX',
+element_au = shared_module ('KV-Element-MFX',
     element_mfx_au_sources,
     name_prefix : '',
     name_suffix : 'bundle',
@@ -32,9 +32,9 @@ configure_file (
     input: '../../audiounit.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_ElementMFX.bundle',
+        'BUNDLE_EXECUTABLE'    : 'KV-Element-MFX.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.ElementMFX',
-        'BUNDLE_NAME'          : 'KV_ElementMFX',
+        'BUNDLE_NAME'          : 'KV-Element-MFX',
         'BUNDLE_DISPLAY_NAME'  : 'Element',
         'BUNDLE_VERSION'       : meson.project_version(),
     },

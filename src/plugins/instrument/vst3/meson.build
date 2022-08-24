@@ -10,8 +10,8 @@ if host_machine.system() == 'darwin'
     element_vst3_sources += '../../macvstutils.mm'
 endif
 
-element_vst3_install_dir = 'lib' / 'vst3' / 'KV_Element.vst3' / 'Contents' / element_vst3_bindir
-element_vst3 = shared_module ('KV_Element',
+element_vst3_install_dir = 'lib' / 'vst3' / 'KV-Element.vst3' / 'Contents' / element_vst3_bindir
+element_vst3 = shared_module ('KV-Element',
     element_vst3_sources,
     name_prefix : '',
     name_suffix : element_vst3_name_suffix,
@@ -30,13 +30,13 @@ configure_file (
     input: '../../plugin.plist.in',
     output: 'Info.plist',
     configuration : {
-        'BUNDLE_EXECUTABLE'    : 'KV_Element.bundle',
+        'BUNDLE_EXECUTABLE'    : 'KV-Element.bundle',
         'BUNDLE_ID'            : 'net.kushview.plugins.Element',
-        'BUNDLE_NAME'          : 'KV_Element',
+        'BUNDLE_NAME'          : 'KV-Element',
         'BUNDLE_DISPLAY_NAME'  : 'Element',
         'BUNDLE_VERSION'       : meson.project_version(),
     },
     install : true,
-    install_dir : 'lib' / 'vst3' / 'KV_Element.vst3' / 'Contents'
+    install_dir : 'lib' / 'vst3' / 'KV-Element.vst3' / 'Contents'
 )
 endif
