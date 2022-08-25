@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Waf Build",
+            "label": "Build",
             "type": "shell",
-            "command": "python waf build",
+            "command": "meson compile -C build",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -26,116 +26,6 @@
                     "message": 5
                 }
             }
-        },
-        {
-            "label": "Waf Check",
-            "type": "shell",
-            "command": "python waf check"
-        },
-        {
-            "label": "Waf Clean",
-            "type": "shell",
-            "command": "python waf clean"
-        },
-        {
-            "label": "Waf Rebuild",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "clean",
-                "build"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Docs",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "docs"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure (no jack, no lua)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--test",
-                "--without-jack",
-                "--without-lua",
-                "--debug"
-            ],
-            "options": {
-                "env": {
-                    "CXXFLAGS": "-I/usr/local/include -I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure (no jack)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--test",
-                "--without-jack",
-                "--debug"
-            ],
-            "options": {
-                "env": {
-                    "CXXFLAGS": "-I/usr/local/include -I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--test",
-                "--debug"
-            ],
-            "options": {
-                "env": {
-                    "CXXFLAGS": "-I/usr/local/include -I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure (workspaces)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--debug",
-                "--enable-docking"
-            ],
-            "options": {
-                "env": {
-                    "CXXFLAGS": "-I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
         }
     ]
 }

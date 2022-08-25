@@ -21,8 +21,8 @@
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/PluginWindow.h"
-#include "plugins/PluginEditor.h"
-#include "plugins/PluginProcessor.h"
+#include "plugineditor.hpp"
+#include "pluginprocessor.hpp"
 #include "ElementApp.h"
 
 #define EL_PLUGIN_MIN_WIDTH 546

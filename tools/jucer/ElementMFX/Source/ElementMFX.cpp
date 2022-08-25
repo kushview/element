@@ -18,10 +18,9 @@
 */
 
 #include "plugins/PluginProcessor.h"
-#include "../../../libs/compat/BinaryData.cpp"
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new Element::PluginProcessor (
-        Element::PluginProcessor::MidiEffect, 0);
+    return new element::PluginProcessor (
+        element::PluginProcessor::MidiEffect, 0);
 }

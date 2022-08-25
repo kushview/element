@@ -55,26 +55,31 @@ RunMode Service::getRunMode() const { return getServices().getRunMode(); }
 ServiceManager::ServiceManager (Context& g, RunMode m)
     : world (g), runMode (m)
 {
-    addChild (new GuiService (g, *this));
-    addChild (new DeviceService());
-    addChild (new EngineService());
-    addChild (new MappingService());
-    addChild (new PresetService());
-    addChild (new SessionService());
-    addChild (new GraphService());
-    addChild (new OSCService());
-
-    lastExportedGraph = DataPath::defaultGraphDir();
-    auto& commands = getWorld().getCommandManager();
-    commands.registerAllCommandsForTarget (this);
-    commands.registerAllCommandsForTarget (findChild<GuiService>());
-    commands.setFirstCommandTarget (this);
+    
 }
 
 ServiceManager::~ServiceManager() {}
 
 void ServiceManager::activate()
 {
+    if (services.size() <= 0)
+    {
+        addChild (new GuiService (world, *this));
+        addChild (new DeviceService());
+        addChild (new EngineService());
+        addChild (new MappingService());
+        addChild (new PresetService());
+        addChild (new SessionService());
+        addChild (new GraphService());
+        addChild (new OSCService());
+
+        lastExportedGraph = DataPath::defaultGraphDir();
+        auto& commands = getWorld().getCommandManager();
+        commands.registerAllCommandsForTarget (this);
+        commands.registerAllCommandsForTarget (findChild<GuiService>());
+        commands.setFirstCommandTarget (this);
+    }
+
     // migrate global node midi programs.
     auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
     auto olddir = DataPath::applicationDataDir().getChildFile ("NodeMidiPrograms");

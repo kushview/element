@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2021  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2022  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "plugins/PluginProcessor.h"
+#include "plugins/pluginprocessor.hpp"
 
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
     return new element::PluginProcessor (
         element::PluginProcessor::Effect, 16);
 }

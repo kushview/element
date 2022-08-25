@@ -31,7 +31,7 @@
 #include "context.hpp"
 #include "messages.hpp"
 
-#include "plugins/PluginEditor.h"
+#include "plugins/plugineditor.hpp"
 
 namespace element {
 namespace ViewHelpers {

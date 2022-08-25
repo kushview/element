@@ -470,11 +470,11 @@ private:
 
     std::unique_ptr<AsyncPrepare> asyncPrepare;
 
+    void initialize();
     friend class AsyncUpdater;
     void handleAsyncUpdate() override;
     void reloadEngine();
 
-    var hasCheckedLicense { 0 };
     int calculateLatencySamples() const;
     static BusesProperties createDefaultBuses (Variant variant, int numAux);
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)

@@ -60,6 +60,8 @@ element_app = executable ('element', element_app_sources,
     link_args : element_app_link_args,
     link_with : [ libelement ])
 
+subdir ('src/plugins')
+
 if host_machine.system() == 'linux'
     subdir ('tools/lindeploy')
 elif host_machine.system() == 'darwin'
