@@ -154,13 +154,16 @@ class FrameworkInfo(object):
 class ApplicationBundleInfo(object):
     def __init__(self, path):
         self.path = path
-        appName = os.path.basename(path).replace('.app', '')
+        appName = os.path.splitext(os.path.basename(path))[0]
+        
         self.binaryPath = os.path.join(path, "Contents", "MacOS", appName)
+        if not os.path.exists(self.binaryPath):
+            self.binaryPath = os.path.join(path, "Contents", "MacOS", appName + ".bundle")
         if not os.path.exists(self.binaryPath):
             appName = appName.replace (' ', '-').lower()
             self.binaryPath = os.path.join(path, "Contents", "MacOS", appName)
-            if not os.path.exists(self.binaryPath):
-                raise RuntimeError("Could not find bundle binary for " + path)
+        if not os.path.exists(self.binaryPath):
+            raise RuntimeError("Could not find bundle binary for " + path)
         self.resourcesPath = os.path.join(path, "Contents", "Resources")
         self.pluginPath = os.path.join(path, "Contents", "PlugIns")
 
@@ -492,6 +495,7 @@ ap.add_argument("-translations-dir", nargs=1, metavar="path", default=None, help
 ap.add_argument("-add-resources", nargs="+", metavar="path", default=[], help="list of additional files or folders to be copied into the bundle's resources; must be the last argument")
 ap.add_argument("-volname", nargs=1, metavar="volname", default=[], help="custom volume name for dmg")
 ap.add_argument("-distdir", nargs=1, metavar="distdir", default=[], help="Use custom dist dir")
+ap.add_argument("-no-clean", dest="clean", action="store_false", default=True, help="Dont clean distdir before deployment")
 config = ap.parse_args()
 
 verbose = config.verbose[0]
@@ -588,10 +592,9 @@ if len(config.distdir) == 1:
     distdir = config.distdir[0]
 else:
     distdir = "dist"
-if os.path.exists(distdir):
+if config.clean and os.path.exists(distdir):
     if verbose >= 2:
         print("+ Removing old dist folder +")
-    
     shutil.rmtree(distdir)
 
 # ------------------------------------------------
@@ -610,7 +613,10 @@ if verbose >= 2:
 if verbose >= 3:
     print(app_bundle, "->", target)
 
-os.mkdir(distdir)
+if not os.path.exists (distdir):
+    os.makedirs (distdir)
+if os.path.exists (target):
+    shutil.rmtree (target)
 shutil.copytree(app_bundle, target, symlinks=True)
 
 applicationBundle = ApplicationBundleInfo(target)
@@ -622,12 +628,12 @@ if verbose >= 2:
 
 try:
     deploymentInfo = deployFrameworksForAppBundle(applicationBundle, config.strip, verbose)
-    if deploymentInfo.qtPath is None:
-        deploymentInfo.qtPath = os.getenv("QTDIR", None)
-        if deploymentInfo.qtPath is None:
-            if verbose >= 1:
-                sys.stderr.write("Warning: Could not detect Qt's path, skipping plugin deployment!\n")
-            config.plugins = False
+    # if deploymentInfo.qtPath is None:
+    #     deploymentInfo.qtPath = os.getenv("QTDIR", None)
+    #     if deploymentInfo.qtPath is None:
+    #         if verbose >= 1:
+    #             sys.stderr.write("Warning: Could not detect Qt's path, skipping plugin deployment!\n")
+    #         config.plugins = False
 except RuntimeError as e:
     if verbose >= 1:
         sys.stderr.write("Error: %s\n" % str(e))
@@ -671,21 +677,21 @@ else:
 
 # ------------------------------------------------
 
-if verbose >= 2:
-    print("+ Installing qt.conf +")
+# if verbose >= 2:
+#     print("+ Installing qt.conf +")
 
-with open(os.path.join(applicationBundle.resourcesPath, "qt.conf"), "wb") as f:
-    f.write(qt_conf.encode())
+# with open(os.path.join(applicationBundle.resourcesPath, "qt.conf"), "wb") as f:
+#     f.write(qt_conf.encode())
 
 # ------------------------------------------------
 
-if len(add_qt_tr) > 0 and verbose >= 2:
-    print("+ Adding Qt translations +")
+# if len(add_qt_tr) > 0 and verbose >= 2:
+#     print("+ Adding Qt translations +")
 
-for lng_file in add_qt_tr:
-    if verbose >= 3:
-        print(os.path.join(qt_tr_dir, lng_file), "->", os.path.join(applicationBundle.resourcesPath, lng_file))
-    shutil.copy2(os.path.join(qt_tr_dir, lng_file), os.path.join(applicationBundle.resourcesPath, lng_file))
+# for lng_file in add_qt_tr:
+#     if verbose >= 3:
+#         print(os.path.join(qt_tr_dir, lng_file), "->", os.path.join(applicationBundle.resourcesPath, lng_file))
+#     shutil.copy2(os.path.join(qt_tr_dir, lng_file), os.path.join(applicationBundle.resourcesPath, lng_file))
 
 # ------------------------------------------------
 
