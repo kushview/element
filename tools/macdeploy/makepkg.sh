@@ -16,4 +16,6 @@ python tools/macdeploy/appbundle.py build/stage/lib/au/KV-Element-MFX.component 
 
 python tools/macdeploy/appbundle.py build/stage/Element.app -verbose 0  -distdir="build/dist" -no-clean
 
-/usr/local/bin/packagesbuild -v --build-folder="`pwd`/build/dist" tools/macdeploy/element.pkgproj
+/usr/local/bin/packagesbuild -v --build-folder="`pwd`/build/dmg" tools/macdeploy/element.pkgproj
+dmgname=$(python tools/version.py --before="element-osx-" --revision --after=".dmg")
+hdiutil create -srcfolder "build/dmg" -format "UDZO" -volname "Element" -ov "build/$dmgname"
