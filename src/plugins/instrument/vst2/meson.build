@@ -15,6 +15,7 @@ endif
 element_vst2 = shared_module ('KV-Element',
     element_vst2_sources,
     name_prefix : '',
+    name_suffix : host_machine.system() == 'darwin' ? 'bundle' : [],
     install : true,
     install_dir : element_vst2_install_dir,
     gnu_symbol_visibility : 'hidden',
