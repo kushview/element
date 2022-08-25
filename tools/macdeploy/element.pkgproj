@@ -3315,7 +3315,7 @@
 				</dict>
 			</array>
 			<key>NAME</key>
-			<string>element-unsigned</string>
+			<string>Install Element</string>
 			<key>PAYLOAD_ONLY</key>
 			<false/>
 			<key>TREAT_MISSING_PRESENTATION_DOCUMENTS_AS_WARNING</key>
