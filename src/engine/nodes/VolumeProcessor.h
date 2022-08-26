@@ -39,7 +39,7 @@ public:
                              .withOutput ("Main", _stereo ? AudioChannelSet::stereo() : AudioChannelSet::mono(), true)),
           stereo (_stereo)
     {
-        addParameter (volume = new AudioParameterFloat (Tags::volume.toString(),
+        addLegacyParameter (volume = new AudioParameterFloat (Tags::volume.toString(),
                                                         "Volume",
                                                         minDb,
                                                         maxDb,

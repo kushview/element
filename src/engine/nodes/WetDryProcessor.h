@@ -36,8 +36,8 @@ public:
         : BaseProcessor()
     {
         setPlayConfigDetails (4, 2, 44100.0, 1024);
-        addParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.f, 1.f, 0.33f));
-        addParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.f, 1.f, 0.40f));
+        addLegacyParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.f, 1.f, 0.33f));
+        addLegacyParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.f, 1.f, 0.40f));
     }
 
     virtual ~WetDryProcessor()

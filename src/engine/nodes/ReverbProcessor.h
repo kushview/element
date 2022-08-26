@@ -36,11 +36,11 @@ public:
         : BaseProcessor()
     {
         setPlayConfigDetails (2, 2, 44100.0, 1024);
-        addParameter (roomSize = new AudioParameterFloat ("roomSize", "Room Size", 0.0f, 1.0f, params.roomSize));
-        addParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.0f, 1.0f, params.damping));
-        addParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.0f, 1.0f, params.wetLevel));
-        addParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.0f, 1.0f, params.dryLevel));
-        addParameter (width = new AudioParameterFloat ("width", "Width", 0.0f, 1.0f, params.width));
+        addLegacyParameter (roomSize = new AudioParameterFloat ("roomSize", "Room Size", 0.0f, 1.0f, params.roomSize));
+        addLegacyParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.0f, 1.0f, params.damping));
+        addLegacyParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.0f, 1.0f, params.wetLevel));
+        addLegacyParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.0f, 1.0f, params.dryLevel));
+        addLegacyParameter (width = new AudioParameterFloat ("width", "Width", 0.0f, 1.0f, params.width));
     }
 
     virtual ~ReverbProcessor() {}

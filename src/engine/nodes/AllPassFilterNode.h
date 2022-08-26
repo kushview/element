@@ -81,7 +81,7 @@ public:
         : BaseProcessor(), stereo (_stereo)
     {
         setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1, 44100.0, 1024);
-        addParameter (length = new AudioParameterFloat ("length", "Buffer Length", 1.f, 500.f, 90.f));
+        addLegacyParameter (length = new AudioParameterFloat ("length", "Buffer Length", 1.f, 500.f, 90.f));
         lastLength = *length;
     }
 

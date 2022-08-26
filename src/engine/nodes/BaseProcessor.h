@@ -32,6 +32,13 @@ public:
         : AudioPluginInstance (ioLayouts) {}
     virtual ~BaseProcessor() {}
 
+protected:
+    /** This is for backward compatibility with juce 6. Don't use in new processors */
+    inline void addLegacyParameter (AudioProcessorParameter* param) {
+        if (auto* hp = dynamic_cast<HostedAudioProcessorParameter*> (param))
+            addHostedParameter (std::unique_ptr<HostedAudioProcessorParameter> (hp));
+        jassertfalse;
+    }
 #if 0
     // Audio Processor Template
     virtual const String getName() const = 0;

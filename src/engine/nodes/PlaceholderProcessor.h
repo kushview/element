@@ -79,7 +79,7 @@ public:
             {
                 String controlId = "control-";
                 controlId << controlIdx++;
-                addParameter (new AudioParameterFloat (controlId, port.getName(), 0, 1, 0));
+                addLegacyParameter (new AudioParameterFloat (controlId, port.getName(), 0, 1, 0));
             }
         }
     }

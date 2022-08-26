@@ -129,8 +129,8 @@ public:
         while (--numTracks >= 0)
             addStereoTrack();
         setRateAndBufferSizeDetails (sampleRate, bufferSize);
-        addParameter (masterMute = new AudioParameterBool ("masterMute", "Master Mute", false));
-        addParameter (masterVolume = new AudioParameterFloat ("masterVolume", "Master Volume", -120.0f, 12.0f, 0.f));
+        addLegacyParameter (masterMute = new AudioParameterBool ("masterMute", "Master Mute", false));
+        addLegacyParameter (masterVolume = new AudioParameterFloat ("masterVolume", "Master Volume", -120.0f, 12.0f, 0.f));
         masterMonitor = new Monitor (-1, 2);
     }
 

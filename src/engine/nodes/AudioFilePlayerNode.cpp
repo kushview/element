@@ -331,10 +331,10 @@ AudioFilePlayerNode::AudioFilePlayerNode()
     : BaseProcessor (BusesProperties()
                          .withOutput ("Main", AudioChannelSet::stereo(), true))
 {
-    addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
-    addParameter (slave = new AudioParameterBool ("slave", "Slave", false));
-    addParameter (volume = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
-    addParameter (looping = new AudioParameterBool ("loop", "Loop", false));
+    addLegacyParameter (playing = new AudioParameterBool ("playing", "Playing", false));
+    addLegacyParameter (slave = new AudioParameterBool ("slave", "Slave", false));
+    addLegacyParameter (volume = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
+    addLegacyParameter (looping = new AudioParameterBool ("loop", "Loop", false));
 
     for (auto* const param : getParameters())
         param->addListener (this);

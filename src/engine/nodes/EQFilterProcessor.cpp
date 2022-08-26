@@ -38,10 +38,10 @@ EQFilterProcessor::EQFilterProcessor (const int _numChannels)
     NormalisableRange<float> qRange (0.1f, 18.0f);
     qRange.setSkewForCentre (0.707f);
 
-    addParameter (freq = new AudioParameterFloat ("freq", "Cutoff Frequency [Hz]", freqRange, 1000.0f));
-    addParameter (q = new AudioParameterFloat ("q", "Filter Q", qRange, 0.707f));
-    addParameter (gainDB = new AudioParameterFloat ("gain", "Filter Gain [dB]", -15.0f, 15.0f, 0.0f));
-    addParameter (eqShape = new AudioParameterChoice ("shape", "EQ Shape", { "Bell", "Notch", "Hi Shelf", "Low Shelf", "HPF", "LPF" }, 0));
+    addLegacyParameter (freq = new AudioParameterFloat ("freq", "Cutoff Frequency [Hz]", freqRange, 1000.0f));
+    addLegacyParameter (q = new AudioParameterFloat ("q", "Filter Q", qRange, 0.707f));
+    addLegacyParameter (gainDB = new AudioParameterFloat ("gain", "Filter Gain [dB]", -15.0f, 15.0f, 0.0f));
+    addLegacyParameter (eqShape = new AudioParameterChoice ("shape", "EQ Shape", { "Bell", "Notch", "Hi Shelf", "Low Shelf", "HPF", "LPF" }, 0));
 }
 
 void EQFilterProcessor::fillInPluginDescription (PluginDescription& desc) const

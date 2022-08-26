@@ -47,7 +47,6 @@ else
 endif
 
 juce_conf_data.set10 ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', true)
-juce_conf_data.set10 ('JUCE_STANDALONE_APPLICATION', true)
 juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
 juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
 juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
@@ -143,8 +142,8 @@ if host_machine.system() == 'linux'
 elif host_machine.system() == 'darwin'
     deps += dependency ('appleframeworks', modules : [
         'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
-         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
-         'discrecording', 'iokit', 'quartzcore', 'metal' ])  
+        'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
+        'discrecording', 'iokit', 'quartzcore', 'metal' ])
     juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)     
 endif
 
@@ -181,7 +180,6 @@ jrc_cpp_args = '''
     -DJUCE_DISPLAY_SPLASH_SCREEN=0
     -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
     -DJUCE_MODULE_AVAILABLE_juce_core=1
-    -DJUCE_STANDALONE_APPLICATION=1
     -DJUCE_USE_CURL=0
     -DNDEBUG'''.split()
     

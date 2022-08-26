@@ -106,10 +106,10 @@ public:
           stereo (_stereo)
     {
         setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1, 44100.0, 1024);
-        addParameter (length = new AudioParameterFloat ("length", "Buffer Length", 1.f, 500.f, 90.f));
+        addLegacyParameter (length = new AudioParameterFloat ("length", "Buffer Length", 1.f, 500.f, 90.f));
         lastLength = *length;
-        addParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.f, 1.f, 0.f));
-        addParameter (feedback = new AudioParameterFloat ("feedback", "Feedback Level", 0.f, 1.f, 0.5f));
+        addLegacyParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.f, 1.f, 0.f));
+        addLegacyParameter (feedback = new AudioParameterFloat ("feedback", "Feedback Level", 0.f, 1.f, 0.5f));
     }
 
     virtual ~CombFilterProcessor()
