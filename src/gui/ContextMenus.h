@@ -201,14 +201,18 @@ public:
         NodeObjectPtr ptr = node.getObject();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
         addOversamplingSubmenu (menu);
-        addSubMenu (TRANS("Options"), menu, ptr != nullptr);
+        addSubMenu (TRANS ("Options"), menu, ptr != nullptr);
     }
 
     inline void addColorSubmenu (ColourSelector& selector)
     {
         PopupMenu color;
-        color.addCustomItem (std::numeric_limits<int>::max(), 
-            selector, 220, 300, false, nullptr);
+        color.addCustomItem (std::numeric_limits<int>::max(),
+                             selector,
+                             220,
+                             300,
+                             false,
+                             nullptr);
         addSubMenu (TRANS ("Color"), color, true);
     }
 
@@ -482,11 +486,11 @@ private:
     {
         SaveDefaultNodeOp (const Node& n)
             : node (n) {}
-        const Node node;       
+        const Node node;
         Message* createMessage()
         {
             return new SaveDefaultNodeMessage (node);
-        } 
+        }
     };
 
     struct ResetDefaultNodeOp : public ResultOp

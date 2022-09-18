@@ -79,8 +79,8 @@ public:
     void showPanel (const DockPanelInfo& info)
     {
         auto& dock = getDock();
-        const auto panelId      = info.identifier;
-        const auto singleton    = info.singleton;
+        const auto panelId = info.identifier;
+        const auto singleton = info.singleton;
 
         if (singleton)
         {
@@ -89,7 +89,10 @@ public:
             {
                 auto* p = dock.getPanel (i);
                 if (p->getType() == panelId)
-                    { panel = p; break; }
+                {
+                    panel = p;
+                    break;
+                }
             }
 
             if (panel != nullptr)
@@ -98,7 +101,7 @@ public:
                 return;
             }
         }
-        
+
         if (DockPlacement::isValid (info.placement))
         {
             dock.createItem (panelId, static_cast<DockPlacement> (info.placement));
@@ -119,7 +122,7 @@ public:
 
     const DockPanelInfo* findPanelInfo (const Identifier& panelID) const
     {
-        for (const auto* info : (*const_cast<Impl*>(this)).getDock().getPanelDescriptions())
+        for (const auto* info : (*const_cast<Impl*> (this)).getDock().getPanelDescriptions())
             if (info->identifier == panelID)
                 return info;
         return nullptr;
@@ -220,14 +223,12 @@ WorkspacesContentComponent::~WorkspacesContentComponent() noexcept
 
 void WorkspacesContentComponent::getAllCommands (Array<CommandID>& commands)
 {
-    commands.addArray ({
-        Commands::workspaceSave,
-        Commands::workspaceOpen,
-        Commands::workspaceResetActive,
-        Commands::workspaceSaveActive,
-        Commands::workspaceClassic,
-        Commands::workspaceEditing 
-    });
+    commands.addArray ({ Commands::workspaceSave,
+                         Commands::workspaceOpen,
+                         Commands::workspaceResetActive,
+                         Commands::workspaceSaveActive,
+                         Commands::workspaceClassic,
+                         Commands::workspaceEditing });
 }
 
 void WorkspacesContentComponent::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
@@ -273,8 +274,7 @@ bool WorkspacesContentComponent::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case Commands::workspaceSave: {
-            FileChooser chooser ("Save Workspace", impl->lastWorkspaceBrowsePath, 
-                "*.elw", true, false);
+            FileChooser chooser ("Save Workspace", impl->lastWorkspaceBrowsePath, "*.elw", true, false);
             if (chooser.browseForFileToSave (true))
             {
                 impl->lastWorkspaceBrowsePath = chooser.getResult().getParentDirectory();
@@ -284,8 +284,7 @@ bool WorkspacesContentComponent::perform (const InvocationInfo& info)
             break;
         }
         case Commands::workspaceOpen: {
-            FileChooser chooser ("Load Workspace", impl->lastWorkspaceBrowsePath,
-                "*.elw", true, false);
+            FileChooser chooser ("Load Workspace", impl->lastWorkspaceBrowsePath, "*.elw", true, false);
             if (chooser.browseForFileToOpen())
             {
                 impl->lastWorkspaceBrowsePath = chooser.getResult().getParentDirectory();
@@ -319,7 +318,7 @@ bool WorkspacesContentComponent::perform (const InvocationInfo& info)
     auto ID = impl->getPanelID (info.commandID);
     if (ID.isEmpty())
         return false;
-    
+
     if (const auto* info = impl->findPanelInfo (ID))
     {
         impl->showPanel (*info);
@@ -361,7 +360,7 @@ void WorkspacesContentComponent::applyWorkspaceState (const WorkspaceState& stat
     workspace.applyState (state);
 }
 
-#define EL_WORKSPACES_MENU_OFFSET   100000
+#define EL_WORKSPACES_MENU_OFFSET 100000
 void WorkspacesContentComponent::addWorkspaceItemsToMenu (PopupMenu& menu)
 {
     auto& dock = impl->getDock();
@@ -403,7 +402,7 @@ void WorkspacesContentComponent::restoreState (PropertiesFile*)
     if (! state.isValid())
         state = WorkspaceState::loadByName ("Classic");
     applyWorkspaceState (state);
-    
+
     if (auto* props = settings.getUserSettings())
         if (auto* vk = getVirtualKeyboardView())
             vk->restoreState (props);
@@ -458,7 +457,10 @@ void WorkspacesContentComponent::setMainView (ContentView* v)
         {
             auto* panel = item->getPanel (0);
             if (auto* ce = dynamic_cast<CodeEditorPanel*> (panel))
-                { ce->setView (sev); deleter.release(); }
+            {
+                ce->setView (sev);
+                deleter.release();
+            }
             // if (auto* selected = impl->getDock().getSelectedItem())
             //     item->dockTo (selected, DockPlacement::Center);
             impl->getDock().showPanel (panel);

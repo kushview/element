@@ -170,8 +170,8 @@ void GraphService::saveGraph (const bool saveAs)
         if (saveAs)
         {
             getServices().addRecentFile (document.getFile());
-            document.getGraph().setProperty (Tags::name, 
-                document.getFile().getFileNameWithoutExtension());
+            document.getGraph().setProperty (Tags::name,
+                                             document.getFile().getFileNameWithoutExtension());
         }
     }
 }

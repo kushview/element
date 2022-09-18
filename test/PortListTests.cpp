@@ -27,28 +27,26 @@ BOOST_AUTO_TEST_CASE (Types)
 {
     kv::PortList ports;
     int index = 0;
-    for (int control = 0; control < 16; ++control)
-    {
-        String symbol = "control_"; symbol << control;
-        ports.add (PortType::Control, index++, control,
-                    symbol, "Control", true);
+    for (int control = 0; control < 16; ++control) {
+        String symbol = "control_";
+        symbol << control;
+        ports.add (PortType::Control, index++, control, symbol, "Control", true);
     }
 
     ports.add (PortType::Midi, index++, 0, "midi_in", "MIDI", true);
     ports.add (PortType::Midi, index++, 0, "midi_out", "MIDI", false);
 
-    for (int port = 0; port < 16; ++port)
-    {
+    for (int port = 0; port < 16; ++port) {
         BOOST_REQUIRE (ports.getType (port) == PortType::Control);
         BOOST_REQUIRE (ports.isInput (port));
         BOOST_REQUIRE (ports.getChannelForPort (port) == port);
     }
 
     const PortType midiType (PortType::Midi);
-    BOOST_REQUIRE (ports.isInput(16) == true);
-    BOOST_REQUIRE (ports.getType(16) == midiType);
-    BOOST_REQUIRE (ports.isOutput(17) == true);
-    BOOST_REQUIRE (ports.getType(17) == midiType);
+    BOOST_REQUIRE (ports.isInput (16) == true);
+    BOOST_REQUIRE (ports.getType (16) == midiType);
+    BOOST_REQUIRE (ports.isOutput (17) == true);
+    BOOST_REQUIRE (ports.getType (17) == midiType);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

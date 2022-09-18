@@ -1,5 +1,5 @@
-#define JUCE_AMALGAMATED_INCLUDE    1
-#define KV_JACK_AUDIO               1
+#define JUCE_AMALGAMATED_INCLUDE 1
+#define KV_JACK_AUDIO            1
 
 #include "JuceHeader.h"
 #include "ElementApp.h"
@@ -16,4 +16,4 @@ using namespace juce;
 using PortDescription = kv::PortDescription;
 using PortType = kv::PortType;
 using PortList = kv::PortList;
-}
+} // namespace Element

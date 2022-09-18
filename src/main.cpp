@@ -140,7 +140,7 @@ private:
         engine->applySettings (settings);
 
         auto* props = settings.getUserSettings();
-        
+
         if (auto dxml = props->getXmlValue ("devices"))
         {
             devices.initialise (DeviceManager::maxAudioChannels,
@@ -393,7 +393,7 @@ public:
 #ifndef EL_SOLO
         const auto path = getCommandLineParameters();
         const File sessionFile = File::isAbsolutePath (path) ? File (path)
-            : File::getCurrentWorkingDirectory().getChildFile(path);
+                                                             : File::getCurrentWorkingDirectory().getChildFile (path);
         if (sessionFile.hasFileExtension ("els"))
             if (auto* sc = world->getServices().findChild<SessionService>())
                 sc->openFile (sessionFile);

@@ -42,19 +42,17 @@
 #include "Settings.h"
 #include "common.hpp"
 
-namespace element  {
+namespace element {
 
-class UnitTestBase : public UnitTest
-{
+class UnitTestBase : public UnitTest {
 public:
-    UnitTestBase (const String& name, const String& category = String(), 
-                    const String& _slug = String())
-        : UnitTest (name, category), slug (_slug) { }
-    
+    UnitTestBase (const String& name, const String& category = String(),
+                  const String& _slug = String())
+        : UnitTest (name, category), slug (_slug) {}
+
     virtual ~UnitTestBase()
     {
-        if (world)
-        {
+        if (world) {
             jassertfalse;
             shutdownWorld();
         }
@@ -66,8 +64,9 @@ public:
 protected:
     void initializeWorld()
     {
-        if (world) return;
-        world.reset (new Context ());
+        if (world)
+            return;
+        world.reset (new Context());
         world->setEngine (new AudioEngine (*world));
         world->getPluginManager().addDefaultFormats();
         world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
@@ -84,7 +83,8 @@ protected:
 
     void shutdownWorld()
     {
-        if (! world) return;
+        if (! world)
+            return;
         app->deactivate();
         app.reset (nullptr);
         world->setEngine (nullptr);
@@ -106,12 +106,20 @@ protected:
     }
 
     void runDispatchLoop (const int millisecondsToRunFor = 40)
-    { 
-        MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor); 
+    {
+        MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor);
     }
-    
-    Context& getWorld() { initializeWorld(); return *world; }
-    ServiceManager& getServices() { initializeWorld(); return *app; }
+
+    Context& getWorld()
+    {
+        initializeWorld();
+        return *world;
+    }
+    ServiceManager& getServices()
+    {
+        initializeWorld();
+        return *app;
+    }
 
 private:
     const String slug;
@@ -119,4 +127,4 @@ private:
     std::unique_ptr<ServiceManager> app;
 };
 
-}
+} // namespace element

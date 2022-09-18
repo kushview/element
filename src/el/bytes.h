@@ -5,9 +5,10 @@
 extern "C" {
 #endif
 
-typedef struct _kv_bytes_t {
-    size_t      size;
-    uint8_t*    data;
+typedef struct _kv_bytes_t
+{
+    size_t size;
+    uint8_t* data;
 } kv_bytes_t;
 
 #ifdef __cplusplus

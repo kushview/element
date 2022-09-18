@@ -30,7 +30,8 @@
 namespace element {
 
 //=============================================================================
-class ScriptingEngine::State {
+class ScriptingEngine::State
+{
 public:
     State() = delete;
     State (ScriptingEngine& s)
@@ -53,7 +54,8 @@ public:
         return state.lua_state();
     }
 
-    void collectGarbage() {
+    void collectGarbage()
+    {
         state.collect_garbage();
     }
 
@@ -86,11 +88,11 @@ private:
         const char* skey = LUA_VERSION_NUM < 502 ? "loaders" : "searchers";
         sol::table orig_searchers = package[skey];
         auto new_searchers = view.create_table();
-        new_searchers.add (orig_searchers[1]);           // first searcher is the preloader
-        new_searchers.add (resolve_internal_package);    // insert ours
+        new_searchers.add (orig_searchers[1]); // first searcher is the preloader
+        new_searchers.add (resolve_internal_package); // insert ours
         for (int i = 2; i <= orig_searchers.size(); ++i) // add everything after (file searchers)
-            new_searchers.add (package[skey][i]);        // ..
-        package[skey] = new_searchers;                   // replace them
+            new_searchers.add (package[skey][i]); // ..
+        package[skey] = new_searchers; // replace them
 #endif
     }
 
@@ -107,17 +109,21 @@ private:
         auto it = state.builtins.find (mid);
         auto end = state.builtins.end();
         std::string msgkey = "builtins";
-        if (it == end) {
+        if (it == end)
+        {
             it = state.packages.find (mid);
             end = state.packages.end();
             msgkey = "packages";
         }
-        if (it != end) {
+        if (it != end)
+        {
             if (nullptr != it->second)
                 sol::stack::push (L, it->second);
             else
                 lua_pushfstring (L, "\n\tno cfunction: lua_CFunction not present: %s", mid.c_str());
-        } else {
+        }
+        else
+        {
             lua_pushfstring (L, "\n\tno field %s['%s']", msgkey.c_str(), mid.c_str());
         }
 
@@ -128,7 +134,8 @@ private:
 void ScriptingEngine::addPackage (const std::string& name, element::lua::CFunction loader)
 {
     auto& pkgs = state->packages;
-    if (pkgs.find (name) == pkgs.end()) {
+    if (pkgs.find (name) == pkgs.end())
+    {
         pkgs.insert ({ name, loader });
         std::clog << "Scripting::add_package(): inserted " << name << std::endl;
     }
@@ -181,7 +188,8 @@ ScriptingEngine::ScriptingEngine()
 
 ScriptingEngine::~ScriptingEngine()
 {
-    if (state != nullptr) {
+    if (state != nullptr)
+    {
         Lua::clearGlobals (state->state);
         state->collectGarbage();
         state.reset();

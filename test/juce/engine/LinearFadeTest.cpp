@@ -20,11 +20,10 @@
 
 namespace element {
 
-class LinearFadeTest : public UnitTestBase
-{
+class LinearFadeTest : public UnitTestBase {
 public:
-    LinearFadeTest() : UnitTestBase ("LinearFade", "engine", "linearFade") { }
-    virtual ~LinearFadeTest() { }
+    LinearFadeTest() : UnitTestBase ("LinearFade", "engine", "linearFade") {}
+    virtual ~LinearFadeTest() {}
 
     void runTest() override
     {
@@ -46,13 +45,12 @@ private:
 
         int frame = 0;
 
-        while (fader.isActive())
-        {
+        while (fader.isActive()) {
             float gain = fader.getNextEnvelopeValue();
             frame++;
         }
-        
-        DBG("frames processed: " << frame);
+
+        DBG ("frames processed: " << frame);
         expect (fader.isActive() == false);
         expect (fader.getCurrentEnvelopeValue() == 0.0);
         fader.reset();
@@ -62,4 +60,4 @@ private:
 
 static LinearFadeTest sLinearFadeTest;
 
-}
+} // namespace element

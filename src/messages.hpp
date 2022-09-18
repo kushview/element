@@ -79,7 +79,7 @@ struct AddPresetMessage : public AppMessage
 struct SaveDefaultNodeMessage : public AppMessage
 {
     SaveDefaultNodeMessage (const Node& n) : node (n) {}
-   ~SaveDefaultNodeMessage() noexcept {}
+    ~SaveDefaultNodeMessage() noexcept {}
     const Node node;
 };
 
@@ -349,4 +349,4 @@ struct PresentViewMessage : public AppMessage
     Factory create;
 };
 
-}
+} // namespace element

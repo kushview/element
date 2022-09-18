@@ -38,7 +38,8 @@ public:
         owner = nullptr;
     }
 
-    template <class T> inline T* findSibling() const;
+    template <class T>
+    inline T* findSibling() const;
 
     virtual void initialize() {}
     virtual void activate() {}
@@ -81,7 +82,7 @@ public:
 
     /** Add a service */
     void addChild (Service* service)
-    { 
+    {
         service->owner = this;
         services.add (service);
     }

@@ -1,5 +1,5 @@
 /// A Parameter.
-// A variable property of a Node. 
+// A variable property of a Node.
 // @classmod el.Parameter
 // @pragma nostrip
 

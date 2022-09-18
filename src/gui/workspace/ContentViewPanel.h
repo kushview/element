@@ -151,7 +151,7 @@ public:
     }
 
     ~CodeEditorPanel() = default;
-    
+
     void setView (ScriptEditorView* newView)
     {
         if (view)
@@ -175,9 +175,21 @@ public:
             view->setBounds (getLocalBounds());
     }
 
-    void initializeView (ServiceManager& app) override { if (view) view->initializeView (app); }
-    void didBecomeActive() override { if (view) view->didBecomeActive(); }
-    void stabilizeContent() override { if (view) view->stabilizeContent(); }
+    void initializeView (ServiceManager& app) override
+    {
+        if (view)
+            view->initializeView (app);
+    }
+    void didBecomeActive() override
+    {
+        if (view)
+            view->didBecomeActive();
+    }
+    void stabilizeContent() override
+    {
+        if (view)
+            view->stabilizeContent();
+    }
 
 protected:
     std::unique_ptr<ScriptEditorView> view;

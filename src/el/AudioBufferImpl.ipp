@@ -7,48 +7,51 @@
 #include "sol_helpers.hpp"
 
 #ifndef LKV_AUDIO_BUFFER_32
- #define LKV_AUDIO_BUFFER_32 0
+#define LKV_AUDIO_BUFFER_32 0
 #endif
 
 #if LKV_AUDIO_BUFFER_32
- #define EL_MT_AUDIO_BUFFER_TYPE   "el.AudioBuffer32Class"
- #define EL_MT_AUDIO_BUFFER_IMPL   EL_MT_AUDIO_BUFFER_32
- #define LKV_AUDIO_BUFFER_OPEN      luaopen_el_AudioBuffer32
- using SampleType    = float;
+#define EL_MT_AUDIO_BUFFER_TYPE "el.AudioBuffer32Class"
+#define EL_MT_AUDIO_BUFFER_IMPL EL_MT_AUDIO_BUFFER_32
+#define LKV_AUDIO_BUFFER_OPEN luaopen_el_AudioBuffer32
+using SampleType = float;
 
 #else
- #define EL_MT_AUDIO_BUFFER_TYPE   "el.AudioBuffer64Class"
- #define EL_MT_AUDIO_BUFFER_IMPL   EL_MT_AUDIO_BUFFER_64
- #define LKV_AUDIO_BUFFER_OPEN      luaopen_el_AudioBuffer
- using SampleType    = lua_Number;
+#define EL_MT_AUDIO_BUFFER_TYPE "el.AudioBuffer64Class"
+#define EL_MT_AUDIO_BUFFER_IMPL EL_MT_AUDIO_BUFFER_64
+#define LKV_AUDIO_BUFFER_OPEN luaopen_el_AudioBuffer
+using SampleType = lua_Number;
 #endif
 
-using Buffer        = juce::AudioBuffer<SampleType>;
+using Buffer = juce::AudioBuffer<SampleType>;
 
 #define toclassref(L, n) *(Buffer**) lua_touserdata (L, n);
 
-static int audio_isfloat (lua_State* L) {
-   #if LKV_AUDIO_BUFFER_32
+static int audio_isfloat (lua_State* L)
+{
+#if LKV_AUDIO_BUFFER_32
     lua_pushboolean (L, true);
-   #else
+#else
     lua_pushboolean (L, false);
-   #endif
+#endif
     return 1;
 }
 
-static int audio_isdouble (lua_State* L) {
-   #if LKV_AUDIO_BUFFER_32
+static int audio_isdouble (lua_State* L)
+{
+#if LKV_AUDIO_BUFFER_32
     lua_pushboolean (L, false);
-   #else
+#else
     lua_pushboolean (L, true);
-   #endif
+#endif
     return 1;
 }
 
 /// Channel count
 // @function AudioBuffer:channels
 // @return the number of channels held in the buffer
-static int audio_channels (lua_State* L) {
+static int audio_channels (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
     lua_pushinteger (L, static_cast<lua_Integer> (buf->getNumChannels()));
     return 1;
@@ -71,13 +74,14 @@ static int audio_channels (lua_State* L) {
 // @int start Sample index to start on
 // @int count Number of samples to clear
 // @function AudioBuffer:clear
-static int audio_clear (lua_State* L) {
+static int audio_clear (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
-    
-    switch (lua_gettop (L)) {
+
+    switch (lua_gettop (L))
+    {
         case 2: {
-            buf->clear (static_cast<int> (lua_tointeger (L, 2) - 1), 0, 
-                        buf->getNumSamples());
+            buf->clear (static_cast<int> (lua_tointeger (L, 2) - 1), 0, buf->getNumSamples());
             break;
         }
 
@@ -86,7 +90,7 @@ static int audio_clear (lua_State* L) {
                         static_cast<int> (lua_tointeger (L, 3)));
             break;
         }
-        
+
         case 4: {
             buf->clear (static_cast<int> (lua_tointeger (L, 2) - 1),
                         static_cast<int> (lua_tointeger (L, 3) - 1),
@@ -95,18 +99,19 @@ static int audio_clear (lua_State* L) {
         }
 
         default: {
-            buf->clear(); 
+            buf->clear();
             break;
         }
     }
 
-    return 0;    
+    return 0;
 }
 
 /// Returns true if the buffer has been cleared
 // @function AudioBuffer:cleared
 // @return true if already cleared
-static int audio_cleared (lua_State* L) {
+static int audio_cleared (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
     lua_pushboolean (L, (int) buf->hasBeenCleared());
     return 1;
@@ -115,7 +120,8 @@ static int audio_cleared (lua_State* L) {
 /// returns the number of samples in the buffer
 // @function AudioBuffer:length
 // @return size of the buffer in samples
-static int audio_length (lua_State* L) {
+static int audio_length (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
     lua_pushinteger (L, static_cast<lua_Integer> (buf->getNumSamples()));
     return 1;
@@ -126,14 +132,16 @@ static int audio_length (lua_State* L) {
 // @param frame The sample index to get
 // @function AudioBuffer:get
 // @return the number of channels held in the buffer
-static int audio_get (lua_State* L) {
+static int audio_get (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
-    if (lua_gettop(L) < 3) {
+    if (lua_gettop (L) < 3)
+    {
         lua_pushnumber (L, 0.0);
-    } else {
-        lua_pushnumber (L, buf->getSample (
-            static_cast<int> (lua_tointeger (L, 2)) - 1,
-            static_cast<int> (lua_tointeger (L, 3)) - 1));
+    }
+    else
+    {
+        lua_pushnumber (L, buf->getSample (static_cast<int> (lua_tointeger (L, 2)) - 1, static_cast<int> (lua_tointeger (L, 3)) - 1));
     }
     return 1;
 }
@@ -143,18 +151,19 @@ static int audio_get (lua_State* L) {
 // @param frame The frame index to set
 // @param value The value to set
 // @function AudioBuffer:set
-static int audio_set (lua_State* L) {
+static int audio_set (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
 
     if (lua_gettop (L) < 4)
         return 0;
 
-    if (buf != nullptr) {
+    if (buf != nullptr)
+    {
         buf->setSample (
             static_cast<int> (lua_tointeger (L, 2)) - 1,
             static_cast<int> (lua_tointeger (L, 3)) - 1,
-            static_cast<SampleType> (lua_tonumber (L, 4))
-        );
+            static_cast<SampleType> (lua_tonumber (L, 4)));
     }
 
     return 0;
@@ -183,9 +192,11 @@ static int audio_set (lua_State* L) {
 // @int count Number of samples to process
 // @number gain Amount of gain to apply
 // @function AudioBuffer:applygain
-static int audio_applygain (lua_State* L) {
+static int audio_applygain (lua_State* L)
+{
     Buffer* buf = toclassref (L, 1);
-    switch (lua_gettop (L)) {
+    switch (lua_gettop (L))
+    {
         case 2: {
             buf->applyGain (static_cast<SampleType> (lua_tonumber (L, 2)));
             break;
@@ -193,14 +204,15 @@ static int audio_applygain (lua_State* L) {
 
         case 3: {
             buf->applyGain (static_cast<int> (lua_tointeger (L, 2) - 1),
-                            0, buf->getNumSamples(),
+                            0,
+                            buf->getNumSamples(),
                             static_cast<SampleType> (lua_tonumber (L, 3)));
             break;
         }
 
         case 4: {
-            buf->applyGain (static_cast<int> (lua_tointeger (L, 2) - 1), 
-                            static_cast<int> (lua_tointeger (L, 3)), 
+            buf->applyGain (static_cast<int> (lua_tointeger (L, 2) - 1),
+                            static_cast<int> (lua_tointeger (L, 3)),
                             static_cast<SampleType> (lua_tonumber (L, 3)));
             break;
         }
@@ -230,14 +242,14 @@ static int audio_applygain (lua_State* L) {
 // @number gain1 Starting gain
 // @number gain2 End gain
 // @function AudioBuffer:fade
-static int audio_fade (lua_State* L) {
-    auto* buf  = toclassref (L, 1);
-    switch (lua_gettop (L)) {
+static int audio_fade (lua_State* L)
+{
+    auto* buf = toclassref (L, 1);
+    switch (lua_gettop (L))
+    {
         case 3: {
             // apply gain to all channels/frames
-            buf->applyGainRamp (0, buf->getNumSamples(),
-                                static_cast<SampleType> (lua_tonumber (L, 2)),
-                                static_cast<SampleType> (lua_tonumber (L, 3)));
+            buf->applyGainRamp (0, buf->getNumSamples(), static_cast<SampleType> (lua_tonumber (L, 2)), static_cast<SampleType> (lua_tonumber (L, 3)));
             break;
         }
 
@@ -248,7 +260,7 @@ static int audio_fade (lua_State* L) {
                                 static_cast<int> (lua_tointeger (L, 4)),
                                 static_cast<SampleType> (lua_tonumber (L, 5)),
                                 static_cast<SampleType> (lua_tonumber (L, 6)));
-            break; 
+            break;
         }
     }
 
@@ -260,16 +272,19 @@ static int audio_fade (lua_State* L) {
 // the buffer is no longer valid and WILL crash the interpreter if used after
 // the fact.
 // @function AudioBuffer:free
-static int audio_free (lua_State* L) {
+static int audio_free (lua_State* L)
+{
     auto** buf = (Buffer**) lua_touserdata (L, 1);
-    if (nullptr != *buf) {
+    if (nullptr != *buf)
+    {
         delete (*buf);
         *buf = nullptr;
     }
     return 0;
 }
 
-static int audio_tostring (lua_State* L) {
+static int audio_tostring (lua_State* L)
+{
     auto* buf = toclassref (L, 1);
     const auto str = kv::lua::to_string (*buf, "AudioBuffer");
     lua_pushstring (L, str.c_str());
@@ -294,12 +309,14 @@ static int audio_tostring (lua_State* L) {
 // -- 2 channels, 2048 samples
 // local buf = AudioBuffer.new (2, 2048)
 // -- do someting with `buf`
-static int audio_new (lua_State* L) {
+static int audio_new (lua_State* L)
+{
     auto** buf = (Buffer**) lua_newuserdata (L, sizeof (Buffer**));
-    
+
     int nchans = 0, nframes = 0;
-    if (lua_gettop(L) >= 2 && lua_isinteger (L, 1) && lua_isinteger (L, 2)) {
-        nchans  = (int) juce::jmax (lua_Integer(), lua_tointeger (L, 1));
+    if (lua_gettop (L) >= 2 && lua_isinteger (L, 1) && lua_isinteger (L, 2))
+    {
+        nchans = (int) juce::jmax (lua_Integer(), lua_tointeger (L, 1));
         nframes = (int) juce::jmax (lua_Integer(), lua_tointeger (L, 2));
     }
 
@@ -310,38 +327,42 @@ static int audio_new (lua_State* L) {
 
 //==============================================================================
 static const luaL_Reg buffer_methods[] = {
-    { "__gc",           audio_free },
-    { "__tostring",     audio_tostring },
-    { "free",           audio_free },
-    { "isfloat",        audio_isfloat },
-    { "isdouble",       audio_isdouble },
-    { "channels",       audio_channels },
-    { "length",         audio_length },
-    { "clear",          audio_clear },
-    { "cleared",        audio_cleared },
-    { "get",            audio_get },
-    { "set",            audio_set },
-    { "applygain",      audio_applygain },
-    { "fade",           audio_fade },
+    { "__gc", audio_free },
+    { "__tostring", audio_tostring },
+    { "free", audio_free },
+    { "isfloat", audio_isfloat },
+    { "isdouble", audio_isdouble },
+    { "channels", audio_channels },
+    { "length", audio_length },
+    { "clear", audio_clear },
+    { "cleared", audio_cleared },
+    { "get", audio_get },
+    { "set", audio_set },
+    { "applygain", audio_applygain },
+    { "fade", audio_fade },
     { NULL, NULL }
 };
 
 //==============================================================================
 #if LKV_AUDIO_BUFFER_32
-EL_PLUGIN_EXPORT 
-int luaopen_el_AudioBuffer32 (lua_State* L) {
+EL_PLUGIN_EXPORT
+int luaopen_el_AudioBuffer32 (lua_State* L)
+{
 #else
-EL_PLUGIN_EXPORT 
-int luaopen_el_AudioBuffer64 (lua_State* L) {
+EL_PLUGIN_EXPORT
+int luaopen_el_AudioBuffer64 (lua_State* L)
+{
 #endif
-    if (luaL_newmetatable (L, EL_MT_AUDIO_BUFFER_IMPL)) {
-        lua_pushvalue (L, -1);               /* duplicate the metatable */
-        lua_setfield (L, -2, "__index");     /* mt.__index = mt */
+    if (luaL_newmetatable (L, EL_MT_AUDIO_BUFFER_IMPL))
+    {
+        lua_pushvalue (L, -1); /* duplicate the metatable */
+        lua_setfield (L, -2, "__index"); /* mt.__index = mt */
         luaL_setfuncs (L, buffer_methods, 0);
         lua_pop (L, 1);
     }
 
-    if (luaL_newmetatable (L, EL_MT_AUDIO_BUFFER_TYPE)) {
+    if (luaL_newmetatable (L, EL_MT_AUDIO_BUFFER_TYPE))
+    {
         lua_pop (L, 1);
     }
 

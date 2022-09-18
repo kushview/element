@@ -17,8 +17,6 @@ PERFORMANCE OF THIS SOFTWARE.
 #ifndef LKV_H
 #define LKV_H
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,26 +27,26 @@ extern "C" {
 #include <lauxlib.h>
 
 #if (LUA_VERSION_NUM < 503)
- #pragma error "Lua KV requires Lua v5.3.5 or higher"
- #pragma GCC error "Lua KV requires Lua v5.3.5 or higher"
+#pragma error "Lua KV requires Lua v5.3.5 or higher"
+#pragma GCC error "Lua KV requires Lua v5.3.5 or higher"
 #endif
 
 #ifndef LKV_FORCE_FLOAT32
- #define LKV_FORCE_FLOAT32                  0
+#define LKV_FORCE_FLOAT32 0
 #endif
 
 #if LKV_FORCE_FLOAT32
-typedef float                               kv_sample_t;
+typedef float kv_sample_t;
 #else
-typedef lua_Number                          kv_sample_t;
+typedef lua_Number kv_sample_t;
 #endif
 
-typedef struct kv_audio_buffer_impl_t      kv_audio_buffer_t;
-typedef struct kv_midi_message_impl_t      kv_midi_message_t;
-typedef struct kv_midi_buffer_impl_t       kv_midi_buffer_t;
-typedef void*                              kv_midi_buffer_iter_t;
-typedef struct kv_midi_pipe_impl_t         kv_midi_pipe_t;
-typedef struct kv_vector_impl_t            kv_vector_t;
+typedef struct kv_audio_buffer_impl_t kv_audio_buffer_t;
+typedef struct kv_midi_message_impl_t kv_midi_message_t;
+typedef struct kv_midi_buffer_impl_t kv_midi_buffer_t;
+typedef void* kv_midi_buffer_iter_t;
+typedef struct kv_midi_pipe_impl_t kv_midi_pipe_t;
+typedef struct kv_vector_impl_t kv_vector_t;
 
 /** Creates a new vector leaving it on the stack */
 kv_vector_t* kv_vector_new (lua_State*, int);
@@ -86,8 +84,8 @@ void kv_vector_resize (kv_vector_t*, int);
     @param num_frames       Number of samples in each channel
 */
 kv_audio_buffer_t* kv_audio_buffer_new (lua_State* L,
-                                        int        num_channels,
-                                        int        num_frames);
+                                        int num_channels,
+                                        int num_frames);
 
 /** Refer the given buffer to a set of external audio channels
     @param buffer       The audio buffer
@@ -95,10 +93,10 @@ kv_audio_buffer_t* kv_audio_buffer_new (lua_State* L,
     @param nchannels    Number of channels is external data
     @param nframes      Number of samples in each external data channel
 */
-void kv_audio_buffer_refer_to (kv_audio_buffer_t*  buffer,
+void kv_audio_buffer_refer_to (kv_audio_buffer_t* buffer,
                                kv_sample_t* const* data,
-                               int                 nchannels,
-                               int                 nframes);
+                               int nchannels,
+                               int nframes);
 
 /** Returs this buffer's channel count */
 int kv_audio_buffer_channels (kv_audio_buffer_t*);
@@ -121,30 +119,30 @@ kv_sample_t* kv_audio_buffer_channel (kv_audio_buffer_t*, int channel);
     @param norealloc    Avoid re-allocating if possible
 */
 void kv_audio_buffer_resize (kv_audio_buffer_t* buffer,
-                             int                nchannels, 
-                             int                nframes,
-                             bool               preserve, 
-                             bool               clear,
-                             bool               norealloc);
+                             int nchannels,
+                             int nframes,
+                             bool preserve,
+                             bool clear,
+                             bool norealloc);
 
-void kv_audio_buffer_duplicate (kv_audio_buffer_t*        buffer,
-                                 const kv_sample_t* const* source,
-                                 int                        nchannels,
-                                 int                        nframes);
+void kv_audio_buffer_duplicate (kv_audio_buffer_t* buffer,
+                                const kv_sample_t* const* source,
+                                int nchannels,
+                                int nframes);
 
 void kv_audio_buffer_duplicate_32 (kv_audio_buffer_t* buffer,
-                                    const float* const* source,
-                                    int                 nchannels,
-                                    int                 nframes);
+                                   const float* const* source,
+                                   int nchannels,
+                                   int nframes);
 
 //=============================================================================
 kv_midi_message_t* kv_midi_message_new (lua_State* L, uint8_t* data, size_t size, bool push);
 void kv_midi_message_free (kv_midi_message_t* msg);
 uint8_t* kv_midi_message_data (kv_midi_message_t* msg);
 void kv_midi_message_reset (kv_midi_message_t* msg);
-void kv_midi_message_update (kv_midi_message_t* msg, 
-                             uint8_t*           data, 
-                             lua_Integer        size);
+void kv_midi_message_update (kv_midi_message_t* msg,
+                             uint8_t* data,
+                             lua_Integer size);
 
 //=============================================================================
 /** Adds a new midi buffer to the stack */
@@ -178,24 +176,24 @@ kv_midi_buffer_iter_t kv_midi_buffer_end (kv_midi_buffer_t*);
 kv_midi_buffer_iter_t kv_midi_buffer_next (kv_midi_buffer_t*, kv_midi_buffer_iter_t);
 
 /** Loop through all midi events */
-#define kv_midi_buffer_foreach(b, i) \
-for (kv_midi_buffer_iter_t (i) = kv_midi_buffer_begin ((b)); \
-    i < kv_midi_buffer_end ((b)); \
-    i = kv_midi_buffer_next ((b), (i)))
+#define kv_midi_buffer_foreach(b, i)                             \
+    for (kv_midi_buffer_iter_t (i) = kv_midi_buffer_begin ((b)); \
+         i < kv_midi_buffer_end ((b));                           \
+         i = kv_midi_buffer_next ((b), (i)))
 
 /** Returns the total size in bytes of the iterator */
-#define kv_midi_buffer_iter_total_size(i) (lua_Integer)(sizeof(int32_t) + sizeof(uint16_t) + *(uint16_t*)((i) + sizeof(int32_t)))
+#define kv_midi_buffer_iter_total_size(i) (lua_Integer) (sizeof (int32_t) + sizeof (uint16_t) + *(uint16_t*) ((i) + sizeof (int32_t)))
 
 /** Returns the frame index of this event */
-#define kv_midi_buffer_iter_frame(i)   *(int32_t*)i
+#define kv_midi_buffer_iter_frame(i) *(int32_t*) i
 
 /** Returns the data size of this event */
-#define kv_midi_buffer_iter_size(i) (lua_Integer)(*(uint16_t*)((uint8_t*)i + sizeof(int32_t)))
+#define kv_midi_buffer_iter_size(i) (lua_Integer) (*(uint16_t*) ((uint8_t*) i + sizeof (int32_t)))
 
 /** Returns the raw MIDI data of this event
     Do not modify in any way
 */
-#define kv_midi_buffer_iter_data(i) (uint8_t*)i + (sizeof(int32_t) + sizeof(uint16_t))
+#define kv_midi_buffer_iter_data(i) (uint8_t*) i + (sizeof (int32_t) + sizeof (uint16_t))
 
 //=============================================================================
 /** Create a new midi pipe on the stack */

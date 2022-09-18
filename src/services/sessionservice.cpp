@@ -217,9 +217,9 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
         if (saveAs)
         {
             getServices().addRecentFile (document->getFile());
-            currentSession->getValueTree().setProperty (Tags::name, 
-                document->getFile().getFileNameWithoutExtension(),
-                nullptr);
+            currentSession->getValueTree().setProperty (Tags::name,
+                                                        document->getFile().getFileNameWithoutExtension(),
+                                                        nullptr);
         }
     }
 }

@@ -20,11 +20,10 @@
 
 namespace element {
 
-class ToggleGridTest : public UnitTestBase
-{
+class ToggleGridTest : public UnitTestBase {
 public:
-    ToggleGridTest() : UnitTestBase ("Toggle Grid", "engine", "toggleGrid") { }
-    virtual ~ToggleGridTest() { }
+    ToggleGridTest() : UnitTestBase ("Toggle Grid", "engine", "toggleGrid") {}
+    virtual ~ToggleGridTest() {}
 
     void runTest() override
     {
@@ -46,7 +45,7 @@ private:
         for (int i = 0; i < grid1.getNumInputs(); ++i)
             for (int o = 0; o < grid1.getNumOutputs(); ++o)
                 expect (grid1.get (i, 0) == false);
-        
+
         beginTest ("get/set");
         grid1.set (2, 2, true);
         expect (grid1.get (2, 2) == true);
@@ -63,12 +62,11 @@ private:
         MatrixState matrix (6, 6);
         matrix.set (3, 3, true);
         ToggleGrid grid4 (matrix);
-        expect (grid4.getNumInputs() == matrix.getNumRows() &&
-                grid4.getNumOutputs() == matrix.getNumColumns());
+        expect (grid4.getNumInputs() == matrix.getNumRows() && grid4.getNumOutputs() == matrix.getNumColumns());
         expect (grid4.get (3, 3) == matrix.connected (3, 3));
     }
 };
 
 static ToggleGridTest sToggleGridTest;
 
-}
+} // namespace element

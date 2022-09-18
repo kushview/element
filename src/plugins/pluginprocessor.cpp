@@ -125,7 +125,7 @@ const String PluginProcessor::getName() const
     return "Element";
 }
 
-bool PluginProcessor::acceptsMidi()  const { return true; }
+bool PluginProcessor::acceptsMidi() const { return true; }
 bool PluginProcessor::producesMidi() const { return true; }
 bool PluginProcessor::isMidiEffect() const { return variant == MidiEffect; }
 
@@ -286,7 +286,7 @@ AudioProcessorEditor* PluginProcessor::createEditor()
 }
 
 void PluginProcessor::getStateInformation (MemoryBlock& destData)
-{   
+{
     if (! controllerActive)
         return;
     if (auto session = world->getSession())
@@ -296,7 +296,7 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
             .setProperty ("pluginEditorBounds", editorBounds.toString(), nullptr)
             .setProperty ("editorKeyboardFocus", editorWantsKeyboard, nullptr)
             .setProperty ("forceZeroLatency", isForcingZeroLatency(), nullptr);
-        
+
         if (auto engine = world->getAudioEngine())
             if (auto mon = engine->getTransportMonitor())
                 session->getValueTree().setProperty (
@@ -352,7 +352,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
                                                       "pluginEditorBounds", RI().toString())
                                                .toString());
             editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
-            setForceZeroLatency ((bool)session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
+            setForceZeroLatency ((bool) session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
             if (engine && ! engine->isUsingExternalClock())
                 engine->setPlaying ((bool) session->getProperty ("pluginTransportPlaying", false));
             session->forEach (setPluginMissingNodeProperties);
@@ -393,7 +393,7 @@ void PluginProcessor::initialize()
 {
     if (controllerActive || ! MessageManager::getInstance()->isThisTheMessageThread())
         return;
-    
+
     world.reset (new Context());
     world->setEngine (new AudioEngine (*world, RunMode::Plugin));
     engine = world->getAudioEngine();

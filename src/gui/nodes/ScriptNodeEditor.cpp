@@ -454,9 +454,9 @@ void ScriptNodeEditor::resized()
 
     if (fileBrowser.isVisible())
         fileBrowser.setBounds (r1.reduced (8));
-    
+
     if (showToolbar)
-    {    
+    {
         paramsButton.changeWidthToFitText (r2.getHeight());
         paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
     }

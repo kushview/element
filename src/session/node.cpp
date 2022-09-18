@@ -31,7 +31,8 @@ struct NameSorter
     NameSorter() {}
     int compareElements (const Node& lhs, const Node& rhs)
     {
-        return lhs.getName() < rhs.getName() ? -1 : lhs.getName() == rhs.getName() ? 0 : 1;
+        return lhs.getName() < rhs.getName() ? -1 : lhs.getName() == rhs.getName() ? 0
+                                                                                   : 1;
     }
     friend class NodeArray;
 };

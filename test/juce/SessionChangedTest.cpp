@@ -20,12 +20,11 @@
 
 namespace element {
 
-class SessionChangedTest : public UnitTestBase
-{
+class SessionChangedTest : public UnitTestBase {
 public:
-    SessionChangedTest () : UnitTestBase ("Session Changed", "sessionSave") {}
+    SessionChangedTest() : UnitTestBase ("Session Changed", "sessionSave") {}
     void initialise() override
-    { 
+    {
         initializeWorld();
         session = getWorld().getSession();
     }
@@ -35,10 +34,10 @@ public:
         session = nullptr;
         shutdownWorld();
     }
-    
+
     void runTest() override
     {
-        beginTest("not flagged changed after session open and save");
+        beginTest ("not flagged changed after session open and save");
         const auto sessionFile = getDataDir().getChildFile ("Sessions/Default.els");
         expect (sessionFile.existsAsFile());
         auto* const controller = getServices().findChild<SessionService>();
@@ -56,4 +55,4 @@ private:
 
 static SessionChangedTest sSessionChangedTest;
 
-}
+} // namespace element

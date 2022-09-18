@@ -27,7 +27,8 @@ namespace et = element::test;
 
 BOOST_AUTO_TEST_SUITE (ScriptManagerTests)
 
-BOOST_AUTO_TEST_CASE (ScanDirectory) {
+BOOST_AUTO_TEST_CASE (ScanDirectory)
+{
     element::ScriptManager scripts;
     auto d = et::getSourceRoot().getChildFile ("scripts");
     scripts.scanDirectory (d);

@@ -22,7 +22,7 @@ namespace element {
 
 class PresetScanTest : public UnitTestBase {
 public:
-    PresetScanTest() : UnitTestBase ("Preset Scanning", "presets", "scan") { }
+    PresetScanTest() : UnitTestBase ("Preset Scanning", "presets", "scan") {}
 
     virtual void initialise() override
     {
@@ -59,4 +59,4 @@ private:
 
 static PresetScanTest sPresetScanTest;
 
-}
+} // namespace element

@@ -104,9 +104,9 @@ public:
 
         if (text.isNotEmpty())
         {
-            g.setColour (isBlacklisted ? Colours::red
-                                       : columnId == nameCol ? LookAndFeel_KV1::textColor
-                                                             : Colours::grey);
+            g.setColour (isBlacklisted         ? Colours::red
+                         : columnId == nameCol ? LookAndFeel_KV1::textColor
+                                               : Colours::grey);
             g.setFont (Font (height * 0.7f));
             g.drawFittedText (text, 4, 0, width - 6, height, Justification::centredLeft, 1, 0.9f);
         }
@@ -892,7 +892,8 @@ PluginManagerContentView::PluginManagerContentView()
 
 PluginManagerContentView::~PluginManagerContentView() {}
 
-Settings* PluginManagerContentView::getSettings() {
+Settings* PluginManagerContentView::getSettings()
+{
     if (auto world = ViewHelpers::getGlobals (this))
         return &world->getSettings();
     return nullptr;

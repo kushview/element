@@ -75,7 +75,7 @@ public:
 
     int getBeatsPerBar() const { return getTimeScale().beatsPerBar(); }
     int getBeatType() const { return getTimeScale().beatType(); }
-    
+
     inline void requestPlayState (bool p)
     {
         while (! playState.set (p))

@@ -23,7 +23,7 @@
 // @classmod el.MidiPipe
 // @pragma nostrip
 
-#include  <element/lua.hpp>
+#include <element/lua.hpp>
 #include "el/midi_buffer.hpp"
 #include "el/factories.hpp"
 #include "engine/midipipe.hpp"

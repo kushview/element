@@ -34,7 +34,7 @@ struct Artist
     {
         auto r = area;
         Graphics::ScopedSaveState savestate (g);
-        
+
         if (justification == Justification::centred)
         {
             g.setOrigin (r.getX(), r.getY());

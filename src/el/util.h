@@ -18,11 +18,11 @@ PERFORMANCE OF THIS SOFTWARE.
 #define LKV_UTIL_H
 
 #ifdef MIN
- #undef MIN
+#undef MIN
 #endif
 
 #ifdef MAX
- #undef MAX
+#undef MAX
 #endif
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))

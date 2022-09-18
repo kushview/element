@@ -26,14 +26,14 @@ using namespace element;
 
 namespace element {
 
-class MidiChannelMapTest : public UnitTestBase
-{
+class MidiChannelMapTest : public UnitTestBase {
 public:
-    explicit MidiChannelMapTest (const String& name = "MidiChannelMap") 
-        : UnitTestBase (name, "engine", "midiChannelMap") { }
-    virtual ~MidiChannelMapTest() { }
+    explicit MidiChannelMapTest (const String& name = "MidiChannelMap")
+        : UnitTestBase (name, "engine", "midiChannelMap") {}
+    virtual ~MidiChannelMapTest() {}
 
-    void initialise() override {
+    void initialise() override
+    {
         MessageManager::getInstance();
     }
 
@@ -65,7 +65,7 @@ private:
             chmap.set (ch, 17 - ch);
         chmap.reset();
         for (int ch = 1; ch <= 16; ++ch)
-            expect (chmap.get(ch) == ch);
+            expect (chmap.get (ch) == ch);
     }
 
     void testOutputCorrect()
@@ -73,7 +73,7 @@ private:
         beginTest ("get() and set()");
         MidiChannelMap chmap;
         for (int ch = 1; ch <= 16; ++ch)
-            expect (chmap.get(ch) == ch);
+            expect (chmap.get (ch) == ch);
         for (int ch = 1; ch <= 16; ++ch)
             chmap.set (ch, 17 - ch);
         for (int ch = 1; ch <= 16; ++ch)
@@ -102,12 +102,12 @@ private:
         auto* processor = new MidiChannelMapProcessor();
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
-        
+
         NodeObjectPtr node = proc.addNode (new AudioProcessorNode (processor));
         MessageManager::getInstance()->runDispatchLoopUntil (10);
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
-        
+
         expect (node != nullptr);
 
         expect (node->getNumAudioInputs() == 0);
@@ -120,9 +120,8 @@ private:
         expect (node->getNumPorts (PortType::Midi, false) == 1);
         expect (node->getNumPorts() == 18);
 
-        for (int i = 0; i < 16; ++i)
-        {
-            expect (node->getPortType(i) == PortType::Control);
+        for (int i = 0; i < 16; ++i) {
+            expect (node->getPortType (i) == PortType::Control);
             expect (node->isPortInput (i));
         }
 
@@ -141,8 +140,7 @@ private:
         expect (midiIn->getNumPorts() == 1);
         expect (midiIn->getPortType (0) == PortType::Midi);
         expect (midiIn->isPortInput (0) == false);
-        expect (proc.addConnection (midiIn->nodeId, midiIn->getMidiOutputPort(),
-                                    node->nodeId, node->getMidiInputPort()));
+        expect (proc.addConnection (midiIn->nodeId, midiIn->getMidiOutputPort(), node->nodeId, node->getMidiInputPort()));
 
         node = nullptr;
         midiIn = nullptr;
@@ -153,4 +151,4 @@ private:
 
 static MidiChannelMapTest sMidiChannelMapTest;
 
-}
+} // namespace element

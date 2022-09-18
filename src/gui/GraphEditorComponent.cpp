@@ -730,16 +730,18 @@ void GraphEditorComponent::updateConnectorComponents (bool async)
 {
     struct UpdateConnectors : public juce::MessageManager::MessageBase
     {
-        UpdateConnectors (GraphEditorComponent* g) : editor(g) {}
-        void messageCallback() override {
+        UpdateConnectors (GraphEditorComponent* g) : editor (g) {}
+        void messageCallback() override
+        {
             if (auto* g = editor.getComponent())
                 g->updateConnectorComponents (false);
         };
         Component::SafePointer<GraphEditorComponent> editor;
     };
 
-    if (async) {
-        (new UpdateConnectors(this))->post();
+    if (async)
+    {
+        (new UpdateConnectors (this))->post();
         return;
     }
 
@@ -1042,7 +1044,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
 bool GraphEditorComponent::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
-        if (File(path).hasFileExtension ("elg;elpreset"))
+        if (File (path).hasFileExtension ("elg;elpreset"))
             return true;
     return false;
 }
@@ -1057,7 +1059,7 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
         const Node node (Node::parse (file));
         bool wasHandled = false;
 
-    #if defined(EL_SOLO)
+#if defined(EL_SOLO)
         // SE and LT Should just open graphs instead of trying to embed them
         if (file.hasFileExtension (".elg"))
         {
@@ -1066,7 +1068,7 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
                     gc->openGraph (file);
             wasHandled = true;
         }
-    #endif
+#endif
 
         if (! wasHandled && node.isValid())
         {
@@ -1120,14 +1122,17 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
     }
 }
 
-void GraphEditorComponent::findLassoItemsInArea (Array<uint32>& itemsFound, 
+void GraphEditorComponent::findLassoItemsInArea (Array<uint32>& itemsFound,
                                                  const Rectangle<int>& area)
 {
     for (int i = 0; i < getNumChildComponents(); ++i)
     {
         if (auto* block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
             if (area.intersects (block->getBounds()))
-                { itemsFound.add (block->node.getNodeId()); block->repaint(); }
+            {
+                itemsFound.add (block->node.getNodeId());
+                block->repaint();
+            }
     }
 }
 

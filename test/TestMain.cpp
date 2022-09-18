@@ -3,8 +3,7 @@
 #include <element/juce.hpp>
 using namespace juce;
 
-struct JuceMessageManagerFixture
-{
+struct JuceMessageManagerFixture {
     JuceMessageManagerFixture()
     {
         MessageManager::getInstance();
@@ -17,12 +16,13 @@ struct JuceMessageManagerFixture
     }
 };
 
-BOOST_GLOBAL_FIXTURE(JuceMessageManagerFixture);
+BOOST_GLOBAL_FIXTURE (JuceMessageManagerFixture);
 
-BOOST_AUTO_TEST_SUITE(Element)
+BOOST_AUTO_TEST_SUITE (Element)
 
-BOOST_AUTO_TEST_CASE (Sanity) {
-    BOOST_TEST_REQUIRE(2 + 2 != 5);
+BOOST_AUTO_TEST_CASE (Sanity)
+{
+    BOOST_TEST_REQUIRE (2 + 2 != 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

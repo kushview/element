@@ -93,25 +93,27 @@ Colour PortComponent::getColor() const noexcept
 }
 
 void PortComponent::paint (Graphics& g)
-{   
+{
     Path path;
-    
+
     float start = 0.0, end = 0.0;
     if (vertical)
     {
-        start = input ?  -90.f :  270.f;
-        end   = input ? 90.f :   90.f;
+        start = input ? -90.f : 270.f;
+        end = input ? 90.f : 90.f;
     }
     else
     {
-        start = input ?  180.f :   0.f;
-        end   = input ?  360.f : 180.f;
+        start = input ? 180.f : 0.f;
+        end = input ? 360.f : 180.f;
     }
 
-    path.addPieSegment(getLocalBounds().toFloat(), 
-        degreesToRadians(start), degreesToRadians (end), 0);
+    path.addPieSegment (getLocalBounds().toFloat(),
+                        degreesToRadians (start),
+                        degreesToRadians (end),
+                        0);
     g.setColour (getColor());
-    g.fillPath(path);
+    g.fillPath (path);
 }
 
 void PortComponent::mouseDown (const MouseEvent& e)
@@ -174,17 +176,17 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     muteButton.addListener (this);
 
     hiddenPorts = node.getBlockValueTree()
-        .getPropertyAsValue (Tags::hiddenPorts, nullptr);
+                      .getPropertyAsValue (Tags::hiddenPorts, nullptr);
     hiddenPorts.addListener (this);
 
     displayModeValue = node.getBlockValueTree()
-        .getPropertyAsValue (Tags::displayMode, nullptr);
+                           .getPropertyAsValue (Tags::displayMode, nullptr);
     displayMode = getDisplayModeFromString (displayModeValue.toString());
     displayModeValue.addListener (this);
 
-    customWidth  = node.getBlockValueTree().getProperty (Tags::width, customWidth);
+    customWidth = node.getBlockValueTree().getProperty (Tags::width, customWidth);
     customHeight = node.getBlockValueTree().getProperty (Tags::height, customHeight);
-    setSize (customWidth > 0 ? customWidth : 170, 
+    setSize (customWidth > 0 ? customWidth : 170,
              customHeight > 0 ? customHeight : 60);
 }
 
@@ -295,9 +297,9 @@ void BlockComponent::changeListenerCallback (ChangeBroadcaster* broadcaster)
     {
         color = colorSelector.getCurrentColour().withAlpha (1.0f);
         node.getUIValueTree().setProperty ("color", color.toString(), nullptr);
-        
+
         forEachSibling ([this] (BlockComponent& sibling) {
-            if (!sibling.isSelected() || sibling.color == color)
+            if (! sibling.isSelected() || sibling.color == color)
                 return;
             sibling.color = color;
             sibling.node.getUIValueTree().setProperty ("color",
@@ -428,10 +430,10 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
 
     if (e.mods.isPopupMenu() || blockDrag)
         return;
-    
+
     if (mouseInCornerResize)
     {
-        setCustomSize (originalBounds.getWidth()  + e.getDistanceFromDragStartX(),
+        setCustomSize (originalBounds.getWidth() + e.getDistanceFromDragStartX(),
                        originalBounds.getHeight() + e.getDistanceFromDragStartY());
         return;
     }
@@ -453,7 +455,7 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     {
         if (panel->onBlockMoved)
             panel->onBlockMoved (*this);
-        
+
         int dx = deltaX - lastDragDeltaX;
         int dy = deltaY - lastDragDeltaY;
 
@@ -462,12 +464,12 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
             auto* block = dynamic_cast<BlockComponent*> (panel->getChildComponent (i));
             if (block == nullptr || block == this || ! block->isSelected())
                 continue;
-            
+
             auto bp = block->getNodePosition();
-            if (! vertical) 
+            if (! vertical)
                 std::swap (bp.x, bp.y);
-        
-            block->moveBlockTo (roundToIntAccurate (bp.x + dx), 
+
+            block->moveBlockTo (roundToIntAccurate (bp.x + dx),
                                 roundToIntAccurate (bp.y + dy));
         }
 
@@ -554,11 +556,11 @@ void BlockComponent::paint (Graphics& g)
     const float cornerSize = 2.4f;
     const auto box (getBoxRectangle());
     const int colorBarHeight = vertical ? 20 : 18;
-    bool colorize = color != Colour(0x00000000);
+    bool colorize = color != Colour (0x00000000);
     Colour bgc = isEnabled() && node.isEnabled()
-            ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
-            : LookAndFeel::widgetBackgroundColor.brighter (0.2);
-    
+                     ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
+                     : LookAndFeel::widgetBackgroundColor.brighter (0.2);
+
     auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1);
 
     if (isSelected())
@@ -582,14 +584,12 @@ void BlockComponent::paint (Graphics& g)
                 auto b2 = b1.removeFromTop (colorBarHeight);
                 g.setColour (barColor);
                 Path path;
-                path.addRoundedRectangle (b2.getX(), b2.getY(), b2.getWidth(), b2.getHeight(),
-                    cornerSize, cornerSize, true, true, false, false);
+                path.addRoundedRectangle (b2.getX(), b2.getY(), b2.getWidth(), b2.getHeight(), cornerSize, cornerSize, true, true, false, false);
                 g.fillPath (path);
 
                 path.clear();
                 g.setColour (bgc);
-                path.addRoundedRectangle (b1.getX(), b1.getY(), b1.getWidth(), b1.getHeight(),
-                    cornerSize, cornerSize, false, false, true, true);
+                path.addRoundedRectangle (b1.getX(), b1.getY(), b1.getWidth(), b1.getHeight(), cornerSize, cornerSize, false, false, true, true);
                 g.fillPath (path);
                 break;
             }
@@ -611,10 +611,10 @@ void BlockComponent::paint (Graphics& g)
     }
 
     if (colorize)
-        g.setColour (Colours::white.overlaidWith(color).contrasting());
+        g.setColour (Colours::white.overlaidWith (color).contrasting());
     else
         g.setColour (Colours::black);
-    
+
     g.setFont (Font (12.f));
 
     auto displayName = node.getDisplayName();
@@ -628,7 +628,7 @@ void BlockComponent::paint (Graphics& g)
         }
         else if (node.isMidiInputNode())
         {
-            auto mode  = ViewHelpers::getGuiController (this)->getRunMode();
+            auto mode = ViewHelpers::getGuiController (this)->getRunMode();
             auto& midi = ViewHelpers::getGlobals (this)->getMidiEngine();
             if (mode != RunMode::Plugin && midi.getNumActiveMidiInputs() <= 0)
                 subName = "(no device)";
@@ -650,21 +650,20 @@ void BlockComponent::paint (Graphics& g)
                     g.setColour (Colours::black);
                     g.setFont (Font (9.f));
                     y += colorBarHeight;
-                    g.drawFittedText (subName, box.getX(), y, 
-                        box.getWidth(), 9, Justification::centred, 2);
+                    g.drawFittedText (subName, box.getX(), y, box.getWidth(), 9, Justification::centred, 2);
                 }
                 break;
             }
             case Compact: {
-                g.drawFittedText (displayName, box.getX(), box.getY(), 
-                box.getWidth(), box.getHeight(), Justification::centred, 2);
+                g.drawFittedText (displayName, box.getX(), box.getY(), box.getWidth(), box.getHeight(), Justification::centred, 2);
                 break;
             }
         }
     }
     else
     {
-        switch (displayMode) {
+        switch (displayMode)
+        {
             case Normal:
             case Embed: {
                 int y = box.getY();
@@ -703,7 +702,7 @@ void BlockComponent::resized()
     const auto box (getBoxRectangle());
     auto r = box.reduced (4, 2).removeFromBottom (14);
     const int halfPinSize = pinSize / 2;
-    
+
     {
         Component* buttons[] = { &configButton, &muteButton, &powerButton };
         for (int i = 0; i < 3; ++i)
@@ -711,7 +710,8 @@ void BlockComponent::resized()
                 buttons[i]->setBounds (r.removeFromLeft (16));
     }
 
-    if (displayMode == Embed && embedded) {
+    if (displayMode == Embed && embedded)
+    {
         auto er = box;
         er.removeFromTop (vertical ? 20 : 18);
         er.removeFromBottom (18);
@@ -739,16 +739,16 @@ void BlockComponent::resized()
         int startY = box.getY() + 22;
         if (displayMode == Compact || displayMode == Small)
         {
-            startY = (jmax(numIns, numOuts) * (pinSpacing + pinSize)) - pinSpacing;
+            startY = (jmax (numIns, numOuts) * (pinSpacing + pinSize)) - pinSpacing;
             startY = box.getY() + ((box.getHeight() - startY) / 2);
         }
-        
+
         Rectangle<int> pri (box.getX() - halfPinSize,
                             startY,
                             pinSize,
                             box.getHeight());
         Rectangle<int> pro (pri.withX (box.getWidth() - 1));
-        
+
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (PortComponent* const pc = dynamic_cast<PortComponent*> (getChildComponent (i)))
@@ -807,18 +807,18 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         setConfigButtonVisible (false);
         setPowerButtonVisible (false);
     }
-    else 
+    else
     {
         setMuteButtonVisible (true);
         setConfigButtonVisible (true);
         setPowerButtonVisible (true);
     }
-    
+
     if (displayMode == Embed)
     {
         if (embedded == nullptr)
         {
-            if (auto* ui = ViewHelpers::getGuiController(this))
+            if (auto* ui = ViewHelpers::getGuiController (this))
             {
                 NodeEditorFactory factory (*ui);
                 if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
@@ -866,11 +866,11 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
 void BlockComponent::getMinimumSize (int& width, int& height)
 {
-    auto *ged = getGraphPanel();
+    auto* ged = getGraphPanel();
     if (! ged)
         return;
-    
-    int w = roundToInt ((!vertical ? 120.0 : 90) * ged->getZoomScale());
+
+    int w = roundToInt ((! vertical ? 120.0 : 90) * ged->getZoomScale());
     int h = roundToInt (46.0 * ged->getZoomScale());
     const int maxPorts = jmax (numIns, numOuts) + 1;
     font.setHeight (11.f * ged->getZoomScale());
@@ -921,15 +921,15 @@ void BlockComponent::getMinimumSize (int& width, int& height)
 
 void BlockComponent::updateSize()
 {
-    auto *ged = getGraphPanel();
+    auto* ged = getGraphPanel();
     if (! ged)
         return;
-    
+
     customWidth = (int) node.getBlockValueTree()
-        .getProperty (Tags::width, customWidth);
+                      .getProperty (Tags::width, customWidth);
     customHeight = (int) node.getBlockValueTree()
-        .getProperty (Tags::height, customHeight);
-    
+                       .getProperty (Tags::height, customHeight);
+
     int minW = 0, minH = 0;
     getMinimumSize (minW, minH);
     jassert (minW > 0 && minH > 0);
@@ -941,7 +941,8 @@ void BlockComponent::updateSize()
             break;
         }
         case Embed: {
-            if (embedded != nullptr) {
+            if (embedded != nullptr)
+            {
                 setSize (embedded->getWidth() + pinSize,
                          embedded->getHeight() + 18 + 18);
             }
@@ -959,8 +960,10 @@ void BlockComponent::setCustomSize (int width, int height)
 {
     int mw = width, mh = height;
     getMinimumSize (mw, mh);
-    if (width < mw)     width = mw;
-    if (height < mh)    height = mh;
+    if (width < mw)
+        width = mw;
+    if (height < mh)
+        height = mh;
 
     if (customWidth != width || customHeight != height)
     {
@@ -969,7 +972,7 @@ void BlockComponent::setCustomSize (int width, int height)
         node.getBlockValueTree()
             .setProperty (Tags::width, customWidth, nullptr)
             .setProperty (Tags::height, customHeight, nullptr);
-        
+
         if (displayMode == Small || displayMode == Compact)
         {
             displayModeValue.removeListener (this);
@@ -977,7 +980,7 @@ void BlockComponent::setCustomSize (int width, int height)
             displayModeValue.addListener (this);
             displayMode = Normal;
         }
-        
+
         setSize (customWidth, customHeight);
     }
 }
@@ -1089,22 +1092,19 @@ GraphEditorComponent* BlockComponent::getGraphPanel() const noexcept
     return findParentComponentOfClass<GraphEditorComponent>();
 }
 
-
 void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
 {
     PopupMenu dMenu;
     const auto block = node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
-    const auto mode =  BlockComponent::getDisplayModeFromString(
+    const auto mode = BlockComponent::getDisplayModeFromString (
         block.getProperty (Tags::displayMode).toString());
     for (int i = 0; i <= BlockComponent::Embed; ++i)
     {
         auto m = static_cast<BlockComponent::DisplayMode> (i);
-        dMenu.addItem (BlockComponent::getDisplayModeName(m), true, mode == m, 
-                        [this, block, m]()
-        {
+        dMenu.addItem (BlockComponent::getDisplayModeName (m), true, mode == m, [this, block, m]() {
             auto b = block;
             b.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
-            forEachSibling ([m](BlockComponent& sibling) {
+            forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
                 auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
@@ -1115,7 +1115,7 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
                 gp->updateConnectorComponents (true);
         });
     }
-    menuToAddTo.addSubMenu (TRANS("Display"), dMenu);
+    menuToAddTo.addSubMenu (TRANS ("Display"), dMenu);
 }
 
 } // namespace element

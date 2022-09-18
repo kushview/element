@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE (SupportedFormats)
     PluginManager manager;
     for (const auto& supported : Util::getSupportedAudioPluginFormats())
         BOOST_REQUIRE (! manager.isAudioPluginFormatSupported (supported));
-    
+
     manager.addDefaultFormats();
     for (const auto& supported : Util::getSupportedAudioPluginFormats())
         BOOST_REQUIRE (manager.isAudioPluginFormatSupported (supported));

@@ -29,7 +29,7 @@
 #include "context.hpp"
 #include "log.hpp"
 #include "module.hpp"
-#include "settings.hpp"  
+#include "settings.hpp"
 
 namespace element {
 
@@ -192,16 +192,21 @@ void Context::openModule (const std::string& ID)
         return;
 
     auto it = impl->modules->discovered.find (ID);
-    if (it == impl->modules->discovered.end()) {
+    if (it == impl->modules->discovered.end())
+    {
         std::clog << "module not found: " << ID << std::endl;
         return;
     }
 
-    if (auto mod = std::make_unique<Module> (it->second, *this, *impl->lua)) {
-        if (mod->open()) {
+    if (auto mod = std::make_unique<Module> (it->second, *this, *impl->lua))
+    {
+        if (mod->open())
+        {
             std::clog << "module opened: " << mod->name() << std::endl;
             impl->modules->add (std::move (mod));
-        } else {
+        }
+        else
+        {
             std::clog << "could not open module: " << mod->name() << std::endl;
         }
     }
@@ -211,8 +216,10 @@ void Context::loadModules()
 {
     std::vector<const elFeature*> features;
 
-    for (const auto& mod : *impl->modules) {
-        for (const auto& e : mod->public_extensions()) {
+    for (const auto& mod : *impl->modules)
+    {
+        for (const auto& e : mod->public_extensions())
+        {
             auto f = (elFeature*) std::malloc (sizeof (elFeature));
             features.push_back (f);
             f->ID = strdup (e.first.c_str());
@@ -227,12 +234,14 @@ void Context::loadModules()
     features.push_back ((elFeature*) nullptr);
     elFeatures fptr = &features.front();
 
-    for (const auto& mod : *impl->modules) {
+    for (const auto& mod : *impl->modules)
+    {
         if (! mod->loaded())
             mod->load (fptr);
     }
 
-    for (auto f : features) {
+    for (auto f : features)
+    {
         if (nullptr == f)
             continue;
         std::free ((void*) f->ID);

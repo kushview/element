@@ -21,8 +21,7 @@
 
 namespace element {
 
-class PluginTests : public UnitTestBase
-{
+class PluginTests : public UnitTestBase {
 public:
     PluginTests()
         : UnitTestBase ("Plugins", "Plugins", "plugins") {}
@@ -66,15 +65,15 @@ private:
 
         auto layout = plugin.getBusesLayout();
         for (int i = 0; i < layout.inputBuses.size(); ++i)
-            layout.inputBuses.getReference(i) = AudioChannelSet::disabled();
-        layout.outputBuses.getReference(0) = AudioChannelSet::create7point1();
+            layout.inputBuses.getReference (i) = AudioChannelSet::disabled();
+        layout.outputBuses.getReference (0) = AudioChannelSet::create7point1();
         expect (plugin.checkBusesLayoutSupported (layout));
         expect (plugin.setBusesLayout (layout));
         expect (plugin.getTotalNumInputChannels() == 0);
         expect (plugin.getTotalNumOutputChannels() == 8 + (2 * 16));
 
         for (int i = 0; i < layout.outputBuses.size(); ++i)
-            layout.outputBuses.getReference(i) = AudioChannelSet::disabled();
+            layout.outputBuses.getReference (i) = AudioChannelSet::disabled();
         expect (! plugin.setBusesLayout (layout));
     }
 
@@ -112,4 +111,4 @@ private:
 };
 
 static PluginTests sPluginTests;
-}
+} // namespace element

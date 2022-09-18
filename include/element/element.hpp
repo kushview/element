@@ -10,5 +10,8 @@
     ClassName& operator= (const ClassName&&) = delete;
 
 namespace element {
-template <typename... Args> void ignore_unused (Args&&...) noexcept {}
+template <typename... Args>
+void ignore_unused (Args&&...) noexcept
+{
 }
+} // namespace element

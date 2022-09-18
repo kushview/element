@@ -55,7 +55,7 @@ public:
     static const char* desktopScaleKey;
     static const char* mainContentTypeKey;
     static const char* pluginListHeaderKey;
-    
+
     std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
 

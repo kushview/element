@@ -40,7 +40,7 @@ namespace PanelIDs {
     static const Identifier virtualKeyboard = "virtualKeyboard";
     static const Identifier luaConsole = "luaConsole";
     static const Identifier codeEditor = "codeEditor";
-    
+
 } // namespace PanelIDs
 
 /** A generic panel used for testing and development */
@@ -102,7 +102,7 @@ public:
         type->description = "Displays a single channel strip for a given node";
         type->showInMenu = false;
         type->singleton = true;
-        
+
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::nodeMidi;
         type->name = "MIDI";

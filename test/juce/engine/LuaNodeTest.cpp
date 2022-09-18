@@ -161,25 +161,24 @@ end
 )";
 
 //=============================================================================
-class LuaNodeLifecycleTest : public LuaUnitTest
-{
+class LuaNodeLifecycleTest : public LuaUnitTest {
 public:
     LuaNodeLifecycleTest() : LuaUnitTest ("Lua Node Lifecycle", "LuaNode", "lifecycle") {}
     ~LuaNodeLifecycleTest() override = default;
 
     void runTest() override
     {
-        char* oldPath = getenv("LUA_PATH");
-        setenv("LUA_PATH", getPath().toRawUTF8(), 1);
+        char* oldPath = getenv ("LUA_PATH");
+        setenv ("LUA_PATH", getPath().toRawUTF8(), 1);
         auto graph = std::make_unique<GraphNode>();
         graph->prepareToRender (44100.0, 1024);
         auto* node = new LuaNode();
-        
+
         beginTest ("validate");
         auto result = node->loadScript (nodeScript);
         expect (result.wasOk(), result.getErrorMessage());
 
-        setenv("LUA_PATH", oldPath != nullptr ? oldPath : "", 1);
+        setenv ("LUA_PATH", oldPath != nullptr ? oldPath : "", 1);
         if (! result.wasOk())
             return;
 
@@ -188,12 +187,12 @@ public:
 
         beginTest ("ports");
         expect (node->getNumPorts() == 6);
-        expect (node->getNumPorts (kv::PortType::Audio,   true)  == 2);
-        expect (node->getNumPorts (kv::PortType::Audio,   false) == 2);
-        expect (node->getNumPorts (kv::PortType::Midi,    true)  == 1);
-        expect (node->getNumPorts (kv::PortType::Midi,    false) == 0);
-        expect (node->getNumPorts (kv::PortType::Control, true)  == 1);
-        
+        expect (node->getNumPorts (kv::PortType::Audio, true) == 2);
+        expect (node->getNumPorts (kv::PortType::Audio, false) == 2);
+        expect (node->getNumPorts (kv::PortType::Midi, true) == 1);
+        expect (node->getNumPorts (kv::PortType::Midi, false) == 0);
+        expect (node->getNumPorts (kv::PortType::Control, true) == 1);
+
         beginTest ("release");
         graph->releaseResources();
 
@@ -208,15 +207,14 @@ private:
 static LuaNodeLifecycleTest sLuaNodeLifecycleTest;
 
 //=============================================================================
-class LuaNodeValidateTest : public LuaUnitTest
-{
+class LuaNodeValidateTest : public LuaUnitTest {
 public:
-    LuaNodeValidateTest() : LuaUnitTest ("Lua Node Validation", "LuaNode", "validate") { }
+    LuaNodeValidateTest() : LuaUnitTest ("Lua Node Validation", "LuaNode", "validate") {}
     virtual ~LuaNodeValidateTest() {}
 
     void runTest() override
     {
-        char* oldPath = getenv("LUA_PATH");
+        char* oldPath = getenv ("LUA_PATH");
         setenv ("LUA_PATH", getPath().toRawUTF8(), 1);
 
         auto node = std::make_unique<LuaNode>();
@@ -224,7 +222,7 @@ public:
         beginTest ("validation ok");
         auto result = node->loadScript (nodeScript);
         expect (result.wasOk());
-        setenv("LUA_PATH", oldPath != nullptr ? oldPath : "", 1);
+        setenv ("LUA_PATH", oldPath != nullptr ? oldPath : "", 1);
         return;
 
         beginTest ("global syntax error");

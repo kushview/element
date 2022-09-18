@@ -73,7 +73,7 @@ private:
     bool showIns = true;
     bool showOuts = true;
     Viewport view;
-    
+
     struct Content : public Component,
                      public Button::Listener
     {

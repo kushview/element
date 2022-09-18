@@ -42,7 +42,7 @@ public:
     virtual ~Context();
 
     ServiceManager& getServices();
-    
+
     AudioEnginePtr getAudioEngine() const;
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();

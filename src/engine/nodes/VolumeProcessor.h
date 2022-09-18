@@ -40,10 +40,10 @@ public:
           stereo (_stereo)
     {
         addLegacyParameter (volume = new AudioParameterFloat (Tags::volume.toString(),
-                                                        "Volume",
-                                                        minDb,
-                                                        maxDb,
-                                                        0.f));
+                                                              "Volume",
+                                                              minDb,
+                                                              maxDb,
+                                                              0.f));
         lastVolume = *volume;
         gain = Decibels::decibelsToGain (lastVolume);
         lastGain = gain;

@@ -97,7 +97,7 @@ NodePortsTable::NodePortsTable()
     model.reset (new TableModel (*this));
     table.setModel (model.get());
     auto& header = table.getHeader();
-    header.addColumn ("",  TableModel::VisibleColumn, 30, 30, 30,  TableHeaderComponent::defaultFlags);
+    header.addColumn ("", TableModel::VisibleColumn, 30, 30, 30, TableHeaderComponent::defaultFlags);
     header.addColumn ("Name", TableModel::NameColumn, 100, 30, -1, TableHeaderComponent::defaultFlags);
     header.addColumn ("Type", TableModel::TypeColumn, 100, 30, -1, TableHeaderComponent::defaultFlags);
     addAndMakeVisible (table);

@@ -10,14 +10,13 @@
 using namespace juce;
 
 EL_PLUGIN_EXPORT
-int luaopen_el_Bounds (lua_State* L) {
+int luaopen_el_Bounds (lua_State* L)
+{
     using B = Rectangle<int>;
-    
-    auto M = kv::lua::new_rectangle<int> (L, LKV_TYPE_NAME_BOUNDS,
-        sol::meta_method::to_string, [](B& self) {
-            return kv::lua::to_string (self, LKV_TYPE_NAME_BOUNDS);
-        }
-    );
+
+    auto M = kv::lua::new_rectangle<int> (L, LKV_TYPE_NAME_BOUNDS, sol::meta_method::to_string, [] (B& self) {
+        return kv::lua::to_string (self, LKV_TYPE_NAME_BOUNDS);
+    });
 
     sol::stack::push (L, M);
     return 1;

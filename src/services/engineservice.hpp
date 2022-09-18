@@ -29,7 +29,7 @@ class GraphManager;
 class RootGraphManager;
 
 class EngineService : public Service,
-                         private ChangeListener
+                      private ChangeListener
 {
 public:
     EngineService();

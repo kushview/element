@@ -78,16 +78,25 @@ public:
     BlockComponent (const Node& graph_, const Node& node_, const bool vertical_);
     ~BlockComponent() noexcept;
 
-    enum DisplayMode {
-        Compact, Small, Normal, Embed
+    enum DisplayMode
+    {
+        Compact,
+        Small,
+        Normal,
+        Embed
     };
 
-    inline static DisplayMode getDisplayModeFromString (const String& str) {
+    inline static DisplayMode getDisplayModeFromString (const String& str)
+    {
         auto s = str.toLowerCase().trim();
-        if (str == "normal")    return Normal;
-        if (str == "compact")   return Compact;
-        if (str == "small")     return Small;
-        if (str == "embed")     return Embed;
+        if (str == "normal")
+            return Normal;
+        if (str == "compact")
+            return Compact;
+        if (str == "small")
+            return Small;
+        if (str == "embed")
+            return Embed;
         return Normal;
     }
 
@@ -96,10 +105,18 @@ public:
         String key = "";
         switch (mode)
         {
-            case Normal:  key = "normal"; break;
-            case Compact: key = "compact"; break;
-            case Small:   key = "small"; break;
-            case Embed:   key = "embed"; break;
+            case Normal:
+                key = "normal";
+                break;
+            case Compact:
+                key = "compact";
+                break;
+            case Small:
+                key = "small";
+                break;
+            case Embed:
+                key = "embed";
+                break;
         }
         return key;
     }
@@ -109,10 +126,18 @@ public:
         String name = "";
         switch (mode)
         {
-            case Normal:  name = "Normal"; break;
-            case Compact: name = "Compact"; break;
-            case Small:   name = "Small"; break;
-            case Embed:   name = "Embed"; break;
+            case Normal:
+                name = "Normal";
+                break;
+            case Compact:
+                name = "Compact";
+                break;
+            case Small:
+                name = "Small";
+                break;
+            case Embed:
+                name = "Embed";
+                break;
         }
         return name;
     }
@@ -194,9 +219,9 @@ private:
     Node node;
 
     Value nodeEnabled,
-          nodeName,
-          hiddenPorts,
-          displayModeValue;
+        nodeName,
+        hiddenPorts,
+        displayModeValue;
 
     int numIns = 0, numOuts = 0;
 
@@ -233,19 +258,17 @@ private:
     class BlockColorSelector : public juce::ColourSelector
     {
     public:
-        BlockColorSelector() : ColourSelector (ColourSelector::showColourAtTop | 
-                                               ColourSelector::editableColour | 
-                                               ColourSelector::showColourspace)
+        BlockColorSelector() : ColourSelector (ColourSelector::showColourAtTop | ColourSelector::editableColour | ColourSelector::showColourspace)
         {
             colors.addArray ({
-                Colour (0xFF800000), // Dark Red                
+                Colour (0xFF800000), // Dark Red
                 Colour (0xFFE24B00), // Dark Orange
                 Colour (0xFFEDED00), // Dark Yellow
                 Colour (0xFF247D21), // Pastel Green
                 Colour (0xFF2969BE), // Pastel Blue
                 Colour (0xFF5627A1), // Purple
                 Colour (0xFF363636), // Jet
-                Colour (0xFFFFFCFF)  // Snow
+                Colour (0xFFFFFCFF) // Snow
             });
 
             colors.addArray ({
@@ -256,19 +279,20 @@ private:
                 Colour (0xFF90BE6D),
                 Colour (0xFF43AA8B),
                 Colour (0xFF017798), // CG Blue
-                Colour (0xFF8C9A9E), // Cadet Grey                
-                Colour (0xFF475B63),                
+                Colour (0xFF8C9A9E), // Cadet Grey
+                Colour (0xFF475B63),
             });
         }
-        
+
         ~BlockColorSelector() = default;
-        
+
         int getNumSwatches() const { return colors.size(); }
-        
+
         Colour getSwatchColour (int index) const
         {
-            return isPositiveAndBelow (index, colors.size()) 
-                ? colors.getReference(index) : fallback;
+            return isPositiveAndBelow (index, colors.size())
+                       ? colors.getReference (index)
+                       : fallback;
         }
 
         void setSwatchColour (int index, const Colour& color)
@@ -276,6 +300,7 @@ private:
             if (isPositiveAndBelow (index, colors.size()))
                 colors.set (index, color);
         }
+
     private:
         Array<Colour> colors;
         Colour fallback { 0xFF000000 };
@@ -289,7 +314,7 @@ private:
     void changeListenerCallback (ChangeBroadcaster*) override;
 
     void deleteAllPins();
-    
+
     bool mouseInCornerResize = false;
     Rectangle<int> getBoxRectangle() const;
     Rectangle<int> getCornerResizeBox() const;
@@ -307,13 +332,12 @@ private:
         setNodePosition (pti.x, pti.y);
     }
 
-    
     Point<double> getNodePosition() const noexcept;
 
     void setSelectedInternal (bool status);
 
     void makeEditorActive();
-    
+
     void update (const bool doPosition = true, const bool forcePins = false);
     void updateSize();
     void updatePins (bool force);
@@ -323,7 +347,7 @@ private:
     void valueChanged (Value& value) override;
 
     void addDisplaySubmenu (PopupMenu& menuToAddTo);
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent);
 };
 

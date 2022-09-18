@@ -7,7 +7,8 @@
  *  The template parameter should be a
 */
 template <typename CType>
-class FeatureData {
+class FeatureData
+{
 public:
     using data_type = CType;
     ~FeatureData() = default;
@@ -21,7 +22,8 @@ private:
     data_type data;
 };
 
-class FeatureType {
+class FeatureType
+{
 public:
     virtual ~FeatureType() = default;
     const elFeature* c_type() const noexcept { return &f; }
@@ -44,14 +46,16 @@ private:
 };
 
 /** List of referenced features. */
-class Features final {
+class Features final
+{
 public:
     using VectorType = std::vector<const elFeature*>;
 
     Features() { features.push_back (nullptr); }
     Features (const elFeature* const* cfeatures)
     {
-        for (int i = 0; cfeatures[i] != nullptr; ++i) {
+        for (int i = 0; cfeatures[i] != nullptr; ++i)
+        {
             features.push_back (cfeatures[i]);
         }
         features.push_back (nullptr);
@@ -75,7 +79,7 @@ public:
 
     bool contains (const char* ID) const noexcept { return nullptr != find (ID); }
     elFeatures c_type() const noexcept { return features.data(); }
-    operator const elFeature* const *() const noexcept
+    operator const elFeature* const*() const noexcept
     {
         return features.data();
     }
@@ -88,7 +92,8 @@ private:
 };
 
 /** Collection of feature implementations. */
-class FeatureStore {
+class FeatureStore
+{
 public:
     FeatureStore() = default;
     virtual ~FeatureStore() = default;
@@ -123,7 +128,8 @@ public:
 
     void clear()
     {
-        while (types.size() > 0) {
+        while (types.size() > 0)
+        {
             auto ptr = types.back();
             types.pop_back();
             ptr.reset();

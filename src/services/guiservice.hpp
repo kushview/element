@@ -40,8 +40,8 @@ class PluginWindow;
 class SessionDocument;
 
 class GuiService : public Service,
-                      public juce::ApplicationCommandTarget,
-                      private juce::ChangeListener
+                   public juce::ApplicationCommandTarget,
+                   private juce::ChangeListener
 {
 public:
     Signal<void()> nodeSelected;

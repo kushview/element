@@ -44,7 +44,7 @@ namespace element {
 ServiceManager& Service::getServices() const
 {
     jassert (owner != nullptr); // if you hit this then you're probably calling
-                                // this before controller initialization
+        // this before controller initialization
     return *owner;
 }
 
@@ -55,7 +55,6 @@ RunMode Service::getRunMode() const { return getServices().getRunMode(); }
 ServiceManager::ServiceManager (Context& g, RunMode m)
     : world (g), runMode (m)
 {
-    
 }
 
 ServiceManager::~ServiceManager() {}
@@ -217,7 +216,7 @@ void ServiceManager::handleMessage (const Message& msg)
     handled = true; // final else condition will set false
     if (const auto* lpm = dynamic_cast<const LoadPluginMessage*> (&msg))
     {
-            ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);
+        ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);
     }
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))
     {

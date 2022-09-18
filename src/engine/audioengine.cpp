@@ -450,11 +450,11 @@ public:
                 if (! incomingMidi.isEmpty())
                 {
                     midiIOMonitor->sent();
-                   #if JUCE_WINDOWS
+#if JUCE_WINDOWS
                     midiOut->sendBlockOfMessagesNow (incomingMidi);
-                   #else
+#else
                     midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
-                   #endif
+#endif
                 }
             }
         }

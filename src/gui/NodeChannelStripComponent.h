@@ -328,7 +328,8 @@ private:
             channelBox.clear();
 
             // audio out node ports flipped until more robust
-            auto& ports = isAudioOutNode ? audioIns : isMonitoringInputs() ? audioIns : audioOuts;
+            auto& ports = isAudioOutNode ? audioIns : isMonitoringInputs() ? audioIns
+                                                                           : audioOuts;
 
             const bool monoPorts = ports.size() % 2 != 0;
             const int step = monoPorts ? 1 : 2;

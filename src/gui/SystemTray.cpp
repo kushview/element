@@ -76,7 +76,7 @@ void SystemTray::setEnabled (bool enabled)
 {
     if (element::Util::isRunningInWine())
         return;
-    
+
     if (enabled)
     {
         if (instance == nullptr)

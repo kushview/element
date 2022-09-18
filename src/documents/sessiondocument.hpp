@@ -35,7 +35,8 @@ public:
     Result saveDocument (const File& file) override;
     File getLastDocumentOpened() override;
     void setLastDocumentOpened (const File& file) override;
-    File getSuggestedSaveAsFile (const File&) override {
+    File getSuggestedSaveAsFile (const File&) override
+    {
         return getFile().getNonexistentSibling (true);
     }
 

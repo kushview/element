@@ -19,12 +19,11 @@
 #include "LuaUnitTest.h"
 using namespace element;
 
-class LuaStream : public LuaUnitTest
-{
+class LuaStream : public LuaUnitTest {
 public:
     LuaStream() : LuaUnitTest ("LuaStream", "Lua", "stream") {}
     ~LuaStream() override {}
-    
+
     void runTest() override
     {
         sol::state& L = lua;
@@ -41,50 +40,50 @@ public:
 
             runSnippet ("stream_from_c.lua");
             expect (lua["currentpos"].get<lua_Integer>() == 0);
-            expect (lua["result"].get<std::string>() == std::string(testData));
+            expect (lua["result"].get<std::string>() == std::string (testData));
         } catch (const std::exception& e) {
             expect (false, e.what());
         }
-        
+
         lua.collect_garbage();
     }
 };
 
 static LuaStream sLuaTableTest;
 
-template<typename T>
-static T* proxy_userdata (const sol::table& proxy) {
+template <typename T>
+static T* proxy_userdata (const sol::table& proxy)
+{
     if (! proxy.valid())
         return nullptr;
     auto mt = proxy[sol::metatable_key];
     return mt["__impl"].get_or<T*> (nullptr);
 }
 
-void my_panic(sol::optional<std::string> maybe_msg) {
-	std::cerr << "Lua is in a panic state and will now abort() the application" << std::endl;
-	if (maybe_msg) {
-		const std::string& msg = maybe_msg.value();
-		std::cerr << "\terror message: " << msg << std::endl;
-	}
-	// When this function exits, Lua will exhibit default behavior and abort()
+void my_panic (sol::optional<std::string> maybe_msg)
+{
+    std::cerr << "Lua is in a panic state and will now abort() the application" << std::endl;
+    if (maybe_msg) {
+        const std::string& msg = maybe_msg.value();
+        std::cerr << "\terror message: " << msg << std::endl;
+    }
+    // When this function exits, Lua will exhibit default behavior and abort()
 }
 
-class LuaInherritUserdata : public LuaUnitTest
-{
+class LuaInherritUserdata : public LuaUnitTest {
 public:
     LuaInherritUserdata() : LuaUnitTest ("Inherrit CXX", "Lua", "userdata") {}
     ~LuaInherritUserdata() override {}
-    
-    class Parent
-    {
+
+    class Parent {
     public:
         Parent()
         {
             // DBG("Parent::Parent()");
         }
-        
+
         ~Parent()
-        { 
+        {
             // DBG("Parent::~Parent()");
         }
 
@@ -92,25 +91,22 @@ public:
         {
             std::clog << getValue() << std::endl;
         }
-        
+
         static void init (sol::variadic_args args)
         {
             sol::object obj = args.get<sol::object>();
-            if (obj.is<sol::table>())
-            {
+            if (obj.is<sol::table>()) {
                 auto self = obj.as<sol::table>();
-                if (auto* impl = proxy_userdata<Parent> (self))
-                {
+                if (auto* impl = proxy_userdata<Parent> (self)) {
                     impl->proxy = self;
-                    impl->_value = self ["value"];
+                    impl->_value = self["value"];
                 }
             }
         }
 
         double getValue() const
         {
-            if (_value)
-            {
+            if (_value) {
                 sol::object ret = _value (proxy);
                 return ret.as<double>();
             }
@@ -123,7 +119,7 @@ public:
                 return;
             value = val;
             if (changed)
-                changed(); 
+                changed();
         }
 
         std::function<void()> changed;
@@ -136,7 +132,7 @@ public:
         double value = 100;
         sol::table proxy;
         sol::function _value;
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parent);
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Parent);
     };
 
     void runTest() override
@@ -148,17 +144,23 @@ public:
 
         beginTest ("Sol3 Parent");
         auto T = lua.new_usertype<Parent> ("Parent",
-            sol::no_constructor,
-            "new",      sol::constructors<Parent()>(),
-            "name",     sol::property (&Parent::get_name, &Parent::set_name),
+                                           sol::no_constructor,
+                                           "new",
+                                           sol::constructors<Parent()>(),
+                                           "name",
+                                           sol::property (&Parent::get_name, &Parent::set_name),
 
-            "init",     Parent::init,
-            
-            "set",      &Parent::setValue,
-            "get",      &Parent::getValue,
-            "print",    &Parent::printValue,
-            "changed",  &Parent::changed
-        );
+                                           "init",
+                                           Parent::init,
+
+                                           "set",
+                                           &Parent::setValue,
+                                           "get",
+                                           &Parent::getValue,
+                                           "print",
+                                           &Parent::printValue,
+                                           "changed",
+                                           &Parent::changed);
 
         sol::table T_mt = T[sol::metatable_key];
         T_mt.set_function ("__newuserdata", [this]() {
@@ -168,12 +170,10 @@ public:
         T_mt["__pairs"] = sol::lua_nil;
 
         T_mt["__props"] = lua.create_table().add (
-            "name"
-        );
+            "name");
 
         T_mt["__methods"] = lua.create_table().add (
-            "print", "get", "set"
-        );
+            "print", "get", "set");
 
         auto status = runSnippet ("sol3_parent.lua");
         expect (status == sol::call_status::ok);

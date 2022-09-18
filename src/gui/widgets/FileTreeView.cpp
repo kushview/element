@@ -28,10 +28,10 @@ using namespace juce;
 namespace element {
 
 //==============================================================================
-class FileListTreeItem   : public TreeViewItem,
-                           private TimeSliceClient,
-                           private AsyncUpdater,
-                           private ChangeListener
+class FileListTreeItem : public TreeViewItem,
+                         private TimeSliceClient,
+                         private AsyncUpdater,
+                         private ChangeListener
 {
 public:
     FileListTreeItem (FileTreeView& treeComp,
@@ -49,7 +49,7 @@ public:
         DirectoryContentsList::FileInfo fileInfo;
 
         if (parentContents != nullptr
-             && parentContents->getFileInfo (indexInContents, fileInfo))
+            && parentContents->getFileInfo (indexInContents, fileInfo))
         {
             fileSize = File::descriptionOfSizeInBytes (fileInfo.fileSize);
             modTime = fileInfo.modificationTime.formatted ("%d %b '%y %H:%M");
@@ -69,14 +69,15 @@ public:
     }
 
     //==============================================================================
-    bool mightContainSubItems() override                 { return isDirectory; }
-    String getUniqueName() const override                { return file.getFullPathName(); }
-    int getItemHeight() const override                   { return owner.getItemHeight(); }
+    bool mightContainSubItems() override { return isDirectory; }
+    String getUniqueName() const override { return file.getFullPathName(); }
+    int getItemHeight() const override { return owner.getItemHeight(); }
 
     var getDragSourceDescription() override
-    { 
-        return owner.dragsNativeFiles() 
-            ? var() : var (owner.getDragAndDropDescription()); 
+    {
+        return owner.dragsNativeFiles()
+                   ? var()
+                   : var (owner.getDragAndDropDescription());
     }
 
     void itemOpennessChanged (bool isNowOpen) override
@@ -169,8 +170,7 @@ public:
         if (isOpen() && subContentsList != nullptr)
         {
             for (int i = 0; i < subContentsList->getNumFiles(); ++i)
-                addSubItem (new FileListTreeItem (owner, subContentsList, i,
-                                                  subContentsList->getFile(i), thread));
+                addSubItem (new FileListTreeItem (owner, subContentsList, i, subContentsList->getFile (i), thread));
         }
     }
 
@@ -186,18 +186,14 @@ public:
                 thread.addTimeSliceClient (this);
         }
 
-        owner.getLookAndFeel().drawFileBrowserRow (g, width, height,
-                                                   file, file.getFileName(),
-                                                   &icon, fileSize, modTime,
-                                                   isDirectory, isSelected(),
-                                                   indexInContentsList, owner);
+        owner.getLookAndFeel().drawFileBrowserRow (g, width, height, file, file.getFileName(), &icon, fileSize, modTime, isDirectory, isSelected(), indexInContentsList, owner);
     }
-    
+
     std::unique_ptr<Component> createItemComponent() override
     {
-        return owner.dragsNativeFiles() 
-            ? std::make_unique<ItemComponent> (*this)
-            : nullptr;
+        return owner.dragsNativeFiles()
+                   ? std::make_unique<ItemComponent> (*this)
+                   : nullptr;
     };
 
     String getAccessibilityName() override
@@ -251,7 +247,7 @@ private:
     public:
         ItemComponent (FileListTreeItem& i)
             : item (i) {}
-        
+
         void paint (Graphics& g) override
         {
             item.paintItem (g, getWidth(), getHeight());
@@ -266,7 +262,7 @@ private:
         {
             if (dragging)
                 return;
-            
+
             StringArray files;
             files.add (item.file.getFullPathName());
             for (int i = 0; i < item.owner.getNumSelectedFiles(); ++i)
@@ -283,7 +279,8 @@ private:
 
         void mouseUp (const MouseEvent& event) override
         {
-            if (! dragging && getLocalBounds().contains (event.position.toInt())) {
+            if (! dragging && getLocalBounds().contains (event.position.toInt()))
+            {
                 item.itemClicked (event);
                 item.setSelected (true, true);
             }
@@ -343,8 +340,7 @@ void FileTreeView::refresh()
 {
     deleteRootItem();
 
-    auto root = new FileListTreeItem (*this, nullptr, 0, directoryContentsList.getDirectory(),
-                                      directoryContentsList.getTimeSliceThread());
+    auto root = new FileListTreeItem (*this, nullptr, 0, directoryContentsList.getDirectory(), directoryContentsList.getTimeSliceThread());
 
     root->setSubContentsList (&directoryContentsList, false);
     setRootItem (root);
@@ -397,9 +393,9 @@ void FileTreeView::setDragNativeFiles (bool useNative)
 {
     if (nativeFileDrag == useNative)
         return;
-    
+
     nativeFileDrag = useNative;
     refresh();
 }
 
-} // namespace juce
+} // namespace element

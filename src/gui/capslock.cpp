@@ -21,7 +21,7 @@
 #elif defined(__APPLE__)
 #include <CoreGraphics/CoreGraphics.h>
 #else
- #warning "Caps lock detection not yet implemented on Linux"
+#warning "Caps lock detection not yet implemented on Linux"
 #endif
 
 #include "gui/capslock.hpp"

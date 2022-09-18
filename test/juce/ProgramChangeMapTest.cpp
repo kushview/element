@@ -22,12 +22,11 @@
 
 namespace element {
 
-class ProgramChangeMapTest : public UnitTestBase
-{
+class ProgramChangeMapTest : public UnitTestBase {
 public:
-    ProgramChangeMapTest() : UnitTestBase ("Program Change Map", "nodes", "midiProgramMap") { }
-    void initialise() override { }
-    void shutdown() override { }
+    ProgramChangeMapTest() : UnitTestBase ("Program Change Map", "nodes", "midiProgramMap") {}
+    void initialise() override {}
+    void shutdown() override {}
     void runTest() override
     {
         GraphNode graph;
@@ -102,17 +101,24 @@ private:
         midi->addEvent (MidiMessage::noteOn (1, 12, static_cast<uint8> (50)), 300);
         midi->addEvent (MidiMessage::noteOff (1, 12), 300);
         node->render (audio, pipe);
-        
+
         MidiBuffer::Iterator iter (*midi);
-        MidiMessage msg; int frame = 0, index = 0;
-        while (iter.getNextEvent (msg, frame))
-        {
-            switch (index)
-            {
-                case 0: expect (msg.isProgramChange() && msg.getProgramChangeNumber() == 6); break;
-                case 1: expect (msg.isProgramChange() && msg.getProgramChangeNumber() == 5); break;
-                case 2: expect (msg.isNoteOn()); break;
-                case 3: expect (msg.isNoteOff()); break;
+        MidiMessage msg;
+        int frame = 0, index = 0;
+        while (iter.getNextEvent (msg, frame)) {
+            switch (index) {
+                case 0:
+                    expect (msg.isProgramChange() && msg.getProgramChangeNumber() == 6);
+                    break;
+                case 1:
+                    expect (msg.isProgramChange() && msg.getProgramChangeNumber() == 5);
+                    break;
+                case 2:
+                    expect (msg.isNoteOn());
+                    break;
+                case 3:
+                    expect (msg.isNoteOff());
+                    break;
             }
 
             ++index;
@@ -122,4 +128,4 @@ private:
 
 static ProgramChangeMapTest sProgramChangeMapTest;
 
-}
+} // namespace element

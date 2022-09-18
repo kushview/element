@@ -20,11 +20,10 @@
 
 using namespace element;
 
-class DummyTest : public UnitTest
-{
+class DummyTest : public UnitTest {
 public:
-    DummyTest() : UnitTest ("Dummy", "dummy") { }
-    virtual ~DummyTest() { }
+    DummyTest() : UnitTest ("Dummy", "dummy") {}
+    virtual ~DummyTest() {}
 
     void runTest()
     {
@@ -73,12 +72,9 @@ private:
 
     static var testLog (const var::NativeFunctionArgs& args)
     {
-        if (args.numArguments == 1)
-        {
+        if (args.numArguments == 1) {
             Logger::writeToLog (args.arguments->toString());
-        }
-        else if (args.numArguments > 1)
-        {
+        } else if (args.numArguments > 1) {
             for (int i = 0; i < args.numArguments; ++i)
                 Logger::writeToLog ((args.arguments + i)->toString());
         }

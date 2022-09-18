@@ -231,12 +231,12 @@ namespace Lua {
     }
 
 //==============================================================================
-#define DEFINE_LUA_TXT_LOADER(pkgname)                                                              \
-    static int load_el_##pkgname (lua_State* L)                                                     \
-    {                                                                                               \
-        sol::state_view view (L);                                                                   \
+#define DEFINE_LUA_TXT_LOADER(pkgname)                                                                            \
+    static int load_el_##pkgname (lua_State* L)                                                                   \
+    {                                                                                                             \
+        sol::state_view view (L);                                                                                 \
         sol::stack::push (L, view.script (BinaryData::pkgname##_lua, (String ("el.") + #pkgname).toStdString())); \
-        return 1;                                                                                   \
+        return 1;                                                                                                 \
     }
 
     DEFINE_LUA_TXT_LOADER (AudioBuffer)

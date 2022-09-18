@@ -20,39 +20,36 @@
 
 static bool copyData()
 {
-    const auto dataDir      = File::getCurrentWorkingDirectory().getChildFile ("data");
-    const auto buildDir     = File::getCurrentWorkingDirectory().getChildFile ("build");
-    const auto buildData    = buildDir.getChildFile ("data");
+    const auto dataDir = File::getCurrentWorkingDirectory().getChildFile ("data");
+    const auto buildDir = File::getCurrentWorkingDirectory().getChildFile ("build");
+    const auto buildData = buildDir.getChildFile ("data");
     if (buildData.exists())
         buildData.deleteRecursively();
     return dataDir.copyDirectoryTo (buildDir.getChildFile ("data"));
 }
 
-
 class TestApp : public JUCEApplication,
-                public AsyncUpdater
-{
+                public AsyncUpdater {
     String commandLine;
     std::unique_ptr<Component> comp;
 
 public:
-    TestApp() { }
-    virtual ~TestApp() { }
+    TestApp() {}
+    virtual ~TestApp() {}
 
-    const String getApplicationName()    override      { return "Element Tests"; }
-    const String getApplicationVersion() override      { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed()    override      { return false; }
+    const String getApplicationName() override { return "Element Tests"; }
+    const String getApplicationVersion() override { return ProjectInfo::versionString; }
+    bool moreThanOneInstanceAllowed() override { return false; }
 
     void handleAsyncUpdate() override
     {
         runUnitTests();
     }
 
-    void initialise (const String& cli ) override
+    void initialise (const String& cli) override
     {
         commandLine = cli;
-        if (! copyData()) 
-        {
+        if (! copyData()) {
             setApplicationReturnValue (100);
             quit();
             return;
@@ -71,48 +68,37 @@ public:
         UnitTestRunner runner;
         runner.setAssertOnFailure (true);
 
-    #if JUCE_LINUX
+#if JUCE_LINUX
         comp = std::make_unique<Component>();
-        comp->setSize (2,2);
+        comp->setSize (2, 2);
         comp->addToDesktop (0);
-    #endif
+#endif
 
-        if (opts.size() <= 0)
-        {
+        if (opts.size() <= 0) {
             runner.runAllTests();
-        }
-        else if (opts.size() == 1 && UnitTest::getAllCategories().contains (opts [0]))
-        {
+        } else if (opts.size() == 1 && UnitTest::getAllCategories().contains (opts[0])) {
             runner.runTestsInCategory (opts[0]);
-        }
-        else if (opts.size() == 2)
-        {
-            const String category (opts [0]);
-            const String slug (opts [1]);
+        } else if (opts.size() == 2) {
+            const String category (opts[0]);
+            const String slug (opts[1]);
             Array<UnitTest*> testsToRun;
             for (auto* const unitTest : UnitTest::getAllTests())
                 if (auto* const test = dynamic_cast<element::UnitTestBase*> (unitTest))
                     if (category == test->getCategory() && slug == test->getSlug())
                         testsToRun.add (unitTest);
-            if (testsToRun.isEmpty())
-            {
+            if (testsToRun.isEmpty()) {
                 Logger::writeToLog ("test(s) not found");
-            }
-            else
-            {
+            } else {
                 runner.runTests (testsToRun);
             }
-        }
-        else
-        {
-            String notfound ("category not found: "); 
-            notfound << opts [0];
+        } else {
+            String notfound ("category not found: ");
+            notfound << opts[0];
             Logger::writeToLog (notfound);
         }
 
         int totalFails = 0, totalPass = 0;
-        for (int i = 0; i < runner.getNumResults(); ++i)
-        {
+        for (int i = 0; i < runner.getNumResults(); ++i) {
             const auto* const result = runner.getResult (i);
             totalFails += result->failures;
             totalPass += result->passes;
@@ -120,26 +106,27 @@ public:
 
         Logger::writeToLog ("-----------------------------------------------------------------");
         Logger::writeToLog ("Test Results");
-        String message = "pass: "; message << totalPass << " fail: " << totalFails << newLine;
+        String message = "pass: ";
+        message << totalPass << " fail: " << totalFails << newLine;
         Logger::writeToLog (message);
         setApplicationReturnValue (totalFails);
         systemRequestedQuit();
     }
-    
-    
-    void shutdown() override {
+
+    void shutdown() override
+    {
         comp.reset();
     }
 
     void systemRequestedQuit() override
     {
         TestApp::quit();
-        MessageManager::getInstance()->runDispatchLoopUntil(14);
+        MessageManager::getInstance()->runDispatchLoopUntil (14);
     }
 
     void anotherInstanceStarted (const String& commandLine) override
     {
-       ignoreUnused (commandLine);
+        ignoreUnused (commandLine);
     }
 
     void resumed() override {}

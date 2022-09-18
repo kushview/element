@@ -7,9 +7,10 @@ extern "C" {
 
 #include <stdint.h>
 
-typedef union _kv_packed_t {
+typedef union _kv_packed_t
+{
     int64_t packed;
-    uint8_t data [4];
+    uint8_t data[4];
 } kv_packed_t;
 
 #ifdef __cplusplus

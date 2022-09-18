@@ -72,7 +72,7 @@ private:
 
     struct DelayedNodeFocus : public Timer
     {
-        DelayedNodeFocus (PluginWindow& w) : window (w) { }
+        DelayedNodeFocus (PluginWindow& w) : window (w) {}
         void timerCallback() override;
         void trigger (int millis = 100) { startTimer (millis); }
 

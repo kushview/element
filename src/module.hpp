@@ -15,7 +15,8 @@ namespace element {
 
 using FeatureMap = std::map<std::string, const void*>;
 
-class Module {
+class Module
+{
 public:
     Module (const std::string& bundle_path, Context& context, Scripting& s);
     ~Module();
@@ -69,7 +70,8 @@ private:
     void handle_module_extension (const elFeature& f);
 };
 
-class Modules {
+class Modules
+{
 public:
     using ptr_type = std::unique_ptr<Module>;
     using vector_type = std::vector<ptr_type>;
@@ -99,7 +101,8 @@ public:
         if (discovered.size() > 0)
             return (int) discovered.size();
 
-        for (auto const& entry : searchpath.find_folders (false, "*.element")) {
+        for (auto const& entry : searchpath.find_folders (false, "*.element"))
+        {
             Manifest manifest = read_module_manifest (entry.string());
             if (! manifest.name.empty())
                 discovered.insert ({ manifest.name, entry.string() });
@@ -110,7 +113,8 @@ public:
 
     void unload_all()
     {
-        for (const auto& mod : mods) {
+        for (const auto& mod : mods)
+        {
             mod->unload();
             mod->close();
         }

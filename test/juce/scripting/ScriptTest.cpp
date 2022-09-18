@@ -38,16 +38,15 @@ static const String sAnonymous = R"(
 )";
 
 //=============================================================================
-class ScriptTest : public LuaUnitTest
-{
+class ScriptTest : public LuaUnitTest {
 public:
     ScriptTest()
         : LuaUnitTest ("ScriptTest", "ScriptTest", "basics") {}
-    
+
     void runTest() override
     {
         const auto ampFile = File::getCurrentWorkingDirectory()
-            .getChildFile ("scripts/amp.lua");
+                                 .getChildFile ("scripts/amp.lua");
         {
             beginTest ("load");
             auto script = std::unique_ptr<Script> (new Script (lua));
@@ -68,14 +67,14 @@ public:
 
         {
             auto script = std::unique_ptr<Script> (new Script (lua, ampFile));
-            expect (script->isLoaded() && !script->hasError(), script->getErrorMessage());
+            expect (script->isLoaded() && ! script->hasError(), script->getErrorMessage());
         }
 
         {
             auto script = std::unique_ptr<Script> (new Script (lua, sSyntaxError));
             beginTest (String ("load with error"));
             expect (script->hasError(), script->getErrorMessage());
-            DBG(script->getErrorMessage());
+            DBG (script->getErrorMessage());
 
             beginTest ("error");
             auto result = script->call();
@@ -83,12 +82,12 @@ public:
             expect (script->getErrorMessage().containsIgnoreCase ("error"));
             DBG (script->getErrorMessage());
         }
-        
+
         {
             auto script = std::unique_ptr<Script> (new Script (lua));
             script->load (sExceptionError);
             script->call();
-            beginTest (String("exception: ") + script->getErrorMessage());
+            beginTest (String ("exception: ") + script->getErrorMessage());
             expect (script->getErrorMessage().isNotEmpty());
         }
 
@@ -133,17 +132,19 @@ public:
 
         {
             beginTest ("base64 encode");
-            String urlStr = "base64://"; urlStr << Util::toBase64 (sExceptionError);
+            String urlStr = "base64://";
+            urlStr << Util::toBase64 (sExceptionError);
             URL url (urlStr);
-            const auto decoded = Util::fromBase64 (url.toString(false).replace ("base64://", ""));
+            const auto decoded = Util::fromBase64 (url.toString (false).replace ("base64://", ""));
             expect (decoded.trim() == sExceptionError.trim(), decoded);
         }
 
         {
             beginTest ("gzip encode/decode");
-            String urlStr = "gzip://"; urlStr << gzip::encode (sExceptionError);
+            String urlStr = "gzip://";
+            urlStr << gzip::encode (sExceptionError);
             URL url (urlStr);
-            const auto decompressed = gzip::decode (url.toString(false).replace ("gzip://", ""));
+            const auto decompressed = gzip::decode (url.toString (false).replace ("gzip://", ""));
             expect (sExceptionError.trim() == decompressed.trim());
         }
     }
@@ -152,11 +153,10 @@ public:
 static ScriptTest sScriptTest;
 
 //=============================================================================
-class DSPScriptTest : public LuaUnitTest
-{
+class DSPScriptTest : public LuaUnitTest {
 public:
     DSPScriptTest()
-        : LuaUnitTest ("DSP Script", "Script", "DSP") { }
+        : LuaUnitTest ("DSP Script", "Script", "DSP") {}
 
     void runTest() override
     {
@@ -164,8 +164,7 @@ public:
             beginTest ("load");
             auto script = std::make_unique<Script> (lua);
             script->load (readSnippet ("test_dsp_script_01.lua"));
-            if (script->hasError())
-            {
+            if (script->hasError()) {
                 expect (false, String ("Could not load script: ") + script->getErrorMessage());
                 return;
             }
@@ -175,21 +174,21 @@ public:
                 return;
 
             auto result = script->call();
-            expect(result.get_type() == sol::type::table, sol::type_name (result.lua_state(), result.get_type()));
+            expect (result.get_type() == sol::type::table, sol::type_name (result.lua_state(), result.get_type()));
             sol::table Amp = result;
             DSPScript dsp (Amp);
             beginTest ("dsp loaded");
             expect (dsp.isValid(), "Could not instantiate DSP Script");
             if (! dsp.isValid())
                 return;
-            
+
             beginTest ("ports");
             const auto& ports = dsp.getPorts();
-            expect (ports.size (kv::PortType::Audio,   true)  == 2);
-            expect (ports.size (kv::PortType::Audio,   false) == 2);
-            expect (ports.size (kv::PortType::Midi,    true)  == 0);
-            expect (ports.size (kv::PortType::Midi,    false) == 0);
-            expect (ports.size (kv::PortType::Control, true)  == 1);
+            expect (ports.size (kv::PortType::Audio, true) == 2);
+            expect (ports.size (kv::PortType::Audio, false) == 2);
+            expect (ports.size (kv::PortType::Midi, true) == 0);
+            expect (ports.size (kv::PortType::Midi, false) == 0);
+            expect (ports.size (kv::PortType::Control, true) == 1);
             expect (ports.size (kv::PortType::Control, false) == 0);
 
             beginTest ("init");
@@ -201,18 +200,17 @@ public:
             expect (Amp.get_or ("rate", 0.0) == 44100.0, String (Amp.get_or ("rate", 0)));
             expect (Amp.get_or ("block", 0.0) == 4096.0, String (Amp.get_or ("block", 0)));
 
-            
             AudioSampleBuffer audio (2, 4096);
             for (int c = 0; c < 2; ++c)
                 for (int f = 0; f < 4096; ++f)
                     audio.setSample (c, f, 1.0);
             MidiPipe midi;
 
-            dsp.getParameterObject(0)->setValueNotifyingHost(0.0);
+            dsp.getParameterObject (0)->setValueNotifyingHost (0.0);
             dsp.process (audio, midi);
 
             beginTest ("processed");
-            expect (audio.getSample (0, 4095) < 1.0, String (audio.getSample(0, 4095)));
+            expect (audio.getSample (0, 4095) < 1.0, String (audio.getSample (0, 4095)));
 
             MemoryBlock block;
             beginTest ("save");

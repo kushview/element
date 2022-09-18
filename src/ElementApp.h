@@ -25,7 +25,8 @@
 
 #include <element/element.hpp>
 
-namespace kv {}
+namespace kv {
+}
 using namespace kv;
 
 //=============================================================================

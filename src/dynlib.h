@@ -7,9 +7,9 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
-    #include "dlfcn-win32.h"
+#include "dlfcn-win32.h"
 #else
-    #include <dlfcn.h>
+#include <dlfcn.h>
 #endif
 
 static void* element_openlib (const char* path)

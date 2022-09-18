@@ -11,7 +11,8 @@ namespace element {
 
 static constexpr const char* MANIFEST_FILENAME = "manifest.lua";
 
-struct Manifest {
+struct Manifest
+{
     Manifest() = default;
     Manifest (const Manifest&& o)
     {
@@ -41,7 +42,8 @@ static Manifest read_module_manifest (Tx&& bundle_path)
     sol::state state;
     state.open_libraries (sol::lib::base, sol::lib::string);
 
-    try {
+    try
+    {
         state.safe_script_file (f.string());
 
         result.name = state.get_or ("name", std::string (""));
@@ -52,7 +54,8 @@ static Manifest read_module_manifest (Tx&& bundle_path)
                 if (item.first.is<int>() && item.second.is<std::string>())
                     result.provides.push_back (item.second.as<std::string>());
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception& e)
+    {
         std::clog << "config error: " << e.what() << std::endl;
     }
 

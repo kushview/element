@@ -1,6 +1,6 @@
 
 #ifndef EL_DYNLIB_H
-    #error "don't include dlfcn-win32.h directly, use dynlib.h instead"
+#error "don't include dlfcn-win32.h directly, use dynlib.h instead"
 #endif
 #undef DLFCN_WIN32_SHARED
 

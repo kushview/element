@@ -36,8 +36,8 @@ namespace element {
     @tags{GUI}
 */
 
-class JUCE_API  FileTreeView  : public juce::TreeView,
-                                public juce::DirectoryContentsDisplayComponent
+class JUCE_API FileTreeView : public juce::TreeView,
+                              public juce::DirectoryContentsDisplayComponent
 {
 public:
     //==============================================================================
@@ -52,7 +52,7 @@ public:
     /** Returns the number of files the user has got selected.
         @see getSelectedFile
     */
-    int getNumSelectedFiles() const override               { return juce::TreeView::getNumSelectedItems(); }
+    int getNumSelectedFiles() const override { return juce::TreeView::getNumSelectedItems(); }
 
     /** Returns one of the files that the user has currently selected.
         The index should be in the range 0 to (getNumSelectedFiles() - 1).
@@ -82,13 +82,13 @@ public:
 
     /** Returns the last value that was set by setDragAndDropDescription().
     */
-    const juce::String& getDragAndDropDescription() const noexcept    { return dragAndDropDescription; }
+    const juce::String& getDragAndDropDescription() const noexcept { return dragAndDropDescription; }
 
     /** Changes the height of the treeview items. */
     void setItemHeight (int newHeight);
 
     /** Returns the height of the treeview items. */
-    int getItemHeight() const noexcept                          { return itemHeight; }
+    int getItemHeight() const noexcept { return itemHeight; }
 
     /** Do native file drag */
     void setDragNativeFiles (bool useNative);

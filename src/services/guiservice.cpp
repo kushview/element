@@ -110,7 +110,7 @@ void GuiService::ForegroundCheck::timerCallback()
     if (! ui.getSettings().hidePluginWindowsWhenFocusLost())
         return;
 
-    auto session = ui.getWorld().getSession();    
+    auto session = ui.getWorld().getSession();
     jassert (session);
     if (foreground)
     {
@@ -122,7 +122,7 @@ void GuiService::ForegroundCheck::timerCallback()
     {
         ui.closeAllPluginWindows();
     }
-    
+
     sIsForeground = foreground;
     stopTimer();
 }
@@ -457,8 +457,7 @@ void GuiService::getAllCommands (Array<CommandID>& commands)
         Commands::hideAllPluginWindows,
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
-        Commands::toggleUserInterface
-    });
+        Commands::toggleUserInterface });
 
     commands.add (Commands::quit);
     getContentComponent()->getAllCommands (commands);

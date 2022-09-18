@@ -10,7 +10,8 @@ namespace element {
 
 extern std::string wildcard_to_regex (const std::string& wildcard);
 
-class SearchPath {
+class SearchPath
+{
 public:
     SearchPath() = default;
     ~SearchPath() = default;
@@ -64,7 +65,8 @@ private:
         std::vector<std::filesystem::path> results;
         std::function<bool (const std::filesystem::directory_entry& entry)> match;
 
-        try {
+        try
+        {
             std::regex reg (pattern);
             if (pattern == "*" || pattern.empty())
                 match = [] (const std::filesystem::directory_entry&) -> bool { return true; };
@@ -73,16 +75,20 @@ private:
                     return std::regex_match (entry.path().filename().string(), reg);
                 };
 
-            for (const auto& dir : paths) {
+            for (const auto& dir : paths)
+            {
                 std::filesystem::path path (dir);
-                if (std::filesystem::exists (path) && std::filesystem::is_directory (path)) {
-                    for (auto const& entry : Iter (path)) {
+                if (std::filesystem::exists (path) && std::filesystem::is_directory (path))
+                {
+                    for (auto const& entry : Iter (path))
+                    {
                         if (std::filesystem::is_directory (entry) && match (entry))
                             results.push_back (entry.path());
                     }
                 }
             }
-        } catch (const std::regex_error& e) {
+        } catch (const std::regex_error& e)
+        {
             // noop
         }
 
