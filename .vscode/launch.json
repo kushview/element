@@ -5,7 +5,7 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build-native/element.exe",
+            "program": "${workspaceFolder}/build/element.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

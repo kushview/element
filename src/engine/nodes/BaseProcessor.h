@@ -34,11 +34,9 @@ public:
 
 protected:
     /** This is for backward compatibility with juce 6. Don't use in new processors */
-    inline void addLegacyParameter (AudioProcessorParameter* param)
+    inline void addLegacyParameter (HostedAudioProcessorParameter* param)
     {
-        if (auto* hp = dynamic_cast<HostedAudioProcessorParameter*> (param))
-            addHostedParameter (std::unique_ptr<HostedAudioProcessorParameter> (hp));
-        jassertfalse;
+        addHostedParameter (std::unique_ptr<HostedAudioProcessorParameter> (param));
     }
 #if 0
     // Audio Processor Template
