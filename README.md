@@ -41,7 +41,7 @@ _*Ubuntu is the most tested, but should run on any major distribution_
 Want to help widdle down the TODO list? Please review the [code style](docs/code-style.md) and [contributor notes](CONTRIBUTING.md) before submitting pull requests.  You may also want to join the [#element-dev](https://discord.gg/mSDmPrj) channel on the Kushview [Discord](https://discord.gg/mSDmPrj) server.
 
 ### Issue Reporting
-Please report bugs and feature requests on Github. [Element issue tracker](https://github.com/kushview/element/issues).
+Please report bugs and feature requests on Gitlab. [Element issue tracker](https://gitlab.com/kushview/element/-/issues).
 
 ### Sponsors & Support
 This project has been made possible by our Pro license holders & Patrons. Element never would have made it this far without you!  If you'd like to support the project, you can do so by subscribing or purchasing a pre-built binary on [kushview.net](https://kushview.net/element/)
