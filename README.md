@@ -27,7 +27,7 @@ See [building.md](./docs/building.md) for instructions and dependency informatio
 * And more...
 
 ### Compatibility
-Element currently loads most major plugin formats. Not seeing yours? [Check the issue tracker](https://github.com/kushview/element/issues)
+Element currently loads most major plugin formats. Not seeing yours? [Check the issue tracker](https://gitlab.com/kushview/element/-/issues)
 
 | OS       | Version       | Formats     |
 | -------- |:-------------:| -----------:|
