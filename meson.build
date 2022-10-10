@@ -1,4 +1,4 @@
-project ('element', ['c', 'cpp' ] + meson.get_external_property ('extra_languages', []),
+project ('element', ['c', 'cpp' ],
     version : '0.47.0',
     meson_version : '>= 0.58.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
@@ -6,7 +6,12 @@ project ('element', ['c', 'cpp' ] + meson.get_external_property ('extra_language
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
-# Global Arguments
+# Add objective-c if on mac
+if host_machine.system() == 'darwin'
+  add_languages(['objc', 'objcpp'], native : false, required : true)
+  objcc = meson.get_compiler ('objc')
+  objcpp = meson.get_compiler ('objcpp')
+endif
 
 # Boost
 boost_dep = dependency ('boost', required : true)
