@@ -83,7 +83,7 @@ void EQFilterProcessor::prepareToPlay (double sampleRate, int maximumExpectedSam
 void EQFilterProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
     const int numChans = jmin (2, buffer.getNumChannels());
-    auto** output = buffer.getArrayOfWritePointers();
+    auto output = buffer.getArrayOfWritePointers();
 
     updateParams();
 

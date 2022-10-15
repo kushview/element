@@ -94,8 +94,8 @@ public:
         if (buffer.getNumChannels() >= 4)
         {
             const int numSamples = buffer.getNumSamples();
-            const auto** input = buffer.getArrayOfReadPointers();
-            auto** output = buffer.getArrayOfWritePointers();
+            auto input = buffer.getArrayOfReadPointers();
+            auto output = buffer.getArrayOfWritePointers();
 
             for (int i = 0; i < numSamples; ++i)
             {
