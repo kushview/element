@@ -94,9 +94,14 @@ public:
     CallbackHandler (MidiEngine& me) noexcept : owner (me) {}
 
 private:
-    void audioDeviceIOCallback (const float** ins, int numIns, float** outs, int numOuts, int numSamples) override
+    void audioDeviceIOCallbackWithContext (const float* const* inputChannelData,
+                                           int numInputChannels,
+                                           float* const* outputChannelData,
+                                           int numOutputChannels,
+                                           int numSamples,
+                                           const AudioIODeviceCallbackContext& context) override
     {
-        ignoreUnused (ins, numIns, outs, numOuts, numSamples);
+        ignoreUnused (inputChannelData, numInputChannels, outputChannelData, numOutputChannels, numSamples, context);
     }
 
     void audioDeviceAboutToStart (AudioIODevice* device) override

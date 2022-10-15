@@ -162,8 +162,8 @@ public:
         }
 
         const int numChans = jmin (2, buffer.getNumChannels());
-        const auto** input = buffer.getArrayOfReadPointers();
-        auto** output = buffer.getArrayOfWritePointers();
+        auto input = buffer.getArrayOfReadPointers();
+        auto output = buffer.getArrayOfWritePointers();
         for (int c = 0; c < numChans; ++c)
             for (int i = 0; i < buffer.getNumSamples(); ++i)
                 output[c][i] = comb[c].process (input[c][i], *damping, *feedback);

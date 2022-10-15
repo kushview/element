@@ -374,7 +374,12 @@ public:
         }
     }
 
-    void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels, float** const outputChannelData, const int numOutputChannels, const int numSamples) override
+    void audioDeviceIOCallbackWithContext (const float* const* inputChannelData,
+                                           int numInputChannels,
+                                           float* const* outputChannelData,
+                                           int numOutputChannels,
+                                           int numSamples,
+                                           const AudioIODeviceCallbackContext& context) override
     {
         jassert (sampleRate > 0 && blockSize > 0);
         int totalNumChans = 0;
