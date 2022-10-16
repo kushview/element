@@ -38,6 +38,7 @@ static const juce::Identifier group = "group";
 static const juce::Identifier id = "id";
 static const juce::Identifier index = "index";
 static const juce::Identifier keyId = "keyId";
+static const juce::Identifier keyMap = "keyMap";
 static const juce::Identifier length = "length";
 static const juce::Identifier media = "media";
 static const juce::Identifier name = "name";

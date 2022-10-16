@@ -240,6 +240,114 @@ private:
     }
 };
 
+class KeyMapPropertyComponent : public PropertyComponent,
+                                private Value::Listener
+{
+public:
+    KeyMapPropertyComponent (const Node& n)
+        : PropertyComponent ("Key Map", 25),
+          textWithButton (*this)
+    {
+        node = n;
+        keyMapValue = node.getPropertyAsValue (Tags::keyMap);
+        keyMapValue.addListener (this);
+        addAndMakeVisible (textWithButton);
+        valueChanged (keyMapValue);
+        resized();
+    }
+
+    virtual ~KeyMapPropertyComponent()
+    {
+        listening = false;
+        keyMapValue.removeListener (this);
+    }
+
+    /** Clears the keymapping and sets the listening state to false */
+    void clearMapping()
+    {
+        keyMapValue.setValue (String());
+        listening = false;
+        textWithButton.button.setToggleState (false, dontSendNotification);
+        textWithButton.text.setText ("", dontSendNotification);
+    }
+
+    void refresh() override
+    {
+        if (keyMapValue.toString() != textWithButton.text.getText())
+            valueChanged (keyMapValue);
+    }
+
+private:
+    Node node;
+    Value keyMapValue;
+    bool listening = false;
+
+    class TextWithButton : public juce::Component
+    {
+    public:
+        TextWithButton (KeyMapPropertyComponent& o)
+            : owner (o)
+        {
+            addAndMakeVisible (text);
+            text.setReadOnly (true);
+
+            addAndMakeVisible (button);
+            button.setButtonText ("Map");
+            button.onClick = [this]() { owner.buttonClicked(); };
+            button.setColour (TextButton::buttonOnColourId, kv::Colors::toggleBlue);
+
+            addAndMakeVisible (clear);
+            clear.setButtonText ("Clear");
+            clear.onClick = [this]() { owner.clearMapping(); };
+
+            resized();
+        }
+
+        ~TextWithButton()
+        {
+            button.onClick = nullptr;
+        }
+
+        void resized() override
+        {
+            auto b = getLocalBounds();
+            clear.setBounds (b.removeFromRight (50));
+            b.removeFromRight (4);
+            button.setBounds (b.removeFromRight (50));
+            b.removeFromRight (4);
+            text.setBounds (b);
+        }
+
+        KeyMapPropertyComponent& owner;
+        TextEditor text;
+        TextButton button;
+        TextButton clear;
+    } textWithButton;
+
+    bool keyPressed (const KeyPress& key) override
+    {
+        if (! listening)
+            return false;
+
+        keyMapValue.setValue (key.getTextDescription());
+        return true;
+    }
+
+    void buttonClicked()
+    {
+        listening = ! listening;
+        textWithButton.button.setToggleState (listening, dontSendNotification);
+        if (listening)
+            grabKeyboardFocus();
+    }
+
+    void valueChanged (Value& value) override
+    {
+        if (value.refersToSameSourceAs (keyMapValue))
+            textWithButton.text.setText (keyMapValue.toString(), dontSendNotification);
+    }
+};
+
 class GraphPropertyPanel : public PropertyPanel
 {
 public:
@@ -292,7 +400,7 @@ private:
 #ifndef EL_SOLO
         props.add (new MidiProgramPropertyComponent (g));
 #endif
-
+        props.add (new KeyMapPropertyComponent (g));
         // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
         //                                          TRANS("Persistent"),
         //                                          TRANS("Don't unload when deactivated")));

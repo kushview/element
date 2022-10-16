@@ -20,6 +20,7 @@
 #include "services.hpp"
 #include "services/guiservice.hpp"
 #include "services/sessionservice.hpp"
+#include "services/engineservice.hpp"
 
 #include "engine/audioengine.hpp"
 
@@ -43,6 +44,7 @@ struct GlobalLookAndFeel
     element::LookAndFeel look;
 };
 
+/** Dispatches global key presses */
 struct GuiService::KeyPressManager : public KeyListener
 {
     KeyPressManager (GuiService& g) : owner (g) {}
@@ -53,6 +55,10 @@ struct GuiService::KeyPressManager : public KeyListener
         bool handled = false;
         if (isCapsLockOn() && isVirtualKeyboardVisible())
             handled = handleVirtualKeyboardPressed (key, component);
+
+        if (! handled)
+            handled = handleGraphChange (key, component);
+
         return handled;
     }
 
@@ -79,7 +85,7 @@ private:
         return nullptr;
     }
 
-    bool handleVirtualKeyboardPressed (const KeyPress& key, Component* component)
+    bool handleVirtualKeyboardPressed (const KeyPress& key, Component*)
     {
         if (auto* vcv = getVirtualKeyboardView())
             return vcv->keyPressed (key);
@@ -90,6 +96,35 @@ private:
     {
         if (auto* vcv = getVirtualKeyboardView())
             return vcv->keyStateChanged (isKeyDown);
+        return false;
+    }
+
+    bool handleGraphChange (const KeyPress& key, Component*)
+    {
+        if (auto sess = owner.session())
+            for (int i = 0; i < sess->getNumGraphs(); ++i)
+                if (tryGraphKeyPress (sess, sess->getActiveGraph(), sess->getGraph (i), key))
+                    return true;
+
+        return false;
+    }
+
+    bool tryGraphKeyPress (SessionPtr session, const Node& active, const Node& g, const KeyPress& key)
+    {
+        if (active == g)
+            return false;
+
+        const auto gp = KeyPress::createFromDescription (g.getProperty (Tags::keyMap));
+        if (gp.isValid() && key == gp)
+        {
+            owner.closeAllPluginWindows (true);
+            auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
+            graphs.setProperty (Tags::active, graphs.indexOf (g.getValueTree()), 0);
+            owner.findSibling<EngineService>()->setRootNode (g);
+            owner.showPluginWindowsFor (g, true, false, false);
+            return true;
+        }
+
         return false;
     }
 
