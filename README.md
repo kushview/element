@@ -1,5 +1,4 @@
 # Element
-[![Build Status](https://travis-ci.org/kushview/element.svg?branch=master)](https://travis-ci.org/kushview/element)
 ![Element Screenshot](docs/img/Element-The-Message.png)
 
 ### ADVANCED AUDIO PLUGIN HOST
