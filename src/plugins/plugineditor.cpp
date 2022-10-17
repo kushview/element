@@ -20,6 +20,8 @@
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
+#include "gui/LookAndFeel_KV1.h"
+
 #include "gui/PluginWindow.h"
 #include "plugineditor.hpp"
 #include "pluginprocessor.hpp"
@@ -309,7 +311,7 @@ protected:
     void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
         ignoreUnused (shouldDrawButtonAsDown);
-        getLookAndFeel().drawTreeviewPlusMinusBox (g, getLocalBounds().toFloat().reduced (2), kv::LookAndFeel_KV1::widgetBackgroundColor.darker(), getToggleState(), shouldDrawButtonAsHighlighted);
+        getLookAndFeel().drawTreeviewPlusMinusBox (g, getLocalBounds().toFloat().reduced (2), LookAndFeel_KV1::widgetBackgroundColor.darker(), getToggleState(), shouldDrawButtonAsHighlighted);
     }
 };
 

@@ -23,7 +23,7 @@
 
 #include "gui/LuaTokeniser.h"
 
-namespace kv {
+namespace element {
 
 struct LuaTokeniserFunctions
 {
@@ -349,4 +349,4 @@ CodeEditorComponent::ColourScheme LuaTokeniser::getDefaultColourScheme()
     return cs;
 }
 
-} // namespace kv
+} // namespace element

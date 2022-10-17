@@ -18,6 +18,7 @@
 */
 
 #include "gui/Window.h"
+#include "gui/LookAndFeel_KV1.h"
 
 namespace element {
 

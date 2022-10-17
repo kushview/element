@@ -21,6 +21,7 @@
 
 #include "ElementApp.h"
 #include "gui/ContentComponent.h"
+#include "gui/PatchMatrixComponent.h"
 
 namespace element {
 

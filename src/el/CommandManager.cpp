@@ -2,7 +2,7 @@
 // @classmod el.CommandManager
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include "sol_helpers.hpp"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
 
@@ -66,6 +66,6 @@ EL_PLUGIN_EXPORT int luaopen_el_CommandManager (lua_State* L)
         sol::base_classes,
         sol::bases<ApplicationCommandManager>());
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "CommandManager"));
+    sol::stack::push (L, element::lua::remove_and_clear (M, "CommandManager"));
     return 1;
 }

@@ -3,7 +3,7 @@
 
 #include <sol/sol.hpp>
 
-namespace kv {
+namespace element {
 namespace lua {
 
     template <class DerivedType>
@@ -37,4 +37,4 @@ namespace lua {
     }
 
 } // namespace lua
-} // namespace kv
+} // namespace element

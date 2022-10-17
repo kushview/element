@@ -1,16 +1,21 @@
 
 libelement_sources = '''
+    arc.cpp
     bindings.cpp
-    gui/capslock.cpp
     commands.cpp
     context.cpp
     datapath.cpp
+    matrixstate.cpp
     messages.cpp
     module.cpp
+    ringbuffer.cpp
     scripting.cpp
+    semaphore.cpp
     settings.cpp
     services.cpp
+    slaveprocess.cpp
     strings.cpp
+    timescale.cpp
     utils.cpp
     version.cpp
 
@@ -59,17 +64,31 @@ libelement_sources = '''
     engine/nodefactory.cpp
     engine/audioengine.cpp
     engine/rootgraph.cpp
-
+    engine/shuttle.cpp
+    
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp
     gui/BlockComponent.cpp
     gui/Buttons.cpp
+    gui/capslock.cpp
     gui/ChannelStripComponent.cpp
     gui/ConnectionGrid.cpp
     gui/ContentComponent.cpp
     gui/ContextMenus.cpp
+    gui/DecibelScaleComponent.cpp
+    gui/DigitalMeter.cpp
+    gui/Dock.cpp
+    gui/DockArea.cpp
+    gui/DockContainer.cpp
+    gui/DockItem.cpp
+    gui/DockItemTabs.cpp
+    gui/DockLayout.cpp
+    gui/DockPanel.cpp
+    gui/DockWindow.cpp
+    gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
+    gui/LookAndFeel_KV1.cpp
     gui/LookAndFeel.cpp
     gui/LuaTokeniser.cpp
     gui/MainMenu.cpp
@@ -77,6 +96,7 @@ libelement_sources = '''
     gui/NavigationConcertinaPanel.cpp
     gui/NodeEditorFactory.cpp
     gui/NodeIOConfiguration.cpp
+    gui/PatchMatrixComponent.cpp
     gui/nodes/AudioRouterEditor.cpp
     gui/nodes/CompressorNodeEditor.cpp
     gui/nodes/EQFilterNodeEditor.cpp
@@ -151,6 +171,7 @@ libelement_sources = '''
 
     session/controllerdevice.cpp
     session/devicemanager.cpp
+    session/model.cpp
     session/node.cpp
     session/pluginmanager.cpp
     session/session.cpp

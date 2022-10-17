@@ -21,6 +21,9 @@
 
 #include "gui/Buttons.h"
 #include "gui/LookAndFeel.h"
+#include "gui/PatchMatrixComponent.h"
+
+#include "matrixstate.hpp"
 #include "signals.hpp"
 
 namespace element {
@@ -88,7 +91,7 @@ private:
             onChanged();
     }
 
-    void updateMatrixState (kv::MatrixState& state)
+    void updateMatrixState (MatrixState& state)
     {
         layout.omni.setToggleState (channels[0], dontSendNotification);
         for (int r = 0; r < state.getNumRows(); ++r)
@@ -96,7 +99,7 @@ private:
                 state.set (r, c, channels[1 + state.getIndexForCell (r, c)]);
     }
 
-    void updateChannels (const kv::MatrixState& state)
+    void updateChannels (const MatrixState& state)
     {
         channels = BigInteger();
         channels.setBit (0, layout.omni.getToggleState());
@@ -106,7 +109,7 @@ private:
         sendChanged();
     }
 
-    class MatrixBase : public kv::PatchMatrixComponent
+    class MatrixBase : public PatchMatrixComponent
     {
     public:
         MatrixBase (MidiChannelSelectComponent& o, const int r, const int c)
@@ -155,7 +158,7 @@ private:
         }
 
         MidiChannelSelectComponent& owner;
-        kv::MatrixState state;
+        MatrixState state;
     };
 
     class Matrix_2x8 : public MatrixBase

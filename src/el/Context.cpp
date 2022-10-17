@@ -12,6 +12,8 @@
 #include "context.hpp"
 #include "settings.hpp"
 
+namespace lua = element::lua;
+
 static int el_Context_userdata (lua_State* L)
 {
     sol::state_view lua (L);
@@ -98,6 +100,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
         require ('el.Session')
     )");
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, "Context"));
+    sol::stack::push (L, lua::remove_and_clear (M, "Context"));
     return 1;
 }

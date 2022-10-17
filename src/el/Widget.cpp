@@ -3,13 +3,14 @@
 // @classmod el.Widget
 // @pragma nostrip
 
+#include "element/element.h"
 #include "object.hpp"
 #include "widget.hpp"
 #define LKV_TYPE_NAME_WIDGET "Widget"
 
 using namespace juce;
 
-namespace kv {
+namespace element {
 namespace lua {
 
     class Widget : public juce::Component
@@ -100,16 +101,17 @@ namespace lua {
     };
 
 } // namespace lua
-} // namespace kv
+} // namespace element
 
 EL_PLUGIN_EXPORT
 int luaopen_el_Widget (lua_State* L)
 {
-    using kv::lua::Widget;
+    namespace lua = element::lua;
+    using lua::Widget;
 
-    auto T = kv::lua::new_widgettype<Widget> (
+    auto T = lua::new_widgettype<Widget> (
         L, LKV_TYPE_NAME_WIDGET, sol::meta_method::to_string, [] (Widget& self) {
-            return kv::lua::to_string (self, LKV_TYPE_NAME_WIDGET);
+            return lua::to_string (self, LKV_TYPE_NAME_WIDGET);
         },
         /// Add a child widget.
         // @function Widget:add

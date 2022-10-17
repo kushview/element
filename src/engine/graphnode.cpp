@@ -46,7 +46,7 @@ GraphNode::GraphNode()
       currentMidiInputBuffer (nullptr)
 {
     for (int i = 0; i < IONode::numDeviceTypes; ++i)
-        ioNodes[i] = KV_INVALID_PORT;
+        ioNodes[i] = EL_INVALID_PORT;
     setName ("Graph");
 }
 
@@ -90,7 +90,7 @@ NodeObject* GraphNode::addNode (NodeObject* newNode, uint32 nodeId)
         }
     }
 
-    if (nodeId == 0 || nodeId == KV_INVALID_NODE)
+    if (nodeId == 0 || nodeId == EL_INVALID_NODE)
     {
         const_cast<uint32&> (newNode->nodeId) = ++lastNodeId;
         jassert (newNode->nodeId == lastNodeId);
@@ -330,7 +330,7 @@ void GraphNode::setMidiChannels (const BigInteger channels) noexcept
     midiChannels.setChannels (channels);
 }
 
-void GraphNode::setMidiChannels (const kv::MidiChannels channels) noexcept
+void GraphNode::setMidiChannels (const MidiChannels channels) noexcept
 {
     ScopedLock sl (getPropertyLock());
     midiChannels = channels;

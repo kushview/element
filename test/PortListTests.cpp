@@ -18,14 +18,15 @@
 
 #include <boost/test/unit_test.hpp>
 #include "JuceHeader.h"
+#include "porttype.hpp"
 
-using PortType = kv::PortType;
+using PortType = element::PortType;
 
 BOOST_AUTO_TEST_SUITE (PortListTests)
 
 BOOST_AUTO_TEST_CASE (Types)
 {
-    kv::PortList ports;
+    element::PortList ports;
     int index = 0;
     for (int control = 0; control < 16; ++control) {
         String symbol = "control_";

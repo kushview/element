@@ -19,6 +19,9 @@
 
 #include "ElementApp.h"
 #include "gui/Buttons.h"
+#include "gui/DigitalMeter.h"
+#include "gui/DecibelScaleComponent.h"
+
 #include "signals.hpp"
 
 namespace element {

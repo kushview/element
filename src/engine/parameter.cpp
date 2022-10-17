@@ -132,9 +132,9 @@ void Parameter::removeListener (Parameter::Listener* listenerToRemove)
     listeners.removeFirstMatchingValue (listenerToRemove);
 }
 
-ControlPortParameter::ControlPortParameter (const kv::PortDescription& p)
+ControlPortParameter::ControlPortParameter (const PortDescription& p)
 {
-    jassert (p.type == kv::PortType::Control);
+    jassert (p.type == PortType::Control);
     setPort (p);
 }
 
@@ -145,7 +145,7 @@ String ControlPortParameter::getText (float normalisedValue, int /*maxLength*/) 
     return String (convertFrom0to1 (normalisedValue), 6);
 }
 
-void ControlPortParameter::setPort (const kv::PortDescription& newPort, bool preserveValue)
+void ControlPortParameter::setPort (const PortDescription& newPort, bool preserveValue)
 {
     port = newPort;
     range.start = port.minValue;

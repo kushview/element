@@ -21,6 +21,9 @@
 
 #include "ElementApp.h"
 #include "engine/nodeobject.hpp"
+#include "midichannels.hpp"
+#include "arc.hpp"
+#include "session/model.hpp"
 
 namespace element {
 
@@ -70,7 +73,7 @@ public:
     uint32 getIndex() const
     {
         const int index = getProperty (Tags::index, -1);
-        return index >= 0 ? static_cast<uint32> (index) : KV_INVALID_PORT;
+        return index >= 0 ? static_cast<uint32> (index) : EL_INVALID_PORT;
     }
 
     const String getSymbol() const { return getProperty (Tags::symbol, String()); }
@@ -129,7 +132,7 @@ public:
     static void sanitizeRuntimeProperties (ValueTree node, const bool recursive = false);
 
     /** Create a value tree version of an arc */
-    static ValueTree makeArc (const kv::Arc& arc);
+    static ValueTree makeArc (const Arc& arc);
 
     /** Create an Arc from a ValueTree */
     static Arc arcFromValueTree (const ValueTree& data);
@@ -213,7 +216,7 @@ public:
 
     //=========================================================================
     /** Returns the enabled MIDI channels on this Node */
-    kv::MidiChannels getMidiChannels() const;
+    MidiChannels getMidiChannels() const;
 
     //=========================================================================
     /** Returns true if bypass is on for this Node */

@@ -307,7 +307,7 @@ int NodeObject::getNthPort (const PortType type, const int index, bool isInput, 
     }
 
     jassertfalse;
-    return KV_INVALID_PORT;
+    return EL_INVALID_PORT;
 }
 
 uint32 NodeObject::getMidiInputPort() const { return getPortForChannel (PortType::Midi, 0, true); }

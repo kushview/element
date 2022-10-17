@@ -3,12 +3,12 @@
 // @classmod el.Range
 // @pragma nostrip
 
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
-
+#include <element/element.h>
+#include "sol_helpers.hpp"
 #define LKV_TYPE_NAME_RANGE "Range"
 
 using namespace juce;
+namespace lua = element::lua;
 
 EL_PLUGIN_EXPORT
 int luaopen_el_Range (lua_State* L)
@@ -32,7 +32,7 @@ int luaopen_el_Range (lua_State* L)
 
         sol::meta_method::to_string,
         [] (RT& self) {
-            return kv::lua::to_string (self, LKV_TYPE_NAME_RANGE);
+            return lua::to_string (self, LKV_TYPE_NAME_RANGE);
         },
 
         /// Max value.
@@ -71,6 +71,6 @@ int luaopen_el_Range (lua_State* L)
         "setlength",
         &RT::setLength);
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, LKV_TYPE_NAME_RANGE));
+    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_RANGE));
     return 1;
 }

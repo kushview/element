@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "lua-kv.hpp"
+#include "sol_helpers.hpp"
 #include LKV_JUCE_HEADER
 
-namespace kv {
+namespace element {
 namespace lua {
 
     template <typename T>
@@ -18,4 +18,4 @@ namespace lua {
     }
 
 } // namespace lua
-} // namespace kv
+} // namespace element

@@ -40,7 +40,7 @@ public:
 
 private:
     CodeDocument document;
-    kv::LuaTokeniser tokens;
+    LuaTokeniser tokens;
     std::unique_ptr<CodeEditorComponent> editor;
     TextButton compileButton;
     TextButton editorButton;

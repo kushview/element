@@ -28,10 +28,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_osc/juce_osc.h>
-#include <kv_core/kv_core.h>
-#include <kv_engines/kv_engines.h>
-#include <kv_gui/kv_gui.h>
-#include <kv_models/kv_models.h>
 
 #include "BinaryData.h"
 

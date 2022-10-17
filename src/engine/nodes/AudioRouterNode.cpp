@@ -328,7 +328,7 @@ void AudioRouterNode::setState (const void* data, int sizeInBytes)
 
     if (tree.isValid())
     {
-        kv::MatrixState matrix;
+        MatrixState matrix;
         matrix.restoreFromValueTree (tree);
         jassert (matrix.getNumRows() > 0 && matrix.getNumColumns() > 0);
         if (matrix.getNumRows() > 0 && matrix.getNumColumns() > 0)

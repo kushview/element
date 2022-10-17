@@ -323,8 +323,8 @@ public:
         linePath.setUsingNonZeroWinding (true);
     }
 
-    uint32 sourceFilterID { KV_INVALID_PORT },
-        destFilterID { KV_INVALID_PORT };
+    uint32 sourceFilterID { EL_INVALID_PORT },
+        destFilterID { EL_INVALID_PORT };
     int sourceFilterChannel, destFilterChannel;
 
 private:

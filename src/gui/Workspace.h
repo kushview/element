@@ -20,6 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "gui/Dock.h"
+#include "session/model.hpp"
 
 #define EL_WORKSPACE_CLASSIC "Classic"
 #define EL_WORKSPACE_EDITING "Editing"
@@ -27,10 +29,9 @@
 
 namespace element {
 
-class ServiceManager;
-class GuiService;
 class Context;
-
+class GuiService;
+class ServiceManager;
 class Workspace;
 
 class WorkspaceState : public ObjectModel

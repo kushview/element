@@ -27,6 +27,7 @@
 #include "gui/SessionTreePanel.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/NavigationConcertinaPanel.h"
+#include "gui/FileComboBox.h"
 
 #include "utils.hpp"
 

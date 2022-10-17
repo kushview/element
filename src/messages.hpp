@@ -87,7 +87,7 @@ struct SaveDefaultNodeMessage : public AppMessage
 struct RemoveNodeMessage : public AppMessage
 {
     RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) {}
-    RemoveNodeMessage (const NodeArray& n) : nodeId (KV_INVALID_NODE) { nodes.addArray (n); }
+    RemoveNodeMessage (const NodeArray& n) : nodeId (EL_INVALID_NODE) { nodes.addArray (n); }
     RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) {}
     const uint32 nodeId;
     const Node node;
@@ -106,7 +106,7 @@ struct AddConnectionMessage : public AppMessage
         destNode = d;
         sourceChannel = sc;
         destChannel = dc;
-        sourcePort = destPort = KV_INVALID_PORT;
+        sourcePort = destPort = EL_INVALID_PORT;
         jassert (useChannels());
     }
 
@@ -142,7 +142,7 @@ public:
         destNode = d;
         sourceChannel = sc;
         destChannel = dc;
-        sourcePort = destPort = KV_INVALID_PORT;
+        sourcePort = destPort = EL_INVALID_PORT;
         jassert (useChannels());
     }
 

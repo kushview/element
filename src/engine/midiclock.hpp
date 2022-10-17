@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "delaylockedloop.hpp"
 
 namespace element {
 

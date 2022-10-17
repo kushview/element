@@ -3,12 +3,13 @@
 // @classmod el.Slider
 // @pragma nostrip
 
+#include <element/element.h>
 #include "object.hpp"
 #include "widget.hpp"
 
 #define LKV_TYPE_NAME_SLIDER "Slider"
 
-namespace kv {
+namespace element {
 namespace lua {
 
     class Slider : public juce::Slider
@@ -70,16 +71,17 @@ namespace lua {
     };
 
 } // namespace lua
-} // namespace kv
+} // namespace element
 
 EL_PLUGIN_EXPORT
 int luaopen_el_Slider (lua_State* L)
 {
     using namespace juce;
-    using kv::lua::Slider;
+    using element::lua::Slider;
+    namespace lua = element::lua;
 
-    auto T = kv::lua::new_widgettype<Slider> (
-        L, LKV_TYPE_NAME_SLIDER, sol::meta_method::to_string, [] (Slider& self) { return kv::lua::to_string (self, LKV_TYPE_NAME_SLIDER); },
+    auto T = lua::new_widgettype<Slider> (
+        L, LKV_TYPE_NAME_SLIDER, sol::meta_method::to_string, [] (Slider& self) { return lua::to_string (self, LKV_TYPE_NAME_SLIDER); },
 
         /// Attributes.
         // @section attributes

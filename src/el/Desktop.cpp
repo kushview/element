@@ -3,8 +3,8 @@
 // @classmod el.Desktop
 // @pragma nostrip
 
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
+#include <element/element.hpp>
+#include "sol_helpers.hpp"
 
 #define LKV_TYPE_NAME_DESKTOP "Desktop"
 
@@ -30,6 +30,6 @@ int luaopen_el_Desktop (lua_State* L)
                              "scale",
                              sol::property (&Desktop::getGlobalScaleFactor, &Desktop::setGlobalScaleFactor));
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, LKV_TYPE_NAME_DESKTOP));
+    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_DESKTOP));
     return 1;
 }

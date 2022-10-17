@@ -229,7 +229,7 @@ struct LuaNode::Context
 
                 if (ok)
                 {
-                    audioBuffer = kv::lua::new_userdata<AudioBuffer<float>> (state, EL_MT_AUDIO_BUFFER_32);
+                    audioBuffer = lua::new_userdata<AudioBuffer<float>> (state, EL_MT_AUDIO_BUFFER_32);
                     audioBufRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = audioBufRef != LUA_REFNIL && audioBufRef != LUA_NOREF;
                 }
@@ -291,7 +291,7 @@ struct LuaNode::Context
             const int block = 1024;
             const double rate = 44100.0;
 
-            using PT = kv::PortType;
+            using PT = element::PortType;
 
             // call node_io_ports() and node_params()
             PortList validatePorts;
@@ -357,7 +357,7 @@ struct LuaNode::Context
         if (sol::function f = state["node_prepare"])
             f (rate, block);
 
-        using PT = kv::PortType;
+        using PT = element::PortType;
         auto nchans = jmax (ports.size (PT::Audio, true),
                             ports.size (PT::Audio, false));
         auto nmidi = jmax (ports.size (PT::Midi, true),

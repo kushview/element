@@ -356,10 +356,10 @@ uint32 GraphManager::addNode (const Node& newNode)
     if (! newNode.isValid())
     {
         AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create Node"), "Cannot instantiate node without a description");
-        return KV_INVALID_NODE;
+        return EL_INVALID_NODE;
     }
 
-    uint32 nodeId = KV_INVALID_NODE;
+    uint32 nodeId = EL_INVALID_NODE;
     const PluginDescription desc (pluginManager.findDescriptionFor (newNode));
     if (auto* node = createFilter (&desc, 0, 0, newNode.hasProperty (Tags::id) ? newNode.getNodeId() : 0))
     {
@@ -380,7 +380,7 @@ uint32 GraphManager::addNode (const Node& newNode)
     }
     else
     {
-        nodeId = KV_INVALID_NODE;
+        nodeId = EL_INVALID_NODE;
         AlertWindow::showMessageBox (AlertWindow::WarningIcon, "Couldn't create filter", "The plugin could not be instantiated");
     }
 
@@ -394,7 +394,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
         AlertWindow::showMessageBox (AlertWindow::WarningIcon,
                                      TRANS ("Couldn't create filter"),
                                      TRANS ("Cannot instantiate plugin without a description"));
-        return KV_INVALID_NODE;
+        return EL_INVALID_NODE;
     }
 
     if (auto* object = createFilter (desc, rx, ry, nodeId))
@@ -464,7 +464,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
     }
     else
     {
-        nodeId = KV_INVALID_NODE;
+        nodeId = EL_INVALID_NODE;
         showFailedInstantiationAlert (*desc, true);
     }
 

@@ -3,7 +3,7 @@
 
 #if LKV_AUDIO_BUFFER_COMPILE
 
-#include "lua-kv.hpp"
+#include <element/element.h>
 #include "sol_helpers.hpp"
 
 #ifndef LKV_AUDIO_BUFFER_32
@@ -286,7 +286,7 @@ static int audio_free (lua_State* L)
 static int audio_tostring (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
-    const auto str = kv::lua::to_string (*buf, "AudioBuffer");
+    const auto str = element::lua::to_string (*buf, "AudioBuffer");
     lua_pushstring (L, str.c_str());
     return 1;
 }

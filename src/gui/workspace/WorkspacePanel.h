@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "gui/DockPanel.h"
 
 namespace element {
 

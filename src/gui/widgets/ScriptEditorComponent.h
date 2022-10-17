@@ -36,7 +36,7 @@ public:
     {
         setTabSize (4, true);
         setFont (getFont().withHeight (getDefaultFontHeight()));
-        setColourScheme (kv::LuaTokeniser().getDefaultColourScheme());
+        setColourScheme (LuaTokeniser().getDefaultColourScheme());
     }
 
     virtual ~ScriptEditorComponent() = default;

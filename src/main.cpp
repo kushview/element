@@ -32,6 +32,7 @@
 #include "version.hpp"
 #include "settings.hpp"
 #include "utils.hpp"
+#include "slaveprocess.hpp"
 
 namespace element {
 
@@ -404,7 +405,7 @@ private:
     String launchCommandLine;
     std::unique_ptr<Context> world;
     std::unique_ptr<Startup> startup;
-    OwnedArray<kv::ChildProcessSlave> slaves;
+    OwnedArray<element::ChildProcessSlave> slaves;
 
     void printCopyNotice()
     {

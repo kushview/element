@@ -27,6 +27,7 @@
 #include "engine/rootgraph.hpp"
 #include "context.hpp"
 #include "settings.hpp"
+#include "tempo.hpp"
 
 namespace element {
 

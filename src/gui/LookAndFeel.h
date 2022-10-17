@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "gui/LookAndFeel_KV1.h"
 
 namespace element {
 
@@ -37,10 +38,6 @@ struct Style
         textActiveColorId,
         textBoldColorId,
     };
-};
-
-struct Colors : kv::Colors
-{
 };
 
 class LookAndFeel : public LookAndFeel_KV1

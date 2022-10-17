@@ -4,16 +4,21 @@
 // @classmod el.MidiBuffer
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include "sol_helpers.hpp"
 #include "midi_buffer.hpp"
 #include "bytes.h"
 #include "packed.h"
+
+#include "JuceHeader.h"
+
 #define EL_MT_MIDI_BUFFER_TYPE "kv.MidiBufferClass"
 
 using MidiBuffer = juce::MidiBuffer;
 using Iterator = juce::MidiBufferIterator;
 using MidiMessage = juce::MidiMessage;
-using Impl = kv::lua::MidiBufferImpl;
+
+namespace lua = element::lua;
+using Impl = lua::MidiBufferImpl;
 
 /// Create an empty MIDI Buffer
 // @function MidiBuffer.new
@@ -27,7 +32,7 @@ using Impl = kv::lua::MidiBufferImpl;
 // @within Constructors
 static int midibuffer_new (lua_State* L)
 {
-    auto** impl = kv::lua::new_midibuffer (L);
+    auto** impl = lua::new_midibuffer (L);
     if (lua_gettop (L) > 1)
     {
         if (lua_isinteger (L, 2))

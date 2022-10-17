@@ -2,8 +2,8 @@
 // @classmod el.MouseEvent
 // @pragma nostrip
 
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
+#include <element/element.h>
+#include "sol_helpers.hpp"
 
 #define LKV_TYPE_NAME_MOUSE_EVENT "MouseEvent"
 
@@ -60,6 +60,6 @@ int luaopen_el_MouseEvent (lua_State* L)
                                 "tilty",
                                 &MouseEvent::tiltY);
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, LKV_TYPE_NAME_MOUSE_EVENT));
+    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_MOUSE_EVENT));
     return 1;
 }

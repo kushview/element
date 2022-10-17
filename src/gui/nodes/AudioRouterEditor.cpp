@@ -19,13 +19,14 @@
 
 #include "engine/nodes/AudioRouterNode.h"
 #include "gui/nodes/AudioRouterEditor.h"
+#include "gui/PatchMatrixComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/Artist.h"
 #include "common.hpp"
 
 namespace element {
 
-class AudioRouterMatrix : public kv::PatchMatrixComponent
+class AudioRouterMatrix : public PatchMatrixComponent
 {
 public:
     AudioRouterMatrix (AudioRouterEditor& ed)
@@ -58,7 +59,7 @@ public:
         }
         else
         {
-            g.setColour (matrix.connected (row, column) ? Colour (kv::Colors::elemental.brighter()) : Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
+            g.setColour (matrix.connected (row, column) ? Colour (Colors::elemental.brighter()) : Colour (LookAndFeel_KV1::defaultMatrixCellOffColor));
 
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }

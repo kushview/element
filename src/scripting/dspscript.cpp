@@ -21,7 +21,7 @@
 #include "engine/midipipe.hpp"
 #include "scripting/dspscript.hpp"
 
-using namespace kv;
+using namespace element;
 namespace element {
 
 //==============================================================================
@@ -138,7 +138,7 @@ DSPScript::DSPScript (sol::table tbl)
 
     if (ok)
     {
-        audio = kv::lua::new_userdata<AudioBuffer<float>> (
+        audio = lua::new_userdata<AudioBuffer<float>> (
             L, EL_MT_AUDIO_BUFFER_32);
         audioRef = luaL_ref (L, LUA_REGISTRYINDEX);
         ok = audioRef != LUA_REFNIL && audioRef != LUA_NOREF;
@@ -201,7 +201,7 @@ Result DSPScript::validate (const String& script)
         const int block = 1024;
         const double rate = 44100.0;
 
-        using PT = kv::PortType;
+        using PT = PortType;
         
         // call node_io_ports() and node_params()
         PortList validatePorts;
@@ -260,7 +260,7 @@ Result DSPScript::validate (const String& script)
 #endif
 }
 
-void DSPScript::getPorts (kv::PortList& out)
+void DSPScript::getPorts (PortList& out)
 {
     for (const auto* port : ports.getPorts())
         out.add (new PortDescription (*port));

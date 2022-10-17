@@ -294,7 +294,7 @@ private:
             addAndMakeVisible (button);
             button.setButtonText ("Map");
             button.onClick = [this]() { owner.buttonClicked(); };
-            button.setColour (TextButton::buttonOnColourId, kv::Colors::toggleBlue);
+            button.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
 
             addAndMakeVisible (clear);
             clear.setButtonText ("Clear");

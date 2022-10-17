@@ -25,7 +25,7 @@
 
 #include "JuceHeader.h"
 
-namespace kv {
+namespace element {
 
 //==============================================================================
 /**
@@ -64,4 +64,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LuaTokeniser)
 };
 
-} // namespace kv
+} // namespace element

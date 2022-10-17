@@ -20,6 +20,7 @@
 */
 
 #include "JuceHeader.h"
+#include "porttype.hpp"
 
 #pragma once
 
@@ -311,7 +312,7 @@ class ControlPortParameter : public Parameter
 public:
     using Ptr = ReferenceCountedObjectPtr<ControlPortParameter>;
 
-    ControlPortParameter (const kv::PortDescription&);
+    ControlPortParameter (const PortDescription&);
     ~ControlPortParameter();
 
     int getPortIndex() const noexcept override { return port.index; }
@@ -328,8 +329,8 @@ public:
 
     float getValueForText (const String& text) const override { return convertTo0to1 (text.getFloatValue()); }
 
-    void setPort (const kv::PortDescription& newPort, bool preserveValue = false);
-    kv::PortDescription getPort() const { return port; }
+    void setPort (const PortDescription& newPort, bool preserveValue = false);
+    PortDescription getPort() const { return port; }
     int getPortChannel() const { return port.channel; }
 
     float get() const { return value; }
@@ -342,7 +343,7 @@ public:
     const NormalisableRange<float>& getNormalisableRange() const { return range; }
 
 private:
-    kv::PortDescription port;
+    PortDescription port;
     NormalisableRange<float> range;
     float value { 0.0 };
 };

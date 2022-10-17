@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include "matrixstate.hpp"
+
 namespace element {
 
-/** Similar to a kv::MatrixState but is intended to be used in a realtime context */
+/** Similar to a MatrixState but is intended to be used in a realtime context */
 class ToggleGrid
 {
 public:

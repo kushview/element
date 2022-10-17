@@ -31,7 +31,7 @@ class RootGraph;
 class GraphManager : public ChangeBroadcaster
 {
 public:
-    static const uint32 invalidNodeId = KV_INVALID_PORT;
+    static const uint32 invalidNodeId = EL_INVALID_PORT;
     static const int invalidChannel = -1;
 
     GraphManager (GraphNode&, PluginManager&);

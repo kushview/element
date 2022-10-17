@@ -2,10 +2,11 @@
 // @classmod el.Graphics
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include <element/element.hpp>
 #include "sol_helpers.hpp"
 
 using namespace juce;
+namespace lua = element::lua;
 
 EL_PLUGIN_EXPORT
 int luaopen_el_Graphics (lua_State* L)
@@ -54,6 +55,6 @@ int luaopen_el_Graphics (lua_State* L)
         // @function Graphics:fillall
         "fillall",
         sol::overload ([] (Graphics& g) { g.fillAll(); }, [] (Graphics& g, int color) { g.fillAll (Colour (color)); }));
-    sol::stack::push (L, element::lua::remove_and_clear (M, "Graphics"));
+    sol::stack::push (L, lua::remove_and_clear (M, "Graphics"));
     return 1;
 }
