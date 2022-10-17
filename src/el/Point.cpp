@@ -3,9 +3,8 @@
 // @classmod el.Point
 // @pragma nostrip
 
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
-
+#include <element/element.h>
+#include "sol_helpers.hpp"
 #define LKV_TYPE_NAME_POINT "Point"
 
 using namespace juce;
@@ -128,6 +127,6 @@ int luaopen_el_Point (lua_State* L)
         "toint",
         &PTF::toInt);
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, LKV_TYPE_NAME_POINT));
+    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_POINT));
     return 1;
 }

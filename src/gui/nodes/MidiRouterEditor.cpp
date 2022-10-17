@@ -21,11 +21,13 @@
 #include "gui/nodes/MidiRouterEditor.h"
 #include "gui/LookAndFeel.h"
 #include "gui/Artist.h"
+#include "gui/PatchMatrixComponent.h"
+
 #include "common.hpp"
 
 namespace element {
 
-class MidiRouterMatrix : public kv::PatchMatrixComponent
+class MidiRouterMatrix : public PatchMatrixComponent
 {
 public:
     MidiRouterMatrix (MidiRouterEditor& ed)
@@ -58,7 +60,7 @@ public:
         }
         else
         {
-            g.setColour (matrix.connected (row, column) ? Colour (kv::Colors::elemental.brighter()) : Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
+            g.setColour (matrix.connected (row, column) ? Colour (Colors::elemental.brighter()) : Colour (LookAndFeel_KV1::defaultMatrixCellOffColor));
 
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }

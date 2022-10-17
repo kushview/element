@@ -2,9 +2,9 @@
 // @classmod el.MidiMessage
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include "element/element.h"
+#include "sol_helpers.hpp"
 #include "packed.h"
-#include LKV_JUCE_HEADER
 
 #define EL_MT_MIDI_MESSAGE_TYPE "el.MidiMessageClass"
 

@@ -13,10 +13,6 @@ juce_modules = '''
     juce_gui_basics
     juce_gui_extra 
     juce_osc
-    kv_core 
-    kv_engines 
-    kv_gui 
-    kv_models
 '''.split()
 
 juce_conf_data = configuration_data()
@@ -25,7 +21,6 @@ juce_ext = host_machine.system() == 'darwin' ? 'mm' : 'cpp'
 juce_sources = []
 juce_includes = include_directories (
     '../JUCE/modules',
-    '../kv/modules',
     '.'
 )
 

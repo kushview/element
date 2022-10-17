@@ -18,21 +18,15 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <JuceHeader.h>
 #include "datapath.hpp"
+#include "porttype.hpp"
 #include "signals.hpp"
 #include "tags.hpp"
 
 #include <element/element.hpp>
 
-namespace kv {
-}
-using namespace kv;
-
-//=============================================================================
 namespace element {
-
-using PortType = kv::PortType;
 
 inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
 {

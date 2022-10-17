@@ -34,7 +34,7 @@
 #include "context.hpp"
 #include "settings.hpp"
 #include "sol/sol.hpp"
-#include "el/lua-kv.hpp"
+#include "el/sol_helpers.hpp"
 
 #include "AudioBuffer.lua.h"
 #include "command.lua.h"

@@ -569,10 +569,10 @@ void Node::getPossibleDestinations (NodeArray& a) const
 
 Arc Node::arcFromValueTree (const ValueTree& data)
 {
-    Arc arc ((uint32) (int) data.getProperty (Tags::sourceNode, (int) KV_INVALID_NODE),
-             (uint32) (int) data.getProperty (Tags::sourcePort, (int) KV_INVALID_PORT),
-             (uint32) (int) data.getProperty (Tags::destNode, (int) KV_INVALID_NODE),
-             (uint32) (int) data.getProperty (Tags::destPort, (int) KV_INVALID_PORT));
+    Arc arc ((uint32) (int) data.getProperty (Tags::sourceNode, (int) EL_INVALID_NODE),
+             (uint32) (int) data.getProperty (Tags::sourcePort, (int) EL_INVALID_PORT),
+             (uint32) (int) data.getProperty (Tags::destNode, (int) EL_INVALID_NODE),
+             (uint32) (int) data.getProperty (Tags::destPort, (int) EL_INVALID_PORT));
     return arc;
 }
 
@@ -718,9 +718,9 @@ bool Node::isChildOfRootGraph() const
     return graph.isRootGraph();
 }
 
-kv::MidiChannels Node::getMidiChannels() const
+MidiChannels Node::getMidiChannels() const
 {
-    kv::MidiChannels chans;
+    MidiChannels chans;
     if (objectData.hasProperty (Tags::midiChannels))
     {
         if (auto* const block = objectData.getProperty (Tags::midiChannels).getBinaryData())

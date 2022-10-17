@@ -22,6 +22,7 @@
 #include "ElementApp.h"
 #include "engine/nodeobject.hpp"
 #include "engine/velocitycurve.hpp"
+#include "arc.hpp"
 #include "signals.hpp"
 
 namespace element {
@@ -161,7 +162,7 @@ public:
     void setMidiChannels (const BigInteger channels) noexcept;
 
     /** Set the allowed MIDI channels of this Graph */
-    void setMidiChannels (const kv::MidiChannels channels) noexcept;
+    void setMidiChannels (const MidiChannels channels) noexcept;
 
     /** returns true if this graph is processing the given channel */
     bool acceptsMidiChannel (const int channel) const noexcept;
@@ -222,7 +223,7 @@ private:
     MidiBuffer* currentMidiInputBuffer;
     MidiBuffer currentMidiOutputBuffer;
 
-    kv::MidiChannels midiChannels;
+    MidiChannels midiChannels;
     VelocityCurve velocityCurve;
     MidiBuffer filteredMidi;
 

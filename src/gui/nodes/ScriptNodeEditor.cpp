@@ -403,7 +403,7 @@ void ScriptNodeEditor::updatePreview()
                         break;
                 }
 
-                if (auto* const c = kv::lua::object_userdata<Component> (editor))
+                if (auto* const c = lua::object_userdata<Component> (editor))
                 {
                     comp = c;
                     widget = editor;

@@ -458,8 +458,8 @@ Node EngineService::addNode (const Node& node, const Node& target, const Connect
 void EngineService::addNode (const Node& node)
 {
     auto* root = graphs->findActiveRootGraphManager();
-    const uint32 nodeId = (root != nullptr) ? root->addNode (node) : KV_INVALID_NODE;
-    if (KV_INVALID_NODE != nodeId)
+    const uint32 nodeId = (root != nullptr) ? root->addNode (node) : EL_INVALID_NODE;
+    if (EL_INVALID_NODE != nodeId)
     {
         const Node actual (root->getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
@@ -499,7 +499,7 @@ void EngineService::addPlugin (const PluginDescription& desc, const bool verifie
     if (plugs.size() > 0)
     {
         const auto nodeId = root->addNode (plugs.getFirst(), rx, ry);
-        if (KV_INVALID_NODE != nodeId)
+        if (EL_INVALID_NODE != nodeId)
         {
             const Node node (root->getNodeModelForId (nodeId));
             if (getWorld().getSettings().showPluginWindowsWhenAdded())
@@ -812,7 +812,7 @@ Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
     auto& plugins (getWorld().getPluginManager());
     const auto nodeId = c.addNode (&desc, 0.5f, 0.5f, 0);
 
-    if (KV_INVALID_NODE != nodeId)
+    if (EL_INVALID_NODE != nodeId)
     {
         plugins.addToKnownPlugins (desc);
 
@@ -925,7 +925,7 @@ void EngineService::replace (const Node& node, const PluginDescription& desc)
         const auto oldNodeId = node.getNodeId();
         const auto wasWindowOpen = (bool) node.getProperty ("windowVisible");
         const auto nodeId = ctl->addNode (&desc, x, y);
-        if (nodeId != KV_INVALID_NODE)
+        if (nodeId != EL_INVALID_NODE)
         {
             NodeObjectPtr newptr = ctl->getNodeForId (nodeId);
             const NodeObjectPtr oldptr = node.getObject();

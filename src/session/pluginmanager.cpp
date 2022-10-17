@@ -24,6 +24,7 @@
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
 #include "settings.hpp"
+#include "slaveprocess.hpp"
 #include "utils.hpp"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME "DeadAudioPlugins.txt"
@@ -43,7 +44,7 @@ static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
 static void pluginScannerSlaveCrashHandler (void*) {}
 
-class PluginScannerMaster : public kv::ChildProcessMaster,
+class PluginScannerMaster : public element::ChildProcessMaster,
                             public AsyncUpdater
 {
 public:
@@ -230,7 +231,8 @@ private:
     }
 };
 
-class PluginScannerSlave : public kv::ChildProcessSlave, public AsyncUpdater
+class PluginScannerSlave : public element::ChildProcessSlave,
+                           public AsyncUpdater
 {
 public:
     PluginScannerSlave()
@@ -718,7 +720,7 @@ void PluginManager::searchUnverifiedPlugins()
     priv->searchUnverifiedPlugins (this->props);
 }
 
-kv::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
+element::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
 {
     return new PluginScannerSlave();
 }

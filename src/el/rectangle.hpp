@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
+#include "sol_helpers.hpp"
 
-namespace kv {
+namespace element {
 namespace lua {
 
     template <typename T, typename... Args>
@@ -299,8 +298,8 @@ namespace lua {
 #endif
         );
 
-        return kv::lua::remove_and_clear (M, name);
+        return element::lua::remove_and_clear (M, name);
     }
 
 } // namespace lua
-} // namespace kv
+} // namespace element

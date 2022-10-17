@@ -20,6 +20,7 @@
 #include "engine/nodes/AudioMixerProcessor.h"
 #include "gui/widgets/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
+#include "gui/DigitalMeter.h"
 
 #define EL_FADER_MIN_DB -90.0
 #define EL_FADER_MAX_DB 12.0

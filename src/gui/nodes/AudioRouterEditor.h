@@ -21,6 +21,7 @@
 
 #include "gui/nodes/NodeEditorComponent.h"
 #include "engine/nodes/MidiProgramMapNode.h"
+#include "matrixstate.hpp"
 
 namespace element {
 

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "gui/DockPanel.h"
 
 namespace element {
 
@@ -77,7 +78,7 @@ public:
         type->description = "Embedded virtual keyboard which sends MIDI events to the Global MIDI input";
         type->singleton = true;
         type->showInMenu = false;
-        type->placement = kv::DockPlacement::Bottom;
+        type->placement = DockPlacement::Bottom;
 
         type = types.add (new DockPanelInfo());
         type->identifier = PanelIDs::graphMixer;

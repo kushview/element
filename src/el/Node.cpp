@@ -2,7 +2,7 @@
 // @classmod el.Node
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include "sol_helpers.hpp"
 #include "session/node.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
@@ -145,6 +145,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
 #endif
     );
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "Node"));
+    sol::stack::push (L, element::lua::remove_and_clear (M, "Node"));
     return 1;
 }

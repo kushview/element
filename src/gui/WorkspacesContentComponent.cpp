@@ -19,6 +19,7 @@
 
 #include "services.hpp"
 #include "services/guiservice.hpp"
+#include "gui/DockPanel.h"
 #include "gui/WorkspacesContentComponent.h"
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
@@ -84,7 +85,7 @@ public:
 
         if (singleton)
         {
-            kv::DockPanel* panel = nullptr;
+            DockPanel* panel = nullptr;
             for (int i = 0; i < dock.getNumPanels(); ++i)
             {
                 auto* p = dock.getPanel (i);

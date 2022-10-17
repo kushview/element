@@ -66,8 +66,8 @@ public:
     void restore (const void* data, size_t size);
 
     //==========================================================================
-    const kv::PortList& getPorts() const { return ports; }
-    void getPorts (kv::PortList& out);
+    const PortList& getPorts() const { return ports; }
+    void getPorts (PortList& out);
 
     //==========================================================================
     int getNumParameters() const { return numParams; }
@@ -94,7 +94,7 @@ private:
     };
     float paramData[maxParams];
     sol::userdata params;
-    kv::PortList ports;
+    PortList ports;
 
     class Parameter;
     friend class Parameter;

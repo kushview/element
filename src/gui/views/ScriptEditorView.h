@@ -81,7 +81,7 @@ protected:
 
 private:
     std::unique_ptr<ScriptEditorComponent> editor;
-    kv::LuaTokeniser tokens;
+    LuaTokeniser tokens;
     CodeDocument code;
 };
 

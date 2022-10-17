@@ -112,7 +112,7 @@ LuaMidiPipe::~LuaMidiPipe()
 
 LuaMidiPipe** LuaMidiPipe::create (lua_State* L, int numReserved)
 {
-    auto** pipe = kv::lua::new_userdata<LuaMidiPipe> (L, "el.MidiPipe");
+    auto** pipe = lua::new_userdata<LuaMidiPipe> (L, "el.MidiPipe");
     (*pipe)->state = L;
     (*pipe)->setSize (numReserved);
     (*pipe)->used = 0;
@@ -125,7 +125,7 @@ void LuaMidiPipe::setSize (int newsize)
 
     while (buffers.size() < newsize)
     {
-        buffers.add (kv::lua::new_midibuffer (state));
+        buffers.add (lua::new_midibuffer (state));
         refs.add (luaL_ref (state, LUA_REGISTRYINDEX));
     }
 

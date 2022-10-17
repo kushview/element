@@ -1,9 +1,11 @@
 
 #pragma once
-#include "lua-kv.hpp"
+
+#include <element/element.hpp>
+#include "sol_helpers.hpp"
 #include "JuceHeader.h"
 
-namespace kv {
+namespace element {
 namespace lua {
 
     struct MidiBufferImpl final
@@ -59,4 +61,4 @@ namespace lua {
     }
 
 } // namespace lua
-} // namespace kv
+} // namespace element

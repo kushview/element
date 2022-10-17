@@ -2,7 +2,7 @@
 // @classmod el.Session
 // @pragma nostrip
 
-#include "lua-kv.hpp"
+#include "sol_helpers.hpp"
 #include "session/node.hpp"
 #include "session/session.hpp"
 
@@ -71,6 +71,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L)
 #endif
     );
 
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "Session"));
+    sol::stack::push (L, element::lua::remove_and_clear (M, "Session"));
     return 1;
 }

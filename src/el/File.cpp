@@ -2,8 +2,8 @@
 // @classmod el.File
 // @pragma nostrip
 
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
+#include <element/element.h>
+#include "sol_helpers.hpp"
 #define LKV_TYPE_NAME_FILE "File"
 
 using namespace juce;

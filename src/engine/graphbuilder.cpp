@@ -446,7 +446,7 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
     for (int i = 0; i < PortType::Unknown; ++i)
     {
         allNodes[i].add ((uint32) zeroNodeID); // first buffer is read-only zeros
-        allPorts[i].add (KV_INVALID_PORT);
+        allPorts[i].add (EL_INVALID_PORT);
     }
 
     for (int i = 0; i < orderedNodes.size(); ++i)
@@ -788,7 +788,7 @@ void GraphBuilder::markUnusedBuffersFree (const int stepIndex)
         for (int i = 0; i < nodes.size(); ++i)
         {
             if (isNodeBusy (nodes.getUnchecked (i))
-                && ! isBufferNeededLater (stepIndex, KV_INVALID_PORT, nodes.getUnchecked (i), ports.getUnchecked (i)))
+                && ! isBufferNeededLater (stepIndex, EL_INVALID_PORT, nodes.getUnchecked (i), ports.getUnchecked (i)))
             {
                 nodes.set (i, (uint32) freeNodeID);
             }
@@ -812,7 +812,7 @@ bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputC
             }
         }
 
-        inputChannelOfIndexToIgnore = KV_INVALID_PORT;
+        inputChannelOfIndexToIgnore = EL_INVALID_PORT;
         ++stepIndexToSearchFrom;
     }
 

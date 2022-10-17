@@ -138,7 +138,7 @@ void MidiRouterNode::setState (const void* data, int sizeInBytes)
 
     if (tree.isValid())
     {
-        kv::MatrixState matrix;
+        MatrixState matrix;
         matrix.restoreFromValueTree (tree);
         jassert (matrix.getNumRows() == numSources && matrix.getNumColumns() == numDestinations);
         setMatrixState (matrix);

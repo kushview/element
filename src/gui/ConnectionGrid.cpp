@@ -21,10 +21,13 @@
 #include "gui/widgets/BreadCrumbComponent.h"
 #include "gui/ContextMenus.h"
 #include "gui/widgets/HorizontalListBox.h"
-#include "session/pluginmanager.hpp"
-#include "session/presetmanager.hpp"
 #include "gui/ConnectionGrid.h"
 #include "gui/Artist.h"
+
+#include "session/pluginmanager.hpp"
+#include "session/presetmanager.hpp"
+
+#include "matrixstate.hpp"
 
 #define EL_MATRIX_SIZE 30
 
@@ -116,8 +119,9 @@ public:
         }
         else
         {
-            g.setColour (matrix.connected (row, column) ? Colour (kv::Colors::elemental.brighter()) : Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
-
+            g.setColour (matrix.connected (row, column)
+                             ? Colour (Colors::elemental.brighter())
+                             : Colour (LookAndFeel_KV1::defaultMatrixCellOffColor));
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }
     }

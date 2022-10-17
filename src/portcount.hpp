@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include "porttype.hpp"
 
 namespace element {
 
@@ -93,7 +93,7 @@ struct PortCount
         return ports;
     }
 
-    void getPorts (kv::PortList& ports) const
+    void getPorts (PortList& ports) const
     {
         uint32_t index = 0;
         for (int i = 0; i < PortType::Unknown; ++i)

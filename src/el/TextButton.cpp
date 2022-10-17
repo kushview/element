@@ -9,7 +9,7 @@
 
 using namespace juce;
 
-namespace kv {
+namespace element {
 namespace lua {
 
     class TextButton : public juce::TextButton,
@@ -57,16 +57,17 @@ namespace lua {
     };
 
 } // namespace lua
-} // namespace kv
+} // namespace element
 
 EL_PLUGIN_EXPORT
 int luaopen_el_TextButton (lua_State* L)
 {
-    using kv::lua::TextButton;
+    namespace lua = element::lua;
+    using lua::TextButton;
 
-    auto T = kv::lua::new_widgettype<TextButton> (
+    auto T = lua::new_widgettype<TextButton> (
         L, LKV_TYPE_NAME_TEXT_BUTTON, sol::meta_method::to_string, [] (TextButton& self) {
-            return kv::lua::to_string (self, LKV_TYPE_NAME_TEXT_BUTTON);
+            return lua::to_string (self, LKV_TYPE_NAME_TEXT_BUTTON);
         },
 
         /// Attributes.

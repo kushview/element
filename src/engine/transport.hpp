@@ -20,8 +20,11 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "atomic.hpp"
+#include "shuttle.hpp"
 
 namespace element {
+
 class Transport : public Shuttle
 {
 public:

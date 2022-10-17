@@ -25,6 +25,8 @@
 #include "engine/nodes/MidiFilterNode.h"
 #include "engine/nodes/NodeTypes.h"
 
+#include "semaphore.hpp"
+
 namespace element {
 
 class OSCSenderNode : public MidiFilterNode,

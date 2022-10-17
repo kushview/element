@@ -20,6 +20,7 @@
 #include "LookAndFeel.h"
 #include "gui/Buttons.h"
 #include "gui/widgets/MidiBlinker.h"
+#include "gui/Dock.h"
 
 namespace element {
 

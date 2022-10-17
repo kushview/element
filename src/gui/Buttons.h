@@ -23,6 +23,7 @@
 #include "gui/Icons.h"
 #include "gui/LookAndFeel.h"
 #include "session/node.hpp"
+#include "tempo.hpp"
 
 namespace element {
 

@@ -25,6 +25,7 @@
 
 namespace element {
 
+class ChildProcessSlave;
 class NodeObject;
 class Node;
 class PluginScannerMaster;
@@ -73,7 +74,7 @@ public:
     }
 
     /** creates a child process slave used in start up */
-    kv::ChildProcessSlave* createAudioPluginScannerSlave();
+    element::ChildProcessSlave* createAudioPluginScannerSlave();
 
     /** creates a new plugin scanner for use by a third party, e.g. plugin manager UI */
     PluginScanner* createAudioPluginScanner();

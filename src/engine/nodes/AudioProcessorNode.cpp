@@ -170,7 +170,7 @@ void AudioProcessorNode::setState (const void* data, int size)
 
 void AudioProcessorNode::refreshPorts()
 {
-    kv::PortList newPorts;
+    PortList newPorts;
 
     auto* const midiDevice = dynamic_cast<MidiDeviceProcessor*> (proc.get());
     const bool isMidiDevice = nullptr != midiDevice;

@@ -18,6 +18,7 @@
 */
 
 #include "engine/transport.hpp"
+#include "tempo.hpp"
 
 namespace element {
 

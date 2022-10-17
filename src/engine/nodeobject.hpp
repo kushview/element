@@ -23,7 +23,9 @@
 #include "engine/midipipe.hpp"
 #include "engine/oversampler.hpp"
 #include "engine/parameter.hpp"
+#include "atomic.hpp"
 #include "portcount.hpp"
+#include "midichannels.hpp"
 
 namespace element {
 
@@ -428,7 +430,7 @@ private:
     friend class GraphNode;
     friend class Node;
 
-    kv::PortList ports;
+    PortList ports;
     GraphNode* parent = nullptr;
     bool isPrepared = false;
 

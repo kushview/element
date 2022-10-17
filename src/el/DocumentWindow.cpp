@@ -6,14 +6,13 @@
 
 #include "object.hpp"
 #include "widget.hpp"
-#include "lua-kv.hpp"
-#include LKV_JUCE_HEADER
+#include "sol_helpers.hpp"
 
 #define LKV_TYPE_NAME_WINDOW "DocumentWindow"
 
 using namespace juce;
 
-namespace kv {
+namespace element {
 namespace lua {
 
     class DocumentWindow : public juce::DocumentWindow
@@ -91,15 +90,20 @@ namespace lua {
     };
 
 } // namespace lua
-} // namespace kv
+} // namespace element
 
 EL_PLUGIN_EXPORT
 int luaopen_el_DocumentWindow (lua_State* L)
 {
-    using kv::lua::DocumentWindow;
+    // clang-format off
+    using element::lua::DocumentWindow;
+    namespace lua = element::lua;
 
-    auto T = kv::lua::new_widgettype<DocumentWindow> (
-        L, LKV_TYPE_NAME_WINDOW, sol::meta_method::to_string, [] (DocumentWindow& self) { return kv::lua::to_string (self, LKV_TYPE_NAME_WINDOW); },
+    auto T = lua::new_widgettype<DocumentWindow> (
+        L, LKV_TYPE_NAME_WINDOW, sol::meta_method::to_string, 
+            [] (DocumentWindow& self) {
+                return lua::to_string (self, LKV_TYPE_NAME_WINDOW); 
+            },
 
         /// Attributes.
         // @section attributes
@@ -138,4 +142,5 @@ int luaopen_el_DocumentWindow (lua_State* L)
 
     sol::stack::push (L, T);
     return 1;
+    // clang-format on
 }
