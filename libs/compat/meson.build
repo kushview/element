@@ -106,6 +106,9 @@ juce_sources += 'include_juce_audio_processors_lv2_libs.cpp'
 juce_conf_data.set10 ('JUCE_PLUGINHOST_LV2', true)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_LADSPA', cpp.check_header ('ladspa.h'))
 
+### AudioUnit
+juce_au_includes = []
+
 if host_machine.system() == 'linux'
     alsa_dep = dependency ('alsa', required : false)
     juce_conf_data.set10 ('JUCE_ALSA', alsa_dep.found())
@@ -139,7 +142,9 @@ elif host_machine.system() == 'darwin'
         'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
         'discrecording', 'iokit', 'quartzcore', 'metal' ])
-    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)     
+    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)
+    juce_au_includes = include_directories (
+        '../JUCE/modules/juce_audio_plugin_client/AU')
 endif
 
 configure_file (output : 'juce_config.h', 
@@ -147,7 +152,14 @@ configure_file (output : 'juce_config.h',
 
 libelement_juce = static_library ('element_juce', 
     juce_sources,
-    include_directories : [ juce_includes, asio_includes, vst3_includes, vst2_includes, lv2_includes ],
+    include_directories : [ 
+        juce_includes, 
+        asio_includes, 
+        vst3_includes, 
+        vst2_includes, 
+        lv2_includes,
+        juce_au_includes
+    ],
     gnu_symbol_visibility : 'hidden',
     dependencies : deps,
     install : false)
