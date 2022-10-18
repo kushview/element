@@ -94,5 +94,7 @@
         "bit": "cpp"
     },
     "C_Cpp.intelliSenseMemoryLimit": 1024,
-    "mesonbuild.buildFolder": "build"
+    "mesonbuild.buildFolder": "build",
+    
+    "jenkins.pipeline.linter.connector.url": "https://ci.lvtk.org/pipeline-model-converter/validate"
 }
