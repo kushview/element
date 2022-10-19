@@ -636,8 +636,25 @@ public:
 
             if (uitype != settings.getMainContentType())
             {
-                settings.setMainContentType (uitype);
-                ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
+                bool changeType = true;
+                if (uitype == "workspace")
+                {
+                    changeType = AlertWindow::showOkCancelBox (AlertWindow::InfoIcon,
+                                                               "Experimental Feature",
+                                                               "Workspaces is an experimental feature. Are you sure you want to enable it?",
+                                                               "Yes",
+                                                               "No");
+                }
+
+                if (changeType)
+                {
+                    settings.setMainContentType (uitype);
+                    ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
+                }
+                else
+                {
+                    mainContentBox.setSelectedId (1, dontSendNotification);
+                }
             }
         }
 

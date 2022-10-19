@@ -941,6 +941,8 @@ bool GuiService::handleMessage (const AppMessage& msg)
             mainWindow->restoreWindowStateFromString (ws);
             getContentComponent()->restoreState (pf);
             stabilizeContent();
+            refreshMainMenu();
+            refreshSystemTray();
         }
 
         return true;
