@@ -29,7 +29,7 @@
 
 #include "session/node.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 namespace element {
 

@@ -10,7 +10,7 @@
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 namespace lua = element::lua;
 

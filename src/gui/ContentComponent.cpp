@@ -38,7 +38,7 @@
 
 #include "commands.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 #include "gui/ContentComponent.h"
 

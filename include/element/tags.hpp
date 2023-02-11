@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/core.hpp>
 
 namespace Tags {
 static const juce::Identifier asset = "asset";

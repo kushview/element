@@ -22,7 +22,7 @@
 #include "session/devicemanager.hpp"
 #include "commands.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
 #define EL_OSC_ADDRESS_ENGINE "/element/engine"

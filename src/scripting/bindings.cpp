@@ -32,7 +32,7 @@
 #include "session/session.hpp"
 #include "datapath.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "sol/sol.hpp"
 #include "el/sol_helpers.hpp"
 

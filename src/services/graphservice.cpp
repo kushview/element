@@ -28,7 +28,7 @@
 #include "session/session.hpp"
 #include "datapath.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 namespace element {
 

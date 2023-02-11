@@ -1,3 +1,9 @@
+juce_dep = dependency ('juce-7', required : false)
+if not juce_dep.found()
+    juce_proj = subproject ('juce')
+    juce_dep = juce_proj.get_variable ('juce_dep')
+endif
+
 # JUCE
 juce_modules = '''
     juce_audio_basics 
@@ -19,10 +25,7 @@ juce_conf_data = configuration_data()
 
 juce_ext = host_machine.system() == 'darwin' ? 'mm' : 'cpp'
 juce_sources = []
-juce_includes = include_directories (
-    '../JUCE/modules',
-    '.'
-)
+juce_includes = include_directories ('.')
 
 foreach m : juce_modules
     pat = 'include_@0@'.format (m)
@@ -46,7 +49,7 @@ juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
 juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
 juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
 
-asio_includes = []
+juce_asio_includes = []
 juce_conf_data.set10 ('JUCE_ASIO', false)
 if host_machine.system() == 'windows'
     base = get_option ('asiosdk')
@@ -55,11 +58,11 @@ if host_machine.system() == 'windows'
     else
         base += '/@0@'
         foreach d : 'common host host\\pc'.split()
-            asio_includes += include_directories (base.format (d))
+            juce_asio_includes += include_directories (base.format (d))
         endforeach
         foreach h : 'asiosys.h'.split()
             cpp.check_header (h,
-                include_directories : asio_includes,
+                include_directories : juce_asio_includes,
                 required : true
             )
         endforeach
@@ -69,41 +72,43 @@ endif
 
 juce_conf_data.set10 ('KV_DOCKING_WINDOWS', true)
 
-vst2_includes = []
+juce_vst2_includes = []
 if get_option ('vst2sdk') == 'auto'
     # noop
 else
-    vst2_includes += include_directories (get_option ('vst2sdk'))
+    juce_vst2_includes += include_directories (get_option ('vst2sdk'))
 endif
 
 aeffect_h_found = cpp.check_header ('pluginterfaces/vst2.x/aeffect.h',
-    include_directories : vst2_includes, required : false)
+    include_directories : juce_vst2_includes, required : false)
 aeffectx_h_found = cpp.check_header ('pluginterfaces/vst2.x/aeffectx.h',
-    include_directories : vst2_includes, required : false)
+    include_directories : juce_vst2_includes, required : false)
 vstfxstore_h_found = cpp.check_header ('pluginterfaces/vst2.x/vstfxstore.h',
-    include_directories : vst2_includes, required : false)
+    include_directories : juce_vst2_includes, required : false)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_VST', aeffect_h_found and aeffectx_h_found)
 
+juce_vst3_includes = []
 if get_option('vst3sdk') == 'auto'
-    vst3_includes = include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
+    # juce_vst3_includes += include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
 else
-    vst3_includes = include_directories (get_option ('vst3sdk'))
+    juce_vst3_includes += include_directories (get_option ('vst3sdk'))
 endif
 
 juce_conf_data.set10 ('JUCE_VST3_CAN_REPLACE_VST2', vstfxstore_h_found)
-juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', true)
+juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', false)
 
-lv2_includes = include_directories (
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/serd',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord/src',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv/src',
-    '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sratom')
-juce_sources += 'include_juce_audio_processors_lv2_libs.cpp'
-juce_conf_data.set10 ('JUCE_PLUGINHOST_LV2', true)
+juce_lv2_includes = []
+# include_directories (
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/serd',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord/src',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv/src',
+#     '../JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sratom')
+# juce_sources += 'include_juce_audio_processors_lv2_libs.cpp'
+juce_conf_data.set10 ('JUCE_PLUGINHOST_LV2', false)
 juce_conf_data.set10 ('JUCE_PLUGINHOST_LADSPA', cpp.check_header ('ladspa.h'))
 
 ### AudioUnit
@@ -142,9 +147,9 @@ elif host_machine.system() == 'darwin'
         'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
         'discrecording', 'iokit', 'quartzcore', 'metal' ])
-    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)
-    juce_au_includes = include_directories (
-        '../JUCE/modules/juce_audio_plugin_client/AU')
+    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', false)
+    # juce_au_includes += include_directories (
+    #     '../JUCE/modules/juce_audio_plugin_client/AU')
 endif
 
 configure_file (output : 'juce_config.h', 
@@ -154,49 +159,26 @@ libelement_juce = static_library ('element_juce',
     juce_sources,
     include_directories : [ 
         juce_includes, 
-        asio_includes, 
-        vst3_includes, 
-        vst2_includes, 
-        lv2_includes,
+        juce_asio_includes, 
+        juce_vst3_includes, 
+        juce_vst2_includes, 
+        juce_lv2_includes,
         juce_au_includes
     ],
     gnu_symbol_visibility : 'hidden',
-    dependencies : deps,
+    dependencies : [ deps, juce_dep ],
     install : false)
 
 jrc_sources = ['jrc.cpp']
-if host_machine.system() == 'darwin'
-    jrc_sources += '../JUCE/modules/juce_core/juce_core.mm'
-else
-    jrc_sources += '../JUCE/modules/juce_core/juce_core.cpp'
-endif
+jrc_deps = [ juce_dep ]
 
-jrc_deps = []
-
-if host_machine.system() == 'linux'
-    jrc_deps += [
-        cpp.find_library ('dl', required : true),
-        cpp.find_library ('pthread', required : true)
-    ]
-elif host_machine.system() == 'darwin'
-    jrc_deps += dependency ('appleframeworks', modules :
-        'Cocoa Foundation IOKit'.split())
-endif
-
-jrc_cpp_args = '''
-    -DJUCE_DISPLAY_SPLASH_SCREEN=0
-    -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
-    -DJUCE_MODULE_AVAILABLE_juce_core=1
-    -DJUCE_USE_CURL=0
-    -DNDEBUG'''.split()
-    
 jrc = executable ('jrc', jrc_sources,
     install : false,
     win_subsystem : 'console',
     gnu_symbol_visibility : 'hidden',
-    dependencies : jrc_deps,
-    include_directories : [ '.', '../JUCE/modules' ],
-    cpp_args : jrc_cpp_args,
-    objcpp_args : jrc_cpp_args,
+    dependencies : [ jrc_deps ],
+    include_directories : [ '.' ],
+    cpp_args : [],
+    objcpp_args : [],
     link_args : [],
-    link_with : [])
+    link_with : [ libelement_juce ])

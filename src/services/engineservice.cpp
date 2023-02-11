@@ -27,7 +27,7 @@
 #include "session/pluginmanager.hpp"
 #include "session/node.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 #include "services/engineservice.hpp"
 

@@ -30,7 +30,7 @@
 #include "log.hpp"
 #include "messages.hpp"
 #include "version.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "utils.hpp"
 #include "slaveprocess.hpp"
 

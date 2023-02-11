@@ -23,7 +23,7 @@
 #include "engine/nodefactory.hpp"
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "slaveprocess.hpp"
 #include "utils.hpp"
 

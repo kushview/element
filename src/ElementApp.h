@@ -22,9 +22,9 @@
 #include "datapath.hpp"
 #include "porttype.hpp"
 #include "signals.hpp"
-#include "tags.hpp"
 
 #include <element/element.hpp>
+#include <element/tags.hpp>
 
 namespace element {
 

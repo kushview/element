@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://gitlab.com/kushview/juce.git/
+push-url = git@gitlab.com:kushview/juce.git
+revision = element
+
+[provide]
+dependency_names = juce-7,juce

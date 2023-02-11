@@ -29,7 +29,7 @@
 #include "context.hpp"
 #include "log.hpp"
 #include "module.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 namespace element {
 

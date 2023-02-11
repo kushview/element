@@ -21,7 +21,7 @@ endif
 test_element_app = executable ('test_element', 
     test_element_sources,
     include_directories : [ '.', libelement_includes ],
-    dependencies : element_app_deps,
+    dependencies : [ element_app_deps, juce_dep ],
     link_with : [ libelement ],
     gnu_symbol_visibility : 'hidden',
     cpp_args : test_element_cpp_args,

@@ -19,7 +19,9 @@
 #include "gui/Workspace.h"
 #include "session/devicemanager.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
+
+#include <element/settings.hpp>
 
 namespace element {
 

@@ -29,6 +29,7 @@ endif
 
 subdir ('libs/lua')
 subdir ('libs/compat')
+subdir ('include/element/juce')
 subdir ('scripts')
 subdir ('src')
 

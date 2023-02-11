@@ -26,7 +26,7 @@
 #include "session/pluginmanager.hpp"
 #include "session/session.hpp"
 #include "ElementApp.h"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 #include "pluginprocessor.hpp"
 #include "plugineditor.hpp"

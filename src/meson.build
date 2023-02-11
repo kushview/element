@@ -215,9 +215,9 @@ libelement_includes =  [
     ),
     lua_includes, 
     juce_includes, 
-    vst3_includes, 
-    vst2_includes, 
-    lv2_includes 
+    juce_vst3_includes, 
+    juce_vst2_includes, 
+    juce_lv2_includes 
 ]
 
 host_cpp_args = []
@@ -248,11 +248,11 @@ libelement_includes += scripts_includes
 libelement_sources  += scripts_sources
 libelement_cpp_args  = host_cpp_args
 
-libelement = static_library ('element', 
-    libelement_sources, 
+libelement = static_library ('element',
+    libelement_sources,
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
-    dependencies : deps,
+    dependencies : [ deps, juce_dep ],
     cpp_args : libelement_cpp_args,
     install : false,
     objects : [ libelement_lua.extract_all_objects (recursive : false),
@@ -261,5 +261,6 @@ libelement = static_library ('element',
 if meson.is_subproject()
     element_dep = declare_dependency (
         include_directories : libelement_includes,
-        link_with : libelement)
+        link_with : libelement,
+        dependencies : [ deps, juce_dep ])
 endif

@@ -26,7 +26,7 @@
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "utils.hpp"
 
 namespace element {

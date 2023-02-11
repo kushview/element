@@ -27,7 +27,7 @@
 #include "gui/ViewHelpers.h"
 #include "services/oscservice.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 #define EL_GENERAL_SETTINGS_NAME "General"
 #define EL_AUDIO_SETTINGS_NAME "Audio"

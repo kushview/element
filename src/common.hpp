@@ -39,6 +39,6 @@
 #include "commands.hpp"
 #include "messages.hpp"
 #include "context.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "utils.hpp"
 #include "version.hpp"

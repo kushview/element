@@ -28,7 +28,7 @@
 #include "context.hpp"
 
 #include "messages.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "BinaryData.h"
 
 namespace element {

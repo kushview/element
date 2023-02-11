@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <element/juce/core.hpp>
+#include <element/juce/data_structures.hpp>
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 
 class Context;
 
-class Settings : public ApplicationProperties
+class Settings : public juce::ApplicationProperties
 {
 public:
     Settings();
@@ -56,8 +58,8 @@ public:
     static const char* mainContentTypeKey;
     static const char* pluginListHeaderKey;
 
-    std::unique_ptr<XmlElement> getLastGraph() const;
-    void setLastGraph (const ValueTree& data);
+    std::unique_ptr<juce::XmlElement> getLastGraph() const;
+    void setLastGraph (const juce::ValueTree& data);
 
     /** Returns true if updates shoul be checked for on launch */
     bool checkForUpdates() const;
@@ -90,10 +92,10 @@ public:
     bool askToSaveSession();
     void setAskToSaveSession (const bool);
 
-    const File getDefaultNewSessionFile() const;
-    void setDefaultNewSessionFile (const File&);
+    const juce::File getDefaultNewSessionFile() const;
+    void setDefaultNewSessionFile (const juce::File&);
 
-    void addItemsToMenu (Context&, PopupMenu&);
+    void addItemsToMenu (Context&, juce::PopupMenu&);
     bool performMenuResult (Context&, const int result);
 
     void setGenerateMidiClock (const bool);
@@ -108,9 +110,9 @@ public:
     void setUseLegacyInterface (const bool);
     bool useLegacyInterface() const;
 
-    void setWorkspace (const String& name);
-    String getWorkspace() const;
-    File getWorkspaceFile() const;
+    void setWorkspace (const juce::String& name);
+    juce::String getWorkspace() const;
+    juce::File getWorkspaceFile() const;
 
     bool isOscHostEnabled() const;
     void setOscHostEnabled (bool);
@@ -126,11 +128,11 @@ public:
     double getDesktopScale() const;
     void setDesktopScale (double);
 
-    String getMainContentType() const;
-    void setMainContentType (const String&);
+    juce::String getMainContentType() const;
+    void setMainContentType (const juce::String&);
 
 private:
-    PropertiesFile* getProps() const;
+    juce::PropertiesFile* getProps() const;
 };
 
 } // namespace element
