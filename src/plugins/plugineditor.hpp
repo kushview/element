@@ -20,7 +20,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

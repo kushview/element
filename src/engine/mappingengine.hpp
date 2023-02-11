@@ -21,7 +21,7 @@
 
 #include "JuceHeader.h"
 #include "session/controllerdevice.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

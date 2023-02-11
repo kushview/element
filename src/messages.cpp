@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "signals.hpp"
+#include <element/signals.hpp>
 #include "services/engineservice.hpp"
 #include "context.hpp"
 #include "session/pluginmanager.hpp"

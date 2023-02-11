@@ -24,7 +24,7 @@
 #include "gui/LookAndFeel.h"
 #include "session/session.hpp"
 #include "context.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

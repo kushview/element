@@ -27,7 +27,7 @@
 #include "session/commandmanager.hpp"
 #include "session/node.hpp"
 #include "session/session.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

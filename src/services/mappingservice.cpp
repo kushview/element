@@ -23,7 +23,7 @@
 #include "engine/mappingengine.hpp"
 #include "session/controllerdevice.hpp"
 #include "context.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

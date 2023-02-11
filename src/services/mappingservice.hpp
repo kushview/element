@@ -20,7 +20,7 @@
 #include "services.hpp"
 #include "engine/nodeobject.hpp"
 #include "session/controllerdevice.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

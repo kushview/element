@@ -21,7 +21,7 @@
 
 #include "services.hpp"
 #include "documents/graphdocument.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

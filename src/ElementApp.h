@@ -21,7 +21,7 @@
 #include <JuceHeader.h>
 #include "datapath.hpp"
 #include "porttype.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 #include <element/element.hpp>
 #include <element/tags.hpp>

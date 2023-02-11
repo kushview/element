@@ -21,7 +21,7 @@
 #include "ElementApp.h"
 #include "session/controllerdevice.hpp"
 #include "session/node.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 #define EL_TEMPO_MIN 20
 #define EL_TEMPO_MAX 999

@@ -23,7 +23,7 @@
 #include "engine/nodeobject.hpp"
 #include "engine/velocitycurve.hpp"
 #include "arc.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 
