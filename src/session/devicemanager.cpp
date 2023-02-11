@@ -17,9 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "session/devicemanager.hpp"
+#include <element/devicemanager.hpp>
 
 namespace element {
+
+using namespace juce;
 
 const int DeviceManager::maxAudioChannels = 128;
 

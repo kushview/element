@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce/data_structures.hpp>
 
 namespace element {
 
@@ -75,10 +75,10 @@ public:
     juce::ValueTree setData (const juce::ValueTree& data);
 
     /** Returns the number of children the underlying juce::ValueTree has */
-    int32 getNumChildren() const { return objectData.getNumChildren(); }
+    juce::int32 getNumChildren() const { return objectData.getNumChildren(); }
 
     /** Count the number of children with a type */
-    int32 countChildrenOfType (const juce::Identifier& slug) const;
+    juce::int32 countChildrenOfType (const juce::Identifier& slug) const;
 
     juce::String toXmlString() const { return objectData.toXmlString(); }
 

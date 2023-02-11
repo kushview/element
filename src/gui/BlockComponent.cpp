@@ -29,8 +29,9 @@
 #include "gui/NodeIOConfiguration.h"
 #include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
-#include "session/node.hpp"
-#include "context.hpp"
+#include "engine/midiengine.hpp"
+#include <element/node.hpp>
+#include <element/context.hpp>
 #include "scopedflag.hpp"
 
 namespace element {

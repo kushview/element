@@ -21,7 +21,7 @@
 #include "gui/SystemTray.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "utils.hpp"
 
 #define EL_USE_NEW_SYSTRAY_ICON 0

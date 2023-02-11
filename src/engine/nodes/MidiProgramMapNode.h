@@ -20,7 +20,7 @@
 #pragma once
 
 #include "engine/nodes/MidiFilterNode.h"
-#include "engine/midipipe.hpp"
+#include <element/midipipe.hpp>
 #include "engine/nodes/BaseProcessor.h"
 #include <element/signals.hpp>
 

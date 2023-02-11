@@ -19,7 +19,7 @@
 #include "services.hpp"
 #include "scripting.hpp"
 #include "gui/views/LuaConsoleView.h"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

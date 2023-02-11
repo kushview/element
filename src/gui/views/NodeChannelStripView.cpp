@@ -22,8 +22,8 @@
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"
-#include "session/session.hpp"
-#include "context.hpp"
+#include <element/session.hpp>
+#include <element/context.hpp>
 #include <element/signals.hpp>
 
 namespace element {

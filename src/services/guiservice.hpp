@@ -25,8 +25,8 @@
 #include "gui/PreferencesComponent.h"
 #include "gui/WindowManager.h"
 #include "session/commandmanager.hpp"
-#include "session/node.hpp"
-#include "session/session.hpp"
+#include <element/node.hpp>
+#include <element/session.hpp>
 #include <element/signals.hpp>
 
 namespace element {

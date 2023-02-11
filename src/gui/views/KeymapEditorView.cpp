@@ -19,7 +19,7 @@
 
 #include "gui/GuiCommon.h"
 #include "session/commandmanager.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "gui/views/KeymapEditorView.h"
 
 namespace element {

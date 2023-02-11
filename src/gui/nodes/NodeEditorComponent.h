@@ -20,8 +20,8 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "engine/nodeobject.hpp"
-#include "session/node.hpp"
+#include <element/nodeobject.hpp>
+#include <element/node.hpp>
 
 #define EL_NODE_EDITOR_DEFAULT_ID "el.DefaultNodeEditor"
 

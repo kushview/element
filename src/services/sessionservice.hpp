@@ -21,7 +21,7 @@
 
 #include "services.hpp"
 #include "documents/sessiondocument.hpp"
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include <element/signals.hpp>
 
 namespace element {

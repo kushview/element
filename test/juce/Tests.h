@@ -23,7 +23,7 @@
 #include "services.hpp"
 #include "services/sessionservice.hpp"
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "engine/mappingengine.hpp"
 #include "engine/internalformat.hpp"
 #include "engine/LinearFade.h"

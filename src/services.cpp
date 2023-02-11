@@ -34,7 +34,7 @@
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "messages.hpp"
 #include <element/settings.hpp>
 #include "version.hpp"

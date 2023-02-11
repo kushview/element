@@ -18,7 +18,7 @@
 
 #include <element/signals.hpp>
 #include "services/engineservice.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "session/pluginmanager.hpp"
 #include "messages.hpp"
 

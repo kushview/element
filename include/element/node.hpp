@@ -19,16 +19,21 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
-#include <element/midichannels.hpp>
+#include <element/juce/core.hpp>
+#include <element/juce/data_structures.hpp>
+
 #include <element/arc.hpp>
 #include <element/model.hpp>
+#include <element/midichannels.hpp>
+#include <element/nodeobject.hpp>
+#include <element/tags.hpp>
 
 namespace element {
 
 // FIXME:
 using namespace juce;
 
+class DataPath;
 class GraphManager;
 class NodeArray;
 class PortArray;

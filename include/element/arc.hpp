@@ -1,6 +1,6 @@
 /*
-    This file is part of the Kushview Modules for JUCE
-    Copyright (c) 2014-2019  Kushview, LLC.  All rights reserved.
+    This file is part of Element
+    Copyright (c) 2014-2023  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,27 +19,29 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <cstdint>
+
+#include <element/juce/core.hpp>
 
 namespace element {
 
 struct JUCE_API Arc
 {
 public:
-    Arc (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) noexcept;
+    Arc (uint32_t sourceNode, uint32_t sourcePort, uint32_t destNode, uint32_t destPort) noexcept;
     virtual ~Arc() {}
 
     /** The source node ID */
-    uint32 sourceNode;
+    uint32_t sourceNode;
 
     /** The source port index */
-    uint32 sourcePort;
+    uint32_t sourcePort;
 
     /** The destination node ID */
-    uint32 destNode;
+    uint32_t destNode;
 
     /** The destination port index */
-    uint32 destPort;
+    uint32_t destPort;
 
     inline Arc& operator= (const Arc& o)
     {
@@ -103,8 +105,8 @@ public:
         }
     }
 
-    bool isAnInputTo (const uint32 possibleInputId,
-                      const uint32 possibleDestinationId) const noexcept
+    bool isAnInputTo (const uint32_t possibleInputId,
+                      const uint32_t possibleDestinationId) const noexcept
     {
         return isAnInputToRecursive (possibleInputId, possibleDestinationId, entries.size());
     }
@@ -112,25 +114,25 @@ public:
 private:
     struct Entry
     {
-        explicit Entry (const uint32 destNode_) noexcept : destNode (destNode_) {}
+        explicit Entry (const uint32_t destNode_) noexcept : destNode (destNode_) {}
 
-        const uint32 destNode;
-        juce::SortedSet<uint32> srcNodes;
+        const uint32_t destNode;
+        juce::SortedSet<uint32_t> srcNodes;
 
         JUCE_DECLARE_NON_COPYABLE (Entry)
     };
 
     juce::OwnedArray<Entry> entries;
 
-    bool isAnInputToRecursive (const uint32 possibleInputId,
-                               const uint32 possibleDestinationId,
+    bool isAnInputToRecursive (const uint32_t possibleInputId,
+                               const uint32_t possibleDestinationId,
                                int recursionCheck) const noexcept
     {
         int index;
 
         if (const Entry* const entry = findEntry (possibleDestinationId, index))
         {
-            const juce::SortedSet<uint32>& srcNodes = entry->srcNodes;
+            const juce::SortedSet<uint32_t>& srcNodes = entry->srcNodes;
 
             if (srcNodes.contains (possibleInputId))
                 return true;
@@ -146,7 +148,7 @@ private:
         return false;
     }
 
-    Entry* findEntry (const uint32 destNode, int& insertIndex) const noexcept
+    Entry* findEntry (const uint32_t destNode, int& insertIndex) const noexcept
     {
         Entry* result = nullptr;
 

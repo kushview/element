@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 #include "services/guiservice.hpp"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "gui/ChannelStripComponent.h"
 #include <element/signals.hpp>
 

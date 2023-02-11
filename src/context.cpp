@@ -16,20 +16,22 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "services.hpp"
+#include <element/devicemanager.hpp>
+#include <element/session.hpp>
+#include <element/settings.hpp>
 
 #include "engine/internalformat.hpp"
-#include "scripting.hpp"
-#include "session/devicemanager.hpp"
+#include "engine/mappingengine.hpp"
+#include "engine/midiengine.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
-#include "session/session.hpp"
 #include "session/commandmanager.hpp"
 
-#include "context.hpp"
+#include "services.hpp"
+#include "scripting.hpp"
+#include <element/context.hpp>
 #include "log.hpp"
 #include "module.hpp"
-#include <element/settings.hpp>
 
 namespace element {
 

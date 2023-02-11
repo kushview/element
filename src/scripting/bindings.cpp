@@ -21,17 +21,17 @@
 
 #include "services.hpp"
 #include "services/guiservice.hpp"
-#include "engine/audioengine.hpp"
-#include "engine/midipipe.hpp"
+#include <element/audioengine.hpp>
+#include <element/midipipe.hpp>
 #include "gui/SystemTray.h"
 #include "scripting/scriptmanager.hpp"
 #include "session/commandmanager.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "datapath.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 #include "sol/sol.hpp"
 #include "el/sol_helpers.hpp"

@@ -28,12 +28,12 @@
 #include "gui/PluginWindow.h"
 #include "gui/Workspace.h"
 #include "gui/WorkspacesContentComponent.h"
-#include "engine/audioengine.hpp"
-#include "session/session.hpp"
+#include <element/audioengine.hpp>
+#include <element/session.hpp>
 #include "session/commandmanager.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
 #include "urls.hpp"

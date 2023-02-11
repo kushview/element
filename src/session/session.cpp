@@ -20,10 +20,10 @@
 #include "engine/internalformat.hpp"
 #include <element/transport.hpp>
 
-#include "session/node.hpp"
-#include "session/session.hpp"
+#include <element/node.hpp>
+#include <element/session.hpp>
 
-#include "context.hpp"
+#include <element/context.hpp>
 #include "tempo.hpp"
 
 namespace element {

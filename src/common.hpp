@@ -33,12 +33,12 @@
 
 #include "engine/nodes/NodeTypes.h"
 
-#include "session/node.hpp"
-#include "session/session.hpp"
+#include <element/node.hpp>
+#include <element/session.hpp>
 
 #include "commands.hpp"
 #include "messages.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
 #include "version.hpp"

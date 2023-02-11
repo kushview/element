@@ -24,7 +24,7 @@
 #include "services/deviceservice.hpp"
 #include "engine/internalformat.hpp"
 #include "session/pluginmanager.hpp"
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "ElementApp.h"
 #include <element/settings.hpp>
 

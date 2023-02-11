@@ -20,7 +20,7 @@
 #include "services.hpp"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "session/pluginmanager.hpp"
 
 namespace element {

@@ -6,12 +6,16 @@
 #include "lua.hpp"
 #include "sol_helpers.hpp"
 
+#include <element/settings.hpp>
+
+#include "engine/midiengine.hpp"
+#include "engine/mappingengine.hpp"
 #include "session/commandmanager.hpp"
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
-#include "context.hpp"
-#include <element/settings.hpp>
+#include <element/context.hpp>
 
+using namespace juce;
 namespace lua = element::lua;
 
 static int el_Context_userdata (lua_State* L)

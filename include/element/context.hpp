@@ -18,17 +18,18 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "engine/audioengine.hpp"
-#include "engine/mappingengine.hpp"
-#include "engine/midiengine.hpp"
-#include "session/session.hpp"
+#include <element/juce/core.hpp>
+
+#include <element/audioengine.hpp>
+#include <element/session.hpp>
 
 namespace element {
 
 class ServiceManager;
 class CommandManager;
 class DeviceManager;
+class MappingEngine;
+class MidiEngine;
 class ScriptingEngine;
 class Log;
 class PluginManager;
@@ -38,7 +39,7 @@ class Settings;
 class Context
 {
 public:
-    explicit Context (const String& commandLine = String());
+    explicit Context (const juce::String& commandLine = juce::String());
     virtual ~Context();
 
     ServiceManager& getServices();

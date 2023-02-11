@@ -22,6 +22,7 @@
 #include "gui/views/GraphEditorView.h"
 #include "common.hpp"
 #include "scopedcallback.hpp"
+#include "engine/midiengine.hpp"
 
 namespace element {
 

@@ -20,10 +20,10 @@
 #pragma once
 
 #include "services.hpp"
-#include "engine/audioengine.hpp"
-#include "engine/parameter.hpp"
+#include <element/audioengine.hpp>
+#include <element/parameter.hpp>
 #include "ElementApp.h"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

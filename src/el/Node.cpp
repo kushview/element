@@ -2,8 +2,9 @@
 // @classmod el.Node
 // @pragma nostrip
 
+#include <element/element.h>
 #include "sol_helpers.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
 {

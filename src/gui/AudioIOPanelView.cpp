@@ -18,7 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "session/node.hpp"
+#include <element/node.hpp>
 using namespace element;
 //[/Headers]
 

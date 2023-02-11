@@ -19,21 +19,22 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "JuceHeader.h"
-#include "porttype.hpp"
+#include <element/juce/core.hpp>
+#include <element/porttype.hpp>
 
 #pragma once
 
 namespace element {
 
-/** An abstract base class for parameter objects that can be added to a Node
+/** An abstract base class for parameter objects that can be added to a Node.
+
     Based on juce::AudioProcessorParameter, but designed for GraphNodes which 
     can change parameters.
 */
-class Parameter : public ReferenceCountedObject
+class Parameter : public juce::ReferenceCountedObject
 {
 public:
-    using Ptr = ReferenceCountedObjectPtr<Parameter>;
+    using Ptr = juce::ReferenceCountedObjectPtr<Parameter>;
 
     /** Contructor */
     Parameter() noexcept;
@@ -79,17 +80,17 @@ public:
     virtual float getDefaultValue() const = 0;
 
     /** Should parse a string and return the appropriate value for it. */
-    virtual float getValueForText (const String& text) const = 0;
+    virtual float getValueForText (const juce::String& text) const = 0;
 
     /** Returns the name to display for this parameter, which should be made
         to fit within the given string length.
     */
-    virtual String getName (int maximumStringLength) const = 0;
+    virtual juce::String getName (int maximumStringLength) const = 0;
 
     /** Some parameters may be able to return a label string for
         their units. For example "Hz" or "%".
     */
-    virtual String getLabel() const = 0;
+    virtual juce::String getLabel() const = 0;
 
     /** Returns the number of steps that this parameter's range should be quantised into.
 
@@ -134,7 +135,7 @@ public:
         as a string, but this could do anything you need for a custom type
         of value.
     */
-    virtual String getText (float normalisedValue, int /*maximumStringLength*/) const;
+    virtual juce::String getText (float normalisedValue, int /*maximumStringLength*/) const;
 
     /** This can be overridden to tell the host that this parameter operates in the
         reverse direction.
@@ -205,7 +206,7 @@ public:
     void endChangeGesture();
 
     //==============================================================================
-    /** Returns the current value of the parameter as a String.
+    /** Returns the current value of the parameter as a juce::String.
 
         This function can be called when you are hosting plug-ins to get a
         more specialsed textual represenation of the current value from the
@@ -214,7 +215,7 @@ public:
         If you are implementing a plug-in then you should ignore this function
         and instead override getText.
     */
-    virtual String getCurrentValueAsText() const;
+    virtual juce::String getCurrentValueAsText() const;
 
     /** Returns the set of strings which represent the possible states a parameter
         can be in.
@@ -224,7 +225,7 @@ public:
 
         If you are implementing a plug-in then you do not need to override this.
     */
-    virtual StringArray getValueStrings() const;
+    virtual juce::StringArray getValueStrings() const;
 
     //==============================================================================
     /**
@@ -294,9 +295,9 @@ private:
 
     //==============================================================================
     int parameterIndex = -1;
-    CriticalSection listenerLock;
-    Array<Listener*> listeners;
-    mutable StringArray valueStrings;
+    juce::CriticalSection listenerLock;
+    juce::Array<Listener*> listeners;
+    mutable juce::StringArray valueStrings;
 
 #if JUCE_DEBUG
     bool isPerformingGesture = false;
@@ -305,12 +306,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Parameter)
 };
 
-using ParameterArray = ReferenceCountedArray<Parameter>;
+using ParameterArray = juce::ReferenceCountedArray<Parameter>;
 
 class ControlPortParameter : public Parameter
 {
 public:
-    using Ptr = ReferenceCountedObjectPtr<ControlPortParameter>;
+    using Ptr = juce::ReferenceCountedObjectPtr<ControlPortParameter>;
 
     ControlPortParameter (const PortDescription&);
     ~ControlPortParameter();
@@ -323,11 +324,11 @@ public:
     void setValue (float newValue) override { value = range.convertFrom0to1 (newValue); }
     float getDefaultValue() const override { return range.convertTo0to1 (port.defaultValue); }
 
-    String getName (int maxLength) const override { return port.name.substring (0, maxLength); }
-    String getLabel() const override { return {}; }
-    String getText (float normalisedValue, int maxLength) const override;
+    juce::String getName (int maxLength) const override { return port.name.substring (0, maxLength); }
+    juce::String getLabel() const override { return {}; }
+    juce::String getText (float normalisedValue, int maxLength) const override;
 
-    float getValueForText (const String& text) const override { return convertTo0to1 (text.getFloatValue()); }
+    float getValueForText (const juce::String& text) const override { return convertTo0to1 (text.getFloatValue()); }
 
     void setPort (const PortDescription& newPort, bool preserveValue = false);
     PortDescription getPort() const { return port; }
@@ -340,17 +341,17 @@ public:
 
     float convertTo0to1 (float input) const { return range.convertTo0to1 (input); }
     float convertFrom0to1 (float input) const { return range.convertFrom0to1 (input); }
-    const NormalisableRange<float>& getNormalisableRange() const { return range; }
+    const juce::NormalisableRange<float>& getNormalisableRange() const { return range; }
 
 private:
     PortDescription port;
-    NormalisableRange<float> range;
+    juce::NormalisableRange<float> range;
     float value { 0.0 };
 };
 
 //==============================================================================
 class ParameterListener : private Parameter::Listener,
-                          private Timer
+                          private juce::Timer
 {
 public:
     ParameterListener (Parameter::Ptr param)
@@ -370,11 +371,11 @@ public:
 
     Parameter* getParameter() noexcept { return parameter.get(); }
 
+protected:
     virtual void handleNewParameterValue() = 0;
 
 private:
     //==============================================================================
-
     void controlValueChanged (int, float) override
     {
         parameterValueHasChanged = 1;
@@ -383,7 +384,6 @@ private:
     void controlTouched (int, bool) override {}
 
     //==============================================================================
-
     void timerCallback() override
     {
         if (parameterValueHasChanged.compareAndSetBool (0, 1))
@@ -393,13 +393,12 @@ private:
         }
         else
         {
-            startTimer (jmin (250, getTimerInterval() + 10));
+            startTimer (juce::jmin (250, getTimerInterval() + 10));
         }
     }
 
     Parameter::Ptr parameter;
-    Atomic<int> parameterValueHasChanged { 0 };
-
+    juce::Atomic<int> parameterValueHasChanged { 0 };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
 };
 

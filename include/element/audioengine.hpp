@@ -19,13 +19,12 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "engine/engine.hpp"
-#include "engine/midiiomonitor.hpp"
+#include <element/devicemanager.hpp>
+#include <element/engine.hpp>
+#include <element/midiiomonitor.hpp>
+#include <element/runmode.hpp>
+#include <element/session.hpp>
 #include <element/transport.hpp>
-#include "session/devicemanager.hpp"
-#include "session/session.hpp"
-#include "runmode.hpp"
 
 namespace element {
 

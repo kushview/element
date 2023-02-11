@@ -18,7 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "session/devicemanager.hpp"
+#include <element/devicemanager.hpp>
 #include "session/pluginmanager.hpp"
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "gui/ContentComponent.h"
@@ -26,7 +26,9 @@
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "services/oscservice.hpp"
-#include "context.hpp"
+#include "engine/midiengine.hpp"
+
+#include <element/context.hpp>
 #include <element/settings.hpp>
 
 #define EL_GENERAL_SETTINGS_NAME "General"

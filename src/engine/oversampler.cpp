@@ -1,4 +1,4 @@
-#include "engine/oversampler.hpp"
+#include <element/oversampler.hpp>
 
 namespace element {
 
@@ -30,7 +30,7 @@ void Oversampler<T>::prepare (int numChannels, int blockSize)
 {
     reset();
 
-    numChannels = jmax (1, numChannels);
+    numChannels = juce::jmax (1, numChannels);
 
     if (processors.size() <= 0 || channels != numChannels || buffer != blockSize)
     {

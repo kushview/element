@@ -19,15 +19,20 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "engine/midipipe.hpp"
-#include "engine/oversampler.hpp"
-#include "engine/parameter.hpp"
+#include <element/juce/core.hpp>
+#include <element/juce/audio_processors.hpp>
+
+#include <element/midipipe.hpp>
+#include <element/oversampler.hpp>
 #include <element/atomic.hpp>
-#include "portcount.hpp"
-#include "midichannels.hpp"
+#include <element/parameter.hpp>
+#include <element/portcount.hpp>
+#include <element/midichannels.hpp>
+#include <element/signals.hpp>
 
 namespace element {
+
+using namespace juce;
 
 /* So render tasks can be friends of graph node */
 namespace GraphRender {

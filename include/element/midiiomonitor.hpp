@@ -19,13 +19,14 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce/core.hpp>
+#include <element/juce/events.hpp>
 #include <element/signals.hpp>
 
 namespace element {
 
 /** Monitors MIDI input/output from device IO in the audio engine */
-class MidiIOMonitor : public ReferenceCountedObject
+class MidiIOMonitor : public juce::ReferenceCountedObject
 {
 public:
     MidiIOMonitor() {}
@@ -47,7 +48,7 @@ public:
 
     inline void notify()
     {
-        jassert (MessageManager::getInstance()->isThisTheMessageThread());
+        jassert (juce::MessageManager::getInstance()->isThisTheMessageThread());
         if (midiInputCount.get() > 0)
             midiReceived();
         if (midiOutputCount.get() > 0)
@@ -59,10 +60,10 @@ public:
     inline void sent() { midiOutputCount.set (midiOutputCount.get() + 1); }
 
 private:
-    Atomic<int> midiInputCount { 0 };
-    Atomic<int> midiOutputCount { 0 };
+    juce::Atomic<int> midiInputCount { 0 };
+    juce::Atomic<int> midiOutputCount { 0 };
 };
 
-typedef ReferenceCountedObjectPtr<MidiIOMonitor> MidiIOMonitorPtr;
+typedef juce::ReferenceCountedObjectPtr<MidiIOMonitor> MidiIOMonitorPtr;
 
 } // namespace element

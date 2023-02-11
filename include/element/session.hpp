@@ -18,9 +18,9 @@
 */
 #pragma once
 
-#include "ElementApp.h"
-#include "session/controllerdevice.hpp"
-#include "session/node.hpp"
+#include <element/model.hpp>
+#include <element/controllerdevice.hpp>
+#include <element/node.hpp>
 #include <element/signals.hpp>
 
 #define EL_TEMPO_MIN 20

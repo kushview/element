@@ -25,7 +25,7 @@
 #include "gui/MainWindow.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
 

@@ -17,13 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "gui/ContentComponent.h"
 #include "gui/views/NavigationView.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
 #include "session/pluginmanager.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

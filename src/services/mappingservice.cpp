@@ -21,8 +21,8 @@
 #include "services/deviceservice.hpp"
 #include "services/guiservice.hpp"
 #include "engine/mappingengine.hpp"
-#include "session/controllerdevice.hpp"
-#include "context.hpp"
+#include <element/controllerdevice.hpp>
+#include <element/context.hpp>
 #include <element/signals.hpp>
 
 namespace element {

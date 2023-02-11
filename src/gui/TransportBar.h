@@ -21,8 +21,8 @@
 
 #include "ElementApp.h"
 #include "gui/Buttons.h"
-#include "engine/audioengine.hpp"
-#include "session/session.hpp"
+#include <element/audioengine.hpp>
+#include <element/session.hpp>
 
 namespace element {
 

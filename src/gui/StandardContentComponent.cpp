@@ -45,12 +45,12 @@
 #include "gui/TransportBar.h"
 #include "gui/NavigationConcertinaPanel.h"
 
-#include "session/devicemanager.hpp"
+#include <element/devicemanager.hpp>
 #include "session/pluginmanager.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 
 #include "gui/StandardContentComponent.h"

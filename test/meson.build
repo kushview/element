@@ -12,7 +12,9 @@ test_element_sources = '''
     scripting/ScriptDescriptionTests.cpp
     scripting/ScriptManagerTests.cpp
 '''.split()
-test_element_cpp_args = []
+test_element_cpp_args = [
+    '-DEL_TEST_SOURCE_ROOT="@0@"'.format (meson.project_source_root())
+]
 
 if cpp.get_argument_syntax() == 'gcc'
     test_element_cpp_args += [ '-Wno-unused-function', '-Wno-unused-variable' ]

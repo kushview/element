@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce/audio_basics.hpp>
 
 struct lua_State;
 namespace element {
@@ -35,13 +35,13 @@ class MidiPipe
 {
 public:
     MidiPipe();
-    MidiPipe (MidiBuffer** buffers, int numBuffers);
-    MidiPipe (const OwnedArray<MidiBuffer>& buffers, const Array<int>& channels);
+    MidiPipe (juce::MidiBuffer** buffers, int numBuffers);
+    MidiPipe (const juce::OwnedArray<juce::MidiBuffer>& buffers, const juce::Array<int>& channels);
     ~MidiPipe();
 
     int getNumBuffers() const { return size; }
-    const MidiBuffer* const getReadBuffer (const int index) const;
-    MidiBuffer* const getWriteBuffer (const int index) const;
+    const juce::MidiBuffer* const getReadBuffer (const int index) const;
+    juce::MidiBuffer* const getWriteBuffer (const int index) const;
 
     void clear();
     void clear (int startSample, int numSamples);
@@ -53,7 +53,7 @@ private:
         maxReferencedBuffers = 32
     };
     int size = 0;
-    MidiBuffer* referencedBuffers[maxReferencedBuffers];
+    juce::MidiBuffer* referencedBuffers[maxReferencedBuffers];
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPipe);
 };
 
@@ -72,10 +72,10 @@ public:
     int getNumBuffers() const { return used; }
 
     /** Get a read only buffer */
-    const MidiBuffer* const getReadBuffer (int index) const;
+    const juce::MidiBuffer* const getReadBuffer (int index) const;
 
     /** Get a writable buffer */
-    MidiBuffer* getWriteBuffer (int index) const;
+    juce::MidiBuffer* getWriteBuffer (int index) const;
 
     /** Change how many buffers are managed */
     void setSize (int newsize);
@@ -91,8 +91,8 @@ public:
 
 private:
     lua_State* state { nullptr };
-    Array<element::lua::MidiBufferImpl**> buffers;
-    Array<int> refs;
+    juce::Array<element::lua::MidiBufferImpl**> buffers;
+    juce::Array<int> refs;
     int used { 0 };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LuaMidiPipe);
 };

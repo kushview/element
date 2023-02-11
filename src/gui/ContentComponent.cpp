@@ -32,12 +32,12 @@
 #include "gui/TransportBar.h"
 #include "gui/ViewHelpers.h"
 
-#include "session/devicemanager.hpp"
-#include "session/node.hpp"
+#include <element/devicemanager.hpp>
+#include <element/node.hpp>
 #include "session/pluginmanager.hpp"
 
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 
 #include "gui/ContentComponent.h"

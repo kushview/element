@@ -19,9 +19,9 @@
 
 #include "services/oscservice.hpp"
 #include "session/commandmanager.hpp"
-#include "session/devicemanager.hpp"
+#include <element/devicemanager.hpp>
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"

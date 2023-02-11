@@ -20,7 +20,7 @@
 #pragma once
 
 #include "services.hpp"
-#include "session/controllerdevice.hpp"
+#include <element/controllerdevice.hpp>
 
 namespace element {
 

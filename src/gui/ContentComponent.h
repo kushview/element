@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "engine/nodeobject.hpp"
-#include "session/session.hpp"
+#include <element/nodeobject.hpp>
+#include <element/session.hpp>
 #include "Workspace.h"
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"

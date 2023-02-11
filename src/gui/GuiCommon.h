@@ -26,10 +26,10 @@
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
-#include "session/session.hpp"
-#include "session/node.hpp"
+#include <element/session.hpp>
+#include <element/node.hpp>
 
 #include "commands.hpp"
 #include "messages.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>

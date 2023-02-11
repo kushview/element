@@ -3,7 +3,7 @@
 
 #include "JuceHeader.h"
 #include "ElementApp.h"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "element/lua.hpp"
 #include "sol/forward.hpp"
 

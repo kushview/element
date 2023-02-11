@@ -18,8 +18,8 @@
 */
 
 #include "services.hpp"
-#include "engine/nodeobject.hpp"
-#include "session/controllerdevice.hpp"
+#include <element/nodeobject.hpp>
+#include <element/controllerdevice.hpp>
 #include <element/signals.hpp>
 
 namespace element {

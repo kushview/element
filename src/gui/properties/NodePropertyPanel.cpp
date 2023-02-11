@@ -1,7 +1,7 @@
 
 #include "gui/properties/NodePropertyPanel.h"
 #include "gui/properties/NodeProperties.h"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 

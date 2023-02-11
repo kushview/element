@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 

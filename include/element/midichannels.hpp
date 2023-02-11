@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <element/juce/core.hpp>
+
 namespace element {
 
 struct JUCE_API MidiChannels

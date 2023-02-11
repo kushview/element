@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/GuiCommon.h"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 

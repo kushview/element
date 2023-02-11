@@ -23,7 +23,7 @@
 #include "ElementApp.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
-#include "session/node.hpp"
+#include <element/node.hpp>
 #include "commands.hpp"
 
 namespace element {

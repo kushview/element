@@ -25,9 +25,9 @@
 #include "services/presetservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/SessionImportWizard.h"
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "datapath.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 
 namespace element {

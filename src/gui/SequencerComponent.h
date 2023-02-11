@@ -20,7 +20,7 @@
 #ifndef ELEMENT_SEQUENCER_COMPONENT_H
 #define ELEMENT_SEQUENCER_COMPONENT_H
 
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "gui/Timeline.h"
 
 namespace element {

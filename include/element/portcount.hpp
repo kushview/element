@@ -18,9 +18,12 @@
 
 #pragma once
 
-#include "porttype.hpp"
+#include <element/porttype.hpp>
 
 namespace element {
+
+// FIXME:
+using namespace juce;
 
 struct PortCount
 {

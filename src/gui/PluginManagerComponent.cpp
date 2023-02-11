@@ -20,7 +20,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/PluginManagerComponent.h"
 #include "session/pluginmanager.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
 

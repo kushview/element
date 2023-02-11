@@ -23,10 +23,10 @@
 #include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
-#include "session/devicemanager.hpp"
+#include <element/devicemanager.hpp>
 #include "session/pluginmanager.hpp"
-#include "session/node.hpp"
-#include "context.hpp"
+#include <element/node.hpp>
+#include <element/context.hpp>
 #include <element/settings.hpp>
 
 #include "services/engineservice.hpp"

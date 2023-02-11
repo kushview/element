@@ -16,12 +16,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "gui/Workspace.h"
-#include "session/devicemanager.hpp"
-#include "context.hpp"
+#include <element/devicemanager.hpp>
+#include <element/settings.hpp>
 #include <element/settings.hpp>
 
-#include <element/settings.hpp>
+#include "gui/Workspace.h"
+
+#include <element/context.hpp>
+#include "engine/midiengine.hpp"
 
 namespace element {
 

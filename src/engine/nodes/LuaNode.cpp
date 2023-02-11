@@ -24,8 +24,8 @@
 
 #include "ElementApp.h"
 #include "engine/nodes/LuaNode.h"
-#include "engine/midipipe.hpp"
-#include "engine/parameter.hpp"
+#include <element/midipipe.hpp>
+#include <element/parameter.hpp>
 #include "scripting/bindings.hpp"
 
 #define EL_LUA_DBG(x)

@@ -27,10 +27,10 @@
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/SessionGraphsListBox.h"
 #include "gui/widgets/FileTreeView.h"
-#include "session/session.hpp"
-#include "session/node.hpp"
+#include <element/session.hpp>
+#include <element/node.hpp>
 #include "datapath.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

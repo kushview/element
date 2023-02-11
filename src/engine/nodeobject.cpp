@@ -23,11 +23,11 @@
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/audioengine.hpp"
-#include "engine/midipipe.hpp"
-#include "engine/nodeobject.hpp"
+#include <element/audioengine.hpp>
+#include <element/midipipe.hpp>
+#include <element/nodeobject.hpp>
 #include "engine/rootgraph.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 

@@ -1,5 +1,5 @@
 
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "engine/miditranspose.hpp"
 #include "engine/graphnode.hpp"
 #include "engine/graphbuilder.hpp"

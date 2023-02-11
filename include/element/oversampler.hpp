@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2021  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,34 +19,35 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "engine/engine.hpp"
+#include <element/juce/core.hpp>
+#include <element/juce/dsp.hpp>
 
 namespace element {
 
-class DeviceManager : public AudioDeviceManager
+template <typename SampleType>
+class Oversampler final
 {
 public:
-    typedef AudioDeviceManager::AudioDeviceSetup AudioSettings;
-    static const int maxAudioChannels;
+    using ProcessorType = juce::dsp::Oversampling<SampleType>;
 
-    DeviceManager();
-    ~DeviceManager();
+    Oversampler() = default;
+    ~Oversampler();
 
-    void getAudioDrivers (StringArray& drivers);
-    void selectAudioDriver (const String& name);
-    void attach (EnginePtr engine);
+    int getNumProcessors() const { return processors.size(); }
+    ProcessorType* getProcessor (int index) const { return processors[index]; }
 
-#if KV_JACK_AUDIO
-    kv::JackClient& getJackClient();
-#endif
-
-    virtual void createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list) override;
+    float getLatencySamples (int index) const;
+    int getFactor (int index) const;
+    void prepare (int numChannels, int blockSize);
+    void reset();
 
 private:
-    friend class World;
-    class Private;
-    std::unique_ptr<Private> impl;
+    enum {
+        maxProc = 3
+    };
+    int channels = 0,
+        buffer = 0;
+    juce::OwnedArray<ProcessorType> processors;
 };
 
 } // namespace element

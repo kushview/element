@@ -37,7 +37,7 @@
 
 #include "session/pluginmanager.hpp"
 #include "session/presetmanager.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 #include "gui/GraphEditorComponent.h"
 

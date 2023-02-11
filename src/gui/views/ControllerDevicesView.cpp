@@ -21,9 +21,10 @@
 #include "gui/Buttons.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
-#include "session/controllerdevice.hpp"
+#include <element/controllerdevice.hpp>
 #include "messages.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
+#include "engine/midiengine.hpp"
 
 namespace element {
 

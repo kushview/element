@@ -20,7 +20,7 @@
 #pragma once
 
 #include "session/commandmanager.hpp"
-#include "runmode.hpp"
+#include <element/runmode.hpp>
 
 namespace element {
 

@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "ElementApp.h"
 #include "engine/nodes/MidiProgramMapNode.h"
 
 namespace element {

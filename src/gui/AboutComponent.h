@@ -24,7 +24,7 @@
 #include "gui/LookAndFeel.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "utils.hpp"
 
 namespace element {

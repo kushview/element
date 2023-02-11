@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "engine/internalformat.hpp"
 #include "engine/midiclock.hpp"
 #include "engine/midichannelmap.hpp"
@@ -25,7 +25,7 @@
 #include "engine/miditranspose.hpp"
 #include <element/transport.hpp>
 #include "engine/rootgraph.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include <element/settings.hpp>
 #include "tempo.hpp"
 

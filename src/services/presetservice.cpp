@@ -20,9 +20,9 @@
 #include "services/presetservice.hpp"
 #include "services/guiservice.hpp"
 #include "gui/ContentComponent.h"
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "session/presetmanager.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "datapath.hpp"
 
 namespace element {

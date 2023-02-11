@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/views/VirtualKeyboardView.h"
 

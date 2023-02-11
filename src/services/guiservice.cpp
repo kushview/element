@@ -22,7 +22,7 @@
 #include "services/sessionservice.hpp"
 #include "services/engineservice.hpp"
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 
 #include "gui/AboutComponent.h"
 #include "gui/ContentComponent.h"

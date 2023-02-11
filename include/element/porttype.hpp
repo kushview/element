@@ -19,12 +19,17 @@
 
 #pragma once
 
+#include <cstdint>
+
+#include <element/juce/core.hpp>
+#include <element/juce/data_structures.hpp>
+
 #ifndef EL_INVALID_CHANNEL
 #define EL_INVALID_CHANNEL -1
 #endif
 
 #ifndef EL_INVALID_PORT
-#define EL_INVALID_PORT (uint32) - 1
+#define EL_INVALID_PORT (uint32_t) - 1
 #endif
 
 #ifndef EL_INVALID_NODE
@@ -216,7 +221,7 @@ public:
         init();
 
         for (int port = 0; port < types.size(); ++port)
-            addPort (types.getUnchecked (port), (uint32) port);
+            addPort (types.getUnchecked (port), (uint32_t) port);
     }
 
     inline void clear()
@@ -226,56 +231,56 @@ public:
     }
 
     /** Add (append) a port to the map */
-    inline void addPort (PortType type, uint32 index)
+    inline void addPort (PortType type, uint32_t index)
     {
         ports.getUnchecked (type)->add (index);
     }
 
-    inline bool containsChannel (const PortType type, const int32 channel) const
+    inline bool containsChannel (const PortType type, const int channel) const
     {
         if (type == PortType::Unknown)
             return false;
 
-        const juce::Array<uint32>* const a (ports.getUnchecked (type));
+        const juce::Array<uint32_t>* const a (ports.getUnchecked (type));
         return a->size() > 0 && juce::isPositiveAndBelow (channel, a->size());
     }
 
-    int32 getNumChannels (const PortType type) const { return ports.getUnchecked (type)->size(); }
-    uint32 getNumPorts (const PortType type) const { return ports.getUnchecked (type)->size(); }
+    int getNumChannels (const PortType type) const { return ports.getUnchecked (type)->size(); }
+    uint32_t getNumPorts (const PortType type) const { return ports.getUnchecked (type)->size(); }
 
     /** Get a port index for a channel */
-    inline uint32 getPortChecked (const PortType type, const int32 channel) const
+    inline uint32_t getPortChecked (const PortType type, const int channel) const
     {
         if (! containsChannel (type, channel))
             return EL_INVALID_PORT;
 
-        const juce::Array<uint32>* const a (ports.getUnchecked (type));
+        const juce::Array<uint32_t>* const a (ports.getUnchecked (type));
         return a->getUnchecked (channel);
     }
 
-    const juce::Array<uint32>& getPorts (const PortType type) const { return *ports.getUnchecked (type); }
+    const juce::Array<uint32_t>& getPorts (const PortType type) const { return *ports.getUnchecked (type); }
 
-    inline uint32 getPort (const PortType type, const int32 channel) const
+    inline uint32_t getPort (const PortType type, const int channel) const
     {
         return ports.getUnchecked (type)->getUnchecked (channel);
     }
 
-    inline uint32 getAtomPort (const int32 channel) const { return ports.getUnchecked (PortType::Atom)->getUnchecked (channel); }
-    inline uint32 getAudioPort (const int32 channel) const { return ports.getUnchecked (PortType::Audio)->getUnchecked (channel); }
-    inline uint32 getControlPort (const int32 channel) const { return ports.getUnchecked (PortType::Control)->getUnchecked (channel); }
-    inline uint32 getCVPort (const int32 channel) const { return ports.getUnchecked (PortType::CV)->getUnchecked (channel); }
-    inline uint32 getEventPort (const int32 channel) const { return ports.getUnchecked (PortType::Event)->getUnchecked (channel); }
-    inline uint32 getMidiPort (const int32 channel) const { return ports.getUnchecked (PortType::Midi)->getUnchecked (channel); }
+    inline uint32_t getAtomPort (const int channel) const { return ports.getUnchecked (PortType::Atom)->getUnchecked (channel); }
+    inline uint32_t getAudioPort (const int channel) const { return ports.getUnchecked (PortType::Audio)->getUnchecked (channel); }
+    inline uint32_t getControlPort (const int channel) const { return ports.getUnchecked (PortType::Control)->getUnchecked (channel); }
+    inline uint32_t getCVPort (const int channel) const { return ports.getUnchecked (PortType::CV)->getUnchecked (channel); }
+    inline uint32_t getEventPort (const int channel) const { return ports.getUnchecked (PortType::Event)->getUnchecked (channel); }
+    inline uint32_t getMidiPort (const int channel) const { return ports.getUnchecked (PortType::Midi)->getUnchecked (channel); }
 
 private:
     // owned arrays of arrays....
-    juce::OwnedArray<juce::Array<uint32>> ports;
+    juce::OwnedArray<juce::Array<uint32_t>> ports;
 
     inline void init()
     {
         ports.ensureStorageAllocated (PortType::Unknown + 1);
-        for (int32 p = 0; p <= PortType::Unknown; ++p)
-            ports.add (new juce::Array<uint32>());
+        for (int p = 0; p <= PortType::Unknown; ++p)
+            ports.add (new juce::Array<uint32_t>());
     }
 };
 
@@ -286,48 +291,48 @@ public:
     ChannelConfig() {}
     ~ChannelConfig() {}
 
-    inline void addPort (const PortType type, const uint32 port, const bool isInput)
+    inline void addPort (const PortType type, const uint32_t port, const bool isInput)
     {
         ChannelMapping& mapping = isInput ? inputs : outputs;
         mapping.addPort (type, port);
     }
 
-    inline void addInput (const PortType type, const uint32 port) { inputs.addPort (type, port); }
-    inline void addOutput (const PortType type, const uint32 port) { outputs.addPort (type, port); }
+    inline void addInput (const PortType type, const uint32_t port) { inputs.addPort (type, port); }
+    inline void addOutput (const PortType type, const uint32_t port) { outputs.addPort (type, port); }
 
     inline const ChannelMapping& getChannelMapping (const bool isInput) const { return isInput ? inputs : outputs; }
     inline const ChannelMapping& getInputs() const { return inputs; }
     inline const ChannelMapping& getOutputs() const { return outputs; }
 
-    inline uint32 getPort (PortType type, int32 channel, bool isInput) const { return getChannelMapping (isInput).getPort (type, channel); }
-    inline uint32 getInputPort (const PortType type, const int32 channel) const { return inputs.getPort (type, channel); }
-    inline uint32 getOutputPort (const PortType type, const int32 channel) const { return outputs.getPort (type, channel); }
+    inline uint32_t getPort (PortType type, int channel, bool isInput) const { return getChannelMapping (isInput).getPort (type, channel); }
+    inline uint32_t getInputPort (const PortType type, const int channel) const { return inputs.getPort (type, channel); }
+    inline uint32_t getOutputPort (const PortType type, const int channel) const { return outputs.getPort (type, channel); }
 
-    inline uint32 getAtomPort (int32 channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
-    inline uint32 getAudioPort (int32 channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
-    inline uint32 getControlPort (int32 channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
-    inline uint32 getCVPort (int32 channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
+    inline uint32_t getAtomPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
+    inline uint32_t getAudioPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
+    inline uint32_t getControlPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
+    inline uint32_t getCVPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
 
-    inline uint32 getAudioInputPort (const int32 channel) const { return inputs.getAudioPort (channel); }
-    inline uint32 getAudioOutputPort (const int32 channel) const { return outputs.getAudioPort (channel); }
-    inline uint32 getControlInputPort (const int32 channel) const { return inputs.getControlPort (channel); }
-    inline uint32 getControlOutputPort (const int32 channel) const { return outputs.getControlPort (channel); }
+    inline uint32_t getAudioInputPort (const int channel) const { return inputs.getAudioPort (channel); }
+    inline uint32_t getAudioOutputPort (const int channel) const { return outputs.getAudioPort (channel); }
+    inline uint32_t getControlInputPort (const int channel) const { return inputs.getControlPort (channel); }
+    inline uint32_t getControlOutputPort (const int channel) const { return outputs.getControlPort (channel); }
 
-    inline int32 getNumChannels (const PortType type, bool isInput) const
+    inline int getNumChannels (const PortType type, bool isInput) const
     {
         return isInput ? inputs.getNumChannels (type) : outputs.getNumChannels (type);
     }
 
-    inline int32 getNumAtomInputs() const { return inputs.getNumChannels (PortType::Atom); }
-    inline int32 getNumAtomOutputs() const { return outputs.getNumChannels (PortType::Atom); }
-    inline int32 getNumAudioInputs() const { return inputs.getNumChannels (PortType::Audio); }
-    inline int32 getNumAudioOutputs() const { return outputs.getNumChannels (PortType::Audio); }
-    inline int32 getNumControlInputs() const { return inputs.getNumChannels (PortType::Control); }
-    inline int32 getNumControlOutputs() const { return outputs.getNumChannels (PortType::Control); }
-    inline int32 getNumCVInputs() const { return inputs.getNumChannels (PortType::CV); }
-    inline int32 getNumCVOutputs() const { return outputs.getNumChannels (PortType::CV); }
-    inline int32 getNumEventInputs() const { return inputs.getNumChannels (PortType::Event); }
-    inline int32 getNumEventOutputs() const { return outputs.getNumChannels (PortType::Event); }
+    inline int getNumAtomInputs() const { return inputs.getNumChannels (PortType::Atom); }
+    inline int getNumAtomOutputs() const { return outputs.getNumChannels (PortType::Atom); }
+    inline int getNumAudioInputs() const { return inputs.getNumChannels (PortType::Audio); }
+    inline int getNumAudioOutputs() const { return outputs.getNumChannels (PortType::Audio); }
+    inline int getNumControlInputs() const { return inputs.getNumChannels (PortType::Control); }
+    inline int getNumControlOutputs() const { return outputs.getNumChannels (PortType::Control); }
+    inline int getNumCVInputs() const { return inputs.getNumChannels (PortType::CV); }
+    inline int getNumCVOutputs() const { return outputs.getNumChannels (PortType::CV); }
+    inline int getNumEventInputs() const { return inputs.getNumChannels (PortType::Event); }
+    inline int getNumEventOutputs() const { return outputs.getNumChannels (PortType::Event); }
 
 private:
     ChannelMapping inputs, outputs;
@@ -337,7 +342,7 @@ private:
 struct PortDescription
 {
     PortDescription() {}
-    PortDescription (int32 portType, int32 portIndex, int32 portChannel, const juce::String& portSymbol, const juce::String& portName, const bool isInput)
+    PortDescription (int portType, int portIndex, int portChannel, const juce::String& portSymbol, const juce::String& portName, const bool isInput)
         : type (portType), index (portIndex), channel (portChannel), symbol (portSymbol), name (portName), input (isInput) {}
     PortDescription (const PortDescription& o) { operator= (o); }
     PortDescription& operator= (const PortDescription& o)
@@ -421,7 +426,7 @@ public:
         add (port);
     }
 
-    inline void add (int32 type, int32 index, int32 channel, const juce::String& symbol, const juce::String& name, const bool input)
+    inline void add (int type, int index, int channel, const juce::String& symbol, const juce::String& name, const bool input)
     {
         add (new PortDescription (type, index, channel, symbol, name, input));
     }

@@ -2,9 +2,11 @@
 // @classmod el.Session
 // @pragma nostrip
 
+#include <element/element.h>
+#include <element/node.hpp>
+
 #include "sol_helpers.hpp"
-#include "session/node.hpp"
-#include "session/session.hpp"
+#include <element/session.hpp>
 
 EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L)
 {

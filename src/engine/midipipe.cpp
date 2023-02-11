@@ -26,7 +26,7 @@
 #include <element/lua.hpp>
 #include "el/midi_buffer.hpp"
 #include "el/factories.hpp"
-#include "engine/midipipe.hpp"
+#include <element/midipipe.hpp>
 
 namespace element {
 

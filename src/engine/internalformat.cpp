@@ -41,13 +41,13 @@
 #include "engine/nodes/ScriptNode.h"
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "engine/internalformat.hpp"
 #include "engine/ionode.hpp"
 
-#include "session/session.hpp"
+#include <element/session.hpp>
 
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

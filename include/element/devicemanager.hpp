@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,18 +19,34 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <element/juce/audio_devices.hpp>
+#include <element/engine.hpp>
 
 namespace element {
 
-class Engine : public ReferenceCountedObject
+class DeviceManager : public juce::AudioDeviceManager
 {
 public:
-    virtual ~Engine() {}
-    virtual AudioIODeviceCallback& getAudioIODeviceCallback() = 0;
-    virtual MidiInputCallback& getMidiInputCallback() = 0;
-};
+    typedef juce::AudioDeviceManager::AudioDeviceSetup AudioSettings;
+    static const int maxAudioChannels;
 
-typedef ReferenceCountedObjectPtr<Engine> EnginePtr;
+    DeviceManager();
+    ~DeviceManager();
+
+    void getAudioDrivers (juce::StringArray& drivers);
+    void selectAudioDriver (const juce::String& name);
+    void attach (EnginePtr engine);
+
+#if KV_JACK_AUDIO
+    kv::JackClient& getJackClient();
+#endif
+
+    virtual void createAudioDeviceTypes (juce::OwnedArray<juce::AudioIODeviceType>& list) override;
+
+private:
+    friend class World;
+    class Private;
+    std::unique_ptr<Private> impl;
+};
 
 } // namespace element

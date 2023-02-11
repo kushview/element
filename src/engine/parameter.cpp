@@ -19,8 +19,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/parameter.hpp"
+#include <element/parameter.hpp>
 
+using namespace juce;
 namespace element {
 
 //==============================================================================

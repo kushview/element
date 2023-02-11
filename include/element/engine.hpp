@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2021  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,35 +19,18 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce/audio_devices.hpp>
 
 namespace element {
 
-template <typename SampleType>
-class Oversampler final
+class Engine : public juce::ReferenceCountedObject
 {
 public:
-    using ProcessorType = juce::dsp::Oversampling<SampleType>;
-
-    Oversampler() = default;
-    ~Oversampler();
-
-    int getNumProcessors() const { return processors.size(); }
-    ProcessorType* getProcessor (int index) const { return processors[index]; }
-
-    float getLatencySamples (int index) const;
-    int getFactor (int index) const;
-    void prepare (int numChannels, int blockSize);
-    void reset();
-
-private:
-    enum
-    {
-        maxProc = 3
-    };
-    int channels = 0,
-        buffer = 0;
-    OwnedArray<ProcessorType> processors;
+    virtual ~Engine() {}
+    virtual juce::AudioIODeviceCallback& getAudioIODeviceCallback() = 0;
+    virtual juce::MidiInputCallback& getMidiInputCallback() = 0;
 };
+
+typedef juce::ReferenceCountedObjectPtr<Engine> EnginePtr;
 
 } // namespace element

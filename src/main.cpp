@@ -22,11 +22,11 @@
 #include "services/sessionservice.hpp"
 #include "engine/internalformat.hpp"
 #include "scripting.hpp"
-#include "session/devicemanager.hpp"
+#include <element/devicemanager.hpp>
 #include "session/pluginmanager.hpp"
 #include "commands.hpp"
 #include "datapath.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "log.hpp"
 #include "messages.hpp"
 #include "version.hpp"

@@ -18,7 +18,7 @@
 */
 
 #include "session/pluginmanager.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 #include "engine/nodes/NodeTypes.h"
 #include "engine/nodefactory.hpp"
 #include "engine/ionode.hpp"

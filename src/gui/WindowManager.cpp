@@ -17,9 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "context.hpp"
+#include <element/context.hpp>
 #include "services/guiservice.hpp"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "engine/graphnode.hpp"
 #include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
