@@ -22,7 +22,7 @@
 #include "ElementApp.h"
 #include "engine/engine.hpp"
 #include "engine/midiiomonitor.hpp"
-#include "engine/transport.hpp"
+#include <element/transport.hpp>
 #include "session/devicemanager.hpp"
 #include "session/session.hpp"
 #include "runmode.hpp"

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace element {
 
 struct BeatType
@@ -65,8 +67,8 @@ struct BeatType
         return fromDivisor (info.timeSigDenominator);
     }
 
-    uint8 getType() const { return static_cast<uint8> (type); }
-    uint8 divisor() const { return (1 << type); }
+    uint8_t getType() const { return static_cast<uint8_t> (type); }
+    uint8_t divisor() const { return (1 << type); }
 
     operator int() const { return static_cast<int> (type); }
     operator ID() const { return type; }

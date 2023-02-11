@@ -19,7 +19,10 @@
 
 #pragma once
 
-#include "linkedlist.hpp"
+#include <cstdint>
+#include <string>
+
+#include <element/linkedlist.hpp>
 
 #if _MSC_VER
 #pragma warning(disable : 4355)
@@ -96,7 +99,7 @@ public:
     {
     public:
         // Constructor.
-        Node (TimeScale* timescale, uint64 frame_ = 0, float tempo_ = 120.0f, unsigned short beattype_ = 2, unsigned short beats_per_bar_ = 4, unsigned short beat_divisor_ = 2)
+        Node (TimeScale* timescale, uint64_t frame_ = 0, float tempo_ = 120.0f, unsigned short beattype_ = 2, unsigned short beats_per_bar_ = 4, unsigned short beat_divisor_ = 2)
             : frame (frame_), bar (0), beat (0), tick (0), pixel (0), tempo (tempo_), beatType (beattype_), beatsPerBar (beats_per_bar_), beatDivisor (beat_divisor_), ticksPerBeat (0), ts (timescale), tickRate (1.0f), beatRate (1.0f)
         {
         }
@@ -112,43 +115,43 @@ public:
         float tempoEx (unsigned short beatType = 2) const;
 
         // Frame/bar convertors.
-        unsigned short barFromFrame (uint64 iFrame) const
+        unsigned short barFromFrame (uint64_t iFrame) const
         {
             return bar + (unsigned short) uroundf ((beatRate * (iFrame - frame)) / (ts->frameRate() * beatsPerBar));
         }
 
-        uint64 frameFromBar (unsigned short iBar) const
+        uint64_t frameFromBar (unsigned short iBar) const
         {
-            return frame + (uint64) uroundf ((ts->frameRate() * beatsPerBar * (iBar - bar)) / beatRate);
+            return frame + (uint64_t) uroundf ((ts->frameRate() * beatsPerBar * (iBar - bar)) / beatRate);
         }
 
         // Frame/beat convertors.
-        unsigned int beatFromFrame (uint64 iFrame) const
+        unsigned int beatFromFrame (uint64_t iFrame) const
         {
             return beat + (unsigned int) uroundf ((beatRate * (iFrame - frame)) / ts->frameRate());
         }
 
-        uint64 frameFromBeat (unsigned int iBeat) const { return frame + (uint64) uroundf ((ts->frameRate() * (iBeat - beat)) / beatRate); }
+        uint64_t frameFromBeat (unsigned int iBeat) const { return frame + (uint64_t) uroundf ((ts->frameRate() * (iBeat - beat)) / beatRate); }
 
         // Frame/tick convertors.
-        uint64 tickFromFrame (uint64 iFrame) const
+        uint64_t tickFromFrame (uint64_t iFrame) const
         {
-            return tick + (uint64) uroundf ((tickRate * (iFrame - frame)) / ts->frameRate());
+            return tick + (uint64_t) uroundf ((tickRate * (iFrame - frame)) / ts->frameRate());
         }
 
-        uint64 frameFromTick (uint64 iTick) const { return frame + (uint64) uroundf ((ts->frameRate() * (iTick - tick)) / tickRate); }
+        uint64_t frameFromTick (uint64_t iTick) const { return frame + (uint64_t) uroundf ((ts->frameRate() * (iTick - tick)) / tickRate); }
 
         // Tick/beat convertors.
-        unsigned int beatFromTick (uint64 iTick) const { return beat + (unsigned int) ((iTick - tick) / ticksPerBeat); }
-        uint64 tickFromBeat (unsigned int iBeat) const { return tick + (uint64) (ticksPerBeat * (iBeat - beat)); }
+        unsigned int beatFromTick (uint64_t iTick) const { return beat + (unsigned int) ((iTick - tick) / ticksPerBeat); }
+        uint64_t tickFromBeat (unsigned int iBeat) const { return tick + (uint64_t) (ticksPerBeat * (iBeat - beat)); }
 
         // Tick/bar convertors.
-        unsigned short barFromTick (uint64 iTick) const { return bar + (unsigned short) ((iTick - tick) / (ticksPerBeat * beatsPerBar)); }
-        uint64 tickFromBar (unsigned short iBar) const { return tick + (uint64) (ticksPerBeat * beatsPerBar * (iBar - bar)); }
+        unsigned short barFromTick (uint64_t iTick) const { return bar + (unsigned short) ((iTick - tick) / (ticksPerBeat * beatsPerBar)); }
+        uint64_t tickFromBar (unsigned short iBar) const { return tick + (uint64_t) (ticksPerBeat * beatsPerBar * (iBar - bar)); }
 
         // Tick/pixel convertors.
-        uint64 tickFromPixel (int x) const { return tick + (uint64) uroundf ((tickRate * (x - pixel)) / ts->pixelRate()); }
-        int pixelFromTick (uint64 iTick) const { return pixel + (int) uroundf ((ts->pixelRate() * (iTick - tick)) / tickRate); }
+        uint64_t tickFromPixel (int x) const { return tick + (uint64_t) uroundf ((tickRate * (x - pixel)) / ts->pixelRate()); }
+        int pixelFromTick (uint64_t iTick) const { return pixel + (int) uroundf ((ts->pixelRate() * (iTick - tick)) / tickRate); }
 
         // Beat/pixel convertors.
         unsigned int beatFromPixel (int x) const { return beat + (unsigned int) uroundf ((beatRate * (x - pixel)) / ts->pixelRate()); }
@@ -168,18 +171,18 @@ public:
         bool beatIsBar (unsigned int iBeat) const { return ((iBeat - beat) % beatsPerBar) == 0; }
 
         // Frame/bar quantizer.
-        uint64 frameSnapToBar (uint64 frame_) const { return frameFromBar (barFromFrame (frame_)); }
+        uint64_t frameSnapToBar (uint64_t frame_) const { return frameFromBar (barFromFrame (frame_)); }
 
         // Beat snap filters.
-        uint64 tickSnap (uint64 tick_, unsigned short p = 1) const;
-        uint64 frameSnap (uint64 frame_) const { return frameFromTick (tickSnap (tickFromFrame (frame_))); }
+        uint64_t tickSnap (uint64_t tick_, unsigned short p = 1) const;
+        uint64_t frameSnap (uint64_t frame_) const { return frameFromTick (tickSnap (tickFromFrame (frame_))); }
         int pixelSnap (int x) const { return pixelFromTick (tickSnap (tickFromPixel (x))); }
 
         // Node keys.
-        uint64 frame;
+        uint64_t frame;
         unsigned short bar;
         unsigned int beat;
-        uint64 tick;
+        uint64_t tick;
         int pixel;
 
         // Node payload.
@@ -212,10 +215,10 @@ public:
 
         void reset (Node* node = 0);
 
-        Node* seekFrame (uint64 frame) const;
+        Node* seekFrame (uint64_t frame) const;
         Node* seekBar (unsigned short bar) const;
         Node* seekBeat (unsigned int beat) const;
-        Node* seekTick (uint64 tick) const;
+        Node* seekTick (uint64_t tick) const;
         Node* seekPixel (int x) const;
 
     protected:
@@ -226,7 +229,7 @@ public:
     Cursor& cursor() { return mCursor; }
 
     // Node list specifics.
-    Node* addNode (uint64 iFrame = 0, float fTempo = 120.0f, unsigned short iBeatType = 2, unsigned short iBeatsPerBar = 4, unsigned short iBeatDivisor = 2);
+    Node* addNode (uint64_t iFrame = 0, float fTempo = 120.0f, unsigned short iBeatType = 2, unsigned short iBeatsPerBar = 4, unsigned short iBeatDivisor = 2);
 
     void updateNode (Node* node);
     void removeNode (Node* node);
@@ -239,52 +242,52 @@ public:
     int64_t frameFromPixel (int x) const { return roundf ((mFrameRate * x) / mPixelRate); }
 
     // Frame/bar general converters.
-    unsigned short barFromFrame (uint64 frame)
+    unsigned short barFromFrame (uint64_t frame)
     {
         Node* node = mCursor.seekFrame (frame);
         return (node ? node->barFromFrame (frame) : 0);
     }
 
-    uint64 frameFromBar (unsigned short bar)
+    uint64_t frameFromBar (unsigned short bar)
     {
         Node* node = mCursor.seekBar (bar);
         return (node ? node->frameFromBar (bar) : 0);
     }
 
     // Frame/beat general converters.
-    unsigned int beatFromFrame (uint64 frame)
+    unsigned int beatFromFrame (uint64_t frame)
     {
         Node* node = mCursor.seekFrame (frame);
         return (node ? node->beatFromFrame (frame) : 0);
     }
 
-    uint64 frameFromBeat (unsigned int beat)
+    uint64_t frameFromBeat (unsigned int beat)
     {
         Node* node = mCursor.seekBeat (beat);
         return (node ? node->frameFromBeat (beat) : 0);
     }
 
     // Frame/tick general converters.
-    uint64 tickFromFrame (uint64 frame) const
+    uint64_t tickFromFrame (uint64_t frame) const
     {
         Node* node = mCursor.seekFrame (frame);
         return (node ? node->tickFromFrame (frame) : 0);
     }
 
-    uint64 frameFromTick (uint64 tick) const
+    uint64_t frameFromTick (uint64_t tick) const
     {
         Node* node = mCursor.seekTick (tick);
         return (node ? node->frameFromTick (tick) : 0);
     }
 
     // Tick/pixel general converters.
-    uint64 tickFromPixel (int x) const
+    uint64_t tickFromPixel (int x) const
     {
         Node* node = mCursor.seekPixel (x);
         return (node ? node->tickFromPixel (x) : 0);
     }
 
-    int pixelFromTick (uint64 tick) const
+    int pixelFromTick (uint64_t tick) const
     {
         Node* node = mCursor.seekTick (tick);
         return (node ? node->pixelFromTick (tick) : 0);
@@ -311,13 +314,13 @@ public:
     }
 
     // Snap functions.
-    uint64 tickSnap (uint64 iTick)
+    uint64_t tickSnap (uint64_t iTick)
     {
         Node* node = mCursor.seekTick (iTick);
         return (node ? node->tickSnap (iTick) : iTick);
     }
 
-    uint64 frameSnap (uint64 frame)
+    uint64_t frameSnap (uint64_t frame)
     {
         Node* node = mCursor.seekFrame (frame);
         return (node ? node->frameSnap (frame) : frame);
@@ -335,12 +338,12 @@ public:
 
 #if 0
 	// Convert frames to time string and vice-versa.
-    QString textFromFrame (uint64 iFrame, bool bDelta = false, uint64 iDelta = 0);
-    uint64 frameFromText (const QString& sText, bool bDelta = false, uint64 iFrame = 0);
+    QString textFromFrame (uint64_t iFrame, bool bDelta = false, uint64_t iDelta = 0);
+    uint64_t frameFromText (const QString& sText, bool bDelta = false, uint64_t iFrame = 0);
 
 	// Convert ticks to time string and vice-versa.
-    QString textFromTick (uint64 iTick, bool bDelta = false, uint64 iDelta = 0);
-    uint64 tickFromText (const QString& sText, bool bDelta = false, uint64 iTick = 0);
+    QString textFromTick (uint64_t iTick, bool bDelta = false, uint64_t iDelta = 0);
+    uint64_t tickFromText (const QString& sText, bool bDelta = false, uint64_t iTick = 0);
 #endif
 
     /** Set the tempo
@@ -420,8 +423,8 @@ public:
     }
 
     // Tick/Frame range conversion (delta conversion).
-    uint64 frameFromTickRange (uint64 tickStart, uint64 tickEnd);
-    uint64 tickFromFrameRange (uint64 frameStart, uint64 frameEnd);
+    uint64_t frameFromTickRange (uint64_t tickStart, uint64_t tickEnd);
+    uint64_t tickFromFrameRange (uint64_t frameStart, uint64_t frameEnd);
 
 #if 1
     // Location marker declaration.
@@ -429,7 +432,7 @@ public:
     {
     public:
         // Constructor.
-        Marker (uint64 iFrame, unsigned short iBar, const std::string& sText, const std::string& rgbColor = std::string ("#545454"))
+        Marker (uint64_t iFrame, unsigned short iBar, const std::string& sText, const std::string& rgbColor = std::string ("#545454"))
             : frame (iFrame), bar (iBar), text (sText), color (rgbColor) {}
 
         // Copy constructor.
@@ -439,7 +442,7 @@ public:
                                         color (marker.color) {}
 
         // Marker keys.
-        uint64 frame;
+        uint64_t frame;
         unsigned short bar;
 
         // Marker payload.
@@ -462,10 +465,10 @@ public:
         void reset (Marker* marker = 0);
 
         // Seek methods.
-        Marker* seekFrame (uint64 iFrame);
+        Marker* seekFrame (uint64_t iFrame);
         Marker* seekBar (unsigned short iBar);
         Marker* seekBeat (unsigned int iBeat);
-        Marker* seekTick (uint64 iTick);
+        Marker* seekTick (uint64_t iTick);
         Marker* seekPixel (int x);
 
         // Notable markers accessors
@@ -482,7 +485,7 @@ public:
     MarkerCursor& markers() { return mMarkerCursor; }
 
     // Marker list specifics.
-    Marker* addMarker (uint64 iFrame, const std::string& text, const std::string& color = std::string ("#000000"));
+    Marker* addMarker (uint64_t iFrame, const std::string& text, const std::string& color = std::string ("#000000"));
     void updateMarker (Marker* marker);
     void removeMarker (Marker* marker);
 

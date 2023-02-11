@@ -19,16 +19,17 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "atomic.hpp"
-#include "shuttle.hpp"
+#include <cstdint>
+
+#include <element/atomic.hpp>
+#include <element/shuttle.hpp>
 
 namespace element {
 
 class Transport : public Shuttle
 {
 public:
-    class Monitor : public ReferenceCountedObject
+    class Monitor : public juce::ReferenceCountedObject
     {
     public:
         Monitor()
@@ -39,14 +40,14 @@ public:
             beatDivisor.set (2);
         }
 
-        Atomic<int> beatsPerBar;
-        Atomic<int> beatType;
-        Atomic<int> beatDivisor;
-        Atomic<double> sampleRate;
-        Atomic<float> tempo;
-        Atomic<bool> playing;
-        Atomic<bool> recording;
-        Atomic<int64> positionFrames;
+        juce::Atomic<int> beatsPerBar;
+        juce::Atomic<int> beatType;
+        juce::Atomic<int> beatDivisor;
+        juce::Atomic<double> sampleRate;
+        juce::Atomic<float> tempo;
+        juce::Atomic<bool> playing;
+        juce::Atomic<bool> recording;
+        juce::Atomic<int64_t> positionFrames;
 
         inline double getPositionSeconds() const
         {
@@ -71,7 +72,7 @@ public:
         }
     };
 
-    typedef ReferenceCountedObjectPtr<Monitor> MonitorPtr;
+    typedef juce::ReferenceCountedObjectPtr<Monitor> MonitorPtr;
 
     Transport();
     ~Transport();
@@ -100,7 +101,7 @@ public:
     }
     void requestMeter (int beatsPerBar, int beatType);
 
-    void requestAudioFrame (const int64 frame);
+    void requestAudioFrame (const int64_t frame);
 
     void preProcess (int nframes);
     void postProcess (int nframes);
@@ -110,11 +111,10 @@ public:
 private:
     AtomicValue<bool> playState, recordState;
     AtomicValue<double> nextTempo;
-    Atomic<int> nextBeatsPerBar, nextBeatDivisor;
-
-    Atomic<bool> seekWanted;
-    AtomicValue<int64> seekFrame;
-
+    juce::Atomic<int> nextBeatsPerBar, nextBeatDivisor;
+    juce::Atomic<bool> seekWanted;
+    AtomicValue<int64_t> seekFrame;
     MonitorPtr monitor;
 };
+
 } // namespace element

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "timescale.hpp"
+#include <element/timescale.hpp>
 
 namespace element {
 
@@ -162,12 +162,12 @@ float TimeScale::Node::tempoEx (unsigned short beatType_) const
     return extempo;
 }
 
-uint64 TimeScale::Node::tickSnap (uint64 tick_, unsigned short p) const
+uint64_t TimeScale::Node::tickSnap (uint64_t tick_, unsigned short p) const
 {
-    uint64 ticksnap = tick_ - tick;
+    uint64_t ticksnap = tick_ - tick;
     if (ts->snapPerBeat() > 0)
     {
-        uint64 q = ticksPerBeat / ts->snapPerBeat();
+        uint64_t q = ticksPerBeat / ts->snapPerBeat();
         ticksnap = q * ((ticksnap + (q >> p)) / q);
     }
     return tick + ticksnap;
@@ -178,7 +178,7 @@ void TimeScale::Cursor::reset (TimeScale::Node* n)
     node = (n ? n : ts->nodes().first());
 }
 
-TimeScale::Node* TimeScale::Cursor::seekFrame (uint64 iFrame) const
+TimeScale::Node* TimeScale::Cursor::seekFrame (uint64_t iFrame) const
 {
     if (node == 0)
     {
@@ -259,7 +259,7 @@ TimeScale::Node* TimeScale::Cursor::seekBeat (unsigned int sbeat) const
     return node;
 }
 
-TimeScale::Node* TimeScale::Cursor::seekTick (uint64 stick) const
+TimeScale::Node* TimeScale::Cursor::seekTick (uint64_t stick) const
 {
     if (node == 0)
     {
@@ -313,7 +313,7 @@ TimeScale::Node* TimeScale::Cursor::seekPixel (int px) const
     return node;
 }
 
-TimeScale::Node* TimeScale::addNode (uint64 frame_, float tempo_, unsigned short beat_type_, unsigned short beats_per_bar_, unsigned short beat_divisor_)
+TimeScale::Node* TimeScale::addNode (uint64_t frame_, float tempo_, unsigned short beat_type_, unsigned short beats_per_bar_, unsigned short beat_divisor_)
 {
     Node* node = 0;
 
@@ -493,21 +493,21 @@ int TimeScale::indexFromSnap (unsigned short snap_per_beat)
 }
 
 // Tick/Frame range conversion (delta conversion).
-uint64 TimeScale::frameFromTickRange (uint64 iTickStart, uint64 iTickEnd)
+uint64_t TimeScale::frameFromTickRange (uint64_t iTickStart, uint64_t iTickEnd)
 {
     Node* pNode = mCursor.seekTick (iTickStart);
-    uint64 iFrameStart = (pNode ? pNode->frameFromTick (iTickStart) : 0);
+    uint64_t iFrameStart = (pNode ? pNode->frameFromTick (iTickStart) : 0);
     pNode = mCursor.seekTick (iTickEnd);
-    uint64 iFrameEnd = (pNode ? pNode->frameFromTick (iTickEnd) : 0);
+    uint64_t iFrameEnd = (pNode ? pNode->frameFromTick (iTickEnd) : 0);
     return (iFrameEnd > iFrameStart ? iFrameEnd - iFrameStart : 0);
 }
 
-uint64 TimeScale::tickFromFrameRange (uint64 iFrameStart, uint64 iFrameEnd)
+uint64_t TimeScale::tickFromFrameRange (uint64_t iFrameStart, uint64_t iFrameEnd)
 {
     Node* pNode = mCursor.seekFrame (iFrameStart);
-    uint64 iTickStart = (pNode ? pNode->tickFromFrame (iFrameStart) : 0);
+    uint64_t iTickStart = (pNode ? pNode->tickFromFrame (iFrameStart) : 0);
     pNode = mCursor.seekFrame (iFrameEnd);
-    uint64 iTickEnd = (pNode ? pNode->tickFromFrame (iFrameEnd) : 0);
+    uint64_t iTickEnd = (pNode ? pNode->tickFromFrame (iFrameEnd) : 0);
     return (iTickEnd > iTickStart ? iTickEnd - iTickStart : 0);
 }
 
@@ -518,7 +518,7 @@ void TimeScale::MarkerCursor::reset (TimeScale::Marker* m)
 }
 
 // Location marker seek methods.
-TimeScale::Marker* TimeScale::MarkerCursor::seekFrame (uint64 iFrame)
+TimeScale::Marker* TimeScale::MarkerCursor::seekFrame (uint64_t iFrame)
 {
     if (marker == 0)
     {
@@ -555,18 +555,18 @@ TimeScale::Marker* TimeScale::MarkerCursor::seekBeat (unsigned int iBeat)
     return seekFrame (ts->frameFromBeat (iBeat));
 }
 
-TimeScale::Marker* TimeScale::MarkerCursor::seekTick (uint64 iTick)
+TimeScale::Marker* TimeScale::MarkerCursor::seekTick (uint64_t iTick)
 {
     return seekFrame (ts->frameFromTick (iTick));
 }
 
 TimeScale::Marker* TimeScale::MarkerCursor::seekPixel (int x)
 {
-    return seekFrame (static_cast<uint64> (ts->frameFromPixel (x)));
+    return seekFrame (static_cast<uint64_t> (ts->frameFromPixel (x)));
 }
 
 // Location markers list specifics.
-TimeScale::Marker* TimeScale::addMarker (uint64 target_frame, const std::string& txt, const std::string& rgb)
+TimeScale::Marker* TimeScale::addMarker (uint64_t target_frame, const std::string& txt, const std::string& rgb)
 {
     Marker* marker = 0;
 

@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "JuceHeader.h"
-
 namespace element {
 
 /** A doubly linked list */
@@ -28,7 +26,7 @@ template <class Node>
 class LinkedList
 {
 public:
-    LinkedList() : firstNode (0), lastNode (0), numNodes (0), freeList (0), scopedList (false) {}
+    LinkedList() {}
     ~LinkedList() { clear(); }
 
     Node* first() const { return firstNode; }
@@ -69,8 +67,6 @@ public:
         Node* prevNode;
         Node* nextNode;
         Node* nextFreeNode;
-
-        JUCE_LEAK_DETECTOR (Link)
     };
 
     class iterator
@@ -150,11 +146,11 @@ public:
     iterator end() { return iterator (*this, nullptr); }
 
 private:
-    Node* firstNode;
-    Node* lastNode;
-    int numNodes;
-    Node* freeList;
-    bool scopedList;
+    Node* firstNode { nullptr };
+    Node* lastNode { nullptr };
+    int numNodes { 0 };
+    Node* freeList { nullptr };
+    bool scopedList { false };
 };
 
 template <class Node>

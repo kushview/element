@@ -21,7 +21,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/ViewHelpers.h"
-#include "engine/transport.hpp"
+#include <element/transport.hpp>
 
 namespace element {
 

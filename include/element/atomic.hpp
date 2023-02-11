@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <atomic>
+
 namespace element {
 
 template <typename Val>

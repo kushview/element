@@ -19,7 +19,10 @@
 
 #pragma once
 
-#include "timescale.hpp"
+#include <cstdint>
+
+#include <element/juce/audio_processors.hpp>
+#include <element/timescale.hpp>
 
 namespace element {
 
@@ -27,11 +30,11 @@ namespace element {
 class Shuttle : public juce::AudioPlayHead
 {
 public:
-    static const int32 PPQ;
+    static const int PPQ;
 
     /** This function should be used when loading midi data.  e.g. opening
         a midi file that has a different ppq than the Shuttle */
-    static double scaledTick (double sourceTick, const int32 srcPpq);
+    static double scaledTick (double sourceTick, const int srcPpq);
 
     struct Position : public juce::AudioPlayHead::CurrentPositionInfo
     {
@@ -49,18 +52,18 @@ public:
     double getBeatsPerFrame() const;
 
     void setLengthBeats (const float beats);
-    void setLengthFrames (const uint32 df);
+    void setLengthFrames (const uint32_t df);
     void setLengthSeconds (const double seconds);
 
     const double getLengthBeats() const;
-    const int64 getLengthFrames() const;
+    const int64_t getLengthFrames() const;
     const double getLengthSeconds() const;
 
     const double getPositionBeats() const;
-    const int64 getPositionFrames() const;
+    const int64_t getPositionFrames() const;
     const double getPositionSeconds() const;
 
-    int64 getRemainingFrames() const;
+    int64_t getRemainingFrames() const;
 
     void resetRecording();
 
@@ -72,13 +75,13 @@ public:
     void setSampleRate (double rate);
 
     void advance (int nframes);
-    inline void seekAudioFrame (int64 frame)
+    inline void seekAudioFrame (int64_t frame)
     {
         framePos = frame;
     }
 
-    bool getCurrentPosition (CurrentPositionInfo& result);
-    juce::Optional<PositionInfo> getPosition() const override;
+    bool getCurrentPosition (juce::AudioPlayHead::CurrentPositionInfo& result);
+    juce::Optional<juce::AudioPlayHead::PositionInfo> getPosition() const override;
 
 protected:
     TimeScale ts;
@@ -88,8 +91,8 @@ private:
     double framesPerBeat;
     double beatsPerFrame;
 
-    int64 framePos;
-    uint32 duration;
+    int64_t framePos;
+    uint32_t duration;
     double sampleRate;
 
     double ppqLoopStart;

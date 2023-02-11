@@ -23,7 +23,7 @@
 #include "engine/midipipe.hpp"
 #include "engine/oversampler.hpp"
 #include "engine/parameter.hpp"
-#include "atomic.hpp"
+#include <element/atomic.hpp>
 #include "portcount.hpp"
 #include "midichannels.hpp"
 

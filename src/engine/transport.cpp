@@ -17,8 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/transport.hpp"
+#include <element/transport.hpp>
 #include "tempo.hpp"
+
+using namespace juce;
 
 namespace element {
 
