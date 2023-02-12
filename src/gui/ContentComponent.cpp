@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/graphservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
@@ -34,7 +34,7 @@
 
 #include <element/devicemanager.hpp>
 #include <element/node.hpp>
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 
 #include "commands.hpp"
 #include <element/context.hpp>

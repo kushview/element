@@ -19,6 +19,12 @@
 
 #include "ElementApp.h"
 
+#include <element/audioengine.hpp>
+#include <element/context.hpp>
+#include <element/session.hpp>
+
+#include "engine/midiengine.hpp"
+
 #include "engine/nodes/AllPassFilterNode.h"
 #include "engine/nodes/AudioFilePlayerNode.h"
 #include "engine/nodes/AudioMixerProcessor.h"
@@ -27,56 +33,43 @@
 #include "engine/nodes/CompressorProcessor.h"
 #include "engine/nodes/EQFilterProcessor.h"
 #include "engine/nodes/FreqSplitterProcessor.h"
-#include "engine/nodes/LuaNode.h"
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
-#include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
-#include "engine/nodes/MidiMonitorNode.h"
-#include "engine/nodes/MidiRouterNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/nodes/OSCReceiverNode.h"
-#include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ReverbProcessor.h"
-#include "engine/nodes/ScriptNode.h"
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
-#include <element/audioengine.hpp>
+
 #include "engine/internalformat.hpp"
 #include "engine/ionode.hpp"
 
-#include <element/session.hpp>
-
-#include <element/context.hpp>
-
 namespace element {
 
-typedef IONode IONode;
-
-InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
-    : engine (e), midi (me)
+InternalFormat::InternalFormat (Context& ctx)
+    : context (ctx)
 {
     {
         PlaceholderProcessor p;
         p.fillInPluginDescription (placeholderDesc);
     }
     {
-        MidiDeviceProcessor in (true, midi);
+        MidiDeviceProcessor in (true, context.getMidiEngine());
         in.fillInPluginDescription (midiInputDeviceDesc);
-        MidiDeviceProcessor out (false, midi);
+        MidiDeviceProcessor out (false, context.getMidiEngine());
         out.fillInPluginDescription (midiOutputDeviceDesc);
     }
 }
 
 AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
 {
-    if (desc.fileOrIdentifier == "element.midiInputDevice")
+    if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_INPUT_DEVICE)
     {
-        return new MidiDeviceProcessor (true, midi);
+        return new MidiDeviceProcessor (true, context.getMidiEngine());
     }
-    else if (desc.fileOrIdentifier == "element.midiOutputDevice")
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
     {
-        return new MidiDeviceProcessor (false, midi);
+        return new MidiDeviceProcessor (false, context.getMidiEngine());
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
     {

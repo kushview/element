@@ -17,12 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include <element/nodeobject.hpp>
 #include <element/controllerdevice.hpp>
 #include <element/signals.hpp>
 
 namespace element {
+
+class Node;
 
 class MappingService : public Service
 {

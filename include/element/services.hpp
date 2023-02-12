@@ -19,7 +19,11 @@
 
 #pragma once
 
-#include "session/commandmanager.hpp"
+#include <element/juce/data_structures.hpp>
+#include <element/juce/gui_basics.hpp>
+
+#include <juce_gui_extra/juce_gui_extra.h>
+
 #include <element/runmode.hpp>
 
 namespace element {
@@ -61,8 +65,8 @@ private:
 };
 
 //=============================================================================
-class ServiceManager : public MessageListener,
-                       protected ApplicationCommandTarget
+class ServiceManager : public juce::MessageListener,
+                       protected juce::ApplicationCommandTarget
 {
 public:
     ServiceManager (Context&, RunMode mode = RunMode::Standalone);
@@ -78,7 +82,7 @@ public:
     inline Context& getGlobals() { return world; }
 
     /** Returns the undo manager */
-    inline UndoManager& getUndoManager() { return undo; }
+    inline juce::UndoManager& getUndoManager() { return undo; }
 
     /** Add a service */
     void addChild (Service* service)
@@ -105,7 +109,7 @@ public:
     /** Child controllers should use this when files are opened and need
         to be saved in recent files.
     */
-    inline void addRecentFile (const File& file) { recentFiles.addFile (file); }
+    inline void addRecentFile (const juce::File& file) { recentFiles.addFile (file); }
 
     /** Activate this and children */
     void activate();
@@ -113,25 +117,25 @@ public:
     /** Deactivate this and children */
     void deactivate();
 
-    RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
+    juce::RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
 
 protected:
-    friend class ApplicationCommandTarget;
-    ApplicationCommandTarget* getNextCommandTarget() override;
-    void getAllCommands (Array<CommandID>& commands) override;
-    void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
+    friend class juce::ApplicationCommandTarget;
+    juce::ApplicationCommandTarget* getNextCommandTarget() override;
+    void getAllCommands (juce::Array<juce::CommandID>& commands) override;
+    void getCommandInfo (juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
-
-    void handleMessage (const Message&) override;
+    void handleMessage (const juce::Message&) override;
 
 private:
     friend class Application;
-    OwnedArray<Service> services;
-    File lastSavedFile;
-    File lastExportedGraph;
+    juce::OwnedArray<Service> services;
+    juce::File lastSavedFile;
+    juce::File lastExportedGraph;
     Context& world;
-    RecentlyOpenedFilesList recentFiles;
-    UndoManager undo;
+    juce::RecentlyOpenedFilesList recentFiles;
+    juce::UndoManager undo;
+    
     RunMode runMode;
 
     void run();

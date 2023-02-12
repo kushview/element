@@ -17,7 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/context.hpp>
+#include <element/settings.hpp>
+
+#include <element/services.hpp>
 #include "services/deviceservice.hpp"
 #include "services/engineservice.hpp"
 #include "services/guiservice.hpp"
@@ -31,20 +34,20 @@
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
 
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
 #include "commands.hpp"
-#include <element/context.hpp>
 #include "messages.hpp"
-#include <element/settings.hpp>
 #include "version.hpp"
 
 namespace element {
 
+using namespace juce;
+
 ServiceManager& Service::getServices() const
 {
     jassert (owner != nullptr); // if you hit this then you're probably calling
-        // this before controller initialization
+                                // getServices() before controller initialization
     return *owner;
 }
 

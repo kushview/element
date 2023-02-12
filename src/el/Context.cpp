@@ -11,7 +11,7 @@
 #include "engine/midiengine.hpp"
 #include "engine/mappingengine.hpp"
 #include "session/commandmanager.hpp"
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
 #include <element/context.hpp>
 

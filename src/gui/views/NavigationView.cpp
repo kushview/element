@@ -22,7 +22,7 @@
 #include "gui/views/NavigationView.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include <element/context.hpp>
 
 namespace element {

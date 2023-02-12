@@ -57,6 +57,8 @@ public:
     static const char* desktopScaleKey;
     static const char* mainContentTypeKey;
     static const char* pluginListHeaderKey;
+    static const char* devicesKey;
+    static const char* keymappingsKey;
 
     std::unique_ptr<juce::XmlElement> getLastGraph() const;
     void setLastGraph (const juce::ValueTree& data);

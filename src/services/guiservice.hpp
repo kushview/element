@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PreferencesComponent.h"

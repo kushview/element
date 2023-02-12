@@ -19,7 +19,7 @@
 #include <element/signals.hpp>
 #include "services/engineservice.hpp"
 #include <element/context.hpp>
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "messages.hpp"
 
 namespace element {

@@ -21,7 +21,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/BlockComponent.h"
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
 #include "utils.hpp"
 

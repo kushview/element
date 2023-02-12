@@ -19,7 +19,7 @@
 
 #include "ElementApp.h"
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/guiservice.hpp"
 #include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "documents/graphdocument.hpp"
 #include <element/signals.hpp>
 

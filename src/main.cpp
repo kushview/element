@@ -17,13 +17,13 @@
 */
 
 #include "ElementApp.h"
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"
 #include "engine/internalformat.hpp"
 #include "scripting.hpp"
 #include <element/devicemanager.hpp>
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "commands.hpp"
 #include "datapath.hpp"
 #include <element/context.hpp>
@@ -173,7 +173,7 @@ private:
         if (props && keymp)
         {
             std::unique_ptr<XmlElement> xml;
-            xml = props->getXmlValue ("keymappings");
+            xml = props->getXmlValue (Settings::keymappingsKey);
             if (xml != nullptr)
                 world.getCommandManager().getKeyMappings()->restoreFromXml (*xml);
             xml = nullptr;
@@ -187,7 +187,7 @@ private:
         auto engine (world.getAudioEngine());
 
         plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (*engine, world.getMidiEngine()));
+        plugins.addFormat (new InternalFormat (world));
         plugins.addFormat (new ElementAudioPluginFormat (world));
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
@@ -262,9 +262,9 @@ public:
         midi.writeSettings (settings);
 
         if (auto el = world->getDeviceManager().createStateXml())
-            props->setValue ("devices", el.get());
+            props->setValue (Settings::devicesKey, el.get());
         if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
-            props->setValue ("keymappings", keymappings.get());
+            props->setValue (Settings::keymappingsKey, keymappings.get());
 
         engine = nullptr;
         Logger::setCurrentLogger (nullptr);

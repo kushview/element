@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/guiservice.hpp"
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"

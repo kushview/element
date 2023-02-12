@@ -35,7 +35,7 @@
 #include "gui/NodeIOConfiguration.h"
 #include "engine/nodes/BaseProcessor.h"
 
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
 #include <element/node.hpp>
 

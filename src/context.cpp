@@ -23,11 +23,11 @@
 #include "engine/internalformat.hpp"
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
 #include "session/commandmanager.hpp"
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "scripting.hpp"
 #include <element/context.hpp>
 #include "log.hpp"

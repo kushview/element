@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/guiservice.hpp"
 #include <element/audioengine.hpp>
 #include <element/midipipe.hpp>
@@ -27,7 +27,7 @@
 #include "scripting/scriptmanager.hpp"
 #include "session/commandmanager.hpp"
 #include <element/node.hpp>
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
 #include <element/session.hpp>
 #include "datapath.hpp"

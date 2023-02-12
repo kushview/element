@@ -19,7 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include <element/devicemanager.hpp>
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"

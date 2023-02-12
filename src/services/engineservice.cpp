@@ -18,13 +18,13 @@
 */
 
 #include "ElementApp.h"
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/guiservice.hpp"
 #include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
 #include <element/devicemanager.hpp>
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include <element/node.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>

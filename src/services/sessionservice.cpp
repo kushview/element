@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/engineservice.hpp"
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"

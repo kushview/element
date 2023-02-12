@@ -23,7 +23,7 @@
 #include "services/mappingservice.hpp"
 #include "services/deviceservice.hpp"
 #include "engine/internalformat.hpp"
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include <element/session.hpp>
 #include "ElementApp.h"
 #include <element/settings.hpp>
@@ -403,7 +403,7 @@ void PluginProcessor::initialize()
     engine->applySettings (settings);
 
     plugins.addDefaultFormats();
-    plugins.addFormat (new InternalFormat (*engine, world->getMidiEngine()));
+    plugins.addFormat (new InternalFormat (*world));
     plugins.addFormat (new ElementAudioPluginFormat (*world));
     plugins.restoreUserPlugins (settings);
 

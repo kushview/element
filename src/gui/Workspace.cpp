@@ -18,7 +18,7 @@
 */
 
 #include "ElementApp.h"
-#include "services.hpp"
+#include <element/services.hpp>
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"

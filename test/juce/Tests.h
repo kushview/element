@@ -20,7 +20,7 @@
 
 #include "JuceHeader.h"
 #include "ElementApp.h"
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/sessionservice.hpp"
 
 #include <element/audioengine.hpp>
@@ -70,7 +70,7 @@ protected:
         world->setEngine (new AudioEngine (*world));
         world->getPluginManager().addDefaultFormats();
         world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
-        world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine(), world->getMidiEngine()));
+        world->getPluginManager().addFormat (new InternalFormat (*world));
         app.reset (new ServiceManager (*world));
         app->activate();
         auto& settings = getWorld().getSettings();

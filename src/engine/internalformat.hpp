@@ -23,15 +23,13 @@
 
 namespace element {
 
-class AudioEngine;
-class MidiEngine;
 class Context;
 
 /** Manages the internal plugin types. */
 class InternalFormat : public AudioPluginFormat
 {
 public:
-    InternalFormat (AudioEngine&, MidiEngine&);
+    InternalFormat (Context&);
     ~InternalFormat() {}
 
     void getAllTypes (OwnedArray<PluginDescription>& results);
@@ -56,8 +54,7 @@ protected:
     bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
 
 private:
-    AudioEngine& engine;
-    MidiEngine& midi;
+    Context& context;
     PluginDescription audioInDesc;
     PluginDescription audioOutDesc;
     PluginDescription midiInDesc;

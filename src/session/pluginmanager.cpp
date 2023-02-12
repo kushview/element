@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include <element/node.hpp>
 #include "engine/nodes/NodeTypes.h"
 #include "engine/nodefactory.hpp"

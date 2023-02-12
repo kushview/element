@@ -22,7 +22,7 @@
 
 #include "ElementApp.h"
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/deviceservice.hpp"
 #include "services/engineservice.hpp"
 #include "services/guiservice.hpp"

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <element/juce/audio_processors.hpp>
 
 #define EL_PLUGIN_SCANNER_PROCESS_ID "pspelbg"
 
@@ -30,6 +30,9 @@ class NodeObject;
 class Node;
 class PluginScannerMaster;
 class PluginScanner;
+
+// FIXME:
+using namespace juce;
 
 class PluginManager : public ChangeBroadcaster
 {
