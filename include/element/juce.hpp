@@ -33,3 +33,17 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_osc/juce_osc.h>
+
+namespace element {
+
+}
+
+// FIXME:
+using namespace juce;
+
+namespace ProjectInfo {
+const char* const  projectName    = "Element";
+const char* const  companyName    = "Kushview";
+const char* const  versionString  = "0.47.0";
+const int          versionNumber  = 0x2f00;
+}

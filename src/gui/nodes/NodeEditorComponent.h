@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 #include <element/nodeobject.hpp>
 #include <element/node.hpp>
 

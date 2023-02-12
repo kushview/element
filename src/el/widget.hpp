@@ -6,7 +6,7 @@
 
 #include <element/element.hpp>
 #include "sol_helpers.hpp"
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 namespace element {
 namespace lua {

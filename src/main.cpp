@@ -20,7 +20,7 @@
 #include <element/services.hpp>
 #include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"
-#include "engine/internalformat.hpp"
+#include <element/juce/internalformat.hpp>
 #include "scripting.hpp"
 #include <element/devicemanager.hpp>
 #include <element/pluginmanager.hpp>

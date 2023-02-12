@@ -31,7 +31,7 @@
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
 
-static const String initScript =
+static const juce::String initScript =
     R"(
 require ('el.AudioBuffer')
 require ('el.MidiBuffer')
@@ -41,7 +41,7 @@ require ('el.audio')
 require ('el.MidiPipe')
 )";
 
-static const String stereoAmpScript =
+static const juce::String stereoAmpScript =
     R"(--- Stereo Amplifier in Lua
 --
 -- This script came with Element and is in the public domain.

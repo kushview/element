@@ -24,6 +24,8 @@
 #include <element/context.hpp>
 #include "utils.hpp"
 
+#include "BinaryData.h"
+
 #define EL_USE_NEW_SYSTRAY_ICON 0
 #define EL_SYSTRAY_MIN_SIZE 22
 

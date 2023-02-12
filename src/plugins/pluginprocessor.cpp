@@ -22,7 +22,7 @@
 #include "services/sessionservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/deviceservice.hpp"
-#include "engine/internalformat.hpp"
+#include <element/juce/internalformat.hpp>
 #include <element/pluginmanager.hpp>
 #include <element/session.hpp>
 #include "ElementApp.h"

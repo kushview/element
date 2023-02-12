@@ -129,6 +129,7 @@ protected:
 
 private:
     friend class Application;
+    friend class Context;
     juce::OwnedArray<Service> services;
     juce::File lastSavedFile;
     juce::File lastExportedGraph;

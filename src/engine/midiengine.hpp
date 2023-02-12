@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 #pragma once
 

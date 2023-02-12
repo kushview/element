@@ -65,6 +65,9 @@ public:
     void addModulePath (const std::string& path);
     void discoverModules();
 
+    //===
+    void testLaunch();
+    
 private:
     friend class Application;
     std::string appName;

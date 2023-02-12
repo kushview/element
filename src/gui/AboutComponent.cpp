@@ -19,6 +19,7 @@
 
 #include "gui/AboutComponent.h"
 #include "version.hpp"
+#include "BinaryData.h"
 
 #define EL_LICENSE_TEXT                                                        \
     "Copyright (C) 2014-%YEAR%  Kushview, LLC.  All rights reserved.\r\n\r\n"  \

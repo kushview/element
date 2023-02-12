@@ -23,6 +23,8 @@
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
 
+#include "BinaryData.h"
+
 namespace element {
 
 WorkspaceState::WorkspaceState()

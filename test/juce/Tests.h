@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 #include "ElementApp.h"
 #include <element/services.hpp>
 #include "services/sessionservice.hpp"
 
 #include <element/audioengine.hpp>
 #include "engine/mappingengine.hpp"
-#include "engine/internalformat.hpp"
+#include <element/juce/internalformat.hpp>
 #include "engine/LinearFade.h"
 #include "engine/velocitycurve.hpp"
 #include "engine/ToggleGrid.h"

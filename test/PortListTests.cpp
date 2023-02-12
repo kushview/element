@@ -17,7 +17,7 @@
 */
 
 #include <boost/test/unit_test.hpp>
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 #include <element/porttype.hpp>
 
 using PortType = element::PortType;

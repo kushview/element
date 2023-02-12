@@ -20,7 +20,7 @@
 #include <element/session.hpp>
 #include <element/settings.hpp>
 
-#include "engine/internalformat.hpp"
+#include <element/juce/internalformat.hpp>
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
 #include <element/pluginmanager.hpp>
@@ -261,6 +261,10 @@ void Context::addModulePath (const std::string& path)
 void Context::discoverModules()
 {
     impl->modules->discover();
+}
+
+void Context::testLaunch() {
+    getServices().run();
 }
 
 } // namespace element

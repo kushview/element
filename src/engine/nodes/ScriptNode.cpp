@@ -37,7 +37,7 @@
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
 
-static const String initScript =
+static const juce::String initScript =
     R"(
 require ('el.AudioBuffer')
 require ('el.MidiBuffer')

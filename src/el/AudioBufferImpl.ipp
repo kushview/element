@@ -4,6 +4,8 @@
 #if LKV_AUDIO_BUFFER_COMPILE
 
 #include <element/element.h>
+#include <element/juce/audio_basics.hpp>
+
 #include "sol_helpers.hpp"
 
 #ifndef LKV_AUDIO_BUFFER_32

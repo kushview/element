@@ -2,6 +2,7 @@
 // @classmod el.Graphics
 // @pragma nostrip
 
+#include <element/juce/graphics.hpp>
 #include <element/element.hpp>
 #include "sol_helpers.hpp"
 
