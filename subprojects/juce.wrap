@@ -4,4 +4,5 @@ push-url = git@gitlab.com:kushview/juce.git
 revision = element
 
 [provide]
-dependency_names = juce-7,juce
+juce-7=juce_dep
+juce=juce_dep

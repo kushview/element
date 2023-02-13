@@ -18,19 +18,24 @@
 
 #include "ElementApp.h"
 #include <element/services.hpp>
-#include "services/graphservice.hpp"
-#include "services/sessionservice.hpp"
+
 #include <element/juce/internalformat.hpp>
-#include "scripting.hpp"
+
+#include <element/context.hpp>
 #include <element/devicemanager.hpp>
 #include <element/pluginmanager.hpp>
+#include <element/settings.hpp>
+
+#include "session/commandmanager.hpp"
+#include "engine/midiengine.hpp"
+#include "scripting.hpp"
 #include "commands.hpp"
 #include "datapath.hpp"
-#include <element/context.hpp>
+#include "services/graphservice.hpp"
+#include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"
 #include "version.hpp"
-#include <element/settings.hpp>
 #include "utils.hpp"
 #include "slaveprocess.hpp"
 
