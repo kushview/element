@@ -41,91 +41,18 @@
 
 namespace element {
 
-class Startup : public ActionBroadcaster,
-                private Thread
+class Startup : public ActionBroadcaster
 {
 public:
-    Startup (Context& w, const bool useThread = false, const bool splash = false)
-        : Thread ("ElementStartup"),
-          world (w),
-          usingThread (useThread),
-          showSplash (splash),
-          isFirstRun (false)
-    {
-    }
-
+    Startup (Context& w)
+        : world (w), isFirstRun (false) {}
     ~Startup() {}
 
     void launchApplication()
     {
         Settings& settings (world.getSettings());
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
-        DataPath path;
-        ignoreUnused (path);
-
-        updateSettingsIfNeeded();
-
-        if (usingThread)
-        {
-            startThread();
-            while (isThreadRunning())
-                MessageManager::getInstance()->runDispatchLoopUntil (30);
-        }
-        else
-        {
-            if (showSplash)
-                (new StartupScreen())->deleteAfterDelay (RelativeTime::seconds (5), true);
-            this->run();
-        }
-    }
-
-    const bool isUsingThread() const { return usingThread; }
-
-private:
-    friend class Application;
-    Context& world;
-    const bool usingThread;
-    const bool showSplash;
-    bool isFirstRun;
-
-    class StartupScreen : public SplashScreen
-    {
-    public:
-        StartupScreen()
-            : SplashScreen ("Element", 600, 400, true)
-        {
-            addAndMakeVisible (text);
-            text.setText ("Loading Application", dontSendNotification);
-            text.setSize (600, 400);
-            text.setFont (Font (24.0f));
-            text.setJustificationType (Justification::centred);
-            text.setColour (Label::textColourId, Colours::white);
-        }
-
-        void resized() override
-        {
-            SplashScreen::resized();
-            text.setBounds (getLocalBounds());
-        }
-
-        void paint (Graphics& g) override
-        {
-            SplashScreen::paint (g);
-            g.fillAll (Colours::aliceblue);
-        }
-
-    private:
-        Label text;
-    };
-
-    void updateSettingsIfNeeded()
-    {
-        Settings& settings (world.getSettings());
-        ignoreUnused (settings);
-    }
-
-    void run() override
-    {
+        
         setupLogging();
         setupKeyMappings();
         setupAudioEngine();
@@ -135,6 +62,11 @@ private:
 
         sendActionMessage ("finishedLaunching");
     }
+
+private:
+    friend class Application;
+    Context& world;
+    bool isFirstRun;
 
     void setupAudioEngine()
     {
@@ -449,7 +381,7 @@ private:
         if (startup != nullptr)
             return;
 
-        startup = std::make_unique<Startup> (*world, false, false);
+        startup = std::make_unique<Startup> (*world);
         startup->addActionListener (this);
         startup->launchApplication();
     }
