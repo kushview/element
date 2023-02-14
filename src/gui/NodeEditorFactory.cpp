@@ -1,5 +1,5 @@
 
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "engine/nodes/NodeTypes.h"
 #include <element/nodeobject.hpp>
 

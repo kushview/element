@@ -18,7 +18,7 @@
 */
 
 #include "services/presetservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/ContentComponent.h"
 #include <element/session.hpp>
 #include "session/presetmanager.hpp"

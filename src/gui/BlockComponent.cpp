@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/views/NodePortsTable.h"
 #include "gui/Artist.h"
 #include "gui/BlockComponent.h"

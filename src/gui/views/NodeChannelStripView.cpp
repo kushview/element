@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"

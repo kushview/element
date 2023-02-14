@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "engine/graphmanager.hpp"
 #include <element/audioengine.hpp>
 #include "gui/ContentComponent.h"

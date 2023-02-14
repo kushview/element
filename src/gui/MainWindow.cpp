@@ -18,7 +18,7 @@
 */
 
 #include "services/graphservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"

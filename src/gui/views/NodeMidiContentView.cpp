@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/LookAndFeel.h"
 #include "gui/properties/NodeProperties.h"
 #include "gui/views/NodeMidiContentView.h"

@@ -58,20 +58,6 @@ ContentView::~ContentView()
 {
 }
 
-ContentComponent* ContentComponent::create (ServiceManager& controller)
-{
-    auto& s = controller.getGlobals().getSettings();
-
-    if (s.getMainContentType() == "workspace")
-        return new WorkspacesContentComponent (controller);
-    if (s.getMainContentType() == "standard")
-        return new StandardContentComponent (controller);
-    if (s.getMainContentType() == "compact")
-        return new StandardContentComponent (controller);
-
-    return new StandardContentComponent (controller);
-}
-
 void ContentView::paint (Graphics& g)
 {
     g.fillAll (LookAndFeel::backgroundColor);
@@ -516,14 +502,6 @@ ContentComponent::ContentComponent (ServiceManager& ctl_)
     toolBarVisible = true;
     toolBarSize = 32;
 
-    // {
-    //     int w, h;
-    //     windowSizeProperty (settings, "mainWindowState", w, h, 760, 480);
-    //     setSize (w, h);
-    //     updateLayout();
-    //     resized();
-    // }
-
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
 
@@ -659,6 +637,15 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
 void ContentComponent::post (Message* message)
 {
     controller.postMessage (message);
+}
+
+void ContentComponent::setToolbarVisible (bool visible) {
+    if (toolBarVisible == visible)
+        return;
+    toolBarVisible = visible;
+    toolBar->setVisible (toolBarVisible);
+    resized();
+    refreshToolbar();
 }
 
 void ContentComponent::refreshToolbar()

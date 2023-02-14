@@ -19,7 +19,7 @@
 
 #include "services/mappingservice.hpp"
 #include "services/deviceservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "engine/mappingengine.hpp"
 #include <element/controllerdevice.hpp>
 #include <element/context.hpp>

@@ -18,12 +18,13 @@
 */
 
 #include <element/context.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include <element/nodeobject.hpp>
 #include "engine/graphnode.hpp"
 #include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"
+#include "session/commandmanager.hpp"
 
 namespace element {
 

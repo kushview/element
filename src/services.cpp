@@ -18,24 +18,26 @@
 */
 
 #include <element/context.hpp>
+#include <element/pluginmanager.hpp>
 #include <element/settings.hpp>
-
 #include <element/services.hpp>
+
 #include "services/deviceservice.hpp"
 #include "services/engineservice.hpp"
-#include "services/guiservice.hpp"
-#include "engine/graphmanager.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/graphservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/oscservice.hpp"
 #include "services/sessionservice.hpp"
 #include "services/presetservice.hpp"
 
+#include "session/commandmanager.hpp"
+#include "session/presetmanager.hpp"
+
+#include "engine/graphmanager.hpp"
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
 
-#include <element/pluginmanager.hpp>
-#include "session/presetmanager.hpp"
 #include "commands.hpp"
 #include "messages.hpp"
 #include "version.hpp"

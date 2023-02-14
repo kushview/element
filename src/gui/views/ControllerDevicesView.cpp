@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/Buttons.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"

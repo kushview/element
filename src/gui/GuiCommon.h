@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"

@@ -21,7 +21,7 @@
 #include "services/engineservice.hpp"
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/presetservice.hpp"
 #include "services/sessionservice.hpp"
 

@@ -19,25 +19,22 @@
 
 #pragma once
 
-#include <element/services.hpp>
-#include "gui/LookAndFeel.h"
-#include "gui/MainWindow.h"
-#include "gui/PreferencesComponent.h"
-#include "gui/WindowManager.h"
-#include "session/commandmanager.hpp"
 #include <element/node.hpp>
 #include <element/session.hpp>
+#include <element/services.hpp>
 #include <element/signals.hpp>
 
 namespace element {
 
-class ServiceManager;
-class EngineControl;
-class Context;
+class CommandManager;
 class ContentComponent;
+class ContentFactory;
+class Context;
+class LookAndFeel;
 class MainWindow;
 class PluginWindow;
-class SessionDocument;
+class ServiceManager;
+class WindowManager;
 
 class GuiService : public Service,
                    public juce::ApplicationCommandTarget,
@@ -117,7 +114,7 @@ public:
 
     /** @internal close a specific plugin window
         PluginWindows call this when they need deleted
-        */
+    */
     void closePluginWindow (PluginWindow*);
 
     /** Get the look and feel used by this instance */
@@ -140,23 +137,26 @@ public:
 
     void checkForegroundStatus();
 
+    void setContentFactory (std::unique_ptr<ContentFactory>);
+
 private:
     ServiceManager& controller;
     Context& world;
     SessionRef sessionRef;
     OwnedArray<PluginWindow> pluginWindows;
+    
     std::unique_ptr<WindowManager> windowManager;
     std::unique_ptr<MainWindow> mainWindow;
     std::unique_ptr<ContentComponent> content;
     std::unique_ptr<DialogWindow> about;
-
+    std::unique_ptr<ContentFactory> factory;
+    
     Node selectedNode; // TODO: content manager
 
     struct KeyPressManager;
     std::unique_ptr<KeyPressManager> keys;
 
-    struct ForegroundCheck : public Timer
-    {
+    struct ForegroundCheck : public Timer {
         ForegroundCheck (GuiService& _ui) : ui (_ui) {}
         void timerCallback() override;
         GuiService& ui;

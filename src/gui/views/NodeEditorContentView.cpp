@@ -20,7 +20,7 @@
 #include "ElementApp.h"
 
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"
 #include "engine/graphnode.hpp"

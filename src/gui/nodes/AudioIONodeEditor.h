@@ -20,6 +20,7 @@
 #pragma once
 
 #include "gui/nodes/NodeEditorComponent.h"
+
 #include <element/devicemanager.hpp>
 
 namespace element {

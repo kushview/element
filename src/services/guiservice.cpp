@@ -17,30 +17,63 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/ui/contentfactory.hpp>
+
+#include <element/audioengine.hpp>
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+
+#include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
 #include "services/engineservice.hpp"
 
-#include <element/audioengine.hpp>
+#include "gui/views/VirtualKeyboardView.h"
 
 #include "gui/AboutComponent.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
+#include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
+#include "gui/PreferencesComponent.h"
 #include "gui/SystemTray.h"
-#include "gui/views/VirtualKeyboardView.h"
-
+#include "gui/WindowManager.h"
+#include "gui/WorkspacesContentComponent.h"
+#include "gui/StandardContentComponent.h"
 #include "gui/capslock.hpp"
+
+#include "session/commandmanager.hpp"
+
 #include "version.hpp"
 
 namespace element {
 
+//=============================================================================
+class DefaultContentFactory : public ContentFactory {
+public:
+    DefaultContentFactory (Context& ctx) 
+        : context (ctx) { }
+    ~DefaultContentFactory() {}
+    
+    std::unique_ptr<ContentComponent> createMainContent (const String& type) override {
+        if (type == "workspace")
+            return std::make_unique<WorkspacesContentComponent> (context.getServices());
+        if (type == "standard")
+            return std::make_unique<StandardContentComponent> (context.getServices());
+        if (type == "compact")
+            return std::make_unique<StandardContentComponent> (context.getServices());
+
+        return std::make_unique<StandardContentComponent> (context.getServices());
+    }
+
+private:
+    Context& context;
+};
+
+//=============================================================================
 struct GlobalLookAndFeel
 {
-    GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (&look); }
-    ~GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (nullptr); }
+    GlobalLookAndFeel()   { LookAndFeel::setDefaultLookAndFeel (&look); }
+    ~GlobalLookAndFeel()  { LookAndFeel::setDefaultLookAndFeel (nullptr); }
     element::LookAndFeel look;
 };
 
@@ -170,6 +203,16 @@ void GuiService::checkForegroundStatus()
 }
 
 //=============================================================================
+void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newFactory) {
+    clearContentComponent();
+    if (factory)
+        factory.reset();
+    factory = std::move (newFactory);
+    if (! factory)
+        factory = std::make_unique<DefaultContentFactory> (getWorld());
+}
+
+//=============================================================================
 GuiService::GuiService (Context& w, ServiceManager& a)
     : Service(),
       controller (a),
@@ -183,6 +226,7 @@ GuiService::GuiService (Context& w, ServiceManager& a)
         sGlobalLookAndFeel.reset (new GlobalLookAndFeel());
     sGuiControllerInstances.add (this);
     windowManager.reset (new WindowManager (*this));
+    factory = std::make_unique<DefaultContentFactory> (w);
 }
 
 GuiService::~GuiService()
@@ -339,9 +383,12 @@ void GuiService::showSplash() {}
 
 ContentComponent* GuiService::getContentComponent()
 {
+    jassert (factory != nullptr);
     if (! content)
     {
-        content.reset (ContentComponent::create (controller));
+        const auto uitype = getWorld().getSettings().getMainContentType();
+        content.reset ();
+        content = factory->createMainContent (uitype);
         content->setSize (760, 480);
     }
 
@@ -495,7 +542,8 @@ void GuiService::getAllCommands (Array<CommandID>& commands)
         Commands::toggleUserInterface });
 
     commands.add (Commands::quit);
-    getContentComponent()->getAllCommands (commands);
+    if (content)
+        content->getAllCommands (commands);
 }
 
 void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -796,7 +844,8 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             break;
     }
 
-    getContentComponent()->getCommandInfo (commandID, result);
+    if (content)
+        content->getCommandInfo (commandID, result);
 }
 
 bool GuiService::perform (const InvocationInfo& info)
@@ -870,6 +919,7 @@ void GuiService::stabilizeContent()
     if (auto* cc = content.get())
         cc->stabilize();
     refreshMainMenu();
+    refreshSystemTray();
     if (mainWindow)
         mainWindow->refreshName();
 }
@@ -935,11 +985,10 @@ bool GuiService::handleMessage (const AppMessage& msg)
         if (mainWindow && pf != nullptr)
         {
             const auto ws = mainWindow->getWindowStateAsString();
-            mainWindow->clearContentComponent();
-            content.reset (nullptr);
+            clearContentComponent();
             mainWindow->setContentNonOwned (getContentComponent(), true);
             mainWindow->restoreWindowStateFromString (ws);
-            getContentComponent()->restoreState (pf);
+            content->restoreState (pf);
             stabilizeContent();
             refreshMainMenu();
             refreshSystemTray();
@@ -949,9 +998,9 @@ bool GuiService::handleMessage (const AppMessage& msg)
     }
     else if (auto m = dynamic_cast<const PresentViewMessage*> (&msg))
     {
-        if (m->create)
+        if (m->create && content != nullptr)
             if (auto* v = m->create())
-                getContentComponent()->setMainView (v);
+                content->setMainView (v);
 
         return true;
     }
@@ -977,13 +1026,10 @@ void GuiService::clearContentComponent()
 
     if (mainWindow)
     {
-        jassertfalse; // This should only ever be called from
-            // an Element plugin instance
         mainWindow->clearContentComponent();
     }
 
-    jassert (content != nullptr);
-    content = nullptr;
+    content.reset();
 }
 
 } // namespace element

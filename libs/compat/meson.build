@@ -1,8 +1,6 @@
-juce_dep = dependency ('juce-7', required : false)
-if not juce_dep.found()
-    juce_proj = subproject ('juce')
-    juce_dep = juce_proj.get_variable ('juce_dep')
-endif
+
+juce_proj = subproject ('juce')
+juce_dep = juce_proj.get_variable ('juce_dep')
 
 # JUCE
 juce_modules = '''
@@ -14,7 +12,8 @@ juce_modules = '''
     juce_core 
     juce_cryptography
     juce_data_structures 
-    juce_dsp juce_events 
+    juce_dsp 
+    juce_events 
     juce_graphics 
     juce_gui_basics
     juce_gui_extra 
@@ -89,13 +88,13 @@ juce_conf_data.set10 ('JUCE_PLUGINHOST_VST', aeffect_h_found and aeffectx_h_foun
 
 juce_vst3_includes = []
 if get_option('vst3sdk') == 'auto'
-    # juce_vst3_includes += include_directories ('../JUCE/modules/juce_audio_processors/format_types/VST3_SDK')
+    juce_vst3_includes += juce_proj.get_variable ('juce_vst3_includes')
 else
     juce_vst3_includes += include_directories (get_option ('vst3sdk'))
 endif
 
 juce_conf_data.set10 ('JUCE_VST3_CAN_REPLACE_VST2', vstfxstore_h_found)
-juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', false)
+juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', true)
 
 juce_lv2_includes = []
 # include_directories (
@@ -147,18 +146,17 @@ elif host_machine.system() == 'darwin'
         'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
         'discrecording', 'iokit', 'quartzcore', 'metal' ])
-    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', false)
-    # juce_au_includes += include_directories (
-    #     '../JUCE/modules/juce_audio_plugin_client/AU')
+    juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)
+    juce_au_includes += juce_proj.get_variable ('juce_au_includes')
 endif
 
 configure_file (output : 'juce_config.h', 
-                configuration : juce_conf_data)
+         configuration : juce_conf_data)
 
 libelement_juce = static_library ('element_juce', 
     juce_sources,
     include_directories : [ 
-        juce_includes, 
+        juce_includes,
         juce_asio_includes, 
         juce_vst3_includes, 
         juce_vst2_includes, 

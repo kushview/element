@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/DockPanel.h"
 #include "gui/WorkspacesContentComponent.h"
 #include "gui/workspace/PanelTypes.h"
@@ -30,6 +30,7 @@
 #include "messages.hpp"
 #include <element/settings.hpp>
 #include "BinaryData.h"
+#include "commands.hpp"
 
 namespace element {
 
