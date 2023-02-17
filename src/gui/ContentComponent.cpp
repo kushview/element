@@ -639,7 +639,8 @@ void ContentComponent::post (Message* message)
     controller.postMessage (message);
 }
 
-void ContentComponent::setToolbarVisible (bool visible) {
+void ContentComponent::setToolbarVisible (bool visible)
+{
     if (toolBarVisible == visible)
         return;
     toolBarVisible = visible;

@@ -25,8 +25,7 @@
 
 namespace element {
 
-struct JUCE_API Arc
-{
+struct JUCE_API Arc {
 public:
     Arc (uint32_t sourceNode, uint32_t sourcePort, uint32_t destNode, uint32_t destPort) noexcept;
     virtual ~Arc() {}
@@ -56,8 +55,7 @@ private:
     JUCE_LEAK_DETECTOR (Arc)
 };
 
-struct ArcSorter
-{
+struct ArcSorter {
     static inline int compareElements (const Arc* const first, const Arc* const second) noexcept
     {
         if (first->sourceNode < second->sourceNode)
@@ -83,20 +81,17 @@ struct ArcSorter
 
 /** Holds a fast lookup table for checking which arcs are inputs to others. */
 template <class ArcType>
-class ArcTable
-{
+class ArcTable {
 public:
     explicit ArcTable (const juce::OwnedArray<ArcType>& arcs)
     {
-        for (int i = 0; i < arcs.size(); ++i)
-        {
+        for (int i = 0; i < arcs.size(); ++i) {
             const ArcType* const c = arcs.getUnchecked (i);
 
             int index;
             Entry* entry = findEntry (c->destNode, index);
 
-            if (entry == nullptr)
-            {
+            if (entry == nullptr) {
                 entry = new Entry (c->destNode);
                 entries.insert (index, entry);
             }
@@ -112,8 +107,7 @@ public:
     }
 
 private:
-    struct Entry
-    {
+    struct Entry {
         explicit Entry (const uint32_t destNode_) noexcept : destNode (destNode_) {}
 
         const uint32_t destNode;
@@ -130,15 +124,13 @@ private:
     {
         int index;
 
-        if (const Entry* const entry = findEntry (possibleDestinationId, index))
-        {
+        if (const Entry* const entry = findEntry (possibleDestinationId, index)) {
             const juce::SortedSet<uint32_t>& srcNodes = entry->srcNodes;
 
             if (srcNodes.contains (possibleInputId))
                 return true;
 
-            if (--recursionCheck >= 0)
-            {
+            if (--recursionCheck >= 0) {
                 for (int i = 0; i < srcNodes.size(); ++i)
                     if (isAnInputToRecursive (possibleInputId, srcNodes.getUnchecked (i), recursionCheck))
                         return true;
@@ -155,29 +147,21 @@ private:
         int start = 0;
         int end = entries.size();
 
-        for (;;)
-        {
-            if (start >= end)
-            {
+        for (;;) {
+            if (start >= end) {
                 break;
-            }
-            else if (destNode == entries.getUnchecked (start)->destNode)
-            {
+            } else if (destNode == entries.getUnchecked (start)->destNode) {
                 result = entries.getUnchecked (start);
                 break;
-            }
-            else
-            {
+            } else {
                 const int halfway = (start + end) / 2;
 
-                if (halfway == start)
-                {
+                if (halfway == start) {
                     if (destNode >= entries.getUnchecked (halfway)->destNode)
                         ++start;
 
                     break;
-                }
-                else if (destNode >= entries.getUnchecked (halfway)->destNode)
+                } else if (destNode >= entries.getUnchecked (halfway)->destNode)
                     start = halfway;
                 else
                     end = halfway;

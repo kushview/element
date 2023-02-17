@@ -26,8 +26,7 @@ namespace element {
 class Context;
 
 /** Manages the internal plugin types. */
-class InternalFormat : public juce::AudioPluginFormat
-{
+class InternalFormat : public juce::AudioPluginFormat {
 public:
     InternalFormat (Context&);
     ~InternalFormat() {}
@@ -70,8 +69,7 @@ private:
     juce::AudioPluginInstance* instantiatePlugin (const juce::PluginDescription& desc, double rate, int block);
 };
 
-class ElementAudioPluginFormat : public juce::AudioPluginFormat
-{
+class ElementAudioPluginFormat : public juce::AudioPluginFormat {
 public:
     ElementAudioPluginFormat (Context&);
     ~ElementAudioPluginFormat() {}

@@ -26,11 +26,9 @@
 
 namespace element {
 
-class Transport : public Shuttle
-{
+class Transport : public Shuttle {
 public:
-    class Monitor : public juce::ReferenceCountedObject
-    {
+    class Monitor : public juce::ReferenceCountedObject {
     public:
         Monitor()
         {
@@ -82,21 +80,18 @@ public:
 
     inline void requestPlayState (bool p)
     {
-        while (! playState.set (p))
-        {
+        while (! playState.set (p)) {
         }
     }
     inline void requestPlayPause() { requestPlayState (! playState.get()); }
     inline void requestRecordState (bool r)
     {
-        while (! recordState.set (r))
-        {
+        while (! recordState.set (r)) {
         }
     }
     inline void requestTempo (const double bpm)
     {
-        while (! nextTempo.set (bpm))
-        {
+        while (! nextTempo.set (bpm)) {
         }
     }
     void requestMeter (int beatsPerBar, int beatType);

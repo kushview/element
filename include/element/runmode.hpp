@@ -21,8 +21,7 @@
 namespace element {
 
 /** The runtime mode of Element */
-enum struct RunMode : int
-{
+enum struct RunMode : int {
     /** Running as standalone application */
     Standalone = 0,
     /** Running as an audio plugin */

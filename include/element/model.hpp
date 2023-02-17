@@ -24,8 +24,7 @@
 namespace element {
 
 /** A thin wrapper around a juce juce::ValueTree */
-class JUCE_API ObjectModel
-{
+class JUCE_API ObjectModel {
 public:
     explicit ObjectModel (const juce::ValueTree& data = juce::ValueTree());
     ObjectModel (const juce::Identifier& slugId);

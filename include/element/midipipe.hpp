@@ -24,15 +24,14 @@
 struct lua_State;
 namespace element {
 namespace lua {
-    struct MidiBufferImpl;
+struct MidiBufferImpl;
 }
 } // namespace element
 
 namespace element {
 
 /** A glorified array of MidiBuffers used in rendering graph nodes */
-class MidiPipe
-{
+class MidiPipe {
 public:
     MidiPipe();
     MidiPipe (juce::MidiBuffer** buffers, int numBuffers);
@@ -48,8 +47,7 @@ public:
     void clear (int index, int startSample, int numSamples);
 
 private:
-    enum
-    {
+    enum {
         maxReferencedBuffers = 32
     };
     int size = 0;
@@ -57,8 +55,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPipe);
 };
 
-class LuaMidiPipe final
-{
+class LuaMidiPipe final {
 public:
     LuaMidiPipe();
     ~LuaMidiPipe();

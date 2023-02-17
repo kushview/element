@@ -39,8 +39,7 @@ class NodeArray;
 class PortArray;
 class Node;
 
-class Port : public ObjectModel
-{
+class Port : public ObjectModel {
 public:
     Port() : ObjectModel (Tags::port) {}
     Port (const ValueTree& p)
@@ -91,8 +90,7 @@ public:
     operator uint32() const { return getIndex(); }
 };
 
-class Node : public ObjectModel
-{
+class Node : public ObjectModel {
 public:
     /** Create an invalid node */
     Node();
@@ -362,8 +360,7 @@ public:
     {
         auto nodes = getNodesValueTree();
 
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
-        {
+        for (int i = 0; i < nodes.getNumChildren(); ++i) {
             auto child = nodes.getChild (i);
             if (child[Tags::format] == format && child[Tags::identifier] == identifier)
                 return Node (child, false);
@@ -385,8 +382,7 @@ public:
     bool hasChildNode (const var& format, const var& identifier) const
     {
         auto nodes = getNodesValueTree();
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
-        {
+        for (int i = 0; i < nodes.getNumChildren(); ++i) {
             auto child = nodes.getChild (i);
             if (child[Tags::format] == format && child[Tags::identifier] == identifier)
                 return true;
@@ -505,8 +501,7 @@ private:
 
 typedef Node NodeModel;
 
-class NodeObjectSync final : private ValueTree::Listener
-{
+class NodeObjectSync final : private ValueTree::Listener {
 public:
     NodeObjectSync();
     NodeObjectSync (const Node& node);
@@ -532,23 +527,20 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeObjectSync)
 };
 
-class PortArray : public Array<Port>
-{
+class PortArray : public Array<Port> {
 public:
     PortArray() {}
     ~PortArray() {}
 };
 
-class NodeArray : public Array<Node>
-{
+class NodeArray : public Array<Node> {
 public:
     NodeArray() {}
     ~NodeArray() {}
     void sortByName();
 };
 
-struct ConnectionBuilder
-{
+struct ConnectionBuilder {
     ConnectionBuilder (const ConnectionBuilder& o)
     {
         operator= (o);
@@ -591,8 +583,7 @@ struct ConnectionBuilder
         if (dstOffset < 0)
             dstOffset = 0;
 
-        for (int i = 0; i < 2; ++i)
-        {
+        for (int i = 0; i < 2; ++i) {
             ValueTree connection (Tags::arc);
             connection.setProperty (Tags::sourceNode, (int64) src.getNodeId(), 0)
                 .setProperty (Tags::destNode, (int64) dst.getNodeId(), 0)
@@ -611,8 +602,7 @@ private:
     Node target;
     mutable String lastError;
 
-    struct ConnectionMap
-    {
+    struct ConnectionMap {
         ConnectionMap (const Node& node, PortType t, const int nc, const int tc, const bool input)
             : nodeId (node.getNodeId()),
               type (t),

@@ -27,8 +27,7 @@
 namespace element {
 
 /** A mini-transport for use in a processable that can loop */
-class Shuttle : public juce::AudioPlayHead
-{
+class Shuttle : public juce::AudioPlayHead {
 public:
     static const int PPQ;
 
@@ -36,8 +35,7 @@ public:
         a midi file that has a different ppq than the Shuttle */
     static double scaledTick (double sourceTick, const int srcPpq);
 
-    struct Position : public juce::AudioPlayHead::CurrentPositionInfo
-    {
+    struct Position : public juce::AudioPlayHead::CurrentPositionInfo {
         double timeInBeats;
     };
 

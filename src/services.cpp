@@ -49,7 +49,7 @@ using namespace juce;
 ServiceManager& Service::getServices() const
 {
     jassert (owner != nullptr); // if you hit this then you're probably calling
-                                // getServices() before controller initialization
+        // getServices() before controller initialization
     return *owner;
 }
 

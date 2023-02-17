@@ -38,8 +38,7 @@ class WindowManager;
 
 class GuiService : public Service,
                    public juce::ApplicationCommandTarget,
-                   private juce::ChangeListener
-{
+                   private juce::ChangeListener {
 public:
     Signal<void()> nodeSelected;
     GuiService (Context& w, ServiceManager& a);
@@ -144,13 +143,13 @@ private:
     Context& world;
     SessionRef sessionRef;
     OwnedArray<PluginWindow> pluginWindows;
-    
+
     std::unique_ptr<WindowManager> windowManager;
     std::unique_ptr<MainWindow> mainWindow;
     std::unique_ptr<ContentComponent> content;
     std::unique_ptr<DialogWindow> about;
     std::unique_ptr<ContentFactory> factory;
-    
+
     Node selectedNode; // TODO: content manager
 
     struct KeyPressManager;

@@ -25,25 +25,23 @@
 #include <element/juce/data_structures.hpp>
 
 #ifndef EL_INVALID_CHANNEL
-#define EL_INVALID_CHANNEL -1
+    #define EL_INVALID_CHANNEL -1
 #endif
 
 #ifndef EL_INVALID_PORT
-#define EL_INVALID_PORT (uint32_t) - 1
+    #define EL_INVALID_PORT (uint32_t) - 1
 #endif
 
 #ifndef EL_INVALID_NODE
-#define EL_INVALID_NODE EL_INVALID_PORT
+    #define EL_INVALID_NODE EL_INVALID_PORT
 #endif
 
 namespace element {
 
 /** The type of a port. */
-class PortType
-{
+class PortType {
 public:
-    enum ID
-    {
+    enum ID {
         Control = 0,
         Audio = 1,
         CV = 2,
@@ -195,10 +193,8 @@ private:
 
     static inline ID typeForString (const juce::String& identifier)
     {
-        for (int i = 0; i <= Midi; ++i)
-        {
-            if (slugName (i) == identifier || typeURI (i) == identifier || typeName (i) == identifier)
-            {
+        for (int i = 0; i <= Midi; ++i) {
+            if (slugName (i) == identifier || typeURI (i) == identifier || typeName (i) == identifier) {
                 return static_cast<ID> (i);
             }
         }
@@ -210,8 +206,7 @@ private:
 
 /** Maps channel numbers to a port indexes for all port types. This is an attempt
     to handle boiler-plate port to channel mapping functions */
-class ChannelMapping
-{
+class ChannelMapping {
 public:
     inline ChannelMapping() { init(); }
 
@@ -285,8 +280,7 @@ private:
 };
 
 /** Contains two ChannelMappings.  One for inputs and one for outputs */
-class ChannelConfig
-{
+class ChannelConfig {
 public:
     ChannelConfig() {}
     ~ChannelConfig() {}
@@ -339,8 +333,7 @@ private:
 };
 
 /** A detailed descption of a port */
-struct PortDescription
-{
+struct PortDescription {
     PortDescription() {}
     PortDescription (int portType, int portIndex, int portChannel, const juce::String& portSymbol, const juce::String& portName, const bool isInput)
         : type (portType), index (portIndex), channel (portChannel), symbol (portSymbol), name (portName), input (isInput) {}
@@ -372,8 +365,7 @@ struct PortDescription
     float defaultValue { 1.0 };
 };
 
-struct PortIndexComparator
-{
+struct PortIndexComparator {
     static int compareElements (const PortDescription* const first, const PortDescription* const second)
     {
         return (first->index < second->index) ? -1
@@ -382,8 +374,7 @@ struct PortIndexComparator
     }
 };
 
-class PortList
-{
+class PortList {
 public:
     PortList() = default;
     PortList (const PortList& o) { operator= (o); }
@@ -539,8 +530,7 @@ private:
 public:
     inline juce::ValueTree createValueTree (const int port) const
     {
-        if (const auto* desc = findByIndexInternal (port))
-        {
+        if (const auto* desc = findByIndexInternal (port)) {
             juce::ValueTree data ("port");
             data.setProperty ("index", desc->index, nullptr)
                 .setProperty ("channel", desc->channel, nullptr)

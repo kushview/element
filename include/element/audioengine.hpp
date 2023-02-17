@@ -34,8 +34,7 @@ class Context;
 class Settings;
 class RootGraph;
 
-class AudioEngine : public Engine
-{
+class AudioEngine : public Engine {
 public:
     Signal<void()> sampleLatencyChanged;
     AudioEngine (Context&, RunMode mode = RunMode::Standalone);

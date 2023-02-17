@@ -34,8 +34,7 @@ class PluginScanner;
 // FIXME:
 using namespace juce;
 
-class PluginManager : public ChangeBroadcaster
-{
+class PluginManager : public ChangeBroadcaster {
 public:
     PluginManager();
     ~PluginManager();
@@ -147,14 +146,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager);
 };
 
-class PluginScanner : private Timer
-{
+class PluginScanner : private Timer {
 public:
     PluginScanner (KnownPluginList&);
     ~PluginScanner();
 
-    class Listener
-    {
+    class Listener {
     public:
         Listener() {}
         virtual ~Listener() {}

@@ -34,11 +34,9 @@ class Context;
 class Session : public ObjectModel,
                 public ReferenceCountedObject,
                 public ChangeBroadcaster,
-                public ValueTree::Listener
-{
+                public ValueTree::Listener {
 public:
-    struct ScopedFrozenLock
-    {
+    struct ScopedFrozenLock {
         ScopedFrozenLock (const Session& s) : session (s)
         {
             wasFrozen = session.freezeChangeNotification;
@@ -169,14 +167,12 @@ public:
 typedef ReferenceCountedObjectPtr<Session> SessionPtr;
 typedef SessionPtr SessionRef;
 
-struct ControllerMapObjects
-{
+struct ControllerMapObjects {
     ControllerMapObjects() = default;
     ControllerMapObjects (SessionPtr s, const ControllerMap& m)
         : session (s), controllerMap (m)
     {
-        if (session != nullptr)
-        {
+        if (session != nullptr) {
             device = session->findControllerDeviceById (Uuid (controllerMap.getProperty (Tags::controller)));
             control = device.findControlById (Uuid (controllerMap.getProperty (Tags::control)));
             node = session->findNodeById (Uuid (controllerMap.getProperty (Tags::node)));

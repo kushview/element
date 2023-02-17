@@ -18,13 +18,13 @@ public:
         Return the content specified.  If type is empty or not supported,
         you should still return a valid Content object.
     */
-    virtual std::unique_ptr<ContentComponent> createMainContent (const juce::String& type) =0;
+    virtual std::unique_ptr<ContentComponent> createMainContent (const juce::String& type) = 0;
 
 protected:
     ContentFactory() = default;
 
 private:
-    EL_DISABLE_COPY(ContentFactory)
+    EL_DISABLE_COPY (ContentFactory)
 };
 
-}
+} // namespace element

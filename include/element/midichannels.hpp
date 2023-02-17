@@ -5,8 +5,7 @@
 
 namespace element {
 
-struct JUCE_API MidiChannels
-{
+struct JUCE_API MidiChannels {
     inline MidiChannels()
     {
         reset();

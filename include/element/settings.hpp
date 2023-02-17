@@ -26,8 +26,7 @@ namespace element {
 
 class Context;
 
-class Settings : public juce::ApplicationProperties
-{
+class Settings : public juce::ApplicationProperties {
 public:
     Settings();
     ~Settings();

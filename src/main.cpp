@@ -52,7 +52,7 @@ public:
     {
         Settings& settings (world.getSettings());
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
-        
+
         setupLogging();
         setupKeyMappings();
         setupAudioEngine();

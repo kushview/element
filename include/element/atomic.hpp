@@ -24,8 +24,7 @@
 namespace element {
 
 template <typename Val>
-class AtomicValue
-{
+class AtomicValue {
 public:
     explicit AtomicValue (Val initial = Val())
         : state (ReadWrite)
@@ -39,8 +38,7 @@ public:
     inline bool set (Val newValue)
     {
         State expected = ReadWrite;
-        if (state.compare_exchange_strong (expected, ReadLock))
-        {
+        if (state.compare_exchange_strong (expected, ReadLock)) {
             values[1] = newValue;
             readValue = &values[1];
             state = WriteRead;
@@ -49,8 +47,7 @@ public:
 
         expected = WriteRead;
 
-        if (state.compare_exchange_strong (expected, LockRead))
-        {
+        if (state.compare_exchange_strong (expected, LockRead)) {
             values[0] = newValue;
             readValue = &values[0];
             state = ReadWrite;
@@ -83,8 +80,7 @@ public:
     }
 
 private:
-    enum State
-    {
+    enum State {
         ReadWrite,
         ReadLock,
         WriteRead,
@@ -96,8 +92,7 @@ private:
     Val values[2];
 };
 
-class AtomicLock
-{
+class AtomicLock {
 public:
     AtomicLock()
         : a_mutex(),
@@ -126,8 +121,7 @@ public:
     inline void unlock()
     {
         a_locks.set (a_locks.get() - 1);
-        if (a_locks.get() < 1)
-        {
+        if (a_locks.get() < 1) {
             a_locks.set (0);
             release();
         }

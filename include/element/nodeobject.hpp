@@ -36,18 +36,16 @@ using namespace juce;
 
 /* So render tasks can be friends of graph node */
 namespace GraphRender {
-    class ProcessBufferOp;
+class ProcessBufferOp;
 }
 
 class GraphNode;
 class ProcessBufferOp;
 
-class NodeObject : public ReferenceCountedObject
-{
+class NodeObject : public ReferenceCountedObject {
 public:
     /** Special parameter indexes when mapping universal node settings */
-    enum SpecialParameter
-    {
+    enum SpecialParameter {
         NoParameter = -1,
         EnabledParameter = -2,
         BypassParameter = -3,
@@ -410,8 +408,7 @@ protected:
 
     void setName (const String& newName)
     {
-        if (newName.isNotEmpty() && newName != name)
-        {
+        if (newName.isNotEmpty() && newName != name) {
             name = newName;
             nameChanged();
         }
@@ -465,16 +462,14 @@ private:
     Atomic<int> globalMidiPrograms { 0 };
 
     CriticalSection propertyLock;
-    struct EnablementUpdater : public AsyncUpdater
-    {
+    struct EnablementUpdater : public AsyncUpdater {
         EnablementUpdater (NodeObject& g) : graph (g) {}
         ~EnablementUpdater() {}
         void handleAsyncUpdate() override;
         NodeObject& graph;
     } enablement;
 
-    struct MidiProgramLoader : public AsyncUpdater
-    {
+    struct MidiProgramLoader : public AsyncUpdater {
         MidiProgramLoader (NodeObject& n) : node (n) {}
         ~MidiProgramLoader() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
@@ -482,16 +477,14 @@ private:
     } midiProgramLoader;
 
     friend struct PortResetter;
-    struct PortResetter : public AsyncUpdater
-    {
+    struct PortResetter : public AsyncUpdater {
         PortResetter (NodeObject& n) : node (n) {}
         ~PortResetter() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
         NodeObject& node;
     } portResetter;
 
-    struct MidiProgram
-    {
+    struct MidiProgram {
         int program;
         String name;
         MemoryBlock state;

@@ -36,8 +36,7 @@ class PluginManager;
 class PresetManager;
 class Settings;
 
-class Context
-{
+class Context {
 public:
     explicit Context (const juce::String& commandLine = juce::String());
     virtual ~Context();
@@ -67,7 +66,7 @@ public:
 
     //===
     void testLaunch();
-    
+
 private:
     friend class Application;
     std::string appName;

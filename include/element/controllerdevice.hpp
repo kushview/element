@@ -37,17 +37,14 @@ namespace element {
 // FIXME:
 using namespace juce;
 
-class ControllerDevice : public ObjectModel
-{
+class ControllerDevice : public ObjectModel {
 public:
-    enum ControlToggleMode
-    {
+    enum ControlToggleMode {
         EqualsOrHigher = 0,
         Equals
     };
 
-    class Control : public ObjectModel
-    {
+    class Control : public ObjectModel {
     public:
         explicit Control (const ValueTree& data = ValueTree())
             : ObjectModel (data)
@@ -80,12 +77,9 @@ public:
         {
             MidiMessage midi;
 
-            if (isNoteEvent())
-            {
+            if (isNoteEvent()) {
                 midi = MidiMessage::noteOn (1, getEventId(), (uint8) 64);
-            }
-            else if (isControllerEvent())
-            {
+            } else if (isControllerEvent()) {
                 midi = MidiMessage::controllerEvent (1, getEventId(), 64);
             }
 
@@ -140,16 +134,12 @@ public:
             stabilizePropertyString (Tags::name, "Control");
             stabilizePropertyString (Tags::uuid, Uuid().toString());
 
-            if (hasProperty (Tags::mappingData))
-            {
+            if (hasProperty (Tags::mappingData)) {
                 const auto midi = getMappingDataLegacy();
-                if (midi.isNoteOnOrOff())
-                {
+                if (midi.isNoteOnOrOff()) {
                     setProperty ("eventType", "note");
                     setProperty ("eventId", midi.getNoteNumber());
-                }
-                else if (midi.isController())
-                {
+                } else if (midi.isController()) {
                     setProperty ("eventType", "controller");
                     setProperty ("eventId", midi.getControllerNumber());
                 }
@@ -199,8 +189,7 @@ private:
     void setMissingProperties();
 };
 
-class ControllerMap : public ObjectModel
-{
+class ControllerMap : public ObjectModel {
 public:
     explicit ControllerMap (const ValueTree& data = ValueTree()) : ObjectModel (data) {}
     ~ControllerMap() noexcept {}

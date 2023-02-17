@@ -23,8 +23,7 @@
 
 namespace element {
 
-class Engine : public juce::ReferenceCountedObject
-{
+class Engine : public juce::ReferenceCountedObject {
 public:
     virtual ~Engine() {}
     virtual juce::AudioIODeviceCallback& getAudioIODeviceCallback() = 0;

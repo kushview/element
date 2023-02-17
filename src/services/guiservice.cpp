@@ -48,13 +48,15 @@
 namespace element {
 
 //=============================================================================
-class DefaultContentFactory : public ContentFactory {
+class DefaultContentFactory : public ContentFactory
+{
 public:
-    DefaultContentFactory (Context& ctx) 
-        : context (ctx) { }
+    DefaultContentFactory (Context& ctx)
+        : context (ctx) {}
     ~DefaultContentFactory() {}
-    
-    std::unique_ptr<ContentComponent> createMainContent (const String& type) override {
+
+    std::unique_ptr<ContentComponent> createMainContent (const String& type) override
+    {
         if (type == "workspace")
             return std::make_unique<WorkspacesContentComponent> (context.getServices());
         if (type == "standard")
@@ -72,8 +74,8 @@ private:
 //=============================================================================
 struct GlobalLookAndFeel
 {
-    GlobalLookAndFeel()   { LookAndFeel::setDefaultLookAndFeel (&look); }
-    ~GlobalLookAndFeel()  { LookAndFeel::setDefaultLookAndFeel (nullptr); }
+    GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (&look); }
+    ~GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (nullptr); }
     element::LookAndFeel look;
 };
 
@@ -203,7 +205,8 @@ void GuiService::checkForegroundStatus()
 }
 
 //=============================================================================
-void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newFactory) {
+void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newFactory)
+{
     clearContentComponent();
     if (factory)
         factory.reset();
@@ -387,7 +390,7 @@ ContentComponent* GuiService::getContentComponent()
     if (! content)
     {
         const auto uitype = getWorld().getSettings().getMainContentType();
-        content.reset ();
+        content.reset();
         content = factory->createMainContent (uitype);
         content->setSize (760, 480);
     }

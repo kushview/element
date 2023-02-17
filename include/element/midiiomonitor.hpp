@@ -26,8 +26,7 @@
 namespace element {
 
 /** Monitors MIDI input/output from device IO in the audio engine */
-class MidiIOMonitor : public juce::ReferenceCountedObject
-{
+class MidiIOMonitor : public juce::ReferenceCountedObject {
 public:
     MidiIOMonitor() {}
 

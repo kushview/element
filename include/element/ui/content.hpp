@@ -23,7 +23,7 @@
 #include <element/session.hpp>
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"
-#define EL_VIEW_CONSOLE "LuaConsoleViw"
+#define EL_VIEW_CONSOLE     "LuaConsoleViw"
 
 namespace element {
 
@@ -42,8 +42,7 @@ class NodeChannelStripView;
 using namespace juce;
 
 class ContentView : public juce::Component,
-                    public juce::ApplicationCommandTarget
-{
+                    public juce::ApplicationCommandTarget {
 public:
     ContentView();
     virtual ~ContentView();
@@ -91,8 +90,7 @@ class ContentComponent : public Component,
                          public ApplicationCommandTarget,
                          public DragAndDropContainer,
                          public DragAndDropTarget,
-                         public FileDragAndDropTarget
-{
+                         public FileDragAndDropTarget {
 protected:
     ContentComponent (ServiceManager& app);
 
@@ -116,7 +114,7 @@ public:
 
     /** Change toolbar visibility */
     void setToolbarVisible (bool);
-    
+
     /** Manually refresh the toolbar */
     void refreshToolbar();
 

@@ -25,8 +25,7 @@
 namespace element {
 
 template <typename SampleType>
-class Oversampler final
-{
+class Oversampler final {
 public:
     using ProcessorType = juce::dsp::Oversampling<SampleType>;
 

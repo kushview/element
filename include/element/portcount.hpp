@@ -25,8 +25,7 @@ namespace element {
 // FIXME:
 using namespace juce;
 
-struct PortCount
-{
+struct PortCount {
     PortCount()
     {
         clear();
@@ -99,14 +98,12 @@ struct PortCount
     void getPorts (PortList& ports) const
     {
         uint32_t index = 0;
-        for (int i = 0; i < PortType::Unknown; ++i)
-        {
+        for (int i = 0; i < PortType::Unknown; ++i) {
             PortType pt (i);
             const auto symPrefix = pt.getSlug();
             const auto namePrefix = pt.getName();
 
-            for (int j = 0; j < inputs[i]; ++j)
-            {
+            for (int j = 0; j < inputs[i]; ++j) {
                 String symbol = symPrefix;
                 symbol << "_in_" << String (j + 1);
                 String name = namePrefix;
@@ -115,8 +112,7 @@ struct PortCount
                 ports.add (i, index++, j, symbol, name, true);
             }
 
-            for (int j = 0; j < outputs[i]; ++j)
-            {
+            for (int j = 0; j < outputs[i]; ++j) {
                 String symbol = symPrefix;
                 symbol << "_out_" << String (j + 1);
                 String name = namePrefix;

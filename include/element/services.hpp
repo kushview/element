@@ -33,8 +33,7 @@ class Settings;
 struct AppMessage;
 class ServiceManager;
 
-class Service
-{
+class Service {
 public:
     Service() {}
     virtual ~Service()
@@ -66,8 +65,7 @@ private:
 
 //=============================================================================
 class ServiceManager : public juce::MessageListener,
-                       protected juce::ApplicationCommandTarget
-{
+                       protected juce::ApplicationCommandTarget {
 public:
     ServiceManager (Context&, RunMode mode = RunMode::Standalone);
     ~ServiceManager();
@@ -136,7 +134,7 @@ private:
     Context& world;
     juce::RecentlyOpenedFilesList recentFiles;
     juce::UndoManager undo;
-    
+
     RunMode runMode;
 
     void run();

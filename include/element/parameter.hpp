@@ -31,8 +31,7 @@ namespace element {
     Based on juce::AudioProcessorParameter, but designed for GraphNodes which 
     can change parameters.
 */
-class Parameter : public juce::ReferenceCountedObject
-{
+class Parameter : public juce::ReferenceCountedObject {
 public:
     using Ptr = juce::ReferenceCountedObjectPtr<Parameter>;
 
@@ -155,8 +154,7 @@ public:
     */
     virtual bool isMetaParameter() const;
 
-    enum Category
-    {
+    enum Category {
         genericParameter = (0 << 16) | 0, /** If your parameter is not a meter then you should use this category */
 
         inputGain = (1 << 16) | 0, /** Currently not used */
@@ -238,8 +236,7 @@ public:
         This Listener replaces most of the functionality in the
         AudioProcessorListener class, which will be deprecated and removed.
     */
-    class Listener
-    {
+    class Listener {
     public:
         /** Destructor. */
         virtual ~Listener() = default;
@@ -308,8 +305,7 @@ private:
 
 using ParameterArray = juce::ReferenceCountedArray<Parameter>;
 
-class ControlPortParameter : public Parameter
-{
+class ControlPortParameter : public Parameter {
 public:
     using Ptr = juce::ReferenceCountedObjectPtr<ControlPortParameter>;
 
@@ -351,8 +347,7 @@ private:
 
 //==============================================================================
 class ParameterListener : private Parameter::Listener,
-                          private juce::Timer
-{
+                          private juce::Timer {
 public:
     ParameterListener (Parameter::Ptr param)
         : parameter (param)
@@ -386,13 +381,10 @@ private:
     //==============================================================================
     void timerCallback() override
     {
-        if (parameterValueHasChanged.compareAndSetBool (0, 1))
-        {
+        if (parameterValueHasChanged.compareAndSetBool (0, 1)) {
             handleNewParameterValue();
             startTimerHz (50);
-        }
-        else
-        {
+        } else {
             startTimer (juce::jmin (250, getTimerInterval() + 10));
         }
     }

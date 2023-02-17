@@ -25,7 +25,7 @@
 #include <element/linkedlist.hpp>
 
 #if _MSC_VER
-#pragma warning(disable : 4355)
+    #pragma warning(disable : 4355)
 #endif
 
 #define beatToFrame (beat, bpm, rate)
@@ -33,11 +33,9 @@
 namespace element {
 
 /** Time scaling helper class */
-class TimeScale
-{
+class TimeScale {
 public:
-    enum DisplayFormat
-    {
+    enum DisplayFormat {
         Frames = 0,
         Time,
         BBT
@@ -95,8 +93,7 @@ public:
     static int indexFromSnap (unsigned short snap);
 
     // Time scale node declaration.
-    class Node : public LinkedList<Node>::Link
-    {
+    class Node : public LinkedList<Node>::Link {
     public:
         // Constructor.
         Node (TimeScale* timescale, uint64_t frame_ = 0, float tempo_ = 120.0f, unsigned short beattype_ = 2, unsigned short beats_per_bar_ = 4, unsigned short beat_divisor_ = 2)
@@ -207,8 +204,7 @@ public:
 
     // To optimize and keep track of current frame
     // position, mostly like an sequence cursor/iterator.
-    class Cursor
-    {
+    class Cursor {
     public:
         Cursor (TimeScale* scale) : ts (scale), node (0) {}
         TimeScale* timescale() const { return ts; }
@@ -428,8 +424,7 @@ public:
 
 #if 1
     // Location marker declaration.
-    class Marker : public LinkedList<Marker>::Link
-    {
+    class Marker : public LinkedList<Marker>::Link {
     public:
         // Constructor.
         Marker (uint64_t iFrame, unsigned short iBar, const std::string& sText, const std::string& rgbColor = std::string ("#545454"))
@@ -452,8 +447,7 @@ public:
 
     // To optimize and keep track of current frame
     // position, mostly like an sequence cursor/iterator.
-    class MarkerCursor
-    {
+    class MarkerCursor {
     public:
         // Constructor.
         MarkerCursor (TimeScale* tscale) : ts (tscale), marker (0) {}
@@ -500,14 +494,14 @@ protected:
     float frameRate() const { return mFrameRate; }
 
 private:
-    unsigned short mSnapPerBeat; ///< Snap per beat (divisor).
+    unsigned short mSnapPerBeat;    ///< Snap per beat (divisor).
     unsigned short mHorizontalZoom; ///< Horizontal zoom factor.
-    unsigned short mVerticalZoom; ///< Vertical zoom factor.
+    unsigned short mVerticalZoom;   ///< Vertical zoom factor.
 
     DisplayFormat mDisplayFmt; ///< Textual display format.
 
-    unsigned int mSampleRate; ///< Sample rate (frames per second)
-    unsigned short mTicksPerBeat; ///< Tticks per quarter note (PPQN)
+    unsigned int mSampleRate;      ///< Sample rate (frames per second)
+    unsigned short mTicksPerBeat;  ///< Tticks per quarter note (PPQN)
     unsigned short mPixelsPerBeat; ///< Pixels per beat (width).
 
     // Tempo-map node list.

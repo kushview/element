@@ -23,8 +23,7 @@ namespace element {
 
 /** A doubly linked list */
 template <class Node>
-class LinkedList
-{
+class LinkedList {
 public:
     LinkedList() {}
     ~LinkedList() { clear(); }
@@ -47,8 +46,7 @@ public:
     int find (Node* node) const;
 
     /** Base list node */
-    class Link
-    {
+    class Link {
     public:
         Link() : prevNode (nullptr),
                  nextNode (nullptr),
@@ -69,8 +67,7 @@ public:
         Node* nextFreeNode;
     };
 
-    class iterator
-    {
+    class iterator {
     public:
         inline iterator (LinkedList<Node>& list, Node* ptr) : nodes (list), nodePtr (ptr) {}
         inline iterator (const iterator& it) : nodes (it.nodes), nodePtr (it.nodePtr) {}
@@ -160,17 +157,14 @@ void LinkedList<Node>::insertAfter (Node* node, Node* previous)
         previous = lastNode;
 
     node->setPrevious (previous);
-    if (previous)
-    {
+    if (previous) {
         node->setNext (previous->next());
         if (previous->next())
             (previous->next())->setPrevious (node);
         else
             lastNode = node;
         previous->setNext (node);
-    }
-    else
-    {
+    } else {
         firstNode = lastNode = node;
         node->setNext (0);
     }
@@ -186,17 +180,14 @@ void LinkedList<Node>::insertBefore (Node* node, Node* next_node)
 
     node->setNext (next_node);
 
-    if (next_node)
-    {
+    if (next_node) {
         node->setPrevious (next_node->prev());
         if (next_node->prev())
             (next_node->prev())->setNext (node);
         else
             firstNode = node;
         next_node->setPrevious (node);
-    }
-    else
-    {
+    } else {
         lastNode = firstNode = node;
         node->setPrevious (0);
     }
@@ -227,8 +218,7 @@ void LinkedList<Node>::remove (Node* node)
     unlink (node);
 
     // Add it to the alternate free list.
-    if (scopedList)
-    {
+    if (scopedList) {
         Node* nextFree = freeList;
         node->setNextFree (nextFree);
         freeList = node;
@@ -241,15 +231,13 @@ void LinkedList<Node>::clear()
 {
     // Remove pending items.
     Node* last = lastNode;
-    while (last)
-    {
+    while (last) {
         remove (last);
         last = lastNode;
     }
 
     Node* free_list = freeList;
-    while (free_list)
-    {
+    while (free_list) {
         Node* nextFree = free_list->nextFree();
         delete free_list;
         free_list = nextFree;
@@ -270,17 +258,12 @@ Node* LinkedList<Node>::at (int index) const
     if (index < 0 || index >= numNodes)
         return 0;
 
-    if (index > (numNodes >> 1))
-    {
-        for (i = numNodes - 1, node = lastNode; node && i > index; --i, node = node->prev())
-        {
+    if (index > (numNodes >> 1)) {
+        for (i = numNodes - 1, node = lastNode; node && i > index; --i, node = node->prev()) {
             ;
         }
-    }
-    else
-    {
-        for (i = 0, node = firstNode; node && i < index; ++i, node = node->next())
-        {
+    } else {
+        for (i = 0, node = firstNode; node && i < index; ++i, node = node->next()) {
             ;
         }
     }
@@ -294,8 +277,7 @@ int LinkedList<Node>::find (Node* node) const
     int index = 0;
     Node* n = firstNode;
 
-    while (n)
-    {
+    while (n) {
         if (node == n)
             return index;
 

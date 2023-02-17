@@ -24,8 +24,7 @@
 
 namespace element {
 
-class DeviceManager : public juce::AudioDeviceManager
-{
+class DeviceManager : public juce::AudioDeviceManager {
 public:
     typedef juce::AudioDeviceManager::AudioDeviceSetup AudioSettings;
     static const int maxAudioChannels;
