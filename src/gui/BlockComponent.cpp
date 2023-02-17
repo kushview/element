@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
-#include "services/guiservice.hpp"
+#include <element/services.hpp>
+#include <element/services/guiservice.hpp>
 #include "gui/views/NodePortsTable.h"
 #include "gui/Artist.h"
 #include "gui/BlockComponent.h"
@@ -29,8 +29,9 @@
 #include "gui/NodeIOConfiguration.h"
 #include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
-#include "session/node.hpp"
-#include "context.hpp"
+#include "engine/midiengine.hpp"
+#include <element/node.hpp>
+#include <element/context.hpp>
 #include "scopedflag.hpp"
 
 namespace element {

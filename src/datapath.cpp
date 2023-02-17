@@ -17,7 +17,7 @@
 */
 
 #include "datapath.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 namespace DataPathHelpers {

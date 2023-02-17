@@ -18,18 +18,19 @@
 */
 
 #include "ElementApp.h"
-#include "services.hpp"
-#include "services/guiservice.hpp"
+
+#include <element/context.hpp>
+#include <element/devicemanager.hpp>
+#include <element/node.hpp>
+#include <element/pluginmanager.hpp>
+#include <element/services.hpp>
+#include <element/settings.hpp>
+
 #include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
-#include "session/devicemanager.hpp"
-#include "session/pluginmanager.hpp"
-#include "session/node.hpp"
-#include "context.hpp"
-#include "settings.hpp"
-
 #include "services/engineservice.hpp"
+#include <element/services/guiservice.hpp>
 
 namespace element {
 

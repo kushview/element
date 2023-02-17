@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "gui/views/EmptyContentView.h"
@@ -45,15 +45,17 @@
 #include "gui/TransportBar.h"
 #include "gui/NavigationConcertinaPanel.h"
 
-#include "session/devicemanager.hpp"
-#include "session/pluginmanager.hpp"
-#include "session/node.hpp"
+#include <element/devicemanager.hpp>
+#include <element/pluginmanager.hpp>
+#include <element/node.hpp>
 
 #include "commands.hpp"
-#include "context.hpp"
-#include "settings.hpp"
+#include <element/context.hpp>
+#include <element/settings.hpp>
 
 #include "gui/StandardContentComponent.h"
+
+#include "BinaryData.h"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0

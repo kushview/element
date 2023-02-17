@@ -20,16 +20,16 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "services.hpp"
-#include "services/guiservice.hpp"
+#include <element/services.hpp>
+#include <element/services/guiservice.hpp>
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
-#include "session/session.hpp"
-#include "session/node.hpp"
+#include <element/session.hpp>
+#include <element/node.hpp>
 
 #include "commands.hpp"
 #include "messages.hpp"
-#include "context.hpp"
-#include "settings.hpp"
+#include <element/context.hpp>
+#include <element/settings.hpp>

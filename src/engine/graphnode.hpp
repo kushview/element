@@ -20,10 +20,10 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "engine/velocitycurve.hpp"
-#include "arc.hpp"
-#include "signals.hpp"
+#include <element/arc.hpp>
+#include <element/signals.hpp>
 
 namespace element {
 

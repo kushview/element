@@ -21,7 +21,7 @@
 #include "scripting.hpp"
 #include "scripting/scriptmanager.hpp"
 #include "scripting/bindings.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 
 #ifndef EL_LUA_SPATH
 #define EL_LUA_SPATH ""

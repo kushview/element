@@ -19,13 +19,15 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "engine/nodeobject.hpp"
-#include "midichannels.hpp"
-#include "arc.hpp"
-#include "session/model.hpp"
+#include <element/nodeobject.hpp>
+#include <element/midichannels.hpp>
+#include <element/arc.hpp>
+#include <element/model.hpp>
 
 namespace element {
+
+// FIXME:
+using namespace juce;
 
 class GraphManager;
 class NodeArray;

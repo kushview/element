@@ -22,7 +22,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/widgets/ScriptEditorComponent.h"
 #include "scripting/scriptsource.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 

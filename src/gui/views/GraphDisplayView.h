@@ -22,6 +22,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
 #include "gui/widgets/BreadCrumbComponent.h"
+#include "session/commandmanager.hpp"
 
 namespace element {
 

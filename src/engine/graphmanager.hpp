@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "engine/graphnode.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 namespace element {
 

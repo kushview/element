@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "session/session.hpp"
+#include <element/session.hpp>
 
 namespace element {
 class SessionDocument : public FileBasedDocument,

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/graphservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
@@ -32,13 +32,13 @@
 #include "gui/TransportBar.h"
 #include "gui/ViewHelpers.h"
 
-#include "session/devicemanager.hpp"
-#include "session/node.hpp"
-#include "session/pluginmanager.hpp"
+#include <element/devicemanager.hpp>
+#include <element/node.hpp>
+#include <element/pluginmanager.hpp>
 
 #include "commands.hpp"
-#include "context.hpp"
-#include "settings.hpp"
+#include <element/context.hpp>
+#include <element/settings.hpp>
 
 #include "gui/ContentComponent.h"
 
@@ -56,20 +56,6 @@ ContentView::ContentView()
 
 ContentView::~ContentView()
 {
-}
-
-ContentComponent* ContentComponent::create (ServiceManager& controller)
-{
-    auto& s = controller.getGlobals().getSettings();
-
-    if (s.getMainContentType() == "workspace")
-        return new WorkspacesContentComponent (controller);
-    if (s.getMainContentType() == "standard")
-        return new StandardContentComponent (controller);
-    if (s.getMainContentType() == "compact")
-        return new StandardContentComponent (controller);
-
-    return new StandardContentComponent (controller);
 }
 
 void ContentView::paint (Graphics& g)
@@ -516,14 +502,6 @@ ContentComponent::ContentComponent (ServiceManager& ctl_)
     toolBarVisible = true;
     toolBarSize = 32;
 
-    // {
-    //     int w, h;
-    //     windowSizeProperty (settings, "mainWindowState", w, h, 760, 480);
-    //     setSize (w, h);
-    //     updateLayout();
-    //     resized();
-    // }
-
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
 
@@ -659,6 +637,16 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
 void ContentComponent::post (Message* message)
 {
     controller.postMessage (message);
+}
+
+void ContentComponent::setToolbarVisible (bool visible)
+{
+    if (toolBarVisible == visible)
+        return;
+    toolBarVisible = visible;
+    toolBar->setVisible (toolBarVisible);
+    resized();
+    refreshToolbar();
 }
 
 void ContentComponent::refreshToolbar()

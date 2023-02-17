@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/engineservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
-#include "session/session.hpp"
+#include <element/session.hpp>
 
 namespace element {
 

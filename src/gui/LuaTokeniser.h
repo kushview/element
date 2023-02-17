@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 namespace element {
 

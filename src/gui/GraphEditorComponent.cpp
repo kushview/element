@@ -35,9 +35,9 @@
 #include "gui/NodeIOConfiguration.h"
 #include "engine/nodes/BaseProcessor.h"
 
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
-#include "session/node.hpp"
+#include <element/node.hpp>
 
 #include "gui/GraphEditorComponent.h"
 

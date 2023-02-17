@@ -5,15 +5,15 @@
 #include "lua.hpp"
 #include "sol/sol.hpp"
 
-#include "JuceHeader.h"
+#include <element/juce/core.hpp>
 
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
 template <typename T>
-struct unique_usertype_traits<ReferenceCountedObjectPtr<T>>
+struct unique_usertype_traits<juce::ReferenceCountedObjectPtr<T>>
 {
     typedef T type;
-    typedef ReferenceCountedObjectPtr<T> actual_type;
+    typedef juce::ReferenceCountedObjectPtr<T> actual_type;
     static const bool value = true;
     static bool is_null (const actual_type& ptr) { return ptr == nullptr; }
     static type* get (const actual_type& ptr) { return ptr.get(); }

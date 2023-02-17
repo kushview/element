@@ -20,9 +20,9 @@
 #pragma once
 
 #include "sol/sol.hpp"
-#include "engine/parameter.hpp"
+#include <element/parameter.hpp>
 #include "scripting/scriptinstance.hpp"
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 namespace element {
 

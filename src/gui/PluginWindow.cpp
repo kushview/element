@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services/guiservice.hpp"
-#include "engine/nodeobject.hpp"
+#include <element/services/guiservice.hpp>
+#include <element/nodeobject.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"

@@ -26,6 +26,7 @@
 #include "plugineditor.hpp"
 #include "pluginprocessor.hpp"
 #include "ElementApp.h"
+#include "session/commandmanager.hpp"
 
 #define EL_PLUGIN_MIN_WIDTH 546
 #define EL_PLUGIN_MIN_HEIGHT 266

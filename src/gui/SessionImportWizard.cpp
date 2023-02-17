@@ -19,7 +19,7 @@
 
 #include "gui/SessionImportWizard.h"
 #include "gui/GuiCommon.h"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

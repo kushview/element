@@ -27,8 +27,8 @@
 
 #include "ElementApp.h"
 #include "engine/nodes/ScriptNode.h"
-#include "engine/midipipe.hpp"
-#include "engine/parameter.hpp"
+#include <element/midipipe.hpp>
+#include <element/parameter.hpp>
 #include "scripting/bindings.hpp"
 #include "scripting/dspscript.hpp"
 #include "scripting/script.hpp"
@@ -37,7 +37,7 @@
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
 
-static const String initScript =
+static const juce::String initScript =
     R"(
 require ('el.AudioBuffer')
 require ('el.MidiBuffer')

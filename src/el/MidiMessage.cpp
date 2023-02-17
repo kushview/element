@@ -2,7 +2,9 @@
 // @classmod el.MidiMessage
 // @pragma nostrip
 
-#include "element/element.h"
+#include <element/element.h>
+#include <element/juce/audio_basics.hpp>
+
 #include "sol_helpers.hpp"
 #include "packed.h"
 

@@ -17,7 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "model.hpp"
+#include <element/model.hpp>
+
+using namespace juce;
 
 namespace element {
 

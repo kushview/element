@@ -18,7 +18,7 @@
 */
 
 #include "el/factories.hpp"
-#include "engine/midipipe.hpp"
+#include <element/midipipe.hpp>
 #include "scripting/dspscript.hpp"
 
 using namespace element;

@@ -18,15 +18,15 @@
 */
 
 #include "services/engineservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/deviceservice.hpp"
-#include "engine/internalformat.hpp"
-#include "session/pluginmanager.hpp"
-#include "session/session.hpp"
+#include <element/juce/internalformat.hpp>
+#include <element/pluginmanager.hpp>
+#include <element/session.hpp>
 #include "ElementApp.h"
-#include "settings.hpp"
+#include <element/settings.hpp>
 
 #include "pluginprocessor.hpp"
 #include "plugineditor.hpp"
@@ -403,7 +403,7 @@ void PluginProcessor::initialize()
     engine->applySettings (settings);
 
     plugins.addDefaultFormats();
-    plugins.addFormat (new InternalFormat (*engine, world->getMidiEngine()));
+    plugins.addFormat (new InternalFormat (*world));
     plugins.addFormat (new ElementAudioPluginFormat (*world));
     plugins.restoreUserPlugins (settings);
 

@@ -20,11 +20,11 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/LookAndFeel.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "utils.hpp"
 
 namespace element {

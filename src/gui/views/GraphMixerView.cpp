@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/views/GraphMixerView.h"
 #include "gui/views/GraphMixerView.h"

@@ -17,14 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/shuttle.hpp"
+#include <element/shuttle.hpp>
 #include "tempo.hpp"
 
 namespace element {
 
-const int32 Shuttle::PPQ = 1920;
+const int Shuttle::PPQ = 1920;
 
-double Shuttle::scaledTick (double sourceTick, const int32 srcPpq)
+double Shuttle::scaledTick (double sourceTick, const int srcPpq)
 {
     if (srcPpq == Shuttle::PPQ || srcPpq <= 0)
         return sourceTick;
@@ -104,14 +104,14 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> Shuttle::getPosition() const
 }
 
 const double Shuttle::getLengthBeats() const { return getLengthSeconds() * (getTempo() / 60.0f); }
-const int64 Shuttle::getLengthFrames() const { return duration; }
+const int64_t Shuttle::getLengthFrames() const { return duration; }
 const double Shuttle::getLengthSeconds() const { return (double) duration / (double) ts.getSampleRate(); }
 
 const double Shuttle::getPositionBeats() const { return getPositionSeconds() * (getTempo() / 60.0f); }
-const int64 Shuttle::getPositionFrames() const { return framePos; }
+const int64_t Shuttle::getPositionFrames() const { return framePos; }
 const double Shuttle::getPositionSeconds() const { return (double) framePos / (double) ts.getSampleRate(); }
 
-int64 Shuttle::getRemainingFrames() const { return getLengthFrames() - framePos; }
+int64_t Shuttle::getRemainingFrames() const { return getLengthFrames() - framePos; }
 double Shuttle::getSampleRate() const { return (double) ts.getSampleRate(); }
 float Shuttle::getTempo() const { return ts.getTempo(); }
 const TimeScale& Shuttle::getTimeScale() const { return ts; }
@@ -127,7 +127,7 @@ void Shuttle::resetRecording()
 
 void Shuttle::setLengthBeats (const float beats) { setLengthFrames (framesPerBeat * beats); }
 void Shuttle::setLengthSeconds (const double seconds) { setLengthFrames (juce::roundToInt (getSampleRate() * seconds)); }
-void Shuttle::setLengthFrames (const uint32 df) { duration = df; }
+void Shuttle::setLengthFrames (const uint32_t df) { duration = df; }
 
 void Shuttle::setTempo (float bpm)
 {
@@ -142,7 +142,7 @@ void Shuttle::setTempo (float bpm)
 
         beatsPerFrame = 1.0f / framesPerBeat;
         framePos = llrint (oldTime * framesPerBeat);
-        duration = (uint32) llrint (oldLen * framesPerBeat);
+        duration = (uint32_t) llrint (oldLen * framesPerBeat);
     }
 }
 
@@ -157,7 +157,7 @@ void Shuttle::setSampleRate (double rate)
     ts.updateScale();
 
     framePos = llrint (oldTime * ts.getSampleRate());
-    duration = (uint32) (oldLenSec * (float) ts.getSampleRate());
+    duration = (uint32_t) (oldLenSec * (float) ts.getSampleRate());
     framesPerBeat = Tempo::audioFramesPerBeat (ts.getSampleRate(), ts.getTempo());
     beatsPerFrame = 1.0f / framesPerBeat;
 }

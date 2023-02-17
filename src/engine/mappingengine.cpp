@@ -17,11 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
-#include "session/controllerdevice.hpp"
-#include "session/node.hpp"
+#include <element/controllerdevice.hpp>
+#include <element/node.hpp>
 
 namespace element {
 

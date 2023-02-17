@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "documents/sessiondocument.hpp"
-#include "session/session.hpp"
-#include "signals.hpp"
+#include <element/session.hpp>
+#include <element/signals.hpp>
 
 namespace element {
 class SessionService : public Service

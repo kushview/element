@@ -19,8 +19,8 @@
 
 #include "ElementApp.h"
 
-#include "services.hpp"
-#include "services/guiservice.hpp"
+#include <element/services.hpp>
+#include <element/services/guiservice.hpp>
 #include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"
 #include "engine/graphnode.hpp"
@@ -34,8 +34,8 @@
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
 #include "gui/NodeEditorFactory.h"
-#include "session/devicemanager.hpp"
-#include "context.hpp"
+#include <element/devicemanager.hpp>
+#include <element/context.hpp>
 
 namespace element {
 

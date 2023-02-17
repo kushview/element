@@ -19,15 +19,16 @@
 
 #pragma once
 
-#include "JuceHeader.h"
-#include "session/controllerdevice.hpp"
-#include "signals.hpp"
+#include <element/juce.hpp>
+#include <element/controllerdevice.hpp>
+#include <element/signals.hpp>
 
 namespace element {
 
 class ControllerMapHandler;
 class ControllerMapInput;
 class NodeObject;
+class Node;
 class MidiEngine;
 
 class MappingEngine

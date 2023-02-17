@@ -19,9 +19,11 @@
 
 #pragma once
 
-#include "JuceHeader.h"
-#include "engine/nodeobject.hpp"
-#include "session/node.hpp"
+#include <element/juce.hpp>
+#include <element/nodeobject.hpp>
+#include <element/node.hpp>
+
+#include "gui/LookAndFeel.h"
 
 #define EL_NODE_EDITOR_DEFAULT_ID "el.DefaultNodeEditor"
 

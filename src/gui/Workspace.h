@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 #include "gui/Dock.h"
-#include "session/model.hpp"
+#include <element/model.hpp>
 
 #define EL_WORKSPACE_CLASSIC "Classic"
 #define EL_WORKSPACE_EDITING "Editing"

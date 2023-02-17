@@ -29,13 +29,14 @@ endif
 
 subdir ('libs/lua')
 subdir ('libs/compat')
+subdir ('include/element/juce')
 subdir ('scripts')
 subdir ('src')
 
 ###############################################################################
 # Element Application
 element_app_link_args = []
-element_app_deps = deps
+element_app_deps = [ deps, juce_dep ]
 element_app_sources = [ 'src/main.cpp' ]
 
 if host_machine.system() == 'windows'

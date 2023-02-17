@@ -19,6 +19,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/views/SessionSettingsView.h"
+#include "session/commandmanager.hpp"
 
 namespace element {
 typedef Array<PropertyComponent*> PropertyArray;

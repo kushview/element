@@ -2,6 +2,7 @@
 // @classmod el.MouseEvent
 // @pragma nostrip
 
+#include <element/juce/gui_basics.hpp>
 #include <element/element.h>
 #include "sol_helpers.hpp"
 

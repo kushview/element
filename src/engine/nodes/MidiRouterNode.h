@@ -20,7 +20,7 @@
 #pragma once
 
 #include "engine/nodes/NodeTypes.h"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "engine/linearfade.hpp"
 #include "engine/togglegrid.hpp"
 

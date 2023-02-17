@@ -17,13 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "gui/Buttons.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
-#include "session/controllerdevice.hpp"
+#include <element/controllerdevice.hpp>
 #include "messages.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
+#include "engine/midiengine.hpp"
 
 namespace element {
 

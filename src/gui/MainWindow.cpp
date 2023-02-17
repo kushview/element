@@ -18,15 +18,15 @@
 */
 
 #include "services/graphservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
 #include "session/commandmanager.hpp"
 #include "commands.hpp"
-#include "context.hpp"
-#include "settings.hpp"
+#include <element/context.hpp>
+#include <element/settings.hpp>
 #include "utils.hpp"
 
 namespace element {

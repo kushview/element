@@ -16,10 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "scripting.hpp"
 #include "gui/views/LuaConsoleView.h"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

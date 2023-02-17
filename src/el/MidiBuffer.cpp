@@ -9,7 +9,7 @@
 #include "bytes.h"
 #include "packed.h"
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 #define EL_MT_MIDI_BUFFER_TYPE "kv.MidiBufferClass"
 

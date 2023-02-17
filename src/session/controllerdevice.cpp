@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "session/controllerdevice.hpp"
+#include <element/controllerdevice.hpp>
 
 namespace element {
 

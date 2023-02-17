@@ -17,18 +17,18 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
-#include "services/guiservice.hpp"
+#include <element/services.hpp>
+#include <element/services/guiservice.hpp>
 #include "engine/graphmanager.hpp"
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/ViewHelpers.h"
-#include "session/node.hpp"
+#include <element/node.hpp>
 #include "session/commandmanager.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 #include "messages.hpp"
 
 #include "plugins/plugineditor.hpp"

@@ -17,8 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/settings.hpp>
+#include <element/tags.hpp>
+
 #include "engine/midiengine.hpp"
-#include "settings.hpp"
 
 namespace element {
 

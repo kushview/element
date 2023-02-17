@@ -4,6 +4,8 @@
 // @pragma nostrip
 
 #include <element/element.h>
+#include <element/juce/graphics.hpp>
+
 #include "sol_helpers.hpp"
 #define LKV_TYPE_NAME_POINT "Point"
 

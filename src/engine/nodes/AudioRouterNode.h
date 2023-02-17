@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 #include "engine/linearfade.hpp"
 #include "engine/togglegrid.hpp"
 #include "engine/nodes/BaseProcessor.h"

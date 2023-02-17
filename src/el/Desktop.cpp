@@ -4,6 +4,8 @@
 // @pragma nostrip
 
 #include <element/element.hpp>
+#include <element/juce/gui_basics.hpp>
+
 #include "sol_helpers.hpp"
 
 #define LKV_TYPE_NAME_DESKTOP "Desktop"

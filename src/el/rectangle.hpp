@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <element/juce/graphics.hpp>
+
 #include "sol_helpers.hpp"
 
 namespace element {

@@ -2,7 +2,7 @@
 
 #include "element/element.h"
 #include "sol_helpers.hpp"
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 namespace element {
 namespace lua {

@@ -18,8 +18,8 @@
 */
 
 #include "engine/nodes/BaseProcessor.h" // for internal id macros
-#include "session/node.hpp"
-#include "session/session.hpp"
+#include <element/node.hpp>
+#include <element/session.hpp>
 #include "engine/graphmanager.hpp"
 #include "scopedflag.hpp"
 

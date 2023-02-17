@@ -23,8 +23,7 @@
             "includePath": [
                 "${workspaceRoot}/build/libs/compat/*",
                 "${workspaceRoot}/libs/lua/*",
-                "${workspaceRoot}/libs/JUCE/modules/*",
-                "${workspaceRoot}/libs/kv/modules/*",
+                "${workspaceRoot}/subprojects/juce/modules/*",
                 "${workspaceRoot}/libs/compat/*",
                 "${workspaceRoot}/src/*",
                 "${workspaceRoot}/test/*",

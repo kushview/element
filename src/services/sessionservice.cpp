@@ -17,19 +17,19 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/engineservice.hpp"
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/presetservice.hpp"
 #include "services/sessionservice.hpp"
 
 #include "gui/ContentComponent.h"
 
-#include "session/node.hpp"
-#include "context.hpp"
-#include "settings.hpp"
+#include <element/node.hpp>
+#include <element/context.hpp>
+#include <element/settings.hpp>
 
 namespace element {
 

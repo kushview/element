@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "session/pluginmanager.hpp"
+#include <element/pluginmanager.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/views/PluginsPanelView.h"
 

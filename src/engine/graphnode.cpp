@@ -20,12 +20,12 @@
 #include "engine/graphbuilder.hpp"
 #include "engine/ionode.hpp"
 #include "engine/nodes/AudioProcessorNode.h"
-#include "engine/audioengine.hpp"
-#include "engine/midipipe.hpp"
+#include <element/audioengine.hpp>
+#include <element/midipipe.hpp>
 #include "engine/miditranspose.hpp"
 #include "engine/nodes/NodeTypes.h"
-#include "session/node.hpp"
-#include "portcount.hpp"
+#include <element/node.hpp>
+#include <element/portcount.hpp>
 
 #include "engine/graphnode.hpp"
 

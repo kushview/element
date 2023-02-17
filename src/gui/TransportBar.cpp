@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/TransportBar.h"
 

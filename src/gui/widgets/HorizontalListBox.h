@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 
 /**
     A horizontal list of items that can be scrolled vertically.

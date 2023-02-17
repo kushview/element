@@ -20,10 +20,10 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "services/guiservice.hpp"
-#include "engine/nodeobject.hpp"
+#include <element/services/guiservice.hpp>
+#include <element/nodeobject.hpp>
 #include "gui/ChannelStripComponent.h"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

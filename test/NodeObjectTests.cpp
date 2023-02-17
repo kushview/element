@@ -2,7 +2,7 @@
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
 #include "engine/ionode.hpp"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 
 using namespace element;
 

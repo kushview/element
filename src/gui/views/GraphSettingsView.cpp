@@ -17,13 +17,18 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
+#include <element/services.hpp>
+
 #include "services/engineservice.hpp"
+#include "session/commandmanager.hpp"
+
 #include "engine/rootgraph.hpp"
 #include "engine/velocitycurve.hpp"
+
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"
+
 #include "scopedflag.hpp"
 
 namespace element {

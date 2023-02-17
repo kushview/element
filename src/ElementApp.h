@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include <element/juce.hpp>
 #include "datapath.hpp"
-#include "porttype.hpp"
-#include "signals.hpp"
-#include "tags.hpp"
+#include <element/porttype.hpp>
+#include <element/signals.hpp>
 
 #include <element/element.hpp>
+#include <element/tags.hpp>
 
 namespace element {
 

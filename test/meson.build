@@ -12,7 +12,9 @@ test_element_sources = '''
     scripting/ScriptDescriptionTests.cpp
     scripting/ScriptManagerTests.cpp
 '''.split()
-test_element_cpp_args = []
+test_element_cpp_args = [
+    '-DEL_TEST_SOURCE_ROOT="@0@"'.format (meson.project_source_root())
+]
 
 if cpp.get_argument_syntax() == 'gcc'
     test_element_cpp_args += [ '-Wno-unused-function', '-Wno-unused-variable' ]
@@ -21,7 +23,7 @@ endif
 test_element_app = executable ('test_element', 
     test_element_sources,
     include_directories : [ '.', libelement_includes ],
-    dependencies : element_app_deps,
+    dependencies : [ element_app_deps, juce_dep ],
     link_with : [ libelement ],
     gnu_symbol_visibility : 'hidden',
     cpp_args : test_element_cpp_args,

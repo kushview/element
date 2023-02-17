@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 #include "ElementApp.h"
-#include "services.hpp"
+#include <element/services.hpp>
 #include "services/sessionservice.hpp"
 
-#include "engine/audioengine.hpp"
+#include <element/audioengine.hpp>
 #include "engine/mappingengine.hpp"
-#include "engine/internalformat.hpp"
+#include <element/juce/internalformat.hpp>
 #include "engine/LinearFade.h"
 #include "engine/velocitycurve.hpp"
 #include "engine/ToggleGrid.h"
@@ -70,7 +70,7 @@ protected:
         world->setEngine (new AudioEngine (*world));
         world->getPluginManager().addDefaultFormats();
         world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
-        world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine(), world->getMidiEngine()));
+        world->getPluginManager().addFormat (new InternalFormat (*world));
         app.reset (new ServiceManager (*world));
         app->activate();
         auto& settings = getWorld().getSettings();

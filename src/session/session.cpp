@@ -17,13 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/internalformat.hpp"
-#include "engine/transport.hpp"
+#include <element/juce/internalformat.hpp>
+#include <element/transport.hpp>
 
-#include "session/node.hpp"
-#include "session/session.hpp"
+#include <element/node.hpp>
+#include <element/session.hpp>
 
-#include "context.hpp"
+#include <element/context.hpp>
 #include "tempo.hpp"
 
 namespace element {

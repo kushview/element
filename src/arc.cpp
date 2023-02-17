@@ -17,11 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "arc.hpp"
+#include <element/arc.hpp>
 
 namespace element {
 
-Arc::Arc (uint32 sn, uint32 sp, uint32 dn, uint32 dp) noexcept
+Arc::Arc (uint32_t sn, uint32_t sp, uint32_t dn, uint32_t dp) noexcept
     : sourceNode (sn), sourcePort (sp), destNode (dn), destPort (dp)
 {
 }

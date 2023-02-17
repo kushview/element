@@ -20,7 +20,7 @@
 #pragma once
 
 #include "engine/nodes/BaseProcessor.h"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 
 namespace element {
 

@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include "engine/midipipe.hpp"
+#include <element/midipipe.hpp>
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiFilterNode.h"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

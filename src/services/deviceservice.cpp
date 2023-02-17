@@ -20,8 +20,8 @@
 #include "services/deviceservice.hpp"
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
-#include "session/session.hpp"
-#include "context.hpp"
+#include <element/session.hpp>
+#include <element/context.hpp>
 
 namespace element {
 

@@ -24,7 +24,7 @@
 #include "gui/PatchMatrixComponent.h"
 
 #include "matrixstate.hpp"
-#include "signals.hpp"
+#include <element/signals.hpp>
 
 namespace element {
 

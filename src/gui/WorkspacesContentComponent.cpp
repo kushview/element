@@ -17,19 +17,20 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
-#include "services/guiservice.hpp"
+#include <element/services.hpp>
+#include <element/services/guiservice.hpp>
 #include "gui/DockPanel.h"
 #include "gui/WorkspacesContentComponent.h"
 #include "gui/workspace/PanelTypes.h"
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
-#include "context.hpp"
+#include <element/context.hpp>
 
 #include "messages.hpp"
-#include "settings.hpp"
+#include <element/settings.hpp>
 #include "BinaryData.h"
+#include "commands.hpp"
 
 namespace element {
 

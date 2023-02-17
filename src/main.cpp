@@ -17,110 +17,42 @@
 */
 
 #include "ElementApp.h"
-#include "services.hpp"
-#include "services/graphservice.hpp"
-#include "services/sessionservice.hpp"
-#include "engine/internalformat.hpp"
+#include <element/services.hpp>
+
+#include <element/juce/internalformat.hpp>
+
+#include <element/context.hpp>
+#include <element/devicemanager.hpp>
+#include <element/pluginmanager.hpp>
+#include <element/settings.hpp>
+
+#include "session/commandmanager.hpp"
+#include "engine/midiengine.hpp"
 #include "scripting.hpp"
-#include "session/devicemanager.hpp"
-#include "session/pluginmanager.hpp"
 #include "commands.hpp"
 #include "datapath.hpp"
-#include "context.hpp"
+#include "services/graphservice.hpp"
+#include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"
 #include "version.hpp"
-#include "settings.hpp"
 #include "utils.hpp"
 #include "slaveprocess.hpp"
 
 namespace element {
 
-class Startup : public ActionBroadcaster,
-                private Thread
+class Startup : public ActionBroadcaster
 {
 public:
-    Startup (Context& w, const bool useThread = false, const bool splash = false)
-        : Thread ("ElementStartup"),
-          world (w),
-          usingThread (useThread),
-          showSplash (splash),
-          isFirstRun (false)
-    {
-    }
-
+    Startup (Context& w)
+        : world (w), isFirstRun (false) {}
     ~Startup() {}
 
     void launchApplication()
     {
         Settings& settings (world.getSettings());
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
-        DataPath path;
-        ignoreUnused (path);
 
-        updateSettingsIfNeeded();
-
-        if (usingThread)
-        {
-            startThread();
-            while (isThreadRunning())
-                MessageManager::getInstance()->runDispatchLoopUntil (30);
-        }
-        else
-        {
-            if (showSplash)
-                (new StartupScreen())->deleteAfterDelay (RelativeTime::seconds (5), true);
-            this->run();
-        }
-    }
-
-    const bool isUsingThread() const { return usingThread; }
-
-private:
-    friend class Application;
-    Context& world;
-    const bool usingThread;
-    const bool showSplash;
-    bool isFirstRun;
-
-    class StartupScreen : public SplashScreen
-    {
-    public:
-        StartupScreen()
-            : SplashScreen ("Element", 600, 400, true)
-        {
-            addAndMakeVisible (text);
-            text.setText ("Loading Application", dontSendNotification);
-            text.setSize (600, 400);
-            text.setFont (Font (24.0f));
-            text.setJustificationType (Justification::centred);
-            text.setColour (Label::textColourId, Colours::white);
-        }
-
-        void resized() override
-        {
-            SplashScreen::resized();
-            text.setBounds (getLocalBounds());
-        }
-
-        void paint (Graphics& g) override
-        {
-            SplashScreen::paint (g);
-            g.fillAll (Colours::aliceblue);
-        }
-
-    private:
-        Label text;
-    };
-
-    void updateSettingsIfNeeded()
-    {
-        Settings& settings (world.getSettings());
-        ignoreUnused (settings);
-    }
-
-    void run() override
-    {
         setupLogging();
         setupKeyMappings();
         setupAudioEngine();
@@ -130,6 +62,11 @@ private:
 
         sendActionMessage ("finishedLaunching");
     }
+
+private:
+    friend class Application;
+    Context& world;
+    bool isFirstRun;
 
     void setupAudioEngine()
     {
@@ -173,7 +110,7 @@ private:
         if (props && keymp)
         {
             std::unique_ptr<XmlElement> xml;
-            xml = props->getXmlValue ("keymappings");
+            xml = props->getXmlValue (Settings::keymappingsKey);
             if (xml != nullptr)
                 world.getCommandManager().getKeyMappings()->restoreFromXml (*xml);
             xml = nullptr;
@@ -187,7 +124,7 @@ private:
         auto engine (world.getAudioEngine());
 
         plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (*engine, world.getMidiEngine()));
+        plugins.addFormat (new InternalFormat (world));
         plugins.addFormat (new ElementAudioPluginFormat (world));
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
@@ -262,9 +199,9 @@ public:
         midi.writeSettings (settings);
 
         if (auto el = world->getDeviceManager().createStateXml())
-            props->setValue ("devices", el.get());
+            props->setValue (Settings::devicesKey, el.get());
         if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
-            props->setValue ("keymappings", keymappings.get());
+            props->setValue (Settings::keymappingsKey, keymappings.get());
 
         engine = nullptr;
         Logger::setCurrentLogger (nullptr);
@@ -444,7 +381,7 @@ private:
         if (startup != nullptr)
             return;
 
-        startup = std::make_unique<Startup> (*world, false, false);
+        startup = std::make_unique<Startup> (*world);
         startup->addActionListener (this);
         startup->launchApplication();
     }

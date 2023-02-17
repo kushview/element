@@ -1,7 +1,7 @@
 
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "engine/nodes/NodeTypes.h"
-#include "engine/nodeobject.hpp"
+#include <element/nodeobject.hpp>
 
 #include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"
@@ -17,7 +17,7 @@
 
 #include "gui/NodeEditorFactory.h"
 #include "scripting.hpp"
-#include "context.hpp"
+#include <element/context.hpp>
 
 namespace element {
 

@@ -20,15 +20,15 @@
 #include "services/deviceservice.hpp"
 #include "services/engineservice.hpp"
 #include "services/graphservice.hpp"
-#include "services/guiservice.hpp"
+#include <element/services/guiservice.hpp>
 #include "services/mappingservice.hpp"
 #include "services/presetservice.hpp"
 #include "gui/ContentComponent.h"
 #include "gui/SessionImportWizard.h"
-#include "session/session.hpp"
+#include <element/session.hpp>
 #include "datapath.hpp"
-#include "context.hpp"
-#include "settings.hpp"
+#include <element/context.hpp>
+#include <element/settings.hpp>
 
 namespace element {
 

@@ -17,14 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services.hpp"
-#include "services/guiservice.hpp"
+#include <element/services.hpp>
+#include <element/services/guiservice.hpp>
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"
-#include "session/session.hpp"
-#include "context.hpp"
-#include "signals.hpp"
+#include <element/session.hpp>
+#include <element/context.hpp>
+#include <element/signals.hpp>
 
 namespace element {
 

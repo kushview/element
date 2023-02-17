@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include <element/juce.hpp>
 #include "gui/ContentComponent.h"
 
 namespace element {

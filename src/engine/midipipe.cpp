@@ -26,7 +26,7 @@
 #include <element/lua.hpp>
 #include "el/midi_buffer.hpp"
 #include "el/factories.hpp"
-#include "engine/midipipe.hpp"
+#include <element/midipipe.hpp>
 
 namespace element {
 
@@ -187,7 +187,7 @@ int LuaMidiPipe::clear (lua_State* L)
 static int midipipe_new (lua_State* L)
 {
     lua_Integer nbufs = (lua_gettop (L) > 1 && lua_isinteger (L, 2))
-                            ? jmax (lua_Integer(), lua_tointeger (L, 2))
+                            ? std::max (lua_Integer(), lua_tointeger (L, 2))
                             : 0;
     element::LuaMidiPipe::create (L, static_cast<int> (nbufs));
     return 1;
@@ -197,7 +197,7 @@ static int midipipe_gc (lua_State* L)
 {
     auto** pipe = (element::LuaMidiPipe**) lua_touserdata (L, 1);
     if (nullptr != *pipe)
-        deleteAndZero (*pipe);
+        juce::deleteAndZero (*pipe);
     return 0;
 }
 
