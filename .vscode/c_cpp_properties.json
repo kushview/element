@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "OSX",
-            "intelliSenseMode": "macos-clang",
+            "intelliSenseMode": "${default}",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "defines": [
@@ -15,7 +15,8 @@
                 "KV_JACK_AUDIO=1",
                 "HAVE_PYTHON=1",
                 "EL_USE_LOCAL_AUTH=1",
-                "EL_PRO=1"
+                "EL_PRO=1",
+                "BOOST_ALL_NO_LIB"
             ],
             "forcedInclude": [
                 "${workspaceFolder}/.vscode/vscode.h"
