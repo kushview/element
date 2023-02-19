@@ -46,6 +46,7 @@ endif
 juce_conf_data.set10 ('JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED', true)
 juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
 juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
+juce_conf_data.set10 ('JUCE_DISABLE_JUCE_VERSION_PRINTING', true)
 juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
 
 juce_asio_includes = []
