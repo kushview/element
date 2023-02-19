@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "OSX",
-            "intelliSenseMode": "macos-clang-x64",
+            "intelliSenseMode": "macos-clang",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "defines": [
@@ -18,16 +18,20 @@
                 "EL_PRO=1"
             ],
             "forcedInclude": [
-                "${workspaceRoot}/.vscode/vscode.h"
+                "${workspaceFolder}/.vscode/vscode.h"
             ],
             "includePath": [
-                "${workspaceRoot}/build/libs/compat/*",
-                "${workspaceRoot}/libs/lua/*",
-                "${workspaceRoot}/subprojects/juce/modules/*",
-                "${workspaceRoot}/libs/compat/*",
-                "${workspaceRoot}/src/*",
-                "${workspaceRoot}/test/*",
-                "/opt/kushview/include/*",
+                "${workspaceFolder}/subprojects/juce/modules/*",
+                "${workspaceFolder}/build/libs/compat/*",
+                "${workspaceFolder}/build/include/*",
+                "${workspaceFolder}/libs/lua/src/*",
+                "${workspaceFolder}/libs/sol/*",                
+                "${workspaceFolder}/libs/compat/*",
+                "${workspaceFolder}/include/*",
+                "${workspaceFolder}/src/*",
+                "${workspaceFolder}/test/*",
+                "/opt/homebrew/include/*",
+                "/usr/local/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"

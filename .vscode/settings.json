@@ -91,10 +91,13 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "__mutex_base": "cpp",
+        "__threading_support": "cpp"
     },
     "C_Cpp.intelliSenseMemoryLimit": 1024,
     "mesonbuild.buildFolder": "build",
     
-    "jenkins.pipeline.linter.connector.url": "https://ci.lvtk.org/pipeline-model-converter/validate"
+    "jenkins.pipeline.linter.connector.url": "https://ci.lvtk.org/pipeline-model-converter/validate",
+    "mesonbuild.configureOnOpen": false
 }
