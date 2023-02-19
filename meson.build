@@ -27,9 +27,12 @@ if not cpp.check_header ('filesystem', required : false)
     endif
 endif
 
+element_includes = include_directories ('include')
+
 subdir ('libs/lua')
 subdir ('libs/compat')
 subdir ('include/element/juce')
+subdir ('tools')
 subdir ('scripts')
 subdir ('src')
 
