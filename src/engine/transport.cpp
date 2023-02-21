@@ -112,7 +112,7 @@ void Transport::requestMeter (int beatsPerBar, int beatDivisor)
     nextBeatDivisor.set (beatDivisor);
 }
 
-void Transport::requestAudioFrame (const int64 frame)
+void Transport::requestAudioFrame (const int64_t frame)
 {
     seekFrame.set (frame);
     seekWanted.set (true);
