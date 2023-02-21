@@ -3,18 +3,6 @@
 pipeline {
     agent none
     
-    post {
-        failure {
-            updateGitlabCommitStatus name: 'build_linux64', state: 'failed'
-        }
-        success {
-            updateGitlabCommitStatus name: 'build_linux64', state: 'success'
-        }
-        aborted {
-            updateGitlabCommitStatus name: 'build_linux64', state: 'canceled'
-        }
-    }
-
     options {
         gitLabConnection ('LVTK-GitLab')
         gitlabBuilds (builds: [ 
@@ -40,6 +28,11 @@ pipeline {
                 sh 'sh tools/lindeploy/jenkins.sh'
                 updateGitlabCommitStatus name: 'build_linux64', state: 'success'
             }
+            post {
+                failure { updateGitlabCommitStatus name: 'build_linux64', state: 'failed' }
+                success { updateGitlabCommitStatus name: 'build_linux64', state: 'success' }
+                aborted { updateGitlabCommitStatus name: 'build_linux64', state: 'canceled' }
+            }
         }
 
         stage('test_linux64') {
@@ -52,6 +45,11 @@ pipeline {
                 echo "Testing..."
                 updateGitlabCommitStatus name: 'test_linux64', state: 'success'
             }
+            post {
+                failure { updateGitlabCommitStatus name: 'test_linux64', state: 'failed' }
+                success { updateGitlabCommitStatus name: 'test_linux64', state: 'success' }
+                aborted { updateGitlabCommitStatus name: 'test_linux64', state: 'canceled' }
+            }
         }
 
         stage('deploy_linux64') {
@@ -63,6 +61,11 @@ pipeline {
                 updateGitlabCommitStatus name: 'deploy_linux64', state: 'running'
                 echo "Deploying..."
                 updateGitlabCommitStatus name: 'deploy_linux64', state: 'success'
+            }
+            post {
+                failure { updateGitlabCommitStatus name: 'deploy_linux64', state: 'failed' }
+                success { updateGitlabCommitStatus name: 'deploy_linux64', state: 'success' }
+                aborted { updateGitlabCommitStatus name: 'deploy_linux64', state: 'canceled' }
             }
         }
     }

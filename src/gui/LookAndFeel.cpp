@@ -22,6 +22,8 @@
 #include "gui/widgets/MidiBlinker.h"
 #include "gui/Dock.h"
 
+#include "BinaryData.h"
+
 namespace element {
 
 LookAndFeel::LookAndFeel()
