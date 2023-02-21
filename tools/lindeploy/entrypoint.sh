@@ -16,7 +16,7 @@ builddir="build-docker"
 
 rm -rf build-docker
 meson subprojects download
-meson subprojects update
+meson subprojects update --reset
 
 set -e
 meson setup -Dbuildtype=release $nativefiles $builddir
