@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds a Linux AppImage
 
-set -e
+
 
 export CC=clang
 export CFLAGS="-DEL_APPIMAGE=1"
@@ -15,6 +15,10 @@ nativefiles="--native-file=tools/machine/linux.ini"
 builddir="build-docker"
 
 rm -rf build-docker
+meson subprojects download
+meson subprojects update
+
+set -e
 meson setup -Dbuildtype=release $nativefiles $builddir
 meson compile -C $builddir
 meson test -C $builddir
