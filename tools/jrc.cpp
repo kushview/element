@@ -56,7 +56,8 @@ static int addFile (const File& file,
     //           << (int) mb.getSize() << " bytes" << std::endl;
 
     headerStream << "    extern const char*  " << name << ";\r\n"
-                    "    const int           " << name << "Size = "
+                                                          "    const int           "
+                 << name << "Size = "
                  << (int) mb.getSize() << ";\r\n\r\n";
 
     static int tempNum = 0;
@@ -66,8 +67,7 @@ static int addFile (const File& file,
     size_t i = 0;
     const uint8* const data = (const uint8*) mb.getData();
 
-    while (i < mb.getSize() - 1)
-    {
+    while (i < mb.getSize() - 1) {
         if ((i % 40) != 39)
             cppStream << (int) data[i] << ",";
         else
@@ -99,27 +99,24 @@ static bool isHiddenFile (const File& f, const File& root)
 int main (int argc, char* argv[])
 {
     if (argc < 3) {
-        std::cout << 
-" Usage: jrc  <input> <output> <namespace>\n\n"
-" jrc will encode the <input> file as two files called (inputfile).cpp\n"
-" and (<inputfile>).h in the target <output> directory.";
+        std::cout << " Usage: jrc  <input> <output> <namespace>\n\n"
+                     " jrc will encode the <input> file as two files called (inputfile).cpp\n"
+                     " and (<inputfile>).h in the target <output> directory.";
 
         return -1;
     }
 
     const File sourceFile (String (argv[1]).unquoted());
 
-    if (! sourceFile.existsAsFile())
-    {
+    if (! sourceFile.existsAsFile()) {
         std::cout << sourceFile.getFullPathName() << " does not exist." << std::endl;
         return -2;
     }
 
     const File destDirectory (File::getCurrentWorkingDirectory()
-                                   .getChildFile (String (argv[2]).unquoted()));
+                                  .getChildFile (String (argv[2]).unquoted()));
 
-    if (! destDirectory.isDirectory())
-    {
+    if (! destDirectory.isDirectory()) {
         std::cout << destDirectory.getFullPathName() << " does not exist" << std::endl;
         return -3;
     }
@@ -130,7 +127,7 @@ int main (int argc, char* argv[])
     baseName = baseName.trim();
 
     const File headerFile (destDirectory.getChildFile (baseName + ".h"));
-    const File cppFile    (destDirectory.getChildFile (baseName + ".cpp"));
+    const File cppFile (destDirectory.getChildFile (baseName + ".cpp"));
 
     // std::cout << "Creating " << headerFile.getFullPathName()
     //           << " and " << cppFile.getFullPathName()
@@ -142,35 +139,37 @@ int main (int argc, char* argv[])
 
     std::unique_ptr<OutputStream> header (headerFile.createOutputStream());
 
-    if (header == nullptr)
-    {
+    if (header == nullptr) {
         std::cout << "Couldn't open "
-                  << headerFile.getFullPathName() << " for writing" << std::endl << std::endl;
+                  << headerFile.getFullPathName() << " for writing" << std::endl
+                  << std::endl;
         return -4;
     }
 
     std::unique_ptr<OutputStream> cpp (cppFile.createOutputStream());
 
-    if (cpp == nullptr)
-    {
+    if (cpp == nullptr) {
         std::cout << "Couldn't open "
-                  << cppFile.getFullPathName() << " for writing" << std::endl << std::endl;
+                  << cppFile.getFullPathName() << " for writing" << std::endl
+                  << std::endl;
         return -5;
     }
 
     *header << "/* (Auto-generated binary data file). */\r\n\r\n"
                "#pragma once\r\n\r\n"
-               "namespace " << className << "\r\n"
-               "{\r\n";
+               "namespace "
+            << className << "\r\n"
+                            "{\r\n";
 
     *cpp << "/* (Auto-generated binary data file). */\r\n\r\n"
-            "#include \"" << baseName << ".h\"\r\n\r\n";
+            "#include \""
+         << baseName << ".h\"\r\n\r\n";
 
     int totalBytes = 0;
 
-    Array<File> files; files.add (sourceFile);
-    for (int i = 0; i < files.size(); ++i)
-    {
+    Array<File> files;
+    files.add (sourceFile);
+    for (int i = 0; i < files.size(); ++i) {
         const File file (files[i]);
 
         // (avoid source control files and hidden files..)

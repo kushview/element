@@ -687,7 +687,7 @@ void EngineService::setRootNode (const Node& newRootNode)
 void EngineService::changeListenerCallback (ChangeBroadcaster* cb)
 {
     auto& devices (getWorld().getDeviceManager());
-    if (getRunMode() == RunMode::Plugin || cb != &devices)
+    if (cb != &devices)
         return;
 
     for (auto* const root : graphs->getGraphs())
@@ -696,7 +696,9 @@ void EngineService::changeListenerCallback (ChangeBroadcaster* cb)
         auto* processor = root->getRootGraph();
         if (! processor || ! manager)
             continue;
-
+#if 0
+        manager->syncArcsModel();
+#else
         const bool wasSuspended = processor->isSuspended();
         processor->suspendProcessing (true);
         processor->setPlayConfigFor (devices);
@@ -710,6 +712,7 @@ void EngineService::changeListenerCallback (ChangeBroadcaster* cb)
 
         manager->syncArcsModel();
         processor->suspendProcessing (wasSuspended);
+#endif
     }
 }
 

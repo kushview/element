@@ -58,10 +58,10 @@ const String RootGraph::getOutputChannelName (int c) const { return audioOutputN
 
 void RootGraph::updateChannelNames (AudioIODevice* device)
 {
-    auto activeIn  = device->getActiveInputChannels();
-    auto namesIn   = device->getInputChannelNames();
+    auto activeIn = device->getActiveInputChannels();
+    auto namesIn = device->getInputChannelNames();
     auto activeOut = device->getActiveOutputChannels();
-    auto namesOut  = device->getOutputChannelNames();
+    auto namesOut = device->getOutputChannelNames();
     audioOutputNames.clear();
     audioInputNames.clear();
     for (int i = 0; i < namesIn.size(); ++i)
