@@ -54,7 +54,7 @@ public:
         if (renderMode == mode)
             return;
         ScopedLock sl (getPropertyLock());
-        renderMode = locked ? SingleGraph : mode;
+        renderMode = mode;
     }
 
     inline void setMidiProgram (const int program)
@@ -65,14 +65,14 @@ public:
         midiProgram = program;
     }
 
-    // const String getName() const override;
     const String getInputChannelName (int channelIndex) const;
     const String getOutputChannelName (int channelIndex) const;
     const String getAudioInputDeviceName() const { return graphName; }
     const String getAudioOutputDeviceName() const { return graphName; }
 
-    /** the index in the audio engine.  if less than 0 then the graph
-        is not attached
+    /** Returns the index in the audio engine.
+
+        If the return value is less than 0, it means the graph is not attached.
      */
     int getEngineIndex() const { return engineIndex; }
 
@@ -89,7 +89,6 @@ private:
     int engineIndex = -1;
     RenderMode renderMode = Parallel;
 
-    bool locked = false;
     void updateChannelNames (AudioIODevice* device);
 };
 } // namespace element
