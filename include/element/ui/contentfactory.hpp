@@ -3,6 +3,8 @@
 #include <memory>
 
 #include <element/juce/core.hpp>
+#include <element/juce/gui_basics.hpp>
+
 #include <element/element.hpp>
 
 namespace element {
@@ -19,6 +21,9 @@ public:
         you should still return a valid Content object.
     */
     virtual std::unique_ptr<ContentComponent> createMainContent (const juce::String& type) = 0;
+
+    /** Create a menu bar model to use in the Main Window. */
+    virtual std::unique_ptr<juce::MenuBarModel> createMainMenuBarModel() { return nullptr; }
 
 protected:
     ContentFactory() = default;

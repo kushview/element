@@ -46,8 +46,11 @@ public:
     void refreshName();
 
 private:
+    friend class GuiService;
+    
     Context& world;
-    std::unique_ptr<MainMenu> mainMenu;
+    std::unique_ptr<juce::MenuBarModel> mainMenu;
+    void setMainMenuModel (std::unique_ptr<juce::MenuBarModel>);
     void nameChanged();
     void nameChangedSession();
     void nameChangedSingleGraph();

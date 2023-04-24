@@ -35,9 +35,12 @@ MainWindow::MainWindow (Context& g)
     : DocumentWindow (Util::appName(), Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
-    mainMenu.reset (new MainMenu (*this, g.getCommandManager()));
-    mainMenu->setupMenu();
+    auto _mainMenu = new MainMenu (*this, g.getCommandManager());
+    mainMenu.reset (_mainMenu);
+    _mainMenu->setupMenu();
+    
     nameChanged();
+    
     g.getSession()->addChangeListener (this);
     addKeyListener (g.getCommandManager().getKeyMappings());
     setUsingNativeTitleBar (true);
@@ -58,6 +61,21 @@ void MainWindow::changeListenerCallback (ChangeBroadcaster*)
 void MainWindow::refreshName()
 {
     nameChanged();
+}
+
+void MainWindow::setMainMenuModel (std::unique_ptr<juce::MenuBarModel> model)
+{
+    if (mainMenu) {
+        setMenuBarComponent (nullptr);
+        mainMenu.reset();
+    }
+
+    mainMenu = std::move (model);
+
+    if (mainMenu) {
+        setMenuBar (mainMenu.get());
+        refreshMenu();
+    }
 }
 
 void MainWindow::nameChanged()

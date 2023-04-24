@@ -480,6 +480,10 @@ void GuiService::run()
     PropertiesFile* const pf = settings.getUserSettings();
 
     mainWindow.reset (new MainWindow (world));
+    if (auto menu = factory->createMainMenuBarModel()) {
+        mainWindow->setMainMenuModel (std::move (menu));
+    }
+
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
