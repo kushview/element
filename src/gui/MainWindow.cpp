@@ -49,6 +49,7 @@ MainWindow::MainWindow (Context& g)
 
 MainWindow::~MainWindow()
 {
+    setMenuBar (nullptr);
     world.getSession()->removeChangeListener (this);
     mainMenu.reset();
 }
@@ -66,7 +67,7 @@ void MainWindow::refreshName()
 void MainWindow::setMainMenuModel (std::unique_ptr<juce::MenuBarModel> model)
 {
     if (mainMenu) {
-        setMenuBarComponent (nullptr);
+        setMenuBar (nullptr);
         mainMenu.reset();
     }
 
@@ -80,6 +81,12 @@ void MainWindow::setMainMenuModel (std::unique_ptr<juce::MenuBarModel> model)
 
 void MainWindow::nameChanged()
 {
+    if (windowTitleFunction != nullptr)
+    {
+        setName (windowTitleFunction());
+        return;
+    }
+
 #ifndef EL_SOLO
     nameChangedSession();
 #else

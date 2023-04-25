@@ -25,6 +25,11 @@ public:
     /** Create a menu bar model to use in the Main Window. */
     virtual std::unique_ptr<juce::MenuBarModel> createMainMenuBarModel() { return nullptr; }
 
+    /** Return a function to use when setting the Main Window's title. If this
+        returns nullptr, Element will fallback to default titling.
+     */
+    virtual std::function<juce::String()> getMainWindowTitler() { return nullptr; }
+
 protected:
     ContentFactory() = default;
 

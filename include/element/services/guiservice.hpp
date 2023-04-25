@@ -168,6 +168,7 @@ private:
     void toggleAboutScreen();
 
     void saveProperties (PropertiesFile* props);
+    void setMainWindowTitler (std::function<juce::String()>);
 };
 
 } // namespace element

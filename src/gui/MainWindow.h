@@ -47,10 +47,12 @@ public:
 
 private:
     friend class GuiService;
-    
+
     Context& world;
+    std::function<juce::String()> windowTitleFunction;
     std::unique_ptr<juce::MenuBarModel> mainMenu;
     void setMainMenuModel (std::unique_ptr<juce::MenuBarModel>);
+    
     void nameChanged();
     void nameChangedSession();
     void nameChangedSingleGraph();

@@ -208,6 +208,8 @@ void GuiService::checkForegroundStatus()
 void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newFactory)
 {
     clearContentComponent();
+    if (mainWindow)
+        mainWindow->windowTitleFunction = nullptr;
     if (factory)
         factory.reset();
     factory = std::move (newFactory);
@@ -480,6 +482,7 @@ void GuiService::run()
     PropertiesFile* const pf = settings.getUserSettings();
 
     mainWindow.reset (new MainWindow (world));
+    mainWindow->windowTitleFunction = factory->getMainWindowTitler();
     if (auto menu = factory->createMainMenuBarModel()) {
         mainWindow->setMainMenuModel (std::move (menu));
     }
@@ -947,6 +950,14 @@ void GuiService::refreshSystemTray()
     // stabilize systray
     auto& settings = getWorld().getSettings();
     SystemTray::setEnabled (settings.isSystrayEnabled());
+}
+
+void GuiService::setMainWindowTitler (std::function<juce::String()> f)
+{
+    if (mainWindow) {
+        mainWindow->windowTitleFunction = f;
+        mainWindow->refreshName();
+    }
 }
 
 void GuiService::refreshMainMenu()
