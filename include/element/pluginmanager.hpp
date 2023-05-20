@@ -28,6 +28,7 @@ namespace element {
 class ChildProcessSlave;
 class NodeObject;
 class Node;
+class NodeFactory;
 class PluginScannerMaster;
 class PluginScanner;
 
@@ -74,6 +75,9 @@ public:
                 return fmt;
         return nullptr;
     }
+
+    /** Returns the node factory. */
+    NodeFactory& getNodeFactory();
 
     /** creates a child process slave used in start up */
     element::ChildProcessSlave* createAudioPluginScannerSlave();

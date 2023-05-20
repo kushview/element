@@ -701,6 +701,8 @@ void PluginManager::addFormat (AudioPluginFormat* fmt)
     getAudioPluginFormats().addFormat (fmt);
 }
 
+NodeFactory& PluginManager::getNodeFactory() { return priv->nodes; }
+
 void PluginManager::addToKnownPlugins (const PluginDescription& desc)
 {
     auto* const format = getAudioPluginFormat (desc.pluginFormatName);
@@ -761,11 +763,11 @@ AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& 
 NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
 {
     errorMsg.clear();
-
+    auto& nodes = getNodeFactory();
     if (auto* const plugin = createAudioPlugin (desc, errorMsg))
     {
         plugin->enableAllBuses();
-        return priv->nodes.wrap (plugin);
+        return nodes.wrap (plugin);
     }
 
     if (desc.pluginFormatName == "Internal")
@@ -799,7 +801,7 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
         return nullptr;
     }
 
-    if (auto* node = priv->nodes.instantiate (desc))
+    if (auto* node = nodes.instantiate (desc))
         return node;
 
     errorMsg = desc.name;
