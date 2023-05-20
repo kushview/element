@@ -17,13 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/pluginmanager.hpp>
+#include <element/nodefactory.hpp>
 #include <element/node.hpp>
+#include <element/pluginmanager.hpp>
+#include <element/settings.hpp>
+
 #include "engine/nodes/NodeTypes.h"
-#include "engine/nodefactory.hpp"
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
-#include <element/settings.hpp>
 #include "slaveprocess.hpp"
 #include "utils.hpp"
 

@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/nodefactory.hpp>
+
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/AudioRouterNode.h"
@@ -29,7 +31,6 @@
 #include "engine/nodes/OSCReceiverNode.h"
 #include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ScriptNode.h"
-#include "engine/nodefactory.hpp"
 #include "engine/graphnode.hpp"
 
 namespace element {

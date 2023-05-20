@@ -263,9 +263,4 @@ void Context::discoverModules()
     impl->modules->discover();
 }
 
-void Context::testLaunch()
-{
-    getServices().run();
-}
-
 } // namespace element
