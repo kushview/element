@@ -21,6 +21,7 @@
 
 #include <element/services.hpp>
 #include <element/node.hpp>
+#include "engine/nodes/NodeTypes.h"
 
 namespace element {
 
@@ -44,6 +45,17 @@ public:
     /** deactivate the controller */
     void deactivate() override;
 
+    /** Attempt adding a Node by identifier and format.
+     * 
+        This should work well for Element internal plugins. Third party
+        formats may or may not work.  For VST/AU/LV2 etc etc, avoid using
+        this method if possible.
+
+        @param ID The file or identifier
+        @param format The format name (default: "Element")
+    */
+    Node addNode (const String& ID, const String& format = EL_INTERNAL_FORMAT_NAME);
+
     /** Adds a new node to the current graph. */
     void addNode (const Node& node);
 
@@ -51,10 +63,10 @@ public:
     Node addNode (const Node& node, const Node& target, const ConnectionBuilder&);
 
     /** Adds a plugin by description to the current graph */
-    void addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f);
+    Node addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f);
 
     /** Adds a plugin to a specific graph */
-    void addPlugin (const Node& graph, const PluginDescription& desc);
+    Node addPlugin (const Node& graph, const PluginDescription& desc);
 
     /** Adds a plugin to a specific graph and adds connections from
         a ConnectionBuilder */

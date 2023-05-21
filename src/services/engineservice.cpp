@@ -456,6 +456,14 @@ Node EngineService::addNode (const Node& node, const Node& target, const Connect
     return Node();
 }
 
+Node EngineService::addNode (const String& ID, const String& format)
+{
+    juce::PluginDescription desc;
+    desc.fileOrIdentifier = ID;
+    desc.pluginFormatName = format;
+    return addPlugin (desc, true);
+}
+
 void EngineService::addNode (const Node& node)
 {
     auto* root = graphs->findActiveRootGraphManager();
@@ -474,11 +482,11 @@ void EngineService::addNode (const Node& node)
     }
 }
 
-void EngineService::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
+Node EngineService::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
 {
     auto* root = graphs->findActiveRootGraphManager();
     if (! root)
-        return;
+        return {};
 
     OwnedArray<PluginDescription> plugs;
     if (! verified)
@@ -497,12 +505,13 @@ void EngineService::addPlugin (const PluginDescription& desc, const bool verifie
         plugs.add (new PluginDescription (desc));
     }
 
+    Node node;
     if (plugs.size() > 0)
     {
         const auto nodeId = root->addNode (plugs.getFirst(), rx, ry);
         if (EL_INVALID_NODE != nodeId)
         {
-            const Node node (root->getNodeModelForId (nodeId));
+            node = root->getNodeModelForId (nodeId);
             if (getWorld().getSettings().showPluginWindowsWhenAdded())
                 findSibling<GuiService>()->presentPluginWindow (node);
         }
@@ -511,6 +520,7 @@ void EngineService::addPlugin (const PluginDescription& desc, const bool verifie
     {
         AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add Plugin", String ("Could not add ") + desc.name + " for an unknown reason");
     }
+    return node;
 }
 
 void EngineService::removeNode (const Node& node)
@@ -736,15 +746,16 @@ void EngineService::syncModels()
     }
 }
 
-void EngineService::addPlugin (const Node& graph, const PluginDescription& desc)
+Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc)
 {
     if (! graph.isGraph())
-        return;
+        return {};
 
+    Node node;
     if (auto* controller = graphs->findGraphManagerFor (graph))
-    {
-        const Node node (addPlugin (*controller, desc));
-    }
+        node = addPlugin (*controller, desc);
+
+    return node;
 }
 
 Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified)
