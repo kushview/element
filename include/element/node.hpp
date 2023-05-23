@@ -149,6 +149,9 @@ public:
     /** Returns the user-modifiable name of this node */
     const String getName() const { return getProperty (Tags::name); }
 
+    /** Change the user-defined name */
+    void setName (const String& name) { setProperty (Tags::name, name); }
+
     /** Returns the node name defined by the user. If not set it returns the
         node name set when loaded.
     */
