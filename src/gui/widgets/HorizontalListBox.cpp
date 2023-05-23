@@ -836,6 +836,12 @@ int HorizontalListBox::getVisibleContentWidth() const noexcept
     return viewport->getMaximumVisibleWidth();
 }
 
+void HorizontalListBox::setScrollBarsShown (bool vertical, bool horizontal)
+{
+    viewport->setScrollBarsShown (vertical, horizontal, ! vertical, ! horizontal);
+    resized();
+}
+
 ScrollBar* HorizontalListBox::getVerticalScrollBar() const noexcept
 {
     return &viewport->getVerticalScrollBar();
