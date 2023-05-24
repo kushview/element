@@ -416,16 +416,30 @@ void EngineService::removeGraph (int index)
     findSibling<GuiService>()->stabilizeContent();
 }
 
-void EngineService::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
+void EngineService::connectChannels (const Node& graph, const Node& src, const int sc, const Node& dst, const int dc) {
+    connectChannels (graph, src.getNodeId(), sc, dst.getNodeId(), dc);
+}
+
+void EngineService::connectChannels (const Node& graph, const uint32 s, const int sc, const uint32 d, const int dc)
 {
-    if (auto* root = graphs->findActiveRootGraphManager())
+    if (auto* root = graphs->findGraphManagerFor (graph))
     {
         auto src = root->getNodeForId (s);
         auto dst = root->getNodeForId (d);
         if (! src || ! dst)
             return;
-        addConnection (src->nodeId, src->getPortForChannel (PortType::Audio, sc, false), dst->nodeId, dst->getPortForChannel (PortType::Audio, dc, true));
+        // clang-format off
+        addConnection (src->nodeId, 
+            src->getPortForChannel (PortType::Audio, sc, false), 
+            dst->nodeId, 
+            dst->getPortForChannel (PortType::Audio, dc, true));
+        // clang-format on
     }
+}
+
+void EngineService::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
+{
+    connectChannels (getWorld().getSession()->getActiveGraph(), s, sc, d, dc);
 }
 
 void EngineService::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)

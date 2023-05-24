@@ -190,6 +190,7 @@ bool GraphNode::canConnect (const uint32 sourceNode, const uint32 sourcePort, co
     if (sourcePort >= source->getNumPorts())
     {
         DBG ("[EL] source port greater than total: port: "
+             << source->getName() << ": "
              << (int) sourcePort << " total: "
              << (int) source->getNumPorts());
         return false;

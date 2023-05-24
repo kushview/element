@@ -105,8 +105,18 @@ public:
     /** Add a connection on a specific graph */
     void addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& graph);
 
+    void connectChannels (const Node& graph, const Node& src, const int sc, const Node& dst, const int dc);
+
+    void connectChannels (const Node& graph, const uint32 s, const int sc, const uint32 d, const int dc);
+
     /** Connect by channel on the root graph */
     void connectChannels (const uint32, const int, const uint32, const int);
+
+    void testConnectAudio (const Node& src, int sc, const Node& dst, int dc, int nc = 1) {
+        if (nc < 1) nc = 1;
+        while (--nc >= 0)
+            connectChannels (src.getParentGraph(), src, sc++, dst, dc++);
+    }
 
     /** Remove a connection on the active root graph */
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
