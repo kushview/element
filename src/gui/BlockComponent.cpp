@@ -257,7 +257,7 @@ void BlockComponent::buttonClicked (Button* b)
 
     NodeObjectPtr obj = node.getObject();
     auto* proc = (obj) ? obj->getAudioProcessor() : 0;
-    if (! proc)
+    if ( ! obj)
         return;
 
     if (b == &configButton && configButton.getToggleState())
@@ -265,7 +265,7 @@ void BlockComponent::buttonClicked (Button* b)
         configButton.setToggleState (false, dontSendNotification);
         // ioBox.clear();
     }
-    else if (b == &configButton && ! configButton.getToggleState())
+    else if (proc != nullptr && b == &configButton && ! configButton.getToggleState())
     {
         auto* component = new NodeAudioBusesComponent (node, proc, ViewHelpers::findContentComponent (this));
         CallOutBox::launchAsynchronously (
