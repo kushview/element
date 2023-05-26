@@ -52,6 +52,7 @@ public:
         Unknown = 7
     };
 
+    PortType() : type (Unknown) {}
     PortType (const juce::Identifier& identifier)
         : type (typeForString (identifier.toString())) {}
 
