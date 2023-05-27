@@ -28,7 +28,7 @@ namespace element {
 
 class CommandManager;
 class ContentComponent;
-class ContentFactory;
+class WindowDecorator;
 class Context;
 class LookAndFeel;
 class MainWindow;
@@ -136,7 +136,7 @@ public:
 
     void checkForegroundStatus();
 
-    void setContentFactory (std::unique_ptr<ContentFactory>);
+    void setMainWindowDecorator (std::unique_ptr<WindowDecorator>);
 
 private:
     ServiceManager& controller;
@@ -148,7 +148,7 @@ private:
     std::unique_ptr<MainWindow> mainWindow;
     std::unique_ptr<ContentComponent> content;
     std::unique_ptr<DialogWindow> about;
-    std::unique_ptr<ContentFactory> factory;
+    std::unique_ptr<WindowDecorator> factory;
 
     Node selectedNode; // TODO: content manager
 
