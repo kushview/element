@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/ui/contentfactory.hpp>
+#include <element/ui/windowdecorator.hpp>
 
 #include <element/audioengine.hpp>
 #include <element/services.hpp>
@@ -48,7 +48,7 @@
 namespace element {
 
 //=============================================================================
-class DefaultContentFactory : public ContentFactory
+class DefaultContentFactory : public WindowDecorator
 {
 public:
     DefaultContentFactory (Context& ctx)
@@ -205,14 +205,14 @@ void GuiService::checkForegroundStatus()
 }
 
 //=============================================================================
-void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newFactory)
+void GuiService::setMainWindowDecorator (std::unique_ptr<WindowDecorator> newDecorator)
 {
     clearContentComponent();
     if (mainWindow)
         mainWindow->windowTitleFunction = nullptr;
     if (factory)
         factory.reset();
-    factory = std::move (newFactory);
+    factory = std::move (newDecorator);
     if (! factory)
         factory = std::make_unique<DefaultContentFactory> (getWorld());
 }

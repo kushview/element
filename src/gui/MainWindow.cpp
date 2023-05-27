@@ -38,9 +38,9 @@ MainWindow::MainWindow (Context& g)
     auto _mainMenu = new MainMenu (*this, g.getCommandManager());
     mainMenu.reset (_mainMenu);
     _mainMenu->setupMenu();
-    
+
     nameChanged();
-    
+
     g.getSession()->addChangeListener (this);
     addKeyListener (g.getCommandManager().getKeyMappings());
     setUsingNativeTitleBar (true);
@@ -66,15 +66,21 @@ void MainWindow::refreshName()
 
 void MainWindow::setMainMenuModel (std::unique_ptr<juce::MenuBarModel> model)
 {
-    if (mainMenu) {
+    if (mainMenu)
+    {
         setMenuBar (nullptr);
         mainMenu.reset();
     }
 
     mainMenu = std::move (model);
 
-    if (mainMenu) {
+    if (mainMenu)
+    {
         setMenuBar (mainMenu.get());
+#if JUCE_MAC
+        MenuBarModel::setMacMainMenu (mainMenu.get(), nullptr, "");
+        setMenuBar (nullptr);
+#endif
         refreshMenu();
     }
 }

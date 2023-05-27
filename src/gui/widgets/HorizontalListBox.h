@@ -218,6 +218,7 @@ public:
     /** Scrolls if necessary to make sure that a particular row is visible. */
     void scrollToEnsureRowIsOnscreen (int row);
 
+    void setScrollBarPosition (bool right, bool bottom);
     void setScrollBarsShown (bool vertical, bool horizontal);
     
     /** Returns a pointer to the vertical scrollbar. */
