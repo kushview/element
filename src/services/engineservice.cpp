@@ -475,7 +475,7 @@ Node EngineService::addNode (const String& ID, const String& format)
     juce::PluginDescription desc;
     desc.fileOrIdentifier = ID;
     desc.pluginFormatName = format;
-    return addPlugin (desc, true);
+    return addPlugin (desc, true, .5f, .5f, true);
 }
 
 void EngineService::addNode (const Node& node)
@@ -496,7 +496,7 @@ void EngineService::addNode (const Node& node)
     }
 }
 
-Node EngineService::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
+Node EngineService::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry, bool dontShowUI)
 {
     auto* root = graphs->findActiveRootGraphManager();
     if (! root)
@@ -526,7 +526,7 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
         if (EL_INVALID_NODE != nodeId)
         {
             node = root->getNodeModelForId (nodeId);
-            if (getWorld().getSettings().showPluginWindowsWhenAdded())
+            if (!dontShowUI && getWorld().getSettings().showPluginWindowsWhenAdded())
                 findSibling<GuiService>()->presentPluginWindow (node);
         }
     }

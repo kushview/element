@@ -63,7 +63,7 @@ public:
     Node addNode (const Node& node, const Node& target, const ConnectionBuilder&);
 
     /** Adds a plugin by description to the current graph */
-    Node addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f);
+    Node addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f, bool dontShowUI = false);
 
     /** Adds a plugin to a specific graph */
     Node addPlugin (const Node& graph, const PluginDescription& desc);
