@@ -25,6 +25,7 @@
 #include <element/juce/gui_basics.hpp>
 
 #include <element/element.hpp>
+#include <element/ui/menumodels.hpp>
 
 namespace element {
 
@@ -46,7 +47,7 @@ public:
     virtual std::unique_ptr<ContentComponent> createMainContent (const juce::String& type) = 0;
 
     /** Create a menu bar model to use in the Main Window. */
-    virtual std::unique_ptr<juce::MenuBarModel> createMainMenuBarModel() { return nullptr; }
+    virtual std::unique_ptr<MainMenuBarModel> createMainMenuBarModel() { return nullptr; }
 
     /** Return a function to use when setting the Main Window's title. If this
         returns nullptr, Element will fallback to default titling.

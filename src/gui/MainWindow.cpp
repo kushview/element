@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
+#include <element/ui/menumodels.hpp>
 #include "services/graphservice.hpp"
 #include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
@@ -64,7 +64,7 @@ void MainWindow::refreshName()
     nameChanged();
 }
 
-void MainWindow::setMainMenuModel (std::unique_ptr<juce::MenuBarModel> model)
+void MainWindow::setMainMenuModel (std::unique_ptr<MainMenuBarModel> model)
 {
     if (mainMenu)
     {
@@ -72,17 +72,17 @@ void MainWindow::setMainMenuModel (std::unique_ptr<juce::MenuBarModel> model)
         mainMenu.reset();
     }
 
-    mainMenu = std::move (model);
-
-    if (mainMenu)
+    if (model)
     {
-        setMenuBar (mainMenu.get());
+        setMenuBar (model.get());
 #if JUCE_MAC
-        MenuBarModel::setMacMainMenu (mainMenu.get(), nullptr, "");
+        MenuBarModel::setMacMainMenu (model.get(), model->getMacAppMenu(), "");
         setMenuBar (nullptr);
 #endif
         refreshMenu();
     }
+
+    mainMenu.reset (model.release());
 }
 
 void MainWindow::nameChanged()

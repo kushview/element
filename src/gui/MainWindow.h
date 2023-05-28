@@ -27,6 +27,7 @@ namespace element {
 class ServiceManager;
 class Context;
 class MainMenu;
+class MainMenuBarModel;
 
 class MainWindow : public DocumentWindow,
                    public ChangeListener
@@ -51,7 +52,7 @@ private:
     Context& world;
     std::function<juce::String()> windowTitleFunction;
     std::unique_ptr<juce::MenuBarModel> mainMenu;
-    void setMainMenuModel (std::unique_ptr<juce::MenuBarModel>);
+    void setMainMenuModel (std::unique_ptr<MainMenuBarModel> model);
     
     void nameChanged();
     void nameChangedSession();
