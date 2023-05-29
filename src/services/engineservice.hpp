@@ -118,6 +118,8 @@ public:
             connectChannels (src.getParentGraph(), src, sc++, dst, dc++);
     }
 
+    void testReconfigureRootGraphs();
+
     /** Remove a connection on the active root graph */
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
 

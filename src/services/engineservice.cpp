@@ -442,6 +442,9 @@ void EngineService::connectChannels (const uint32 s, const int sc, const uint32 
     connectChannels (getWorld().getSession()->getActiveGraph(), s, sc, d, dc);
 }
 
+void EngineService::testReconfigureRootGraphs() {
+    changeListenerCallback (&getWorld().getDeviceManager());
+}
 void EngineService::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
     if (auto* root = graphs->findActiveRootGraphManager())
