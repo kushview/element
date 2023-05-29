@@ -654,6 +654,15 @@ void ContentComponent::refreshToolbar()
     toolBar->setSession (getGlobals().getSession());
 }
 
+void ContentComponent::setStatusBarVisible (bool vis) {
+    if (statusBarVisible == vis)
+        return;
+    statusBarVisible = vis;
+    statusBar->setVisible (vis);
+    resized();
+    refreshStatusBar();
+}
+
 void ContentComponent::refreshStatusBar()
 {
     statusBar->updateLabels();

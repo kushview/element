@@ -122,6 +122,9 @@ public:
     /** Manually refresh the status bar */
     void refreshStatusBar();
 
+    /** Chang statusbar visibility */
+    void setStatusBarVisible (bool);
+
     /** Override this to resize the main content */
     virtual void resizeContent (const Rectangle<int>& area) { ignoreUnused (area); }
 
@@ -211,7 +214,7 @@ private:
     std::unique_ptr<Component> extra;
     int extraViewHeight = 44;
 
-    bool statusBarVisible;
+    bool statusBarVisible { true };
     int statusBarSize;
     bool toolBarVisible;
     int toolBarSize;

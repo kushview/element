@@ -440,7 +440,7 @@ void GuiService::presentPluginWindow (const Node& node, const bool focus)
     if (! windowManager)
         return;
 
-    if (node.isIONode() || node.isGraph())
+    if (node.isIONode())
     {
         DBG ("[EL] not showing pugin window for: " << node.getName());
         return;
