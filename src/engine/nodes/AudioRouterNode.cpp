@@ -115,7 +115,7 @@ String AudioRouterNode::getSizeString() const
     return result;
 }
 
-void AudioRouterNode::setSize (int newIns, int newOuts)
+void AudioRouterNode::setSize (int newIns, int newOuts, bool async)
 {
     newIns = jmax (1, newIns);
     newOuts = jmax (1, newOuts);
@@ -140,7 +140,11 @@ void AudioRouterNode::setSize (int newIns, int newOuts)
     }
 
     rebuildPorts = true;
-    triggerPortReset();
+    if (async) {
+        triggerPortReset();
+    } else {
+        refreshPorts();
+    }
     sendChangeMessage();
 }
 

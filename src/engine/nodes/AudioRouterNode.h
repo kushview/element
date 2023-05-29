@@ -41,7 +41,7 @@ public:
     void getState (MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 
-    void setSize (int newIns, int newOuts);
+    void setSize (int newIns, int newOuts, bool async = true);
     String getSizeString() const;
     void setMatrixState (const MatrixState&);
     MatrixState getMatrixState() const;
