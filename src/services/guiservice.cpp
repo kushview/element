@@ -442,7 +442,7 @@ void GuiService::presentPluginWindow (const Node& node, const bool focus)
 
     if (node.isIONode())
     {
-        DBG ("[EL] not showing pugin window for: " << node.getName());
+        DBG ("[element] not showing pugin window for: " << node.getName());
         return;
     }
 

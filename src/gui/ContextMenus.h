@@ -576,7 +576,7 @@ private:
             return true;
 
 #else
-            DBG ("[EL] FXB/FXP presets not yet supported on this platform.");
+            DBG ("[element] FXB/FXP presets not yet supported on this platform.");
             return true;
 #endif
         }

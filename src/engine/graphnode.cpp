@@ -134,7 +134,7 @@ bool GraphNode::removeNode (const uint32 nodeId)
 
             if (n->isSubGraph())
             {
-                DBG ("[EL] sub graph removed");
+                DBG ("[element] sub graph removed");
             }
 
             return true;
@@ -176,20 +176,20 @@ bool GraphNode::canConnect (const uint32 sourceNode, const uint32 sourcePort, co
 {
     if (sourceNode == destNode)
     {
-        DBG ("[EL] cannot connect to self: " << (int) sourceNode);
+        DBG ("[element] cannot connect to self: " << (int) sourceNode);
         return false;
     }
 
     const NodeObject* const source = getNodeForId (sourceNode);
     if (source == nullptr)
     {
-        DBG ("[EL] source not found");
+        DBG ("[element] source not found");
         return false;
     }
 
     if (sourcePort >= source->getNumPorts())
     {
-        DBG ("[EL] source port greater than total: port: "
+        DBG ("[element] source port greater than total: port: "
              << source->getName() << ": "
              << (int) sourcePort << " total: "
              << (int) source->getNumPorts());
@@ -198,7 +198,7 @@ bool GraphNode::canConnect (const uint32 sourceNode, const uint32 sourcePort, co
 
     if (! source->isPortOutput (sourcePort))
     {
-        DBG ("[EL] source port is not an output port: " << (int) sourcePort);
+        DBG ("[element] source port is not an output port: " << (int) sourcePort);
         return false;
     }
 

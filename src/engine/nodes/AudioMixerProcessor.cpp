@@ -424,7 +424,7 @@ void AudioMixerProcessor::addStereoTrack()
     }
     else
     {
-        DBG ("[EL] AudioMixerProcessor: could not add new track");
+        DBG ("[element] AudioMixerProcessor: could not add new track");
     }
 }
 

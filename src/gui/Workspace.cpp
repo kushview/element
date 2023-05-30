@@ -83,7 +83,7 @@ WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
 {
     WorkspaceState state;
     jassert (! state.isValid());
-    DBG ("[EL] workspace loading: " << file.getFileName());
+    DBG ("[element] workspace loading: " << file.getFileName());
 
     if (tryXml)
     {
@@ -112,7 +112,7 @@ WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
 WorkspaceState WorkspaceState::fromXmlFile (const File& file)
 {
     WorkspaceState state;
-    DBG ("[EL] workspace loading: " << file.getFileName());
+    DBG ("[element] workspace loading: " << file.getFileName());
 
     if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
         state.objectData = ValueTree::fromXml (*xml);
@@ -204,7 +204,7 @@ void Workspace::applyState (const WorkspaceState& state)
     {
         state.applyTo (dock);
         setName (state.getName());
-        DBG ("[EL] workspace loaded: " << getName());
+        DBG ("[element] workspace loaded: " << getName());
     }
 }
 

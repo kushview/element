@@ -57,7 +57,7 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         if (! assertedLowChannels)
         {
-            DBG ("[EL] PGC map: num bufs: " << midi.getNumBuffers());
+            DBG ("[element] PGC map: num bufs: " << midi.getNumBuffers());
             assertedLowChannels = true;
         }
 

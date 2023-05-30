@@ -296,7 +296,7 @@ void MappingService::learn (const bool shouldLearn)
 
     if (shouldLearn)
     {
-        DBG ("[EL] MappingService: start learning");
+        DBG ("[element] MappingService: start learning");
         impl->learnState = CaptureParameter;
         capture.addNodes (getWorld().getSession());
     }
@@ -306,7 +306,7 @@ void MappingService::onParameterCaptured (const Node& node, int parameter)
 {
     if (impl->learnState == CaptureParameter)
     {
-        DBG ("[EL] MappingService: got parameter: " << parameter);
+        DBG ("[element] MappingService: got parameter: " << parameter);
         auto& mapping (getWorld().getMappingEngine());
         impl->learnState = CaptureControl;
         impl->node = node;
@@ -315,7 +315,7 @@ void MappingService::onParameterCaptured (const Node& node, int parameter)
     }
     else
     {
-        DBG ("[EL] received captured param: invalid state: " << (int) impl->learnState);
+        DBG ("[element] received captured param: invalid state: " << (int) impl->learnState);
     }
 }
 
@@ -330,7 +330,7 @@ void MappingService::onControlCaptured()
         impl->message = mapping.getCapturedMidiMessage();
         impl->control = mapping.getCapturedControl();
 
-        DBG ("[EL] MappingService: got control: " << impl->control.getName().toString());
+        DBG ("[element] MappingService: got control: " << impl->control.getName().toString());
 
         if (impl->isCaptureComplete())
         {
@@ -351,7 +351,7 @@ void MappingService::onControlCaptured()
     }
     else
     {
-        DBG ("[EL] received captured control: invalid state: " << (int) impl->learnState);
+        DBG ("[element] received captured control: invalid state: " << (int) impl->learnState);
     }
 }
 

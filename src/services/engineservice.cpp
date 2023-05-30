@@ -381,13 +381,13 @@ void EngineService::removeGraph (int index)
         }
         else
         {
-            DBG ("[EL] could not detach root graph");
+            DBG ("[element] could not detach root graph");
         }
 
         if (removeIt)
         {
             graphs->remove (holder);
-            DBG ("[EL] graph removed: index: " << index);
+            DBG ("[element] graph removed: index: " << index);
             ValueTree sgraphs = session->getValueTree().getChildWithName (Tags::graphs);
 
             if (index < 0 || index >= session->getNumGraphs())
@@ -398,12 +398,12 @@ void EngineService::removeGraph (int index)
 
             if (nextGraph.isRootGraph())
             {
-                DBG ("[EL] setting new graph: " << nextGraph.getName());
+                DBG ("[element] setting new graph: " << nextGraph.getName());
                 setRootNode (nextGraph);
             }
             else if (session->getNumGraphs() > 0)
             {
-                DBG ("[EL] failed to find appropriate index.");
+                DBG ("[element] failed to find appropriate index.");
                 sgraphs.setProperty (Tags::active, 0, 0);
                 setRootNode (session->getActiveGraph());
             }
@@ -411,7 +411,7 @@ void EngineService::removeGraph (int index)
     }
     else
     {
-        DBG ("[EL] could not find root graph index: " << index);
+        DBG ("[element] could not find root graph index: " << index);
     }
 
     findSibling<GuiService>()->stabilizeContent();
@@ -569,7 +569,7 @@ void EngineService::removeNode (const Uuid& uuid)
     }
     else
     {
-        DBG ("[EL] node not found: " << uuid.toString());
+        DBG ("[element] node not found: " << uuid.toString());
     }
 }
 
@@ -650,7 +650,7 @@ void EngineService::setRootNode (const Node& newRootNode)
 
     if (! holder)
     {
-        DBG ("[EL] failed to find root graph for node: " << newRootNode.getName());
+        DBG ("[element] failed to find root graph for node: " << newRootNode.getName());
         return;
     }
 
@@ -678,7 +678,7 @@ void EngineService::setRootNode (const Node& newRootNode)
         {
             active->controller->savePluginStates();
             active->controller->unloadGraph();
-            DBG("[EL] graph unloaded: " << active->model.getName());
+            DBG("[element] graph unloaded: " << active->model.getName());
         }
     }
 #endif
@@ -691,7 +691,7 @@ void EngineService::setRootNode (const Node& newRootNode)
     }
     else
     {
-        DBG ("[EL] couldn't find graph processor for node.");
+        DBG ("[element] couldn't find graph processor for node.");
     }
 
     if (auto* const r = holder->getController())
@@ -706,7 +706,7 @@ void EngineService::setRootNode (const Node& newRootNode)
     }
     else
     {
-        DBG ("[EL] no graph controller for node: " << newRootNode.getName());
+        DBG ("[element] no graph controller for node: " << newRootNode.getName());
     }
 
     engine->refreshSession();

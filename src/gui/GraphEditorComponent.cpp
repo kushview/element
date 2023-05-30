@@ -635,7 +635,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 
             if (failure)
             {
-                DBG ("[EL] unkown menu result: " << result);
+                DBG ("[element] unkown menu result: " << result);
             }
             else if (hasRequestedType)
             {
@@ -670,7 +670,7 @@ void GraphEditorComponent::mouseDrag (const MouseEvent& e)
 
 void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
 {
-    DBG ("[EL] GraphEditorComponent::createNewPlugin(...)");
+    DBG ("[element] GraphEditorComponent::createNewPlugin(...)");
 }
 
 BlockComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const

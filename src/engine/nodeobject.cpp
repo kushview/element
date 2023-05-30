@@ -169,7 +169,7 @@ void NodeObject::connectAudioTo (const NodeObject* other)
 
     if (failed > 0)
     {
-        DBG ("[EL] failed connecting audio from " << src->getName() << " to " << dst->getName());
+        DBG ("[element] failed connecting audio from " << src->getName() << " to " << dst->getName());
     }
 }
 
@@ -500,7 +500,7 @@ void NodeObject::MidiProgramLoader::handleAsyncUpdate()
 #if 0
     if (node.lastMidiProgram.get() == requestedProgram)
     {
-        DBG("[EL] same program, not loading.");
+        DBG("[element] same program, not loading.");
         return;
     }
 #endif
@@ -519,13 +519,13 @@ void NodeObject::MidiProgramLoader::handleAsyncUpdate()
                 {
                     node.lastMidiProgram.set (requestedProgram);
                     node.setState (state.getData(), (int) state.getSize());
-                    DBG ("[EL] loaded program: " << requestedProgram);
+                    DBG ("[element] loaded program: " << requestedProgram);
                 }
             }
         }
         else
         {
-            DBG ("[EL] Program file doesn't exist: " << node.getMidiProgramFile().getFileName());
+            DBG ("[element] Program file doesn't exist: " << node.getMidiProgramFile().getFileName());
         }
     }
     else
@@ -537,7 +537,7 @@ void NodeObject::MidiProgramLoader::handleAsyncUpdate()
         }
         else
         {
-            DBG ("[EL] program has no data");
+            DBG ("[element] program has no data");
         }
     }
 

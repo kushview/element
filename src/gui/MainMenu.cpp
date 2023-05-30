@@ -169,7 +169,7 @@ void MainMenu::menuItemSelected (int index, int menu)
 #if JUCE_DEBUG
     if (index == 1000)
     {
-        DBG ("[EL] === SESSION DUMP ===");
+        DBG ("[element] === SESSION DUMP ===");
         auto data = session->getValueTree().createCopy();
         Node::sanitizeProperties (data, true);
         DBG (data.toXmlString());

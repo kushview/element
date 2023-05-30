@@ -330,7 +330,7 @@ NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x,
 
     if (errorMessage.isNotEmpty())
     {
-        DBG ("[EL] error creating audio plugin: " << errorMessage);
+        DBG ("[element] error creating audio plugin: " << errorMessage);
         jassert (node == nullptr);
     }
 
@@ -605,13 +605,13 @@ void GraphManager::setNodeModel (const Node& node)
         }
         else if (NodeObjectPtr ph = createPlaceholder (node))
         {
-            DBG ("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
+            DBG ("[element] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
             node.getValueTree().setProperty (Tags::missing, true, nullptr);
         }
         else
         {
-            DBG ("[EL] couldn't create node: " << node.getName());
+            DBG ("[element] couldn't create node: " << node.getName());
             failed.add (node.getValueTree());
         }
     }
@@ -642,18 +642,18 @@ void GraphManager::setNodeModel (const Node& node)
         }
         else
         {
-            DBG ("[EL] failed creating connection: ");
+            DBG ("[element] failed creating connection: ");
             const Node graphObject (graph, false);
 
             if (graphObject.getNodeById (sourceNode).isValid() && graphObject.getNodeById (destNode).isValid())
             {
-                DBG ("[EL] set missing connection");
+                DBG ("[element] set missing connection");
                 // if the nodes are valid then preserve it
                 arc.setProperty (Tags::missing, true, 0);
             }
             else
             {
-                DBG ("[EL] purge failed arc");
+                DBG ("[element] purge failed arc");
                 failed.add (arc);
             }
         }

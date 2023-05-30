@@ -320,7 +320,7 @@ void ServiceManager::handleMessage (const Message& msg)
         }
         else
         {
-            DBG ("[EL] add controller device not valid");
+            DBG ("[element] add controller device not valid");
         }
     }
     else if (const auto* removeControlMessage = dynamic_cast<const RemoveControlMessage*> (&msg))
@@ -363,7 +363,7 @@ void ServiceManager::handleMessage (const Message& msg)
 
     if (! handled)
     {
-        DBG ("[EL] unhandled Message received");
+        DBG ("[element] unhandled Message received");
     }
 }
 

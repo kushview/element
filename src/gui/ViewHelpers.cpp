@@ -200,7 +200,7 @@ void ViewHelperMixin::connectPorts (const Port& src, const Port& dst)
     const Node dstNode (dst.getNode());
     const Node graph (srcNode.getParentGraph());
 
-    DBG ("[EL] sending connect message: " << srcNode.getName() << " <-> " << dstNode.getName());
+    DBG ("[element] sending connect message: " << srcNode.getName() << " <-> " << dstNode.getName());
     postMessage (new AddConnectionMessage (srcNode.getNodeId(), src.getIndex(), dstNode.getNodeId(), dst.getIndex(), graph));
 }
 

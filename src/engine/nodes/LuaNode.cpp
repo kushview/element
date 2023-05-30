@@ -508,7 +508,7 @@ struct LuaNode::Context
             }
         } catch (const std::exception& e)
         {
-            DBG ("[EL] " << e.what());
+            DBG ("[element] " << e.what());
         }
     }
 
@@ -539,7 +539,7 @@ struct LuaNode::Context
             state.collect_garbage();
         } catch (const std::exception& e)
         {
-            DBG ("[EL] " << e.what());
+            DBG ("[element] " << e.what());
         }
     }
 

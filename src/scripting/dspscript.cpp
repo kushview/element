@@ -342,7 +342,7 @@ void DSPScript::save (MemoryBlock& out)
             }
         } catch (const std::exception& e)
         {
-            DBG ("[EL] " << e.what());
+            DBG ("[element] " << e.what());
         }
         lua.collect_garbage();
     }
@@ -402,7 +402,7 @@ void DSPScript::restore (const void* d, size_t s)
         lua.collect_garbage();
     } catch (const std::exception& e)
     {
-        DBG ("[EL] " << e.what());
+        DBG ("[element] " << e.what());
     }
 }
 

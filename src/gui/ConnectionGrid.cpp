@@ -365,7 +365,7 @@ private:
 
             if (failure)
             {
-                DBG ("[EL] unkown menu result: " << result);
+                DBG ("[element] unkown menu result: " << result);
             }
             else if (hasRequestedType)
             {

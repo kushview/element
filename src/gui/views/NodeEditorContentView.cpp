@@ -168,7 +168,7 @@ NodeEditorContentView::~NodeEditorContentView()
 void NodeEditorContentView::getState (String& state)
 {
     ValueTree tree ("state");
-    // DBG("[EL] ned saving node: " << node.getUuidString());
+    // DBG("[element] ned saving node: " << node.getUuidString());
     tree.setProperty (Tags::node, node.getUuidString(), nullptr)
         .setProperty ("sticky", sticky, nullptr);
 
@@ -214,7 +214,7 @@ void NodeEditorContentView::setState (const String& state)
     }
     else
     {
-        DBG ("[EL] couldn't find node to to select in node editor");
+        DBG ("[element] couldn't find node to to select in node editor");
     }
 }
 

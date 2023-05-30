@@ -46,7 +46,7 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
     }
     else if (tree.hasType (Tags::controller) || tree.hasType (Tags::control))
     {
-        PLUGIN_DBG ("[EL] set missing for: " << tree.getProperty (Tags::name).toString());
+        PLUGIN_DBG ("[element] set missing for: " << tree.getProperty (Tags::name).toString());
     }
 }
 
@@ -150,7 +150,7 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
         return;
     }
 
-    PLUGIN_DBG ("[EL] prepare to play: prepared=" << (int) prepared << " sampleRate: " << sampleRate << " buff: " << bufferSize << " numIns: " << numIns << " numOuts: " << numOuts);
+    PLUGIN_DBG ("[element] prepare to play: prepared=" << (int) prepared << " sampleRate: " << sampleRate << " buff: " << bufferSize << " numIns: " << numIns << " numOuts: " << numOuts);
 
     const bool channelCountsChanged = numIns != getTotalNumInputChannels()
                                       || numOuts != getTotalNumOutputChannels();
@@ -170,7 +170,7 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
 
         if (detailsChanged)
         {
-            PLUGIN_DBG ("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
+            PLUGIN_DBG ("[element] details changed: " << sampleRate << " : " << bufferSize << " : " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
 
             if (channelCountsChanged) // && preparedCount <= 0)
             {
@@ -193,7 +193,7 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
 
 void PluginProcessor::releaseResources()
 {
-    PLUGIN_DBG ("[EL] release resources: " << (int) prepared);
+    PLUGIN_DBG ("[element] release resources: " << (int) prepared);
     if (engine)
         engine->sampleLatencyChanged.disconnect_all_slots();
     if (prepared)
@@ -226,7 +226,7 @@ void PluginProcessor::reloadEngine()
 
 void PluginProcessor::reset()
 {
-    PLUGIN_DBG ("[EL] plugin reset");
+    PLUGIN_DBG ("[element] plugin reset");
 }
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -322,7 +322,7 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    PLUGIN_DBG ("[EL] restore state: prepared: " << (int) prepared);
+    PLUGIN_DBG ("[element] restore state: prepared: " << (int) prepared);
     if (! controllerActive)
         return;
     auto session = world->getSession();
@@ -343,7 +343,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 
         if (error.isNotEmpty())
         {
-            PLUGIN_DBG ("[EL] plugin failed restoring state: " << error);
+            PLUGIN_DBG ("[element] plugin failed restoring state: " << error);
         }
         else
         {
@@ -364,28 +364,28 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 
         if (prepared)
         {
-            PLUGIN_DBG ("[EL] plugin restored state while already prepared");
+            PLUGIN_DBG ("[element] plugin restored state while already prepared");
         }
         else
         {
-            PLUGIN_DBG ("[EL] plugin tried to restore state when not prepared");
+            PLUGIN_DBG ("[element] plugin tried to restore state when not prepared");
         }
     }
 }
 
 void PluginProcessor::numChannelsChanged()
 {
-    PLUGIN_DBG ("[EL] num channels changed: " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
+    PLUGIN_DBG ("[element] num channels changed: " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
 }
 
 void PluginProcessor::numBusesChanged()
 {
-    PLUGIN_DBG ("[EL] num buses changed: " << getBusCount (true) << "/" << getBusCount (false));
+    PLUGIN_DBG ("[element] num buses changed: " << getBusCount (true) << "/" << getBusCount (false));
 }
 
 void PluginProcessor::processorLayoutsChanged()
 {
-    PLUGIN_DBG ("[EL] layout changed: prepared: " << (int) prepared);
+    PLUGIN_DBG ("[element] layout changed: prepared: " << (int) prepared);
     triggerAsyncUpdate();
 }
 
@@ -416,11 +416,11 @@ void PluginProcessor::initialize()
     if (MessageManager::getInstance()->isThisTheMessageThread())
     {
         session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
-        PLUGIN_DBG ("[EL] default graph created");
+        PLUGIN_DBG ("[element] default graph created");
     }
     else
     {
-        PLUGIN_DBG ("[EL] couldn't create default graph");
+        PLUGIN_DBG ("[element] couldn't create default graph");
     }
 
     controller.reset (new ServiceManager (*world, RunMode::Plugin));
@@ -435,7 +435,7 @@ void PluginProcessor::initialize()
 
 void PluginProcessor::handleAsyncUpdate()
 {
-    PLUGIN_DBG ("[EL] handle async update");
+    PLUGIN_DBG ("[element] handle async update");
     initialize();
     reloadEngine();
 

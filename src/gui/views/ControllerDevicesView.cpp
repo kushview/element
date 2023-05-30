@@ -702,7 +702,7 @@ public:
                                  false);
             if (chooser.browseForFileToSave (true))
             {
-                DBG ("[EL] save device");
+                DBG ("[element] save device");
                 if (auto xml = editedDevice.getValueTree().createXml())
                     xml->writeToFile (chooser.getResult(), String());
             }

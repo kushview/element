@@ -423,7 +423,7 @@ public:
         if ((! message.isController() || ! controllerNumbers[message.getControllerNumber()]) && (! message.isNoteOnOrOff() || ! noteNumbers[message.getNoteNumber()]))
             return;
 
-        // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber()
+        // DBG("[element] handle mapped MIDI: " << message.getControllerNumber()
         //     << " : " << message.getControllerValue());
         if (message.isNoteOn())
             mapping.captureNextEvent (*this, notes[message.getNoteNumber()], message);
@@ -607,7 +607,7 @@ bool MappingEngine::addInput (const ControllerDevice& controller, MidiEngine& mi
     std::unique_ptr<ControllerMapInput> input;
     input.reset (new ControllerMapInput (*this, midi, controller));
 
-    DBG ("[EL] MappingEngine: added input handler for controller: " << controller.getName().toString());
+    DBG ("[element] MappingEngine: added input handler for controller: " << controller.getName().toString());
     return inputs->add (input.release());
 }
 

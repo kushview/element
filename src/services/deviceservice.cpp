@@ -84,7 +84,7 @@ void DeviceService::add (const ControllerDevice& device, const ControllerDevice:
     }
     else
     {
-        DBG (String ("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
+        DBG (String ("[element] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
 }
 
@@ -133,7 +133,7 @@ void DeviceService::remove (const ControllerDevice& device, const ControllerDevi
     }
     else
     {
-        DBG (String ("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
+        DBG (String ("[element] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
 }
 
@@ -156,7 +156,7 @@ void DeviceService::refresh (const ControllerDevice& device)
 
         if (objects.isValid() && mapping.addHandler (objects.control, objects.node, parameter))
         {
-            DBG("[EL] added handler in refresh: " << objects.control.getName().toString());
+            DBG("[element] added handler in refresh: " << objects.control.getName().toString());
         }
     }
 #endif
@@ -184,11 +184,11 @@ void DeviceService::refresh()
 
         if (mapping.addHandler (control, node, parameter))
         {
-            DBG ("[EL] added handler in refresh: " << control.getName().toString());
+            DBG ("[element] added handler in refresh: " << control.getName().toString());
         }
         else
         {
-            DBG ("[EL] failed adding handler: " << control.getName().toString());
+            DBG ("[element] failed adding handler: " << control.getName().toString());
         }
     }
 

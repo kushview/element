@@ -218,7 +218,7 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
         }
         else
         {
-            DBG ("[EL] could not open MIDI output: " << deviceIdx << ": " << deviceName);
+            DBG ("[element] could not open MIDI output: " << deviceIdx << ": " << deviceName);
         }
     }
 
@@ -297,7 +297,7 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
     midiOutLatency.set (state.getProperty ("midiLatency", (double) midiOutLatency.get()));
     if (inputDevice != (bool) state.getProperty ("inputDevice"))
     {
-        DBG ("[EL] MIDI Device node wrong direction");
+        DBG ("[element] MIDI Device node wrong direction");
     }
     setCurrentDevice (state.getProperty ("deviceName", "").toString());
 }
