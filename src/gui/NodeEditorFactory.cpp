@@ -2,6 +2,7 @@
 #include <element/services/guiservice.hpp>
 #include "engine/nodes/NodeTypes.h"
 #include <element/nodeobject.hpp>
+#include <element/ui/grapheditor.hpp>
 
 #include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"
@@ -39,6 +40,11 @@ public:
             return nullptr;
         }
 
+        const auto NID = node.getIdentifier().toString();
+        if (NID == EL_INTERNAL_ID_GRAPH) {
+            return new GraphEditor (node);
+        }
+        
         switch (placement)
         {
             case NodeEditorPlacement::PluginWindow:

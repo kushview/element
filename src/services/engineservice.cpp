@@ -297,6 +297,7 @@ void EngineService::addGraph (const Node& newGraph)
 {
     jassert (newGraph.isGraph());
 
+    Node ret;
     Node node = newGraph.getValueTree().getParent().isValid() ? newGraph
                                                               : Node (newGraph.getValueTree().createCopy(), false);
     auto engine = getWorld().getAudioEngine();

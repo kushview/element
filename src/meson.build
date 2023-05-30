@@ -66,6 +66,8 @@ libelement_sources = '''
     engine/rootgraph.cpp
     engine/shuttle.cpp
     
+    gui/grapheditor.cpp
+    
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp
     gui/BlockComponent.cpp

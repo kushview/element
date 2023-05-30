@@ -20,6 +20,7 @@
 #pragma once
 
 #include "gui/nodes/NodeEditorComponent.h"
+#include "gui/LookAndFeel.h"
 
 #include <element/devicemanager.hpp>
 

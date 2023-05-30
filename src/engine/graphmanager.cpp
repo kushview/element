@@ -400,7 +400,8 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
     if (auto* object = createFilter (desc, rx, ry, nodeId))
     {
         nodeId = object->nodeId;
-        ValueTree data (Tags::node);
+        ValueTree data = ! object->isGraph() ? ValueTree (Tags::node)
+                                             : Node::createDefaultGraph (desc->name).getValueTree();
 
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Tags::format, desc->pluginFormatName, nullptr)
@@ -596,7 +597,7 @@ void GraphManager::setNodeModel (const Node& node)
     {
         Node node (nodes.getChild (i), false);
         const PluginDescription desc (pluginManager.findDescriptionFor (node));
-        if (NodeObjectPtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
+        if (NodeObjectPtr obj = createFilter (&desc, 0, 0, node.getNodeId()))
         {
             setupNode (node.getValueTree(), obj);
             obj->setEnabled (node.isEnabled());

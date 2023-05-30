@@ -17,15 +17,19 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#pragma once
-
-#include <element/juce/gui_basics.hpp>
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
-class MainMenuBarModel : public juce::MenuBarModel {
+class GraphEditor : public NodeEditorComponent {
 public:
-    virtual ~MainMenuBarModel() = default;
-    virtual juce::PopupMenu* getMacAppMenu() { return nullptr; }
+    GraphEditor (const Node& graph);
+    ~GraphEditor();
+    void resized() override;
+    void paint (juce::Graphics& g) override;
+private:
+    class Graph;
+    std::unique_ptr<Graph> graph;
 };
+
 }
