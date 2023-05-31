@@ -565,7 +565,7 @@ void GraphNode::getPluginDescription (PluginDescription& d) const
     d.category = "Graphs";
     d.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
     d.fileOrIdentifier = EL_INTERNAL_ID_GRAPH;
-    d.manufacturerName = "Element";
+    d.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
     d.version = "1.0.0";
     d.isInstrument = false;
     d.numInputChannels = getNumAudioInputs();

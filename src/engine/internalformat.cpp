@@ -114,7 +114,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* desc = ds.add (new PluginDescription());
         desc->pluginFormatName = getName();
         desc->name = "Comb Filter (mono)";
-        desc->manufacturerName = "Element";
+        desc->manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
         desc->category = "Effect";
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
@@ -131,7 +131,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* desc = ds.add (new PluginDescription());
         desc->pluginFormatName = getName();
         desc->name = "AllPass Filter (mono)";
-        desc->manufacturerName = "Element";
+        desc->manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
         desc->category = "Effect";
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
@@ -148,7 +148,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* desc = ds.add (new PluginDescription());
         desc->pluginFormatName = getName();
         desc->name = "Volume (mono)";
-        desc->manufacturerName = "Element";
+        desc->manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
         desc->category = "Effect";
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;

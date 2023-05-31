@@ -61,7 +61,7 @@ void IONode::fillInPluginDescription (PluginDescription& d) const
     d.uniqueId = d.name.hashCode();
     d.category = "I/O Devices";
     d.pluginFormatName = "Internal";
-    d.manufacturerName = "Element";
+    d.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
     d.version = "1.0";
     d.isInstrument = false;
 

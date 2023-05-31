@@ -66,7 +66,7 @@ public:
         desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
-        desc.manufacturerName = "Element";
+        desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
         desc.pluginFormatName = "Element";
         desc.version = "1.0.0";
     }

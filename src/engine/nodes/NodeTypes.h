@@ -21,6 +21,10 @@
 
 #define EL_INTERNAL_FORMAT_NAME "Element"
 
+#ifndef EL_INTERNAL_FORMAT_AUTHOR
+#define EL_INTERNAL_FORMAT_AUTHOR "Element"
+#endif
+
 // Nodes backed by AudioProcessor
 #define EL_INTERNAL_ID_ALLPASS_FILTER "element.allPass"
 #define EL_INTERNAL_ID_AUDIO_FILE_PLAYER "element.audioFilePlayer"
