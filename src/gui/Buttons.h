@@ -107,14 +107,14 @@ public:
 class ConfigButton : public SettingButton
 {
 public:
-    ConfigButton() { setPath (getIcons().fasCog, 2); }
+    ConfigButton() { setPath (getIcons().fasCog, 2.f); }
     ~ConfigButton() {}
 };
 
 class GraphButton : public SettingButton
 {
 public:
-    GraphButton() { setPath (getIcons().fasThLarge, 2.2); }
+    GraphButton() { setPath (getIcons().fasThLarge, 2.2f); }
     ~GraphButton() {}
 };
 

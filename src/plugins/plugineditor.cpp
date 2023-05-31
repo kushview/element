@@ -208,7 +208,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker (0.29));
+        g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker (0.29f));
     }
 
     void resized() override

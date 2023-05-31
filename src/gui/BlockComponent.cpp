@@ -559,14 +559,14 @@ void BlockComponent::paint (Graphics& g)
     const int colorBarHeight = vertical ? 20 : 18;
     bool colorize = color != Colour (0x00000000);
     Colour bgc = isEnabled() && node.isEnabled()
-                     ? LookAndFeel::widgetBackgroundColor.brighter (0.8)
-                     : LookAndFeel::widgetBackgroundColor.brighter (0.2);
+                     ? LookAndFeel::widgetBackgroundColor.brighter (0.8f)
+                     : LookAndFeel::widgetBackgroundColor.brighter (0.2f);
 
-    auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1);
+    auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1f);
 
     if (isSelected())
     {
-        bgc = bgc.brighter (0.55);
+        bgc = bgc.brighter (0.55f);
     }
 
     if (colorize)
@@ -575,7 +575,7 @@ void BlockComponent::paint (Graphics& g)
         {
             case Compact:
             case Small: {
-                g.setColour (selected ? barColor.brighter (0.275) : barColor);
+                g.setColour (selected ? barColor.brighter (0.275f) : barColor);
                 g.fillRoundedRectangle (box.toFloat(), cornerSize);
                 break;
             }

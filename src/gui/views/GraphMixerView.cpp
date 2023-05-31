@@ -111,7 +111,7 @@ public:
         if (selected)
         {
             g.setColour (Colours::white);
-            g.setOpacity (0.09);
+            g.setOpacity (0.09f);
             g.fillAll();
         }
     }

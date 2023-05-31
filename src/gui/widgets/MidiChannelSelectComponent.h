@@ -128,7 +128,7 @@ private:
             if (state.connected (row, col))
             {
                 if (owner.layout.omni.getToggleState() || ! isEnabled())
-                    g.setColour (LookAndFeel::widgetBackgroundColor.darker (0.1));
+                    g.setColour (LookAndFeel::widgetBackgroundColor.darker (0.1f));
                 else
                     g.setColour (Colors::toggleGreen);
             }

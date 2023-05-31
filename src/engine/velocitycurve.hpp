@@ -88,25 +88,25 @@ public:
             default:
             case Max:
             case Linear:
-                setOffset (0.50);
+                setOffset (0.50f);
                 break;
             case Soft_1:
-                setOffset (0.45);
+                setOffset (0.45f);
                 break;
             case Soft_2:
-                setOffset (0.35);
+                setOffset (0.35f);
                 break;
             case Soft_3:
-                setOffset (0.25);
+                setOffset (0.25f);
                 break;
             case Hard_1:
-                setOffset (0.55);
+                setOffset (0.55f);
                 break;
             case Hard_2:
-                setOffset (0.65);
+                setOffset (0.65f);
                 break;
             case Hard_3:
-                setOffset (0.75);
+                setOffset (0.75f);
                 break;
         }
     }
@@ -161,20 +161,20 @@ private:
     {
 #define dbgVars 0
         t = newT;
-        if (t < 0.001)
-            t = 0.001;
-        if (t > 0.999)
-            t = 0.999;
+        if (t < 0.001f)
+            t = 0.001f;
+        if (t > 0.999f)
+            t = 0.999f;
 
         const float z0 = t * 127.f;
         const float z1 = (1.f - t) * 127.f;
         const float s0 = -1.f * (127.f - z0) / (127.f - z1);
         const float s1 = -1.f * z0 / z1;
 
-        const float b0 = z0 * 0.5;
-        const float b1 = z1 * 0.5;
-        const float b2 = (127.f + z0) * 0.5;
-        const float b3 = (127.f + z1) * 0.5;
+        const float b0 = z0 * 0.5f;
+        const float b1 = z1 * 0.5f;
+        const float b2 = (127.f + z0) * 0.5f;
+        const float b3 = (127.f + z1) * 0.5f;
 
         c0 = (b3 - b1 + (s0 * b0) - (s1 * b2)) / (s0 - s1);
         c1 = s1 * (b3 - b1 + (s0 * b0) - (s1 * b2));
