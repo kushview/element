@@ -66,6 +66,7 @@ libelement_sources = '''
     engine/rootgraph.cpp
     engine/shuttle.cpp
     
+    gui/designer.cpp
     gui/grapheditor.cpp
     
     gui/AboutComponent.cpp

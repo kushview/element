@@ -1016,8 +1016,6 @@ void BlockComponent::updatePosition()
     if (! node.isValid())
         return;
 
-    bool isSubGraphIO = node.isIONode() && graph.getParentGraph().isValid();
-
     double x = 0.0, y = 0.0;
     auto* const panel = getGraphPanel();
     Component* parent = nullptr;

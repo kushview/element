@@ -932,6 +932,7 @@ void GuiService::stabilizeContent()
     refreshSystemTray();
     if (mainWindow)
         mainWindow->refreshName();
+    sigRefreshed();
 }
 
 void GuiService::stabilizeViews()

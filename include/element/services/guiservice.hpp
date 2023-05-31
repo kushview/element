@@ -23,6 +23,7 @@
 #include <element/session.hpp>
 #include <element/services.hpp>
 #include <element/signals.hpp>
+#include <element/ui/designer.hpp>
 
 namespace element {
 
@@ -41,6 +42,8 @@ class GuiService : public Service,
                    private juce::ChangeListener {
 public:
     Signal<void()> nodeSelected;
+    Signal<void()> sigRefreshed;
+    
     GuiService (Context& w, ServiceManager& a);
     ~GuiService();
 
@@ -149,6 +152,7 @@ private:
     std::unique_ptr<ContentComponent> content;
     std::unique_ptr<DialogWindow> about;
     std::unique_ptr<WindowDecorator> factory;
+    std::unique_ptr<Designer> designer;
 
     Node selectedNode; // TODO: content manager
 
