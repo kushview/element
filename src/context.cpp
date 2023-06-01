@@ -28,10 +28,12 @@
 #include "session/commandmanager.hpp"
 
 #include <element/services.hpp>
-#include "scripting.hpp"
 #include <element/context.hpp>
+
+#include "appinfo.hpp"
 #include "log.hpp"
 #include "module.hpp"
+#include "scripting.hpp"
 
 namespace element {
 
@@ -101,7 +103,7 @@ private:
 
 Context::Context (const String& _cli)
 {
-    appName = "Element";
+    appName = EL_APP_NAME;
     impl.reset (new Impl (*this));
     impl->init();
 }

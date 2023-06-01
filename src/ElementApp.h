@@ -19,12 +19,12 @@
 #pragma once
 
 #include <element/juce.hpp>
-#include "datapath.hpp"
 #include <element/porttype.hpp>
 #include <element/signals.hpp>
-
 #include <element/element.hpp>
 #include <element/tags.hpp>
+
+#include "datapath.hpp"
 
 namespace element {
 

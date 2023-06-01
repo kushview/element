@@ -16,17 +16,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "datapath.hpp"
 #include <element/node.hpp>
+
+#include "appinfo.hpp"
+#include "datapath.hpp"
 
 namespace element {
 namespace DataPathHelpers {
     StringArray getSubDirs()
     {
-        auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts" });
-#ifndef EL_SOLO
-        dirs.add ("Sessions");
-#endif
+        auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts", "Sessions" });
         return dirs;
     }
 
@@ -54,26 +53,29 @@ const File DataPath::applicationDataDir()
 {
 #if JUCE_MAC
     return File::getSpecialLocation (File::userApplicationDataDirectory)
-        .getChildFile ("Application Support/Element");
+        .getChildFile ("Application Support")
+        .getChildFile (EL_APP_NAME);
 #else
     return File::getSpecialLocation (File::userApplicationDataDirectory)
-        .getChildFile ("Element");
+        .getChildFile (EL_APP_NAME);
 #endif
 }
 
 const File DataPath::defaultUserDataPath()
 {
     return File::getSpecialLocation (File::userMusicDirectory)
-        .getChildFile ("Element");
+        .getChildFile (EL_APP_NAME);
 }
 
 const File DataPath::defaultSettingsFile()
 {
+    String fn (EL_APP_NAME);
 #if JUCE_DEBUG
-    return applicationDataDir().getChildFile ("ElementDebug.conf");
+    fn << "_Debug.conf";
 #else
-    return applicationDataDir().getChildFile ("Element.conf");
+    fn << ".conf";
 #endif
+    return applicationDataDir().getChildFile (fn);
 }
 
 const File DataPath::defaultLocation() { return defaultUserDataPath(); }
@@ -140,6 +142,7 @@ const File DataPath::installDir()
 {
     File dir;
 
+#if EL_INSTALL_DIR_AWARE
 #if JUCE_WINDOWS
     const auto installDir = WindowsRegistry::getValue (
                                 "HKEY_LOCAL_MACHINE\\Software\\Kushview\\Element\\InstallDir", "")
@@ -149,7 +152,7 @@ const File DataPath::installDir()
 #elif JUCE_MAC
     dir = File ("/Applications");
 #endif
-
+#endif
     return dir;
 }
 } // namespace element

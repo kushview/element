@@ -19,6 +19,7 @@
 #pragma once
 
 #include <element/juce.hpp>
+#include "appinfo.hpp"
 
 namespace element {
 namespace Util {
@@ -55,18 +56,18 @@ namespace Util {
     /** Returns the application name depending on product.
     Element Lite, Element Solo, or Element
  */
-    inline static String appName (const String& beforeText = String())
+    inline static String appName (const String& beforeText = String(),
+                                  const String& afterText = String())
     {
         String name;
         if (beforeText.isNotEmpty())
-            name << beforeText << " Element";
-        else
-            name = "Element";
+            name << beforeText;
+            
+        name << EL_APP_NAME;
 
-#if defined(EL_SOLO)
-        name << " SE";
-#endif
-
+        if (afterText.isNotEmpty())
+            name << afterText;
+        
         return name;
     }
 
