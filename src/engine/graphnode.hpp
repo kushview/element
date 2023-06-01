@@ -234,6 +234,7 @@ private:
 
     std::atomic<AudioPlayHead*> playhead { nullptr };
 
+    CriticalSection seqLock;
     void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();

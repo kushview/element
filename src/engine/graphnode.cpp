@@ -244,6 +244,7 @@ bool GraphNode::connectChannels (PortType type, uint32 sourceNode, int32 sourceC
 void GraphNode::removeConnection (const int index)
 {
     connections.remove (index);
+    cancelPendingUpdate();
     triggerAsyncUpdate();
 }
 
@@ -436,6 +437,7 @@ void GraphNode::buildRenderingSequence()
         while (midiBuffers.size() < numMidiBuffersNeeded)
             midiBuffers.add (new MidiBuffer());
 
+        ScopedLock sl (seqLock);
         renderingOps.swapWith (newRenderingOps);
     }
 
@@ -545,10 +547,13 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
 
     currentMidiOutputBuffer.clear();
 
-    for (int i = 0; i < renderingOps.size(); ++i)
     {
-        GraphOp* const op = static_cast<GraphOp*> (renderingOps.getUnchecked (i));
-        op->perform (renderingBuffers, midiBuffers, numSamples);
+        ScopedLock sl (seqLock);
+        for (int i = 0; i < renderingOps.size(); ++i)
+        {
+            GraphOp* const op = static_cast<GraphOp*> (renderingOps.getUnchecked (i));
+            op->perform (renderingBuffers, midiBuffers, numSamples);
+        }
     }
 
     for (int i = 0; i < buffer.getNumChannels(); ++i)
