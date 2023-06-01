@@ -147,7 +147,7 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
 
 void OSCReceiverNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::backgroundColor.brighter (0.1));
+    g.fillAll (LookAndFeel::backgroundColor.brighter (0.1f));
 }
 
 void OSCReceiverNodeEditor::connectButtonClicked()
@@ -282,7 +282,7 @@ void OSCReceiverNodeEditor::updateConnectButton()
 void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 {
     String text = connected ? "On" : "Off";
-    auto textColour = connected ? Colours::green.brighter (0.3) : Colours::red.brighter (0.3);
+    auto textColour = connected ? Colours::green.brighter (0.3f) : Colours::red.brighter (0.3f);
 
     connectionStatusLabel.setText (text, dontSendNotification);
     connectionStatusLabel.setColour (Label::textColourId, textColour);

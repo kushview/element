@@ -61,19 +61,19 @@ public:
 TransportBar::TransportBar()
 {
     addAndMakeVisible (play = new SettingButton());
-    play->setPath (getIcons().fasPlay, 4.4);
+    play->setPath (getIcons().fasPlay, 4.4f);
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     play->addListener (this);
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
     play->setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
 
     addAndMakeVisible (stop = new SettingButton());
-    stop->setPath (getIcons().fasStop, 4.4);
+    stop->setPath (getIcons().fasStop, 4.4f);
     stop->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stop->addListener (this);
 
     addAndMakeVisible (record = new SettingButton());
-    record->setPath (getIcons().fasCircle, 4.4);
+    record->setPath (getIcons().fasCircle, 4.4f);
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
     record->setColour (SettingButton::backgroundOnColourId, Colours::red);

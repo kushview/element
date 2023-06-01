@@ -224,7 +224,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1));
+        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1f));
         g.fillRect (getLocalBounds());
     }
 
@@ -370,7 +370,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1));
+        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1f));
         g.fillRect (getLocalBounds());
 
         const Colour lineColor (0xff545454);

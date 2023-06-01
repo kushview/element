@@ -50,18 +50,18 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     }
     else if (isButtonDown)
     {
-        fill = fill.darker (0.20);
+        fill = fill.darker (0.20f);
     }
     else if (isMouseOverButton)
     {
-        fill = fill.brighter (0.12);
+        fill = fill.brighter (0.12f);
     }
 
     g.fillAll (fill);
 
     if (! path.isEmpty())
     {
-        Icon i (path, getTextColour().brighter (0.15));
+        Icon i (path, getTextColour().brighter (0.15f));
         Rectangle<float> r { 0.0, 0.0, (float) getWidth(), (float) getHeight() };
         i.draw (g, r.reduced (pathReduction), false);
     }
