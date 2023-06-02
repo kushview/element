@@ -1,4 +1,6 @@
 
+if get_option('plugins').enabled()
+
 if host_machine.system() == 'windows'
     element_vst3_name_suffix = 'vst3'
     element_vst3_bindir = 'x86_64-win'
@@ -18,3 +20,5 @@ subdir ('effect/au')
 subdir ('effect/vst2')
 subdir ('effect/vst3')
 subdir ('midieffect/au')
+
+endif
