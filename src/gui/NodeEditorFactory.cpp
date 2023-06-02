@@ -15,6 +15,7 @@
 #include "gui/nodes/OSCSenderNodeEditor.h"
 #include "gui/nodes/VolumeNodeEditor.h"
 #include "gui/nodes/ScriptNodeEditor.h"
+#include "../nodes/mcu.hpp"
 
 #include "gui/NodeEditorFactory.h"
 #include "scripting.hpp"
@@ -43,6 +44,8 @@ public:
         const auto NID = node.getIdentifier().toString();
         if (NID == EL_INTERNAL_ID_GRAPH) {
             return new GraphEditor (node);
+        } else if (NID == "el.MCU") {
+            return new MackieControlEditor (node);
         }
         
         switch (placement)

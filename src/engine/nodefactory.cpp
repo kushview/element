@@ -33,6 +33,8 @@
 #include "engine/nodes/ScriptNode.h"
 #include "engine/graphnode.hpp"
 
+#include "../nodes/mcu.hpp"
+
 namespace element {
 
 NodeFactory::NodeFactory()
@@ -47,6 +49,7 @@ NodeFactory::NodeFactory()
     add<OSCReceiverNode> (EL_INTERNAL_ID_OSC_RECEIVER);
     add<ScriptNode> (EL_INTERNAL_ID_SCRIPT);
     add<GraphNode> (EL_INTERNAL_ID_GRAPH);
+    add<MackieControlUniversal> ("el.MCU");
 }
 
 NodeFactory::~NodeFactory()
