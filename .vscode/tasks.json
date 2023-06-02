@@ -26,6 +26,55 @@
                     "message": 5
                 }
             }
+        },
+        {
+            "label": "Bundle",
+            "type": "shell",
+            "command": "cd build && meson install --destdir=\".\" --quiet",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": {
+                "owner": "meson",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Launch OSX",
+            "type": "shell",
+            "command": "open build/stage/Element.app",
+            "dependsOn": "Bundle",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": {
+                "owner": "meson",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         }
     ]
 }
