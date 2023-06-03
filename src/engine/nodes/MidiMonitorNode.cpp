@@ -118,6 +118,12 @@ void MidiMonitorNode::timerCallback()
         else if (msg.isMidiContinue())
             text << "Continue";
 
+        if (msg.isNoteOn()) {
+            text << "NOTE ON: " << msg.getNoteNumber();
+        } else if (msg.isNoteOff()) {
+            text << "NOTE OFF: " << msg.getNoteNumber();
+        }
+
         midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
         text.clear();
         ++numLogged;

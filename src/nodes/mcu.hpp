@@ -71,7 +71,7 @@ public:
     inline bool wantsMidiPipe() const override { return true; }
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override {
         auto buf = midi.getWriteBuffer (0);
-        for (const auto& msg : *buf) {
+        for (const auto msg : *buf) {
             juce::ignoreUnused (msg);
         }
         midi.clear();

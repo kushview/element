@@ -23,7 +23,7 @@
 #include "gui/BlockComponent.h"
 #include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
-#include "utils.hpp"
+#include "./utils.hpp"
 
 namespace element {
 
