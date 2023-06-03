@@ -27,21 +27,6 @@
 
 namespace element {
 
-inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput, const int offset = 80000)
-{
-    jassert (offset > 0);
-    const auto devices = isInput ? MidiInput::getAvailableDevices() : MidiOutput::getAvailableDevices();
-    for (int i = 0; i < devices.size(); ++i)
-        menu.addItem (i + offset, devices[i].name, true, false);
-}
-
-inline static MidiDeviceInfo getMidiDeviceForMenuResult (const int result, const bool isInput, const int offset = 80000)
-{
-    jassert (offset > 0 && result >= offset);
-    const int index = result - offset;
-    const auto devices = isInput ? MidiInput::getAvailableDevices() : MidiOutput::getAvailableDevices();
-    return isPositiveAndBelow (index, devices.size()) ? devices.getUnchecked(index) : MidiDeviceInfo();
-}
 
 class PluginsPopupMenu : public PopupMenu
 {

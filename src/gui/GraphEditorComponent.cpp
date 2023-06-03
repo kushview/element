@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/ui/popups.hpp>
+
 #include "ElementApp.h"
 #include "services/graphservice.hpp"
 #include "engine/graphmanager.hpp"
