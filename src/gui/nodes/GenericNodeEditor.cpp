@@ -23,11 +23,11 @@
 namespace element {
 
 class BooleanParameterComponent final : public Component,
-                                        private ParameterListener
+                                        private ParameterObserver
 {
 public:
     BooleanParameterComponent (Parameter* param)
-        : ParameterListener (param)
+        : ParameterObserver (param)
     {
         // Set the initial value.
         handleNewParameterValue();
@@ -74,11 +74,11 @@ private:
 };
 
 class SwitchParameterComponent final : public Component,
-                                       private ParameterListener
+                                       private ParameterObserver
 {
 public:
     SwitchParameterComponent (Parameter* param)
-        : ParameterListener (param)
+        : ParameterObserver (param)
     {
         auto* leftButton = buttons.add (new TextButton());
         auto* rightButton = buttons.add (new TextButton());
@@ -178,11 +178,11 @@ private:
 };
 
 class ChoiceParameterComponent final : public Component,
-                                       private ParameterListener
+                                       private ParameterObserver
 {
 public:
     ChoiceParameterComponent (Parameter* param)
-        : ParameterListener (param),
+        : ParameterObserver (param),
           parameterValues (getParameter()->getValueStrings())
     {
         box.addItemList (parameterValues, 1);
@@ -240,11 +240,11 @@ private:
 };
 
 class SliderParameterComponent final : public Component,
-                                       private ParameterListener
+                                       private ParameterObserver
 {
 public:
     SliderParameterComponent (Parameter* param)
-        : ParameterListener (param)
+        : ParameterObserver (param)
     {
         if (getParameter()->getNumSteps() != AudioProcessor::getDefaultNumParameterSteps())
             slider.setRange (0.0, 1.0, 1.0 / (getParameter()->getNumSteps() - 1.0));

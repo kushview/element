@@ -29,11 +29,11 @@
 namespace element {
 
 //==============================================================================
-class ControlPort : private ParameterListener
+class ControlPort : private ParameterObserver
 {
 public:
     ControlPort (Parameter* parameter)
-        : ParameterListener (parameter)
+        : ParameterObserver (parameter)
     {
         param = parameter;
         control = dynamic_cast<ControlPortParameter*> (param.get());
@@ -100,12 +100,12 @@ private:
 
 //==============================================================================
 class LuaNodeParameterPropertyFloat : public PropertyComponent,
-                                      private ParameterListener
+                                      private ParameterObserver
 {
 public:
     LuaNodeParameterPropertyFloat (Parameter::Ptr p)
         : PropertyComponent (p->getName (1024)),
-          ParameterListener (p),
+          ParameterObserver (p),
           param (p)
     {
         if (param->getLabel().isNotEmpty())

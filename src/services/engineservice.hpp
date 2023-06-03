@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <element/juce/audio_devices.hpp>
 #include <element/services.hpp>
 #include <element/node.hpp>
 #include "engine/nodes/NodeTypes.h"
@@ -73,7 +74,7 @@ public:
     Node addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
 
     /** Adds a midi device node to the current root graph */
-    void addMidiDeviceNode (const String& device, const bool isInput);
+    void addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput);
 
     /** Removes a node from the current graph */
     void removeNode (const uint32);

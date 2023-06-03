@@ -789,8 +789,6 @@ void StandardContentComponent::stabilize (const bool refreshDataPathTrees)
         setContentView (new EmptyContentView());
     }
 
-    if (auto* window = findParentComponentOfClass<DocumentWindow>())
-        window->setName ("Element - " + session->getName());
     if (auto* ss = nav->findPanel<SessionTreePanel>())
         ss->setSession (session);
     if (auto* mcv = nav->findPanel<NodeMidiContentView>())

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <element/signals.hpp>
 #include "engine/nodes/BaseProcessor.h"
 
 namespace element {
@@ -26,11 +27,23 @@ namespace element {
 class MidiEngine;
 
 class MidiDeviceProcessor : public BaseProcessor,
-                            public MidiInputCallback
+                            public MidiInputCallback,
+                            private Timer
 {
 public:
     explicit MidiDeviceProcessor (const bool isInput, MidiEngine&);
     ~MidiDeviceProcessor() noexcept;
+
+    boost::signals2::signal<void()> sigDeviceChanged;
+
+    /** Returns the name of the Node.  MIDI in or out Device. */
+    const String getName() const override
+    {
+        return inputDevice ? "MIDI In Device" : "MIDI Out Device";
+    }
+
+    /** Returns the name of the device currently loaded or trying to be loaded. */
+    String getDeviceName() const noexcept;
 
     void fillInPluginDescription (PluginDescription& desc) const override
     {
@@ -53,15 +66,21 @@ public:
     void setLatency (double latencyMs);
 
     bool isInputDevice() const { return inputDevice; }
-    bool isOutputDevice() const { return ! isInputDevice(); }
+    bool isOutputDevice() const { return ! inputDevice; }
 
-    void setCurrentDevice (const String& device);
-    const String& getCurrentDevice() const { return deviceName; }
+    Array<MidiDeviceInfo> getAvailableDevices() const noexcept;
+    void setDevice (const MidiDeviceInfo& newDevice);
+    Result closeDevice();
+    
+    /** Returns the device info that is currently running */
+    MidiDeviceInfo getDevice() const noexcept { return device; }
+
+    /** Returns the device info that is currently running */
+    MidiDeviceInfo getWantedDevice() const noexcept { return deviceWanted; }
+
     bool isDeviceOpen() const;
 
     void reload();
-
-    const String getName() const override;
 
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
@@ -147,11 +166,17 @@ private:
     const bool inputDevice;
     MidiEngine& midi;
     bool prepared = false;
-    String deviceName;
+    MidiDeviceInfo device; // actual device name in use;
+    MidiDeviceInfo deviceWanted; // The device as saved in Stage and chosen by users.
     MidiMessageCollector inputMessages;
     std::unique_ptr<MidiInput> input;
     std::unique_ptr<MidiOutput> output;
     Atomic<double> midiOutLatency { 0.0 };
+
+    void waitForDevice() {}
+    void timerCallback() override;
+    bool deviceIsAvailable (const String& name);
+    bool deviceIsAvailable (const MidiDeviceInfo& dev);
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiDeviceProcessor);
 };
 

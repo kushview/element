@@ -869,7 +869,7 @@ Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
     return Node();
 }
 
-void EngineService::addMidiDeviceNode (const String& device, const bool isInput)
+void EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput)
 {
     NodeObjectPtr ptr;
     Node graph;
@@ -888,13 +888,14 @@ void EngineService::addMidiDeviceNode (const String& device, const bool isInput)
 
     if (proc != nullptr)
     {
-        proc->setCurrentDevice (device);
+        proc->setDevice (device);
+        
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             auto node (graph.getNode (i));
             if (node.getObject() == ptr.get())
             {
-                node.setProperty (Tags::name, proc->getCurrentDevice());
+                node.setProperty (Tags::name, proc->getDeviceName());
                 node.resetPorts();
                 break;
             }

@@ -48,12 +48,12 @@ static CodeEditorComponent::ColourScheme luaColors()
 }
 
 class LuaNodeParameterPropertyFloat : public PropertyComponent,
-                                      private ParameterListener
+                                      private ParameterObserver
 {
 public:
     LuaNodeParameterPropertyFloat (Parameter::Ptr p)
         : PropertyComponent (p->getName (1024)),
-          ParameterListener (p),
+          ParameterObserver (p),
           param (p)
     {
         if (param->getLabel().isNotEmpty())

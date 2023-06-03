@@ -55,12 +55,12 @@ public:
 
         @see addMidiInputCallback, isMidiInputEnabled
     */
-    void setMidiInputEnabled (const String& midiInputDeviceName, bool enabled);
+    void setMidiInputEnabled (const String& deviceId, bool enabled);
 
     /** Returns true if a given midi input device is being used.
         @see setMidiInputEnabled
     */
-    bool isMidiInputEnabled (const String& midiInputDeviceName) const;
+    bool isMidiInputEnabled (const String& deviceId) const;
 
     /** Registers a listener for callbacks when midi events arrive from a midi input.
 
@@ -72,13 +72,11 @@ public:
         Only devices which are enabled (see the setMidiInputEnabled() method) will have their
         events forwarded on to listeners.
      */
-    void addMidiInputCallback (const String& midiInputDeviceName,
-                               MidiInputCallback* callback,
+    void addMidiInputCallback (const String& deviceId, MidiInputCallback* callback,
                                bool consumer = false);
 
     /** Removes a listener that was previously registered with addMidiInputCallback(). */
-    void removeMidiInputCallback (const String& midiInputDeviceName,
-                                  MidiInputCallback* callback);
+    void removeMidiInputCallback (const String& deviceId, MidiInputCallback* callback);
 
     /** Removes a listener that was previously registered with addMidiInputCallback().
         This version does not check device name.
@@ -121,7 +119,7 @@ public:
 private:
     struct MidiCallbackInfo
     {
-        String deviceName;
+        String device;
 
         /** If true, will receive callbacks no matter the active state for the
             Audio Engine. If false, then will only receive callbacks if active
@@ -129,7 +127,7 @@ private:
          */
         bool consumer = false;
 
-        MidiInputCallback* callback;
+        MidiInputCallback* callback { nullptr };
     };
 
     struct MidiInputHolder : public MidiInputCallback

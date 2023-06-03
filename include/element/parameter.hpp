@@ -19,6 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <boost/signals2.hpp>
+
 #include <element/juce/core.hpp>
 #include <element/porttype.hpp>
 
@@ -305,6 +307,7 @@ private:
 
 using ParameterArray = juce::ReferenceCountedArray<Parameter>;
 
+/** A parameter type which represents a Control port. */
 class ControlPortParameter : public Parameter {
 public:
     using Ptr = juce::ReferenceCountedObjectPtr<ControlPortParameter>;
@@ -312,31 +315,64 @@ public:
     ControlPortParameter (const PortDescription&);
     ~ControlPortParameter();
 
-    int getPortIndex() const noexcept override { return port.index; }
-    int getParameterIndex() const noexcept override { return port.channel; }
-    Category getCategory() const override { return Parameter::genericParameter; }
-
-    float getValue() const override { return range.convertTo0to1 (value); }
-    void setValue (float newValue) override { value = range.convertFrom0to1 (newValue); }
-    float getDefaultValue() const override { return range.convertTo0to1 (port.defaultValue); }
-
-    juce::String getName (int maxLength) const override { return port.name.substring (0, maxLength); }
-    juce::String getLabel() const override { return {}; }
-    juce::String getText (float normalisedValue, int maxLength) const override;
-
-    float getValueForText (const juce::String& text) const override { return convertTo0to1 (text.getFloatValue()); }
-
-    void setPort (const PortDescription& newPort, bool preserveValue = false);
-    PortDescription getPort() const { return port; }
-    int getPortChannel() const { return port.channel; }
-
+    /** Returns the human understandable value. */
     float get() const { return value; }
     operator float() const { return value; }
+    
+    /** Sets the value.
+        @param newValue Human understandable value.
+    */
     void set (float newValue) { operator= (newValue); }
     ControlPortParameter& operator= (float newValue);
 
+    /** Returns the index of this port. */
+    int getPortIndex() const noexcept override { return port.index; }
+
+    /** Returns the index of this parameter as stored by the parent NodeObject. */
+    int getParameterIndex() const noexcept override { return port.channel; }
+    
+    /** Returns category for this control */
+    Category getCategory() const override { return Parameter::genericParameter; }
+
+    /** Returns the ports value ranged from 0 to 1 */
+    float getValue() const override { return range.convertTo0to1 (value); }
+
+    /** Set the value in a.
+        @param newValue Must be ranged 0 to 1
+    */
+    void setValue (float newValue) override { value = range.convertFrom0to1 (newValue); }
+
+    /** Returns the value in a 0 to 1 range */
+    float getDefaultValue() const override { return range.convertTo0to1 (port.defaultValue); }
+
+    /** Returns the name of this Control port */
+    juce::String getName (int maxLength) const override { return port.name.substring (0, maxLength); }
+
+    /** Gets a label that should be used for this port. */
+    juce::String getLabel() const override { return {}; }
+
+    /** Get a text representation of this port. */
+    juce::String getText (float normalisedValue, int maxLength) const override;
+
+    /** Tries to get the 0 to 1 value of this port. */
+    float getValueForText (const juce::String& text) const override { return convertTo0to1 (text.getFloatValue()); }
+
+    /** Change port metadata. */
+    void setPort (const PortDescription& newPort, bool preserveValue = false);
+    
+    /** Get port information. */
+    PortDescription getPort() const { return port; }
+
+    /** Get the cooresponding channel to the port index. */
+    int getPortChannel() const { return port.channel; }
+
+    /** Translate a human value to a 0 to 1 ranged value */
     float convertTo0to1 (float input) const { return range.convertTo0to1 (input); }
+
+    /** Translates a 0 to 1 value to a human value */
     float convertFrom0to1 (float input) const { return range.convertFrom0to1 (input); }
+
+    /** Get the range used by this port */
     const juce::NormalisableRange<float>& getNormalisableRange() const { return range; }
 
 private:
@@ -346,28 +382,61 @@ private:
 };
 
 //==============================================================================
-class ParameterListener : private Parameter::Listener,
+/** Class to aid in handling changes in a parameter.
+    Currently just a placeholder until API can be created.
+*/
+class PortObserver {
+public: 
+    PortObserver() =default;
+    virtual ~PortObserver() = default;
+};
+
+//==============================================================================
+class ParameterObserver : private PortObserver,
+                          private Parameter::Listener,
                           private juce::Timer {
 public:
-    ParameterListener (Parameter::Ptr param)
+    ParameterObserver() = default;
+    ParameterObserver (Parameter::Ptr param)
         : parameter (param)
     {
-        jassert (parameter != nullptr);
-        parameter->addListener (this);
-        startTimer (100);
+        observeParameter (param);
     }
 
-    ~ParameterListener() override
+    ~ParameterObserver() override
     {
         stopTimer();
-        parameter->removeListener (this);
-        parameter = nullptr;
+        if (parameter != nullptr) {
+            parameter->removeListener (this);
+            parameter = nullptr;
+        }
     }
 
-    Parameter* getParameter() noexcept { return parameter.get(); }
+    void observeParameter (Parameter::Ptr param)
+    {
+        if (parameter == param)
+            return;
+        if (parameter) {
+            parameter->removeListener (this);
+        }
+        parameter = param;
+        if (parameter != nullptr) {
+            parameter->addListener (this);
+            startTimer (100);
+        } else {
+            stopTimer();
+        }
+    }
+
+    /** Returns the parameter being observed. */
+    Parameter::Ptr getParameter() noexcept { return parameter; }
+
+    /** Invoked on the UI thread when the parameter changes. */
+    boost::signals2::signal<void()> sigValueChanged;
 
 protected:
-    virtual void handleNewParameterValue() = 0;
+    /** Called on the UI thread when the parameter value changes */
+    virtual void handleNewParameterValue() {}
 
 private:
     //==============================================================================
@@ -383,6 +452,7 @@ private:
     {
         if (parameterValueHasChanged.compareAndSetBool (0, 1)) {
             handleNewParameterValue();
+            sigValueChanged();
             startTimerHz (50);
         } else {
             startTimer (juce::jmin (250, getTimerInterval() + 10));
@@ -391,7 +461,7 @@ private:
 
     Parameter::Ptr parameter;
     juce::Atomic<int> parameterValueHasChanged { 0 };
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterObserver)
 };
 
 } // namespace element

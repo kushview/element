@@ -112,8 +112,8 @@ public:
 
     void comboBoxChanged (ComboBox*) override
     {
-        const auto deviceName = deviceBox.getItemText (deviceBox.getSelectedItemIndex());
-        proc.setCurrentDevice (deviceName);
+        auto device = devices[ deviceBox.getSelectedItemIndex()];
+        proc.setDevice (device);
         stabilizeComponents();
     }
 
@@ -122,7 +122,11 @@ private:
 
     MidiDeviceProcessor& proc;
     const bool inputDevice;
-    StringArray devices;
+    Array<MidiDeviceInfo> devices;
+    int notAvailableDeviceId = 0;
+    MidiDeviceInfo notAvailableDev;
+    bool hasNotAvailableDevice() const { return notAvailableDeviceId > 0; }
+
     ComboBox deviceBox;
     TextButton statusButton;
     Slider midiOutLatency;
@@ -130,12 +134,24 @@ private:
 
     void updateDevices (const bool resetList = true)
     {
+        notAvailableDeviceId = 0;
+        notAvailableDev = {};
+
         if (resetList)
-            devices = inputDevice ? MidiInput::getDevices() : MidiOutput::getDevices();
+            devices = proc.getAvailableDevices();
         deviceBox.clear (dontSendNotification);
         for (int i = 0; i < devices.size(); ++i)
-            deviceBox.addItem (devices[i], i + 1);
-        deviceBox.setSelectedItemIndex (devices.indexOf (proc.getName()));
+            deviceBox.addItem (devices[i].name, i + 1);
+        
+        if (! proc.isDeviceOpen()) {
+            notAvailableDev = proc.getWantedDevice();
+            if (notAvailableDev.identifier.isNotEmpty()) {
+                notAvailableDeviceId = 1000;
+                deviceBox.addItem (notAvailableDev.name, notAvailableDeviceId);
+            }
+        } else {
+            deviceBox.setSelectedItemIndex (devices.indexOf (proc.getDevice()));
+        }
     }
 };
 
@@ -147,7 +163,9 @@ MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput, MidiEngine& me)
     setPlayConfigDetails (0, 0, 44100.0, 1024);
 }
 
-MidiDeviceProcessor::~MidiDeviceProcessor() noexcept {}
+MidiDeviceProcessor::~MidiDeviceProcessor() noexcept {
+    closeDevice();
+}
 
 void MidiDeviceProcessor::setLatency (double latencyMs)
 {
@@ -156,8 +174,24 @@ void MidiDeviceProcessor::setLatency (double latencyMs)
     midiOutLatency.set (jlimit (-1000.0, 1000.0, latencyMs));
 }
 
-void MidiDeviceProcessor::setCurrentDevice (const String& device)
+void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
 {
+    if (device.identifier == newDevice.identifier 
+            && deviceWanted.identifier == newDevice.identifier
+            && isDeviceOpen()) {
+        DBG("[element] returned setting new device");
+        return;
+    }
+    
+    if (newDevice.identifier.isEmpty()) {
+        closeDevice();
+        DBG("[element] closed on call to set");
+        return;
+    }
+
+    deviceWanted = newDevice;
+
+    // check if device online
     const bool wasSuspended = isSuspended();
     suspendProcessing (true);
     const bool wasPrepared = prepared;
@@ -167,7 +201,41 @@ void MidiDeviceProcessor::setCurrentDevice (const String& device)
     if (prepared)
         releaseResources();
 
-    deviceName = device;
+    if (inputDevice)
+    {
+        midi.removeMidiInputCallback (this);
+        if (deviceWanted.identifier.isNotEmpty()) {
+            midi.addMidiInputCallback (deviceWanted.identifier, this, true);
+            device = deviceWanted;
+        }
+    }
+    else
+    {
+        if (output) {
+            output->stopBackgroundThread();
+            output->clearAllPendingMessages();
+            output.reset();
+        }
+
+        output = MidiOutput::openDevice (deviceWanted.identifier);
+        
+        if (output)
+        {
+            output->clearAllPendingMessages();
+            output->startBackgroundThread();
+            device = deviceWanted;
+        }
+        else
+        {
+            DBG ("[element] could not open MIDI output: " << deviceWanted.name);
+        }
+    }
+
+    if (! isDeviceOpen()) {
+        startTimer (1500);
+    } else {
+        DBG("[element] midi device opened " << device.name);
+    }
 
     if (wasPrepared)
         prepareToPlay (rate, block);
@@ -175,20 +243,47 @@ void MidiDeviceProcessor::setCurrentDevice (const String& device)
     suspendProcessing (wasSuspended);
 }
 
+Result MidiDeviceProcessor::closeDevice() {
+    const bool wasSuspended = isSuspended();
+    suspendProcessing (true);
+
+    if (inputDevice) {
+        midi.removeMidiInputCallback (this);
+    } else {
+        if (output) {
+            output->clearAllPendingMessages();
+            std::unique_ptr<MidiOutput> closer;
+            {
+                ScopedLock sl (getCallbackLock());
+                std::swap (output, closer);
+            }
+            closer.reset();
+        }
+    }
+
+    suspendProcessing (wasSuspended);
+    device.identifier.clear();
+    device.name.clear();
+    return Result::ok();
+}
+
 bool MidiDeviceProcessor::isDeviceOpen() const
-{
+{   
+    if (inputDevice) {
+        return device.identifier.isNotEmpty() && deviceWanted.identifier == device.identifier;
+    }
+
     ScopedLock sl (getCallbackLock());
-    return inputDevice ? deviceName.isNotEmpty() : output != nullptr;
+    return output != nullptr;
 }
 
 void MidiDeviceProcessor::reload()
 {
-    setCurrentDevice (deviceName);
+    // noop
 }
 
-const String MidiDeviceProcessor::getName() const
-{
-    return deviceName;
+String MidiDeviceProcessor::getDeviceName() const noexcept {
+    return device.name;
 }
 
 void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
@@ -197,31 +292,12 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
     if (prepared)
         return;
 
-    const StringArray devList = inputDevice ? MidiInput::getDevices() : MidiOutput::getDevices();
-    const int defaultIdx = inputDevice ? MidiInput::getDefaultDeviceIndex() : MidiOutput::getDefaultDeviceIndex();
-    int deviceIdx = deviceName.isNotEmpty() ? devList.indexOf (deviceName) : defaultIdx;
-    if (deviceIdx < 0)
-        deviceIdx = defaultIdx;
-
-    if (inputDevice)
-    {
-        if (deviceName.isNotEmpty())
-            midi.addMidiInputCallback (deviceName, this, true);
+    if (! isDeviceOpen()) {
+        if (deviceWanted.identifier.isNotEmpty())
+            if (deviceIsAvailable (deviceWanted))
+                setDevice (deviceWanted);
     }
-    else
-    {
-        output = MidiOutput::openDevice (deviceIdx);
-        if (output)
-        {
-            output->clearAllPendingMessages();
-            output->startBackgroundThread();
-        }
-        else
-        {
-            DBG ("[element] could not open MIDI output: " << deviceIdx << ": " << deviceName);
-        }
-    }
-
+    
     setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
     prepared = true;
 }
@@ -255,19 +331,6 @@ void MidiDeviceProcessor::releaseResources()
 {
     prepared = false;
     inputMessages.reset (getSampleRate());
-    midi.removeMidiInputCallback (this);
-
-    if (input)
-    {
-        input->stop();
-        input = nullptr;
-    }
-
-    if (output)
-    {
-        output->stopBackgroundThread();
-        output = nullptr;
-    }
 }
 
 AudioProcessorEditor* MidiDeviceProcessor::createEditor()
@@ -281,7 +344,8 @@ void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     ValueTree state ("state");
     state.setProperty ("inputDevice", isInputDevice(), 0)
-        .setProperty ("deviceName", deviceName, 0)
+        .setProperty ("deviceName", deviceWanted.name, 0)
+        .setProperty (Tags::identifier, deviceWanted.identifier, nullptr)
         .setProperty ("midiLatency", midiOutLatency.get(), nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
@@ -299,7 +363,14 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
     {
         DBG ("[element] MIDI Device node wrong direction");
     }
-    setCurrentDevice (state.getProperty ("deviceName", "").toString());
+
+    MidiDeviceInfo info;
+    info.name = state.getProperty ("deviceName", "").toString();
+    info.identifier = state.getProperty (Tags::identifier).toString();
+    DBG("[element] restoring device state: " << info.name);
+    DBG("[element] MIDI Device ID: " << info.identifier);
+    closeDevice();
+    setDevice (info);
 }
 
 void MidiDeviceProcessor::handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
@@ -312,6 +383,42 @@ void MidiDeviceProcessor::handleIncomingMidiMessage (MidiInput* source, const Mi
 void MidiDeviceProcessor::handlePartialSysexMessage (MidiInput* source, const uint8* messageData, int numBytesSoFar, double timestamp)
 {
     ignoreUnused (source, messageData, numBytesSoFar, timestamp);
+}
+
+Array<MidiDeviceInfo> MidiDeviceProcessor::getAvailableDevices() const noexcept
+{
+    const auto devlist = input ? MidiInput::getAvailableDevices()
+                               : MidiOutput::getAvailableDevices();
+    return devlist;
+}
+
+bool MidiDeviceProcessor::deviceIsAvailable (const String& name)
+{
+    for (const auto& info : getAvailableDevices())
+    {
+        if (info.name == name)
+            return true;
+    }
+    return true;
+}
+
+bool MidiDeviceProcessor::deviceIsAvailable (const MidiDeviceInfo& dev) {
+    for (const auto& info : getAvailableDevices())
+        if (info == dev)
+            return true;
+    return true;
+}
+
+
+void MidiDeviceProcessor::timerCallback()
+{
+    if (deviceWanted.identifier.isEmpty())
+        {
+            stopTimer();
+            return;
+        }
+    DBG("waiting for wanted device: " << deviceWanted.name);
+    setDevice (deviceWanted);
 }
 
 } // namespace element
