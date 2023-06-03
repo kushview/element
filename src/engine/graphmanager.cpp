@@ -562,9 +562,9 @@ bool GraphManager::canConnect (uint32 sourceFilterUID, int sourceFilterChannel, 
     return processor.canConnect (sourceFilterUID, sourceFilterChannel, destFilterUID, destFilterChannel);
 }
 
-bool GraphManager::addConnection (uint32 sourceFilterUID, int sourceFilterChannel, uint32 destFilterUID, int destFilterChannel)
+bool GraphManager::addConnection (uint32 sourceFilterUID, int sourcePort, uint32 destFilterUID, int destPort)
 {
-    const bool result = processor.addConnection (sourceFilterUID, (uint32) sourceFilterChannel, destFilterUID, (uint32) destFilterChannel);
+    const bool result = processor.addConnection (sourceFilterUID, (uint32) sourcePort, destFilterUID, (uint32) destPort);
     if (result)
         processorArcsChanged();
 
@@ -635,7 +635,16 @@ void GraphManager::setNodeModel (const Node& node)
         ValueTree arc (arcs.getChild (i));
         const auto sourceNode = (uint32) (int) arc.getProperty (Tags::sourceNode);
         const auto destNode = (uint32) (int) arc.getProperty (Tags::destNode);
+
+#if 0
+        auto src = processor.getNodeForId (sourceNode);
+        auto dst = processor.getNodeForId (destNode);
+        if (src && dst) {
+            DBG("connection " << src->getName() << " to " << dst->getName());
+        }
+#endif
         bool worked = processor.addConnection (sourceNode, (uint32) (int) arc.getProperty (Tags::sourcePort), destNode, (uint32) (int) arc.getProperty (Tags::destPort));
+
         if (worked)
         {
             arc.removeProperty (Tags::missing, 0);
@@ -773,6 +782,10 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 
     node.restorePluginState();
     node.resetPorts();
+    if (node.isA ("Element", EL_INTERNAL_ID_MIDI_INPUT_DEVICE) || node.isA ("Element", EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)) {
+        jassert (node.getNumPorts() == 1);
+    }
+
     jassert (node.getNumPorts() == static_cast<int> (obj->getNumPorts()));
 }
 

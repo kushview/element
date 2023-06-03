@@ -443,6 +443,21 @@ void EngineService::connectChannels (const uint32 s, const int sc, const uint32 
     connectChannels (getWorld().getSession()->getActiveGraph(), s, sc, d, dc);
 }
 
+void EngineService::connect (PortType type, const Node& src, int sc, const Node& dst, int dc, int nc) {
+    if (nc < 1) nc = 1;
+    if (auto manager = graphs->findGraphManagerFor (src.getParentGraph())) {
+        auto s = src.getObject();
+        auto d = dst.getObject();
+        while (s && d && --nc >= 0) {
+            auto sp = s->getPortForChannel (type, sc++, false);
+            auto dp = d->getPortForChannel (type, dc++, true);
+            manager->addConnection (src.getNodeId(), sp, dst.getNodeId(), dp);
+        }
+        manager->removeIllegalConnections();
+        manager->syncArcsModel();
+    }
+}
+
 void EngineService::testReconfigureRootGraphs() {
     changeListenerCallback (&getWorld().getDeviceManager());
 }
@@ -869,7 +884,7 @@ Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
     return Node();
 }
 
-void EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput)
+Node EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput)
 {
     NodeObjectPtr ptr;
     Node graph;
@@ -886,6 +901,7 @@ void EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool 
     MidiDeviceProcessor* const proc = (ptr == nullptr) ? nullptr
                                                        : dynamic_cast<MidiDeviceProcessor*> (ptr->getAudioProcessor());
 
+    Node deviceNode;
     if (proc != nullptr)
     {
         proc->setDevice (device);
@@ -897,6 +913,7 @@ void EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool 
             {
                 node.setProperty (Tags::name, proc->getDeviceName());
                 node.resetPorts();
+                deviceNode = node;
                 break;
             }
         }
@@ -905,6 +922,8 @@ void EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool 
     {
         // noop
     }
+
+    return deviceNode;
 }
 
 void EngineService::changeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& layout)

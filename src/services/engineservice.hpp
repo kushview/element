@@ -74,7 +74,7 @@ public:
     Node addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
 
     /** Adds a midi device node to the current root graph */
-    void addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput);
+    Node addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput);
 
     /** Removes a node from the current graph */
     void removeNode (const uint32);
@@ -113,11 +113,16 @@ public:
     /** Connect by channel on the root graph */
     void connectChannels (const uint32, const int, const uint32, const int);
 
+    void connect (PortType type, const Node& src, int sc, const Node& dst, int dc, int nc = 1);
+
+
     void testConnectAudio (const Node& src, int sc, const Node& dst, int dc, int nc = 1) {
         if (nc < 1) nc = 1;
         while (--nc >= 0)
             connectChannels (src.getParentGraph(), src, sc++, dst, dc++);
     }
+
+
 
     void testReconfigureRootGraphs();
 
