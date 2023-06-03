@@ -449,9 +449,22 @@ void EngineService::connect (PortType type, const Node& src, int sc, const Node&
         auto s = src.getObject();
         auto d = dst.getObject();
         while (s && d && --nc >= 0) {
-            auto sp = s->getPortForChannel (type, sc++, false);
-            auto dp = d->getPortForChannel (type, dc++, true);
-            manager->addConnection (src.getNodeId(), sp, dst.getNodeId(), dp);
+            auto sp = s->getPortForChannel (type, sc, false);
+            auto dp = d->getPortForChannel (type, dc, true);
+            if (! manager->addConnection (src.getNodeId(), sp, dst.getNodeId(), dp)) {
+                String msg = "[element] connection failed: \n";
+                
+                msg << "Source: " << src.getName() << juce::newLine
+                    << " ch. " << (int) sc << juce::newLine
+                    << " port " <<  (int) sp << juce::newLine
+                    << "Target: " << dst.getName() << juce::newLine
+                    << " ch. " << (int) dc << juce::newLine
+                    << " port " <<  (int) dp << juce::newLine;
+                DBG(msg);
+                break;
+            };
+ 
+            ++sc; ++dc;
         }
         manager->removeIllegalConnections();
         manager->syncArcsModel();

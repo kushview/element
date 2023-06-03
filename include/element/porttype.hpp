@@ -432,8 +432,10 @@ public:
 
     inline int getPortForChannel (int type, int channel, bool input) const
     {
-        if (auto* const desc = findByChannelInternal (type, channel, input))
+        if (auto* const desc = findByChannelInternal (type, channel, input)) {
+            jassert (desc->index != EL_INVALID_PORT);
             return desc->index;
+        }
         return static_cast<int> (EL_INVALID_PORT);
     }
 
@@ -498,6 +500,12 @@ public:
         ports.clearQuick (true);
         ports.addCopiesOf (o.ports);
         return *this;
+    }
+
+    void sanitizeIndexes() {
+        uint32_t index = 0;
+        for (auto* port : ports)
+            port->index = index++;
     }
 
 private:
