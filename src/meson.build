@@ -5,6 +5,7 @@ libelement_sources = '''
     commands.cpp
     context.cpp
     datapath.cpp
+    lv2.cpp
     matrixstate.cpp
     messages.cpp
     module.cpp
@@ -255,7 +256,7 @@ libelement = static_library ('element',
     libelement_sources,
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
-    dependencies : [ deps, juce_dep ],
+    dependencies : [ deps, juce_dep, lvtk_host_dep ],
     cpp_args : libelement_cpp_args,
     install : false,
     objects : [ libelement_lua.extract_all_objects (recursive : false),

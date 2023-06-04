@@ -789,13 +789,14 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
         }
     }
 
-    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
+    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME &&
+        desc.pluginFormatName != "LV2")
     {
         return nullptr;
     }
 
     errorMsg.clear();
-    if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
+    if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME && desc.pluginFormatName != "LV2")
     {
         errorMsg = desc.name;
         errorMsg << ": invalid format: " << desc.pluginFormatName;

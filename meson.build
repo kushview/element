@@ -15,6 +15,9 @@ endif
 
 # Boost
 boost_dep = dependency ('boost', required : true)
+lvtk_proj = subproject ('lvtk')
+lvtk_host_dep = lvtk_proj.get_variable ('lvtk_host_dep')
+
 deps = [ boost_dep ]
 
 # Filesystem

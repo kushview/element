@@ -31,6 +31,7 @@ class NodeProvider
 public:
     NodeProvider() = default;
     virtual ~NodeProvider() = default;
+    virtual String format() const { return "Element"; }
     virtual NodeObject* create (const String&) = 0;
     virtual StringArray findTypes() = 0;
 };
