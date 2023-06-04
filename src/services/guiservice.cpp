@@ -351,6 +351,10 @@ void GuiService::runDialog (const String& uri)
     }
 }
 
+void GuiService::setAppInfo (const AppInfo& info) {
+    appInfo = info;
+}
+
 void GuiService::closePluginWindow (PluginWindow* w)
 {
     if (windowManager)
@@ -972,6 +976,10 @@ void GuiService::toggleAboutScreen()
     if (! about)
     {
         about.reset (new AboutDialog (*this));
+        if (appInfo.title.isNotEmpty()) {
+            if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent()))
+                c->setAppInfo (appInfo);
+        }
     }
 
     jassert (about);

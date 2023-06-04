@@ -149,6 +149,10 @@ public:
         text.setReadOnly (true);
     }
 
+    void setLicenseText (const String& newText) {
+        text.setText (newText);
+    }
+
     void resized() override
     {
         text.setBounds (getLocalBounds());
@@ -257,6 +261,49 @@ void AboutComponent::paint (Graphics& g)
 
     if (elementLogo != nullptr)
         elementLogo->drawWithin (g, elementLogoBounds, RectanglePlacement::centred, 1.0);
+    else {
+        logo.drawWithin  (g, elementLogoBounds, RectanglePlacement::centred, 1.0);
+    }
+}
+
+void AboutComponent::updateAppInfo() {
+    if (info.title.isNotEmpty()) {
+        titleLabel.setText (info.title, sendNotification);
+    }
+
+    if (info.version.isNotEmpty()) {
+        versionLabel.setText (info.version, sendNotification);
+    }
+
+    if (info.copyright.isNotEmpty()) {
+        copyrightLabel.setText (info.copyright, sendNotification);
+    }
+    
+    if (! info.link.isEmpty()) {
+        aboutButton.setURL (info.link);
+    }
+
+    if (! info.linkText.isNotEmpty()) {
+        aboutButton.setButtonText (info.linkText);
+    }
+
+    if (info.licenseText.isNotEmpty()) {
+        tabs.removeTab (0); // authors
+        tabs.removeTab (0); // donors
+        tabs.removeTab (1); // credits
+        if (auto t = dynamic_cast<LicenseTextComponent*> (tabs.getTabContentComponent(0))) {
+            t->setLicenseText (info.licenseText);
+            tabs.setCurrentTabIndex (0);
+        }
+    }
+
+    if (info.logo.isValid()) {
+        elementLogo.reset();
+        logo.setImage (info.logo);
+    }
+
+    resized();
+    repaint();
 }
 
 } // namespace element

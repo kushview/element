@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <element/ui/about.hpp>
+
 #include "ElementApp.h"
 #include <element/services/guiservice.hpp>
 #include "gui/LookAndFeel.h"
@@ -26,6 +28,7 @@
 #include "commands.hpp"
 #include <element/context.hpp>
 #include "utils.hpp"
+
 
 namespace element {
 
@@ -36,16 +39,24 @@ public:
     void resized() override;
     void paint (Graphics& g) override;
 
+    void setAppInfo (const AppInfo& details) { info = details; updateAppInfo(); }
+    AppInfo getAppInfo() const { return info; }
+
 private:
-    Label titleLabel { "title", Util::appName().toUpperCase() },
+    AppInfo info;
+    Label titleLabel { "title", "Element" },
         versionLabel { "version" },
-        copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2019 Kushview, LLC.") };
+        copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2023 Kushview, LLC.") };
     HyperlinkButton aboutButton { "About Us", URL ("https://kushview.net") };
     Rectangle<float> elementLogoBounds;
     std::unique_ptr<Drawable> elementLogo;
+    DrawableImage logo;
     TabbedComponent tabs { TabbedButtonBar::TabsAtTop };
+    
+    void updateAppInfo();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutComponent)
 };
+
 
 class AboutDialog : public DialogWindow
 {

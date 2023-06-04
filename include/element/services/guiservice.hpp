@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include <element/node.hpp>
+#include <element/ui/about.hpp>
 #include <element/session.hpp>
 #include <element/services.hpp>
 #include <element/signals.hpp>
 #include <element/ui/designer.hpp>
+#include <element/ui/about.hpp>
 
 namespace element {
 
@@ -56,6 +57,7 @@ public:
 
     ServiceManager& getServices() const { return controller; }
     KeyListener* getKeyListener() const;
+    void setAppInfo (const AppInfo& info);
 
     void closeAllWindows();
 
@@ -159,6 +161,7 @@ private:
     struct KeyPressManager;
     std::unique_ptr<KeyPressManager> keys;
 
+    AppInfo appInfo;
     struct ForegroundCheck : public Timer {
         ForegroundCheck (GuiService& _ui) : ui (_ui) {}
         void timerCallback() override;
