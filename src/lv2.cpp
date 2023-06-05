@@ -14,6 +14,7 @@ public:
 
     void getTypes (StringArray& tps) {
         for (const auto& uri : world->plugin_uris()) {
+            DBG(uri);
             tps.add (uri);
         }
     }

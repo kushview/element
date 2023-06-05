@@ -888,6 +888,7 @@ void PluginManager::scanAudioPlugins (const StringArray& names)
     if (! priv)
         return;
 
+    scanInternalPlugins();
     if (isScanningAudioPlugins())
         return;
 
