@@ -68,14 +68,14 @@ void ServiceManager::activate()
 {
     if (services.size() <= 0)
     {
-        addChild (new GuiService (world, *this));
-        addChild (new DeviceService());
-        addChild (new EngineService());
-        addChild (new MappingService());
-        addChild (new PresetService());
-        addChild (new SessionService());
-        addChild (new GraphService());
-        addChild (new OSCService());
+        add (new GuiService (world, *this));
+        add (new DeviceService());
+        add (new EngineService());
+        add (new MappingService());
+        add (new PresetService());
+        add (new SessionService());
+        add (new GraphService());
+        add (new OSCService());
 
         lastExportedGraph = DataPath::defaultGraphDir();
         auto& commands = getWorld().getCommandManager();

@@ -83,7 +83,7 @@ public:
     inline juce::UndoManager& getUndoManager() { return undo; }
 
     /** Add a service */
-    void addChild (Service* service)
+    void add (Service* service)
     {
         service->owner = this;
         services.add (service);
@@ -115,6 +115,9 @@ public:
     /** Deactivate this and children */
     void deactivate();
 
+    /** Run/Launch the application. */
+    void run();
+
     juce::RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
 
 protected:
@@ -136,8 +139,6 @@ private:
     juce::UndoManager undo;
 
     RunMode runMode;
-
-    void run();
 };
 
 template <class T>
