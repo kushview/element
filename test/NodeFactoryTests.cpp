@@ -21,7 +21,8 @@ BOOST_AUTO_TEST_CASE (Internals)
         // EL_INTERNAL_ID_MIDI_SEQUENCER,
         EL_INTERNAL_ID_OSC_RECEIVER,
         EL_INTERNAL_ID_OSC_SENDER,
-        EL_INTERNAL_ID_SCRIPT);
+        EL_INTERNAL_ID_SCRIPT,
+        EL_INTERNAL_ID_MCU);
 
     OwnedArray<PluginDescription> types;
     for (const auto& ID : expectedIDs) {
