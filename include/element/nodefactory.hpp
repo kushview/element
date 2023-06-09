@@ -34,6 +34,7 @@ public:
     virtual String format() const { return "Element"; }
     virtual NodeObject* create (const String&) = 0;
     virtual StringArray findTypes() = 0;
+    virtual StringArray getHiddenTypes() { return {}; }
 };
 
 class NodeFactory final
@@ -42,8 +43,12 @@ public:
     NodeFactory();
     ~NodeFactory();
 
-    void getPluginDescriptions (OwnedArray<PluginDescription>& out, const String& identifier);
+    /** Fill a list of plugin descriptions. public */
+    void getPluginDescriptions (OwnedArray<PluginDescription>& out, 
+                                const String& identifier,
+                                bool includeHidden = false);
 
+    /** Returns a list of known Node IDs public and private. */
     const StringArray& getKnownIDs() const { return knownIDs; }
 
     NodeFactory& add (NodeProvider* f);
@@ -54,6 +59,23 @@ public:
         return add (new Single<NT> (identifier));
     }
 
+    void addHiddenType (const String& tp) {
+        denyIDs.addIfNotAlreadyThere (tp);
+    }
+
+    void hideAllTypes() {
+        for (const auto& tp : knownIDs)
+            denyIDs.add (tp);
+        denyIDs.removeDuplicates (false);
+        denyIDs.removeEmptyStrings();
+    }
+
+    void removeHiddenType (const String& tp) {
+        auto idx = denyIDs.indexOf (tp);
+        if (idx >= 0)
+            denyIDs.remove (idx);
+    }
+
     NodeObject* instantiate (const PluginDescription&);
     NodeObject* instantiate (const String& identifier);
     NodeObject* wrap (AudioProcessor*);
@@ -62,6 +84,7 @@ public:
 
 private:
     OwnedArray<NodeProvider> providers;
+    StringArray denyIDs;
     StringArray knownIDs;
 
     template <class NT>

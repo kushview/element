@@ -59,11 +59,14 @@ NodeFactory::~NodeFactory()
 }
 
 //==============================================================================
-void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, const String& identifier)
+void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, const String& ID, bool includeHidden)
 {
+    if (! includeHidden && denyIDs.contains (ID))
+        return;
+
     for (auto* f : providers)
     {
-        if (NodeObjectPtr ptr = f->create (identifier))
+        if (NodeObjectPtr ptr = f->create (ID))
         {
             auto* desc = out.add (new PluginDescription());
             ptr->getPluginDescription (*desc);
@@ -76,6 +79,11 @@ void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, con
 NodeFactory& NodeFactory::add (NodeProvider* f)
 {
     providers.add (f);
+
+    denyIDs.addArray (f->getHiddenTypes());
+    denyIDs.removeDuplicates (true);
+    denyIDs.removeEmptyStrings();
+
     knownIDs.addArray (f->findTypes());
     knownIDs.removeDuplicates (true);
     knownIDs.removeEmptyStrings();
