@@ -144,7 +144,9 @@ void AudioRouterNode::setSize (int newIns, int newOuts, bool async)
         triggerPortReset();
     } else {
         refreshPorts();
+        portsChanged();
     }
+
     sendChangeMessage();
 }
 

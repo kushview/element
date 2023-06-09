@@ -96,7 +96,7 @@ public:
         }
 
         channel = 0;
-        for (int i = 0; i < numSources; ++i)
+        for (int i = 0; i < numDestinations; ++i)
         {
             newPorts.add (PortType::Audio, index++, channel++, String ("audio_out_XX").replace ("XX", String (i)), String ("Output XX").replace ("XX", String (i + 1)), false);
         }
