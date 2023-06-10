@@ -32,7 +32,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const int) {}
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const int) override {}
 
 private:
     Parameter::Ptr param1, param2;
