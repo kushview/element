@@ -71,7 +71,7 @@ public:
     Array<MidiDeviceInfo> getAvailableDevices() const noexcept;
     void setDevice (const MidiDeviceInfo& newDevice);
     Result closeDevice();
-    
+
     /** Returns the device info that is currently running */
     MidiDeviceInfo getDevice() const noexcept { return device; }
 

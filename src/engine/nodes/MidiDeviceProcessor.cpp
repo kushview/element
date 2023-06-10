@@ -112,7 +112,7 @@ public:
 
     void comboBoxChanged (ComboBox*) override
     {
-        auto device = devices[ deviceBox.getSelectedItemIndex()];
+        auto device = devices[deviceBox.getSelectedItemIndex()];
         proc.setDevice (device);
         stabilizeComponents();
     }
@@ -142,14 +142,18 @@ private:
         deviceBox.clear (dontSendNotification);
         for (int i = 0; i < devices.size(); ++i)
             deviceBox.addItem (devices[i].name, i + 1);
-        
-        if (! proc.isDeviceOpen()) {
+
+        if (! proc.isDeviceOpen())
+        {
             notAvailableDev = proc.getWantedDevice();
-            if (notAvailableDev.identifier.isNotEmpty()) {
+            if (notAvailableDev.identifier.isNotEmpty())
+            {
                 notAvailableDeviceId = 1000;
                 deviceBox.addItem (notAvailableDev.name, notAvailableDeviceId);
             }
-        } else {
+        }
+        else
+        {
             deviceBox.setSelectedItemIndex (devices.indexOf (proc.getDevice()));
         }
     }
@@ -163,7 +167,8 @@ MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput, MidiEngine& me)
     setPlayConfigDetails (0, 0, 44100.0, 1024);
 }
 
-MidiDeviceProcessor::~MidiDeviceProcessor() noexcept {
+MidiDeviceProcessor::~MidiDeviceProcessor() noexcept
+{
     closeDevice();
 }
 
@@ -176,16 +181,18 @@ void MidiDeviceProcessor::setLatency (double latencyMs)
 
 void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
 {
-    if (device.identifier == newDevice.identifier 
-            && deviceWanted.identifier == newDevice.identifier
-            && isDeviceOpen()) {
-        DBG("[element] returned setting new device");
+    if (device.identifier == newDevice.identifier
+        && deviceWanted.identifier == newDevice.identifier
+        && isDeviceOpen())
+    {
+        DBG ("[element] returned setting new device");
         return;
     }
-    
-    if (newDevice.identifier.isEmpty()) {
+
+    if (newDevice.identifier.isEmpty())
+    {
         closeDevice();
-        DBG("[element] closed on call to set");
+        DBG ("[element] closed on call to set");
         return;
     }
 
@@ -204,21 +211,23 @@ void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
     if (inputDevice)
     {
         midi.removeMidiInputCallback (this);
-        if (deviceWanted.identifier.isNotEmpty()) {
+        if (deviceWanted.identifier.isNotEmpty())
+        {
             midi.addMidiInputCallback (deviceWanted.identifier, this, true);
             device = deviceWanted;
         }
     }
     else
     {
-        if (output) {
+        if (output)
+        {
             output->stopBackgroundThread();
             output->clearAllPendingMessages();
             output.reset();
         }
 
         output = MidiOutput::openDevice (deviceWanted.identifier);
-        
+
         if (output)
         {
             output->clearAllPendingMessages();
@@ -231,10 +240,13 @@ void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
         }
     }
 
-    if (! isDeviceOpen()) {
+    if (! isDeviceOpen())
+    {
         startTimer (1500);
-    } else {
-        DBG("[element] midi device opened " << device.name);
+    }
+    else
+    {
+        DBG ("[element] midi device opened " << device.name);
     }
 
     if (wasPrepared)
@@ -243,14 +255,19 @@ void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
     suspendProcessing (wasSuspended);
 }
 
-Result MidiDeviceProcessor::closeDevice() {
+Result MidiDeviceProcessor::closeDevice()
+{
     const bool wasSuspended = isSuspended();
     suspendProcessing (true);
 
-    if (inputDevice) {
+    if (inputDevice)
+    {
         midi.removeMidiInputCallback (this);
-    } else {
-        if (output) {
+    }
+    else
+    {
+        if (output)
+        {
             output->clearAllPendingMessages();
             std::unique_ptr<MidiOutput> closer;
             {
@@ -268,8 +285,9 @@ Result MidiDeviceProcessor::closeDevice() {
 }
 
 bool MidiDeviceProcessor::isDeviceOpen() const
-{   
-    if (inputDevice) {
+{
+    if (inputDevice)
+    {
         return device.identifier.isNotEmpty() && deviceWanted.identifier == device.identifier;
     }
 
@@ -282,7 +300,8 @@ void MidiDeviceProcessor::reload()
     // noop
 }
 
-String MidiDeviceProcessor::getDeviceName() const noexcept {
+String MidiDeviceProcessor::getDeviceName() const noexcept
+{
     return device.name;
 }
 
@@ -292,12 +311,13 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
     if (prepared)
         return;
 
-    if (! isDeviceOpen()) {
+    if (! isDeviceOpen())
+    {
         if (deviceWanted.identifier.isNotEmpty())
             if (deviceIsAvailable (deviceWanted))
                 setDevice (deviceWanted);
     }
-    
+
     setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
     prepared = true;
 }
@@ -367,8 +387,8 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
     MidiDeviceInfo info;
     info.name = state.getProperty ("deviceName", "").toString();
     info.identifier = state.getProperty (Tags::identifier).toString();
-    DBG("[element] restoring device state: " << info.name);
-    DBG("[element] MIDI Device ID: " << info.identifier);
+    DBG ("[element] restoring device state: " << info.name);
+    DBG ("[element] MIDI Device ID: " << info.identifier);
     closeDevice();
     setDevice (info);
 }
@@ -402,22 +422,22 @@ bool MidiDeviceProcessor::deviceIsAvailable (const String& name)
     return true;
 }
 
-bool MidiDeviceProcessor::deviceIsAvailable (const MidiDeviceInfo& dev) {
+bool MidiDeviceProcessor::deviceIsAvailable (const MidiDeviceInfo& dev)
+{
     for (const auto& info : getAvailableDevices())
         if (info == dev)
             return true;
     return true;
 }
 
-
 void MidiDeviceProcessor::timerCallback()
 {
     if (deviceWanted.identifier.isEmpty())
-        {
-            stopTimer();
-            return;
-        }
-    DBG("waiting for wanted device: " << deviceWanted.name);
+    {
+        stopTimer();
+        return;
+    }
+    DBG ("waiting for wanted device: " << deviceWanted.name);
     setDevice (deviceWanted);
 }
 

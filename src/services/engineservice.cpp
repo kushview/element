@@ -417,7 +417,8 @@ void EngineService::removeGraph (int index)
     findSibling<GuiService>()->stabilizeContent();
 }
 
-void EngineService::connectChannels (const Node& graph, const Node& src, const int sc, const Node& dst, const int dc) {
+void EngineService::connectChannels (const Node& graph, const Node& src, const int sc, const Node& dst, const int dc)
+{
     connectChannels (graph, src.getNodeId(), sc, dst.getNodeId(), dc);
 }
 
@@ -443,35 +444,42 @@ void EngineService::connectChannels (const uint32 s, const int sc, const uint32 
     connectChannels (getWorld().getSession()->getActiveGraph(), s, sc, d, dc);
 }
 
-void EngineService::connect (PortType type, const Node& src, int sc, const Node& dst, int dc, int nc) {
-    if (nc < 1) nc = 1;
-    if (auto manager = graphs->findGraphManagerFor (src.getParentGraph())) {
+void EngineService::connect (PortType type, const Node& src, int sc, const Node& dst, int dc, int nc)
+{
+    if (nc < 1)
+        nc = 1;
+    if (auto manager = graphs->findGraphManagerFor (src.getParentGraph()))
+    {
         auto s = src.getObject();
         auto d = dst.getObject();
-        while (s && d && --nc >= 0) {
+        while (s && d && --nc >= 0)
+        {
             auto sp = s->getPortForChannel (type, sc, false);
             auto dp = d->getPortForChannel (type, dc, true);
-            if (! manager->addConnection (src.getNodeId(), sp, dst.getNodeId(), dp)) {
+            if (! manager->addConnection (src.getNodeId(), sp, dst.getNodeId(), dp))
+            {
                 String msg = "[element] connection failed: \n";
-                
+
                 msg << "Source: " << src.getName() << juce::newLine
                     << " ch. " << (int) sc << juce::newLine
-                    << " port " <<  (int) sp << juce::newLine
+                    << " port " << (int) sp << juce::newLine
                     << "Target: " << dst.getName() << juce::newLine
                     << " ch. " << (int) dc << juce::newLine
-                    << " port " <<  (int) dp << juce::newLine;
-                DBG(msg);
+                    << " port " << (int) dp << juce::newLine;
+                DBG (msg);
                 break;
             };
- 
-            ++sc; ++dc;
+
+            ++sc;
+            ++dc;
         }
         manager->removeIllegalConnections();
         manager->syncArcsModel();
     }
 }
 
-void EngineService::testReconfigureRootGraphs() {
+void EngineService::testReconfigureRootGraphs()
+{
     changeListenerCallback (&getWorld().getDeviceManager());
 }
 void EngineService::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
@@ -558,7 +566,7 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
         if (EL_INVALID_NODE != nodeId)
         {
             node = root->getNodeModelForId (nodeId);
-            if (!dontShowUI && getWorld().getSettings().showPluginWindowsWhenAdded())
+            if (! dontShowUI && getWorld().getSettings().showPluginWindowsWhenAdded())
                 findSibling<GuiService>()->presentPluginWindow (node);
         }
     }
@@ -918,7 +926,7 @@ Node EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool 
     if (proc != nullptr)
     {
         proc->setDevice (device);
-        
+
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             auto node (graph.getNode (i));

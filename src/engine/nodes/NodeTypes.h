@@ -55,7 +55,7 @@
 #define EL_INTERNAL_ID_OSC_RECEIVER "element.oscReceiver"
 #define EL_INTERNAL_ID_OSC_SENDER "element.oscSender"
 #define EL_INTERNAL_ID_SCRIPT "element.script"
-#define EL_INTERNAL_ID_MCU   "el.MCU"
+#define EL_INTERNAL_ID_MCU "el.MCU"
 
 //==============================================================================
 #define EL_INTERNAL_UID_AUDIO_FILE_PLAYER 1000
@@ -85,4 +85,4 @@
 #define EL_INTERNAL_UID_SCRIPT 1024
 #define EL_INTERNAL_UID_ALLPASS_FILTER 1025
 #define EL_INTERNAL_UID_VOLUME 1026
-#define EL_INTERNAL_UID_MCU   1027
+#define EL_INTERNAL_UID_MCU 1027

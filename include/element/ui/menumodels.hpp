@@ -28,4 +28,4 @@ public:
     virtual ~MainMenuBarModel() = default;
     virtual juce::PopupMenu* getMacAppMenu() { return nullptr; }
 };
-}
+} // namespace element

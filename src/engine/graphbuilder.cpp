@@ -7,6 +7,38 @@
 
 namespace element {
 
+class BindParameterOp : public GraphOp,
+                        public Parameter::Listener
+{
+public:
+    BindParameterOp (Parameter::Ptr src, Parameter::Ptr dst)
+        : param1 (src), param2 (dst)
+    {
+        param1->addListener (this);
+    }
+
+    ~BindParameterOp()
+    {
+        param1->removeListener (this);
+    }
+
+    void controlValueChanged (int index, float value) override
+    {
+        juce::ignoreUnused (index);
+        param2->setValueNotifyingHost (value);
+    }
+
+    void controlTouched (int index, bool grabbed) override
+    {
+    }
+
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const int) {}
+
+private:
+    Parameter::Ptr param1, param2;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BindParameterOp)
+};
+
 class ClearChannelOp : public GraphOp
 {
 public:
@@ -514,7 +546,7 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
     for (uint32 port = 0; port < numPorts; ++port)
     {
         const PortType portType (node->getPortType (port));
-        if (portType != PortType::Audio && portType != PortType::Midi)
+        if (portType != PortType::Audio && portType != PortType::Midi && portType != PortType::Control)
             continue;
 
         const uint32 numIns = node->getNumPorts (portType, true);
@@ -524,18 +556,30 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
         // than or equal to the total inputs of the same port type
         if (node->isPortOutput (port))
         {
-            const int outputChan = node->getChannelPort (port);
-            if (outputChan >= (int) numIns && outputChan < (int) numOuts)
+            switch (portType.id())
             {
-                const int bufIndex = getFreeBuffer (portType);
-                channelsToUse[portType.id()].add (bufIndex);
-                const uint32 outPort = node->getNthPort (portType, outputChan, false, false);
+                case PortType::Control: {
+                    const int bufIndex = getFreeBuffer (portType);
+                    markBufferAsContaining (bufIndex, portType, node->nodeId, port);
+                    break;
+                }
 
-                jassert (bufIndex != 0);
-                jassert (outPort == port);
-                jassert (outPort < node->getNumPorts());
+                default: {
+                    const int outputChan = node->getChannelPort (port);
+                    if (outputChan >= (int) numIns && outputChan < (int) numOuts)
+                    {
+                        const int bufIndex = getFreeBuffer (portType);
+                        channelsToUse[portType.id()].add (bufIndex);
+                        const uint32 outPort = node->getNthPort (portType, outputChan, false, false);
 
-                markBufferAsContaining (bufIndex, portType, node->nodeId, outPort);
+                        jassert (bufIndex != 0);
+                        jassert (outPort == port);
+                        jassert (outPort < node->getNumPorts());
+
+                        markBufferAsContaining (bufIndex, portType, node->nodeId, outPort);
+                    }
+                    break;
+                }
             }
             continue;
         }
@@ -598,7 +642,14 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
             }
 
             const bool bufNeededLater = isBufferNeededLater (ourRenderingIndex, port, srcNode, srcPort);
-            if (bufNeededLater && (inputChan < (int) numOuts || portType == PortType::Midi))
+            if (portType == PortType::Control)
+            {
+                auto src = graph.getNodeForId (srcNode);
+                renderingOps.add (new BindParameterOp (
+                    src->getParameter ((int) srcPort),
+                    node->getParameter ((int) port)));
+            }
+            else if (bufNeededLater && (inputChan < (int) numOuts || portType == PortType::Midi))
             {
                 // can't mess up this channel because it's needed later by another node, so we
                 // need to use a copy of it..

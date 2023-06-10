@@ -842,13 +842,13 @@ void HorizontalListBox::setScrollBarsShown (bool vertical, bool horizontal)
     resized();
 }
 
-void HorizontalListBox::setScrollBarPosition (bool right, bool bottom) {
+void HorizontalListBox::setScrollBarPosition (bool right, bool bottom)
+{
     viewport->setScrollBarPosition (right, bottom);
 }
 
 ScrollBar* HorizontalListBox::getVerticalScrollBar() const noexcept
 {
-   
     return &viewport->getVerticalScrollBar();
 }
 

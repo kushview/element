@@ -44,7 +44,8 @@ NodeObject::NodeObject (const PortList& portList)
     inputGain.set (1.0f);
     lastInputGain.set (1.0f);
     oversampler = std::make_unique<Oversampler<float>>();
-    ports = portList;
+    // ports = portList;
+    setPorts (portList);
 }
 
 NodeObject::NodeObject (const uint32 nodeId_) noexcept
@@ -649,11 +650,12 @@ void NodeObject::setPorts (const PortList& newPorts)
         ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
     }
 
-    ParameterArray newParams;
+    ParameterArray newParams, newParamsOut;
     for (const auto* port : ports)
     {
-        if (port->input && port->type == PortType::Control)
-            newParams.add (getOrCreateParameter (*port));
+        auto& parr = port->input ? newParams : newParamsOut;
+        if (port->type == PortType::Control)
+            parr.add (getOrCreateParameter (*port));
     }
 
     struct SortByArrayIndex
@@ -662,11 +664,15 @@ void NodeObject::setPorts (const PortList& newPorts)
         {
             return lhs->getParameterIndex() < rhs->getParameterIndex() ? -1 : 1;
         }
-    };
+    } sorter;
 
-    SortByArrayIndex sorter;
     newParams.sort (sorter, true);
     parameters.swapWith (newParams);
+    newParamsOut.sort (sorter, true);
+    parametersOut.swapWith (newParamsOut);
+
+    for (const auto& po : parametersOut)
+        DBG (po->getName (30));
 }
 
 ValueTree NodeObject::createPortsData() const
@@ -845,14 +851,18 @@ void NodeObject::setLatencySamples (int latency)
 //=========================================================================
 Parameter::Ptr NodeObject::getOrCreateParameter (const PortDescription& port)
 {
-    jassert (port.type == PortType::Control && port.input == true);
-    if (port.type != PortType::Control && port.input != true)
+    jassert (port.type == PortType::Control);
+    if (port.type != PortType::Control)
         return nullptr;
 
     auto param = getParameter (port);
 
     if (param == nullptr)
     {
+        if (! port.input)
+        {
+            DBG ("creating output port default");
+        }
         param = new ControlPortParameter (port);
     }
 

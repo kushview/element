@@ -115,14 +115,13 @@ public:
 
     void connect (PortType type, const Node& src, int sc, const Node& dst, int dc, int nc = 1);
 
-
-    void testConnectAudio (const Node& src, int sc, const Node& dst, int dc, int nc = 1) {
-        if (nc < 1) nc = 1;
+    void testConnectAudio (const Node& src, int sc, const Node& dst, int dc, int nc = 1)
+    {
+        if (nc < 1)
+            nc = 1;
         while (--nc >= 0)
             connectChannels (src.getParentGraph(), src, sc++, dst, dc++);
     }
-
-
 
     void testReconfigureRootGraphs();
 

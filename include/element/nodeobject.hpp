@@ -114,7 +114,19 @@ public:
     int getNumAudioOutputs() const;
 
     //=========================================================================
-    const ParameterArray& getParameters() const { return parameters; }
+    const ParameterArray& getParameters (bool inputs = true) const noexcept { return inputs ? parameters : parametersOut; }
+
+    Parameter::Ptr getParameter (int index, bool isInput) const noexcept
+    {
+        return getParameters (isInput)[index];
+    }
+
+    Parameter::Ptr getParameter (int port)
+    {
+        auto desc = getPort (port);
+        return desc.type == PortType::Control ? getParameter (desc.channel, desc.input)
+                                              : nullptr;
+    }
 
     //=========================================================================
     /** Returns the type of port
@@ -446,7 +458,7 @@ private:
     int latencySamples = 0;
     String name;
 
-    ParameterArray parameters;
+    ParameterArray parameters, parametersOut;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float>> inRMS, outRMS;

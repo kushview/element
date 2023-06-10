@@ -172,8 +172,10 @@ MidiEngine::MidiInputHolder* MidiEngine::getMidiInput (const String& identifier,
 
     int index = 0;
     bool found = false;
-    for (const auto& dev : MidiInput::getAvailableDevices()) {
-        if (identifier != dev.identifier) {
+    for (const auto& dev : MidiInput::getAvailableDevices())
+    {
+        if (identifier != dev.identifier)
+        {
             ++index;
             continue;
         }

@@ -72,8 +72,7 @@ public:
         Only devices which are enabled (see the setMidiInputEnabled() method) will have their
         events forwarded on to listeners.
      */
-    void addMidiInputCallback (const String& deviceId, MidiInputCallback* callback,
-                               bool consumer = false);
+    void addMidiInputCallback (const String& deviceId, MidiInputCallback* callback, bool consumer = false);
 
     /** Removes a listener that was previously registered with addMidiInputCallback(). */
     void removeMidiInputCallback (const String& deviceId, MidiInputCallback* callback);

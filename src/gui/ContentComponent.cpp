@@ -654,7 +654,8 @@ void ContentComponent::refreshToolbar()
     toolBar->setSession (getGlobals().getSession());
 }
 
-void ContentComponent::setStatusBarVisible (bool vis) {
+void ContentComponent::setStatusBarVisible (bool vis)
+{
     if (statusBarVisible == vis)
         return;
     statusBarVisible = vis;

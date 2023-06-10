@@ -27,8 +27,7 @@ namespace element {
 class Node;
 class NodeArray;
 
-class DataPath
-{
+class DataPath {
 public:
     DataPath();
     ~DataPath();

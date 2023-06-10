@@ -62,12 +62,12 @@ namespace Util {
         String name;
         if (beforeText.isNotEmpty())
             name << beforeText;
-            
+
         name << EL_APP_NAME;
 
         if (afterText.isNotEmpty())
             name << afterText;
-        
+
         return name;
     }
 

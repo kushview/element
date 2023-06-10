@@ -27,9 +27,10 @@ public:
     ~GraphEditor();
     void resized() override;
     void paint (juce::Graphics& g) override;
+
 private:
     class Graph;
     std::unique_ptr<Graph> graph;
 };
 
-}
+} // namespace element

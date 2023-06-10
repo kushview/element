@@ -502,7 +502,8 @@ public:
         return *this;
     }
 
-    void sanitizeIndexes() {
+    void sanitizeIndexes()
+    {
         uint32_t index = 0;
         for (auto* port : ports)
             port->index = index++;

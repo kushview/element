@@ -257,7 +257,7 @@ void BlockComponent::buttonClicked (Button* b)
 
     NodeObjectPtr obj = node.getObject();
     auto* proc = (obj) ? obj->getAudioProcessor() : 0;
-    if ( ! obj)
+    if (! obj)
         return;
 
     if (b == &configButton && configButton.getToggleState())
@@ -1052,7 +1052,7 @@ void BlockComponent::updatePins (bool force)
     for (int i = 0; i < numPorts; ++i)
     {
         const Port port (node.getPort (i));
-        if (PortType::Control == port.getType() || port.isHiddenOnBlock())
+        if (port.isHiddenOnBlock())
             continue;
 
         if (port.isInput())
@@ -1072,7 +1072,7 @@ void BlockComponent::updatePins (bool force)
         {
             const Port port (node.getPort (i));
             const PortType t (port.getType());
-            if (t == PortType::Control || port.isHiddenOnBlock())
+            if (port.isHiddenOnBlock())
                 continue;
 
             const bool isInput (port.isInput());

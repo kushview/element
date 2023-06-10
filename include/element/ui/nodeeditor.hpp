@@ -27,8 +27,7 @@
 
 namespace element {
 
-class NodeEditorComponent : public Component
-{
+class NodeEditorComponent : public Component {
 protected:
     NodeEditorComponent (const Node&) noexcept;
 

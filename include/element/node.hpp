@@ -497,13 +497,16 @@ public:
     /** Iterate over all ValueTree's recursively */
     void forEach (std::function<void (const ValueTree& tree)>) const;
 
-    void setColor (const juce::Colour& color) {
+    void setColor (const juce::Colour& color)
+    {
         getUIValueTree().setProperty ("color", color.toString(), nullptr);
     }
-    juce::Colour getColor() const noexcept { 
+    juce::Colour getColor() const noexcept
+    {
         return juce::Colour::fromString (getUIValueTree().getProperty ("color").toString());
     }
-    juce::Colour getColor (juce::Colour fallback) const noexcept {
+    juce::Colour getColor (juce::Colour fallback) const noexcept
+    {
         return getUIValueTree().hasProperty ("color") ? getColor() : fallback;
     }
 

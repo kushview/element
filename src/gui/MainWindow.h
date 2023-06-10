@@ -53,7 +53,7 @@ private:
     std::function<juce::String()> windowTitleFunction;
     std::unique_ptr<juce::MenuBarModel> mainMenu;
     void setMainMenuModel (std::unique_ptr<MainMenuBarModel> model);
-    
+
     void nameChanged();
     void nameChangedSession();
     void nameChangedSingleGraph();

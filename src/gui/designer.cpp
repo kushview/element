@@ -13,7 +13,8 @@ public:
         : StandardContentComponent (c.getServices()),
           context (c),
           designer (d)
-    {}
+    {
+    }
 
 private:
     friend class Designer;
@@ -39,7 +40,8 @@ void Designer::paint (juce::Graphics&)
 {
 }
 
-void Designer::refresh() {
+void Designer::refresh()
+{
     content->stabilize();
     content->stabilizeViews();
 }

@@ -351,7 +351,8 @@ void GuiService::runDialog (const String& uri)
     }
 }
 
-void GuiService::setAppInfo (const AppInfo& info) {
+void GuiService::setAppInfo (const AppInfo& info)
+{
     appInfo = info;
 }
 
@@ -487,7 +488,8 @@ void GuiService::run()
 
     mainWindow.reset (new MainWindow (world));
     mainWindow->windowTitleFunction = factory->getMainWindowTitler();
-    if (auto menu = factory->createMainMenuBarModel()) {
+    if (auto menu = factory->createMainMenuBarModel())
+    {
         mainWindow->setMainMenuModel (std::move (menu));
     }
 
@@ -959,7 +961,8 @@ void GuiService::refreshSystemTray()
 
 void GuiService::setMainWindowTitler (std::function<juce::String()> f)
 {
-    if (mainWindow) {
+    if (mainWindow)
+    {
         mainWindow->windowTitleFunction = f;
         mainWindow->refreshName();
     }
@@ -976,7 +979,8 @@ void GuiService::toggleAboutScreen()
     if (! about)
     {
         about.reset (new AboutDialog (*this));
-        if (appInfo.title.isNotEmpty()) {
+        if (appInfo.title.isNotEmpty())
+        {
             if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent()))
                 c->setAppInfo (appInfo);
         }

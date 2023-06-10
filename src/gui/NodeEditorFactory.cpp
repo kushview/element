@@ -42,12 +42,15 @@ public:
         }
 
         const auto NID = node.getIdentifier().toString();
-        if (NID == EL_INTERNAL_ID_GRAPH) {
+        if (NID == EL_INTERNAL_ID_GRAPH)
+        {
             return new GraphEditor (node);
-        } else if (NID == "el.MCU") {
+        }
+        else if (NID == "el.MCU")
+        {
             return new MackieControlEditor (node);
         }
-        
+
         switch (placement)
         {
             case NodeEditorPlacement::PluginWindow:

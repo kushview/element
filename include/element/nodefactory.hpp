@@ -26,8 +26,7 @@ namespace element {
 class GuiService;
 class Node;
 
-class NodeProvider
-{
+class NodeProvider {
 public:
     NodeProvider() = default;
     virtual ~NodeProvider() = default;
@@ -37,14 +36,13 @@ public:
     virtual StringArray getHiddenTypes() { return {}; }
 };
 
-class NodeFactory final
-{
+class NodeFactory final {
 public:
     NodeFactory();
     ~NodeFactory();
 
     /** Fill a list of plugin descriptions. public */
-    void getPluginDescriptions (OwnedArray<PluginDescription>& out, 
+    void getPluginDescriptions (OwnedArray<PluginDescription>& out,
                                 const String& identifier,
                                 bool includeHidden = false);
 
@@ -59,18 +57,21 @@ public:
         return add (new Single<NT> (identifier));
     }
 
-    void addHiddenType (const String& tp) {
+    void addHiddenType (const String& tp)
+    {
         denyIDs.addIfNotAlreadyThere (tp);
     }
 
-    void hideAllTypes() {
+    void hideAllTypes()
+    {
         for (const auto& tp : knownIDs)
             denyIDs.add (tp);
         denyIDs.removeDuplicates (false);
         denyIDs.removeEmptyStrings();
     }
 
-    void removeHiddenType (const String& tp) {
+    void removeHiddenType (const String& tp)
+    {
         auto idx = denyIDs.indexOf (tp);
         if (idx >= 0)
             denyIDs.remove (idx);
@@ -88,8 +89,7 @@ private:
     StringArray knownIDs;
 
     template <class NT>
-    struct Single : public NodeProvider
-    {
+    struct Single : public NodeProvider {
         const String ID;
         const String UI;
 

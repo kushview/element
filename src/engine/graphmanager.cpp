@@ -752,6 +752,7 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);
     bool resetPorts = false;
+    juce::ignoreUnused (resetPorts);
     if (auto* const proc = obj->getAudioProcessor())
     {
         // try to match ports
@@ -782,7 +783,8 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 
     node.restorePluginState();
     node.resetPorts();
-    if (node.isA ("Element", EL_INTERNAL_ID_MIDI_INPUT_DEVICE) || node.isA ("Element", EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)) {
+    if (node.isA ("Element", EL_INTERNAL_ID_MIDI_INPUT_DEVICE) || node.isA ("Element", EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE))
+    {
         jassert (node.getNumPorts() == 1);
     }
 

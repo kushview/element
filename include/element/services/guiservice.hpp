@@ -44,7 +44,7 @@ class GuiService : public Service,
 public:
     Signal<void()> nodeSelected;
     Signal<void()> sigRefreshed;
-    
+
     GuiService (Context& w, ServiceManager& a);
     ~GuiService();
 

@@ -22,4 +22,4 @@ private:
     std::unique_ptr<LV2> lv2;
 };
 
-}
+} // namespace element

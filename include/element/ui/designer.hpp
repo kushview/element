@@ -13,10 +13,10 @@ public:
     void resized() override;
     void paint (juce::Graphics&) override;
     void refresh();
-    
+
 private:
     class Content;
     std::unique_ptr<Content> content;
 };
 
-}
+} // namespace element

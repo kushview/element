@@ -297,9 +297,16 @@ sol::table ScriptNodeEditor::createContext()
     sol::table ctx = view.create_table();
 
     ctx["params"] = view.create_table();
-    for (auto* param : lua->getParameters())
+    for (auto* param : lua->getParameters (true))
     {
         ctx["params"][1 + param->getParameterIndex()] =
+            std::make_shared<ScriptNodeControlPort> (param);
+    }
+
+    ctx["controls"] = view.create_table();
+    for (auto* param : lua->getParameters (false))
+    {
+        ctx["controls"][1 + param->getParameterIndex()] =
             std::make_shared<ScriptNodeControlPort> (param);
     }
 

@@ -33,4 +33,5 @@
 #endif
 // clang-format on
 
-namespace element {}
+namespace element {
+}

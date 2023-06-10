@@ -140,9 +140,12 @@ void AudioRouterNode::setSize (int newIns, int newOuts, bool async)
     }
 
     rebuildPorts = true;
-    if (async) {
+    if (async)
+    {
         triggerPortReset();
-    } else {
+    }
+    else
+    {
         refreshPorts();
         portsChanged();
     }

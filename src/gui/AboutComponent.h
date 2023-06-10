@@ -29,7 +29,6 @@
 #include <element/context.hpp>
 #include "utils.hpp"
 
-
 namespace element {
 
 class AboutComponent : public Component
@@ -39,7 +38,11 @@ public:
     void resized() override;
     void paint (Graphics& g) override;
 
-    void setAppInfo (const AppInfo& details) { info = details; updateAppInfo(); }
+    void setAppInfo (const AppInfo& details)
+    {
+        info = details;
+        updateAppInfo();
+    }
     AppInfo getAppInfo() const { return info; }
 
 private:
@@ -52,11 +55,10 @@ private:
     std::unique_ptr<Drawable> elementLogo;
     DrawableImage logo;
     TabbedComponent tabs { TabbedButtonBar::TabsAtTop };
-    
+
     void updateAppInfo();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutComponent)
 };
-
 
 class AboutDialog : public DialogWindow
 {

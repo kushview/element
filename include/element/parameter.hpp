@@ -318,7 +318,7 @@ public:
     /** Returns the human understandable value. */
     float get() const { return value; }
     operator float() const { return value; }
-    
+
     /** Sets the value.
         @param newValue Human understandable value.
     */
@@ -330,7 +330,7 @@ public:
 
     /** Returns the index of this parameter as stored by the parent NodeObject. */
     int getParameterIndex() const noexcept override { return port.channel; }
-    
+
     /** Returns category for this control */
     Category getCategory() const override { return Parameter::genericParameter; }
 
@@ -359,7 +359,7 @@ public:
 
     /** Change port metadata. */
     void setPort (const PortDescription& newPort, bool preserveValue = false);
-    
+
     /** Get port information. */
     PortDescription getPort() const { return port; }
 
@@ -386,8 +386,8 @@ private:
     Currently just a placeholder until API can be created.
 */
 class PortObserver {
-public: 
-    PortObserver() =default;
+public:
+    PortObserver() = default;
     virtual ~PortObserver() = default;
 };
 

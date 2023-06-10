@@ -5,16 +5,20 @@
 
 namespace element {
 
-class LV2NodeProvider::LV2 {
+class LV2NodeProvider::LV2
+{
 public:
-    LV2 (LV2NodeProvider& p) : provider (p) {
+    LV2 (LV2NodeProvider& p) : provider (p)
+    {
         world = std::make_unique<lvtk::World>();
         world->load_all();
     }
 
-    void getTypes (StringArray& tps) {
-        for (const auto& uri : world->plugin_uris()) {
-            DBG(uri);
+    void getTypes (StringArray& tps)
+    {
+        for (const auto& uri : world->plugin_uris())
+        {
+            DBG (uri);
             tps.add (uri);
         }
     }
@@ -26,22 +30,26 @@ private:
     std::vector<std::string> allow;
 };
 
-LV2NodeProvider::LV2NodeProvider() {
+LV2NodeProvider::LV2NodeProvider()
+{
     lv2 = std::make_unique<LV2> (*this);
 }
 
-LV2NodeProvider::~LV2NodeProvider() {
+LV2NodeProvider::~LV2NodeProvider()
+{
     lv2.reset();
 }
 
-NodeObject* LV2NodeProvider::create (const String& uri) {
+NodeObject* LV2NodeProvider::create (const String& uri)
+{
     return nullptr;
 }
 
-StringArray LV2NodeProvider::findTypes() {
+StringArray LV2NodeProvider::findTypes()
+{
     StringArray types;
     lv2->getTypes (types);
     return types;
 }
 
-}
+} // namespace element

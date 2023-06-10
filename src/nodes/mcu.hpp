@@ -19,11 +19,12 @@
 
 #pragma once
 
+#include <element/nodeobject.hpp>
+#include <element/porttype.hpp>
+
 #include "engine/nodes/NodeTypes.h"
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/LookAndFeel.h"
-#include <element/nodeobject.hpp>
-#include <element/porttype.hpp>
 
 namespace element {
 
@@ -35,43 +36,47 @@ struct Program
     int program { -1 };
 };
 
-
 class MackieControlUniversal : public NodeObject,
                                public ChangeBroadcaster
 {
 public:
     MackieControlUniversal()
-        : NodeObject (PortCount().with (PortType::Midi, 1, 8).toPortList()) {}
+        : NodeObject (PortCount().with (PortType::Midi, 1, 0).with (PortType::Control, 0, 9).toPortList()) {}
     ~MackieControlUniversal() {}
 
     /** Open the device. e.g. go online. */
-    void open() {
+    void open()
+    {
         uint8_t data[5] = { 0x00, 0x00, 0x66, 0x14, 0x00 };
         data[4] = 0x63;
 
         sendMidi (MidiMessage::createSysExMessage (data, 5));
     }
-    
-    void close() {
 
+    void close()
+    {
     }
 
-    void sendMidi (const MidiMessage& msg) {
+    void sendMidi (const MidiMessage& msg)
+    {
         col.addMessageToQueue (msg.withTimeStamp ((double) Time::getMillisecondCounter() / 1000.0));
     }
 
     //==========================================================================
-    void prepareToRender (double sampleRate, int maxBufferSize) override {
+    void prepareToRender (double sampleRate, int maxBufferSize) override
+    {
         ignoreUnused (sampleRate, maxBufferSize);
         col.reset (sampleRate);
     }
-    
+
     void releaseResources() override {}
 
     inline bool wantsMidiPipe() const override { return true; }
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override {
+    void render (AudioSampleBuffer& audio, MidiPipe& midi) override
+    {
         auto buf = midi.getWriteBuffer (0);
-        for (const auto msg : *buf) {
+        for (const auto msg : *buf)
+        {
             juce::ignoreUnused (msg);
         }
         midi.clear();
@@ -93,9 +98,9 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.fileOrIdentifier = "el.MCU";
-        desc.uniqueId = 1200;
-        desc.name = "MCU";
+        desc.fileOrIdentifier = EL_INTERNAL_ID_MCU;
+        desc.uniqueId = EL_INTERNAL_UID_MCU;
+        desc.name = "MCU Brain";
         desc.descriptiveName = "Support for Mackie Control Universal";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;
@@ -116,10 +121,12 @@ private:
     juce::MidiMessageCollector col;
 };
 
-class MackieControlEditor : public NodeEditorComponent {
+class MackieControlEditor : public NodeEditorComponent
+{
 public:
     MackieControlEditor (const Node& node)
-        : NodeEditorComponent (node) {
+        : NodeEditorComponent (node)
+    {
         setOpaque (true);
         addAndMakeVisible (testButton);
         testButton.setButtonText ("Test");
@@ -133,9 +140,12 @@ public:
         onlineButton.setClickingTogglesState (true);
         onlineButton.setToggleState (false, dontSendNotification);
         onlineButton.onClick = [this]() {
-            if (onlineButton.getToggleState()) {
+            if (onlineButton.getToggleState())
+            {
                 proc()->open();
-            } else {
+            }
+            else
+            {
                 proc()->close();
             }
         };
@@ -143,21 +153,23 @@ public:
         addAndMakeVisible (fader);
         fader.setRange (0.0, 16383.0, 1.0);
         fader.setSliderStyle (Slider::LinearVertical);
-        fader.onValueChange=[this]() {
+        fader.onValueChange = [this]() {
             proc()->sendMidi (MidiMessage::pitchWheel (1, roundToInt (fader.getValue())));
         };
 
-        setSize (300,500);
+        setSize (300, 500);
     }
 
-    void resized() override {
+    void resized() override
+    {
         auto r = getLocalBounds().reduced (20);
         testButton.setBounds (r.removeFromTop (24));
         onlineButton.setBounds (r.removeFromTop (24));
         fader.setBounds (r.removeFromLeft (20));
     }
 
-    void paint (Graphics& g) override {
+    void paint (Graphics& g) override
+    {
         g.fillAll (element::LookAndFeel::widgetBackgroundColor);
     }
 
@@ -166,7 +178,7 @@ private:
     TextButton onlineButton;
     Slider fader;
 
-    MackieControlUniversal* proc() const noexcept { return getNodeObjectOfType<MackieControlUniversal>(); } 
+    MackieControlUniversal* proc() const noexcept { return getNodeObjectOfType<MackieControlUniversal>(); }
 };
 
 } // namespace element

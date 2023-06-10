@@ -27,7 +27,6 @@
 
 namespace element {
 
-
 class PluginsPopupMenu : public PopupMenu
 {
 public:

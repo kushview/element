@@ -789,8 +789,7 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
         }
     }
 
-    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME &&
-        desc.pluginFormatName != "LV2")
+    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME && desc.pluginFormatName != "LV2")
     {
         return nullptr;
     }
