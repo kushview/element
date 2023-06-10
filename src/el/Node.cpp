@@ -3,8 +3,8 @@
 // @pragma nostrip
 
 #include <element/element.h>
-#include "sol_helpers.hpp"
 #include <element/node.hpp>
+#include "sol_helpers.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
 {
@@ -22,6 +22,7 @@ EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
             const auto child = self->getNode (index - 1);
             return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
                                    : std::shared_ptr<Node>(); },
+        // clang-format off
 
         /// Attributes.
         // @section Attributes
@@ -30,7 +31,8 @@ EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
         // @field Node.name
         // @within Attributes
         "name",
-        property ([] (Node* self) { return self->getName().toStdString(); }, [] (Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }),
+        property ([] (Node* self) { return self->getName().toStdString(); }, 
+                  [] (Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }),
 
         "missing",
         readonly_property (&Node::isMissing),
@@ -47,61 +49,61 @@ EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
         // @section methods
 
         /// Returns true if a valid node.
-        // @function Node:isvalid
+        // @function Node:valid
         // @within Methods
-        "isvalid",
+        "valid",
         &Node::isValid,
 
         /// True if enabled.
-        // @function Node:isenabled
+        // @function Node:enabled
         // @within Methods
-        "isenabled",
+        "enabled",
         &Node::isEnabled,
 
         /// True if bypassed.
-        // @function Node:isbypassed
-        "isbypassed",
+        // @function Node:isBypassed
+        "isBypassed",
         &Node::isBypassed,
 
         /// True if muted.
-        // @function Node:ismuted
-        "ismuted",
+        // @function Node:isMuted
+        "isMuted",
         &Node::isMuted,
 
         /// Display name.
         // Will be a user-defined name or name provided by the plugin.
-        // @function Node:displayname
+        // @function Node:displayName
         // @treturn string
-        "displayname",
+        "displayName",
         [] (Node* self) { return self->getDisplayName().toStdString(); },
 
         /// Plugin name.
         // Name provided by the plugin.
-        // @function Node:pluginname
+        // @function Node:pluginName
         // @treturn string
-        "pluginname",
+        "pluginName",
         [] (Node* self) { return self->getPluginName().toStdString(); },
 
         /// True if this node is a graph.
-        // @function Node:isgraph
-        "isgraph",
+        // @function Node:isGraph
+        "isGraph",
         &Node::isGraph,
 
         /// True if this node is a root graph.
-        // @function Node:isroot
-        "isroot",
+        // @function Node:isRoot
+        "isRoot",
         &Node::isRootGraph,
 
         /// Has custom editor.
-        // @function Node:haseditor
+        // @function Node:hasEditor
         // @return True if the plugin provides it's own editor
-        "haseditor",
+        "hasEditor",
         &Node::hasEditor,
 
         /// Convert to an XML string.
-        // @function Node:toxmlstring
+        // @function Node:toXmlString
         // @treturn string Node formatted as XML
-        "toxmlstring",
+        "toXmlString",
         [] (Node* self) -> std::string {
             auto copy = self->getValueTree().createCopy();
             Node::sanitizeRuntimeProperties (copy, true);
@@ -109,33 +111,37 @@ EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
         },
 
         /// Rebuild port metadata.
-        // @function Node:resetports
-        "resetports",
+        // @function Node:resetPorts
+        "resetPorts",
         &Node::resetPorts,
 
         /// Save state.
-        // @function Node:savestate
-        "savestate",
+        // @function Node:save
+        "save",
         &Node::savePluginState,
 
         /// Restore state.
-        // @function Node:restorestate
-        "restorestate",
+        // @function Node:restore
+        "restore",
         &Node::restorePluginState,
 
         /// Write node to file.
         // @function Node:writefile
         // @string f Absolute file path to save to
         // @return True if successful
-        "writefile",
+        "writeFile",
         [] (const Node& node, const char* filepath) -> bool {
             if (! File::isAbsolutePath (filepath))
                 return false;
             return node.writeToFile (File (String::fromUTF8 (filepath)));
-        }
+        },
 
+        /// Returns true is the node name has changed from default.
+        // @function Node:hasModifiedName
+        // @return True if modified
+        "hasModifiedName",
+        &Node::hasModifiedName
 #if 0
-        "has_modified_name",    &Node::hasModifiedName,
         "has_node_type",        &Node::hasNodeType,
         "get_parent_graph",     &Node::getParentGraph,
         "is_child_of_root_graph", &Node::isChildOfRootGraph,
@@ -144,6 +150,7 @@ EL_PLUGIN_EXPORT int luaopen_el_Node (lua_State* L)
         "get_num_nodes",        &Node::getNumNodes,
         "get_node",             &Node::getNode,
 #endif
+        // clang-format on
     );
 
     sol::stack::push (L, element::lua::remove_and_clear (M, "Node"));
