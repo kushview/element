@@ -69,6 +69,7 @@ libelement_sources = '''
     
     gui/designer.cpp
     gui/grapheditor.cpp
+    gui/meterbridge.cpp
     
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp

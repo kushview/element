@@ -18,6 +18,8 @@
 */
 
 #include <element/services.hpp>
+#include <element/ui/meterbridge.hpp>
+
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "gui/views/EmptyContentView.h"
@@ -520,6 +522,11 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
     setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
 
+    bridge = std::make_unique<MeterBridgeView>();
+    bridge->initializeView (ctl_);
+    addAndMakeVisible (bridge.get());
+    setMeterBridgeVisible (booleanProperty (settings, "meterBridge", false));
+
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
 
@@ -669,6 +676,8 @@ void StandardContentComponent::resizeContent (const Rectangle<int>& area)
 
     if (virtualKeyboardVisible && keyboard)
         keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
+    if (meterBridgeVisible && bridge && bridge->isVisible())
+        bridge->setBounds (r.removeFromBottom (virtualKeyboardSize));
     if (nodeStrip && nodeStrip->isVisible())
         nodeStrip->setBounds (r.removeFromRight (nodeStripSize));
 
@@ -830,6 +839,7 @@ void StandardContentComponent::saveState (PropertiesFile* props)
         container->saveState (props);
     if (auto* const vk = getVirtualKeyboardView())
         vk->saveState (props);
+    props->setValue ("meterBridge", meterBridgeVisible);
 }
 
 void StandardContentComponent::restoreState (PropertiesFile* props)
@@ -989,6 +999,9 @@ bool StandardContentComponent::perform (const InvocationInfo& info)
         case Commands::toggleVirtualKeyboard:
             toggleVirtualKeyboard();
             break;
+        case Commands::toggleMeterBridge:
+            setMeterBridgeVisible (! isMeterBridgeVisible());
+            break;
         case Commands::toggleChannelStrip:
             setNodeChannelStripVisible (! isNodeChannelStripVisible());
             break;
@@ -1066,6 +1079,19 @@ void StandardContentComponent::setMainView (ContentView* view)
 {
     jassert (view != nullptr);
     setContentView (view, false);
+}
+
+void StandardContentComponent::setMeterBridgeVisible (bool vis) {
+    if (vis == meterBridgeVisible)
+        return;
+
+    meterBridgeVisible = vis;
+    bridge->setVisible (meterBridgeVisible);
+    resized();
+}
+
+bool StandardContentComponent::isMeterBridgeVisible() const {
+    return meterBridgeVisible;
 }
 
 } // namespace element

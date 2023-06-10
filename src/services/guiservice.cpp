@@ -550,6 +550,7 @@ void GuiService::getAllCommands (Array<CommandID>& commands)
         Commands::showGraphEditor,
         Commands::showLastContentView,
         Commands::toggleVirtualKeyboard,
+        Commands::toggleMeterBridge,
         Commands::rotateContentView,
         Commands::showAllPluginWindows,
         Commands::hideAllPluginWindows,
@@ -766,6 +767,14 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             if (content && content->isVirtualKeyboardVisible())
                 flags |= Info::isTicked;
             result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", Commands::Categories::UserInterface, flags);
+        }
+        break;
+
+        case Commands::toggleMeterBridge: {
+            int flags = (content != nullptr) ? 0 : Info::isDisabled;
+            if (content && content->isMeterBridgeVisible())
+                flags |= Info::isTicked;
+            result.setInfo ("MeterBridge", "Toggle the Meter Bridge", Commands::Categories::UserInterface, flags);
         }
         break;
 

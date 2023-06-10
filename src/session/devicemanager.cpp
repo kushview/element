@@ -35,6 +35,8 @@ public:
 #if KV_JACK_AUDIO
     kv::JackClient jackClient { "Element", 2, "main_in_", 2, "main_out_" };
 #endif
+
+    juce::ReferenceCountedArray<DeviceManager::LevelMeter> levelsIn, levelsOut;
 };
 
 DeviceManager::DeviceManager()
@@ -46,6 +48,10 @@ DeviceManager::~DeviceManager()
 {
     closeAudioDevice();
     attach (nullptr);
+}
+
+DeviceManager::LevelMeter::Ptr getLevelMeter (int channel, bool input) {
+    juce::ignoreUnused (channel, input);
 }
 
 void DeviceManager::attach (EnginePtr engine)

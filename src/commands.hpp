@@ -66,6 +66,7 @@ namespace Commands {
         toggleChannelStrip,
         showGraphMixer,
         showConsole,
+        toggleMeterBridge,
 
         sessionClose = 0x0300,
         sessionOpen,

@@ -425,6 +425,7 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
+    menu.addCommandItem (&cmd, Commands::toggleMeterBridge, "Meter Bridge");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
     menu.addSeparator();

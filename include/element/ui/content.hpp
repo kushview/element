@@ -160,6 +160,9 @@ public:
     virtual void toggleVirtualKeyboard();
     virtual VirtualKeyboardView* getVirtualKeyboardView() const { return nullptr; }
 
+    virtual void setMeterBridgeVisible (bool) {}
+    virtual bool isMeterBridgeVisible() const { return false; }
+
     virtual void setNodeChannelStripVisible (const bool isVisible);
     virtual bool isNodeChannelStripVisible() const;
 

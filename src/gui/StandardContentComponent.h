@@ -19,9 +19,11 @@
 
 #pragma once
 
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 namespace element {
+
+class MeterBridgeView;
 
 class StandardContentComponent : public ContentComponent
 {
@@ -53,6 +55,9 @@ public:
 
     void setNodeChannelStripVisible (const bool isVisible) override;
     bool isNodeChannelStripVisible() const override;
+
+    void setMeterBridgeVisible (bool) override;
+    bool isMeterBridgeVisible() const override;
 
     void setCurrentNode (const Node& node) override;
     void stabilize (const bool refreshDataPathTrees = false) override;
@@ -90,12 +95,14 @@ private:
 
     ScopedPointer<VirtualKeyboardView> keyboard;
     ScopedPointer<NodeChannelStripView> nodeStrip;
+    std::unique_ptr<MeterBridgeView> bridge;
 
     bool statusBarVisible;
     int statusBarSize;
     bool toolBarVisible;
     int toolBarSize;
     bool virtualKeyboardVisible = false;
+    bool meterBridgeVisible = false;
     int virtualKeyboardSize = 80;
     int nodeStripSize = 80;
 
