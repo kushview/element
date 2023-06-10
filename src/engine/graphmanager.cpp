@@ -419,6 +419,13 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
         Node node (data, true);
         jassert (node.getFormat().toString().isNotEmpty());
         jassert (node.getIdentifier().toString().isNotEmpty());
+        node.resetPorts();
+        PortArray cins;
+        node.getPorts (cins, PortType::Control, true);
+        for (auto& c : cins)
+        {
+            c.setHiddenOnBlock (true);
+        }
 
         if (object->isSubGraph())
         {
@@ -458,8 +465,6 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
             }
         }
 
-        // make sure the model ports are correct with the actual processor
-        node.resetPorts();
         nodes.addChild (data, -1, nullptr);
         changed();
     }

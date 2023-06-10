@@ -670,9 +670,6 @@ void NodeObject::setPorts (const PortList& newPorts)
     parameters.swapWith (newParams);
     newParamsOut.sort (sorter, true);
     parametersOut.swapWith (newParamsOut);
-
-    for (const auto& po : parametersOut)
-        DBG (po->getName (30));
 }
 
 ValueTree NodeObject::createPortsData() const
@@ -859,10 +856,6 @@ Parameter::Ptr NodeObject::getOrCreateParameter (const PortDescription& port)
 
     if (param == nullptr)
     {
-        if (! port.input)
-        {
-            DBG ("creating output port default");
-        }
         param = new ControlPortParameter (port);
     }
 
