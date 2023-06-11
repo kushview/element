@@ -6,4 +6,4 @@ namespace element {
 // temporary!
 using View = ContentView;
 
-}
+} // namespace element

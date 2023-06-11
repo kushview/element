@@ -98,6 +98,22 @@ public:
     Context& getWorld() const;
     MidiIOMonitorPtr getMidiIOMonitor() const;
 
+    struct LevelMeter : public juce::ReferenceCountedObject {
+        LevelMeter() noexcept {}
+        inline double level() const noexcept { return _level.get(); }
+
+    private:
+        friend class AudioEngine;
+
+        Atomic<float> _level { 0 };
+        void updateLevel (const float* const*, int numChannels, int numSamples) noexcept;
+    };
+
+    using LevelMeterPtr = ReferenceCountedObjectPtr<LevelMeter>;
+
+    LevelMeterPtr getLevelMeter (int channel, bool input);
+    int getNumChannels (bool input) const noexcept;
+
 private:
     class Private;
     std::unique_ptr<Private> priv;

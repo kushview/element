@@ -385,6 +385,10 @@ public:
         jassert (sampleRate > 0 && blockSize > 0);
         int totalNumChans = 0;
         ScopedNoDenormals denormals;
+
+        for (int c = 0; c < numInputChannels; ++c)
+            inMeters.getObjectPointerUnchecked (c)->updateLevel (inputChannelData, c, numSamples);
+
         if (numInputChannels > numOutputChannels)
         {
             // if there aren't enough output channels for the number of
@@ -465,6 +469,8 @@ public:
             }
         }
 
+        for (int c = 0; c < numOutputChannels; ++c)
+            outMeters.getObjectPointerUnchecked (c)->updateLevel (outputChannelData, c, numSamples);
         incomingMidi.clear();
     }
 
@@ -548,6 +554,11 @@ public:
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
 
         graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
+
+        while (inMeters.size() < numInputChans)
+            inMeters.add (new AudioEngine::LevelMeter());
+        while (outMeters.size() < numOutputChans)
+            outMeters.add (new AudioEngine::LevelMeter());
 
         if (isPrepared)
         {
@@ -737,6 +748,8 @@ private:
     MidiIOMonitorPtr midiIOMonitor;
 
     Atomic<double> midiOutLatency { 0.0 };
+
+    ReferenceCountedArray<AudioEngine::LevelMeter> inMeters, outMeters;
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -993,6 +1006,52 @@ int AudioEngine::getExternalLatencySamples() const
 MidiIOMonitorPtr AudioEngine::getMidiIOMonitor() const
 {
     return priv != nullptr ? priv->midiIOMonitor : nullptr;
+}
+
+int AudioEngine::getNumChannels (bool input) const noexcept
+{
+    return input ? priv->numInputChans : priv->numOutputChans;
+}
+
+AudioEngine::LevelMeterPtr AudioEngine::getLevelMeter (int channel, bool input)
+{
+    auto& larr = input ? priv->inMeters : priv->outMeters;
+    return larr[channel];
+}
+
+void AudioEngine::LevelMeter::updateLevel (const float* const* channelData, int numChannels, int numSamples) noexcept
+{
+    if (getReferenceCount() <= 1)
+        return;
+
+    auto localLevel = _level.get();
+
+    if (numChannels >= 0)
+    {
+        for (int j = 0; j < numSamples; ++j)
+        {
+            float s = 0;
+
+            s += std::abs (channelData[numChannels][j]);
+
+            // s /= (float) numChannels;
+
+            const float decayFactor = 0.99992f;
+
+            if (s > localLevel)
+                localLevel = s;
+            else if (localLevel > 0.001f)
+                localLevel *= decayFactor;
+            else
+                localLevel = 0;
+        }
+    }
+    else
+    {
+        localLevel = 0;
+    }
+
+    _level.set (localLevel);
 }
 
 } // namespace element

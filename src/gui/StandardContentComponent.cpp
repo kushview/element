@@ -677,7 +677,7 @@ void StandardContentComponent::resizeContent (const Rectangle<int>& area)
     if (virtualKeyboardVisible && keyboard)
         keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
     if (meterBridgeVisible && bridge && bridge->isVisible())
-        bridge->setBounds (r.removeFromBottom (virtualKeyboardSize));
+        bridge->setBounds (r.removeFromBottom (99));
     if (nodeStrip && nodeStrip->isVisible())
         nodeStrip->setBounds (r.removeFromRight (nodeStripSize));
 
@@ -840,6 +840,7 @@ void StandardContentComponent::saveState (PropertiesFile* props)
     if (auto* const vk = getVirtualKeyboardView())
         vk->saveState (props);
     props->setValue ("meterBridge", meterBridgeVisible);
+    props->setValue ("meterBridgeSize", bridge->getMeterBridge().getMeterSize());
 }
 
 void StandardContentComponent::restoreState (PropertiesFile* props)
@@ -1081,7 +1082,8 @@ void StandardContentComponent::setMainView (ContentView* view)
     setContentView (view, false);
 }
 
-void StandardContentComponent::setMeterBridgeVisible (bool vis) {
+void StandardContentComponent::setMeterBridgeVisible (bool vis)
+{
     if (vis == meterBridgeVisible)
         return;
 
@@ -1090,7 +1092,8 @@ void StandardContentComponent::setMeterBridgeVisible (bool vis) {
     resized();
 }
 
-bool StandardContentComponent::isMeterBridgeVisible() const {
+bool StandardContentComponent::isMeterBridgeVisible() const
+{
     return meterBridgeVisible;
 }
 
