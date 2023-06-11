@@ -291,7 +291,7 @@ public:
 
         auto refreshIOLabel = [this] (Label& lab, bool vis) {
             lab.setVisible (vis);
-            lab.setFont (juce::Font (meterSize > 14 ? 11.f : 9.f));
+            lab.setFont (juce::Font (meterSize > 14 ? 11.f : 10.f));
             lab.setJustificationType (juce::Justification::centred);
         };
 
@@ -335,8 +335,8 @@ private:
     AudioEnginePtr engine;
     OwnedArray<SimpleLevelMeter> meters, metersOut;
     OwnedArray<Label> meterLabels, meterOutLabels;
-    Label audioInLabel { "audioin", "Audio In" };
-    Label audioOutLabel { "audioout", "Audio Out" };
+    Label audioInLabel { "audioin", "INS" };
+    Label audioOutLabel { "audioout", "OUTS" };
     bool audioInsVisible = false;
     bool audioOutsVisible = false;
     int meterSize = 18;
