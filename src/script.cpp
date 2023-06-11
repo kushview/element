@@ -170,4 +170,56 @@ void Script::setMissing()
     stabilizePropertyString (tags::code, "");
 }
 
+Script Script::anonymous()
+{
+    static String body (R"(--- New Anonymous Script.
+--
+-- This is an anonymous script. Do as you please.
+--
+-- @script      amp
+-- @kind        Anonymous
+-- @license     GPL v3
+-- @author      Michael Fisher
+)");
+
+    Script script (body);
+    script.setName ("Anonymous Script");
+    return script;
+}
+
+Script Script::view()
+{
+    static String body (R"(--- New View Script.
+--
+-- This is a content View script.
+--
+-- @script      amp
+-- @kind        View
+-- @license     GPL v3
+-- @author      Michael Fisher
+)");
+
+    Script script (body);
+    script.setName ("View Script");
+    return script;
+}
+
+Script Script::make (const juce::String& name, const juce::Identifier& kind)
+{
+    juce::String buffer;
+    // clang-format off
+    buffer << 
+        "--- A new " << kind.toString() << " script." << juce::newLine <<
+        "-- " << juce::newLine <<
+        "-- Script description." << juce::newLine <<
+        "-- " << juce::newLine <<
+        "-- @kind " << kind.toString() << juce::newLine <<
+        "-- @license GPL3-or-later"  << juce::newLine <<
+        "-- @author Your Name" << juce::newLine <<
+        juce::newLine;
+    // clang-format on
+    Script script (buffer);
+    script.setName (name);
+    return script;
+}
 } // namespace element

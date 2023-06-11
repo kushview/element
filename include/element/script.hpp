@@ -54,6 +54,11 @@ public:
     void setCode (const juce::String&);
     bool valid() const noexcept;
 
+    static Script make (const juce::String& name, const juce::Identifier& kind);
+
+    static Script anonymous();
+    static Script view();
+
 private:
     void setMissing();
 };

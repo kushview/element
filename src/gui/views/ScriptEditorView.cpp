@@ -107,45 +107,77 @@ private:
 };
 #endif
 
-ScriptEditorView::ScriptEditorView()
+BaseScriptEditorView::BaseScriptEditorView()
 {
-    setName ("ScriptEditorView");
+    setName ("BaseScriptEditorView");
     editor.reset (new ScriptEditorComponent (code, &tokens));
     addAndMakeVisible (editor.get());
 }
 
-ScriptEditorView::~ScriptEditorView()
+BaseScriptEditorView::~BaseScriptEditorView()
 {
     editor.reset (nullptr);
 }
 
-void ScriptEditorView::resized()
+void BaseScriptEditorView::resized()
 {
     editor->setBounds (getLocalBounds());
 }
 
-void ScriptEditorView::reset()
+void BaseScriptEditorView::reset()
 {
     code.replaceAllContent (String());
     code.clearUndoHistory();
     code.setSavePoint();
 }
 
-void ScriptEditorView::reload()
+void BaseScriptEditorView::reload()
 {
     code.replaceAllContent (getScriptContent());
     code.clearUndoHistory();
     code.setSavePoint();
 }
 
-void ScriptEditorView::initializeView (ServiceManager&)
+void BaseScriptEditorView::initializeView (ServiceManager&)
 {
     reload();
 }
 
 //=============================================================================
+ScriptEditorView::ScriptEditorView (const Script& s)
+    : BaseScriptEditorView(),
+      script (s)
+{
+    setName ("ScriptEditorView");
+
+    saveButton.setButtonText ("Save");
+    addAndMakeVisible (saveButton);
+    saveButton.onClick = [this]() {
+        Result r = Result::ok();
+        script.setCode (getCodeDocument().getAllContent());
+        getCodeDocument().setSavePoint();
+    };
+}
+
+String ScriptEditorView::getScriptContent() const
+{
+    return script.code();
+}
+
+void ScriptEditorView::resized()
+{
+    BaseScriptEditorView::resized();
+    saveButton.changeWidthToFitText (22);
+    saveButton.setBounds (
+        getWidth() - 16 - saveButton.getWidth(),
+        4,
+        saveButton.getWidth(),
+        saveButton.getHeight());
+}
+
+//=============================================================================
 ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (const Node& n, bool editUI)
-    : ScriptEditorView(),
+    : BaseScriptEditorView(),
       node (n),
       editingUI (editUI)
 {
@@ -189,7 +221,7 @@ String ScriptNodeScriptEditorView::getScriptContent() const
 
 void ScriptNodeScriptEditorView::resized()
 {
-    ScriptEditorView::resized();
+    BaseScriptEditorView::resized();
     applyButton.changeWidthToFitText (22);
     applyButton.setBounds (
         getWidth() - 16 - applyButton.getWidth(),

@@ -23,18 +23,19 @@
 #include "gui/widgets/ScriptEditorComponent.h"
 #include "scripting/scriptsource.hpp"
 #include <element/node.hpp>
+#include <element/script.hpp>
 
 namespace element {
 
 class ScriptNode;
 
-class ScriptEditorView : public ContentView
+class BaseScriptEditorView : public ContentView
 {
 protected:
-    ScriptEditorView();
+    BaseScriptEditorView();
 
 public:
-    virtual ~ScriptEditorView();
+    virtual ~BaseScriptEditorView();
 
     ScriptEditorComponent& getEditor() { return *editor; }
 
@@ -85,7 +86,27 @@ private:
     CodeDocument code;
 };
 
-class ScriptNodeScriptEditorView : public ScriptEditorView
+//==============================================================================
+class ScriptEditorView : public BaseScriptEditorView
+{
+public:
+    ScriptEditorView() = delete;
+    ScriptEditorView (const Script& s);
+    virtual ~ScriptEditorView() = default;
+
+    /** @internal */
+    void resized() override;
+
+protected:
+    String getScriptContent() const override;
+
+private:
+    Script script;
+    TextButton saveButton;
+};
+
+//==============================================================================
+class ScriptNodeScriptEditorView : public BaseScriptEditorView
 {
 public:
     ScriptNodeScriptEditorView (const Node& n, bool editUI);

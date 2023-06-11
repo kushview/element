@@ -37,7 +37,7 @@ inline static String decode (const String& input)
                     true,
                     InputStream::zlibFormat,
                     mo.getDataSize());
-    return dc.readEntireStreamAsString();
+    return dc.readString();
 }
 
 } // namespace gzip

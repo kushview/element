@@ -22,6 +22,10 @@
 #include <element/element.h>
 #include <element/juce/data_structures.hpp>
 
+namespace juce {
+class UndoManager;
+}
+
 namespace element {
 
 /** A thin wrapper around a juce juce::ValueTree */
@@ -81,6 +85,19 @@ public:
 
     /** Count the number of children with a type */
     juce::int32 countChildrenOfType (const juce::Identifier& slug) const;
+
+    inline static void removeFromParent (const juce::ValueTree& data, juce::UndoManager* undo = nullptr)
+    {
+        auto parent = data.getParent();
+        if (! parent.isValid())
+            return;
+        parent.removeChild (data, undo);
+    }
+
+    inline static void removeFromParent (const Model& model, juce::UndoManager* undo = nullptr)
+    {
+        removeFromParent (model.getValueTree(), undo);
+    }
 
 protected:
     /** Override this to handle special data validation This is called

@@ -54,6 +54,19 @@ public:
         return nullptr;
     }
 
+    SessionTreePanel* getSessionTreePanel()
+    {
+        if (auto view = getOwnerView())
+            return dynamic_cast<SessionTreePanel*> (view->findParentComponentOfClass<SessionTreePanel>());
+        return nullptr;
+    }
+
+    void refreshPanel()
+    {
+        if (auto panel = getSessionTreePanel())
+            panel->refresh();
+    }
+
     //=========================================================================
     virtual bool mightContainSubItems() override { return false; }
 
@@ -450,7 +463,8 @@ public:
 
     void showDocument() override
     {
-        std::clog << script.code().toStdString() << std::endl;
+        if (auto* cc = getContentComponent())
+            cc->setMainView (new ScriptEditorView (script));
     }
 
     bool isMissing() override { return false; }
@@ -458,6 +472,28 @@ public:
     Icon getIcon() const override
     {
         return Icon (getIcons().fasCircle, Colors::elemental.withAlpha (0.9f));
+    }
+
+    void deleteItem() override
+    {
+        Script::removeFromParent (script);
+        script = {};
+        refreshPanel();
+    }
+
+    void handlePopupMenuResult (int res) override
+    {
+        if (res == 1)
+        {
+            deleteItem();
+        }
+    }
+
+    void showPopupMenu() override
+    {
+        PopupMenu menu;
+        menu.addItem (1, "Delete");
+        launchPopupMenu (menu);
     }
 
 private:
@@ -599,30 +635,31 @@ public:
                 addGraph();
                 break;
             case 6:
-                addScript();
-                break;
+            case 7:
+                addScript (result);
             default:
                 break;
         }
     }
 
-    void addScript()
+    void addScript (int res)
     {
-        Script blank;
-        blank.setName ("Script");
-        blank.setCode (R"(--- A New Script.
--- Use your imagination        
-)");
-        getNode().addScript (blank);
-        if (auto panel = dynamic_cast<SessionTreePanel*> (getOwnerView()->findParentComponentOfClass<SessionTreePanel>()))
-            panel->refresh();
+        if (res == 6)
+            getNode().addScript (Script::make ("Anonymous", types::Anonymous));
+        else if (res == 7)
+            getNode().addScript (Script::make ("View", types::View));
+        refreshPanel();
     }
 
     void showPopupMenu() override
     {
         PopupMenu menu;
         menu.addItem (5, "Add Nested Graph");
-        menu.addItem (6, "Add Script...");
+        PopupMenu scripts;
+        scripts.addItem (6, "Anonymous");
+        scripts.addItem (7, "View");
+
+        menu.addSubMenu ("Add Script", scripts, true);
         menu.addSeparator();
         menu.addItem (4, "Edit Graph...");
         menu.addItem (3, "View Settings...");

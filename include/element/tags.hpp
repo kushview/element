@@ -22,6 +22,11 @@
 
 namespace element {
 namespace types {
+
+static const juce::Identifier DSP = "DSP";
+static const juce::Identifier View = "View";
+static const juce::Identifier Anonymous = "Anonymous";
+
 static const juce::Identifier Node = "Node";
 static const juce::Identifier Graph = "Graph";
 static const juce::Identifier Script = "Script";
