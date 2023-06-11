@@ -20,8 +20,6 @@
 #include "LookAndFeel.h"
 #include "gui/Buttons.h"
 #include "gui/widgets/MidiBlinker.h"
-#include "gui/Dock.h"
-
 #include "BinaryData.h"
 
 namespace element {
@@ -103,7 +101,7 @@ LookAndFeel::LookAndFeel()
     setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
 
     // DockItem
-    setColour (DockItem::selectedHighlightColourId, Colors::toggleBlue);
+    // setColour (DockItem::selectedHighlightColourId, Colors::toggleBlue);
 
     // // ProgressBar
     // setColour (ProgressBar::foregroundColourId, Colors::elemental);

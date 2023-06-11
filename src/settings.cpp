@@ -19,8 +19,6 @@
 #include <element/context.hpp>
 #include <element/devicemanager.hpp>
 #include <element/settings.hpp>
-
-#include "gui/Workspace.h"
 #include "engine/midiengine.hpp"
 
 namespace element {
@@ -309,30 +307,6 @@ void Settings::setUseLegacyInterface (const bool useLegacy)
         return;
     if (auto* p = getProps())
         p->setValue (legacyInterfaceKey, useLegacy);
-}
-
-void Settings::setWorkspace (const String& name)
-{
-    if (getWorkspace() == name)
-        return;
-    if (auto* p = getProps())
-        p->setValue (workspaceKey, name);
-}
-
-String Settings::getWorkspace() const
-{
-    if (auto* p = getProps())
-        return p->getValue (workspaceKey, EL_WORKSPACE_CLASSIC);
-    return EL_WORKSPACE_CLASSIC;
-}
-
-File Settings::getWorkspaceFile() const
-{
-    auto name = getWorkspace();
-    if (name.isNotEmpty())
-        name << ".elw";
-    return name.isNotEmpty() ? DataPath::workspacesDir().getChildFile (name)
-                             : File();
 }
 
 bool Settings::isOscHostEnabled() const

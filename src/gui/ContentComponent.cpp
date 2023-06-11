@@ -23,7 +23,6 @@
 #include "services/sessionservice.hpp"
 
 #include "gui/widgets/MidiBlinker.h"
-#include "gui/WorkspacesContentComponent.h"
 #include "gui/StandardContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"

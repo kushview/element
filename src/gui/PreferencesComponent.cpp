@@ -488,7 +488,7 @@ public:
         mainContentLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (mainContentBox);
         mainContentBox.addItem ("Standard", 1);
-        mainContentBox.addItem ("Workspace", 2);
+        // mainContentBox.addItem ("Workspace", 2);
         if (settings.getMainContentType() == "standard")
             mainContentBox.setSelectedId (1, dontSendNotification);
         else if (settings.getMainContentType() == "workspace")

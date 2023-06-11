@@ -84,14 +84,6 @@ libelement_sources = '''
     gui/ContextMenus.cpp
     gui/DecibelScaleComponent.cpp
     gui/DigitalMeter.cpp
-    gui/Dock.cpp
-    gui/DockArea.cpp
-    gui/DockContainer.cpp
-    gui/DockItem.cpp
-    gui/DockItemTabs.cpp
-    gui/DockLayout.cpp
-    gui/DockPanel.cpp
-    gui/DockWindow.cpp
     gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
@@ -161,10 +153,6 @@ libelement_sources = '''
     gui/widgets/SessionGraphsListBox.cpp
     gui/Window.cpp
     gui/WindowManager.cpp
-    gui/workspace/PanelTypes.cpp
-    gui/workspace/PluginsPanel.cpp
-    gui/Workspace.cpp
-    gui/WorkspacesContentComponent.cpp
     
     plugins/plugineditor.cpp
     plugins/pluginprocessor.cpp

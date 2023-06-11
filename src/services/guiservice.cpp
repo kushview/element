@@ -37,7 +37,6 @@
 #include "gui/PreferencesComponent.h"
 #include "gui/SystemTray.h"
 #include "gui/WindowManager.h"
-#include "gui/WorkspacesContentComponent.h"
 #include "gui/StandardContentComponent.h"
 #include "gui/capslock.hpp"
 
@@ -57,8 +56,6 @@ public:
 
     std::unique_ptr<ContentComponent> createMainContent (const String& type) override
     {
-        if (type == "workspace")
-            return std::make_unique<WorkspacesContentComponent> (context.getServices());
         if (type == "standard")
             return std::make_unique<StandardContentComponent> (context.getServices());
         if (type == "compact")

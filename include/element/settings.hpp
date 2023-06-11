@@ -111,10 +111,6 @@ public:
     void setUseLegacyInterface (const bool);
     bool useLegacyInterface() const;
 
-    void setWorkspace (const juce::String& name);
-    juce::String getWorkspace() const;
-    juce::File getWorkspaceFile() const;
-
     bool isOscHostEnabled() const;
     void setOscHostEnabled (bool);
     int getOscHostPort() const;
