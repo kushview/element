@@ -31,8 +31,33 @@
             "label": "Bundle",
             "type": "shell",
             "command": "cd build && meson install --destdir=\".\" --quiet",
+            "dependsOn": ["Format"],
             "group": {
                 "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": {
+                "owner": "meson",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Format",
+            "type": "shell",
+            "command": "cd build && ninja clang-format",
+            "group": {
+                "kind": "none",
                 "isDefault": false
             },
             "problemMatcher": {
