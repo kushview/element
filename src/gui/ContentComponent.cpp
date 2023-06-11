@@ -114,11 +114,6 @@ public:
         mapButton.addListener (this);
         addAndMakeVisible (mapButton);
         addAndMakeVisible (midiBlinker);
-
-#ifdef EL_SOLO
-        transport.setEnabled (false);
-        transport.setVisible (false);
-#endif
     }
 
     ~Toolbar()
