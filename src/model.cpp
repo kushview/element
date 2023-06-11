@@ -19,35 +19,34 @@
 
 #include <element/model.hpp>
 
-using namespace juce;
-
 namespace element {
 
-ObjectModel::ObjectModel (const ValueTree& data) : objectData (data) {}
-ObjectModel::ObjectModel (const Identifier& type) : objectData (type) {}
+using namespace juce;
+Model::Model (const ValueTree& data) : objectData (data) {}
+Model::Model (const Identifier& type) : objectData (type) {}
 
-bool ObjectModel::canAcceptData (const ValueTree& data)
+bool Model::canAcceptData (const ValueTree& data)
 {
     return objectData.hasType (data.getType());
 }
 
-int32 ObjectModel::countChildrenOfType (const Identifier& slug) const
+int32 Model::countChildrenOfType (const Identifier& slug) const
 {
     int32 cnt = 0;
 
-    for (int i = node().getNumChildren(); --i >= 0;)
-        if (node().getChild (i).hasType (slug))
+    for (int i = getValueTree().getNumChildren(); --i >= 0;)
+        if (getValueTree().getChild (i).hasType (slug))
             ++cnt;
 
     return cnt;
 }
 
-Value ObjectModel::getPropertyAsValue (const Identifier& property, bool updateSynchronously)
+Value Model::getPropertyAsValue (const Identifier& property, bool updateSynchronously)
 {
     return objectData.getPropertyAsValue (property, nullptr, updateSynchronously);
 }
 
-ValueTree ObjectModel::setData (const ValueTree& data)
+ValueTree Model::setData (const ValueTree& data)
 {
     if (! canAcceptData (data))
         return data;
@@ -56,7 +55,7 @@ ValueTree ObjectModel::setData (const ValueTree& data)
     return objectData;
 }
 
-void ObjectModel::setNodeData (const ValueTree& data)
+void Model::setNodeData (const ValueTree& data)
 {
     objectData = data;
 }

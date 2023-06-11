@@ -19,16 +19,17 @@
 
 #pragma once
 
+#include <element/element.h>
 #include <element/juce/data_structures.hpp>
 
 namespace element {
 
 /** A thin wrapper around a juce juce::ValueTree */
-class JUCE_API ObjectModel {
+class EL_API Model {
 public:
-    explicit ObjectModel (const juce::ValueTree& data = juce::ValueTree());
-    ObjectModel (const juce::Identifier& slugId);
-    virtual ~ObjectModel() {}
+    explicit Model (const juce::ValueTree& data = juce::ValueTree());
+    Model (const juce::Identifier& slugId);
+    virtual ~Model() {}
 
     /** Get a property from the underlying juce::ValueTree */
     inline juce::var getProperty (const juce::Identifier& id, const juce::var& d = juce::var()) const
@@ -40,7 +41,7 @@ public:
     juce::Value getPropertyAsValue (const juce::Identifier& property, bool updateSynchronously = false);
 
     /** Set a property */
-    inline ObjectModel& setProperty (const juce::Identifier& property, const juce::var& val)
+    inline Model& setProperty (const juce::Identifier& property, const juce::var& val)
     {
         objectData.setProperty (property, val, nullptr);
         return *this;
@@ -56,20 +57,22 @@ public:
     inline bool hasType (const juce::Identifier& type) const { return objectData.hasType (type); }
 
     /** Access to the underlying juce::ValueTree (const version) */
-    inline const juce::ValueTree& node() const { return objectData; }
-    inline const juce::ValueTree& getValueTree() const { return objectData; }
+    inline const juce::ValueTree& getValueTree() const noexcept { return objectData; }
 
     /** Access to the underlying juce::ValueTree */
-    juce::ValueTree node() { return objectData; }
-    juce::ValueTree getValueTree() { return objectData; }
+    inline juce::ValueTree getValueTree() noexcept { return objectData; }
 
+    /** Returns a juce::XmlElement representation of this Model. */
     virtual std::unique_ptr<juce::XmlElement> createXml() const { return objectData.createXml(); }
+
+    /** Returns an Xml string of this Model. */
+    juce::String toXmlString() const noexcept { return objectData.toXmlString(); }
 
     /** Replace this objects juce::ValueTree with another
         If you need to do something special when data is set, then override
         the canAcceptData and setNodeData methods
 
-        @param The new data to use
+        @param data new data to use
     */
     juce::ValueTree setData (const juce::ValueTree& data);
 
@@ -78,8 +81,6 @@ public:
 
     /** Count the number of children with a type */
     juce::int32 countChildrenOfType (const juce::Identifier& slug) const;
-
-    juce::String toXmlString() const { return objectData.toXmlString(); }
 
 protected:
     /** Override this to handle special data validation This is called
@@ -116,5 +117,8 @@ protected:
             objectData.setProperty (prop, objectData.getProperty (prop, defaultValue), nullptr);
     }
 };
+
+/** Alias for backward compatibility. */
+using ObjectModel = Model;
 
 } // namespace element

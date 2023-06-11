@@ -197,7 +197,7 @@ void AudioIOPanelView::labelTextChanged (Label* labelThatHasChanged)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void AudioIOPanelView::setNode (const Node& node)
 {
-    ValueTree n = node.node();
+    ValueTree n = node.getValueTree();
     nodeNameLabel->getTextValue().referTo (n.getPropertyAsValue (Tags::name, nullptr));
 }
 //[/MiscUserCode]

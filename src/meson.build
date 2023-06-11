@@ -8,7 +8,9 @@ libelement_sources = '''
     lv2.cpp
     matrixstate.cpp
     messages.cpp
+    model.cpp
     module.cpp
+    node.cpp
     ringbuffer.cpp
     scripting.cpp
     semaphore.cpp
@@ -176,8 +178,6 @@ libelement_sources = '''
 
     session/controllerdevice.cpp
     session/devicemanager.cpp
-    session/model.cpp
-    session/node.cpp
     session/pluginmanager.cpp
     session/session.cpp
 
