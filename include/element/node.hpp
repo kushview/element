@@ -19,9 +19,6 @@
 
 #pragma once
 
-#include <element/juce/core.hpp>
-#include <element/juce/data_structures.hpp>
-
 #include <element/arc.hpp>
 #include <element/model.hpp>
 #include <element/midichannels.hpp>
@@ -38,6 +35,7 @@ class GraphManager;
 class NodeArray;
 class PortArray;
 class Node;
+class Script;
 
 /** Representation of a Port of a Node. */
 class Port : public Model {
@@ -494,6 +492,7 @@ public:
     ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
     ValueTree getUIValueTree() const { return objectData.getChildWithName (Tags::ui); }
     ValueTree getBlockValueTree() const noexcept { return getUIValueTree().getChildWithName (Tags::block); }
+    ValueTree getScriptsValueTree() const noexcept { return objectData.getChildWithName (tags::scripts); }
 
     //=========================================================================
     const bool operator== (const Node& o) const { return this->objectData == o.objectData; }
@@ -519,6 +518,11 @@ public:
     {
         return getUIValueTree().hasProperty ("color") ? getColor() : fallback;
     }
+
+    /** Add a script to this node.
+        If failure, the returned will be invalid;
+    */
+    ValueTree addScript (const Script& script);
 
 private:
     void setMissingProperties();

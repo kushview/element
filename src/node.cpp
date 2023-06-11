@@ -20,6 +20,8 @@
 #include "engine/nodes/BaseProcessor.h" // for internal id macros
 #include <element/node.hpp>
 #include <element/session.hpp>
+#include <element/script.hpp>
+
 #include "engine/graphmanager.hpp"
 #include "scopedflag.hpp"
 
@@ -456,6 +458,17 @@ void Node::getPluginDescription (PluginDescription& p) const
     readPluginDescriptionForLoading (objectData, p);
 }
 
+ValueTree Node::addScript (const Script& script)
+{
+    auto data = script.getValueTree();
+    if (data.getParent().isValid())
+        data = data.createCopy();
+    Script src (data);
+    if (src.valid())
+        getScriptsValueTree().addChild (src.getValueTree(), -1, nullptr);
+    return src.getValueTree();
+}
+
 void Node::setMissingProperties()
 {
     stabilizePropertyString (Tags::uuid, Uuid().toString());
@@ -471,6 +484,7 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::tempo, (double) 120.0);
     objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
     objectData.getOrCreateChildWithName (Tags::ports, nullptr);
+    objectData.getOrCreateChildWithName (tags::scripts, nullptr);
     auto ui = objectData.getOrCreateChildWithName (Tags::ui, nullptr);
     ui.getOrCreateChildWithName (Tags::block, nullptr);
 }

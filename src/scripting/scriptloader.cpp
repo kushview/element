@@ -19,10 +19,11 @@
 
 #include "sol/sol.hpp"
 #include "scripting/bindings.hpp"
-#include "scripting/scriptdescription.hpp"
+#include <element/script.hpp>
 #include "scripting/scriptloader.hpp"
 
 namespace element {
+using namespace juce;
 
 ScriptLoader::ScriptLoader (lua_State* state)
 {
@@ -77,7 +78,7 @@ bool ScriptLoader::load (const String& buffer)
         return false;
 
     sol::state_view view (L);
-    info = ScriptDescription::parse (buffer);
+    info = ScriptInfo::parse (buffer);
     std::string chunk = info.name.isNotEmpty() ? info.name.toStdString() : "script=";
     error = "";
 

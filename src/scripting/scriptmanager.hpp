@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "scripting/scriptdescription.hpp"
+#include <element/script.hpp>
 
 namespace element {
 
-using ScriptArray = Array<ScriptDescription>;
+using ScriptArray = juce::Array<ScriptInfo>;
 
 class ScriptManager final
 {
@@ -32,33 +32,33 @@ public:
     ~ScriptManager();
 
     void scanDefaultLocation();
-    void scanDirectory (const File&);
+    void scanDirectory (const juce::File&);
 
     int getNumScripts() const;
-    ScriptDescription getScript (int) const;
+    ScriptInfo getScript (int) const;
 
     const ScriptArray& getScriptsDSP() const;
 
     /** Returns the application's script directory.
         Scripts in the app data dir
     */
-    static File getApplicationScriptsDir();
+    static juce::File getApplicationScriptsDir();
 
     /** Returns the system scripts directory.
         The location where scripts were installed or packaged
     */
-    static File getSystemScriptsDir();
+    static juce::File getSystemScriptsDir();
 
     /** Scripts in the users home dir. e.g. ~/.local/share */
-    static File getHomeScriptsDir();
+    static juce::File getHomeScriptsDir();
 
     /** User scripts location. e.g. $HOME/Music/Element/Scripts */
-    static File getUserScriptsDir();
+    static juce::File getUserScriptsDir();
 
 private:
     class Registry;
     std::unique_ptr<Registry> registry;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptManager);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptManager)
 };
 
 } // namespace element

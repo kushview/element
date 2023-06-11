@@ -3,12 +3,12 @@
 namespace element {
 namespace test {
 
-inline static File getSourceRoot()
+inline static juce::File getSourceRoot()
 {
 #ifdef EL_TEST_SOURCE_ROOT
-    return File (EL_TEST_SOURCE_ROOT);
+    return juce::File (EL_TEST_SOURCE_ROOT);
 #else
-    return File::getCurrentWorkingDirectory().getParentDirectory();
+    return juce::File::getCurrentWorkingDirectory().getParentDirectory();
 #endif
 }
 

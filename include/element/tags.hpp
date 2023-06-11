@@ -20,6 +20,15 @@
 
 #include <element/juce/core.hpp>
 
+namespace element {
+namespace types {
+static const juce::Identifier Node = "Node";
+static const juce::Identifier Graph = "Graph";
+static const juce::Identifier Script = "Script";
+static const juce::Identifier Session = "Session";
+} // namespace types
+} // namespace element
+
 namespace Tags {
 static const juce::Identifier asset = "asset";
 static const juce::Identifier assetId = "assetId";
@@ -157,4 +166,16 @@ static const juce::Identifier workspace = "workspace";
 static const juce::Identifier externalSync = "externalSync";
 
 static const juce::Identifier updater = "updater";
+
 } // namespace Tags
+
+namespace element {
+namespace tags {
+using namespace Tags;
+
+static const juce::Identifier code = "code";
+static const juce::Identifier source = "source";
+static const juce::Identifier scripts = "scripts";
+
+} // namespace tags
+} // namespace element

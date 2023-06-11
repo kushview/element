@@ -17,24 +17,24 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "scripting/scriptdescription.hpp"
+#include <element/script.hpp>
 #include "sol/sol.hpp"
 
 namespace element {
 
-class ScriptLoader final : public ReferenceCountedObject
+class ScriptLoader final : public juce::ReferenceCountedObject
 {
 public:
     ScriptLoader() = delete;
     explicit ScriptLoader (lua_State* L);
-    ScriptLoader (sol::state_view& view, const String& buffer);
-    ScriptLoader (sol::state_view& view, File file);
+    ScriptLoader (sol::state_view& view, const juce::String& buffer);
+    ScriptLoader (sol::state_view& view, juce::File file);
     ~ScriptLoader();
 
     bool isLoaded() const { return hasloaded; }
     bool isReady() const { return isLoaded() && ! hasError(); }
-    bool load (const String& buffer);
-    bool load (File file);
+    bool load (const juce::String& buffer);
+    bool load (juce::File file);
 
     sol::function caller() const
     {
@@ -77,22 +77,22 @@ public:
     }
 
     const auto& getInfo() const { return info; }
-    String getName() const { return info.name; }
-    String getType() const { return info.type; }
-    String getAuthor() const { return info.author; }
-    String getDescription() const { return info.description; }
-    String getSource() const { return info.source; }
+    juce::String getName() const { return info.name; }
+    juce::String getType() const { return info.type; }
+    juce::String getAuthor() const { return info.author; }
+    juce::String getDescription() const { return info.description; }
+    juce::String getSource() const { return info.source; }
 
     bool hasError() const { return error.isNotEmpty(); }
-    String getErrorMessage() const { return error; }
+    juce::String getErrorMessage() const { return error; }
 
 private:
-    ScriptDescription info;
+    ScriptInfo info;
     lua_State* L = nullptr;
     bool ownedstate = false;
     bool hasloaded = false;
     sol::load_result loaded;
-    String error;
+    juce::String error;
 
     template <typename... Args>
     sol::reference execute (const sol::environment& e, Args&&... args)
@@ -142,7 +142,7 @@ private:
             }
         } catch (const std::exception& e)
         {
-            error = String ("exception: ") + e.what();
+            error = juce::String ("exception: ") + e.what();
         }
         return ref;
     }

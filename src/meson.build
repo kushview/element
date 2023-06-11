@@ -18,6 +18,7 @@ libelement_sources = '''
     services.cpp
     slaveprocess.cpp
     strings.cpp
+    script.cpp
     timescale.cpp
     utils.cpp
     version.cpp
@@ -160,8 +161,7 @@ libelement_sources = '''
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp
     scripting/bindings.cpp
-    scripting/script.cpp
-    scripting/scriptdescription.cpp
+    scripting/scriptloader.cpp
     scripting/scriptmanager.cpp
 
     session/controllerdevice.cpp

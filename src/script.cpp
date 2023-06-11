@@ -1,33 +1,19 @@
-/*
-    This file is part of Element
-    Copyright (C) 2020  Kushview, LLC.  All rights reserved.
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+#include <element/gzip.hpp>
+#include <element/script.hpp>
+#include <element/tags.hpp>
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
-
-#include "scripting/scriptdescription.hpp"
 #include "scripting/bindings.hpp"
 #include "sol/sol.hpp"
 
 namespace element {
+using namespace juce;
 
-static ScriptDescription parseScriptComments (const String& buffer)
+static ScriptInfo parseScriptComments (const String& buffer)
 {
     static const StringArray tags = { "@author", "@script", "@description", "@kind" };
 
-    ScriptDescription desc;
+    ScriptInfo desc;
     desc.type = "";
     const auto lines = StringArray::fromLines (buffer);
     int index = 0;
@@ -91,10 +77,10 @@ static ScriptDescription parseScriptComments (const String& buffer)
     return desc;
 }
 
-ScriptDescription ScriptDescription::read (lua_State* L, const String& buffer)
+ScriptInfo ScriptInfo::read (lua_State* L, const String& buffer)
 {
     sol::state_view view (L);
-    ScriptDescription desc;
+    ScriptInfo desc;
     try
     {
         sol::table script;
@@ -117,29 +103,29 @@ ScriptDescription ScriptDescription::read (lua_State* L, const String& buffer)
     return desc;
 }
 
-ScriptDescription ScriptDescription::read (const String& buffer)
+ScriptInfo ScriptInfo::read (const String& buffer)
 {
-    ScriptDescription desc;
+    ScriptInfo desc;
     sol::state lua;
     element::Lua::initializeState (lua);
     return read (lua, buffer);
 }
 
-ScriptDescription ScriptDescription::read (File file)
+ScriptInfo ScriptInfo::read (File file)
 {
     return read (file.loadFileAsString());
 }
 
-ScriptDescription ScriptDescription::parse (const String& buffer)
+ScriptInfo ScriptInfo::parse (const String& buffer)
 {
     auto desc = parseScriptComments (buffer);
     desc.source = "";
     return desc;
 }
 
-ScriptDescription ScriptDescription::parse (File file)
+ScriptInfo ScriptInfo::parse (File file)
 {
-    ScriptDescription desc;
+    ScriptInfo desc;
 
     if (file.existsAsFile())
     {
@@ -148,6 +134,40 @@ ScriptDescription ScriptDescription::parse (File file)
     }
 
     return desc;
+}
+
+//==============================================================================
+Script::Script() : Model (types::Script) { setMissing(); }
+Script::Script (const juce::ValueTree& data) : Model (data) {}
+
+Script::Script (const juce::String& src)
+    : Model (types::Script)
+{
+    setMissing();
+    setSource (src);
+}
+
+Script::Script (const Script& o) { Script::operator= (o); }
+Script& Script::operator= (const Script& o)
+{
+    Model::operator= (o);
+    return *this;
+}
+
+void Script::setName (const String& newName)
+{
+    setProperty (Tags::name, newName);
+}
+String Script::name() const noexcept { return getProperty (Tags::name); }
+
+juce::String Script::source() const noexcept { return gzip::decompress (getProperty (tags::source).toString()); }
+void Script::setSource (const String& newCode) { setProperty (tags::source, gzip::compress (newCode)); }
+bool Script::valid() const noexcept { return hasType (types::Script) && hasProperty (tags::code) && hasProperty (tags::name); }
+
+void Script::setMissing()
+{
+    stabilizePropertyString (tags::name, types::Script.toString());
+    stabilizePropertyString (tags::source, "");
 }
 
 } // namespace element

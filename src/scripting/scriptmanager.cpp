@@ -18,29 +18,30 @@
 */
 
 #include <element/juce.hpp>
-#include "scripting/bindings.hpp"
-#include "scripting/scriptdescription.hpp"
+#include <element/script.hpp>
+
 #include "scripting/scriptmanager.hpp"
+#include "scripting/bindings.hpp"
 #include "datapath.hpp"
 #include "sol/sol.hpp"
 
 namespace element {
 
-static void scanForScripts (File dir, Array<ScriptDescription>& results, bool recursive = true)
+static void scanForScripts (File dir, Array<ScriptInfo>& results, bool recursive = true)
 {
     for (DirectoryEntry entry : RangedDirectoryIterator (dir, recursive, "*.lua"))
     {
-        ScriptDescription desc;
+        ScriptInfo desc;
         try
         {
-            desc = ScriptDescription::parse (entry.getFile());
+            desc = ScriptInfo::parse (entry.getFile());
         } catch (const std::exception& e)
         {
             DBG (e.what());
             desc = {};
         }
 
-        if (desc.isValid())
+        if (desc.valid())
         {
             results.add (desc);
         }
@@ -69,10 +70,10 @@ public:
         if (! dir.isDirectory())
             return;
 
-        Array<ScriptDescription> results;
+        Array<ScriptInfo> results;
         scanForScripts (dir, results);
-        Array<ScriptDescription> newDSP;
-        Array<ScriptDescription> newDSPUI;
+        Array<ScriptInfo> newDSP;
+        Array<ScriptInfo> newDSPUI;
 
         for (int i = 0; i < results.size(); ++i)
         {
@@ -95,8 +96,8 @@ public:
 private:
     friend class ScriptManager;
     ScriptManager& owner;
-    Array<ScriptDescription> scripts;
-    Array<ScriptDescription> dsp, dspui;
+    Array<ScriptInfo> scripts;
+    Array<ScriptInfo> dsp, dspui;
 };
 
 //==============================================================================
@@ -122,7 +123,7 @@ int ScriptManager::getNumScripts() const
     return registry->scripts.size();
 }
 
-ScriptDescription ScriptManager::getScript (int index) const
+ScriptInfo ScriptManager::getScript (int index) const
 {
     return registry->scripts[index];
 }

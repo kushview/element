@@ -17,12 +17,13 @@
 */
 
 #include <boost/test/unit_test.hpp>
-#include "scripting/scriptdescription.hpp"
+#include <element/script.hpp>
 
 #include "testutil.hpp"
 
 using namespace element;
 namespace et = element::test;
+using namespace juce;
 
 //=============================================================================
 const static String sDummyScript =
@@ -47,10 +48,10 @@ const static String sMissingInfo =
 -- 
 )";
 
-static String toString (const ScriptDescription& desc)
+static String toString (const ScriptInfo& desc)
 {
     String result;
-    result << juce::newLine << "ScriptDescription:" << juce::newLine << " name\t\t = " << desc.name << juce::newLine << " type\t\t = " << desc.type << juce::newLine << " author\t\t = " << desc.author << juce::newLine << " description\t = " << desc.description << juce::newLine << " source\t\t = " << desc.source << juce::newLine;
+    result << juce::newLine << "ScriptInfo:" << juce::newLine << " name\t\t = " << desc.name << juce::newLine << " type\t\t = " << desc.type << juce::newLine << " author\t\t = " << desc.author << juce::newLine << " description\t = " << desc.description << juce::newLine << " source\t\t = " << desc.source << juce::newLine;
     return result;
 }
 
@@ -58,12 +59,12 @@ BOOST_AUTO_TEST_SUITE (ScriptDescriptionTests)
 
 BOOST_AUTO_TEST_CASE (ParseBuffer)
 {
-    auto info = ScriptDescription::parse (sDummyScript
-                                              .replace ("%NAME%", "Dummy")
-                                              .replace ("%KIND%", "el.DSP")
-                                              .replace ("%AUTHOR%", "Michael R. Fisher"));
+    auto info = ScriptInfo::parse (sDummyScript
+                                       .replace ("%NAME%", "Dummy")
+                                       .replace ("%KIND%", "el.DSP")
+                                       .replace ("%AUTHOR%", "Michael R. Fisher"));
 
-    BOOST_REQUIRE (info.isValid());
+    BOOST_REQUIRE (info.valid());
     BOOST_REQUIRE (info.name == "Dummy");
     BOOST_REQUIRE (info.type == "DSP");
     BOOST_REQUIRE (info.author == "Michael R. Fisher");
@@ -74,8 +75,8 @@ BOOST_AUTO_TEST_CASE (ParseBuffer)
 BOOST_AUTO_TEST_CASE (ParseFile)
 {
     const auto sfile = et::getSourceRoot().getChildFile ("scripts/amp.lua");
-    auto info = ScriptDescription::parse (sfile);
-    BOOST_REQUIRE (info.isValid());
+    auto info = ScriptInfo::parse (sfile);
+    BOOST_REQUIRE (info.valid());
     BOOST_REQUIRE (info.name == "amp");
     BOOST_REQUIRE (info.type == "DSP");
     BOOST_REQUIRE (info.author == "Michael Fisher");
@@ -85,14 +86,14 @@ BOOST_AUTO_TEST_CASE (ParseFile)
 
 BOOST_AUTO_TEST_CASE (ScriptError)
 {
-    auto info = ScriptDescription::parse (sErrorScript);
-    BOOST_REQUIRE (! info.isValid());
+    auto info = ScriptInfo::parse (sErrorScript);
+    BOOST_REQUIRE (! info.valid());
 }
 
 BOOST_AUTO_TEST_CASE (MissingDetails)
 {
-    auto info = ScriptDescription::parse (sMissingInfo);
-    BOOST_REQUIRE (! info.isValid());
+    auto info = ScriptInfo::parse (sMissingInfo);
+    BOOST_REQUIRE (! info.valid());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
