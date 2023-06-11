@@ -124,9 +124,16 @@ public:
         ctx->getDeviceManager().removeChangeListener (this);
     }
 
+    int sectionPadding() { return 6; }
+
     int meterSpaceRequired (bool input)
     {
         return ((meterSize + meterSpace) * (input ? meters.size() : metersOut.size()));
+    }
+
+    int totalSpaceRequired()
+    {
+        return meterSpaceRequired (true) + (sectionPadding() * 2) + meterSpaceRequired (false);
     }
 
     void changeListenerCallback (juce::ChangeBroadcaster*) override
@@ -135,48 +142,49 @@ public:
         bridge.resized();
     }
 
+    bool showChannelLabels() { return meterSize >= 18; }
+
     void resized()
     {
         const int labSize = 15;
-        if (audioInsVisible)
+        if (audioInsVisible && ! audioOutsVisible)
         {
             auto r = bridge.getLocalBounds();
             auto r1 = r.removeFromTop (labSize);
-            auto r2 = r.removeFromBottom (labSize);
+            auto r2 = r.removeFromBottom (showChannelLabels() ? labSize : 0);
+
             int totalSpace = meterSpaceRequired (true);
 
-            if (! audioOutsVisible)
-                r.setX (bridge.getWidth() / 2 - totalSpace / 2);
-            else
-                r.setX (bridge.getWidth() / 2 - totalSpace - 6);
+            r.setX (bridge.getWidth() / 2 - totalSpace / 2);
             r2.setX (r.getX());
             r1.setX (r.getX());
             r1.setWidth (totalSpace);
             audioInLabel.setBounds (r1);
+
             for (auto* meter : meters)
             {
                 meter->setBounds (r.removeFromLeft (meterSize));
                 r.removeFromLeft (meterSpace);
             }
 
-            for (auto* lab : meterLabels)
+            if (showChannelLabels())
             {
-                lab->setBounds (r2.removeFromLeft (meterSize));
-                r2.removeFromLeft (meterSpace);
+                for (auto* lab : meterLabels)
+                {
+                    lab->setBounds (r2.removeFromLeft (meterSize));
+                    r2.removeFromLeft (meterSpace);
+                }
             }
         }
 
-        if (audioOutsVisible)
+        else if (audioOutsVisible && ! audioInsVisible)
         {
             auto r = bridge.getLocalBounds();
             auto r1 = r.removeFromTop (labSize);
-            auto r2 = r.removeFromBottom (labSize);
+            auto r2 = r.removeFromBottom (showChannelLabels() ? labSize : 0);
             int totalSpace = meterSpaceRequired (false);
 
-            if (! audioInsVisible)
-                r.setX (bridge.getWidth() / 2 - totalSpace / 2);
-            else
-                r.setX (bridge.getWidth() / 2 + 6);
+            r.setX (bridge.getWidth() / 2 - totalSpace / 2);
             r2.setX (r.getX());
             r1.setX (r.getX());
             r1.setWidth (totalSpace);
@@ -187,10 +195,62 @@ public:
                 r.removeFromLeft (meterSpace);
             }
 
-            for (auto* lab : meterOutLabels)
+            if (showChannelLabels())
             {
-                lab->setBounds (r2.removeFromLeft (meterSize));
-                r2.removeFromLeft (meterSpace);
+                for (auto* lab : meterOutLabels)
+                {
+                    lab->setBounds (r2.removeFromLeft (meterSize));
+                    r2.removeFromLeft (meterSpace);
+                }
+            }
+        }
+        else if (audioInsVisible && audioOutsVisible)
+        {
+            auto r = bridge.getLocalBounds();
+            auto r1 = r.removeFromTop (labSize);
+            auto r2 = r.removeFromBottom (showChannelLabels() ? labSize : 0);
+
+            int totalSpace = totalSpaceRequired();
+
+            r.setX (bridge.getWidth() / 2 - totalSpace / 2);
+            r2.setX (r.getX());
+            r1.setX (r.getX());
+            r1.setWidth (meterSpaceRequired (true));
+            audioInLabel.setBounds (r1);
+
+            for (auto* meter : meters)
+            {
+                meter->setBounds (r.removeFromLeft (meterSize));
+                r.removeFromLeft (meterSpace);
+            }
+
+            r.removeFromLeft (sectionPadding() * 2);
+
+            r1.setX (r.getX());
+            r1.setWidth (meterSpaceRequired (false));
+            audioOutLabel.setBounds (r1);
+
+            for (auto* meter : metersOut)
+            {
+                meter->setBounds (r.removeFromLeft (meterSize));
+                r.removeFromLeft (meterSpace);
+            }
+
+            if (showChannelLabels())
+            {
+                for (auto* lab : meterLabels)
+                {
+                    lab->setBounds (r2.removeFromLeft (meterSize));
+                    r2.removeFromLeft (meterSpace);
+                }
+
+                r2.removeFromLeft (sectionPadding() * 2);
+
+                for (auto* lab : meterOutLabels)
+                {
+                    lab->setBounds (r2.removeFromLeft (meterSize));
+                    r2.removeFromLeft (meterSpace);
+                }
             }
         }
     }
@@ -225,34 +285,36 @@ public:
         if (audioOutsVisible)
             for (int c = 0; c < engine->getNumChannels (false); ++c)
             {
-                bridge.addAndMakeVisible (metersOut.add (
-                    new SimpleLevelMeter (engine, c, false)));
+                bridge.addAndMakeVisible (metersOut.add (new SimpleLevelMeter (engine, c, false)));
                 bridge.addAndMakeVisible (meterOutLabels.add (new Label (String (c + 1), String (c + 1))));
             }
-        audioInLabel.setVisible (audioInsVisible);
-        audioInLabel.setFont (juce::Font (11.f));
-        audioInLabel.setJustificationType (juce::Justification::centred);
 
-        audioOutLabel.setVisible (audioOutsVisible);
-        audioOutLabel.setFont (juce::Font (11.f));
-        audioOutLabel.setJustificationType (juce::Justification::centred);
+        auto refreshIOLabel = [this] (Label& lab, bool vis) {
+            lab.setVisible (vis);
+            lab.setFont (juce::Font (meterSize > 14 ? 11.f : 9.f));
+            lab.setJustificationType (juce::Justification::centred);
+        };
+
+        auto refreshMeterLabel = [this] (Label& lab) {
+            lab.setFont (juce::Font (12.f));
+            lab.setJustificationType (juce::Justification::centred);
+            lab.setVisible (showChannelLabels());
+        };
+
+        refreshIOLabel (audioInLabel, audioInsVisible);
+        refreshIOLabel (audioOutLabel, audioOutsVisible);
 
         for (auto* lab : meterLabels)
-        {
-            lab->setFont (juce::Font (12.f));
-            lab->setJustificationType (juce::Justification::centred);
-        }
+            refreshMeterLabel (*lab);
         for (auto* lab : meterOutLabels)
-        {
-            lab->setFont (juce::Font (11.f));
-            lab->setJustificationType (juce::Justification::centred);
-        }
+            refreshMeterLabel (*lab);
     }
 
     void setMeterSizes (int size, int space)
     {
         meterSize = size;
         meterSpace = space;
+        refresh();
         bridge.resized();
     }
 
@@ -298,7 +360,7 @@ void MeterBridge::paint (juce::Graphics& g) { impl->paint (g); }
 int MeterBridge::getMeterSize() const { return impl->meterSize; }
 void MeterBridge::setMeterSize (int newSize)
 {
-    newSize = jmax (10, newSize);
+    newSize = jmax (12, newSize);
     impl->setMeterSizes (newSize, impl->meterSpace);
 }
 
@@ -375,7 +437,18 @@ void MeterBridgeView::mouseDown (const juce::MouseEvent& ev)
             bridge->setVisibility (flags);
         });
 
-        menu.show();
+        menu.addSeparator();
+
+        menu.addItem (12, "Small", true, bridge->getMeterSize() == 12);
+        menu.addItem (18, "Normal", true, bridge->getMeterSize() == 18);
+        menu.addItem (24, "Large", true, bridge->getMeterSize() == 24);
+        menu.addItem (32, "Extra Large", true, bridge->getMeterSize() == 32);
+
+        auto res = menu.show();
+
+        if (res >= 12 && res <= 32)
+            bridge->setMeterSize (res);
+
         resized();
     }
 }
