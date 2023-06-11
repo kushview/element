@@ -24,7 +24,7 @@
 #include "scripting/bindings.hpp"
 #include "scripting.hpp"
 #include "scripting/scriptmanager.hpp"
-#include "scripting/script.hpp"
+#include "scripting/scriptloader.hpp"
 
 namespace element {
 
@@ -368,7 +368,7 @@ void ScriptNodeEditor::updatePreview()
 
     try
     {
-        Script loader (state);
+        ScriptLoader loader (state);
         if (loader.load (lua->getCodeDocument (true).getAllContent()))
         {
             auto f = loader.caller();

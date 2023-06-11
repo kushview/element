@@ -839,8 +839,11 @@ void StandardContentComponent::saveState (PropertiesFile* props)
         container->saveState (props);
     if (auto* const vk = getVirtualKeyboardView())
         vk->saveState (props);
+
+    auto& mo = bridge->getMeterBridge();
     props->setValue ("meterBridge", meterBridgeVisible);
-    props->setValue ("meterBridgeSize", bridge->getMeterBridge().getMeterSize());
+    props->setValue ("meterBridgeSize", mo.getMeterSize());
+    props->setValue ("meterBridgeVisibility", (int) mo.visibility());
 }
 
 void StandardContentComponent::restoreState (PropertiesFile* props)
@@ -852,6 +855,11 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
         container->restoreState (props);
     if (auto* const vk = getVirtualKeyboardView())
         vk->restoreState (props);
+    
+    setMeterBridgeVisible (props->getBoolValue ("meterBridge", meterBridgeVisible));
+    auto& bo = bridge->getMeterBridge();
+    bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.getMeterSize()));
+    bo.setVisibility ((uint32) props->getIntValue ("meterBridgeVisibility", bo.visibility()));
     resized();
 }
 

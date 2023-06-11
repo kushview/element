@@ -20,11 +20,11 @@
 #include "sol/sol.hpp"
 #include "scripting/bindings.hpp"
 #include "scripting/scriptdescription.hpp"
-#include "scripting/script.hpp"
+#include "scripting/scriptloader.hpp"
 
 namespace element {
 
-Script::Script (lua_State* state)
+ScriptLoader::ScriptLoader (lua_State* state)
 {
     ownedstate = state == nullptr;
     L = ownedstate ? luaL_newstate() : state;
@@ -36,19 +36,19 @@ Script::Script (lua_State* state)
     }
 }
 
-Script::Script (sol::state_view& view, const String& buffer)
-    : Script (view.lua_state())
+ScriptLoader::ScriptLoader (sol::state_view& view, const String& buffer)
+    : ScriptLoader (view.lua_state())
 {
     this->load (buffer);
 }
 
-Script::Script (sol::state_view& view, File file)
-    : Script (view.lua_state())
+ScriptLoader::ScriptLoader (sol::state_view& view, File file)
+    : ScriptLoader (view.lua_state())
 {
     this->load (file);
 }
 
-Script::~Script()
+ScriptLoader::~ScriptLoader()
 {
     if (ownedstate)
     {
@@ -63,14 +63,14 @@ Script::~Script()
     L = nullptr;
 }
 
-bool Script::load (File file)
+bool ScriptLoader::load (File file)
 {
     bool res = load (file.loadFileAsString());
     info.source = URL (file).toString (false);
     return res;
 }
 
-bool Script::load (const String& buffer)
+bool ScriptLoader::load (const String& buffer)
 {
     jassert (L != nullptr);
     if (L == nullptr)

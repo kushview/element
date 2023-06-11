@@ -233,7 +233,7 @@ public:
         audioInLabel.setFont (juce::Font (11.f));
         audioInLabel.setJustificationType (juce::Justification::centred);
 
-        audioOutLabel.setVisible (audioInsVisible);
+        audioOutLabel.setVisible (audioOutsVisible);
         audioOutLabel.setFont (juce::Font (11.f));
         audioOutLabel.setJustificationType (juce::Justification::centred);
 
@@ -354,7 +354,6 @@ void MeterBridgeView::resized()
 }
 
 void MeterBridgeView::mouseDown (const juce::MouseEvent& ev)
-
 {
     if (ev.mods.isPopupMenu())
     {

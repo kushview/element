@@ -22,14 +22,14 @@
 
 namespace element {
 
-class Script final : public ReferenceCountedObject
+class ScriptLoader final : public ReferenceCountedObject
 {
 public:
-    Script() = delete;
-    explicit Script (lua_State* L);
-    Script (sol::state_view& view, const String& buffer);
-    Script (sol::state_view& view, File file);
-    ~Script();
+    ScriptLoader() = delete;
+    explicit ScriptLoader (lua_State* L);
+    ScriptLoader (sol::state_view& view, const String& buffer);
+    ScriptLoader (sol::state_view& view, File file);
+    ~ScriptLoader();
 
     bool isLoaded() const { return hasloaded; }
     bool isReady() const { return isLoaded() && ! hasError(); }
@@ -147,7 +147,7 @@ private:
         return ref;
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Script);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptLoader);
 };
 
 } // namespace element

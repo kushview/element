@@ -31,7 +31,7 @@
 #include <element/parameter.hpp>
 #include "scripting/bindings.hpp"
 #include "scripting/dspscript.hpp"
-#include "scripting/script.hpp"
+#include "scripting/scriptloader.hpp"
 #include "scripting/scriptmanager.hpp"
 
 #define EL_LUA_DBG(x)
@@ -89,7 +89,7 @@ Result ScriptNode::loadScript (const String& newCode)
     if (result.failed())
         return result;
 
-    Script loader (lua);
+    ScriptLoader loader (lua);
     loader.load (newCode);
     if (loader.hasError())
         return Result::fail (loader.getErrorMessage());

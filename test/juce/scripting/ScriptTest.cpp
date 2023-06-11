@@ -18,7 +18,7 @@
 
 #include "LuaUnitTest.h"
 #include "scripting/dspscript.hpp"
-#include "scripting/script.hpp"
+#include "scripting/scriptloader.hpp"
 
 using namespace element;
 
