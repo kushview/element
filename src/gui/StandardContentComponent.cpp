@@ -855,7 +855,7 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
         container->restoreState (props);
     if (auto* const vk = getVirtualKeyboardView())
         vk->restoreState (props);
-    
+
     setMeterBridgeVisible (props->getBoolValue ("meterBridge", meterBridgeVisible));
     auto& bo = bridge->getMeterBridge();
     bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.getMeterSize()));
