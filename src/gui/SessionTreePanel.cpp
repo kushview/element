@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/script.hpp>
+
 #include "services/sessionservice.hpp"
 
 #include "engine/nodes/NodeTypes.h"
@@ -425,6 +427,43 @@ private:
     };
 };
 
+//===
+class GraphScriptTreeItem : public SessionBaseTreeItem
+{
+public:
+    GraphScriptTreeItem (const Script& s)
+        : SessionBaseTreeItem(),
+          script (s)
+    {
+    }
+
+    bool mightContainSubItems() override { return false; }
+    void addSubItems() override {}
+
+    String getRenamingName() const override { return getDisplayName(); }
+    String getDisplayName() const override { return script.name(); }
+
+    void setName (const String& newName) override
+    {
+        script.setName (newName);
+    }
+
+    void showDocument() override
+    {
+        std::clog << script.code().toStdString() << std::endl;
+    }
+
+    bool isMissing() override { return false; }
+
+    Icon getIcon() const override
+    {
+        return Icon (getIcons().fasCircle, Colors::elemental.withAlpha (0.9f));
+    }
+
+private:
+    Script script;
+};
+
 //=============================================================================
 class SessionGraphTreeItem : public SessionNodeTreeItem
 {
@@ -472,6 +511,16 @@ public:
     {
         const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
         ViewHelpers::findContentComponent (getOwnerView())->getServices().findChild<EngineService>()->removeGraph (index);
+    }
+
+    void addSubItems() override
+    {
+        SessionGraphTreeItem::addSubItems();
+        for (int i = 0; i < getNode().getScriptsValueTree().getNumChildren(); ++i)
+        {
+            Script script (getNode().getScriptsValueTree().getChild (i));
+            addSubItem (new GraphScriptTreeItem (script));
+        }
     }
 
     void duplicateItem() override
@@ -549,19 +598,32 @@ public:
             case 5:
                 addGraph();
                 break;
-                {
-                }
+            case 6:
+                addScript();
                 break;
-
             default:
                 break;
         }
+    }
+
+    void addScript()
+    {
+        Script blank;
+        blank.setName ("Script");
+        blank.setCode (R"(--- A New Script.
+-- Use your imagination        
+)");
+        getNode().addScript (blank);
+        if (auto panel = dynamic_cast<SessionTreePanel*> (getOwnerView()->findParentComponentOfClass<SessionTreePanel>()))
+            panel->refresh();
     }
 
     void showPopupMenu() override
     {
         PopupMenu menu;
         menu.addItem (5, "Add Nested Graph");
+        menu.addItem (6, "Add Script...");
+        menu.addSeparator();
         menu.addItem (4, "Edit Graph...");
         menu.addItem (3, "View Settings...");
         menu.addSeparator();

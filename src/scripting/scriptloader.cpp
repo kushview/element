@@ -67,7 +67,7 @@ ScriptLoader::~ScriptLoader()
 bool ScriptLoader::load (File file)
 {
     bool res = load (file.loadFileAsString());
-    info.source = URL (file).toString (false);
+    info.code = URL (file).toString (false);
     return res;
 }
 

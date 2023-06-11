@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include "utils.hpp"
+#include <element/element.h>
+#include <element/gzip.hpp>
 
 namespace element {
 
-class ScriptSource
+class EL_API ScriptSource
 {
 public:
     ScriptSource() = default;
@@ -36,11 +37,11 @@ public:
     virtual void setCode (const String& code) = 0;
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptSource);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptSource)
 };
 
 /** A script source for a value tree */
-class ValueTreeScriptSource : public ScriptSource
+class EL_API ValueTreeScriptSource : public ScriptSource
 {
 public:
     ValueTreeScriptSource (const ValueTree& tree) : data (tree) {}

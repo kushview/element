@@ -119,7 +119,7 @@ ScriptInfo ScriptInfo::read (File file)
 ScriptInfo ScriptInfo::parse (const String& buffer)
 {
     auto desc = parseScriptComments (buffer);
-    desc.source = "";
+    desc.code = "";
     return desc;
 }
 
@@ -130,7 +130,7 @@ ScriptInfo ScriptInfo::parse (File file)
     if (file.existsAsFile())
     {
         desc = parseScriptComments (file.loadFileAsString());
-        desc.source = URL (file).toString (false);
+        desc.code = URL (file).toString (false);
     }
 
     return desc;
@@ -140,11 +140,11 @@ ScriptInfo ScriptInfo::parse (File file)
 Script::Script() : Model (types::Script) { setMissing(); }
 Script::Script (const juce::ValueTree& data) : Model (data) {}
 
-Script::Script (const juce::String& src)
+Script::Script (const juce::String& source)
     : Model (types::Script)
 {
     setMissing();
-    setSource (src);
+    setCode (source);
 }
 
 Script::Script (const Script& o) { Script::operator= (o); }
@@ -160,14 +160,14 @@ void Script::setName (const String& newName)
 }
 String Script::name() const noexcept { return getProperty (Tags::name); }
 
-juce::String Script::source() const noexcept { return gzip::decompress (getProperty (tags::source).toString()); }
-void Script::setSource (const String& newCode) { setProperty (tags::source, gzip::compress (newCode)); }
+juce::String Script::code() const noexcept { return gzip::decode (getProperty (tags::code).toString()); }
+void Script::setCode (const String& newCode) { setProperty (tags::code, gzip::encode (newCode)); }
 bool Script::valid() const noexcept { return hasType (types::Script) && hasProperty (tags::code) && hasProperty (tags::name); }
 
 void Script::setMissing()
 {
     stabilizePropertyString (tags::name, types::Script.toString());
-    stabilizePropertyString (tags::source, "");
+    stabilizePropertyString (tags::code, "");
 }
 
 } // namespace element

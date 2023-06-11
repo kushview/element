@@ -8,34 +8,37 @@ namespace gzip {
 using String = juce::String;
 using InputStream = juce::GZIPDecompressorInputStream;
 using OutputStream = juce::GZIPCompressorOutputStream;
+using MemoryOutputStream = juce::MemoryOutputStream;
+using MemoryInputStream = juce::MemoryInputStream;
 
-/** GZip compress a string. */
-inline static String compress (const String& string, int level = -1, int window = 0)
+inline static String encode (const String& input)
 {
-    juce::MemoryOutputStream mo;
+    MemoryOutputStream out;
     {
-        OutputStream go (mo, level, window);
-        go.writeString (string);
-        go.flush();
-    }
-    return mo.toString();
-}
-
-/** GZip decompress a string. */
-inline static String decompress (const String& string)
-{
-    auto size = string.getCharPointer().sizeInBytes();
-    auto data = (void*) string.getCharPointer().getAddress();
-    String out;
-    {
-        juce::MemoryInputStream mi (data, size, false);
+        MemoryOutputStream mo;
         {
-            InputStream go (mi);
-            out = go.readEntireStreamAsString();
+            OutputStream gz (mo);
+            gz.writeString (input);
         }
+        juce::Base64::convertToBase64 (out, mo.getData(), mo.getDataSize());
     }
-
-    return out;
+    String result; // = "data:application/gzip;base64, ";
+    result << out.toString();
+    return result;
 }
+
+inline static String decode (const String& input)
+{
+    MemoryOutputStream mo;
+    juce::Base64::convertFromBase64 (mo, input);
+    auto block = mo.getMemoryBlock();
+    MemoryInputStream mi (block, false);
+    InputStream dc (new MemoryInputStream (block, false),
+                    true,
+                    InputStream::zlibFormat,
+                    mo.getDataSize());
+    return dc.readEntireStreamAsString();
+}
+
 } // namespace gzip
 } // namespace element

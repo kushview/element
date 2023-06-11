@@ -477,37 +477,4 @@ public:
         return result;
     }
 };
-
-namespace gzip {
-
-    inline static String encode (const String& input)
-    {
-        MemoryOutputStream out;
-        {
-            MemoryOutputStream mo;
-            {
-                GZIPCompressorOutputStream gz (mo);
-                gz.writeString (input);
-            }
-            Base64::convertToBase64 (out, mo.getData(), mo.getDataSize());
-        }
-        String result; // = "data:application/gzip;base64, ";
-        result << out.toString();
-        return result;
-    }
-
-    inline static String decode (const String& input)
-    {
-        MemoryOutputStream mo;
-        Base64::convertFromBase64 (mo, input);
-        auto block = mo.getMemoryBlock();
-        MemoryInputStream mi (block, false);
-        GZIPDecompressorInputStream dc (new MemoryInputStream (block, false),
-                                        true,
-                                        GZIPDecompressorInputStream::zlibFormat,
-                                        mo.getDataSize());
-        return dc.readEntireStreamAsString();
-    }
-
-} // namespace gzip
 } // namespace element

@@ -51,7 +51,7 @@ const static String sMissingInfo =
 static String toString (const ScriptInfo& desc)
 {
     String result;
-    result << juce::newLine << "ScriptInfo:" << juce::newLine << " name\t\t = " << desc.name << juce::newLine << " type\t\t = " << desc.type << juce::newLine << " author\t\t = " << desc.author << juce::newLine << " description\t = " << desc.description << juce::newLine << " source\t\t = " << desc.source << juce::newLine;
+    result << juce::newLine << "ScriptInfo:" << juce::newLine << " name\t\t = " << desc.name << juce::newLine << " type\t\t = " << desc.type << juce::newLine << " author\t\t = " << desc.author << juce::newLine << " description\t = " << desc.description << juce::newLine << " source\t\t = " << desc.code << juce::newLine;
     return result;
 }
 
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE (ParseBuffer)
     BOOST_REQUIRE (info.name == "Dummy");
     BOOST_REQUIRE (info.type == "DSP");
     BOOST_REQUIRE (info.author == "Michael R. Fisher");
-    BOOST_REQUIRE (info.source.isEmpty());
+    BOOST_REQUIRE (info.code.isEmpty());
     BOOST_REQUIRE (info.description.isNotEmpty());
 }
 
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE (ParseFile)
     BOOST_REQUIRE (info.name == "amp");
     BOOST_REQUIRE (info.type == "DSP");
     BOOST_REQUIRE (info.author == "Michael Fisher");
-    BOOST_REQUIRE (URL (info.source).getLocalFile() == sfile);
+    BOOST_REQUIRE (URL (info.code).getLocalFile() == sfile);
     BOOST_REQUIRE (info.description.isEmpty());
 }
 

@@ -81,7 +81,7 @@ public:
     juce::String getType() const { return info.type; }
     juce::String getAuthor() const { return info.author; }
     juce::String getDescription() const { return info.description; }
-    juce::String getSource() const { return info.source; }
+    juce::String getSource() const { return info.code; }
 
     bool hasError() const { return error.isNotEmpty(); }
     juce::String getErrorMessage() const { return error; }

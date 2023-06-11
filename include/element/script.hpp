@@ -11,8 +11,7 @@ struct ScriptInfo final {
     juce::String type;
     juce::String author;
     juce::String description;
-    juce::String source;
-    bool compressed = false;
+    juce::String code;
 
     ScriptInfo() = default;
     ScriptInfo (const ScriptInfo& o) { operator= (o); }
@@ -24,7 +23,7 @@ struct ScriptInfo final {
         this->type = o.type;
         this->author = o.author;
         this->description = o.description;
-        this->source = o.source;
+        this->code = o.code;
         return *this;
     }
 
@@ -51,8 +50,8 @@ public:
     juce::String name() const noexcept;
     void setName (const juce::String& newName);
 
-    juce::String source() const noexcept;
-    void setSource (const juce::String&);
+    juce::String code() const noexcept;
+    void setCode (const juce::String&);
     bool valid() const noexcept;
 
 private:
