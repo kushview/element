@@ -78,11 +78,19 @@ static void setHiddenPortsProperty (const Node& node, const StringArray& symbols
 }
 
 //==============================================================================
-int Port::getChannel() const
+uint32 Port::index() const noexcept
+{
+    const int index = getProperty (Tags::index, -1);
+    return index >= 0 ? static_cast<uint32> (index) : EL_INVALID_PORT;
+}
+
+const String Port::symbol() const noexcept { return getProperty (Tags::symbol, String()); }
+
+int Port::channel() const noexcept
 {
     const Node node (objectData.getParent().getParent());
     if (auto* g = node.getObject())
-        return g->getChannelPort (getIndex());
+        return g->getChannelPort (index());
     return -1;
 }
 
@@ -101,11 +109,11 @@ void Port::setHiddenOnBlock (bool hidden)
 
     if (hidden)
     {
-        symbols.addIfNotAlreadyThere (getSymbol());
+        symbols.addIfNotAlreadyThere (symbol());
     }
     else
     {
-        symbols.removeString (getSymbol().toRawUTF8());
+        symbols.removeString (symbol().toRawUTF8());
     }
 
     setHiddenPortsProperty (node, symbols);
@@ -120,7 +128,7 @@ bool Port::isHiddenOnBlock() const
     }
 
     const auto symbols = getHiddenPortsProperty (parent);
-    return symbols.contains (getSymbol().toRawUTF8());
+    return symbols.contains (symbol().toRawUTF8());
 }
 
 //==============================================================================

@@ -444,14 +444,14 @@ private:
         {
             return Node::connectionExists (sourceNode.getParentArcsNode(),
                                            sourceNode.getNodeId(),
-                                           sourcePort.getIndex(),
+                                           sourcePort.index(),
                                            destNode.getNodeId(),
-                                           destPort.getIndex());
+                                           destPort.index());
         }
 
         Message* createMessage()
         {
-            return new AddConnectionMessage (sourceNode.getNodeId(), sourcePort.getIndex(), destNode.getNodeId(), destPort.getIndex());
+            return new AddConnectionMessage (sourceNode.getNodeId(), sourcePort.index(), destNode.getNodeId(), destPort.index());
         }
     };
 

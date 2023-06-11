@@ -19,7 +19,6 @@
 #pragma once
 
 #include <element/juce/core.hpp>
-
 #include <element/audioengine.hpp>
 #include <element/session.hpp>
 

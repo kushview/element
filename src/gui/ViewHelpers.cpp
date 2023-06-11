@@ -201,7 +201,7 @@ void ViewHelperMixin::connectPorts (const Port& src, const Port& dst)
     const Node graph (srcNode.getParentGraph());
 
     DBG ("[element] sending connect message: " << srcNode.getName() << " <-> " << dstNode.getName());
-    postMessage (new AddConnectionMessage (srcNode.getNodeId(), src.getIndex(), dstNode.getNodeId(), dst.getIndex(), graph));
+    postMessage (new AddConnectionMessage (srcNode.getNodeId(), src.index(), dstNode.getNodeId(), dst.index(), graph));
 }
 
 void ViewHelperMixin::connectPorts (const Node& graph, const uint32 srcNode, const uint32 srcPort, const uint32 dstNode, const uint32 dstPort)
@@ -215,7 +215,7 @@ void ViewHelperMixin::disconnectPorts (const Port& src, const Port& dst)
     const Node srcNode (src.getNode());
     const Node dstNode (dst.getNode());
     const Node graph (srcNode.getParentGraph());
-    postMessage (new RemoveConnectionMessage (srcNode.getNodeId(), src.getIndex(), dstNode.getNodeId(), dst.getIndex(), graph));
+    postMessage (new RemoveConnectionMessage (srcNode.getNodeId(), src.index(), dstNode.getNodeId(), dst.index(), graph));
 }
 
 } // namespace element

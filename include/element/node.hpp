@@ -39,7 +39,8 @@ class NodeArray;
 class PortArray;
 class Node;
 
-class Port : public ObjectModel {
+/** Representation of a Port of a Node. */
+class Port : public Model {
 public:
     Port() : ObjectModel (Tags::port) {}
     Port (const ValueTree& p)
@@ -57,9 +58,6 @@ public:
     /** Returns true if this port probably lives on a Node */
     inline bool hasParentNode() const { return getNodeValueTree().hasType (Tags::node); }
 
-    /** Returns the coresponding channel for this port's index */
-    int getChannel() const;
-
     const bool isInput() const
     {
         jassert (objectData.hasProperty ("flow"));
@@ -72,25 +70,32 @@ public:
         return getProperty ("flow", "").toString() == "output";
     }
 
+    /** Returns the port name. */
     const String getName() const { return getProperty (Tags::name, "Port"); }
+
+    /** Returns the type of this Port. */
     const PortType getType() const { return PortType (getProperty (Tags::type, "unknown").toString()); }
+
     bool isA (const PortType type, const bool isInputFlow) const { return getType() == type && isInputFlow == isInput(); }
 
-    uint32 getIndex() const
-    {
-        const int index = getProperty (Tags::index, -1);
-        return index >= 0 ? static_cast<uint32> (index) : EL_INVALID_PORT;
-    }
+    /** Returns the port index of this Port. */
+    uint32 index() const noexcept;
 
-    const String getSymbol() const { return getProperty (Tags::symbol, String()); }
+    /** Returns the symbol for this Port. */
+    const String symbol() const noexcept;
 
-    void setHiddenOnBlock (bool);
+    /** Returns the coresponding channel for this port's index */
+    int channel() const noexcept;
+
+    /** Change block visibility. */
+    void setHiddenOnBlock (bool visible);
+
+    /** Returns true if should be hidden on block. */
     bool isHiddenOnBlock() const;
-
-    operator uint32() const { return getIndex(); }
 };
 
-class Node : public ObjectModel {
+/** Representation of a Node */
+class Node : public Model {
 public:
     /** Create an invalid node */
     Node();
@@ -497,14 +502,19 @@ public:
     /** Iterate over all ValueTree's recursively */
     void forEach (std::function<void (const ValueTree& tree)>) const;
 
+    /** Change the block color */
     void setColor (const juce::Colour& color)
     {
         getUIValueTree().setProperty ("color", color.toString(), nullptr);
     }
+
+    /** Returns the color of this node. */
     juce::Colour getColor() const noexcept
     {
         return juce::Colour::fromString (getUIValueTree().getProperty ("color").toString());
     }
+
+    /** Returns the color of this node or a fallback */
     juce::Colour getColor (juce::Colour fallback) const noexcept
     {
         return getUIValueTree().hasProperty ("color") ? getColor() : fallback;
@@ -636,6 +646,13 @@ private:
     };
 
     OwnedArray<ConnectionMap> portChannelMap;
+};
+
+class Graph : public Node {
+public:
+    Graph() : Node() {}
+    Graph (const Node& node) : Node (node.getValueTree(), false) {}
+    Graph (const Node& node, bool init) : Node (node.getValueTree(), init) {}
 };
 
 } // namespace element

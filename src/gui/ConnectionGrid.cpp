@@ -151,7 +151,11 @@ public:
             return;
 
         const ValueTree arcs (srcNode.getParentArcsNode());
-        if (Node::connectionExists (arcs, srcNode.getNodeId(), srcPort.getIndex(), dstNode.getNodeId(), dstPort.getIndex()))
+        if (Node::connectionExists (arcs,
+                                    srcNode.getNodeId(),
+                                    srcPort.index(),
+                                    dstNode.getNodeId(),
+                                    dstPort.index()))
         {
             matrix.disconnect (row, col);
             disconnectPorts (srcPort, dstPort);
@@ -273,7 +277,7 @@ private:
         {
             String portName = port.getName();
             if (portName.isEmpty())
-                portName << port.getType().getName() << " " << (1 + port.getChannel());
+                portName << port.getType().getName() << " " << (1 + port.channel());
             text << " - " << portName;
         }
 
@@ -449,7 +453,7 @@ private:
                 const Node dst = getNode (col, false);
                 const Port dstPort = getPort (col, false);
 
-                const ValueTree arc (findArc (arcs, src.getNodeId(), srcPort.getIndex(), dst.getNodeId(), dstPort.getIndex()));
+                const ValueTree arc (findArc (arcs, src.getNodeId(), srcPort.index(), dst.getNodeId(), dstPort.index()));
                 if (arc.isValid())
                     matrix.connect (row, col);
                 else
