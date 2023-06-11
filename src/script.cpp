@@ -162,7 +162,16 @@ String Script::name() const noexcept { return getProperty (Tags::name); }
 
 juce::String Script::code() const noexcept { return gzip::decode (getProperty (tags::code).toString()); }
 void Script::setCode (const String& newCode) { setProperty (tags::code, gzip::encode (newCode)); }
-bool Script::valid() const noexcept { return hasType (types::Script) && hasProperty (tags::code) && hasProperty (tags::name); }
+bool Script::valid() const noexcept
+{
+    // clang-format off
+    return hasType (types::Script) && 
+        hasProperty (tags::code) && 
+        hasProperty (tags::name) &&
+        hasProperty (tags::kind) &&
+        getProperty(tags::kind).toString().isNotEmpty();
+    // clang-format on
+}
 
 void Script::setMissing()
 {
@@ -170,42 +179,11 @@ void Script::setMissing()
     stabilizePropertyString (tags::code, "");
 }
 
-Script Script::anonymous()
-{
-    static String body (R"(--- New Anonymous Script.
---
--- This is an anonymous script. Do as you please.
---
--- @script      amp
--- @kind        Anonymous
--- @license     GPL v3
--- @author      Michael Fisher
-)");
-
-    Script script (body);
-    script.setName ("Anonymous Script");
-    return script;
-}
-
-Script Script::view()
-{
-    static String body (R"(--- New View Script.
---
--- This is a content View script.
---
--- @script      amp
--- @kind        View
--- @license     GPL v3
--- @author      Michael Fisher
-)");
-
-    Script script (body);
-    script.setName ("View Script");
-    return script;
-}
-
 Script Script::make (const juce::String& name, const juce::Identifier& kind)
 {
+    if (kind != types::Anonymous && kind != types::View)
+        return {};
+
     juce::String buffer;
     // clang-format off
     buffer << 
@@ -220,6 +198,20 @@ Script Script::make (const juce::String& name, const juce::Identifier& kind)
     // clang-format on
     Script script (buffer);
     script.setName (name);
+    script.getValueTree().setProperty (tags::kind, kind.toString(), nullptr);
     return script;
 }
+
+Script Script::anonymous()
+{
+    Script script (make ("Anonymous", types::Anonymous));
+    return script;
+}
+
+Script Script::view()
+{
+    Script script (make ("View", types::View));
+    return script;
+}
+
 } // namespace element

@@ -652,11 +652,4 @@ private:
     OwnedArray<ConnectionMap> portChannelMap;
 };
 
-class Graph : public Node {
-public:
-    Graph() : Node() {}
-    Graph (const Node& node) : Node (node.getValueTree(), false) {}
-    Graph (const Node& node, bool init) : Node (node.getValueTree(), init) {}
-};
-
 } // namespace element

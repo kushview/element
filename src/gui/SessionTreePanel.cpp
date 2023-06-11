@@ -18,6 +18,7 @@
 */
 
 #include <element/script.hpp>
+#include <element/graph.hpp>
 
 #include "services/sessionservice.hpp"
 
@@ -653,11 +654,13 @@ public:
 
     void showPopupMenu() override
     {
+        bool hasView = Graph (getNode()).hasViewScript();
+
         PopupMenu menu;
         menu.addItem (5, "Add Nested Graph");
         PopupMenu scripts;
         scripts.addItem (6, "Anonymous");
-        scripts.addItem (7, "View");
+        scripts.addItem (7, "View", ! hasView, hasView);
 
         menu.addSubMenu ("Add Script", scripts, true);
         menu.addSeparator();
