@@ -20,7 +20,6 @@
 #pragma once
 
 #include <element/juce/core.hpp>
-#include <element/juce/events.hpp>
 #include <element/signals.hpp>
 
 namespace element {
@@ -32,12 +31,12 @@ public:
 
     ~MidiIOMonitor()
     {
-        midiSent.disconnect_all_slots();
-        midiReceived.disconnect_all_slots();
+        sigReceived.disconnect_all_slots();
+        sigSent.disconnect_all_slots();
     }
 
-    Signal<void()> midiReceived;
-    Signal<void()> midiSent;
+    Signal<void()> sigReceived;
+    Signal<void()> sigSent;
 
     inline void clear()
     {
@@ -45,17 +44,20 @@ public:
         midiOutputCount.set (0);
     }
 
+    /** Call this from the UI thread regularly. */
     inline void notify()
     {
-        jassert (juce::MessageManager::getInstance()->isThisTheMessageThread());
         if (midiInputCount.get() > 0)
-            midiReceived();
+            sigReceived();
         if (midiOutputCount.get() > 0)
-            midiSent();
+            sigSent();
         clear();
     }
 
+    /** Call in the midi thread when received. */
     inline void received() { midiInputCount.set (midiInputCount.get() + 1); }
+
+    /** Call in the midi thread when sent. */
     inline void sent() { midiOutputCount.set (midiOutputCount.get() + 1); }
 
 private:

@@ -137,9 +137,9 @@ public:
         if (midiIOMonitor == nullptr)
         {
             midiIOMonitor = engine->getMidiIOMonitor();
-            connections.add (midiIOMonitor->midiSent.connect (
+            connections.add (midiIOMonitor->sigSent.connect (
                 std::bind (&MidiBlinker::triggerSent, &midiBlinker)));
-            connections.add (midiIOMonitor->midiReceived.connect (
+            connections.add (midiIOMonitor->sigReceived.connect (
                 std::bind (&MidiBlinker::triggerReceived, &midiBlinker)));
         }
 
