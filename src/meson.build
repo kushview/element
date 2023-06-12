@@ -156,9 +156,6 @@ libelement_sources = '''
     gui/Window.cpp
     gui/WindowManager.cpp
     
-    plugins/plugineditor.cpp
-    plugins/pluginprocessor.cpp
-    
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp
     scripting/bindings.cpp

@@ -1,4 +1,3 @@
 option ('asiosdk', type : 'string', value : 'auto', description : 'Path to ASIO SDK')
 option ('vst2sdk', type : 'string', value : 'auto', description : 'Path to VST2 SDK v2.4')
 option ('vst3sdk', type : 'string', value : 'auto', description : 'Path to VST3 SDK')
-option ('plugins', type : 'feature', value : 'auto', description : 'Build the Element Plugins')

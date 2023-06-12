@@ -18,10 +18,15 @@
 */
 
 #include <element/services.hpp>
+#include <element/context.hpp>
+#include <element/settings.hpp>
+#include <element/devicemanager.hpp>
+#include <element/node.hpp>
+#include <element/pluginmanager.hpp>
+
 #include "services/graphservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
-
 #include "gui/widgets/MidiBlinker.h"
 #include "gui/StandardContentComponent.h"
 #include "gui/LookAndFeel.h"
@@ -30,18 +35,9 @@
 #include "gui/TempoAndMeterBar.h"
 #include "gui/TransportBar.h"
 #include "gui/ViewHelpers.h"
-
-#include <element/devicemanager.hpp>
-#include <element/node.hpp>
-#include <element/pluginmanager.hpp>
-
 #include "commands.hpp"
-#include <element/context.hpp>
-#include <element/settings.hpp>
 
 #include "gui/ContentComponent.h"
-
-#include "plugins/plugineditor.hpp"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0
@@ -240,38 +236,10 @@ public:
             PopupMenu menu;
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
-
-            if (isPluginVersion())
-            {
-                if (auto* pe = findParentComponentOfClass<PluginEditor>())
-                {
-                    menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
-                    menu.addItem (99997, "Report zero latency", true, pe->isReportingZeroLatency());
-                }
-            }
-
             auto result = menu.show();
-
             if (99999 == result)
             {
                 ViewHelpers::closePluginWindows (this, false);
-            }
-            else if (99998 == result)
-            {
-                if (isPluginVersion())
-                    if (auto* pe = findParentComponentOfClass<PluginEditor>())
-                        pe->setWantsPluginKeyboardFocus (! pe->getWantsPluginKeyboardFocus());
-            }
-            else if (99997 == result)
-            {
-                if (isPluginVersion())
-                {
-                    if (auto* pe = findParentComponentOfClass<PluginEditor>())
-                    {
-                        pe->setReportZeroLatency (! pe->isReportingZeroLatency());
-                        owner.refreshStatusBar();
-                    }
-                }
             }
         }
         else if (btn == &mapButton)
@@ -397,19 +365,7 @@ public:
         if (isPluginVersion())
         {
             String text = "Latency: ";
-
-            if (auto* pe = findParentComponentOfClass<PluginEditor>())
-            {
-                // workaround -
-                engine->updateExternalLatencySamples();
-                const int latencySamples = pe->getLatencySamples();
-                text << latencySamples << " samples";
-            }
-            else
-            {
-                text << "unknown";
-            }
-
+            text << "unknown";
             sampleRateLabel.setText (text, dontSendNotification);
             streamingStatusLabel.setText ("", dontSendNotification);
             statusLabel.setText ("Plugin", dontSendNotification);

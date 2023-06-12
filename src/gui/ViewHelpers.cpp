@@ -31,8 +31,6 @@
 #include <element/context.hpp>
 #include "messages.hpp"
 
-#include "plugins/plugineditor.hpp"
-
 namespace element {
 namespace ViewHelpers {
 
@@ -94,9 +92,6 @@ namespace ViewHelpers {
 
         if (auto* pw = c->findParentComponentOfClass<PluginWindow>())
             return pw->getElementContentComponent();
-
-        if (auto* ed = c->findParentComponentOfClass<PluginEditor>())
-            return ed->getContentComponent();
 
         if (auto* const contentComponent = findContentComponent())
             return contentComponent;
