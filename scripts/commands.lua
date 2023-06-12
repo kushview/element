@@ -1,6 +1,6 @@
 --- List commands registered in the command manager.
 -- @script commands
--- @kind anonymous
+-- @type anonymous
 -- @license GPLv3
 -- @author Michael Fisher
 -- @usage

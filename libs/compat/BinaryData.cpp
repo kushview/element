@@ -2675,7 +2675,7 @@ static const unsigned char temp_binary_data_10[] =
 "-- try to smooth the volume parameter and could cause zipper noise.\n"
 "--\n"
 "-- @script      amp\n"
-"-- @kind        DSP\n"
+"-- @type        DSP\n"
 "-- @license     GPL v3\n"
 "-- @author      Michael Fisher\n"
 "\n"
@@ -2732,7 +2732,7 @@ const char* amp_lua = (const char*) temp_binary_data_10;
 static const unsigned char temp_binary_data_11[] =
 "--- Editor for `amp` DSP script.\n"
 "-- @script ampui\n"
-"-- @kind DSPUI amp\n"
+"-- @type DSPUI amp\n"
 "\n"
 "local Widget        = require ('el.Widget')\n"
 "local Slider        = require ('el.Slider')\n"

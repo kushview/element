@@ -46,6 +46,8 @@ public:
     ~Script() = default;
 
     Script& operator= (const Script& o);
+    inline bool operator== (const Script& o) const noexcept { return objectData == o.objectData; }
+    inline bool operator!= (const Script& o) const noexcept { return objectData != o.objectData; }
 
     juce::String name() const noexcept;
     void setName (const juce::String& newName);
@@ -54,8 +56,7 @@ public:
     void setCode (const juce::String&);
     bool valid() const noexcept;
 
-    static Script make (const juce::String& name, const juce::Identifier& kind);
-
+    static Script make (const juce::String& name, const juce::Identifier& type);
     static Script anonymous();
     static Script view();
 

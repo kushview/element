@@ -1,6 +1,6 @@
 --- Editor for `examples.sysex` DSP script.
 -- @script examples.sysexui
--- @kind DSPUI examples.sysex
+-- @type DSPUI examples.sysex
 
 local Widget        = require ('el.Widget')
 local TextButton    = require ('el.TextButton')

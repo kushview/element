@@ -11,7 +11,7 @@ using namespace juce;
 
 static ScriptInfo parseScriptComments (const String& buffer)
 {
-    static const StringArray tags = { "@author", "@script", "@description", "@kind" };
+    static const StringArray tags = { "@author", "@script", "@description", "@type" };
 
     ScriptInfo desc;
     desc.type = "";
@@ -36,7 +36,7 @@ static ScriptInfo parseScriptComments (const String& buffer)
 
                     // DBG (tag.replace("@","") << " = " << value);
 
-                    if (tag == "@kind" && desc.type.isEmpty())
+                    if (tag == "@type" && desc.type.isEmpty())
                     {
                         desc.type = value.fromLastOccurrenceOf (".", false, false);
                     }
@@ -105,7 +105,6 @@ ScriptInfo ScriptInfo::read (lua_State* L, const String& buffer)
 
 ScriptInfo ScriptInfo::read (const String& buffer)
 {
-    ScriptInfo desc;
     sol::state lua;
     element::Lua::initializeState (lua);
     return read (lua, buffer);
@@ -168,8 +167,8 @@ bool Script::valid() const noexcept
     return hasType (types::Script) && 
         hasProperty (tags::code) && 
         hasProperty (tags::name) &&
-        hasProperty (tags::kind) &&
-        getProperty(tags::kind).toString().isNotEmpty();
+        hasProperty (tags::type) &&
+        getProperty(tags::type).toString().isNotEmpty();
     // clang-format on
 }
 
@@ -179,26 +178,26 @@ void Script::setMissing()
     stabilizePropertyString (tags::code, "");
 }
 
-Script Script::make (const juce::String& name, const juce::Identifier& kind)
+Script Script::make (const juce::String& name, const juce::Identifier& type)
 {
-    if (kind != types::Anonymous && kind != types::View)
+    if (type != types::Anonymous && type != types::View)
         return {};
 
     juce::String buffer;
     // clang-format off
     buffer << 
-        "--- A new " << kind.toString() << " script." << juce::newLine <<
+        "--- A new " << type.toString() << " script." << juce::newLine <<
         "-- " << juce::newLine <<
         "-- Script description." << juce::newLine <<
         "-- " << juce::newLine <<
-        "-- @kind " << kind.toString() << juce::newLine <<
+        "-- @type " << type.toString() << juce::newLine <<
         "-- @license GPL3-or-later"  << juce::newLine <<
         "-- @author Your Name" << juce::newLine <<
         juce::newLine;
     // clang-format on
     Script script (buffer);
     script.setName (name);
-    script.getValueTree().setProperty (tags::kind, kind.toString(), nullptr);
+    script.getValueTree().setProperty (tags::type, type.toString(), nullptr);
     return script;
 }
 

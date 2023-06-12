@@ -66,7 +66,10 @@ public:
 
         descriptor = loader.call().as<sol::table>();
         if (! descriptor.valid())
+        {
+            scripting.logError ("Descriptor is not valid");
             return;
+        }
 
         juce::Identifier kind (descriptor.get_or<std::string> ("type", "View"));
 
@@ -84,6 +87,7 @@ public:
 
         if (proxy.valid())
         {
+            scripting.logError ("Script instantiated");
             codeValue = s.getPropertyAsValue (tags::code, false);
             script = s;
 
@@ -129,7 +133,7 @@ private:
 
     juce::Identifier kind() const noexcept
     {
-        juce::Identifier k (descriptor.get_or<std::string> ("type", "Anonymous"));
+        juce::Identifier k (descriptor.get_or<std::string> ("type", types::Anonymous.toString().toRawUTF8()));
         return k;
     }
 
@@ -138,9 +142,7 @@ private:
         if (! descriptor.valid())
             return;
         if (sol::safe_function f = descriptor["graph_changed"])
-        {
             f (proxy, graph);
-        }
     }
 
     void notifyNodeChanged()
@@ -148,9 +150,7 @@ private:
         if (! descriptor.valid())
             return;
         if (sol::safe_function f = descriptor["node_changed"])
-        {
             f (proxy, node);
-        }
     }
 
     void valueChanged (juce::Value& val) override

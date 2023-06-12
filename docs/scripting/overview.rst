@@ -24,7 +24,7 @@ encapsulated in a Lua comment section.
     Key         Description
     =========== ======================================
     @script     The script's identifier. **required**
-    @kind       The type of script. **required if not 
+    @type       The type of script. **required if not 
                 an Anonymous script**
     @author     Who wrote it
     @license    License information
@@ -39,7 +39,7 @@ encapsulated in a Lua comment section.
         -- The script's description.
         --
         -- @script      com.example.script
-        -- @kind        DSP
+        -- @type        DSP
         -- @license     GPL v3
         -- @author      Example Author
     

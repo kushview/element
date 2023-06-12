@@ -31,7 +31,7 @@ const static String sDummyScript =
 -- @script %NAME%
 -- @author %AUTHOR%
 -- @description A super cool script
--- @kind %KIND%
+-- @type %KIND%
 }
 )";
 

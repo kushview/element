@@ -4,7 +4,7 @@
 -- try to smooth the volume parameter and could cause zipper noise.
 --
 -- @script      amp
--- @kind        DSP
+-- @type        DSP
 -- @license     GPL v3
 -- @author      Michael Fisher
 

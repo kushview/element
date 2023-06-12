@@ -1,6 +1,6 @@
 --- Editor for `amp` DSP script.
 -- @script ampui
--- @kind DSPUI amp
+-- @type DSPUI amp
 
 local Widget        = require ('el.Widget')
 local Slider        = require ('el.Slider')

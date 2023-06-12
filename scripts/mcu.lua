@@ -4,7 +4,7 @@
 -- the channel parameter to '0' to bypass the filter.
 --
 -- @script      channelize
--- @kind        ControlSurface
+-- @type        ControlSurface
 -- @license     GPL v3
 -- @author      Michael Fisher
 

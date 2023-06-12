@@ -180,7 +180,6 @@ namespace tags {
 using namespace Tags;
 
 static const juce::Identifier code = "code";
-static const juce::Identifier kind = "kind";
 static const juce::Identifier source = "source";
 static const juce::Identifier scripts = "scripts";
 

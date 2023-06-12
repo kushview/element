@@ -2,11 +2,11 @@
 -- @module el.script
 local M = {}
 
-M.kind = {
-    DSP = 'DSP',
-    DSPUI = 'DSPUI',
-    View = 'View'
-}
+M.DSP        = 'DSP'
+M.DSPUI      = 'DSPUI'
+M.VIEW       = 'View'
+M.GRAPH_VIEW = 'GraphView'
+M.ANONYMOUS  = 'Anonymous'
 
 --- Load a known script.
 -- @function load

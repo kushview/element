@@ -15,7 +15,7 @@ public:
     inline Script findViewScript() const noexcept
     {
         auto scripts = getScriptsValueTree();
-        return scripts.getChildWithProperty (tags::kind, types::View.toString());
+        return scripts.getChildWithProperty (tags::type, types::View.toString());
     }
 
     inline bool hasViewScript() const noexcept { return findViewScript().valid(); }

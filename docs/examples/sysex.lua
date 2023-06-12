@@ -1,7 +1,7 @@
 --- SysEx MIDI Example.
 --
 -- @script      examples.sysex
--- @kind        DSP
+-- @type        DSP
 -- @license     GPL v3
 -- @author      Michael Fisher
 
