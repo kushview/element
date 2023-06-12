@@ -23,22 +23,22 @@
 
 namespace element {
 namespace DataPathHelpers {
-    StringArray getSubDirs()
-    {
-        auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts", "Sessions" });
-        return dirs;
-    }
+StringArray getSubDirs()
+{
+    auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts", "Sessions" });
+    return dirs;
+}
 
-    void initializeUserLibrary (const File& path)
+void initializeUserLibrary (const File& path)
+{
+    for (const auto& d : getSubDirs())
     {
-        for (const auto& d : getSubDirs())
-        {
-            const auto subdir = path.getChildFile (d);
-            if (subdir.existsAsFile())
-                subdir.deleteFile();
-            subdir.createDirectory();
-        }
+        const auto subdir = path.getChildFile (d);
+        if (subdir.existsAsFile())
+            subdir.deleteFile();
+        subdir.createDirectory();
     }
+}
 } // namespace DataPathHelpers
 
 DataPath::DataPath()

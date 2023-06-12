@@ -36,20 +36,20 @@ extern int luaopen_el_round (lua_State*);
 namespace element {
 namespace lua {
 
-    void fill_builtins (PackageLoaderMap& pkgs)
-    {
+void fill_builtins (PackageLoaderMap& pkgs)
+{
 #if EL_USE_LIBRARY_BUILT_INS
-        if (pkgs.find ("el.audio") != pkgs.end())
-            return;
-        pkgs.insert (
-            { { "el.audio", luaopen_el_audio },
-              { "el.bytes", luaopen_el_bytes },
-              { "el.midi", luaopen_el_midi },
-              { "el.round", luaopen_el_round } });
+    if (pkgs.find ("el.audio") != pkgs.end())
+        return;
+    pkgs.insert (
+        { { "el.audio", luaopen_el_audio },
+          { "el.bytes", luaopen_el_bytes },
+          { "el.midi", luaopen_el_midi },
+          { "el.round", luaopen_el_round } });
 #else
-        ignore_unused (pkgs);
+    ignore_unused (pkgs);
 #endif
-    }
+}
 
 } // namespace lua
 } // namespace element

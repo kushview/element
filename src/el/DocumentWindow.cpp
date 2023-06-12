@@ -15,79 +15,79 @@ using namespace juce;
 namespace element {
 namespace lua {
 
-    class DocumentWindow : public juce::DocumentWindow
+class DocumentWindow : public juce::DocumentWindow
+{
+public:
+    DocumentWindow (const sol::table&)
+        : juce::DocumentWindow ("", Colours::black, DocumentWindow::allButtons, true)
     {
-    public:
-        DocumentWindow (const sol::table&)
-            : juce::DocumentWindow ("", Colours::black, DocumentWindow::allButtons, true)
-        {
-        }
+    }
 
-        ~DocumentWindow() override
-        {
-            widget = sol::lua_nil;
-        }
+    ~DocumentWindow() override
+    {
+        widget = sol::lua_nil;
+    }
 
-        static void init (const sol::table& proxy)
+    static void init (const sol::table& proxy)
+    {
+        if (auto* const impl = object_userdata<DocumentWindow> (proxy))
         {
-            if (auto* const impl = object_userdata<DocumentWindow> (proxy))
-            {
-                impl->widget = proxy;
-                impl->setUsingNativeTitleBar (true);
-                impl->setResizable (true, false);
-            }
+            impl->widget = proxy;
+            impl->setUsingNativeTitleBar (true);
+            impl->setResizable (true, false);
         }
+    }
 
-        void resized() override
-        {
-            juce::DocumentWindow::resized();
-        }
+    void resized() override
+    {
+        juce::DocumentWindow::resized();
+    }
 
-        /// Close button pressed.
-        // Called when the title bar close button is pressed.
-        // @function DocumentWindow:closepressed
-        // @within Handlers
-        void closeButtonPressed() override
-        {
-            if (sol::safe_function f = widget["closepressed"])
-                f (widget);
-        }
+    /// Close button pressed.
+    // Called when the title bar close button is pressed.
+    // @function DocumentWindow:closepressed
+    // @within Handlers
+    void closeButtonPressed() override
+    {
+        if (sol::safe_function f = widget["closepressed"])
+            f (widget);
+    }
 
-        void setContent (const sol::object& child)
+    void setContent (const sol::object& child)
+    {
+        switch (child.get_type())
         {
-            switch (child.get_type())
-            {
-                case sol::type::table: {
-                    if (Component* const comp = object_userdata<Component> (child))
-                    {
-                        content = child;
-                        setContentNonOwned (comp, true);
-                    }
-                    else
-                    {
-                        // DBG("failed to set widget");
-                    }
-                    break;
+            case sol::type::table: {
+                if (Component* const comp = object_userdata<Component> (child))
+                {
+                    content = child;
+                    setContentNonOwned (comp, true);
                 }
-
-                case sol::type::lua_nil: {
-                    clearContentComponent();
-                    content = sol::lua_nil;
-                    break;
+                else
+                {
+                    // DBG("failed to set widget");
                 }
-
-                default:
-                    break;
+                break;
             }
+
+            case sol::type::lua_nil: {
+                clearContentComponent();
+                content = sol::lua_nil;
+                break;
+            }
+
+            default:
+                break;
         }
+    }
 
-        sol::table getContent() const { return content; }
+    sol::table getContent() const { return content; }
 
-    private:
-        sol::table widget;
-        sol::table content;
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DocumentWindow)
-    };
+private:
+    sol::table widget;
+    sol::table content;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DocumentWindow)
+};
 
 } // namespace lua
 } // namespace element

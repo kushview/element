@@ -12,49 +12,49 @@ using namespace juce;
 namespace element {
 namespace lua {
 
-    class TextButton : public juce::TextButton,
-                       public Button::Listener
+class TextButton : public juce::TextButton,
+                   public Button::Listener
+{
+public:
+    TextButton (const sol::table& obj)
     {
-    public:
-        TextButton (const sol::table& obj)
-        {
-            addListener (this);
-        }
-        ~TextButton()
-        {
-            removeListener (this);
-        }
+        addListener (this);
+    }
+    ~TextButton()
+    {
+        removeListener (this);
+    }
 
-        static void init (const sol::table& proxy)
+    static void init (const sol::table& proxy)
+    {
+        if (auto* const impl = object_userdata<TextButton> (proxy))
+            impl->widget = proxy;
+    }
+
+    /// Handlers.
+    // @section handlers
+
+    /// On clicked handler.
+    // Executed when the button is clicked by the user.
+    // @function TextButton:clicked
+    // @tparam kv.TextButton self The reference to the clicked button
+    void buttonClicked (Button*) override
+    {
+        try
         {
-            if (auto* const impl = object_userdata<TextButton> (proxy))
-                impl->widget = proxy;
-        }
-
-        /// Handlers.
-        // @section handlers
-
-        /// On clicked handler.
-        // Executed when the button is clicked by the user.
-        // @function TextButton:clicked
-        // @tparam kv.TextButton self The reference to the clicked button
-        void buttonClicked (Button*) override
+            if (sol::protected_function f = widget["clicked"])
+                f (widget);
+        } catch (const sol::error& e)
         {
-            try
-            {
-                if (sol::protected_function f = widget["clicked"])
-                    f (widget);
-            } catch (const sol::error& e)
-            {
-                std::cerr << e.what() << std::endl;
-            }
+            std::cerr << e.what() << std::endl;
         }
+    }
 
-    private:
-        TextButton() = delete;
-        sol::table widget;
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextButton)
-    };
+private:
+    TextButton() = delete;
+    sol::table widget;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextButton)
+};
 
 } // namespace lua
 } // namespace element

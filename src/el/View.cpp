@@ -13,25 +13,25 @@
 namespace element {
 namespace lua {
 
-    class View : public element::View
+class View : public element::View
+{
+public:
+    View (const sol::table&) {}
+    ~View() {}
+
+    static void init (const sol::table& proxy)
     {
-    public:
-        View (const sol::table&) {}
-        ~View() {}
-
-        static void init (const sol::table& proxy)
+        if (auto* impl = object_userdata<lua::View> (proxy))
         {
-            if (auto* impl = object_userdata<lua::View> (proxy))
-            {
-                impl->proxy = proxy;
-                impl->initialize();
-            }
+            impl->proxy = proxy;
+            impl->initialize();
         }
-        void initialize() {}
+    }
+    void initialize() {}
 
-    private:
-        sol::table proxy;
-    };
+private:
+    sol::table proxy;
+};
 
 } // namespace lua
 } // namespace element

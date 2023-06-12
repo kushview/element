@@ -26,38 +26,38 @@
 namespace element {
 namespace Util {
 
-    StringArray getSupportedAudioPluginFormats()
-    {
-        StringArray fmts;
+StringArray getSupportedAudioPluginFormats()
+{
+    StringArray fmts;
 
 #if JUCE_MAC && JUCE_PLUGINHOST_AU
-        fmts.add ("AudioUnit");
+    fmts.add ("AudioUnit");
 #endif
 #if JUCE_PLUGINHOST_VST
-        fmts.add ("VST");
+    fmts.add ("VST");
 #endif
 #if JUCE_PLUGINHOST_VST3
-        fmts.add ("VST3");
+    fmts.add ("VST3");
 #endif
 #if JUCE_PLUGINHOST_LADSPA
-        fmts.add ("LADSPA");
+    fmts.add ("LADSPA");
 #endif
 #if JUCE_PLUGINHOST_LV2
-        fmts.add ("LV2");
+    fmts.add ("LV2");
 #endif
 
-        return fmts;
-    }
+    return fmts;
+}
 
-    bool isRunningInWine()
-    {
+bool isRunningInWine()
+{
 #if JUCE_WINDOWS
-        HMODULE ntdll = GetModuleHandleA ("ntdll");
-        return ntdll != nullptr && GetProcAddress (ntdll, "wine_get_version") != nullptr;
+    HMODULE ntdll = GetModuleHandleA ("ntdll");
+    return ntdll != nullptr && GetProcAddress (ntdll, "wine_get_version") != nullptr;
 #else
-        return false;
+    return false;
 #endif
-    }
+}
 
 } // namespace Util
 } // namespace element

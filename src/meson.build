@@ -228,12 +228,13 @@ endif
 
 luael_gen = generator (jrc,
     output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
-    arguments : [ '@INPUT@', '@BUILD_DIR@', 'BinaryData' ])
+    arguments : [ '@INPUT@', '@BUILD_DIR@', 'LuaLib' ])
 libelement_sources += luael_gen.process (
     'el/AudioBuffer.lua',
     'el/command.lua',
     'el/object.lua',
     'el/script.lua',
+    'el/session.lua',
     'el/slug.lua'
 )
 

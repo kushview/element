@@ -13,92 +13,92 @@ using namespace juce;
 namespace element {
 namespace lua {
 
-    class Widget : public juce::Component
+class Widget : public juce::Component
+{
+public:
+    ~Widget()
     {
-    public:
-        ~Widget()
+        widget = sol::lua_nil;
+    }
+
+    Widget (const sol::table& obj)
+    {
+        widget = obj;
+    }
+
+    void resized() override
+    {
+        if (sol::safe_function f = widget["resized"])
+            f (widget);
+    }
+
+    void paint (Graphics& g) override
+    {
+        if (sol::safe_function f = widget["paint"])
         {
-            widget = sol::lua_nil;
+            f (widget, std::ref<Graphics> (g));
+        }
+    }
+
+    void mouseDrag (const MouseEvent& ev) override
+    {
+        if (sol::safe_function f = widget["mousedrag"])
+            f (widget, ev);
+    }
+
+    void mouseDown (const MouseEvent& ev) override
+    {
+        if (sol::safe_function f = widget["mousedown"])
+            f (widget, ev);
+    }
+
+    void mouseUp (const MouseEvent& ev) override
+    {
+        if (sol::safe_function f = widget["mouseup"])
+            f (widget, ev);
+    }
+
+    sol::table addWithZ (const sol::object& child, int zorder)
+    {
+        jassert (child.valid());
+        if (Component* const impl = object_userdata<Component> (child))
+        {
+            addAndMakeVisible (*impl, zorder);
         }
 
-        Widget (const sol::table& obj)
+        return child;
+    }
+
+    sol::table add (const sol::object& child)
+    {
+        return addWithZ (child, -1);
+    }
+
+    static void init (const sol::table& proxy)
+    {
+        if (auto* const impl = object_userdata<Widget> (proxy))
         {
-            widget = obj;
+            impl->widget = proxy;
         }
+    }
 
-        void resized() override
-        {
-            if (sol::safe_function f = widget["resized"])
-                f (widget);
-        }
+    sol::table getBoundsTable()
+    {
+        sol::state_view L (widget.lua_state());
+        auto r = getBounds();
+        auto t = L.create_table();
+        t["x"] = r.getX();
+        t["y"] = r.getY();
+        t["width"] = r.getWidth();
+        t["height"] = r.getHeight();
+        return t;
+    }
 
-        void paint (Graphics& g) override
-        {
-            if (sol::safe_function f = widget["paint"])
-            {
-                f (widget, std::ref<Graphics> (g));
-            }
-        }
-
-        void mouseDrag (const MouseEvent& ev) override
-        {
-            if (sol::safe_function f = widget["mousedrag"])
-                f (widget, ev);
-        }
-
-        void mouseDown (const MouseEvent& ev) override
-        {
-            if (sol::safe_function f = widget["mousedown"])
-                f (widget, ev);
-        }
-
-        void mouseUp (const MouseEvent& ev) override
-        {
-            if (sol::safe_function f = widget["mouseup"])
-                f (widget, ev);
-        }
-
-        sol::table addWithZ (const sol::object& child, int zorder)
-        {
-            jassert (child.valid());
-            if (Component* const impl = object_userdata<Component> (child))
-            {
-                addAndMakeVisible (*impl, zorder);
-            }
-
-            return child;
-        }
-
-        sol::table add (const sol::object& child)
-        {
-            return addWithZ (child, -1);
-        }
-
-        static void init (const sol::table& proxy)
-        {
-            if (auto* const impl = object_userdata<Widget> (proxy))
-            {
-                impl->widget = proxy;
-            }
-        }
-
-        sol::table getBoundsTable()
-        {
-            sol::state_view L (widget.lua_state());
-            auto r = getBounds();
-            auto t = L.create_table();
-            t["x"] = r.getX();
-            t["y"] = r.getY();
-            t["width"] = r.getWidth();
-            t["height"] = r.getHeight();
-            return t;
-        }
-
-    private:
-        Widget() = delete;
-        sol::table widget;
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Widget)
-    };
+private:
+    Widget() = delete;
+    sol::table widget;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Widget)
+};
 
 } // namespace lua
 } // namespace element

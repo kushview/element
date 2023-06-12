@@ -3,7 +3,7 @@
 -- variables, so be careful if you use it directly.
 -- @script console
 -- @pragma nostrip
--- @kind anonymous
+-- @kind Anonymous
 
 io      = require ('io')
 object  = require ('el.object')

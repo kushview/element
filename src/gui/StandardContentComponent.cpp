@@ -525,6 +525,7 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
     bridge = std::make_unique<MeterBridgeView>();
     bridge->initializeView (ctl_);
     addAndMakeVisible (bridge.get());
+    bridge->setVisible (false);
     setMeterBridgeVisible (booleanProperty (settings, "meterBridge", false));
 
     const Node node (getGlobals().getSession()->getCurrentGraph());
@@ -856,10 +857,10 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
     if (auto* const vk = getVirtualKeyboardView())
         vk->restoreState (props);
 
-    setMeterBridgeVisible (props->getBoolValue ("meterBridge", meterBridgeVisible));
     auto& bo = bridge->getMeterBridge();
     bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.getMeterSize()));
     bo.setVisibility ((uint32) props->getIntValue ("meterBridgeVisibility", bo.visibility()));
+    setMeterBridgeVisible (props->getBoolValue ("meterBridge", meterBridgeVisible));
     resized();
 }
 
@@ -1092,9 +1093,6 @@ void StandardContentComponent::setMainView (ContentView* view)
 
 void StandardContentComponent::setMeterBridgeVisible (bool vis)
 {
-    if (vis == meterBridgeVisible)
-        return;
-
     meterBridgeVisible = vis;
     bridge->setVisible (meterBridgeVisible);
     resized();

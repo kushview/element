@@ -25,20 +25,20 @@ namespace element {
 
 namespace Midi {
 
-    inline static int getChannel (const uint8* data)
-    {
-        if ((data[0] & 0xf0) != 0xf0)
-            return (data[0] & 0xf) + 1;
-        return 0;
-    }
+inline static int getChannel (const uint8* data)
+{
+    if ((data[0] & 0xf0) != 0xf0)
+        return (data[0] & 0xf) + 1;
+    return 0;
+}
 
-    inline static void setChannel (uint8* data, const int channel)
-    {
-        jassert (channel > 0 && channel <= 16); // valid channels are numbered 1 to 16
-        if ((data[0] & 0xf0) != (uint8) 0xf0)
-            data[0] = (uint8) ((data[0] & (uint8) 0xf0)
-                               | (uint8) (channel - 1));
-    }
+inline static void setChannel (uint8* data, const int channel)
+{
+    jassert (channel > 0 && channel <= 16); // valid channels are numbered 1 to 16
+    if ((data[0] & 0xf0) != (uint8) 0xf0)
+        data[0] = (uint8) ((data[0] & (uint8) 0xf0)
+                           | (uint8) (channel - 1));
+}
 
 } // namespace Midi
 

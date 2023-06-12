@@ -12,63 +12,63 @@
 namespace element {
 namespace lua {
 
-    class Slider : public juce::Slider
+class Slider : public juce::Slider
+{
+public:
+    Slider (const sol::table&)
+        : juce::Slider() {}
+    ~Slider() {}
+
+    static void init (const sol::table& proxy)
     {
-    public:
-        Slider (const sol::table&)
-            : juce::Slider() {}
-        ~Slider() {}
-
-        static void init (const sol::table& proxy)
+        if (auto* impl = object_userdata<Slider> (proxy))
         {
-            if (auto* impl = object_userdata<Slider> (proxy))
+            impl->proxy = proxy;
+            impl->initialize();
+        }
+    }
+
+    void initialize()
+    {
+        /// Handlers.
+        // @section handlers
+
+        /// Value changed.
+        // @tfield function Slider.valuechanged
+        onValueChange = [this]() {
+            if (sol::function f = proxy["valuechanged"])
             {
-                impl->proxy = proxy;
-                impl->initialize();
+                auto r = f (proxy);
+                if (! r.valid())
+                {
+                    sol::error e = r;
+                    DBG (e.what());
+                }
             }
-        }
+        };
 
-        void initialize()
-        {
-            /// Handlers.
-            // @section handlers
+        /// Started to drag.
+        // @tfield function Slider.dragstart
+        onDragStart = [this]() {
+            if (sol::function f = proxy["dragstart"])
+            {
+                f (proxy);
+            }
+        };
 
-            /// Value changed.
-            // @tfield function Slider.valuechanged
-            onValueChange = [this]() {
-                if (sol::function f = proxy["valuechanged"])
-                {
-                    auto r = f (proxy);
-                    if (! r.valid())
-                    {
-                        sol::error e = r;
-                        DBG (e.what());
-                    }
-                }
-            };
+        /// Stopped dragging.
+        // @tfield function Slider.dragend
+        onDragEnd = [this]() {
+            if (sol::function f = proxy["dragend"])
+            {
+                f (proxy);
+            }
+        };
+    }
 
-            /// Started to drag.
-            // @tfield function Slider.dragstart
-            onDragStart = [this]() {
-                if (sol::function f = proxy["dragstart"])
-                {
-                    f (proxy);
-                }
-            };
-
-            /// Stopped dragging.
-            // @tfield function Slider.dragend
-            onDragEnd = [this]() {
-                if (sol::function f = proxy["dragend"])
-                {
-                    f (proxy);
-                }
-            };
-        }
-
-    private:
-        sol::table proxy;
-    };
+private:
+    sol::table proxy;
+};
 
 } // namespace lua
 } // namespace element

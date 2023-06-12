@@ -41,13 +41,13 @@
 namespace element {
 namespace About {
 
-    static StringArray getDevelopers()
-    {
-        const auto str = String (BinaryData::developers_txt, BinaryData::developers_txtSize);
-        StringArray devs;
-        devs.addTokens (str, "\n", {});
-        return devs;
-    }
+static StringArray getDevelopers()
+{
+    const auto str = String (BinaryData::developers_txt, BinaryData::developers_txtSize);
+    StringArray devs;
+    devs.addTokens (str, "\n", {});
+    return devs;
+}
 } // namespace About
 
 class AboutCreditsPanel : public Component

@@ -2,14 +2,14 @@
 -- @module el.command
 
 local CommandManager    = require ('el.CommandManager')
-local Globals           = require ('el.Context')
+local Context           = require ('el.Context')
 
 local M = {}
 
 --- Returns the global el.CommandManager
 function M.manager()
-    local g = Globals.instance()
-    return g and g:commandmanager() or nil
+    local g = Context.instance()
+    return g and g:commands() or nil
 end
 
 --- Invoke a command.
@@ -25,7 +25,7 @@ function M.invoke (cmd, async)
     if cmd > 0 then
         local m = M.manager()
         assert (m ~= nil, "nil el.CommandManager")
-        return m:invokedirectly (cmd, async or false)
+        return m:invokeDirectly (cmd, async or false)
     end
 
     return false
@@ -62,7 +62,7 @@ end
 -- e.g. Commands::showAbout in C++ becomes command.SHOW_ABOUT
 for _,cmd in ipairs (CommandManager.standard()) do
     local slug = require ('el.slug')
-    local s = CommandManager.tostring (cmd)
+    local s = CommandManager.toString (cmd)
     if string.len(s) > 0 and slug.valid(s) then
         local k = slug.tosnake (s)
         M[string.upper (k)] = cmd

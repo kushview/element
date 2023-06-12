@@ -106,7 +106,7 @@ public:
             notifyNodeChanged();
         }
 
-        Graph newGraph (node.getParentGraph());
+        Graph newGraph (node.isGraph() ? node : node.getParentGraph());
         if (graph != newGraph)
         {
             graph = newGraph;
