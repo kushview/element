@@ -36,8 +36,6 @@ public:
     void selectAudioDriver (const juce::String& name);
     void attach (EnginePtr engine);
 
-    LevelMeter::Ptr getLevelMeter (int channel, bool input);
-
 #if KV_JACK_AUDIO
     kv::JackClient& getJackClient();
 #endif

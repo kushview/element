@@ -50,11 +50,6 @@ DeviceManager::~DeviceManager()
     attach (nullptr);
 }
 
-DeviceManager::LevelMeter::Ptr getLevelMeter (int channel, bool input)
-{
-    juce::ignoreUnused (channel, input);
-}
-
 void DeviceManager::attach (EnginePtr engine)
 {
     if (impl->activeEngine == engine)
