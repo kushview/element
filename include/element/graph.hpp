@@ -21,4 +21,4 @@ public:
     inline bool hasViewScript() const noexcept { return findViewScript().valid(); }
 };
 
-}
+} // namespace element

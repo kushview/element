@@ -68,6 +68,7 @@ extern int luaopen_el_CommandManager (lua_State*);
 extern int luaopen_el_Context (lua_State*);
 extern int luaopen_el_Node (lua_State*);
 extern int luaopen_el_Session (lua_State*);
+extern int luaopen_el_View (lua_State*);
 }
 
 using namespace sol;
@@ -373,6 +374,10 @@ namespace Lua {
         else if (mod == "el.Slider" || mod == "kv.Slider")
         {
             sol::stack::push (L, luaopen_el_Slider);
+        }
+        else if (mod == "el.View")
+        {
+            sol::stack::push (L, luaopen_el_View);
         }
 #endif
 

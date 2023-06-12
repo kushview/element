@@ -126,6 +126,7 @@ libelement_sources = '''
     gui/TransportBar.cpp
     gui/TreeviewBase.cpp
     gui/ViewHelpers.cpp
+    gui/views/scriptview.cpp
     gui/views/ContentView.cpp
     gui/views/ControllerDevicesView.cpp
     gui/views/ControllerMapsView.cpp
@@ -193,6 +194,7 @@ libelement_sources = '''
     el/Session.cpp
     el/Slider.cpp
     el/TextButton.cpp
+    el/View.cpp
     el/Widget.cpp
 
     ../libs/compat/BinaryData.cpp

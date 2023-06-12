@@ -159,6 +159,12 @@ ScriptEditorView::ScriptEditorView (const Script& s)
     };
 }
 
+ScriptEditorView::~ScriptEditorView()
+{
+    if (saveButton.onClick)
+        saveButton.onClick();
+}
+
 String ScriptEditorView::getScriptContent() const
 {
     return script.code();

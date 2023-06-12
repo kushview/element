@@ -92,7 +92,7 @@ class ScriptEditorView : public BaseScriptEditorView
 public:
     ScriptEditorView() = delete;
     ScriptEditorView (const Script& s);
-    virtual ~ScriptEditorView() = default;
+    virtual ~ScriptEditorView();
 
     /** @internal */
     void resized() override;

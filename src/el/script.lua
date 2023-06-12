@@ -2,6 +2,12 @@
 -- @module el.script
 local M = {}
 
+M.kind = {
+    DSP = 'DSP',
+    DSPUI = 'DSPUI',
+    View = 'View'
+}
+
 --- Load a known script.
 -- @function load
 -- @string path The script to run

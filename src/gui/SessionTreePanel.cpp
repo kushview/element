@@ -20,8 +20,8 @@
 #include <element/script.hpp>
 #include <element/graph.hpp>
 
+#include "gui/views/scriptview.hpp"
 #include "services/sessionservice.hpp"
-
 #include "engine/nodes/NodeTypes.h"
 
 #include "gui/GuiCommon.h"
@@ -548,6 +548,19 @@ public:
     {
         const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
         ViewHelpers::findContentComponent (getOwnerView())->getServices().findChild<EngineService>()->removeGraph (index);
+    }
+
+    void showDocument() override
+    {
+        Graph graph (getNode());
+        Script script = graph.findViewScript();
+        if (script.valid())
+            if (auto* cc = getContentComponent())
+            {
+                auto view = std::make_unique<ScriptView> (cc->getGlobals(), script);
+                view->setNode (node);
+                cc->setMainView (view.release());
+            }
     }
 
     void addSubItems() override
