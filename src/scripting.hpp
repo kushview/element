@@ -46,6 +46,8 @@ public:
     std::vector<std::string> getPackageNames() const noexcept;
     void addPackage (const std::string& name, lua::CFunction loader);
 
+    void logError (const String&);
+
 private:
     friend Context;
     class Impl;

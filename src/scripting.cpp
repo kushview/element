@@ -197,6 +197,11 @@ ScriptingEngine::~ScriptingEngine()
     world = nullptr;
 }
 
+void ScriptingEngine::logError (const String& msg)
+{
+    std::clog << msg.toStdString() << std::endl;
+}
+
 void ScriptingEngine::initialize (Context& g)
 {
     world = &g;
