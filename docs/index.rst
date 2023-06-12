@@ -36,10 +36,9 @@ Welcome to the Element user/developer manual.
    :caption: Scripting
 
    Overview <scripting/overview>
-   scripting/script-types
+   Script Types <scripting/script-types>
    Examples <scripting/examples>
    Element API <https://api.kushview.net/lua/el/latest>
-   KV API <https://api.kushview.net/lua/kv/latest>
 
 .. toctree::
    :maxdepth: 1

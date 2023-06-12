@@ -159,3 +159,26 @@ This is a UI for a DSP script.
 
     :return: The widget to use as the editor.
     :rtype: `kv.Widget`_
+
+View
+-----
+This is a View.
+
+**Arguments:**
+
+    None
+
+**Return value:**
+
+    A descriptor table in the following form:
+
+.. lua:attribute:: type: string
+
+    Must always equal ``DSPUI``
+
+.. lua:function:: instantiate()
+
+    Implement this and return a kv.Widget to be used as a View in the UI. 
+
+    :return: The widget to use as the editor.
+    :rtype: el.Widget
