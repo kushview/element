@@ -30,8 +30,7 @@ namespace lua {
     }
 
     template <typename WidgetType, typename... Args>
-    inline static sol::table
-        new_widgettype (lua_State* L, const char* name, Args&&... args)
+    inline static sol::table new_widgettype (lua_State* L, const char* name, Args&&... args)
     {
         using Widget = WidgetType;
         sol::state_view lua (L);

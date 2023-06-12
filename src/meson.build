@@ -177,6 +177,7 @@ libelement_sources = '''
     el/DocumentWindow.cpp
     el/File.cpp
     el/Context.cpp
+    el/Graph.cpp
     el/Graphics.cpp
     el/midi.c
     el/MidiBuffer.cpp

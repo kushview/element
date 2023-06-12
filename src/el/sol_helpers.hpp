@@ -2,9 +2,9 @@
 #pragma once
 
 #include <sstream>
+
 #include "lua.hpp"
 #include "sol/sol.hpp"
-
 #include <element/juce/core.hpp>
 
 namespace sol {
@@ -39,8 +39,9 @@ namespace lua {
     inline static std::string to_string (T& self, const char* name)
     {
         std::stringstream stream;
-        stream << "kv." << name << ": 0x" << std::hex << (intptr_t) &self;
+        stream << "el." << name << ": 0x" << std::hex << (intptr_t) &self;
         return stream.str();
     }
+
 } // namespace lua
 } // namespace element
