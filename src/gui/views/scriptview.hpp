@@ -9,9 +9,10 @@ class Context;
 class Graph;
 class Node;
 
-class ScriptView : public View {
+class ScriptView : public View
+{
 public:
-    ScriptView () = delete;
+    ScriptView() = delete;
     ScriptView (Context&, const Script& s);
     virtual ~ScriptView();
 
@@ -30,8 +31,9 @@ public:
     const Graph& graph() const noexcept;
 
 private:
-    class Impl; friend class Impl;
+    class Impl;
+    friend class Impl;
     std::unique_ptr<Impl> impl;
 };
 
-}
+} // namespace element
