@@ -13,11 +13,12 @@ def options():
     parser = OptionParser()
     parser.add_option ("--before", type="string", dest="before", default='')
     parser.add_option ("--after", type="string", dest="after", default='')
-    parser.add_option ("--last-version", type="string", dest="last_version", \
-                       default=ELEMENT_LAST_VERSION)
+    parser.add_option ("--last-version", type="string", dest="last_version", default=ELEMENT_LAST_VERSION)
     parser.add_option ("--revision", action="store_true", dest="revision", default=False)
+    parser.add_option ("--build", action="store_true", dest="build", default=False)
     parser.add_option ("--cwd", type="string", dest="cwd", default='')
-    (opts, args) = parser.parse_args()
+    parser.add_option ("--ignore-dirty", action="store_true", dest="ignore_dirty", default=False)
+    (opts, _) = parser.parse_args()
     return opts
 
 def call_git (ctx, args):
@@ -75,10 +76,13 @@ def version():
 
     vers = ELEMENT_VERSION
     if exists():
-        if is_dirty():
-            vers += "-dirty"
-        if opts.revision:
+        if opts.build:
+            vers += '.%s' % ncommits (opts.last_version)
+        elif opts.revision:
             vers += '_r%s' % ncommits (opts.last_version)
+
+        if is_dirty() and not opts.ignore_dirty:
+            vers += "-dirty"
 
     os.chdir (here)
     print ('%s%s%s' % (opts.before, vers, opts.after))

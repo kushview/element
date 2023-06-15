@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Title>Element</Title>
+    <Name>Element</Name>
+    <Version>@VERSION@</Version>
+    <Publisher>iCON Pro Audio</Publisher>
+    <StartMenuDir>iCON/PD5</StartMenuDir>
+    <TargetDir>@TARGETDIR@</TargetDir>
+    <ControlScript>control.qs</ControlScript>
+    <MaintenanceToolName>updater</MaintenanceToolName>
+    <RemoteRepositories>
+        <Repository>
+            <Url>https://kushview.s3.amazonaws.com/ci/repository</Url>
+            <Enabled>0</Enabled>
+            <!-- <Username>user</Username>
+            <Password>password</Password> -->
+            <DisplayName>Releases</DisplayName>
+        </Repository>
+        <Repository>
+            <Url>https://kushview.s3.amazonaws.com/ci/repository</Url>
+            <Enabled>1</Enabled>
+            <!-- <Username>user</Username>
+            <Password>password</Password> -->
+            <DisplayName>Nightly</DisplayName>
+        </Repository>
+    </RemoteRepositories>
+</Installer>

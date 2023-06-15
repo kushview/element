@@ -3,6 +3,13 @@ project ('element', ['c', 'cpp' ],
     meson_version : '>= 0.58.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
 
+
+date_py = files ('tools/date.py')
+element_release_date = run_command ('python', date_py).stdout().strip()
+version_py = files ('tools/version.py')
+version_with_build = run_command ('python',
+    [version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
+
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
@@ -44,8 +51,12 @@ subdir ('src')
 element_app_link_args = []
 element_app_deps = [ deps, juce_dep ]
 element_app_sources = [ 'src/main.cpp' ]
+element_exe_name = 'element'
 
-if host_machine.system() == 'windows'
+if host_machine.system() == 'darwin'
+    element_exe_name = 'Element'
+elif host_machine.system() == 'windows'
+    element_exe_name = 'Element'
     windows = import ('windows')
     element_app_sources += windows.compile_resources ('tools/windeploy/resources.rc',
         include_directories :  ['tools/windeploy'])
@@ -58,6 +69,7 @@ if host_machine.system() == 'windows'
                                    '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
                                    '-Wl,--no-whole-archive' ]
     endif
+else
 endif
 
 subdir ('test')
@@ -72,11 +84,19 @@ element_app = executable ('element', element_app_sources,
     link_args : element_app_link_args,
     link_with : [ libelement ])
 
-if host_machine.system() == 'linux'
-    subdir ('tools/lindeploy')
-elif host_machine.system() == 'darwin'
-    subdir ('tools/macdeploy')
-elif host_machine.system() == 'windows'
-    subdir ('tools/windeploy')
-endif
+
+net_kushview      = 'net.kushview'
+installerdir      = get_option('prefix') / 'installer'
+packagesdir       = installerdir / 'packages'
+packagedir_root    = packagesdir / net_kushview + '.element'
+packagedir_osx     = packagesdir / net_kushview + '.element.osx'
+packagedir_win64   = packagesdir / net_kushview + '.element.win64'
+packagedir_linux   = packagesdir / net_kushview + '.element.linux'
+
+GPL3_txt = configure_file (copy: true, 
+    input : files ('LICENSES/GPL3.txt'),
+    output: 'GPL3.txt', install : true, 
+    install_dir : packagedir_root / 'meta')
+
+subdir ('deploy')
 endif

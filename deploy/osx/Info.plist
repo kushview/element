@@ -17,7 +17,7 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>This app requires audio input. If you do not have an audio interface connected it will use the built-in microphone.</string>
     <key>CFBundleExecutable</key>
-    <string>element</string>
+    <string>Element</string>
     <key>CFBundleIconFile</key>
     <string>Icon.icns</string>
     <key>CFBundlePackageType</key>

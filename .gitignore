@@ -34,7 +34,6 @@ node_modules
 /libs/eldb/eldb
 
 /delete.txt
-/deploy/
 /tools/deploy/
 /tools/installers/
 /plugins
@@ -56,3 +55,4 @@ node_modules
 /*.lua
 
 docs/_build/
+/reconfig.sh
