@@ -1,0 +1,6 @@
+
+@BINARYCREATOR@ -v -i "net.kushview.element,net.kushview.element.lv2" -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@ || exit
+rmdir /s /q archives
+mkdir archives
+cd packages
+@ARCHIVEGEN@ -c 9 -f tar.gz ../archives/pd5-windows-archives.tar.gz net.kushview.element net.kushview.element.lv2 || exit

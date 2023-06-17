@@ -10,6 +10,15 @@ version_py = files ('tools/version.py')
 version_with_build = run_command ('python',
     [version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
 
+net_kushview      = 'net.kushview'
+installerdir      = get_option('prefix')
+packagesdir       = installerdir / 'packages'
+packagedir_element = packagesdir / net_kushview + '.element'
+GPL3_txt = configure_file (copy: true, 
+    input : files ('LICENSES/GPL3.txt'),
+    output: 'GPL3.txt', install : get_option ('deploy'),
+    install_dir : packagedir_element / 'meta')
+
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
@@ -51,15 +60,16 @@ subdir ('src')
 element_app_link_args = []
 element_app_deps = [ deps, juce_dep ]
 element_app_sources = [ 'src/main.cpp' ]
-element_exe_name = 'element'
+element_exe_install = true
+element_exe_install_dir = get_option ('bindir')
 
 if host_machine.system() == 'darwin'
-    element_exe_name = 'Element'
+    element_exe_install = false
 elif host_machine.system() == 'windows'
-    element_exe_name = 'Element'
+    element_exe_install_dir = packagedir_element / 'data' / 'bin'
     windows = import ('windows')
-    element_app_sources += windows.compile_resources ('tools/windeploy/resources.rc',
-        include_directories :  ['tools/windeploy'])
+    element_app_sources += windows.compile_resources ('src/res/resources.rc',
+        include_directories :  ['src/res'])
 
     if cpp.get_id() == 'gcc' and cpp.get_argument_syntax() == 'gcc'
         foreach l : 'uuid wsock32 wininet version ole32 ws2_32 oleaut32 imm32 comdlg32 shlwapi rpcrt4 winmm dxgi'.split()
@@ -76,27 +86,14 @@ subdir ('test')
 
 if not meson.is_subproject()
 element_app = executable ('element', element_app_sources,
-    install : true,
+    install : element_exe_install,
+    install_dir : element_exe_install_dir,
     win_subsystem : 'windows',
     gnu_symbol_visibility : 'hidden',
     dependencies : element_app_deps,
     include_directories : [ 'src', libelement_includes ],
     link_args : element_app_link_args,
     link_with : [ libelement ])
-
-
-net_kushview      = 'net.kushview'
-installerdir      = get_option('prefix') / 'installer'
-packagesdir       = installerdir / 'packages'
-packagedir_root    = packagesdir / net_kushview + '.element'
-packagedir_osx     = packagesdir / net_kushview + '.element.osx'
-packagedir_win64   = packagesdir / net_kushview + '.element.win64'
-packagedir_linux   = packagesdir / net_kushview + '.element.linux'
-
-GPL3_txt = configure_file (copy: true, 
-    input : files ('LICENSES/GPL3.txt'),
-    output: 'GPL3.txt', install : true, 
-    install_dir : packagedir_root / 'meta')
 
 subdir ('deploy')
 endif
