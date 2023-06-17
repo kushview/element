@@ -1,13 +1,15 @@
 
-option ('asiosdk', type : 'string', value : 'auto', description : 'Path to ASIO SDK')
+
+option ('lv2dir', type : 'string',  value : '', description: 'LV2 installatino dir')
+
 option ('vst2sdk', type : 'string', value : 'auto', description : 'Path to VST2 SDK v2.4')
 option ('vst3sdk', type : 'string', value : 'auto', description : 'Path to VST3 SDK')
+option ('asiosdk', type : 'string', value : 'auto', description : 'Path to ASIO SDK')
 
-option ('build-number', type : 'string', value : '0', description : 'Override the build number in CI')
+option ('deploy', type : 'boolean', value : true,  description : 'Make Installers')
 option ('sign', type : 'boolean', value : false,  description : 'Code Sign Binaries')
 option ('codesign-identity', type : 'string', value : '', description : 'Identity to use for code signing on Mac')
 option ('notarize', type : 'boolean', value : false, description : 'Whether to notarize or not.')
 option ('app-password', type : 'string', value : '',  description : 'App Password for notoary')
 option ('apple-id', type : 'string', value : '',  description : 'Apple ID owning the app password')
 option ('bundle-id', type : 'string', value : '',  description : 'OSX app bundle id')
-option ('installer', type : 'boolean', value : true,  description : 'Make Installers')

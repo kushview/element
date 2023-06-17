@@ -1,25 +1,32 @@
 
-packages = [ 'root' ]
+element_deploy_targetdir = ''
+element_release_url = ''
 
-if host_machine.system() == 'linux'
-elif host_machine.system() == 'darwin'
-    macdeployqt = find_program ('macdeployqt', required : false)
-    packages += [ 'osx' ]
+element_repo_url = 'https://kushview.s3.amazonaws.com/ci/repos/element'
+
+if host_machine.system() == 'darwin'
+    element_release_url = element_repo_url + '/release/osx'
+    element_deploy_targetdir = '/Library/Application Support/Kushview/Element'
+    subdir ('osx')
 elif host_machine.system() == 'windows'
+    element_release_url = element_repo_url + '/release/windows'
+    element_deploy_targetdir = '@ApplicationsDirX64@/Kushview/Element'
+    subdir ('windows')
 endif
 
-foreach f : [ 'config.xml', 'control.qs' ]
+foreach f : [ 'config.xml', 'control.js' ]
     configure_file (input : f , output : f,
         install : true, 
         install_dir : installerdir / 'config',
         configuration: {
             'VERSION': meson.project_version(),
-            'TARGETDIR': '/Library/Application Support/Kushview/Element'
+            'TARGETDIR': element_deploy_targetdir,
+            'RELEASEREPO': element_release_url
         })
 endforeach
 
-foreach pkg : packages
-    subdir(pkg)
+foreach pkg : 'element lv2'.split()
+    subdir (pkg)
 endforeach
 
 if host_machine.system() == 'darwin'
@@ -33,7 +40,7 @@ if host_machine.system() == 'darwin'
 
     notary_script = ''
     if get_option('notarize') and get_option('sign')
-        notary_script = '''xcrun altool --notarize-app --primary-bundle-id="net.kushview.element.osx"  \
+        notary_script = '''xcrun altool --notarize-app --primary-bundle-id="net.kushview.element.installer"  \
             -u @0@ -p @1@ --file @2@'''.format(
                 get_option('apple-id'), 
                 get_option ('app-password'),
@@ -54,8 +61,25 @@ if host_machine.system() == 'darwin'
             'NOTARYSCRIPT': notary_script,
             'ARCHIVEGEN': archivegen.full_path()
         })
-elif host_machine.system() == 'win32'
-    output = 'element-win64-@0@'.format (version_with_build)
+elif host_machine.system() == 'windows'
+    basename = 'element-windows-@0@'.format (version_with_build)
+
+    extra_args = ''
+    if get_option ('sign')
+       # sign exe
+    endif
+
+    archivegen = find_program ('archivegen', required : true)
+    binarycreator = find_program ('binarycreator', required : true)
+    configure_file (input : 'installer.bat', output : 'installer.bat',
+        install : true, install_dir : installerdir,
+        configuration: {
+            'BINARYCREATOR': binarycreator.full_path(),
+            'CONFIGFILE': 'config\config.xml',
+            'PACKAGES': 'packages',
+            'INSTALLERBASE': basename,
+            'ARCHIVEGEN': archivegen.full_path()
+        })
 endif
 
 summary ('Version', version_with_build, section : 'Application')

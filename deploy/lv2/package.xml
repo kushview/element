@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>LV2</DisplayName>
+    <Description>LV2 Ecosystem </Description>
+    <Version>1.18.10-0</Version>
+    <ReleaseDate>@RELEASEDATE@</ReleaseDate>
+
+    <!-- <Default>true</Default> -->
+    <Essential>false</Essential>
+    <Virtual>true</Virtual>
+    <ForcedInstallation>true</ForcedInstallation>
+    <RequiresAdminRights>false</RequiresAdminRights>
+
+    <Licenses>
+        <License name="LV2" file="LICENSE" />
+    </Licenses>
+</Package>

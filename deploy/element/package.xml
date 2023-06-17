@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>Element</DisplayName>
-    <Name>net.kushview.element</Name>
     <Description>Element modular streaming engine, plugin, host, and Audio Interface controller.</Description>
+
     <Version>@VERSION@</Version>
     <ReleaseDate>@RELEASEDATE@</ReleaseDate>
-    <Script>component.qs</Script>
+
+    <Default>true</Default>
+    <Essential>false</Essential>
     <ForcedInstallation>true</ForcedInstallation>
-    <Virtual>false</Virtual>
+    <RequiresAdminRights>true</RequiresAdminRights>
+    
+    @OPERATIONS@
+
     <Licenses>
         <License name="License Agreement" file="GPL3.txt" />
     </Licenses>
