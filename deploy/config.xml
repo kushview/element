@@ -9,8 +9,8 @@
     <ControlScript>control.js</ControlScript>
     <MaintenanceToolName>updater</MaintenanceToolName>
 
-    <WizardDefaultWidth>920</WizardDefaultWidth>
-    <WizardDefaultHeight>578</WizardDefaultHeight>
+    <WizardDefaultWidth>782</WizardDefaultWidth>
+    <WizardDefaultHeight>512</WizardDefaultHeight>
 
     <RemoteRepositories>
         <Repository>

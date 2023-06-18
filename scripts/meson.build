@@ -3,22 +3,28 @@ if not meson.is_subproject()
 
 scripts_install_dir = get_option('datadir') / 'element/scripts'
 
-if host_machine.system() == 'windows'
-    scripts_install_dir = packagedir_element + '.lua' / 'data' / 'scripts'
-elif host_machine.system() == 'darwin'
-    scripts_install_dir = 'Element.app/Contents/Resources/scripts'
+if get_option ('deploy')
+    if host_machine.system() == 'windows'
+        scripts_install_dir = packagedir_element + '.lua' / 'data' / 'lua' / 'scripts'
+    elif host_machine.system() == 'darwin'
+        scripts_install_dir = packagedir_element + '.lua' / 'data' / 'lua' / 'scripts'
+    endif
 endif
 
-if not get_option ('deploy')
-    install_data (
-        sources : [
-            'amp.lua',
-            'ampui.lua',
-            'channelize.lua',
-            'console.lua'
-        ],
-        install_dir : scripts_install_dir
-    )
+install_data (sources : [
+    'amp.lua',
+    'ampui.lua',
+    'channelize.lua',
+    'console.lua'
+    ],
+    install_dir : scripts_install_dir
+)
+
+if get_option ('deploy')
+    configure_file (input: 'package.xml', output: 'package.xml',
+        install: true, install_dir: packagedir_element + '.lua' / 'meta',
+        configuration: { 'VERSION': version_with_build, 
+                         'RELEASEDATE': element_release_date})
 endif
 
 scripts_gen = generator (jrc,

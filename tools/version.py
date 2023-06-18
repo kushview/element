@@ -6,18 +6,27 @@ from optparse import OptionParser
 from subprocess import call, Popen, PIPE
 import os
 
-ELEMENT_VERSION="0.47.0"
-ELEMENT_LAST_VERSION="0.46.4"
+VERSION="0.47.0"
+LAST_VERSION="0.46.4"
 
 def options():
     parser = OptionParser()
-    parser.add_option ("--before", type="string", dest="before", default='')
-    parser.add_option ("--after", type="string", dest="after", default='')
-    parser.add_option ("--last-version", type="string", dest="last_version", default=ELEMENT_LAST_VERSION)
-    parser.add_option ("--revision", action="store_true", dest="revision", default=False)
+    
+    parser.add_option ("--current-version", type="string", dest="current_version", 
+                        default=VERSION, help="The current version string to display")
+    parser.add_option ("--last-version", type="string", dest="last_version", 
+                        default=LAST_VERSION, help="The last version, hash, tag, etc in git to count commits from")
+    parser.add_option ("--before", type="string", dest="before", default='', help="Prefix string")
+    parser.add_option ("--after", type="string", dest="after", default='', help="Postfix string")
+    
+    parser.add_option ("--cwd", type="string", dest="cwd", default='', help="path to git repository")
+
     parser.add_option ("--build", action="store_true", dest="build", default=False)
-    parser.add_option ("--cwd", type="string", dest="cwd", default='')
-    parser.add_option ("--ignore-dirty", action="store_true", dest="ignore_dirty", default=False)
+    parser.add_option ("--build-style", type='string', dest='build_style', default='dotted')
+    
+    parser.add_option ("--ignore-dirty", action="store_true", dest="ignore_dirty", default=False,
+                       help="Ignore dirty flag")
+
     (opts, _) = parser.parse_args()
     return opts
 
@@ -74,14 +83,18 @@ def version():
     if len(opts.cwd) > 0:
         os.chdir (opts.cwd)
 
-    vers = ELEMENT_VERSION
+    show_dirty = is_dirty() and not opts.ignore_dirty
+
+    vers = opts.current_version
     if exists():
         if opts.build:
-            vers += '.%s' % ncommits (opts.last_version)
-        elif opts.revision:
-            vers += '_r%s' % ncommits (opts.last_version)
-
-        if is_dirty() and not opts.ignore_dirty:
+            if opts.build_style == 'dotted':
+                vers += '.%s' % ncommits (opts.last_version)
+            elif opts.build_style == 'dashed':
+                vers += '-%s' % ncommits (opts.last_version)
+            elif opts.build_style == 'revision':
+                vers += '_r%s' % ncommits (opts.last_version)
+        if show_dirty:
             vers += "-dirty"
 
     os.chdir (here)

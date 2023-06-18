@@ -37,7 +37,7 @@ if get_option ('notarize') and get_option ('sign')
         input : Element_dmg,
         output : 'Element_notarized',
         command : [ 'xcrun', 'altool', '--notarize-app',
-                        '--primary-bundle-id', 'net.kushview.ELement',
+                        '--primary-bundle-id', 'net.kushview.Element',
                         '-u', get_option ('apple-id'),
                         '-p', get_option ('app-password'),
                         '--file', '@INPUT@'

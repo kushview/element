@@ -5,7 +5,8 @@ set -e
 rm -rf *.gz *.app *.dmg
 
 @BINARYCREATOR@ \
-    -i "net.kushview.element,net.kushview.element.lv2" -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@
+    -i "net.kushview.element,net.kushview.element.lv2,net.kushview.element.lua" \
+    -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@
 
 sed -i '' 's/com.yourcompany.installerbase/net.kushview.element.installer/' "@INSTALLERBASE@.app/Contents/Info.plist"
 
@@ -19,7 +20,8 @@ rm -rf archives && mkdir archives
 cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
     ../archives/element-osx.tar.gz \
         net.kushview.element \
-        net.kushview.element.lv2
+        net.kushview.element.lv2 \
+        net.kushview.element.lua
 
 cd ../archives
 md5 *.* > md5.sum
