@@ -56,6 +56,6 @@ node_modules
 
 docs/_build/
 /reconfig.sh
-/stage
+/stage/
 /sign.sh
 /configure

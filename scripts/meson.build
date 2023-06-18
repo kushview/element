@@ -1,4 +1,11 @@
 
+scripts_gen = generator (jrc,
+    output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
+    arguments : [ '@INPUT@', '@BUILD_DIR@', 'scripts' ])
+scripts_includes = include_directories ('.', '../scripts')
+scripts_sources = scripts_gen.process (
+    'ampui.lua', 'channelize.lua', 'amp.lua', 'console.lua')
+
 if not meson.is_subproject()
 
 scripts_install_dir = get_option('datadir') / 'element/scripts'
@@ -26,12 +33,5 @@ if get_option ('deploy')
         configuration: { 'VERSION': version_with_build, 
                          'RELEASEDATE': element_release_date})
 endif
-
-scripts_gen = generator (jrc,
-    output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
-    arguments : [ '@INPUT@', '@BUILD_DIR@', 'scripts' ])
-scripts_includes = include_directories ('.', '../scripts')
-scripts_sources = scripts_gen.process (
-    'ampui.lua', 'channelize.lua', 'amp.lua', 'console.lua')
 
 endif

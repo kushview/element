@@ -94,6 +94,6 @@ element_app = executable ('element', element_app_sources,
     include_directories : [ 'src', libelement_includes ],
     link_args : element_app_link_args,
     link_with : [ libelement ])
+endif
 
 subdir ('deploy')
-endif

@@ -1,4 +1,6 @@
 
+if not meson.is_subproject()
+
 element_deploy_targetdir = ''
 element_release_url = ''
 
@@ -25,9 +27,13 @@ foreach f : [ 'config.xml', 'control.js' ]
         })
 endforeach
 
+endif
+
 foreach pkg : 'element lv2'.split()
     subdir (pkg)
 endforeach
+
+if not meson.is_subproject()
 
 if host_machine.system() == 'darwin'
     basename = 'element-osx-@0@'.format (version_with_build)
@@ -83,4 +89,7 @@ elif host_machine.system() == 'windows'
 endif
 
 summary ('Version', version_with_build, section : 'Application')
+
+endif
+
 # summary ('Hash', version_with_build, section : 'Version')
