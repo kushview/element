@@ -94,6 +94,8 @@ def version():
                 vers += '-%s' % ncommits (opts.last_version)
             elif opts.build_style == 'revision':
                 vers += '_r%s' % ncommits (opts.last_version)
+            elif opts.build_style == 'onlybuild':
+                vers = '%s' % ncommits (opts.last_version)
         if show_dirty:
             vers += "-dirty"
 
