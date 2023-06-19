@@ -395,16 +395,11 @@ private:
                                               TRANS ("Name"),
                                               256,
                                               false));
-#ifndef EL_SOLO
+
         props.add (new RenderModePropertyComponent (g));
         props.add (new VelocityCurvePropertyComponent (g));
-#endif
-
         props.add (new RootGraphMidiChannels (g, getWidth() - 100));
-
-#ifndef EL_SOLO
         props.add (new MidiProgramPropertyComponent (g));
-#endif
         props.add (new KeyMapPropertyComponent (g));
         // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
         //                                          TRANS("Persistent"),

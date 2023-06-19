@@ -241,11 +241,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         const int fileIdx = index - recentMenuOffset;
         class File f = owner.getServices().getRecentlyOpenedFilesList().getFile (fileIdx);
-#ifndef EL_SOLO
         owner.getServices().findChild<SessionService>()->openFile (f);
-#else
-        owner.getServices().findChild<GraphService>()->openGraph (f);
-#endif
     }
 }
 
@@ -270,18 +266,6 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 
 void MainMenu::buildFileMenu (PopupMenu& menu)
 {
-#if defined(EL_SOLO)
-    menu.addCommandItem (&cmd, Commands::graphNew, "New Graph");
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
-    addRecentFiles (menu);
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::importSession, "Import from Session...");
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::graphSave, "Save Graph");
-    menu.addCommandItem (&cmd, Commands::graphSaveAs, "Save Graph As...");
-
-#else
     menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
@@ -291,7 +275,6 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-#endif
 
 #if ! JUCE_MAC
     menu.addSeparator();
@@ -371,12 +354,10 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
 
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
 {
-#ifndef EL_SOLO
     menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
     menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
     menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete current graph");
     menu.addSeparator();
-#endif
     menu.addCommandItem (&cmd, Commands::undo, "Undo");
     menu.addCommandItem (&cmd, Commands::redo, "Redo");
     menu.addSeparator();
@@ -392,11 +373,9 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
-#ifndef EL_SOLO
     menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
     menu.addCommandItem (&cmd, Commands::showConsole, "Console");
     menu.addSeparator();
-#endif
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");

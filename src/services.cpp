@@ -129,7 +129,6 @@ void ServiceManager::run()
     auto session = getWorld().getSession();
     Session::ScopedFrozenLock freeze (*session);
 
-#ifndef EL_SOLO
     if (auto* sc = findChild<SessionService>())
     {
         bool loadDefault = true;
@@ -147,23 +146,6 @@ void ServiceManager::run()
         if (loadDefault)
             sc->openDefaultSession();
     }
-#else
-    if (auto* gc = findChild<GraphService>())
-    {
-        bool loadDefaultGraph = true;
-        if (world.getSettings().openLastUsedSession())
-        {
-            const auto lastGraph = getWorld().getSettings().getUserSettings()->getValue (Settings::lastGraphKey);
-            if (File::isAbsolutePath (lastGraph) && File (lastGraph).existsAsFile())
-            {
-                gc->openGraph (File (lastGraph));
-                loadDefaultGraph = false;
-            }
-        }
-        if (loadDefaultGraph)
-            gc->openDefaultGraph();
-    }
-#endif
 
     if (auto* gui = findChild<GuiService>())
     {
@@ -290,11 +272,7 @@ void ServiceManager::handleMessage (const Message& msg)
     }
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {
-#ifndef EL_SOLO
         sess->openFile (osm->file);
-#else
-        findChild<GraphService>()->openGraph (osm->file);
-#endif
         recentFiles.addFile (osm->file);
     }
     else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))
@@ -382,7 +360,6 @@ void ServiceManager::getAllCommands (Array<CommandID>& cids)
 
         Commands::signIn,
         Commands::signOut,
-#ifndef EL_SOLO
         Commands::sessionNew,
         Commands::sessionSave,
         Commands::sessionSaveAs,
@@ -391,23 +368,17 @@ void ServiceManager::getAllCommands (Array<CommandID>& cids)
         Commands::sessionDuplicateGraph,
         Commands::sessionDeleteGraph,
         Commands::sessionInsertPlugin,
-#endif
+
         Commands::importGraph,
         Commands::exportGraph,
         Commands::panic,
-
         Commands::checkNewerVersion,
-
         Commands::transportPlay,
-
-#ifdef EL_SOLO
         Commands::graphNew,
         Commands::graphOpen,
         Commands::graphSave,
         Commands::graphSaveAs,
         Commands::importSession,
-#endif
-
         Commands::recentsClear,
     });
     cids.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });

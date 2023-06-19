@@ -1031,9 +1031,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
             File file = panel->getSelectedFile();
             if (file.hasFileExtension ("els"))
             {
-#ifndef EL_SOLO
                 postMessage (new OpenSessionMessage (file));
-#endif
             }
             else if (file.hasFileExtension ("elg") || file.hasFileExtension ("elpreset"))
             {
@@ -1060,17 +1058,6 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
         const auto file = File (path);
         const Node node (Node::parse (file));
         bool wasHandled = false;
-
-#if defined(EL_SOLO)
-        // SE and LT Should just open graphs instead of trying to embed them
-        if (file.hasFileExtension (".elg"))
-        {
-            if (auto* cc = ViewHelpers::findContentComponent (this))
-                if (auto* gc = cc->getServices().findChild<GraphService>())
-                    gc->openGraph (file);
-            wasHandled = true;
-        }
-#endif
 
         if (! wasHandled && node.isValid())
         {

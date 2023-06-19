@@ -93,11 +93,7 @@ void MainWindow::nameChanged()
         return;
     }
 
-#ifndef EL_SOLO
     nameChangedSession();
-#else
-    nameChangedSingleGraph();
-#endif
 }
 
 void MainWindow::nameChangedSession()

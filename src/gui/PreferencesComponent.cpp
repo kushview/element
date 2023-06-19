@@ -344,19 +344,12 @@ public:
 
     GeneralSettingsPage (Context& world, GuiService& g)
         : pluginSettings (world),
-#ifndef EL_SOLO
           defaultSessionFile ("Default Session", File(), true, false,
                               false, // bool isForSaving,
                               "*.els", //const String& fileBrowserWildcard,
                               "", //const String& enforcedSuffix,
                               "None"), //const String& textWhenNothingSelected)
-#else
-          defaultSessionFile ("Default Graph", File(), true, false,
-                              false, // bool isForSaving,
-                              "*.elg", //const String& fileBrowserWildcard,
-                              "", //const String& enforcedSuffix,
-                              "None"), //const String& textWhenNothingSelected)
-#endif
+
           settings (world.getSettings()),
           engine (world.getAudioEngine()),
           gui (g)
@@ -410,11 +403,8 @@ public:
         hidePluginWindows.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (openLastSessionLabel);
-#ifndef EL_SOLO
+
         openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
-#else
-        openLastSessionLabel.setText ("Open last used Graph", dontSendNotification);
-#endif
         openLastSessionLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (openLastSession);
         openLastSession.setClickingTogglesState (true);
@@ -422,11 +412,7 @@ public:
         openLastSession.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (askToSaveSessionLabel);
-#ifndef EL_SOLO
         askToSaveSessionLabel.setText ("Ask to save sessions on exit", dontSendNotification);
-#else
-        askToSaveSessionLabel.setText ("Ask to save graphs on exit", dontSendNotification);
-#endif
         askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (askToSaveSession);
         askToSaveSession.setClickingTogglesState (true);
@@ -463,7 +449,6 @@ public:
             }
         };
 
-#ifndef EL_SOLO
         addAndMakeVisible (defaultSessionFileLabel);
         defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
         defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
@@ -473,7 +458,6 @@ public:
         addAndMakeVisible (defaultSessionClearButton);
         defaultSessionClearButton.setButtonText ("X");
         defaultSessionClearButton.addListener (this);
-#endif
 
         const int source = String ("internal") == settings.getUserSettings()->getValue ("clockSource")
                                ? ClockSourceInternal
@@ -482,7 +466,6 @@ public:
         clockSource.setValue (source);
         clockSource.addListener (this);
 
-#ifndef EL_SOLO
         addAndMakeVisible (mainContentLabel);
         mainContentLabel.setText ("UI Type", dontSendNotification);
         mainContentLabel.setFont (Font (12.0, Font::bold));
@@ -498,7 +481,6 @@ public:
             jassertfalse;
         } // invalid content type
         mainContentBox.getSelectedIdAsValue().addListener (this);
-#endif
     }
 
     virtual ~GeneralSettingsPage() noexcept
@@ -556,23 +538,19 @@ public:
         layoutSetting (r, openLastSessionLabel, openLastSession);
         layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
 
-#ifndef EL_SOLO
         r.removeFromTop (spacingBetweenSections);
         r2 = r.removeFromTop (settingHeight);
         mainContentLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
         mainContentBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-#endif
 
         layoutSetting (r, systrayLabel, systray);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
 
-#ifndef EL_SOLO
         layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
         defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
                                              defaultSessionFile.getY(),
                                              settingHeight - 2,
                                              defaultSessionFile.getHeight());
-#endif
 
         if (pluginSettings.isVisible())
         {

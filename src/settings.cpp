@@ -392,25 +392,12 @@ void Settings::setDesktopScale (double scale)
 //=============================================================================
 String Settings::getMainContentType() const
 {
-#ifndef EL_SOLO
-    if (auto* p = getProps())
-        return p->getValue (mainContentTypeKey, "standard");
     return "standard";
-#else
-    return "compact";
-#endif
 }
 
 void Settings::setMainContentType (const String& tp)
 {
-#ifndef EL_SOLO
-    if (getMainContentType() == tp)
-        return;
-    if (auto* p = getProps())
-        p->setValue (mainContentTypeKey, tp);
-#else
     ignoreUnused (tp);
-#endif
 }
 
 //=============================================================================
@@ -431,13 +418,8 @@ void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
 
     sub.addSeparator(); // session items
 
-#ifndef EL_SOLO
     sub.addItem (OpenLastUsedSession, "Open Last Saved Session", true, openLastUsedSession());
     sub.addItem (AskToSaveSessions, "Ask To Save Session", true, askToSaveSession());
-#else
-    sub.addItem (OpenLastUsedSession, "Open Last Saved Graph", true, openLastUsedSession());
-    sub.addItem (AskToSaveSessions, "Ask To Save Graph", true, askToSaveSession());
-#endif
 
     menu.addSubMenu ("General", sub);
 

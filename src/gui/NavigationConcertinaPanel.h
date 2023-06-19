@@ -542,12 +542,10 @@ public:
     {
         clearPanels();
 
-#ifndef EL_SOLO
         auto* sess = new SessionTreePanel();
         sess->setName ("Session");
         sess->setComponentID ("Session");
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
-#endif
 
         auto* gv = new GraphSettingsView();
         gv->setName ("Graph");

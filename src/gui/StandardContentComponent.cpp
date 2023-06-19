@@ -508,7 +508,6 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
 
     container->setMainView (createLastContentView (settings));
 
-#ifndef EL_SOLO
     if (booleanProperty (settings, "accessoryView", false))
     {
         setAccessoryView (stringProperty (settings, "accessoryViewName", EL_VIEW_GRAPH_MIXER));
@@ -517,7 +516,6 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
     {
         setShowAccessoryView (false);
     }
-#endif
 
     setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
@@ -541,15 +539,8 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
         nav->setSize (navSize, getHeight());
         resizerMouseUp();
     }
-#ifndef EL_SOLO
-    nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
-#endif
+
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
-
-#if defined(EL_SOLO)
-    setShowAccessoryView (false);
-#endif
-
     resized();
 }
 
@@ -993,7 +984,6 @@ bool StandardContentComponent::perform (const InvocationInfo& info)
         }
         break;
 
-#ifndef EL_SOLO
         case Commands::showConsole: {
             if (showAccessoryView() && getAccessoryViewName() == EL_VIEW_CONSOLE)
             {
@@ -1005,7 +995,7 @@ bool StandardContentComponent::perform (const InvocationInfo& info)
             }
             break;
         }
-#endif
+
         case Commands::toggleVirtualKeyboard:
             toggleVirtualKeyboard();
             break;

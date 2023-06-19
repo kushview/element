@@ -533,11 +533,9 @@ ApplicationCommandTarget* GuiService::getNextCommandTarget()
 void GuiService::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
-#ifndef EL_SOLO
-        Commands::showConsole,
         Commands::showSessionConfig,
-        Commands::showGraphMixer,
-#endif
+        Commands::showGraphMixer,        
+        Commands::showConsole,
         Commands::toggleChannelStrip,
         Commands::showAbout,
         Commands::showPluginManager,
@@ -584,7 +582,6 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
 
-#ifndef EL_SOLO
         // MARK: Session Commands
         case Commands::sessionClose:
             result.setInfo ("Close Session", "Close the current session", Commands::Categories::Session, 0);
@@ -628,31 +625,6 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
         }
         break;
-#endif
-
-#ifdef EL_SOLO
-        // MARK: Graph Commands
-        case Commands::graphNew:
-            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
-            result.setInfo ("New Graph", "Create a new graph", Commands::Categories::Session, 0);
-            break;
-        case Commands::graphOpen:
-            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
-            result.setInfo ("Open Graph", "Open an existing graph", Commands::Categories::Session, 0);
-            break;
-        case Commands::graphSave:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
-            result.setInfo ("Save Graph", "Save the current graph", Commands::Categories::Session, 0);
-            break;
-        case Commands::graphSaveAs:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Save Graph As", "Save the current graph with a new name", Commands::Categories::Session, 0);
-            break;
-        case Commands::importSession:
-            // result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Import Session", "Import a graph from a session", Commands::Categories::Session, 0);
-            break;
-#endif
 
         // MARK: Media Commands
         case Commands::mediaNew:
@@ -717,7 +689,6 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
         }
         break;
 
-#ifndef EL_SOLO
         case Commands::showGraphMixer: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
@@ -737,7 +708,6 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             result.setInfo ("Console", "Show the scripting console", Commands::Categories::UserInterface, flags);
         }
         break;
-#endif
 
         case Commands::showControllerDevices: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;

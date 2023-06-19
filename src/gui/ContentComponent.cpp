@@ -548,13 +548,8 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
         {
             if (true)
             {
-#ifndef EL_SOLO
                 if (auto* sess = controller.findChild<SessionService>())
                     sess->importGraph (file);
-#else
-                if (auto* gc = controller.findChild<GraphService>())
-                    gc->openGraph (file);
-#endif
             }
             else
             {

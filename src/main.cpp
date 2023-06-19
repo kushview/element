@@ -217,7 +217,6 @@ public:
             return;
         }
 
-#ifndef EL_SOLO
         auto* sc = world->getServices().findChild<SessionService>();
 
         if (world->getSettings().askToSaveSession())
@@ -249,28 +248,6 @@ public:
 
             Application::quit();
         }
-
-#else // SE
-        auto* gc = world->getServices().findChild<GraphService>();
-        if (world->getSettings().askToSaveSession())
-        {
-            // - 0 if the third button was pressed ('cancel')
-            // - 1 if the first button was pressed ('yes')
-            // - 2 if the middle button was pressed ('no')
-            const int res = ! gc->hasGraphChanged() ? 2
-                                                    : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Graph", "This graph may have changes. Would you like to save before exiting?");
-            if (res == 1)
-                gc->saveGraph (false);
-
-            if (res != 0)
-                Application::quit();
-        }
-        else
-        {
-            gc->saveGraph (false);
-            Application::quit();
-        }
-#endif
     }
 
     void anotherInstanceStarted (const String& commandLine) override
@@ -278,7 +255,6 @@ public:
         if (! world)
             return;
 
-#ifndef EL_SOLO
         if (auto* sc = world->getServices().findChild<SessionService>())
         {
             const auto path = commandLine.unquoted().trim();
@@ -291,18 +267,6 @@ public:
                     sc->importGraph (file);
             }
         }
-#else
-        if (auto* gc = world->getServices().findChild<GraphService>())
-        {
-            const auto path = commandLine.unquoted().trim();
-            if (File::isAbsolutePath (path))
-            {
-                const File file (path);
-                if (file.hasFileExtension ("elg"))
-                    gc->openGraph (file);
-            }
-        }
-#endif
     }
 
     void suspended() override {}
@@ -328,14 +292,12 @@ public:
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
-#ifndef EL_SOLO
         const auto path = getCommandLineParameters();
         const File sessionFile = File::isAbsolutePath (path) ? File (path)
                                                              : File::getCurrentWorkingDirectory().getChildFile (path);
         if (sessionFile.hasFileExtension ("els"))
             if (auto* sc = world->getServices().findChild<SessionService>())
                 sc->openFile (sessionFile);
-#endif
     }
 
 private:
