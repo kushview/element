@@ -22,7 +22,7 @@
 #include "datapath.hpp"
 
 #ifndef EL_INSTALL_DIR_AWARE
-    #define EL_INSTALL_DIR_AWARE 1
+#define EL_INSTALL_DIR_AWARE 1
 #endif
 
 namespace element {

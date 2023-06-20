@@ -25,7 +25,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/BlockComponent.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/ContextMenus.h"
 #include "gui/Icons.h"
 #include "gui/PluginWindow.h"

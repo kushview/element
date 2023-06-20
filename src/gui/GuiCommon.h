@@ -23,7 +23,7 @@
 #include <element/services.hpp>
 #include <element/services/guiservice.hpp>
 #include "gui/Buttons.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
 #include <element/session.hpp>

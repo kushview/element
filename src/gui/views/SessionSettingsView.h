@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/Buttons.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 namespace element {
 class SessionPropertyPanel;

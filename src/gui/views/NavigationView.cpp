@@ -18,7 +18,7 @@
 */
 
 #include <element/audioengine.hpp>
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/views/NavigationView.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"

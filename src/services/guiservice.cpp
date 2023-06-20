@@ -29,7 +29,7 @@
 #include "gui/views/VirtualKeyboardView.h"
 
 #include "gui/AboutComponent.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
@@ -527,26 +527,25 @@ ApplicationCommandTarget* GuiService::getNextCommandTarget()
 
 void GuiService::getAllCommands (Array<CommandID>& commands)
 {
-    commands.addArray ({
-        Commands::showSessionConfig,
-        Commands::showGraphMixer,        
-        Commands::showConsole,
-        Commands::toggleChannelStrip,
-        Commands::showAbout,
-        Commands::showPluginManager,
-        Commands::showPreferences,
-        Commands::showGraphConfig,
-        Commands::showPatchBay,
-        Commands::showGraphEditor,
-        Commands::showLastContentView,
-        Commands::toggleVirtualKeyboard,
-        Commands::toggleMeterBridge,
-        Commands::rotateContentView,
-        Commands::showAllPluginWindows,
-        Commands::hideAllPluginWindows,
-        Commands::showKeymapEditor,
-        Commands::showControllerDevices,
-        Commands::toggleUserInterface });
+    commands.addArray ({ Commands::showSessionConfig,
+                         Commands::showGraphMixer,
+                         Commands::showConsole,
+                         Commands::toggleChannelStrip,
+                         Commands::showAbout,
+                         Commands::showPluginManager,
+                         Commands::showPreferences,
+                         Commands::showGraphConfig,
+                         Commands::showPatchBay,
+                         Commands::showGraphEditor,
+                         Commands::showLastContentView,
+                         Commands::toggleVirtualKeyboard,
+                         Commands::toggleMeterBridge,
+                         Commands::rotateContentView,
+                         Commands::showAllPluginWindows,
+                         Commands::hideAllPluginWindows,
+                         Commands::showKeymapEditor,
+                         Commands::showControllerDevices,
+                         Commands::toggleUserInterface });
 
     commands.add (Commands::quit);
     if (content)
@@ -952,9 +951,10 @@ void GuiService::toggleAboutScreen()
         about.reset (new AboutDialog (*this));
         if (appInfo.title.isNotEmpty())
         {
-            if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent())) {
+            if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent()))
+            {
                 c->setAboutInfo (appInfo);
-                about->setName (TRANS("About ") + appInfo.title);
+                about->setName (TRANS ("About ") + appInfo.title);
             }
         }
     }

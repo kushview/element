@@ -21,7 +21,7 @@
 #include <element/services/guiservice.hpp>
 #include "engine/graphmanager.hpp"
 #include <element/audioengine.hpp>
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"

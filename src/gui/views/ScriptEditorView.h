@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/widgets/ScriptEditorComponent.h"
 #include "scripting/scriptsource.hpp"
 #include <element/node.hpp>

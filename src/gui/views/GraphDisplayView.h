@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/GuiCommon.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/widgets/BreadCrumbComponent.h"
 #include "session/commandmanager.hpp"
 

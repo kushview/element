@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 namespace element {
 

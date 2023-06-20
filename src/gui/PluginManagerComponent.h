@@ -20,7 +20,7 @@
 #pragma once
 
 #include <element/juce.hpp>
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 namespace element {
 

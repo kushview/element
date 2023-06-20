@@ -30,5 +30,5 @@
 // clang-format on
 
 namespace element {
-    
+
 }

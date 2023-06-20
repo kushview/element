@@ -9,8 +9,7 @@ namespace element {
 class Context;
 class MeterBridgeView;
 
-class StandardContentComponent : public ContentComponent
-{
+class StandardContentComponent : public ContentComponent {
 public:
     StandardContentComponent (Context& ctx);
     ~StandardContentComponent() noexcept;
@@ -32,10 +31,10 @@ public:
 
     int getNavSize() override;
 
-    bool isVirtualKeyboardVisible() const override { return virtualKeyboardVisible; }
+    bool isVirtualKeyboardVisible() const override;
     void setVirtualKeyboardVisible (const bool isVisible) override;
     void toggleVirtualKeyboard() override;
-    VirtualKeyboardView* getVirtualKeyboardView() const override { return keyboard.get(); }
+    VirtualKeyboardView* getVirtualKeyboardView() const override;
 
     void setNodeChannelStripVisible (const bool isVisible) override;
     bool isNodeChannelStripVisible() const override;
@@ -70,23 +69,19 @@ public:
 
 private:
     ScopedPointer<NavigationConcertinaPanel> nav;
+    friend class ContentContainer;
     ScopedPointer<ContentContainer> container;
     StretchableLayoutManager layout;
-
     class Resizer;
     friend class Resizer;
     ScopedPointer<Resizer> bar1;
 
-    ScopedPointer<VirtualKeyboardView> keyboard;
     ScopedPointer<NodeChannelStripView> nodeStrip;
-    std::unique_ptr<MeterBridgeView> bridge;
 
-    bool statusBarVisible;
+    bool statusBarVisible { true };
     int statusBarSize;
-    bool toolBarVisible;
+    bool toolBarVisible { true };
     int toolBarSize;
-    bool virtualKeyboardVisible = false;
-    bool meterBridgeVisible = false;
     int virtualKeyboardSize = 80;
     int nodeStripSize = 80;
 

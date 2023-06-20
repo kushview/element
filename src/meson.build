@@ -79,7 +79,7 @@ libelement_sources = '''
     gui/capslock.cpp
     gui/ChannelStripComponent.cpp
     gui/ConnectionGrid.cpp
-    gui/ContentComponent.cpp
+    gui/content.cpp
     gui/ContextMenus.cpp
     gui/DecibelScaleComponent.cpp
     gui/DigitalMeter.cpp

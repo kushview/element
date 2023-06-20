@@ -22,7 +22,7 @@
 #include "gui/SequencerClipItem.h"
 #include "gui/SequencerComponent.h"
 #include "gui/GuiCommon.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include <element/session.hpp>
 
 namespace element {

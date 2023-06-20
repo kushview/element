@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/PatchMatrixComponent.h"
 
 namespace element {

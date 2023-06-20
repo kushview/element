@@ -21,7 +21,7 @@
 #include <element/devicemanager.hpp>
 #include <element/pluginmanager.hpp>
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"

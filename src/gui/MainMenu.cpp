@@ -21,7 +21,7 @@
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include <element/services/guiservice.hpp>
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"

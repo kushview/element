@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 namespace element {
 class KeymapEditorView : public ContentView, public Button::Listener

@@ -20,7 +20,7 @@
 #ifndef EL_PLUGINS_PANEL_VIEW_H
 #define EL_PLUGINS_PANEL_VIEW_H
 
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 namespace element {
 

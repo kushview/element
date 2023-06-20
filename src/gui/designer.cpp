@@ -13,7 +13,8 @@ public:
         : StandardContent (c),
           context (c),
           designer (d)
-    { }
+    {
+    }
 
 private:
     friend class Designer;

@@ -129,7 +129,7 @@ public:
     virtual ~SmartLayoutManager() {}
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartLayoutManager);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartLayoutManager)
 };
 
 class SmartLayoutResizeBar : public StretchableLayoutResizerBar
@@ -183,7 +183,7 @@ public:
             std::bind (&ContentContainer::updateLayout, this));
         bar->mouseReleased.connect (
             std::bind (&ContentContainer::lockLayout, this));
-        content2.reset (new ContentView());
+        content2.reset (new Bottom (cc));
         addAndMakeVisible (content2.get());
         updateLayout();
         resized();
@@ -261,23 +261,23 @@ public:
     {
         if (view)
             view->initializeView (owner.getServices());
-        if (content2)
-            removeChildComponent (content2.get());
+        if (auto c2 = content2->content.get())
+            content2->removeChildComponent (c2);
 
-        content2.reset (view);
+        content2->content.reset (view);
 
-        if (content2)
+        if (auto c2 = content2->content.get())
         {
-            content2->willBecomeActive();
-            addAndMakeVisible (content2.get());
+            c2->willBecomeActive();
+            content2->addAndMakeVisible (c2);
         }
 
         resized();
 
-        if (content2)
+        if (auto c2 = content2->content.get())
         {
-            content2->didBecomeActive();
-            content2->stabilizeContent();
+            c2->didBecomeActive();
+            c2->stabilizeContent();
         }
     }
 
@@ -345,7 +345,53 @@ private:
     StretchableLayoutManager layout;
     std::unique_ptr<SmartLayoutResizeBar> bar;
     std::unique_ptr<ContentView> content1;
-    std::unique_ptr<ContentView> content2;
+
+    class Bottom : public juce::Component
+    {
+    public:
+        StandardContent& standard;
+        Bottom (StandardContent& s) : standard (s)
+        {
+            keyboard = std::make_unique<VirtualKeyboardView>();
+            keyboard->willBecomeActive();
+            addAndMakeVisible (keyboard.get());
+            keyboard->initializeView (standard.getServices());
+            keyboard->didBecomeActive();
+
+            bridge = std::make_unique<MeterBridgeView>();
+            bridge->willBecomeActive();
+            addAndMakeVisible (bridge.get());
+            bridge->initializeView (standard.getServices());
+            bridge->didBecomeActive();
+
+            content = std::make_unique<ContentView>();
+            addAndMakeVisible (content.get());
+            setSize (400, 400);
+        }
+
+        ~Bottom() {}
+
+        void paint (Graphics& g) override
+        {
+            g.fillAll (Colours::black);
+        }
+
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            if (keyboard->isVisible())
+                keyboard->setBounds (r.removeFromBottom (80));
+            if (bridge->isVisible())
+                bridge->setBounds (r.removeFromBottom (80));
+            if (content != nullptr)
+                content->setBounds (r);
+        }
+
+        std::unique_ptr<VirtualKeyboardView> keyboard;
+        std::unique_ptr<MeterBridgeView> bridge;
+        std::unique_ptr<ContentView> content;
+    };
+    std::unique_ptr<Bottom> content2;
 
     bool showAccessoryView = false;
     int barSize = 2;
@@ -500,10 +546,10 @@ StandardContentComponent::StandardContentComponent (Context& ctl_)
 
     setOpaque (true);
 
+    addAndMakeVisible (container = new ContentContainer (*this, getServices()));
+    addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_));
     nav->updateContent();
-    addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
-    addAndMakeVisible (container = new ContentContainer (*this, getServices()));
 
     {
         int w, h;
@@ -526,11 +572,6 @@ StandardContentComponent::StandardContentComponent (Context& ctl_)
 
     setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
-
-    bridge = std::make_unique<MeterBridgeView>();
-    bridge->initializeView (ctl_.getServices());
-    addAndMakeVisible (bridge.get());
-    bridge->setVisible (false);
     setMeterBridgeVisible (booleanProperty (settings, "meterBridge", false));
 
     const Node node (getGlobals().getSession()->getCurrentGraph());
@@ -549,7 +590,7 @@ StandardContentComponent::StandardContentComponent (Context& ctl_)
 
     if (auto pp = nav->findPanel<PluginsPanelView>())
         nav->setPanelSize (pp, 20 * 4, false);
-    
+
     resized();
 }
 
@@ -561,15 +602,15 @@ StandardContentComponent::~StandardContentComponent() noexcept
 
 String StandardContentComponent::getMainViewName() const
 {
-    if (container && container->content1)
-        return container->content1->getName();
+    if (auto c1 = container->content1.get())
+        return c1->getName();
     return String();
 }
 
 String StandardContentComponent::getAccessoryViewName() const
 {
-    if (container && container->content2)
-        return container->content2->getName();
+    if (auto c2 = container->content2->content.get())
+        return c2->getName();
     return String();
 }
 
@@ -675,10 +716,6 @@ void StandardContentComponent::resizeContent (const Rectangle<int>& area)
 {
     Rectangle<int> r (area);
 
-    if (virtualKeyboardVisible && keyboard)
-        keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
-    if (meterBridgeVisible && bridge && bridge->isVisible())
-        bridge->setBounds (r.removeFromBottom (99));
     if (nodeStrip && nodeStrip->isVisible())
         nodeStrip->setBounds (r.removeFromRight (nodeStripSize));
 
@@ -825,8 +862,8 @@ void StandardContentComponent::stabilizeViews()
 {
     if (container->content1)
         container->content1->stabilizeContent();
-    if (container->content2)
-        container->content2->stabilizeContent();
+    if (auto c2 = container->content2->content.get())
+        c2->stabilizeContent();
     if (nodeStrip)
         nodeStrip->stabilizeContent();
 }
@@ -841,8 +878,8 @@ void StandardContentComponent::saveState (PropertiesFile* props)
     if (auto* const vk = getVirtualKeyboardView())
         vk->saveState (props);
 
-    auto& mo = bridge->getMeterBridge();
-    props->setValue ("meterBridge", meterBridgeVisible);
+    auto& mo = container->content2->bridge->getMeterBridge();
+    props->setValue ("meterBridge", isMeterBridgeVisible());
     props->setValue ("meterBridgeSize", mo.getMeterSize());
     props->setValue ("meterBridgeVisibility", (int) mo.visibility());
 }
@@ -857,10 +894,10 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
     if (auto* const vk = getVirtualKeyboardView())
         vk->restoreState (props);
 
-    auto& bo = bridge->getMeterBridge();
+    auto& bo = container->content2->bridge->getMeterBridge();
     bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.getMeterSize()));
     bo.setVisibility ((uint32) props->getIntValue ("meterBridgeVisibility", bo.visibility()));
-    setMeterBridgeVisible (props->getBoolValue ("meterBridge", meterBridgeVisible));
+    setMeterBridgeVisible (props->getBoolValue ("meterBridge", isMeterBridgeVisible()));
     resized();
 }
 
@@ -894,30 +931,6 @@ void StandardContentComponent::resizerMouseUp()
     resized();
 }
 
-void StandardContentComponent::setVirtualKeyboardVisible (const bool isVisible)
-{
-    if (isVisible == virtualKeyboardVisible)
-        return;
-
-    if (isVisible)
-    {
-        if (! keyboard)
-            keyboard = new VirtualKeyboardView();
-        keyboard->willBecomeActive();
-        addAndMakeVisible (keyboard);
-        keyboard->didBecomeActive();
-        if (keyboard->isShowing() || keyboard->isOnDesktop())
-            keyboard->grabKeyboardFocus();
-    }
-    else
-    {
-        keyboard = nullptr;
-    }
-
-    virtualKeyboardVisible = isVisible;
-    resized();
-}
-
 void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
 {
     if (! nodeStrip)
@@ -945,14 +958,48 @@ void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
 
     resized();
 }
-
 bool StandardContentComponent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
+
+//=====
+bool StandardContentComponent::isVirtualKeyboardVisible() const
+{
+    if (auto vc = getVirtualKeyboardView())
+        return vc->isVisible();
+    return false;
+}
+
+void StandardContentComponent::setVirtualKeyboardVisible (const bool vis)
+{
+    auto keyboard = getVirtualKeyboardView();
+    if (keyboard->isVisible() == vis)
+        return;
+
+    keyboard->setVisible (vis);
+    if (isVirtualKeyboardVisible())
+    {
+        if (keyboard->isShowing() || keyboard->isOnDesktop())
+            keyboard->grabKeyboardFocus();
+    }
+    else
+    {
+        keyboard->setVisible (false);
+    }
+
+    container->content2->resized();
+    resized();
+}
 
 void StandardContentComponent::toggleVirtualKeyboard()
 {
-    setVirtualKeyboardVisible (! virtualKeyboardVisible);
+    setVirtualKeyboardVisible (! isVirtualKeyboardVisible());
 }
 
+VirtualKeyboardView* StandardContentComponent::getVirtualKeyboardView() const
+{
+    return container->content2->keyboard.get();
+}
+
+//=====
 bool StandardContentComponent::perform (const InvocationInfo& info)
 {
     bool result = true;
@@ -1092,14 +1139,16 @@ void StandardContentComponent::setMainView (ContentView* view)
 
 void StandardContentComponent::setMeterBridgeVisible (bool vis)
 {
-    meterBridgeVisible = vis;
-    bridge->setVisible (meterBridgeVisible);
+    if (isMeterBridgeVisible() == vis)
+        return;
+    container->content2->bridge->setVisible (vis);
+    container->content2->resized();
     resized();
 }
 
 bool StandardContentComponent::isMeterBridgeVisible() const
 {
-    return meterBridgeVisible;
+    return container->content2->bridge->isVisible();
 }
 
 } // namespace element

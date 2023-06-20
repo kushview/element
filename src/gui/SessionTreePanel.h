@@ -38,7 +38,6 @@ public:
 
     void refresh();
 
-    
     void setSession (SessionPtr);
     void showNode (const Node& newNode);
     bool showingNode() const noexcept;

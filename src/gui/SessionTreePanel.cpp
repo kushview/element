@@ -27,7 +27,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/ContextMenus.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 #include "gui/AudioIOPanelView.h"
 #include "gui/views/PluginsPanelView.h"
@@ -902,7 +902,8 @@ TreeViewItem* SessionTreePanel::findItemForNode (const Node& node) const
 
 void SessionTreePanel::onNodeSelected()
 {
-    if (auto* const gui = ViewHelpers::getGuiController (this)) {
+    if (auto* const gui = ViewHelpers::getGuiController (this))
+    {
         if (showingNode() && gui->getSelectedNode() == node)
             return;
         if (auto* const item = findItemForNode (gui->getSelectedNode()))

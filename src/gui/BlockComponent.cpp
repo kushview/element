@@ -23,7 +23,7 @@
 #include "gui/Artist.h"
 #include "gui/BlockComponent.h"
 #include "gui/Buttons.h"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/ContextMenus.h"
 #include "gui/GraphEditorComponent.h"
 #include "gui/NodeIOConfiguration.h"

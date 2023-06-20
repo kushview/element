@@ -289,8 +289,10 @@ void NavigationConcertinaPanel::hidePanel (const juce::String& name)
     updateContent();
 }
 
-void NavigationConcertinaPanel::setPanelName (const String& panel, const String& newName) {
-    if (auto ptr = findPanelByName (panel)) {
+void NavigationConcertinaPanel::setPanelName (const String& panel, const String& newName)
+{
+    if (auto ptr = findPanelByName (panel))
+    {
         ptr->setName (newName);
         repaint();
     }
@@ -325,7 +327,7 @@ void NavigationConcertinaPanel::updateContent()
         gv->setPropertyPanelHeaderVisible (false);
         addPanelInternal (-1, gv, "Graph", nullptr);
     }
-    
+
     if (! namesHidden.contains ("Node"))
     {
         auto* nv = new NodeEditorContentView();

@@ -44,7 +44,8 @@
 namespace element {
 using namespace juce;
 
-class ServiceManager::Impl {
+class ServiceManager::Impl
+{
 public:
     Impl (ServiceManager& sm) : services (sm) {}
     ServiceManager& services;
@@ -82,7 +83,7 @@ void ServiceManager::activate()
 {
     if (impl->active)
         return;
-    
+
     if (! impl->initialized)
     {
         lastExportedGraph = DataPath::defaultGraphDir();
@@ -112,7 +113,7 @@ void ServiceManager::activate()
 
     for (auto* s : services)
         s->activate();
-    
+
     impl->active = true;
 }
 
@@ -130,7 +131,8 @@ void ServiceManager::deactivate()
     impl->active = false;
 }
 
-void ServiceManager::launch() {
+void ServiceManager::launch()
+{
     activate();
     if (auto* gui = findChild<GuiService>())
         gui->run();
@@ -531,7 +533,6 @@ bool ServiceManager::perform (const InvocationInfo& info)
         case Commands::checkNewerVersion:
             CurrentVersion::checkAfterDelay (20, true);
             break;
-
 
         case Commands::recentsClear: {
             recentFiles.clear();

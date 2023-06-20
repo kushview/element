@@ -19,7 +19,7 @@
 #include <element/ui/menumodels.hpp>
 #include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
 #include "session/commandmanager.hpp"

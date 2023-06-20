@@ -12,8 +12,7 @@ namespace element {
 
 class DataPathTreeComponent : public juce::Component,
                               public juce::FileBrowserListener,
-                              private juce::Timer
-{
+                              private juce::Timer {
 public:
     DataPathTreeComponent()
         : thread ("el.thread.DataPathBrowser"),
@@ -79,14 +78,10 @@ public:
         auto session = ViewHelpers::getSession (this);
         auto* const cc = ViewHelpers::findContentComponent (this);
 
-        if (session && cc)
-        {
-            if (file.getFileExtension().toLowerCase() == ".elg" || file.getFileExtension().toLowerCase() == ".els")
-            {
+        if (session && cc) {
+            if (file.getFileExtension().toLowerCase() == ".elg" || file.getFileExtension().toLowerCase() == ".els") {
                 cc->post (new OpenSessionMessage (file));
-            }
-            else if (file.getFileExtension().toLowerCase() == ".elpreset")
-            {
+            } else if (file.getFileExtension().toLowerCase() == ".elpreset") {
                 const Node node (Node::parse (file), false);
                 if (node.isValid())
                     cc->post (new AddNodeMessage (node, session->getActiveGraph()));
@@ -97,8 +92,7 @@ public:
     virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
 
 private:
-    class Filter : public FileFilter
-    {
+    class Filter : public FileFilter {
     public:
         Filter() : FileFilter ("UserDataPath") {}
 
@@ -136,12 +130,9 @@ private:
         if (! AlertWindow::showOkCancelBox (AlertWindow::QuestionIcon, "Delete file", message))
             return;
 
-        if (! file.deleteFile())
-        {
+        if (! file.deleteFile()) {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Delete file", "Could not delete");
-        }
-        else
-        {
+        } else {
             refresh();
         }
     }
@@ -173,20 +164,14 @@ private:
     {
         const String newBaseName = renameWindow.getTextEditorContents ("filename");
 
-        if (result == 0)
-        {
-        }
-        else
-        {
+        if (result == 0) {
+        } else {
             auto file = getSelectedFile();
             auto newFile = file.getParentDirectory().getChildFile (newBaseName).withFileExtension (file.getFileExtension());
-            if (file.moveFileTo (newFile))
-            {
+            if (file.moveFileTo (newFile)) {
                 refresh();
                 tree->setSelectedFile (newFile);
-            }
-            else
-            {
+            } else {
                 AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "File rename", "Could not rename this file.");
             }
         }
@@ -201,8 +186,7 @@ private:
     }
     void handleFileMenu (const int res)
     {
-        switch (res)
-        {
+        switch (res) {
             case 0:
                 break;
             case 1:
@@ -224,4 +208,4 @@ private:
         menu.showMenuAsync (PopupMenu::Options(), callback);
     }
 };
-}
+} // namespace element

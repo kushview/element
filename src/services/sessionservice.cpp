@@ -25,7 +25,7 @@
 #include "services/presetservice.hpp"
 #include "services/sessionservice.hpp"
 
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 #include <element/node.hpp>
 #include <element/context.hpp>

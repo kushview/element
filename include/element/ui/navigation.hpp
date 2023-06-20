@@ -71,8 +71,8 @@ private:
     juce::StringArray names, namesHidden;
     juce::OwnedArray<juce::Component> comps;
     void addPanelInternal (const int index,
-                           juce::Component* comp, 
-                           const juce::String& name = juce::String(), 
+                           juce::Component* comp,
+                           const juce::String& name = juce::String(),
                            juce::Component* header = nullptr);
 
     class Header;

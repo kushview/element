@@ -27,7 +27,7 @@
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "gui/widgets/MidiBlinker.h"
-#include <element/ui/standard.hpp>
+
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
@@ -36,7 +36,7 @@
 #include "gui/ViewHelpers.h"
 #include "commands.hpp"
 
-#include "gui/ContentComponent.h"
+#include <element/ui/content.hpp>
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0
