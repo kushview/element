@@ -19,6 +19,7 @@
 
 #include <element/services.hpp>
 #include <element/ui/meterbridge.hpp>
+#include <element/ui/datapathbrowser.hpp>
 
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
@@ -45,7 +46,13 @@
 #include "gui/views/VirtualKeyboardView.h"
 #include "gui/TempoAndMeterBar.h"
 #include "gui/TransportBar.h"
-#include "gui/NavigationConcertinaPanel.h"
+#include <element/ui/navigation.hpp>
+#include "gui/views/NodeEditorContentView.h"
+#include "gui/views/GraphSettingsView.h"
+#include "gui/views/NodeMidiContentView.h"
+#include "gui/views/PluginsPanelView.h"
+#include "gui/AudioIOPanelView.h"
+#include "gui/SessionTreePanel.h"
 
 #include <element/devicemanager.hpp>
 #include <element/pluginmanager.hpp>
@@ -55,7 +62,7 @@
 #include <element/context.hpp>
 #include <element/settings.hpp>
 
-#include "gui/StandardContentComponent.h"
+#include <element/ui/standard.hpp>
 
 #include "BinaryData.h"
 
@@ -486,14 +493,14 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
     }
 }
 
-StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
+StandardContentComponent::StandardContentComponent (Context& ctl_)
     : ContentComponent (ctl_)
 {
     auto& settings (getGlobals().getSettings());
 
     setOpaque (true);
 
-    addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
+    addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_));
     nav->updateContent();
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (*this, getServices()));
@@ -521,7 +528,7 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
 
     bridge = std::make_unique<MeterBridgeView>();
-    bridge->initializeView (ctl_);
+    bridge->initializeView (ctl_.getServices());
     addAndMakeVisible (bridge.get());
     bridge->setVisible (false);
     setMeterBridgeVisible (booleanProperty (settings, "meterBridge", false));
@@ -540,7 +547,9 @@ StandardContentComponent::StandardContentComponent (ServiceManager& ctl_)
         resizerMouseUp();
     }
 
-    nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
+    if (auto pp = nav->findPanel<PluginsPanelView>())
+        nav->setPanelSize (pp, 20 * 4, false);
+    
     resized();
 }
 

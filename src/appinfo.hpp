@@ -25,13 +25,10 @@
 
 // clang-format off
 #ifndef EL_APP_NAME
- #define EL_APP_NAME "Element"
-#endif
-
-#ifndef EL_INSTALL_DIR_AWARE
- #define EL_INSTALL_DIR_AWARE 1
+    #define EL_APP_NAME "Element"
 #endif
 // clang-format on
 
 namespace element {
+    
 }

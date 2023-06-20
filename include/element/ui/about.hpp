@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #pragma once
 
 #include <element/juce/core.hpp>
@@ -5,7 +8,7 @@
 
 namespace element {
 
-struct AppInfo {
+struct AboutInfo {
     juce::String title;
     juce::String version;
     juce::String copyright;

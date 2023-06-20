@@ -103,7 +103,7 @@ private:
 
 Context::Context (const String& _cli)
 {
-    appName = EL_APP_NAME;
+    appName = "Element";
     impl.reset (new Impl (*this));
     impl->init();
 }

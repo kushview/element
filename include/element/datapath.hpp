@@ -35,47 +35,47 @@ public:
     /** Returns the app data dir.
         For example, on OSX this is ~/Library/Application Support/Element
      */
-    static const File applicationDataDir();
+    static const juce::File applicationDataDir();
 
     /** Returns the default settings file */
-    static const File defaultSettingsFile();
+    static const juce::File defaultSettingsFile();
 
     /** Returns the default user data path */
-    static const File defaultLocation();
+    static const juce::File defaultLocation();
 
     /** Returns the default Node MIDI Presets directory */
-    static const File defaultGlobalMidiProgramsDir();
+    static const juce::File defaultGlobalMidiProgramsDir();
 
     /** Returns the default User data path */
-    static const File defaultUserDataPath();
+    static const juce::File defaultUserDataPath();
 
     /** Returns the default scripts dir (user) */
-    static const File defaultScriptsDir();
+    static const juce::File defaultScriptsDir();
 
     /** Returns the default session directory */
-    static const File defaultSessionDir();
+    static const juce::File defaultSessionDir();
 
     /** Returns the default Graph directory */
-    static const File defaultGraphDir();
+    static const juce::File defaultGraphDir();
 
     /** Returns the default Controllers directory */
-    static const File defaultControllersDir();
+    static const juce::File defaultControllersDir();
 
     /** Returns the default Workspaces directory */
-    static const File workspacesDir();
+    static const juce::File workspacesDir();
 
     /** Returns the installation directory. May return an invalid file,
         especially when in debug mode. Use this sparingly.
       */
-    static const File installDir();
+    static const juce::File installDir();
 
-    const File& getRootDir() const { return root; }
-    File createNewPresetFile (const Node& node, const String& name = String()) const;
-    void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
-    void findPresetFiles (StringArray& results) const;
+    const juce::File& getRootDir() const { return root; }
+    juce::File createNewPresetFile (const Node& node, const juce::String& name = juce::String()) const;
+    void findPresetsFor (const juce::String& format, const juce::String& identifier, NodeArray& nodes) const;
+    void findPresetFiles (juce::StringArray& results) const;
 
 private:
-    File root;
+    juce::File root;
 };
 
 } // namespace element

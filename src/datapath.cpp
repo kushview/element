@@ -21,6 +21,10 @@
 #include "appinfo.hpp"
 #include "datapath.hpp"
 
+#ifndef EL_INSTALL_DIR_AWARE
+    #define EL_INSTALL_DIR_AWARE 1
+#endif
+
 namespace element {
 namespace DataPathHelpers {
 StringArray getSubDirs()

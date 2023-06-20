@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <element/juce/gui_basics.hpp>
 #include "version.hpp"
 
 #ifndef TEST_CURRENT_VERSION
@@ -23,6 +24,7 @@
 #endif
 
 namespace element {
+using namespace juce;
 
 Version::Version() {}
 Version::~Version() {}
@@ -52,7 +54,7 @@ int Version::asHexInteger (const String& versionString)
 
 CurrentVersion::CurrentVersion()
     : Thread ("elVersionCheck"),
-      version (ProjectInfo::versionString),
+      version (EL_VERSION_STRING),
       hasChecked (false) {}
 
 CurrentVersion::~CurrentVersion()
@@ -98,7 +100,7 @@ bool CurrentVersion::isNewerVersionAvailable()
         {
             permalink = "https://kushview.net/element/download/"; // data["homepage"].toString();
             version = data["stable_version"].toString();
-            result = Version::asHexInteger (version) > ProjectInfo::versionNumber;
+            result = false;
         }
     }
 
@@ -129,7 +131,7 @@ void CurrentVersion::timerCallback()
         else if (shouldShowUpToDateMessage)
         {
             String msg = "Element v";
-            msg << ProjectInfo::versionString << " is currently the newest version available.";
+            msg << EL_VERSION_STRING << " is currently the newest version available.";
             AlertWindow::showMessageBox (AlertWindow::InfoIcon, "You're up-to-date.", msg);
         }
     }

@@ -20,16 +20,17 @@
 #pragma once
 
 #include <element/services.hpp>
-#include "services/engineservice.hpp"
-#include "gui/ContentComponent.h"
-#include "gui/TreeviewBase.h"
-#include "gui/ViewHelpers.h"
 #include <element/session.hpp>
+#include <element/ui/content.hpp>
+#include <element/signals.hpp>
+
+#include "services/engineservice.hpp"
+#include "gui/TreeviewBase.h"
 
 namespace element {
 
-class SessionTreePanel : public TreePanelBase,
-                         private ValueTree::Listener
+class SessionTreePanel : public juce::Component,
+                         private juce::ValueTree::Listener
 {
 public:
     explicit SessionTreePanel();
@@ -37,17 +38,26 @@ public:
 
     void refresh();
 
-    void mouseDown (const MouseEvent& event) override;
+    
     void setSession (SessionPtr);
+    void showNode (const Node& newNode);
+    bool showingNode() const noexcept;
+
     SessionPtr getSession() const;
 
+    void paint (juce::Graphics&) override;
+    void resized() override;
+    void mouseDown (const MouseEvent& event) override;
     bool keyPressed (const KeyPress&) override;
 
 private:
     friend class SessionNodeTreeItem;
+    class Panel;
+    std::unique_ptr<Panel> panel;
 
     SessionPtr session;
     ValueTree data;
+    Node node;
     SignalConnection nodeSelectedConnection;
 
     bool ignoreActiveRootGraphSelectionHandler = false;

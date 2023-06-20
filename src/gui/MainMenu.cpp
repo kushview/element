@@ -20,7 +20,6 @@
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
-#include "services/graphservice.hpp"
 #include <element/services/guiservice.hpp>
 #include "gui/ContentComponent.h"
 #include "gui/MainWindow.h"
@@ -57,7 +56,7 @@ void MainMenu::setupMenu()
 {
 #if JUCE_MAC
     macMenu.reset (new PopupMenu());
-    macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About"));
+    macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About "));
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
     macMenu->addSeparator();
     macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");

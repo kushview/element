@@ -115,8 +115,7 @@ public:
     /** Deactivate this and children */
     void deactivate();
 
-    /** Run/Launch the application. */
-    void run();
+    void launch();
 
     juce::RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
 
@@ -131,6 +130,9 @@ protected:
 private:
     friend class Application;
     friend class Context;
+    class Impl;
+    std::unique_ptr<Impl> impl;
+
     juce::OwnedArray<Service> services;
     juce::File lastSavedFile;
     juce::File lastExportedGraph;
@@ -139,7 +141,12 @@ private:
     juce::UndoManager undo;
 
     RunMode runMode;
+
+    /** Run/Launch the core application. */
+    void run();
 };
+
+using Services = ServiceManager;
 
 template <class T>
 inline T* Service::findSibling() const

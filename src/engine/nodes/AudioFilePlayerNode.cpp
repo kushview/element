@@ -17,16 +17,19 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/ui/datapathbrowser.hpp>
+
 #include "engine/nodes/AudioFilePlayerNode.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
+#include "gui/Buttons.h"
 
 // nav panel needs these headers included
 #include "services/engineservice.hpp"
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/views/PluginsPanelView.h"
-#include "gui/NavigationConcertinaPanel.h"
+#include <element/ui/navigation.hpp>
 #include "gui/FileComboBox.h"
 
 #include "utils.hpp"

@@ -18,9 +18,9 @@
 */
 
 #include <element/ui/popups.hpp>
+#include <element/ui/datapathbrowser.hpp>
 
 #include "ElementApp.h"
-#include "services/graphservice.hpp"
 #include "engine/graphmanager.hpp"
 
 #include "gui/GuiCommon.h"
@@ -30,10 +30,16 @@
 #include "gui/Icons.h"
 #include "gui/PluginWindow.h"
 
+#include "gui/views/NodeEditorContentView.h"
+#include "gui/views/GraphSettingsView.h"
+#include "gui/views/NodeMidiContentView.h"
+#include "gui/views/PluginsPanelView.h"
+#include "gui/AudioIOPanelView.h"
+#include "gui/SessionTreePanel.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/views/PluginsPanelView.h"
-#include "gui/NavigationConcertinaPanel.h"
+#include <element/ui/navigation.hpp>
 #include "gui/NodeIOConfiguration.h"
 #include "engine/nodes/BaseProcessor.h"
 

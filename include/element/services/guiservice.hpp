@@ -30,7 +30,7 @@ namespace element {
 
 class CommandManager;
 class ContentComponent;
-class WindowDecorator;
+class ContentFactory;
 class Context;
 class LookAndFeel;
 class MainWindow;
@@ -57,7 +57,7 @@ public:
 
     ServiceManager& getServices() const { return controller; }
     KeyListener* getKeyListener() const;
-    void setAppInfo (const AppInfo& info);
+    void setAboutInfo (const AboutInfo& info);
 
     void closeAllWindows();
 
@@ -141,7 +141,7 @@ public:
 
     void checkForegroundStatus();
 
-    void setMainWindowDecorator (std::unique_ptr<WindowDecorator>);
+    void setContentFactory (std::unique_ptr<ContentFactory>);
 
 private:
     ServiceManager& controller;
@@ -153,7 +153,7 @@ private:
     std::unique_ptr<MainWindow> mainWindow;
     std::unique_ptr<ContentComponent> content;
     std::unique_ptr<DialogWindow> about;
-    std::unique_ptr<WindowDecorator> factory;
+    std::unique_ptr<ContentFactory> factory;
     std::unique_ptr<Designer> designer;
 
     Node selectedNode; // TODO: content manager
@@ -161,7 +161,7 @@ private:
     struct KeyPressManager;
     std::unique_ptr<KeyPressManager> keys;
 
-    AppInfo appInfo;
+    AboutInfo appInfo;
     struct ForegroundCheck : public Timer {
         ForegroundCheck (GuiService& _ui) : ui (_ui) {}
         void timerCallback() override;

@@ -268,7 +268,7 @@ void AboutComponent::paint (Graphics& g)
     }
 }
 
-void AboutComponent::updateAppInfo()
+void AboutComponent::updateAboutInfo()
 {
     if (info.title.isNotEmpty())
     {

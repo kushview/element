@@ -1,24 +1,16 @@
-/*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
 
+#include <memory>
+
+#include <element/juce/core.hpp>
+#include <element/juce/gui_basics.hpp>
+
+#include <element/element.hpp>
+
+#include <element/ui/menumodels.hpp>
 #include <element/nodeobject.hpp>
 #include <element/session.hpp>
 
@@ -92,13 +84,13 @@ class ContentComponent : public Component,
                          public DragAndDropTarget,
                          public FileDragAndDropTarget {
 protected:
-    ContentComponent (ServiceManager& app);
+    ContentComponent (Context& app);
 
 public:
     virtual ~ContentComponent() noexcept;
 
     /** Creates an appropriate content component based on the product that is running */
-    static ContentComponent* create (ServiceManager&);
+    static ContentComponent* create (Context&);
 
     /** Post a message to the app controller */
     void post (Message*);
@@ -201,6 +193,7 @@ public:
     ApplicationCommandTarget* getNextCommandTarget() override;
 
 private:
+    Context& _context;
     ServiceManager& controller;
 
     struct Tooltips;
@@ -221,6 +214,33 @@ private:
     int statusBarSize;
     bool toolBarVisible;
     int toolBarSize;
+};
+
+class ContentFactory {
+public:
+    virtual ~ContentFactory() = default;
+
+    /** Create a main content by type name.
+        
+        Return the content specified.  If type is empty or not supported,
+        you should still return a valid Content object.  The object returned
+        will be used as the content component in the main window.
+    */
+    virtual std::unique_ptr<ContentComponent> createMainContent (const juce::String& type) = 0;
+
+    /** Create a menu bar model to use in the Main Window. */
+    virtual std::unique_ptr<MainMenuBarModel> createMainMenuBarModel() { return nullptr; }
+
+    /** Return a function to use when setting the Main Window's title. If this
+        returns nullptr, Element will fallback to default titling.
+     */
+    virtual std::function<juce::String()> getMainWindowTitler() { return nullptr; }
+
+protected:
+    ContentFactory() = default;
+
+private:
+    EL_DISABLE_COPY (ContentFactory)
 };
 
 } // namespace element

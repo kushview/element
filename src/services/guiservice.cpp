@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/ui/windowdecorator.hpp>
+#include <element/ui/content.hpp>
 
 #include <element/audioengine.hpp>
 #include <element/services.hpp>
@@ -37,7 +37,7 @@
 #include "gui/PreferencesComponent.h"
 #include "gui/SystemTray.h"
 #include "gui/WindowManager.h"
-#include "gui/StandardContentComponent.h"
+#include <element/ui/standard.hpp>
 #include "gui/capslock.hpp"
 
 #include "session/commandmanager.hpp"
@@ -47,7 +47,7 @@
 namespace element {
 
 //=============================================================================
-class DefaultContentFactory : public WindowDecorator
+class DefaultContentFactory : public ContentFactory
 {
 public:
     DefaultContentFactory (Context& ctx)
@@ -56,12 +56,7 @@ public:
 
     std::unique_ptr<ContentComponent> createMainContent (const String& type) override
     {
-        if (type == "standard")
-            return std::make_unique<StandardContentComponent> (context.getServices());
-        if (type == "compact")
-            return std::make_unique<StandardContentComponent> (context.getServices());
-
-        return std::make_unique<StandardContentComponent> (context.getServices());
+        return std::make_unique<StandardContentComponent> (context);
     }
 
 private:
@@ -202,7 +197,7 @@ void GuiService::checkForegroundStatus()
 }
 
 //=============================================================================
-void GuiService::setMainWindowDecorator (std::unique_ptr<WindowDecorator> newDecorator)
+void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newDecorator)
 {
     clearContentComponent();
     if (mainWindow)
@@ -348,7 +343,7 @@ void GuiService::runDialog (const String& uri)
     }
 }
 
-void GuiService::setAppInfo (const AppInfo& info)
+void GuiService::setAboutInfo (const AboutInfo& info)
 {
     appInfo = info;
 }
@@ -957,8 +952,10 @@ void GuiService::toggleAboutScreen()
         about.reset (new AboutDialog (*this));
         if (appInfo.title.isNotEmpty())
         {
-            if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent()))
-                c->setAppInfo (appInfo);
+            if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent())) {
+                c->setAboutInfo (appInfo);
+                about->setName (TRANS("About ") + appInfo.title);
+            }
         }
     }
 

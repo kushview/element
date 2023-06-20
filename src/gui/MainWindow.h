@@ -56,7 +56,6 @@ private:
 
     void nameChanged();
     void nameChangedSession();
-    void nameChangedSingleGraph();
 };
 
 } // namespace element

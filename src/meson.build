@@ -25,14 +25,12 @@ libelement_sources = '''
 
     services/deviceservice.cpp
     services/engineservice.cpp
-    services/graphservice.cpp
     services/guiservice.cpp
     services/mappingservice.cpp
     services/oscservice.cpp
     services/presetservice.cpp
     services/sessionservice.cpp
     
-    documents/graphdocument.cpp
     documents/sessiondocument.cpp
 
     engine/ionode.cpp
@@ -93,7 +91,7 @@ libelement_sources = '''
     gui/LuaTokeniser.cpp
     gui/MainMenu.cpp
     gui/MainWindow.cpp
-    gui/NavigationConcertinaPanel.cpp
+    gui/navigation.cpp
     gui/NodeEditorFactory.cpp
     gui/NodeIOConfiguration.cpp
     gui/PatchMatrixComponent.cpp
@@ -121,7 +119,7 @@ libelement_sources = '''
     gui/SequencerComponent.cpp
     gui/SessionImportWizard.cpp
     gui/SessionTreePanel.cpp
-    gui/StandardContentComponent.cpp
+    gui/standard.cpp
     gui/SystemTray.cpp
     gui/TransportBar.cpp
     gui/TreeviewBase.cpp

@@ -25,7 +25,6 @@
 #include "services/deviceservice.hpp"
 #include "services/engineservice.hpp"
 #include <element/services/guiservice.hpp>
-#include "services/graphservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/oscservice.hpp"
 #include "services/sessionservice.hpp"
@@ -43,8 +42,15 @@
 #include "version.hpp"
 
 namespace element {
-
 using namespace juce;
+
+class ServiceManager::Impl {
+public:
+    Impl (ServiceManager& sm) : services (sm) {}
+    ServiceManager& services;
+    bool initialized { false };
+    bool active = false;
+};
 
 ServiceManager& Service::getServices() const
 {
@@ -60,28 +66,31 @@ RunMode Service::getRunMode() const { return getServices().getRunMode(); }
 ServiceManager::ServiceManager (Context& g, RunMode m)
     : world (g), runMode (m)
 {
+    impl = std::make_unique<Impl> (*this);
+    add (new GuiService (world, *this));
+    add (new DeviceService());
+    add (new EngineService());
+    add (new MappingService());
+    add (new PresetService());
+    add (new SessionService());
+    add (new OSCService());
 }
 
 ServiceManager::~ServiceManager() {}
 
 void ServiceManager::activate()
 {
-    if (services.size() <= 0)
+    if (impl->active)
+        return;
+    
+    if (! impl->initialized)
     {
-        add (new GuiService (world, *this));
-        add (new DeviceService());
-        add (new EngineService());
-        add (new MappingService());
-        add (new PresetService());
-        add (new SessionService());
-        add (new GraphService());
-        add (new OSCService());
-
         lastExportedGraph = DataPath::defaultGraphDir();
         auto& commands = getWorld().getCommandManager();
         commands.registerAllCommandsForTarget (this);
         commands.registerAllCommandsForTarget (findChild<GuiService>());
         commands.setFirstCommandTarget (this);
+        impl->initialized = true;
     }
 
     // migrate global node midi programs.
@@ -103,6 +112,8 @@ void ServiceManager::activate()
 
     for (auto* s : services)
         s->activate();
+    
+    impl->active = true;
 }
 
 void ServiceManager::deactivate()
@@ -115,6 +126,14 @@ void ServiceManager::deactivate()
 
     for (auto* s : services)
         s->deactivate();
+
+    impl->active = false;
+}
+
+void ServiceManager::launch() {
+    activate();
+    if (auto* gui = findChild<GuiService>())
+        gui->run();
 }
 
 void ServiceManager::run()
@@ -513,34 +532,6 @@ bool ServiceManager::perform (const InvocationInfo& info)
             CurrentVersion::checkAfterDelay (20, true);
             break;
 
-        case Commands::graphNew:
-            findChild<GraphService>()->newGraph();
-            break;
-        case Commands::graphOpen: {
-            FileChooser chooser ("Open Graph", lastSavedFile, "*.elg", true, false);
-            if (chooser.browseForFileToOpen())
-            {
-                findChild<GraphService>()->openGraph (chooser.getResult());
-                recentFiles.addFile (chooser.getResult());
-            }
-        }
-        break;
-        case Commands::graphSave:
-            findChild<GraphService>()->saveGraph (false);
-            break;
-        case Commands::graphSaveAs:
-            findChild<GraphService>()->saveGraph (true);
-            break;
-        case Commands::importSession: {
-            FileChooser chooser ("Import Session Graph", lastSavedFile, "*.els", true, false);
-            if (chooser.browseForFileToOpen())
-            {
-                findChild<GraphService>()->openGraph (chooser.getResult());
-                recentFiles.addFile (chooser.getResult());
-                findChild<GuiService>()->refreshMainMenu();
-            }
-        }
-        break;
 
         case Commands::recentsClear: {
             recentFiles.clear();

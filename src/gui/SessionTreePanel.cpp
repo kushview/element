@@ -19,6 +19,7 @@
 
 #include <element/script.hpp>
 #include <element/graph.hpp>
+#include <element/ui/datapathbrowser.hpp>
 
 #include "gui/views/scriptview.hpp"
 #include "services/sessionservice.hpp"
@@ -32,7 +33,7 @@
 #include "gui/views/PluginsPanelView.h"
 #include "gui/views/ScriptEditorView.h"
 #include "gui/SessionTreePanel.h"
-#include "gui/NavigationConcertinaPanel.h"
+#include <element/ui/navigation.hpp>
 
 #include "gui/ViewHelpers.h"
 #include <element/node.hpp>
@@ -178,9 +179,15 @@ public:
     {
         auto session = ViewHelpers::getSession (getOwnerView());
         auto* cc = ViewHelpers::findContentComponent (getOwnerView());
+        if (session == nullptr || cc == nullptr)
+            return;
+
         auto* gui = cc->getServices().findChild<GuiService>();
         auto* const view = getOwnerView();
-        auto* const tree = dynamic_cast<SessionTreePanel*> (view->getParentComponent());
+        auto* const tree = getSessionTreePanel();
+        if (view == nullptr || tree == nullptr)
+            return;
+
         const bool hadFocus = view && view->hasKeyboardFocus (true);
 
         SharedConnectionBlock block (tree->nodeSelectedConnection, true);
@@ -555,12 +562,14 @@ public:
         Graph graph (getNode());
         Script script = graph.findViewScript();
         if (script.valid())
+        {
             if (auto* cc = getContentComponent())
             {
                 auto view = std::make_unique<ScriptView> (cc->getGlobals(), script);
                 view->setNode (node);
                 cc->setMainView (view.release());
             }
+        }
     }
 
     void addSubItems() override
@@ -760,15 +769,27 @@ public:
     SessionTreePanel& panel;
 };
 
+//======
+class SessionTreePanel::Panel : public TreePanelBase
+{
+public:
+    Panel() {};
+    ~Panel() {};
+};
+
 //=============================================================================
 SessionTreePanel::SessionTreePanel()
-    : TreePanelBase ("session")
+    : Component ("Session Tree Pannel")
 {
+    setComponentID ("el.SessionTreePanel");
+    panel = std::make_unique<Panel>();
+    addAndMakeVisible (panel.get());
+    auto& tree = panel->tree;
     tree.setRootItemVisible (false);
     tree.setInterceptsMouseClicks (true, true);
     tree.setDefaultOpenness (true);
     tree.setMultiSelectEnabled (true);
-    setRoot (new SessionRootTreeItem (*this));
+    panel->setRoot (new SessionRootTreeItem (*this));
     data.addListener (this);
 }
 
@@ -776,24 +797,12 @@ SessionTreePanel::~SessionTreePanel()
 {
     nodeSelectedConnection.disconnect();
     data.removeListener (this);
-    setRoot (nullptr);
+    panel->setRoot (nullptr);
+    panel.reset();
 }
 
 void SessionTreePanel::refresh()
 {
-    if (rootItem)
-        rootItem->refreshSubItems();
-}
-
-void SessionTreePanel::mouseDown (const MouseEvent& ev) {}
-
-void SessionTreePanel::setSession (SessionPtr s)
-{
-    session = s;
-    data.removeListener (this);
-    data = (session != nullptr) ? session->getValueTree() : ValueTree();
-    data.addListener (this);
-
     if (auto* const gui = ViewHelpers::getGuiController (this))
     {
         if (! nodeSelectedConnection.connected())
@@ -801,8 +810,69 @@ void SessionTreePanel::setSession (SessionPtr s)
                 std::bind (&SessionTreePanel::onNodeSelected, this));
     }
 
+    if (panel->rootItem)
+        panel->rootItem->refreshSubItems();
+}
+
+void SessionTreePanel::paint (juce::Graphics& g)
+{
+    g.fillAll (juce::Colours::black);
+}
+
+void SessionTreePanel::resized()
+{
+    panel->setBounds (getLocalBounds());
+}
+
+void SessionTreePanel::mouseDown (const MouseEvent& ev) {}
+
+void SessionTreePanel::setSession (SessionPtr s)
+{
+    session = s;
+
+    if (! showingNode())
+    {
+        data.removeListener (this);
+        data = (session != nullptr) ? session->getValueTree() : ValueTree();
+        data.addListener (this);
+    }
+
     refresh();
 }
+
+void SessionTreePanel::showNode (const Node& newNode)
+{
+    if (newNode == node)
+        return;
+
+    std::clog << "[element] SessionTreePanel: showing node: " << newNode.getName().toStdString() << std::endl;
+    data.removeListener (this);
+    node = newNode;
+
+    panel->setRoot (nullptr);
+    if (node.isRootGraph())
+    {
+        panel->setRoot (new SessionRootGraphTreeItem (node));
+        data = node.getValueTree();
+        refresh();
+    }
+    else if (node.isGraph())
+    {
+        panel->setRoot (new SessionGraphTreeItem (node));
+        data = node.getValueTree();
+        refresh();
+    }
+    else
+    {
+        auto os = session;
+        session = nullptr;
+        setSession (os);
+    }
+
+    data.addListener (this);
+}
+
+bool SessionTreePanel::showingNode() const noexcept { return node.isValid(); }
 
 SessionPtr SessionTreePanel::getSession() const
 {
@@ -825,26 +895,29 @@ static TreeViewItem* findItemForNodeRecursive (TreeViewItem* item, const Node& n
 
 TreeViewItem* SessionTreePanel::findItemForNode (const Node& node) const
 {
-    if (rootItem != nullptr)
-        return findItemForNodeRecursive (rootItem.get(), node);
+    if (panel->rootItem != nullptr)
+        return findItemForNodeRecursive (panel->rootItem.get(), node);
     return nullptr;
 }
 
 void SessionTreePanel::onNodeSelected()
 {
-    if (auto* const gui = ViewHelpers::getGuiController (this))
+    if (auto* const gui = ViewHelpers::getGuiController (this)) {
+        if (showingNode() && gui->getSelectedNode() == node)
+            return;
         if (auto* const item = findItemForNode (gui->getSelectedNode()))
             item->setSelected (true, true, dontSendNotification);
+    }
 }
 
 void SessionTreePanel::selectActiveRootGraph()
 {
-    if (ignoreActiveRootGraphSelectionHandler || ! session || nullptr == rootItem)
+    if (ignoreActiveRootGraphSelectionHandler || ! session || nullptr == panel->rootItem)
         return;
     const auto activeGraph = session->getActiveGraph();
-    for (int i = 0; i < rootItem->getNumSubItems(); ++i)
+    for (int i = 0; i < panel->rootItem->getNumSubItems(); ++i)
     {
-        if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (rootItem->getSubItem (i)))
+        if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (panel->rootItem->getSubItem (i)))
         {
             if (activeGraph == item->node)
             {
@@ -875,7 +948,11 @@ void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifi
 
 static bool couldBeSessionObjects (ValueTree& parent, ValueTree& child)
 {
-    return parent.hasType (Tags::session) || (parent.hasType (Tags::graphs) && child.hasType (Tags::node)) || (parent.hasType (Tags::nodes) && child.hasType (Tags::node));
+    // clang-format off
+    return parent.hasType (Tags::session) || 
+        (parent.hasType (Tags::graphs) && child.hasType (Tags::node)) || 
+        (parent.hasType (Tags::nodes) && child.hasType (Tags::node));
+    // clang-format on
 }
 
 static void refreshSubItems (TreeItemBase* item)
@@ -896,18 +973,18 @@ static void refreshSubItems (TreeItemBase* item)
 void SessionTreePanel::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (couldBeSessionObjects (parent, child))
-        refreshSubItems (rootItem.get());
+        refreshSubItems (panel->rootItem.get());
 }
 
 void SessionTreePanel::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int indexRemovedAt)
 {
     if (couldBeSessionObjects (parent, child))
-        refreshSubItems (rootItem.get());
+        refreshSubItems (panel->rootItem.get());
 }
 
 void SessionTreePanel::valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex)
 {
-    refreshSubItems (rootItem.get());
+    refreshSubItems (panel->rootItem.get());
 }
 
 void SessionTreePanel::valueTreeParentChanged (ValueTree& tree)
@@ -920,6 +997,9 @@ void SessionTreePanel::valueTreeRedirected (ValueTree& tree)
 
 bool SessionTreePanel::keyPressed (const KeyPress& k)
 {
+    auto rootItem = panel->rootItem.get();
+    auto& tree = panel->tree;
+
     if ((k.getKeyCode() == 'A' || k.getKeyCode() == 'a') && k.getModifiers().isCommandDown())
     {
         rootItem->getSubItem (0)->setSelected (true, true, dontSendNotification);
@@ -934,7 +1014,7 @@ bool SessionTreePanel::keyPressed (const KeyPress& k)
         }
     }
 
-    return TreePanelBase::keyPressed (k);
+    return panel->keyPressed (k);
 }
 
 } // namespace element

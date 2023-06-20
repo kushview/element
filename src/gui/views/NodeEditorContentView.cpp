@@ -21,7 +21,6 @@
 
 #include <element/services.hpp>
 #include <element/services/guiservice.hpp>
-#include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"
 #include "engine/graphnode.hpp"
 #include "gui/nodes/AudioIONodeEditor.h"
@@ -270,10 +269,7 @@ void NodeEditorContentView::setSticky (bool shouldBeSticky)
 
 void NodeEditorContentView::onGraphChanged()
 {
-    auto* cc = ViewHelpers::findContentComponent (this);
-    jassert (cc);
-    auto& graphs = *cc->getServices().findChild<GraphService>();
-    setNode (graphs.getGraph().getNode (0));
+    std::clog << "NodeEditorContentView::onGraphChanged()\n";
 }
 
 void NodeEditorContentView::onSessionLoaded()
@@ -288,15 +284,11 @@ void NodeEditorContentView::stabilizeContent()
     auto session = ViewHelpers::getSession (this);
     jassert (cc && session);
     auto& gui = *cc->getServices().findChild<GuiService>();
-    auto& graphs = *cc->getServices().findChild<GraphService>();
     auto& sessions = *cc->getServices().findChild<SessionService>();
 
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
             &NodeEditorContentView::stabilizeContent, this));
-    if (! graphChangedConnection.connected())
-        graphChangedConnection = graphs.graphChanged.connect (std::bind (
-            &NodeEditorContentView::onGraphChanged, this));
     if (! sessionLoadedConnection.connected())
         sessionLoadedConnection = sessions.sessionLoaded.connect (std::bind (
             &NodeEditorContentView::onSessionLoaded, this));

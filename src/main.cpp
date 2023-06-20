@@ -31,7 +31,6 @@
 #include "scripting.hpp"
 #include "commands.hpp"
 #include "datapath.hpp"
-#include "services/graphservice.hpp"
 #include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"

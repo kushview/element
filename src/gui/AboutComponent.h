@@ -38,15 +38,15 @@ public:
     void resized() override;
     void paint (Graphics& g) override;
 
-    void setAppInfo (const AppInfo& details)
+    void setAboutInfo (const AboutInfo& details)
     {
         info = details;
-        updateAppInfo();
+        updateAboutInfo();
     }
-    AppInfo getAppInfo() const { return info; }
+    AboutInfo getAboutInfo() const { return info; }
 
 private:
-    AppInfo info;
+    AboutInfo info;
     Label titleLabel { "title", "Element" },
         versionLabel { "version" },
         copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2023 Kushview, LLC.") };
@@ -56,7 +56,7 @@ private:
     DrawableImage logo;
     TabbedComponent tabs { TabbedButtonBar::TabsAtTop };
 
-    void updateAppInfo();
+    void updateAboutInfo();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutComponent)
 };
 

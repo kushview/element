@@ -1,14 +1,18 @@
 project ('element', ['c', 'cpp' ],
-    version : '0.47.0',
+    version : '1.0.0',
     meson_version : '>= 0.58.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
-
 
 date_py = files ('tools/date.py')
 element_release_date = run_command ('python', date_py).stdout().strip()
 version_py = files ('tools/version.py')
 version_with_build = run_command ('python',
     [version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
+
+build_number = run_command ('python',
+    [version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
+git_hash = run_command ('python', [version_py] + '--hash --cwd=.'.split()).stdout().strip()
+git_short_hash = run_command ('python', [version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
 
 net_kushview      = 'net.kushview'
 installerdir      = get_option('prefix')
@@ -45,6 +49,8 @@ if not cpp.check_header ('filesystem', required : false)
         deps += cpp.find_library ('stdc++fs', required : true)
     endif
 endif
+
+subdir ('include/element')
 
 element_includes = include_directories ('include')
 

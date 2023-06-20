@@ -3,18 +3,17 @@
 #include <element/ui/grapheditor.hpp>
 #include <element/context.hpp>
 
-#include "gui/StandardContentComponent.h"
+#include <element/ui/standard.hpp>
 
 namespace element {
-class Designer::Content : public StandardContentComponent
+class Designer::Content : public StandardContent
 {
 public:
     Content (Designer& d, Context& c)
-        : StandardContentComponent (c.getServices()),
+        : StandardContent (c),
           context (c),
           designer (d)
-    {
-    }
+    { }
 
 private:
     friend class Designer;

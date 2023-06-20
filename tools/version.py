@@ -21,8 +21,11 @@ def options():
     
     parser.add_option ("--cwd", type="string", dest="cwd", default='', help="path to git repository")
 
+    parser.add_option ("--hash", action="store_true", dest="hash", default=False)
+    parser.add_option ("--short-hash", action="store_true", dest="short_hash", default=False)
+
     parser.add_option ("--build", action="store_true", dest="build", default=False)
-    parser.add_option ("--build-style", type='string', dest='build_style', default='dotted')
+    parser.add_option ("--build-style", type='string', dest='build_style', default='dashed')
     
     parser.add_option ("--ignore-dirty", action="store_true", dest="ignore_dirty", default=False,
                        help="Ignore dirty flag")
@@ -83,6 +86,14 @@ def version():
     if len(opts.cwd) > 0:
         os.chdir (opts.cwd)
 
+    if opts.short_hash:
+        print (get_hash_short())
+        return 0
+    
+    if opts.hash:
+        print (get_hash())
+        return 0
+    
     show_dirty = is_dirty() and not opts.ignore_dirty
 
     vers = opts.current_version

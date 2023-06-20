@@ -63,7 +63,7 @@ inline static String appName (const String& beforeText = String(),
     if (beforeText.isNotEmpty())
         name << beforeText;
 
-    name << EL_APP_NAME;
+    name << "Element";
 
     if (afterText.isNotEmpty())
         name << afterText;

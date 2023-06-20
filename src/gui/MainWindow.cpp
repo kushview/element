@@ -17,7 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include <element/ui/menumodels.hpp>
-#include "services/graphservice.hpp"
 #include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
 #include "gui/ContentComponent.h"
@@ -126,41 +125,6 @@ void MainWindow::nameChangedSession()
         graphName = "Untitled Graph";
 
     title << " - " << sessionName << ": " << graphName;
-    setName (title);
-}
-
-void MainWindow::nameChangedSingleGraph()
-{
-    String title = Util::appName();
-    String sessionName, graphName;
-    if (auto session = world.getSession())
-    {
-        sessionName = session->getName().trim();
-        graphName = session->getCurrentGraph().getName().trim();
-        if (graphName.isNotEmpty())
-            title << " - " << graphName;
-    }
-
-    if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
-    {
-        if (auto* const gc = getServices().findChild<GraphService>())
-        {
-            const auto file = gc->getGraphFile();
-
-            if (graphName.isEmpty())
-            {
-                if (file.existsAsFile())
-                    title << " - " << file.getFileNameWithoutExtension();
-            }
-            else
-            {
-                // SAVEME: Shows file name if title isn't empty and file exists
-                // if (file.existsAsFile())
-                //     title << " (" << file.getFileName() << ")";
-            }
-        }
-    }
-
     setName (title);
 }
 

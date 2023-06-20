@@ -24,11 +24,10 @@
 #include <element/node.hpp>
 #include <element/pluginmanager.hpp>
 
-#include "services/graphservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "gui/widgets/MidiBlinker.h"
-#include "gui/StandardContentComponent.h"
+#include <element/ui/standard.hpp>
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
@@ -438,8 +437,9 @@ struct ContentComponent::Tooltips
     ScopedPointer<TooltipWindow> tooltipWindow;
 };
 
-ContentComponent::ContentComponent (ServiceManager& ctl_)
-    : controller (ctl_)
+ContentComponent::ContentComponent (Context& ctl_)
+    : _context (ctl_),
+      controller (ctl_.getServices())
 {
     setOpaque (true);
 
@@ -614,8 +614,8 @@ void ContentComponent::refreshStatusBar()
     statusBar->updateLabels();
 }
 
-Context& ContentComponent::getGlobals() { return controller.getGlobals(); }
-SessionPtr ContentComponent::getSession() { return getGlobals().getSession(); }
+Context& ContentComponent::getGlobals() { return _context; }
+SessionPtr ContentComponent::getSession() { return _context.getSession(); }
 String ContentComponent::getMainViewName() const { return String(); }
 String ContentComponent::getAccessoryViewName() const { return String(); }
 int ContentComponent::getNavSize() { return 220; }

@@ -18,11 +18,8 @@
 
 #pragma once
 
-#include "ElementApp.h"
-
-#ifndef EL_GIT_VERSION
-#define EL_GIT_VERSION ""
-#endif
+#include <element/version.h>
+#include <element/juce/events.hpp>
 
 namespace element {
 
@@ -33,24 +30,24 @@ struct Version
     ~Version();
 
     /** Returns the version string with git hash appended */
-    inline static String withGitHash()
+    inline static juce::String withGitHash()
     {
-        String result = ProjectInfo::versionString;
-        if (strlen (EL_GIT_VERSION) > 0)
-            result << "-" << EL_GIT_VERSION;
+        juce::String result (EL_VERSION_STRING);
+        if (strlen (EL_GIT_SHORT_HASH) > 0)
+            result << "-" << EL_GIT_SHORT_HASH;
         return result;
     }
 
     /** Split a version string into an array of segments */
-    static StringArray segments (const String& versionString);
+    static juce::StringArray segments (const juce::String& versionString);
 
     /** Converts version segments into an integer, good for version comparison */
-    static int asHexInteger (const String& versionString);
+    static int asHexInteger (const juce::String& versionString);
 };
 
-class CurrentVersion : private Timer,
-                       private Thread,
-                       public DeletedAtShutdown
+class CurrentVersion : private juce::Timer,
+                       private juce::Thread,
+                       public juce::DeletedAtShutdown
 {
 public:
     CurrentVersion();
@@ -70,14 +67,14 @@ public:
     bool isCancelled() const { return cancelled.get(); }
 
 private:
-    String permalink, version;
-    Atomic<bool> cancelled = false;
+    juce::String permalink, version;
+    juce::Atomic<bool> cancelled = false;
     bool hasChecked;
     bool shouldShowUpToDateMessage;
     bool result = false;
     int timeout = 0;
 
-    friend class Timer;
+    friend class juce::Timer;
     void timerCallback() override;
     void run() override;
 };
