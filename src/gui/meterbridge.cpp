@@ -121,7 +121,7 @@ public:
     ~Impl()
     {
         jassert (ctx != nullptr);
-        ctx->getDeviceManager().removeChangeListener (this);
+        ctx->devices().removeChangeListener (this);
     }
 
     int sectionPadding() { return 6; }
@@ -263,8 +263,8 @@ public:
     void init (Context& context)
     {
         ctx = &context;
-        engine = context.getAudioEngine();
-        context.getDeviceManager().addChangeListener (this);
+        engine = context.audio();
+        context.devices().addChangeListener (this);
         refresh();
     }
 
@@ -392,11 +392,11 @@ MeterBridgeView::MeterBridgeView()
 
 MeterBridgeView::~MeterBridgeView() {}
 
-void MeterBridgeView::initializeView (ServiceManager& sm)
+void MeterBridgeView::initializeView (Services& sm)
 {
     if (bridge == nullptr)
     {
-        bridge = std::make_unique<MeterBridge> (sm.getWorld());
+        bridge = std::make_unique<MeterBridge> (sm.context());
         addAndMakeVisible (bridge.get());
         bridge->setInterceptsMouseClicks (false, true);
     }

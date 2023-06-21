@@ -19,7 +19,7 @@ class Context;
 class LookAndFeel;
 class MainWindow;
 class PluginWindow;
-class ServiceManager;
+class Services;
 class WindowManager;
 
 class GuiService : public Service,
@@ -29,7 +29,7 @@ public:
     Signal<void()> nodeSelected;
     Signal<void()> sigRefreshed;
 
-    GuiService (Context& w, ServiceManager& a);
+    GuiService (Context& w, Services& a);
     ~GuiService();
 
     void activate() override;
@@ -42,7 +42,7 @@ public:
 
     void checkUpdates();
 
-    ServiceManager& getServices() const { return controller; }
+    Services& services() const { return controller; }
     KeyListener* getKeyListener() const;
 
     void closeAllWindows();
@@ -133,7 +133,7 @@ private:
     class UpdateManager;
     std::unique_ptr<UpdateManager> updates;
 
-    ServiceManager& controller;
+    Services& controller;
     Context& world;
     SessionRef sessionRef;
     OwnedArray<PluginWindow> pluginWindows;

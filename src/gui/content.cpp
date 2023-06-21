@@ -121,7 +121,7 @@ public:
     {
         session = s;
         auto& settings (ViewHelpers::getGlobals (this)->getSettings());
-        auto engine (ViewHelpers::getGlobals (this)->getAudioEngine());
+        auto engine (ViewHelpers::getGlobals (this)->audio());
 
         if (midiIOMonitor == nullptr)
         {
@@ -234,7 +234,7 @@ public:
         {
             PopupMenu menu;
             if (auto* cc = ViewHelpers::findContentComponent (this))
-                MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
+                MainMenu::buildPluginMainMenu (cc->context().getCommandManager(), menu);
             auto result = menu.show();
             if (99999 == result)
             {
@@ -243,7 +243,7 @@ public:
         }
         else if (btn == &mapButton)
         {
-            if (auto* mapping = owner.getServices().findChild<MappingService>())
+            if (auto* mapping = owner.services().find<MappingService>())
             {
                 mapping->learn (! mapButton.getToggleState());
                 mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
@@ -257,7 +257,7 @@ public:
 
     void timerCallback() override
     {
-        if (auto* mapping = owner.getServices().findChild<MappingService>())
+        if (auto* mapping = owner.services().find<MappingService>())
         {
             if (! mapping->isLearning())
             {
@@ -281,7 +281,7 @@ private:
     Array<SignalConnection> connections;
     bool isPluginVersion() const
     {
-        return owner.getServices().getRunMode() == RunMode::Plugin;
+        return owner.services().getRunMode() == RunMode::Plugin;
     }
 };
 
@@ -292,13 +292,13 @@ class ContentComponent::StatusBar : public Component,
 public:
     StatusBar (Context& g)
         : world (g),
-          devices (world.getDeviceManager()),
-          plugins (world.getPluginManager())
+          devices (world.devices()),
+          plugins (world.plugins())
     {
         sampleRate.addListener (this);
         streamingStatus.addListener (this);
         if (isPluginVersion())
-            latencySamplesChangedConnection = world.getAudioEngine()->sampleLatencyChanged.connect (
+            latencySamplesChangedConnection = world.audio()->sampleLatencyChanged.connect (
                 std::bind (&StatusBar::updateLabels, this));
 
         addAndMakeVisible (sampleRateLabel);
@@ -360,7 +360,7 @@ public:
 
     void updateLabels()
     {
-        auto engine = world.getAudioEngine();
+        auto engine = world.audio();
         if (isPluginVersion())
         {
             String text = "Latency: ";
@@ -426,7 +426,7 @@ private:
     bool isPluginVersion()
     {
         if (auto* cc = ViewHelpers::findContentComponent (this))
-            return cc->getServices().getRunMode() == RunMode::Plugin;
+            return cc->services().getRunMode() == RunMode::Plugin;
         return false;
     }
 };
@@ -439,20 +439,20 @@ struct ContentComponent::Tooltips
 
 ContentComponent::ContentComponent (Context& ctl_)
     : _context (ctl_),
-      controller (ctl_.getServices())
+      controller (ctl_.services())
 {
     setOpaque (true);
 
-    addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
+    addAndMakeVisible (statusBar = new StatusBar (context()));
     statusBarVisible = true;
     statusBarSize = 22;
 
     addAndMakeVisible (toolBar = new Toolbar (*this));
-    toolBar->setSession (getGlobals().getSession());
+    toolBar->setSession (context().session());
     toolBarVisible = true;
     toolBarSize = 32;
 
-    const Node node (getGlobals().getSession()->getCurrentGraph());
+    const Node node (context().session()->getCurrentGraph());
     setCurrentNode (node);
 
     resized();
@@ -499,7 +499,7 @@ void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
     }
     else if (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin")
     {
-        auto& list (getGlobals().getPluginManager().getKnownPlugins());
+        auto& list (context().plugins().getKnownPlugins());
         if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
@@ -548,7 +548,7 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
         {
             if (true)
             {
-                if (auto* sess = controller.findChild<SessionService>())
+                if (auto* sess = controller.find<SessionService>())
                     sess->importGraph (file);
             }
             else
@@ -596,7 +596,7 @@ void ContentComponent::setToolbarVisible (bool visible)
 
 void ContentComponent::refreshToolbar()
 {
-    toolBar->setSession (getGlobals().getSession());
+    toolBar->setSession (context().session());
 }
 
 void ContentComponent::setStatusBarVisible (bool vis)
@@ -614,8 +614,8 @@ void ContentComponent::refreshStatusBar()
     statusBar->updateLabels();
 }
 
-Context& ContentComponent::getGlobals() { return _context; }
-SessionPtr ContentComponent::getSession() { return _context.getSession(); }
+Context& ContentComponent::context() { return _context; }
+SessionPtr ContentComponent::session() { return _context.session(); }
 String ContentComponent::getMainViewName() const { return String(); }
 String ContentComponent::getAccessoryViewName() const { return String(); }
 int ContentComponent::getNavSize() { return 220; }

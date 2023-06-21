@@ -53,7 +53,7 @@ public:
 
         beginTest ("Processor Channels");
         std::unique_ptr<MidiDeviceProcessor> proc;
-        proc.reset (new MidiDeviceProcessor (true, getWorld().getMidiEngine()));
+        proc.reset (new MidiDeviceProcessor (true, context().midi()));
         expect (proc->getTotalNumInputChannels() == 0 &&
                 proc->getTotalNumOutputChannels() == 0 &&
                 proc->acceptsMidi() == false &&
@@ -69,7 +69,7 @@ public:
         beginTest ("Add to Graph Controller");
         initializeWorld();
         std::unique_ptr<GraphManager> controller;
-        controller.reset (new GraphManager (*graph, getWorld().getPluginManager()));
+        controller.reset (new GraphManager (*graph, context().plugins()));
         const auto graphFile = getDataDir().getChildFile ("Graphs/IAC Bus 1 Graph.elg");
         jassert(graphFile.existsAsFile());
         Node model (Node::parse (graphFile), false);

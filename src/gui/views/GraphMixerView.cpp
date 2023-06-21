@@ -52,7 +52,7 @@ public:
     void selectInGuiController()
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
-            if (auto* const gui = cc->getServices().findChild<GuiService>())
+            if (auto* const gui = cc->services().find<GuiService>())
                 if (getNode() != gui->getSelectedNode())
                     gui->selectNode (getNode());
     }
@@ -229,7 +229,7 @@ public:
     void refreshNodes()
     {
         nodes.clearQuick();
-        const auto graph = gui.getWorld().getSession()->getActiveGraph();
+        const auto graph = gui.context().session()->getActiveGraph();
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             const auto node = graph.getNode (i);
@@ -346,9 +346,9 @@ void GraphMixerView::stabilizeContent()
         content->stabilize();
 }
 
-void GraphMixerView::initializeView (ServiceManager& app)
+void GraphMixerView::initializeView (Services& app)
 {
-    content.reset (new Content (*this, *app.findChild<GuiService>(), app.getGlobals().getSession()));
+    content.reset (new Content (*this, *app.find<GuiService>(), app.context().session()));
     addAndMakeVisible (content.get());
     content->stabilize();
 }

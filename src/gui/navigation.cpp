@@ -346,7 +346,7 @@ void NavigationConcertinaPanel::updateContent()
 
     if (! namesHidden.contains ("Plugins"))
     {
-        auto* pv = new PluginsPanelView (ViewHelpers::getGlobals (this)->getPluginManager());
+        auto* pv = new PluginsPanelView (ViewHelpers::getGlobals (this)->plugins());
         pv->setName ("Plugins");
         pv->setComponentID ("Plugins");
         addPanelInternal (-1, pv, "Plugins", 0);

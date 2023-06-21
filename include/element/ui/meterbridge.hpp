@@ -41,7 +41,7 @@ class MeterBridgeView : public View {
 public:
     MeterBridgeView();
     ~MeterBridgeView();
-    void initializeView (ServiceManager&) override;
+    void initializeView (Services&) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent&) override;
 

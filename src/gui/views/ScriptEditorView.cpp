@@ -138,7 +138,7 @@ void BaseScriptEditorView::reload()
     code.setSavePoint();
 }
 
-void BaseScriptEditorView::initializeView (ServiceManager&)
+void BaseScriptEditorView::initializeView (Services&)
 {
     reload();
 }

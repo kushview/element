@@ -208,7 +208,7 @@ public:
         NodePopupMenu menu (node);
 
         if (world)
-            menu.addPresetsMenu (world->getPresetManager());
+            menu.addPresetsMenu (world->presets());
 
         const int result = menu.show();
         if (auto* message = menu.createMessageForResultCode (result))
@@ -226,7 +226,7 @@ public:
         NodePopupMenu menu (n, p);
 
         if (world)
-            menu.addPresetsMenu (world->getPresetManager());
+            menu.addPresetsMenu (world->presets());
         const int result = menu.show();
         if (auto* message = menu.createMessageForResultCode (result))
         {
@@ -873,7 +873,7 @@ void ConnectionGrid::itemDropped (const SourceDetails& sd)
 
 void ConnectionGrid::didBecomeActive()
 {
-    auto session = ViewHelpers::findContentComponent (this)->getSession();
+    auto session = ViewHelpers::findContentComponent (this)->session();
     setNode (session->getCurrentGraph());
 }
 } // namespace element

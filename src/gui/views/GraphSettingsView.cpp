@@ -447,7 +447,7 @@ void GraphSettingsView::stabilizeContent()
 {
     if (auto* const world = ViewHelpers::getGlobals (this))
     {
-        props->setNode (world->getSession()->getCurrentGraph());
+        props->setNode (world->session()->getCurrentGraph());
     }
 
     if (auto session = ViewHelpers::getSession (this))

@@ -54,14 +54,14 @@ SessionService::~SessionService() {}
 
 void SessionService::activate()
 {
-    currentSession = getWorld().getSession();
+    currentSession = context().session();
     document.reset (new SessionDocument (currentSession));
     changeResetter.reset (new ChangeResetter (*this));
 }
 
 void SessionService::deactivate()
 {
-    auto& world = getWorld();
+    auto& world = context();
     auto& settings (world.getSettings());
     auto* props = settings.getUserSettings();
 
@@ -81,12 +81,12 @@ void SessionService::deactivate()
 
 void SessionService::openDefaultSession()
 {
-    if (auto* gc = findSibling<GuiService>())
+    if (auto* gc = sibling<GuiService>())
         gc->closeAllPluginWindows();
 
     loadNewSessionData();
     refreshOtherControllers();
-    findSibling<GuiService>()->stabilizeContent();
+    sibling<GuiService>()->stabilizeContent();
     resetChanges (true);
 }
 
@@ -106,7 +106,7 @@ void SessionService::openFile (const File& file)
                 auto nodeRef = tree;
                 nodeRef.setProperty (Tags::uuid, Uuid().toString(), nullptr);
             });
-            if (auto* ec = findSibling<EngineService>())
+            if (auto* ec = sibling<EngineService>())
                 ec->addGraph (model);
         }
     }
@@ -118,7 +118,7 @@ void SessionService::openFile (const File& file)
 
         if (result.wasOk())
         {
-            auto& gui = *findSibling<GuiService>();
+            auto& gui = *sibling<GuiService>();
             gui.closeAllPluginWindows();
             refreshOtherControllers();
 
@@ -128,7 +128,7 @@ void SessionService::openFile (const File& file)
                 cc->applySessionState (ui.getProperty ("content").toString());
             }
 
-            findSibling<GuiService>()->stabilizeContent();
+            sibling<GuiService>()->stabilizeContent();
             resetChanges();
         }
 
@@ -141,7 +141,7 @@ void SessionService::openFile (const File& file)
 
     if (didSomething)
     {
-        if (auto* gc = findSibling<GuiService>())
+        if (auto* gc = sibling<GuiService>())
             gc->stabilizeContent();
         changeResetter->triggerAsyncUpdate();
     }
@@ -184,7 +184,7 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
     jassert (document && currentSession);
     auto result = FileBasedDocument::userCancelledSave;
 
-    auto& gui = *findSibling<GuiService>();
+    auto& gui = *sibling<GuiService>();
 
     if (auto* cc = gui.getContentComponent())
     {
@@ -212,11 +212,11 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
         currentSession->dispatchPendingMessages();
         document->setChangedFlag (false);
         jassert (! hasSessionChanged());
-        if (auto* us = getWorld().getSettings().getUserSettings())
+        if (auto* us = context().getSettings().getUserSettings())
             us->setValue (Settings::lastSessionKey, document->getFile().getFullPathName());
         if (saveAs)
         {
-            getServices().addRecentFile (document->getFile());
+            services().addRecentFile (document->getFile());
             currentSession->getValueTree().setProperty (Tags::name,
                                                         document->getFile().getFileNameWithoutExtension(),
                                                         nullptr);
@@ -238,10 +238,10 @@ void SessionService::newSession()
 
     if (res == 1 || res == 2)
     {
-        findSibling<GuiService>()->closeAllPluginWindows();
+        sibling<GuiService>()->closeAllPluginWindows();
         loadNewSessionData();
         refreshOtherControllers();
-        findSibling<GuiService>()->stabilizeContent();
+        sibling<GuiService>()->stabilizeContent();
         resetChanges (true);
     }
 }
@@ -249,7 +249,7 @@ void SessionService::newSession()
 void SessionService::loadNewSessionData()
 {
     currentSession->clear();
-    const auto file = getWorld().getSettings().getDefaultNewSessionFile();
+    const auto file = context().getSettings().getDefaultNewSessionFile();
     bool wasLoaded = false;
 
     if (file.existsAsFile())
@@ -271,10 +271,10 @@ void SessionService::loadNewSessionData()
 
 void SessionService::refreshOtherControllers()
 {
-    findSibling<EngineService>()->sessionReloaded();
-    findSibling<DeviceService>()->refresh();
-    findSibling<MappingService>()->learn (false);
-    findSibling<PresetService>()->refresh();
+    sibling<EngineService>()->sessionReloaded();
+    sibling<DeviceService>()->refresh();
+    sibling<MappingService>()->learn (false);
+    sibling<PresetService>()->refresh();
     sessionLoaded();
 }
 

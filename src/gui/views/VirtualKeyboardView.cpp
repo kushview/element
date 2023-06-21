@@ -124,7 +124,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     midiProgram.setTextBoxStyle (Slider::TextBoxLeft, false, 34, midiProgram.getTextBoxHeight());
     midiProgram.onValueChange = [this]() {
         auto* const world = ViewHelpers::getGlobals (this);
-        AudioEnginePtr engine = world != nullptr ? world->getAudioEngine() : nullptr;
+        AudioEnginePtr engine = world != nullptr ? world->audio() : nullptr;
         if (! engine)
             return;
         auto msg = MidiMessage::programChange (keyboard->getMidiChannel(),
@@ -140,7 +140,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     sustain.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
     sustain.onClick = [this]() {
         auto* const world = ViewHelpers::getGlobals (this);
-        AudioEnginePtr engine = world != nullptr ? world->getAudioEngine() : nullptr;
+        AudioEnginePtr engine = world != nullptr ? world->audio() : nullptr;
         if (! engine)
             return;
         engine->addMidiMessage (MidiMessage::controllerEvent (
@@ -155,7 +155,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     hold.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
     hold.onClick = [this]() {
         auto* const world = ViewHelpers::getGlobals (this);
-        AudioEnginePtr engine = world != nullptr ? world->getAudioEngine() : nullptr;
+        AudioEnginePtr engine = world != nullptr ? world->audio() : nullptr;
         if (! engine)
             return;
         engine->addMidiMessage (MidiMessage::controllerEvent (

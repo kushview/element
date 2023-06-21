@@ -129,7 +129,7 @@ void GraphEditorView::willBeRemoved()
     auto* world = ViewHelpers::getGlobals (this);
     jassert (world); // something went majorly wrong...
     if (world)
-        world->getMidiEngine().removeChangeListener (this);
+        world->midi().removeChangeListener (this);
     saveSettings();
     graph.setNode (Node());
 }
@@ -151,10 +151,10 @@ void GraphEditorView::stabilizeContent()
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
         {
-            auto& gui = *cc->getServices().findChild<GuiService>();
+            auto& gui = *cc->services().find<GuiService>();
             nodeSelectedConnection = gui.nodeSelected.connect (
                 std::bind (&GraphEditorView::onNodeSelected, this));
-            auto& eng = *cc->getServices().findChild<EngineService>();
+            auto& eng = *cc->services().find<EngineService>();
             nodeRemovedConnection = eng.nodeRemoved.connect (
                 std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
         }
@@ -177,7 +177,7 @@ void GraphEditorView::didBecomeActive()
 {
     auto* world = ViewHelpers::getGlobals (this);
     jassert (world); // something went majorly wrong...
-    world->getMidiEngine().addChangeListener (this);
+    world->midi().addChangeListener (this);
     stabilizeContent();
     restoreSettings();
     graph.updateComponents();
@@ -241,8 +241,8 @@ void GraphEditorView::onNodeSelected()
 {
     if (auto* const cc = ViewHelpers::findContentComponent (this))
     {
-        auto session = cc->getSession();
-        auto& gui = *cc->getServices().findChild<GuiService>();
+        auto session = cc->session();
+        auto& gui = *cc->services().find<GuiService>();
         const auto selected = gui.getSelectedNode();
         if (selected.descendsFrom (getGraph()))
         {

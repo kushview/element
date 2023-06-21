@@ -40,7 +40,7 @@
 namespace element {
 
 MainMenu::MainMenu (MainWindow& parent, CommandManager& c)
-    : owner (parent), world (parent.getWorld()), cmd (c) {}
+    : owner (parent), world (parent.context()), cmd (c) {}
 
 MainMenu::~MainMenu()
 {
@@ -116,8 +116,8 @@ ContentComponent* MainMenu::getContentComponent()
 
 void MainMenu::menuItemSelected (int index, int menu)
 {
-    auto session = world.getSession();
-    auto engine = world.getAudioEngine();
+    auto session = world.session();
+    auto engine = world.audio();
 
     if (index == 6000 && menu == Help)
     {
@@ -180,23 +180,23 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 2222)
     {
-        auto& app = owner.getServices();
-        DBG ("has changed: " << (int) app.findChild<SessionService>()->hasSessionChanged());
+        auto& app = owner.services();
+        DBG ("has changed: " << (int) app.find<SessionService>()->hasSessionChanged());
     }
     else if (index == 3333)
     {
-        auto& app = owner.getServices();
-        if (auto* mapping = app.findChild<MappingService>())
+        auto& app = owner.services();
+        if (auto* mapping = app.find<MappingService>())
             mapping->learn (true);
     }
     else if (index == 4444)
     {
         if (session)
             session->cleanOrphanControllerMaps();
-        auto& app = owner.getServices();
-        if (auto* devices = app.findChild<DeviceService>())
+        auto& app = owner.services();
+        if (auto* devices = app.find<DeviceService>())
             devices->refresh();
-        if (auto* gui = app.findChild<GuiService>())
+        if (auto* gui = app.find<GuiService>())
             gui->stabilizeContent();
     }
     else if (index == 5555)
@@ -239,8 +239,8 @@ void MainMenu::menuItemSelected (int index, int menu)
     if (menu == File && index >= recentMenuOffset)
     {
         const int fileIdx = index - recentMenuOffset;
-        class File f = owner.getServices().getRecentlyOpenedFilesList().getFile (fileIdx);
-        owner.getServices().findChild<SessionService>()->openFile (f);
+        class File f = owner.services().getRecentlyOpenedFilesList().getFile (fileIdx);
+        owner.services().find<SessionService>()->openFile (f);
     }
 }
 
@@ -249,7 +249,7 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
     if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
     {
         PopupMenu recents;
-        auto& app (cc->getServices());
+        auto& app (cc->services());
         auto& list (app.getRecentlyOpenedFilesList());
         if (list.getNumFiles() > 0)
         {

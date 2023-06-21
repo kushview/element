@@ -65,7 +65,7 @@ NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c);
 /** Invoke a command directly */
 bool invokeDirectly (Component* c, const int commandID, bool async);
 
-/** Post a message to ServiceManager
+/** Post a message to Services
  
     This works by finding the ContentComponent and letting it handle message posting.
     If the content component wasn't found, then the passed in Message will be deleted
@@ -93,7 +93,7 @@ public:
     virtual ~ViewHelperMixin() {}
 
     inline ContentComponent* getContentComponent() const { return ViewHelpers::findContentComponent (componentCast()); }
-    inline SessionPtr getSession() const { return ViewHelpers::getSession (componentCast()); }
+    inline SessionPtr session() const { return ViewHelpers::getSession (componentCast()); }
     inline void postMessage (Message* message) { return ViewHelpers::postMessageFor (componentCast(), message); }
 
     void connectPorts (const Port& src, const Port& dst);

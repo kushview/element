@@ -26,7 +26,7 @@ public:
     void initialise() override
     {
         initializeWorld();
-        session = getWorld().getSession();
+        session = context().session();
     }
 
     void shutdown() override
@@ -40,7 +40,7 @@ public:
         beginTest ("not flagged changed after session open and save");
         const auto sessionFile = getDataDir().getChildFile ("Sessions/Default.els");
         expect (sessionFile.existsAsFile());
-        auto* const controller = getServices().findChild<SessionService>();
+        auto* const controller = services().find<SessionService>();
         controller->openFile (sessionFile);
         runDispatchLoop (40);
         expect (! controller->hasSessionChanged());

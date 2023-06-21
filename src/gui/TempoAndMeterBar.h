@@ -120,8 +120,8 @@ public:
         {
             if (auto* cc = ViewHelpers::findContentComponent (this))
             {
-                session = cc->getGlobals().getSession();
-                engine = cc->getGlobals().getAudioEngine();
+                session = cc->context().session();
+                engine = cc->context().audio();
                 if (engine)
                     monitor = engine->getTransportMonitor();
             }
@@ -176,7 +176,7 @@ private:
             // MIDI clock doesn't change the meter, only disable user
             // interaction in the plugin.
             if (auto* cc = ViewHelpers::findContentComponent (this))
-                if (cc->getServices().getRunMode() == RunMode::Plugin)
+                if (cc->services().getRunMode() == RunMode::Plugin)
                     meter->setEnabled (false);
         }
         else

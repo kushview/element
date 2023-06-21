@@ -159,7 +159,7 @@ public:
             menu.addSeparator();
             menu.addOptionsSubmenu();
             if (world)
-                menu.addPresetsMenu (world->getPresetManager());
+                menu.addPresetsMenu (world->presets());
             menu.show (0, 0, 0, 0, callback);
         }
         else if (button == &onTopButton)
@@ -245,7 +245,7 @@ void PluginWindow::DelayedNodeFocus::timerCallback()
     {
         auto node = window.getNode();
         if (node.isValid())
-            if (auto* const gui = cc->getServices().findChild<GuiService>())
+            if (auto* const gui = cc->services().find<GuiService>())
                 gui->selectNode (node);
     }
 }
@@ -297,7 +297,7 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
 
     setResizable (windowResize, useResizeHandle);
 
-    const bool defaultOnTop = g.getWorld().getSettings().pluginWindowsOnTop();
+    const bool defaultOnTop = g.context().getSettings().pluginWindowsOnTop();
     setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, defaultOnTop));
 
     auto* const content = new PluginWindowContent (ui, node);

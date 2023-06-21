@@ -40,14 +40,14 @@ public:
 
     int getNumRows() override
     {
-        if (auto session = wizard.getSession())
+        if (auto session = wizard.session())
             return session->getNumGraphs();
         return 0;
     }
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
     {
-        auto session = wizard.getSession();
+        auto session = wizard.session();
         if (session == nullptr)
             return;
         const auto graph (session->getGraph (rowNumber));
@@ -56,7 +56,7 @@ public:
 
     Node getSelectedGraph()
     {
-        auto session = wizard.getSession();
+        auto session = wizard.session();
         if (session == nullptr)
             return Node();
         return session->getGraph (getSelectedRow());
@@ -180,15 +180,15 @@ void SessionImportWizard::loadSession (const File& file)
 
     if (newSession != nullptr && loaded)
     {
-        session = newSession;
+        _session = newSession;
         content->graphsList.updateContent();
         content->graphsList.selectRow (0);
     }
 }
 
-SessionPtr SessionImportWizard::getSession()
+SessionPtr SessionImportWizard::session()
 {
-    return session;
+    return _session;
 }
 
 void SessionImportWizard::paint (Graphics& g)

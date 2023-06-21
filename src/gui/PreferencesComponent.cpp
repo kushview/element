@@ -204,7 +204,7 @@ private:
 
     void requestServerUpdate()
     {
-        if (auto* const osc = gui.findSibling<OSCService>())
+        if (auto* const osc = gui.sibling<OSCService>())
             osc->refreshWithSettings (true);
     }
 
@@ -223,7 +223,7 @@ class PluginSettingsComponent : public SettingsPage,
 {
 public:
     PluginSettingsComponent (Context& w)
-        : plugins (w.getPluginManager()),
+        : plugins (w.plugins()),
           settings (w.getSettings())
 
     {
@@ -351,7 +351,7 @@ public:
                               "None"), //const String& textWhenNothingSelected)
 
           settings (world.getSettings()),
-          engine (world.getAudioEngine()),
+          engine (world.audio()),
           gui (g)
     {
         addAndMakeVisible (clockSourceLabel);
@@ -724,9 +724,9 @@ class MidiSettingsPage : public SettingsPage,
 {
 public:
     MidiSettingsPage (Context& g)
-        : devices (g.getDeviceManager()),
+        : devices (g.devices()),
           settings (g.getSettings()),
-          midi (g.getMidiEngine()),
+          midi (g.midi()),
           world (g)
     {
         addAndMakeVisible (midiOutputLabel);
@@ -751,7 +751,7 @@ public:
         midiOutLatency.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
         midiOutLatency.onValueChange = [this]() {
             world.getSettings().setMidiOutLatency (midiOutLatency.getValue());
-            if (auto e = world.getAudioEngine())
+            if (auto e = world.audio())
                 e->applySettings (world.getSettings());
         };
 #if JUCE_WINDOWS
@@ -832,14 +832,14 @@ public:
         {
             settings.setGenerateMidiClock (generateClock.getToggleState());
             generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
-            if (auto engine = world.getAudioEngine())
+            if (auto engine = world.audio())
                 engine->applySettings (settings);
         }
         else if (button == &sendClockToInput)
         {
             settings.setSendMidiClockToInput (sendClockToInput.getToggleState());
             sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
-            if (auto engine = world.getAudioEngine())
+            if (auto engine = world.audio())
                 engine->applySettings (settings);
         }
     }
@@ -1109,7 +1109,7 @@ Component* PreferencesComponent::createPageForName (const String& name)
     }
     else if (name == EL_AUDIO_SETTINGS_NAME)
     {
-        return new AudioSettingsComponent (world.getDeviceManager());
+        return new AudioSettingsComponent (world.devices());
     }
     else if (name == EL_PLUGINS_PREFERENCE_NAME)
     {

@@ -79,7 +79,7 @@ public:
     DefaultBlockFactory (GraphEditorComponent& e)
         : editor (e) {}
 
-    BlockComponent* createBlockComponent (ServiceManager& app, const Node& node) override
+    BlockComponent* createBlockComponent (Services& app, const Node& node) override
     {
         ignoreUnused (app);
         auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
@@ -1001,7 +1001,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
 
     if (const auto* a = details.description.getArray())
     {
-        auto& plugs (ViewHelpers::getGlobals (this)->getPluginManager());
+        auto& plugs (ViewHelpers::getGlobals (this)->plugins());
 
         if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString (a->getUnchecked (1).toString()))
         {
@@ -1145,7 +1145,7 @@ void GraphEditorComponent::selectNode (const Node& nodeToSelect)
             updateSelection();
             if (auto* cc = ViewHelpers::findContentComponent (this))
             {
-                auto* gui = cc->getServices().findChild<GuiService>();
+                auto* gui = cc->services().find<GuiService>();
                 if (gui->getSelectedNode() != nodeToSelect)
                     gui->selectNode (nodeToSelect);
             }
@@ -1212,7 +1212,7 @@ void GraphEditorComponent::updateSelection()
 BlockComponent* GraphEditorComponent::createBlock (const Node& node)
 {
     if (auto* cc = ViewHelpers::findContentComponent (this))
-        return factory->createBlockComponent (cc->getServices(), node);
+        return factory->createBlockComponent (cc->services(), node);
     jassertfalse;
     return nullptr;
 }

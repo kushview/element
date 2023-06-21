@@ -31,7 +31,7 @@ public:
 
     void resized() override;
     void stabilizeContent() override;
-    void initializeView (ServiceManager&) override;
+    void initializeView (Services&) override;
 
 private:
     class Content;

@@ -27,14 +27,14 @@ namespace element {
 class AddPluginAction : public UndoableAction
 {
 public:
-    AddPluginAction (ServiceManager& _app, const AddPluginMessage& msg)
+    AddPluginAction (Services& _app, const AddPluginMessage& msg)
         : app (_app), graph (msg.graph), description (msg.description), builder (msg.builder), verified (msg.verified) {}
     ~AddPluginAction() noexcept {}
 
     bool perform() override
     {
         addedNode = Node();
-        if (auto* ec = app.findChild<EngineService>())
+        if (auto* ec = app.find<EngineService>())
             if (graph.isGraph())
                 addedNode = addPlugin (*ec);
         return addedNode.isValid();
@@ -47,14 +47,14 @@ public:
         if (! havePosition)
             addedNode.getRelativePosition (x, y);
         havePosition = true;
-        if (auto* ec = app.findChild<EngineService>())
+        if (auto* ec = app.find<EngineService>())
             ec->removeNode (addedNode);
         addedNode = Node();
         return true;
     }
 
 private:
-    ServiceManager& app;
+    Services& app;
     const Node graph;
     const PluginDescription description;
     const ConnectionBuilder builder;
@@ -65,7 +65,7 @@ private:
 
     Node addPlugin (EngineService& ec)
     {
-        auto node = app.getWorld().getPluginManager().getDefaultNode (description);
+        auto node = app.context().plugins().getDefaultNode (description);
         if (! node.isValid())
             return ec.addPlugin (graph, description, builder, verified);
         return ec.addNode (node, graph, builder);
@@ -75,7 +75,7 @@ private:
 class RemoveNodeAction : public UndoableAction
 {
 public:
-    explicit RemoveNodeAction (ServiceManager& a, const Node& node)
+    explicit RemoveNodeAction (Services& a, const Node& node)
         : app (a), targetGraph (node.getParentGraph()), nodeUuid (node.getUuid())
     {
         node.getArcs (arcs);
@@ -88,14 +88,14 @@ public:
 
     bool perform() override
     {
-        auto& ec = *app.findChild<EngineService>();
+        auto& ec = *app.find<EngineService>();
         ec.removeNode (nodeUuid);
         return true;
     }
 
     bool undo() override
     {
-        auto& ec = *app.findChild<EngineService>();
+        auto& ec = *app.find<EngineService>();
         bool handled = true;
 
         const Node newNode (nodeData, false);
@@ -109,7 +109,7 @@ public:
     }
 
 private:
-    ServiceManager& app;
+    Services& app;
     ValueTree nodeData;
     const Node targetGraph;
     const Uuid nodeUuid;
@@ -126,14 +126,14 @@ private:
 class AddConnectionAction : public UndoableAction
 {
 public:
-    AddConnectionAction (ServiceManager& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
+    AddConnectionAction (Services& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
         : app (a), graph (targetGraph), arc (sn, sp, dn, dp)
     {
     }
 
     bool perform() override
     {
-        auto& ec = *app.findChild<EngineService>();
+        auto& ec = *app.find<EngineService>();
         if (! graph.isValid())
             ec.addConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
         else
@@ -143,7 +143,7 @@ public:
 
     bool undo() override
     {
-        auto& ec = *app.findChild<EngineService>();
+        auto& ec = *app.find<EngineService>();
         if (! graph.isValid())
             ec.removeConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
         else
@@ -152,7 +152,7 @@ public:
     }
 
 private:
-    ServiceManager& app;
+    Services& app;
     const Node graph;
     const Arc arc;
 };
@@ -160,14 +160,14 @@ private:
 class RemoveConnectionAction : public UndoableAction
 {
 public:
-    RemoveConnectionAction (ServiceManager& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
+    RemoveConnectionAction (Services& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
         : app (a), graph (targetGraph), arc (sn, sp, dn, dp)
     {
     }
 
     bool perform() override
     {
-        auto& ec = *app.findChild<EngineService>();
+        auto& ec = *app.find<EngineService>();
         if (! graph.isValid())
             ec.removeConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
         else
@@ -177,7 +177,7 @@ public:
 
     bool undo() override
     {
-        auto& ec = *app.findChild<EngineService>();
+        auto& ec = *app.find<EngineService>();
         if (! graph.isValid())
             ec.addConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
         else
@@ -186,19 +186,19 @@ public:
     }
 
 private:
-    ServiceManager& app;
+    Services& app;
     const Node graph;
     const Arc arc;
 };
 
 //=============================================================================
 
-void AddPluginMessage::createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const
+void AddPluginMessage::createActions (Services& app, OwnedArray<UndoableAction>& actions) const
 {
     actions.add (new AddPluginAction (app, *this));
 }
 
-void RemoveNodeMessage::createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const
+void RemoveNodeMessage::createActions (Services& app, OwnedArray<UndoableAction>& actions) const
 {
     if (node.isValid())
         actions.add (new RemoveNodeAction (app, node));
@@ -206,13 +206,13 @@ void RemoveNodeMessage::createActions (ServiceManager& app, OwnedArray<UndoableA
         actions.add (new RemoveNodeAction (app, n));
 }
 
-void AddConnectionMessage::createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const
+void AddConnectionMessage::createActions (Services& app, OwnedArray<UndoableAction>& actions) const
 {
     jassert (usePorts()); // channel-ports not yet supported
     actions.add (new AddConnectionAction (app, target, sourceNode, sourcePort, destNode, destPort));
 }
 
-void RemoveConnectionMessage::createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const
+void RemoveConnectionMessage::createActions (Services& app, OwnedArray<UndoableAction>& actions) const
 {
     jassert (usePorts()); // channel-ports not yet supported
     actions.add (new RemoveConnectionAction (app, target, sourceNode, sourcePort, destNode, destPort));

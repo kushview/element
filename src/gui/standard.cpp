@@ -172,7 +172,7 @@ private:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (StandardContentComponent& cc, ServiceManager& app)
+    ContentContainer (StandardContentComponent& cc, Services& app)
         : owner (cc)
     {
         content1.reset (new ContentView());
@@ -225,7 +225,7 @@ public:
     void setMainView (ContentView* view)
     {
         if (view)
-            view->initializeView (owner.getServices());
+            view->initializeView (owner.services());
 
         if (content1)
         {
@@ -260,7 +260,7 @@ public:
     void setAccessoryView (ContentView* view)
     {
         if (view)
-            view->initializeView (owner.getServices());
+            view->initializeView (owner.services());
         if (auto c2 = content2->content.get())
             content2->removeChildComponent (c2);
 
@@ -318,7 +318,7 @@ public:
         }
 
         locked = false;
-        owner.getServices().findChild<GuiService>()->refreshMainMenu();
+        owner.services().find<GuiService>()->refreshMainMenu();
     }
 
     void saveState (PropertiesFile* props)
@@ -355,13 +355,13 @@ private:
             keyboard = std::make_unique<VirtualKeyboardView>();
             keyboard->willBecomeActive();
             addAndMakeVisible (keyboard.get());
-            keyboard->initializeView (standard.getServices());
+            keyboard->initializeView (standard.services());
             keyboard->didBecomeActive();
 
             bridge = std::make_unique<MeterBridgeView>();
             bridge->willBecomeActive();
             addAndMakeVisible (bridge.get());
-            bridge->initializeView (standard.getServices());
+            bridge->initializeView (standard.services());
             bridge->didBecomeActive();
 
             content = std::make_unique<ContentView>();
@@ -542,11 +542,11 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
 StandardContentComponent::StandardContentComponent (Context& ctl_)
     : ContentComponent (ctl_)
 {
-    auto& settings (getGlobals().getSettings());
+    auto& settings (context().getSettings());
 
     setOpaque (true);
 
-    addAndMakeVisible (container = new ContentContainer (*this, getServices()));
+    addAndMakeVisible (container = new ContentContainer (*this, services()));
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_));
     nav->updateContent();
@@ -574,7 +574,7 @@ StandardContentComponent::StandardContentComponent (Context& ctl_)
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
     setMeterBridgeVisible (booleanProperty (settings, "meterBridge", false));
 
-    const Node node (getGlobals().getSession()->getCurrentGraph());
+    const Node node (context().session()->getCurrentGraph());
     setCurrentNode (node);
 
     toolBarVisible = true;
@@ -651,7 +651,7 @@ void StandardContentComponent::setMainView (const String& name)
     }
     else
     {
-        if (auto s = getGlobals().getSession())
+        if (auto s = context().session())
         {
             if (s->getNumGraphs() > 0)
                 setContentView (createGraphEditorView());
@@ -741,7 +741,7 @@ void StandardContentComponent::itemDropped (const SourceDetails& dragSourceDetai
     }
     else if (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin")
     {
-        auto& list (getGlobals().getPluginManager().getKnownPlugins());
+        auto& list (context().plugins().getKnownPlugins());
         if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
@@ -771,7 +771,7 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
         }
         else if (file.hasFileExtension ("elg"))
         {
-            if (auto* sess = getServices().findChild<SessionService>())
+            if (auto* sess = services().find<SessionService>())
                 sess->importGraph (file);
         }
         else if (file.hasFileExtension ("elpreset"))
@@ -789,7 +789,7 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
         }
         else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
         {
-            auto s = getSession();
+            auto s = session();
             auto graph = s->getActiveGraph();
             PluginDescription desc;
             desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
@@ -825,7 +825,7 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
 
 void StandardContentComponent::stabilize (const bool refreshDataPathTrees)
 {
-    auto session = getGlobals().getSession();
+    auto session = context().session();
     if (session->getNumGraphs() > 0)
     {
         const Node graph = session->getCurrentGraph();
@@ -903,7 +903,7 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
 
 void StandardContentComponent::setCurrentNode (const Node& node)
 {
-    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllerDevicesView") && getSession()->getNumGraphs() > 0)
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllerDevicesView") && session()->getNumGraphs() > 0)
     {
         setMainView ("GraphEditor");
     }
@@ -936,7 +936,7 @@ void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
     if (! nodeStrip)
     {
         nodeStrip = new NodeChannelStripView();
-        nodeStrip->initializeView (getServices());
+        nodeStrip->initializeView (services());
     }
 
     if (isVisible == nodeStrip->isVisible())

@@ -70,10 +70,10 @@ private:
     void setupAudioEngine()
     {
         auto& settings = world.getSettings();
-        DeviceManager& devices (world.getDeviceManager());
+        DeviceManager& devices (world.devices());
         String tp = devices.getCurrentAudioDeviceType();
 
-        AudioEnginePtr engine = world.getAudioEngine();
+        AudioEnginePtr engine = world.audio();
         engine->applySettings (settings);
 
         auto* props = settings.getUserSettings();
@@ -98,7 +98,7 @@ private:
 
     void setupMidiEngine()
     {
-        auto& midi = world.getMidiEngine();
+        auto& midi = world.midi();
         midi.applySettings (world.getSettings());
     }
 
@@ -119,8 +119,8 @@ private:
     void setupPlugins()
     {
         auto& settings (world.getSettings());
-        auto& plugins (world.getPluginManager());
-        auto engine (world.getAudioEngine());
+        auto& plugins (world.plugins());
+        auto engine (world.audio());
 
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (world));
@@ -133,13 +133,13 @@ private:
 
     void setupScripting()
     {
-        auto& scripts = world.getScriptingEngine();
+        auto& scripts = world.scripting();
         ignoreUnused (scripts);
     }
 
     void setupLogging()
     {
-        Logger::setCurrentLogger (&world.getLog());
+        Logger::setCurrentLogger (&world.logger());
     }
 };
 
@@ -184,14 +184,14 @@ public:
 
         slaves.clearQuick (true);
 
-        auto engine (world->getAudioEngine());
-        auto& plugins (world->getPluginManager());
+        auto engine (world->audio());
+        auto& plugins (world->plugins());
         auto& settings (world->getSettings());
-        auto& midi (world->getMidiEngine());
+        auto& midi (world->midi());
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
 
-        auto& srvs = world->getServices();
+        auto& srvs = world->services();
         srvs.saveSettings();
         srvs.deactivate();
         srvs.shutdown();
@@ -199,7 +199,7 @@ public:
         plugins.saveUserPlugins (settings);
         midi.writeSettings (settings);
 
-        if (auto el = world->getDeviceManager().createStateXml())
+        if (auto el = world->devices().createStateXml())
             props->setValue (Settings::devicesKey, el.get());
         if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
             props->setValue (Settings::keymappingsKey, keymappings.get());
@@ -218,7 +218,7 @@ public:
             return;
         }
 
-        auto* sc = world->getServices().findChild<SessionService>();
+        auto* sc = world->services().find<SessionService>();
 
         if (world->getSettings().askToSaveSession())
         {
@@ -256,7 +256,7 @@ public:
         if (! world)
             return;
 
-        if (auto* sc = world->getServices().findChild<SessionService>())
+        if (auto* sc = world->services().find<SessionService>())
         {
             const auto path = commandLine.unquoted().trim();
             if (File::isAbsolutePath (path))
@@ -274,7 +274,7 @@ public:
 
     void resumed() override
     {
-        auto& devices (world->getDeviceManager());
+        auto& devices (world->devices());
         devices.restartLastAudioDevice();
     }
 
@@ -284,11 +284,11 @@ public:
             return;
 
         if (world->getSettings().scanForPluginsOnStartup())
-            world->getPluginManager().scanAudioPlugins();
+            world->plugins().scanAudioPlugins();
 
         startup.reset();
 
-        world->getServices().run();
+        world->services().run();
 
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
@@ -297,7 +297,7 @@ public:
         const File sessionFile = File::isAbsolutePath (path) ? File (path)
                                                              : File::getCurrentWorkingDirectory().getChildFile (path);
         if (sessionFile.hasFileExtension ("els"))
-            if (auto* sc = world->getServices().findChild<SessionService>())
+            if (auto* sc = world->services().find<SessionService>())
                 sc->openFile (sessionFile);
     }
 
@@ -319,7 +319,7 @@ private:
     bool maybeLaunchSlave (const String& commandLine)
     {
         slaves.clearQuick (true);
-        slaves.add (world->getPluginManager().createAudioPluginScannerSlave());
+        slaves.add (world->plugins().createAudioPluginScannerSlave());
         StringArray processIds = { EL_PLUGIN_SCANNER_PROCESS_ID };
         for (auto* slave : slaves)
         {

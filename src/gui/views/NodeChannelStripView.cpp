@@ -71,9 +71,9 @@ void NodeChannelStripView::stabilizeContent()
         content->nodeSelected();
 }
 
-void NodeChannelStripView::initializeView (ServiceManager& app)
+void NodeChannelStripView::initializeView (Services& app)
 {
-    auto& gui = *app.findChild<GuiService>();
+    auto& gui = *app.find<GuiService>();
     content.reset (new Content (gui));
     addAndMakeVisible (content.get());
     resized();

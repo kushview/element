@@ -24,7 +24,7 @@
 
 namespace element {
 
-class ServiceManager;
+class Services;
 class ContentView;
 class Context;
 
@@ -44,7 +44,7 @@ struct AppMessage : public Message
 
     };
 
-    inline virtual void createActions (ServiceManager&, OwnedArray<UndoableAction>&) const {}
+    inline virtual void createActions (Services&, OwnedArray<UndoableAction>&) const {}
 };
 
 struct AddMidiDeviceMessage : public AppMessage
@@ -83,7 +83,7 @@ struct RemoveNodeMessage : public AppMessage
     const Node node;
     NodeArray nodes;
 
-    virtual void createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const;
+    virtual void createActions (Services& app, OwnedArray<UndoableAction>& actions) const;
 };
 
 /** Send this to add a new connection */
@@ -118,7 +118,7 @@ struct AddConnectionMessage : public AppMessage
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return ! useChannels(); }
-    void createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const override;
+    void createActions (Services& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
 /** Send this to remove a connection from the graph */
@@ -153,7 +153,7 @@ public:
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return ! useChannels(); }
-    void createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const override;
+    void createActions (Services& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
 class AddNodeMessage : public Message
@@ -206,7 +206,7 @@ struct AddPluginMessage : public AppMessage
     const PluginDescription description;
     const bool verified;
     ConnectionBuilder builder;
-    void createActions (ServiceManager& app, OwnedArray<UndoableAction>& actions) const override;
+    void createActions (Services& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
 struct ReplaceNodeMessage : public AppMessage

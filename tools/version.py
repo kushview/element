@@ -57,6 +57,11 @@ def ncommits (revision):
         return len (n.split())
     return 0
 
+def build_number (revision):
+    bn = ncommits (revision) - 1
+    if bn < 0: bn = 0
+    return bn
+
 def nchanges():
     if not exists(): return 0
     (out, err) = call_git (None, 'status --porcelain --untracked-files=no'.split())
@@ -100,13 +105,13 @@ def version():
     if exists():
         if opts.build:
             if opts.build_style == 'dotted':
-                vers += '.%s' % ncommits (opts.last_version)
+                vers += '.%s' % build_number (opts.last_version)
             elif opts.build_style == 'dashed':
-                vers += '-%s' % ncommits (opts.last_version)
+                vers += '-%s' % build_number (opts.last_version)
             elif opts.build_style == 'revision':
-                vers += '_r%s' % ncommits (opts.last_version)
+                vers += '_r%s' % build_number (opts.last_version)
             elif opts.build_style == 'onlybuild':
-                vers = '%s' % ncommits (opts.last_version)
+                vers = '%s' % build_number (opts.last_version)
         if show_dirty:
             vers += "-dirty"
 

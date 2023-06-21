@@ -68,12 +68,12 @@ protected:
             return;
         world.reset (new Context());
         world->setEngine (new AudioEngine (*world));
-        world->getPluginManager().addDefaultFormats();
-        world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
-        world->getPluginManager().addFormat (new InternalFormat (*world));
-        app.reset (new ServiceManager (*world));
+        world->plugins().addDefaultFormats();
+        world->plugins().addFormat (new ElementAudioPluginFormat (*world));
+        world->plugins().addFormat (new InternalFormat (*world));
+        app.reset (new Services (*world));
         app->activate();
-        auto& settings = getWorld().getSettings();
+        auto& settings = context().getSettings();
         PropertiesFile::Options opts = settings.getStorageParameters();
         opts.applicationName = "ElementTests";
         settings.setStorageParameters (opts);
@@ -110,12 +110,12 @@ protected:
         MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor);
     }
 
-    Context& getWorld()
+    Context& context()
     {
         initializeWorld();
         return *world;
     }
-    ServiceManager& getServices()
+    Services& services()
     {
         initializeWorld();
         return *app;
@@ -124,7 +124,7 @@ protected:
 private:
     const String slug;
     std::unique_ptr<Context> world;
-    std::unique_ptr<ServiceManager> app;
+    std::unique_ptr<Services> app;
 };
 
 } // namespace element

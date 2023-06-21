@@ -110,9 +110,9 @@ bool TransportBar::checkForMonitor()
     {
         if (auto* w = ViewHelpers::getGlobals (this))
         {
-            engine = w->getAudioEngine();
+            engine = w->audio();
             monitor = engine->getTransportMonitor();
-            session = w->getSession();
+            session = w->session();
         }
     }
 

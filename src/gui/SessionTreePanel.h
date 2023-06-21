@@ -42,7 +42,7 @@ public:
     void showNode (const Node& newNode);
     bool showingNode() const noexcept;
 
-    SessionPtr getSession() const;
+    SessionPtr session() const;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -54,7 +54,7 @@ private:
     class Panel;
     std::unique_ptr<Panel> panel;
 
-    SessionPtr session;
+    SessionPtr _session;
     ValueTree data;
     Node node;
     SignalConnection nodeSelectedConnection;

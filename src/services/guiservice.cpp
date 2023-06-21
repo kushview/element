@@ -148,7 +148,7 @@ private:
             owner.closeAllPluginWindows (true);
             auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
             graphs.setProperty (Tags::active, graphs.indexOf (g.getValueTree()), 0);
-            owner.findSibling<EngineService>()->setRootNode (g);
+            owner.sibling<EngineService>()->setRootNode (g);
             owner.showPluginWindowsFor (g, true, false, false);
             return true;
         }
@@ -247,7 +247,7 @@ void GuiService::ForegroundCheck::timerCallback()
     if (! ui.getSettings().hidePluginWindowsWhenFocusLost())
         return;
 
-    auto session = ui.getWorld().getSession();
+    auto session = ui.context().session();
     jassert (session);
     if (foreground)
     {
@@ -281,12 +281,12 @@ void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newDecorator
         factory.reset();
     factory = std::move (newDecorator);
     if (! factory)
-        factory = std::make_unique<DefaultContentFactory> (getWorld());
+        factory = std::make_unique<DefaultContentFactory> (context());
     appInfo = factory->aboutInfo();
 }
 
 //=============================================================================
-GuiService::GuiService (Context& w, ServiceManager& a)
+GuiService::GuiService (Context& w, Services& a)
     : Service(),
       controller (a),
       world (w),
@@ -341,13 +341,13 @@ void GuiService::saveProperties (PropertiesFile* props)
 
 void GuiService::activate()
 {
-    getWorld().getDeviceManager().addChangeListener (this);
+    context().devices().addChangeListener (this);
     Service::activate();
 }
 
 void GuiService::deactivate()
 {
-    getWorld().getDeviceManager().removeChangeListener (this);
+    context().devices().removeChangeListener (this);
     nodeSelected.disconnect_all_slots();
 
     auto& settings = getSettings();
@@ -463,7 +463,7 @@ ContentComponent* GuiService::getContentComponent()
     jassert (factory != nullptr);
     if (! content)
     {
-        const auto uitype = getWorld().getSettings().getMainContentType();
+        const auto uitype = context().getSettings().getMainContentType();
         content.reset();
         content = factory->createMainContent (uitype);
         content->setSize (760, 480);
@@ -550,7 +550,7 @@ bool GuiService::haveActiveWindows() const
 
 void GuiService::run()
 {
-    auto& settings = getWorld().getSettings();
+    auto& settings = context().getSettings();
     PropertiesFile* const pf = settings.getUserSettings();
 
     mainWindow.reset (new MainWindow (world));
@@ -569,7 +569,7 @@ void GuiService::run()
     mainWindow->addToDesktop();
 
     Desktop::getInstance().setGlobalScaleFactor (
-        getWorld().getSettings().getDesktopScale());
+        context().getSettings().getDesktopScale());
 
     if (pf->getBoolValue ("mainWindowVisible", true))
     {
@@ -583,7 +583,7 @@ void GuiService::run()
         mainWindow->removeFromDesktop();
     }
 
-    findSibling<SessionService>()->resetChanges();
+    sibling<SessionService>()->resetChanges();
     refreshSystemTray();
     stabilizeViews();
 }
@@ -591,7 +591,7 @@ void GuiService::run()
 SessionRef GuiService::session()
 {
     if (! sessionRef)
-        sessionRef = world.getSession();
+        sessionRef = world.session();
     return sessionRef;
 }
 
@@ -630,7 +630,7 @@ void GuiService::getAllCommands (Array<CommandID>& commands)
 void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
     typedef ApplicationCommandInfo Info;
-    auto& app = getServices();
+    auto& app = services();
 
     switch (commandID)
     {
@@ -849,13 +849,13 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             break;
 
         case Commands::undo: {
-            int flags = getServices().getUndoManager().canUndo() ? 0 : Info::isDisabled;
+            int flags = services().getUndoManager().canUndo() ? 0 : Info::isDisabled;
             result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier);
         }
         break;
         case Commands::redo: {
-            bool canRedo = getServices().getUndoManager().canRedo();
+            bool canRedo = services().getUndoManager().canRedo();
             int flags = canRedo ? 0 : Info::isDisabled;
             result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
@@ -928,7 +928,7 @@ bool GuiService::perform (const InvocationInfo& info)
             runDialog ("preferences");
             break;
         case Commands::showAllPluginWindows: {
-            if (auto s = getWorld().getSession())
+            if (auto s = context().session())
                 showPluginWindowsFor (s->getActiveGraph(), true, true);
             break;
         }
@@ -939,7 +939,7 @@ bool GuiService::perform (const InvocationInfo& info)
         }
 
         case Commands::toggleUserInterface: {
-            auto session = getWorld().getSession();
+            auto session = context().session();
             if (auto* const window = mainWindow.get())
             {
                 if (window->isOnDesktop())
@@ -1000,7 +1000,7 @@ void GuiService::stabilizeViews()
 void GuiService::refreshSystemTray()
 {
     // stabilize systray
-    auto& settings = getWorld().getSettings();
+    auto& settings = context().getSettings();
     SystemTray::setEnabled (settings.isSystrayEnabled());
 }
 
@@ -1058,7 +1058,7 @@ bool GuiService::handleMessage (const AppMessage& msg)
 {
     if (nullptr != dynamic_cast<const ReloadMainContentMessage*> (&msg))
     {
-        auto& settings = getWorld().getSettings();
+        auto& settings = context().getSettings();
         PropertiesFile* const pf = settings.getUserSettings();
 
         if (mainWindow && pf != nullptr)
@@ -1095,7 +1095,7 @@ void GuiService::shutdown()
 
 void GuiService::changeListenerCallback (ChangeBroadcaster* broadcaster)
 {
-    if (broadcaster == &getWorld().getDeviceManager())
+    if (broadcaster == &context().devices())
         if (auto* win = mainWindow.get())
             win->refreshMenu();
 }

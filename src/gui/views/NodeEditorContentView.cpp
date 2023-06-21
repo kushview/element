@@ -237,7 +237,7 @@ void NodeEditorContentView::comboBoxChanged (ComboBox*)
     {
         if (sticky)
             setNode (selectedNode);
-        ViewHelpers::findContentComponent (this)->getServices().findChild<GuiService>()->selectNode (selectedNode);
+        ViewHelpers::findContentComponent (this)->services().find<GuiService>()->selectNode (selectedNode);
     }
 }
 
@@ -283,8 +283,8 @@ void NodeEditorContentView::stabilizeContent()
     auto* cc = ViewHelpers::findContentComponent (this);
     auto session = ViewHelpers::getSession (this);
     jassert (cc && session);
-    auto& gui = *cc->getServices().findChild<GuiService>();
-    auto& sessions = *cc->getServices().findChild<SessionService>();
+    auto& gui = *cc->services().find<GuiService>();
+    auto& sessions = *cc->services().find<SessionService>();
 
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
@@ -368,7 +368,7 @@ Component* NodeEditorContentView::createEmbededEditor()
 {
     auto* const world = ViewHelpers::getGlobals (this);
     jassert (world);
-    auto& app = ViewHelpers::findContentComponent (this)->getServices();
+    auto& app = ViewHelpers::findContentComponent (this)->services();
 
     if (node.isAudioInputNode())
     {
@@ -376,7 +376,7 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             if (node.isChildOfRootGraph())
             {
-                return new element::AudioDeviceSelectorComponent (world->getDeviceManager(),
+                return new element::AudioDeviceSelectorComponent (world->devices(),
                                                                   1,
                                                                   DeviceManager::maxAudioChannels,
                                                                   0,
@@ -392,7 +392,7 @@ Component* NodeEditorContentView::createEmbededEditor()
             }
         }
 
-        return new AudioIONodeEditor (node, world->getDeviceManager(), true, false);
+        return new AudioIONodeEditor (node, world->devices(), true, false);
     }
 
     if (node.isAudioOutputNode())
@@ -401,7 +401,7 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             if (node.isChildOfRootGraph())
             {
-                return new element::AudioDeviceSelectorComponent (world->getDeviceManager(),
+                return new element::AudioDeviceSelectorComponent (world->devices(),
                                                                   0,
                                                                   0,
                                                                   1,
@@ -417,10 +417,10 @@ Component* NodeEditorContentView::createEmbededEditor()
             }
         }
 
-        return new AudioIONodeEditor (node, world->getDeviceManager(), false, true);
+        return new AudioIONodeEditor (node, world->devices(), false, true);
     }
 
-    NodeEditorFactory factory (*app.findChild<GuiService>());
+    NodeEditorFactory factory (*app.find<GuiService>());
     if (auto editor = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
         return editor.release();
 

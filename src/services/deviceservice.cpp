@@ -57,12 +57,12 @@ void DeviceService::deactivate()
 
 void DeviceService::add (const ControllerDevice& device)
 {
-    auto& mapping (getWorld().getMappingEngine());
-    auto& midi (getWorld().getMidiEngine());
+    auto& mapping (context().mapping());
+    auto& midi (context().midi());
     if (! mapping.addInput (device, midi))
         return;
 
-    auto session = getWorld().getSession();
+    auto session = context().session();
     if (! session)
         return;
     auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
@@ -75,7 +75,7 @@ void DeviceService::add (const ControllerDevice& device)
 
 void DeviceService::add (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
-    auto session = getWorld().getSession();
+    auto session = context().session();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) < 0)
     {
         auto data = device.getValueTree();
@@ -101,7 +101,7 @@ void DeviceService::add (const File& file)
         for (int i = 0; i < data.getNumChildren(); ++i)
             data.getChild (i).setProperty (Tags::uuid, Uuid().toString(), 0);
 
-        if (auto s = getWorld().getSession())
+        if (auto s = context().session())
         {
             s->getValueTree().getChildWithName (Tags::controllers).addChild (data, -1, 0);
             refresh();
@@ -115,16 +115,16 @@ void DeviceService::add (const File& file)
 
 void DeviceService::remove (const ControllerDevice& device)
 {
-    auto& mapping (getWorld().getMappingEngine());
+    auto& mapping (context().mapping());
     if (! mapping.removeInput (device))
         return;
-    if (auto session = getWorld().getSession())
+    if (auto session = context().session())
         session->getValueTree().getChildWithName (Tags::controllers).removeChild (device.getValueTree(), nullptr);
 }
 
 void DeviceService::remove (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
-    auto session = getWorld().getSession();
+    auto session = context().session();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) >= 0)
     {
         auto data = device.getValueTree();
@@ -144,8 +144,8 @@ void DeviceService::refresh (const ControllerDevice& device)
 #if 0
     // TODO: handle individual re-build of device handlers and state
     // Saved for reference.
-    auto session = getWorld().getSession();
-    auto& mapping = getWorld().getMappingEngine();
+    auto session = context().session();
+    auto& mapping = context().mapping();
     mapping.refreshInput (device);
     
     for (int i = 0; i < session->getNumControllerMaps(); ++i)
@@ -164,9 +164,9 @@ void DeviceService::refresh (const ControllerDevice& device)
 
 void DeviceService::refresh()
 {
-    auto& mapping (getWorld().getMappingEngine());
-    auto& midi (getWorld().getMidiEngine());
-    auto session = getWorld().getSession();
+    auto& mapping (context().mapping());
+    auto& midi (context().midi());
+    auto session = context().session();
     mapping.clear();
 
     for (int i = 0; i < session->getNumControllerDevices(); ++i)

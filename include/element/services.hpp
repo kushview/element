@@ -15,8 +15,9 @@ namespace element {
 class Context;
 class Settings;
 struct AppMessage;
-class ServiceManager;
+class Services;
 
+/** Provides some kind of high level support for something in Element. */
 class Service {
 public:
     Service() {}
@@ -25,73 +26,68 @@ public:
         owner = nullptr;
     }
 
-    template <class T>
-    inline T* findSibling() const;
-
+    /** Initialize the service. */
     virtual void initialize() {}
+    /** Activate the service. */
     virtual void activate() {}
+    /** Deactivate the service. */
     virtual void deactivate() {}
+    /** Shutdown the service. */
     virtual void shutdown() {}
+    /** Save service settings. */
     virtual void saveSettings() {}
 
-    ServiceManager& getServices() const;
+    /** Locate a sibling service by type. */
+    template <class T>
+    inline T* sibling() const;
+
+    Services& services() const;
     Settings& getSettings();
-    Context& getWorld();
+    Context& context();
     RunMode getRunMode() const;
 
 protected:
     virtual bool handleMessage (const AppMessage&) { return false; }
 
 private:
-    friend class ServiceManager;
-    ServiceManager* owner = nullptr;
+    friend class Services;
+    Services* owner = nullptr;
 };
 
 //=============================================================================
-class ServiceManager : public juce::MessageListener,
-                       protected juce::ApplicationCommandTarget {
+class Services : public juce::MessageListener,
+                 protected juce::ApplicationCommandTarget {
 public:
-    ServiceManager (Context&, RunMode mode = RunMode::Standalone);
-    ~ServiceManager();
+    Services (Context&, RunMode mode = RunMode::Standalone);
+    ~Services();
 
     /** Returns the running mode of this instance */
-    RunMode getRunMode() const { return runMode; }
+    RunMode getRunMode() const;
 
-    /** Access to global data */
-    inline Context& getWorld() { return getGlobals(); }
-
-    /** Alias of getWorld() */
-    inline Context& getGlobals() { return world; }
+    /** Alias of context() */
+    Context& context();
 
     /** Returns the undo manager */
-    inline juce::UndoManager& getUndoManager() { return undo; }
+    juce::UndoManager& getUndoManager();
 
     /** Add a service */
-    void add (Service* service)
-    {
-        service->owner = this;
-        services.add (service);
-    }
+    void add (Service* service);
 
     template <class T>
-    inline T* findChild() const
+    inline T* find() const
     {
-        for (auto const* c : services)
+        for (auto* c : *this)
             if (T* t = const_cast<T*> (dynamic_cast<const T*> (c)))
                 return t;
         return nullptr;
     }
 
-    inline void saveSettings()
-    {
-        for (auto* s : services)
-            s->saveSettings();
-    }
+    void saveSettings();
 
     /** Child controllers should use this when files are opened and need
         to be saved in recent files.
     */
-    inline void addRecentFile (const juce::File& file) { recentFiles.addFile (file); }
+    void addRecentFile (const juce::File& file);
 
     /** Activate this and children */
     void activate();
@@ -101,13 +97,14 @@ public:
 
     void launch();
 
-    void shutdown()
-    {
-        for (auto* s : services)
-            s->shutdown();
-    }
+    void shutdown();
 
-    juce::RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
+    juce::RecentlyOpenedFilesList& getRecentlyOpenedFilesList();
+
+    Service** begin() noexcept;
+    Service* const* begin() const noexcept;
+    Service** end() noexcept;
+    Service* const* end() const noexcept;
 
 protected:
     friend class juce::ApplicationCommandTarget;
@@ -122,26 +119,16 @@ private:
     friend class Context;
     class Impl;
     std::unique_ptr<Impl> impl;
-
-    juce::OwnedArray<Service> services;
-    juce::File lastSavedFile;
-    juce::File lastExportedGraph;
-    Context& world;
-    juce::RecentlyOpenedFilesList recentFiles;
-    juce::UndoManager undo;
-
-    RunMode runMode;
+    std::vector<Service*> services;
 
     /** Run/Launch the core application. */
     void run();
 };
 
-using Services = ServiceManager;
-
 template <class T>
-inline T* Service::findSibling() const
+inline T* Service::sibling() const
 {
-    return (owner != nullptr) ? owner->findChild<T>() : nullptr;
+    return (owner != nullptr) ? owner->find<T>() : nullptr;
 }
 
 } // namespace element

@@ -54,9 +54,9 @@ InternalFormat::InternalFormat (Context& ctx)
         p.fillInPluginDescription (placeholderDesc);
     }
     {
-        MidiDeviceProcessor in (true, context.getMidiEngine());
+        MidiDeviceProcessor in (true, context.midi());
         in.fillInPluginDescription (midiInputDeviceDesc);
-        MidiDeviceProcessor out (false, context.getMidiEngine());
+        MidiDeviceProcessor out (false, context.midi());
         out.fillInPluginDescription (midiOutputDeviceDesc);
     }
 }
@@ -65,11 +65,11 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
 {
     if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_INPUT_DEVICE)
     {
-        return new MidiDeviceProcessor (true, context.getMidiEngine());
+        return new MidiDeviceProcessor (true, context.midi());
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
     {
-        return new MidiDeviceProcessor (false, context.getMidiEngine());
+        return new MidiDeviceProcessor (false, context.midi());
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
     {

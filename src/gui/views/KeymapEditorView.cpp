@@ -79,7 +79,7 @@ void KeymapEditorView::stabilizeContent()
     editor = nullptr;
     if (auto* const cc = ViewHelpers::findContentComponent (this))
     {
-        auto* const mapping = cc->getGlobals().getCommandManager().getKeyMappings();
+        auto* const mapping = cc->context().getCommandManager().getKeyMappings();
         addAndMakeVisible (editor = new KeymapEditor (*mapping));
     }
     resized();
@@ -101,9 +101,9 @@ void KeymapEditorView::resized()
 void KeymapEditorView::saveMappings()
 {
     if (auto* const cc = ViewHelpers::findContentComponent (this))
-        if (auto* const mapping = cc->getGlobals().getCommandManager().getKeyMappings())
+        if (auto* const mapping = cc->context().getCommandManager().getKeyMappings())
             if (auto xml = mapping->createXml (false))
-                cc->getGlobals().getSettings().getUserSettings()->setValue (
+                cc->context().getSettings().getUserSettings()->setValue (
                     "keymappings", xml.get());
 }
 

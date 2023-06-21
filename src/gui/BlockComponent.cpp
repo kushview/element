@@ -328,13 +328,13 @@ void BlockComponent::mouseDown (const MouseEvent& e)
     if (auto* cc = ViewHelpers::findContentComponent (this))
     {
         ScopedFlag block (panel->ignoreNodeSelected, true);
-        cc->getServices().findChild<GuiService>()->selectNode (node);
+        cc->services().find<GuiService>()->selectNode (node);
     }
 
     if (e.mods.isPopupMenu())
     {
         auto* const world = ViewHelpers::getGlobals (this);
-        auto& plugins (world->getPluginManager());
+        auto& plugins (world->plugins());
         NodePopupMenu menu (node);
         menu.addReplaceSubmenu (plugins);
 
@@ -351,7 +351,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         menu.addOptionsSubmenu();
 
         if (world)
-            menu.addPresetsMenu (world->getPresetManager());
+            menu.addPresetsMenu (world->presets());
 
         colorSelector.setCurrentColour (Colour::fromString (
             node.getUIValueTree().getProperty ("color", color.toString()).toString()));
@@ -630,7 +630,7 @@ void BlockComponent::paint (Graphics& g)
         else if (node.isMidiInputNode())
         {
             auto mode = ViewHelpers::getGuiController (this)->getRunMode();
-            auto& midi = ViewHelpers::getGlobals (this)->getMidiEngine();
+            auto& midi = ViewHelpers::getGlobals (this)->midi();
             if (mode != RunMode::Plugin && midi.getNumActiveMidiInputs() <= 0)
                 subName = "(no device)";
         }

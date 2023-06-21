@@ -40,7 +40,7 @@ MainWindow::MainWindow (Context& g)
 
     nameChanged();
 
-    g.getSession()->addChangeListener (this);
+    g.session()->addChangeListener (this);
     addKeyListener (g.getCommandManager().getKeyMappings());
     setUsingNativeTitleBar (true);
     setResizable (true, false);
@@ -49,7 +49,7 @@ MainWindow::MainWindow (Context& g)
 MainWindow::~MainWindow()
 {
     setMenuBar (nullptr);
-    world.getSession()->removeChangeListener (this);
+    world.session()->removeChangeListener (this);
     mainMenu.reset();
 }
 
@@ -99,10 +99,10 @@ void MainWindow::nameChangedSession()
 {
     String title = Util::appName();
 
-    auto session = world.getSession();
+    auto session = world.session();
     SessionService* controller = nullptr;
     if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
-        controller = getServices().findChild<SessionService>();
+        controller = services().find<SessionService>();
 
     if (nullptr == session || nullptr == controller)
     {
@@ -146,7 +146,7 @@ void MainWindow::activeWindowStatusChanged()
 {
     if (nullptr == getContentComponent())
         return;
-    auto& gui = *getServices().findChild<GuiService>();
+    auto& gui = *services().find<GuiService>();
     gui.checkForegroundStatus();
 }
 
@@ -156,11 +156,11 @@ void MainWindow::refreshMenu()
         mainMenu->menuItemsChanged();
 }
 
-ServiceManager& MainWindow::getServices()
+Services& MainWindow::services()
 {
     jassert (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()));
     return (dynamic_cast<ContentComponent*> (getContentComponent()))
-        ->getServices();
+        ->services();
 }
 
 } // namespace element

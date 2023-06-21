@@ -78,7 +78,7 @@ public:
 
     void closeButtonPressed() override
     {
-        gui.getWorld().getCommandManager().invokeDirectly (
+        gui.context().getCommandManager().invokeDirectly (
             Commands::showAbout, true);
     }
 

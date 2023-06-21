@@ -105,7 +105,7 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     auto* window = getMainWindow();
     if (! window)
         return;
-    auto* const cmd = &window->getWorld().getCommandManager();
+    auto* const cmd = &window->context().getCommandManager();
 
     if (mouseUpAction == ShowMenu)
     {
@@ -135,7 +135,7 @@ void SystemTray::runMenu()
     auto* window = getMainWindow();
     if (! window)
         return;
-    auto* const cmd = &window->getWorld().getCommandManager();
+    auto* const cmd = &window->context().getCommandManager();
 
     PopupMenu menu;
     menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");

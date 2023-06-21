@@ -45,7 +45,7 @@ public:
 
     Context& owner;
 
-    std::unique_ptr<ServiceManager> services;
+    std::unique_ptr<Services> services;
 
     AudioEnginePtr engine;
     SessionPtr session;
@@ -80,7 +80,7 @@ private:
         lua->initialize (owner);
 
         owner.setEngine (new AudioEngine (owner, RunMode::Standalone));
-        services = std::make_unique<ServiceManager> (owner, RunMode::Standalone);
+        services = std::make_unique<Services> (owner, RunMode::Standalone);
     }
 
     void freeAll()
@@ -112,7 +112,7 @@ Context::~Context()
 }
 
 //=============================================================================
-ServiceManager& Context::getServices()
+Services& Context::services()
 {
     jassert (impl && impl->services);
     return *impl->services;
@@ -124,45 +124,45 @@ CommandManager& Context::getCommandManager()
     return *impl->commands;
 }
 
-DeviceManager& Context::getDeviceManager()
+DeviceManager& Context::devices()
 {
     jassert (impl->devices != nullptr);
     return *impl->devices;
 }
 
-Log& Context::getLog()
+Log& Context::logger()
 {
     jassert (impl != nullptr && impl->log != nullptr);
     return *impl->log;
 }
 
-MappingEngine& Context::getMappingEngine()
+MappingEngine& Context::mapping()
 {
     jassert (impl != nullptr && impl->mapping != nullptr);
     return *impl->mapping;
 }
 
-MidiEngine& Context::getMidiEngine()
+MidiEngine& Context::midi()
 {
     jassert (impl != nullptr && impl->midi != nullptr);
     return *impl->midi;
 }
 
-ScriptingEngine& Context::getScriptingEngine()
+ScriptingEngine& Context::scripting()
 {
     jassert (impl->lua != nullptr);
     return *impl->lua;
 }
 
-AudioEnginePtr Context::getAudioEngine() const { return impl->engine; }
+AudioEnginePtr Context::audio() const { return impl->engine; }
 
-PluginManager& Context::getPluginManager()
+PluginManager& Context::plugins()
 {
     jassert (impl->plugins != nullptr);
     return *impl->plugins;
 }
 
-PresetManager& Context::getPresetManager()
+PresetManager& Context::presets()
 {
     jassert (impl->presets != nullptr);
     return *impl->presets;
@@ -174,7 +174,7 @@ Settings& Context::getSettings()
     return *impl->settings;
 }
 
-SessionPtr Context::getSession()
+SessionPtr Context::session()
 {
     return (impl) ? impl->session : nullptr;
 }
@@ -185,7 +185,7 @@ void Context::setEngine (AudioEnginePtr engine)
         impl->engine->deactivate();
     impl->engine = engine;
 
-    getDeviceManager().attach (engine);
+    devices().attach (engine);
 }
 
 void Context::openModule (const std::string& ID)

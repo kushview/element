@@ -79,7 +79,7 @@ public:
     void updateExternalLatencySamples();
     int getExternalLatencySamples() const;
 
-    Context& getWorld() const;
+    Context& context() const;
     MidiIOMonitorPtr getMidiIOMonitor() const;
 
     struct LevelMeter : public juce::ReferenceCountedObject {

@@ -48,11 +48,11 @@ public:
         node = nullptr;
     }
 
-    int getNumRows() override { return node->getLog().size(); }
+    int getNumRows() override { return node->logger().size(); }
 
     void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
     {
-        const auto& logList = node->getLog();
+        const auto& logList = node->logger();
         ignoreUnused (rowIsSelected);
         g.setFont (Font (Font::getDefaultMonospacedFontName(),
                          g.getCurrentFont().getHeight(),
@@ -63,7 +63,7 @@ public:
 
     void handleAsyncUpdate() override
     {
-        const auto& logList = node->getLog();
+        const auto& logList = node->logger();
         updateContent();
         scrollToEnsureRowIsOnscreen (logList.size() - 1);
         repaint();

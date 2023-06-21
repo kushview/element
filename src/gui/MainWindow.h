@@ -24,7 +24,7 @@
 
 namespace element {
 
-class ServiceManager;
+class Services;
 class Context;
 class MainMenu;
 class MainMenuBarModel;
@@ -39,8 +39,8 @@ public:
     void minimiseButtonPressed() override;
 
     void refreshMenu();
-    Context& getWorld() { return world; }
-    ServiceManager& getServices();
+    Context& context() { return world; }
+    Services& services();
 
     void changeListenerCallback (ChangeBroadcaster* source) override;
     void activeWindowStatusChanged() override;

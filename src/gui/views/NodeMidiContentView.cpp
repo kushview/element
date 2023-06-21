@@ -58,7 +58,7 @@ void NodeMidiContentView::stabilizeContent()
 {
     auto* cc = ViewHelpers::findContentComponent (this);
     jassert (cc);
-    auto& gui = *cc->getServices().findChild<GuiService>();
+    auto& gui = *cc->services().find<GuiService>();
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
             &NodeMidiContentView::stabilizeContent, this));

@@ -20,7 +20,7 @@
 
 namespace element {
 
-class ServiceManager;
+class Services;
 class BreadCrumbComponent;
 class ContentContainer;
 class Context;
@@ -40,7 +40,7 @@ public:
     ContentView();
     virtual ~ContentView();
 
-    virtual void initializeView (ServiceManager&) {}
+    virtual void initializeView (Services&) {}
     virtual void willBeRemoved() {}
     virtual void willBecomeActive() {}
     virtual void didBecomeActive() {}
@@ -97,13 +97,13 @@ public:
     void post (Message*);
 
     /** Access to the app controller */
-    ServiceManager& getServices() { return controller; }
+    Services& services() { return controller; }
 
     /** Access to global objects */
-    Context& getGlobals();
+    Context& context();
 
     /** Access to the currently opened session */
-    SessionPtr getSession();
+    SessionPtr session();
 
     /** Change toolbar visibility */
     void setToolbarVisible (bool);
@@ -195,7 +195,7 @@ public:
 
 private:
     Context& _context;
-    ServiceManager& controller;
+    Services& controller;
 
     struct Tooltips;
     SharedResourcePointer<Tooltips> tips;

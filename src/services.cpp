@@ -44,31 +44,93 @@
 namespace element {
 using namespace juce;
 
-class ServiceManager::Impl
+class Services::Impl
 {
 public:
-    Impl (ServiceManager& sm) : services (sm) {}
-    ServiceManager& services;
+    Impl (Services& sm, Context& g, RunMode m)
+        : owner (sm), world (g), runMode (m) {}
+    void activate()
+    {
+        if (activated)
+            return;
+
+        if (! initialized)
+        {
+            lastExportedGraph = DataPath::defaultGraphDir();
+            auto& commands = owner.context().getCommandManager();
+            commands.registerAllCommandsForTarget (&owner);
+            commands.registerAllCommandsForTarget (owner.find<GuiService>());
+            commands.setFirstCommandTarget (&owner);
+            initialized = true;
+        }
+
+        // migrate global node midi programs.
+        auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
+        auto olddir = DataPath::applicationDataDir().getChildFile ("NodeMidiPrograms");
+        if (! progsdir.exists() && olddir.exists())
+        {
+            progsdir.getParentDirectory().createDirectory();
+            olddir.copyDirectoryTo (progsdir);
+        }
+
+        // restore recents
+        const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
+        if (recentList.existsAsFile())
+        {
+            FileInputStream stream (recentList);
+            recentFiles.restoreFromString (stream.readEntireStreamAsString());
+        }
+
+        for (auto* s : services)
+            s->activate();
+
+        activated = true;
+    }
+
+    void deactivate()
+    {
+        const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
+        if (! recentList.existsAsFile())
+            recentList.create();
+        if (recentList.exists())
+            recentList.replaceWithText (recentFiles.toString(), false, false);
+
+        for (auto* s : services)
+            s->deactivate();
+
+        activated = false;
+    }
+
+private:
+    friend class Services;
+
+    Services& owner;
     bool initialized { false };
-    bool active = false;
+    bool activated = false;
+    juce::OwnedArray<Service> services;
+    juce::File lastSavedFile;
+    juce::File lastExportedGraph;
+    Context& world;
+    juce::RecentlyOpenedFilesList recentFiles;
+    juce::UndoManager undo;
+    RunMode runMode;
 };
 
-ServiceManager& Service::getServices() const
+Services& Service::services() const
 {
     jassert (owner != nullptr); // if you hit this then you're probably calling
-        // getServices() before controller initialization
+        // services() before controller initialization
     return *owner;
 }
 
-Context& Service::getWorld() { return getServices().getWorld(); }
-Settings& Service::getSettings() { return getWorld().getSettings(); }
-RunMode Service::getRunMode() const { return getServices().getRunMode(); }
+Context& Service::context() { return services().context(); }
+Settings& Service::getSettings() { return context().getSettings(); }
+RunMode Service::getRunMode() const { return services().getRunMode(); }
 
-ServiceManager::ServiceManager (Context& g, RunMode m)
-    : world (g), runMode (m)
+Services::Services (Context& g, RunMode m)
 {
-    impl = std::make_unique<Impl> (*this);
-    add (new GuiService (world, *this));
+    impl = std::make_unique<Impl> (*this, g, m);
+    add (new GuiService (g, *this));
     add (new DeviceService());
     add (new EngineService());
     add (new MappingService());
@@ -77,86 +139,70 @@ ServiceManager::ServiceManager (Context& g, RunMode m)
     add (new OSCService());
 }
 
-ServiceManager::~ServiceManager() {}
-
-void ServiceManager::activate()
+Services::~Services()
 {
-    if (impl->active)
-        return;
-
-    if (! impl->initialized)
-    {
-        lastExportedGraph = DataPath::defaultGraphDir();
-        auto& commands = getWorld().getCommandManager();
-        commands.registerAllCommandsForTarget (this);
-        commands.registerAllCommandsForTarget (findChild<GuiService>());
-        commands.setFirstCommandTarget (this);
-        impl->initialized = true;
-    }
-
-    // migrate global node midi programs.
-    auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
-    auto olddir = DataPath::applicationDataDir().getChildFile ("NodeMidiPrograms");
-    if (! progsdir.exists() && olddir.exists())
-    {
-        progsdir.getParentDirectory().createDirectory();
-        olddir.copyDirectoryTo (progsdir);
-    }
-
-    // restore recents
-    const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
-    if (recentList.existsAsFile())
-    {
-        FileInputStream stream (recentList);
-        recentFiles.restoreFromString (stream.readEntireStreamAsString());
-    }
-
-    for (auto* s : services)
-        s->activate();
-
-    impl->active = true;
+    impl.reset();
 }
 
-void ServiceManager::deactivate()
+void Services::activate() { impl->activate(); }
+void Services::deactivate() { impl->deactivate(); }
+
+juce::RecentlyOpenedFilesList& Services::getRecentlyOpenedFilesList() { return impl->recentFiles; }
+void Services::addRecentFile (const juce::File& file) { impl->recentFiles.addFile (file); }
+
+RunMode Services::getRunMode() const { return impl->runMode; }
+Context& Services::context() { return impl->world; }
+juce::UndoManager& Services::getUndoManager() { return impl->undo; }
+
+Service** Services::begin() noexcept { return impl->services.begin(); }
+Service* const* Services::begin() const noexcept { return impl->services.begin(); }
+Service** Services::end() noexcept { return impl->services.end(); }
+Service* const* Services::end() const noexcept { return impl->services.end(); }
+
+void Services::add (Service* service)
 {
-    const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
-    if (! recentList.existsAsFile())
-        recentList.create();
-    if (recentList.exists())
-        recentList.replaceWithText (recentFiles.toString(), false, false);
-
-    for (auto* s : services)
-        s->deactivate();
-
-    impl->active = false;
+    service->owner = this;
+    impl->services.add (service);
 }
 
-void ServiceManager::launch()
+void Services::launch()
 {
     activate();
-    if (auto* gui = findChild<GuiService>())
+    if (auto* gui = find<GuiService>())
         gui->run();
 }
 
-void ServiceManager::run()
+void Services::shutdown()
+{
+    for (auto* s : impl->services)
+        s->shutdown();
+}
+
+void Services::saveSettings()
+{
+    for (auto* s : impl->services)
+        s->saveSettings();
+}
+
+void Services::run()
 {
     activate();
 
     // need content component parented for the following init routines
     // TODO: better controlled startup procedure
-    if (auto* gui = findChild<GuiService>())
+    if (auto* gui = find<GuiService>())
         gui->run();
 
-    auto session = getWorld().getSession();
+    auto session = context().session();
     Session::ScopedFrozenLock freeze (*session);
 
-    if (auto* sc = findChild<SessionService>())
+    if (auto* sc = find<SessionService>())
     {
         bool loadDefault = true;
 
-        if (world.getSettings().openLastUsedSession())
+        if (context().getSettings().openLastUsedSession())
         {
-            const auto lastSession = getWorld().getSettings().getUserSettings()->getValue (Settings::lastSessionKey);
+            const auto lastSession = context().getSettings().getUserSettings()->getValue (Settings::lastSessionKey);
             if (File::isAbsolutePath (lastSession) && File (lastSession).existsAsFile())
             {
                 sc->openFile (File (lastSession));
@@ -168,11 +214,11 @@ void ServiceManager::run()
             sc->openDefaultSession();
     }
 
-    if (auto* gui = findChild<GuiService>())
+    if (auto* gui = find<GuiService>())
     {
         gui->stabilizeContent();
         const Node graph (session->getCurrentGraph());
-        auto* const props = getGlobals().getSettings().getUserSettings();
+        auto* const props = context().getSettings().getUserSettings();
 
         if (graph.isValid())
         {
@@ -183,17 +229,21 @@ void ServiceManager::run()
     }
 }
 
-void ServiceManager::handleMessage (const Message& msg)
+void Services::handleMessage (const Message& msg)
 {
-    auto* ec = findChild<EngineService>();
-    auto* gui = findChild<GuiService>();
-    auto* sess = findChild<SessionService>();
-    auto* devs = findChild<DeviceService>();
-    auto* maps = findChild<MappingService>();
-    auto* presets = findChild<PresetService>();
+    auto* ec = find<EngineService>();
+    auto* gui = find<GuiService>();
+    auto* sess = find<SessionService>();
+    auto* devs = find<DeviceService>();
+    auto* maps = find<MappingService>();
+    auto* presets = find<PresetService>();
     jassert (ec && gui && sess && devs && maps && presets);
 
     bool handled = false; // final else condition will set false
+
+    auto& undo = impl->undo;
+    auto& services = impl->services;
+    auto& recentFiles = impl->recentFiles;
 
     if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
     {
@@ -275,7 +325,7 @@ void ServiceManager::handleMessage (const Message& msg)
     {
         auto node = sdnm->node;
         node.savePluginState();
-        getWorld().getPluginManager().saveDefaultNode (node);
+        context().plugins().saveDefaultNode (node);
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
@@ -366,12 +416,12 @@ void ServiceManager::handleMessage (const Message& msg)
     }
 }
 
-ApplicationCommandTarget* ServiceManager::getNextCommandTarget()
+ApplicationCommandTarget* Services::getNextCommandTarget()
 {
-    return findChild<GuiService>();
+    return find<GuiService>();
 }
 
-void ServiceManager::getAllCommands (Array<CommandID>& cids)
+void Services::getAllCommands (Array<CommandID>& cids)
 {
     cids.addArray ({
         Commands::mediaNew,
@@ -405,105 +455,107 @@ void ServiceManager::getAllCommands (Array<CommandID>& cids)
     cids.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
 
-void ServiceManager::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
+void Services::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
-    findChild<GuiService>()->getCommandInfo (commandID, result);
+    find<GuiService>()->getCommandInfo (commandID, result);
     // for (auto* const child : getChildren())
     //     if (auto* const appChild = dynamic_cast<Controller*> (child))
     //         appChild->getCommandInfo (commandID, result);
 }
 
-bool ServiceManager::perform (const InvocationInfo& info)
+bool Services::perform (const InvocationInfo& info)
 {
+    auto& undo = impl->undo;
     bool res = true;
+
     switch (info.commandID)
     {
         case Commands::undo: {
             if (undo.canUndo())
                 undo.undo();
-            if (auto* cc = findChild<GuiService>()->getContentComponent())
+            if (auto* cc = find<GuiService>()->getContentComponent())
                 cc->stabilizeViews();
-            findChild<GuiService>()->refreshMainMenu();
+            find<GuiService>()->refreshMainMenu();
         }
         break;
 
         case Commands::redo: {
             if (undo.canRedo())
                 undo.redo();
-            if (auto* cc = findChild<GuiService>()->getContentComponent())
+            if (auto* cc = find<GuiService>()->getContentComponent())
                 cc->stabilizeViews();
-            findChild<GuiService>()->refreshMainMenu();
+            find<GuiService>()->refreshMainMenu();
         }
         break;
 
         case Commands::sessionOpen: {
-            FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);
+            FileChooser chooser ("Open Session", impl->lastSavedFile, "*.els", true, false);
             if (chooser.browseForFileToOpen())
             {
-                findChild<SessionService>()->openFile (chooser.getResult());
-                recentFiles.addFile (chooser.getResult());
+                find<SessionService>()->openFile (chooser.getResult());
+                impl->recentFiles.addFile (chooser.getResult());
             }
         }
         break;
 
         case Commands::sessionNew:
-            findChild<SessionService>()->newSession();
+            find<SessionService>()->newSession();
             break;
         case Commands::sessionSave:
-            findChild<SessionService>()->saveSession (false);
+            find<SessionService>()->saveSession (false);
             break;
         case Commands::sessionSaveAs:
-            findChild<SessionService>()->saveSession (true);
+            find<SessionService>()->saveSession (true);
             break;
         case Commands::sessionClose:
-            findChild<SessionService>()->closeSession();
+            find<SessionService>()->closeSession();
             break;
         case Commands::sessionAddGraph:
-            findChild<EngineService>()->addGraph();
+            find<EngineService>()->addGraph();
             break;
         case Commands::sessionDuplicateGraph:
-            findChild<EngineService>()->duplicateGraph();
+            find<EngineService>()->duplicateGraph();
             break;
         case Commands::sessionDeleteGraph:
-            findChild<EngineService>()->removeGraph();
+            find<EngineService>()->removeGraph();
             break;
 
         case Commands::transportPlay:
-            getWorld().getAudioEngine()->togglePlayPause();
+            context().audio()->togglePlayPause();
             break;
 
         case Commands::importGraph: {
-            FileChooser chooser ("Import Graph", lastExportedGraph, "*.elg");
+            FileChooser chooser ("Import Graph", impl->lastExportedGraph, "*.elg");
             if (chooser.browseForFileToOpen())
-                findChild<SessionService>()->importGraph (chooser.getResult());
+                find<SessionService>()->importGraph (chooser.getResult());
         }
         break;
 
         case Commands::exportGraph: {
-            auto session = getWorld().getSession();
+            auto session = context().session();
             auto node = session->getCurrentGraph();
             node.savePluginState();
 
-            if (! lastExportedGraph.isDirectory())
-                lastExportedGraph = lastExportedGraph.getParentDirectory();
-            if (lastExportedGraph.isDirectory())
+            if (! impl->lastExportedGraph.isDirectory())
+                impl->lastExportedGraph = impl->lastExportedGraph.getParentDirectory();
+            if (impl->lastExportedGraph.isDirectory())
             {
-                lastExportedGraph = lastExportedGraph.getChildFile (node.getName()).withFileExtension ("elg");
-                lastExportedGraph = lastExportedGraph.getNonexistentSibling();
+                impl->lastExportedGraph = impl->lastExportedGraph.getChildFile (node.getName()).withFileExtension ("elg");
+                impl->lastExportedGraph = impl->lastExportedGraph.getNonexistentSibling();
             }
 
             {
-                FileChooser chooser ("Export Graph", lastExportedGraph, "*.elg");
+                FileChooser chooser ("Export Graph", impl->lastExportedGraph, "*.elg");
                 if (chooser.browseForFileToSave (true))
-                    findChild<SessionService>()->exportGraph (node, chooser.getResult());
-                if (auto* gui = findChild<GuiService>())
+                    find<SessionService>()->exportGraph (node, chooser.getResult());
+                if (auto* gui = find<GuiService>())
                     gui->stabilizeContent();
             }
         }
         break;
 
         case Commands::panic: {
-            auto e = getWorld().getAudioEngine();
+            auto e = context().audio();
             for (int c = 1; c <= 16; ++c)
             {
                 auto msg = MidiMessage::allNotesOff (c);
@@ -531,12 +583,12 @@ bool ServiceManager::perform (const InvocationInfo& info)
         break;
 
         case Commands::checkNewerVersion:
-            findChild<GuiService>()->checkUpdates();
+            find<GuiService>()->checkUpdates();
             break;
 
         case Commands::recentsClear: {
-            recentFiles.clear();
-            findChild<GuiService>()->refreshMainMenu();
+            impl->recentFiles.clear();
+            find<GuiService>()->refreshMainMenu();
         }
         break;
 

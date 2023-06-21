@@ -364,7 +364,7 @@ public:
             currentGraph = graphs.getGraphIndex();
         }
 
-        auto session = engine.getWorld().getSession();
+        auto session = engine.context().session();
         if (currentGraph >= 0 && currentGraph != session->getActiveGraphIndex())
         {
             // NOTE: this is a cheap way to refresh the GUI, in the future this
@@ -432,8 +432,8 @@ public:
         processCurrentGraph (buffer, incomingMidi);
 
         {
-            ScopedLock lockMidiOut (engine.world.getMidiEngine().getMidiOutputLock());
-            if (auto* const midiOut = engine.world.getMidiEngine().getDefaultMidiOutput())
+            ScopedLock lockMidiOut (engine.world.midi().getMidiOutputLock());
+            if (auto* const midiOut = engine.world.midi().getDefaultMidiOutput())
             {
                 if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
                 {
@@ -791,7 +791,7 @@ void AudioEngine::activate()
 {
     if (getRunMode() == RunMode::Standalone)
     {
-        auto& midi (world.getMidiEngine());
+        auto& midi (world.midi());
         midi.addMidiInputCallback (String(), &getMidiInputCallback());
     }
 }
@@ -800,7 +800,7 @@ void AudioEngine::deactivate()
 {
     if (getRunMode() == RunMode::Standalone)
     {
-        auto& midi (world.getMidiEngine());
+        auto& midi (world.midi());
         midi.removeMidiInputCallback (String(), &getMidiInputCallback());
     }
 }
@@ -932,7 +932,7 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
     if (priv)
     {
         if (getRunMode() == RunMode::Plugin)
-            world.getMidiEngine().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
+            world.midi().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
         priv->processCurrentGraph (buffer, midi);
     }
 }
@@ -969,7 +969,7 @@ void AudioEngine::releaseExternalResources()
         priv->audioStopped();
 }
 
-Context& AudioEngine::getWorld() const { return world; }
+Context& AudioEngine::context() const { return world; }
 
 void AudioEngine::updateExternalLatencySamples()
 {

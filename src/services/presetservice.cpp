@@ -57,7 +57,7 @@ void PresetService::deactivate()
 
 void PresetService::refresh()
 {
-    getWorld().getPresetManager().refresh();
+    context().presets().refresh();
 }
 
 void PresetService::add (const Node& node, const String& presetName)
@@ -71,10 +71,10 @@ void PresetService::add (const Node& node, const String& presetName)
     }
     else
     {
-        getWorld().getPresetManager().refresh();
+        context().presets().refresh();
     }
 
-    if (auto* gui = findSibling<GuiService>())
+    if (auto* gui = sibling<GuiService>())
         if (auto* cc = gui->getContentComponent())
             cc->stabilize (true);
 }

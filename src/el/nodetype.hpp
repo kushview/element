@@ -27,17 +27,17 @@ inline static sol::table new_nodetype (lua_State* L, const char* name, Args&&...
         "displayName", [] (Node* self) { return self->getDisplayName().toStdString(); },
         "pluginName",  [] (Node* self) { return self->getPluginName().toStdString(); },
         "hasModifiedName", &Node::hasModifiedName,
-        "uuid",        [](Node& self) { return self.getUuidString().toStdString(); },
+        "uuidString",  [](Node& self) { return self.getUuidString().toStdString(); },
         "nodeId",      [](Node& self) { return static_cast<lua_Integer> (self.getNodeId()); },
         "nodeType",    [](Node& self) { return self.getNodeType().toString(); },
 
-        "isMissing",   &Node::isMissing,
-        "isValid",     &Node::isValid,
-        "isEnabled",   &Node::isEnabled,
-        "isBypased",   &Node::isBypassed,
-        "isMuted",     &Node::isMuted,
+        "missing",     &Node::isMissing,
+        "valid",       &Node::isValid,
+        "enabled",     &Node::isEnabled,
+        "bypassed",    &Node::isBypassed,
+        "muted",       &Node::isMuted,
         "isGraph",     &Node::isGraph,
-        "isRootGraph", &Node::isRootGraph,
+        "isRoot",      &Node::isRootGraph,
 
         "toXmlString", [] (Node* self) -> std::string {
             auto copy = self->getValueTree().createCopy();

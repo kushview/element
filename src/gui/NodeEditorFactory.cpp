@@ -96,7 +96,7 @@ private:
         }
         else if (NID == EL_INTERNAL_ID_SCRIPT)
         {
-            return new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node);
+            return new ScriptNodeEditor (gui.context().scripting(), node);
         }
         else if (NID == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
         {
@@ -123,7 +123,7 @@ private:
         {
             if (node.isChildOfRootGraph())
             {
-                return new MidiIONodeEditor (node, gui.getWorld().getMidiEngine(), true, false);
+                return new MidiIONodeEditor (node, gui.context().midi(), true, false);
             }
             else
             {
@@ -135,7 +135,7 @@ private:
         {
             if (node.isChildOfRootGraph())
             {
-                return new MidiIONodeEditor (node, gui.getWorld().getMidiEngine(), false, true);
+                return new MidiIONodeEditor (node, gui.context().midi(), false, true);
             }
             else
             {
@@ -168,7 +168,7 @@ private:
         }
         else if (node.getIdentifier() == EL_INTERNAL_ID_SCRIPT)
         {
-            auto* se = new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node);
+            auto* se = new ScriptNodeEditor (gui.context().scripting(), node);
             se->setToolbarVisible (false);
             return se;
         }

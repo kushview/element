@@ -291,7 +291,7 @@ public:
 #else
         jassert (ViewHelpers::getGlobals (this));
         if (auto* world = ViewHelpers::getGlobals (this))
-            world->getMidiEngine().removeMidiInputCallback (this);
+            world->midi().removeMidiInputCallback (this);
 #endif
 
         listening = false;
@@ -308,7 +308,7 @@ public:
 
         jassert (ViewHelpers::getGlobals (this));
         if (auto* world = ViewHelpers::getGlobals (this))
-            world->getMidiEngine().addMidiInputCallback (inputName, this, true);
+            world->midi().addMidiInputCallback (inputName, this, true);
 
         listening = true;
         updateToggleState();
@@ -619,7 +619,7 @@ public:
 
     bool haveControllers() const
     {
-        if (auto sess = (const_cast<Content*> (this))->getSession())
+        if (auto sess = (const_cast<Content*> (this))->session)
             return sess->getNumControllerDevices() > 0;
         return false;
     }
@@ -724,7 +724,7 @@ public:
 
     void comboBoxChanged (ComboBox* box) override
     {
-        editedDevice = ControllerDevice (getSession()->getControllerDeviceValueTree (box->getSelectedItemIndex()));
+        editedDevice = ControllerDevice (session->getControllerDeviceValueTree (box->getSelectedItemIndex()));
         stabilizeContent();
     }
 
@@ -823,7 +823,7 @@ public:
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
         jassert (ViewHelpers::findContentComponent (this) != nullptr);
-        auto& app = ViewHelpers::findContentComponent (this)->getServices();
+        auto& app = ViewHelpers::findContentComponent (this)->services();
 
         StringArray keys;
         Array<var> values;
@@ -1051,7 +1051,7 @@ private:
     int mappingsSize = 150;
     void updateComboBoxes()
     {
-        const auto controllers = getSession()->getValueTree().getChildWithName (Tags::controllers);
+        const auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
         controllersBox.clear (dontSendNotification);
         for (int i = 0; i < controllers.getNumChildren(); ++i)
         {
@@ -1121,10 +1121,10 @@ ControllerDevicesView::ControllerDevicesView()
     addAndMakeVisible (content.get());
 }
 
-void ControllerDevicesView::initializeView (ServiceManager& app)
+void ControllerDevicesView::initializeView (Services& app)
 {
     if (content)
-        content->setSession (app.getWorld().getSession(), false);
+        content->setSession (app.context().session(), false);
 }
 
 ControllerDevicesView::~ControllerDevicesView()

@@ -35,7 +35,7 @@ public:
         jassert (sender != nullptr);
         auto* cc = ViewHelpers::findContentComponent (sender);
         jassert (cc != nullptr);
-        plugins = &cc->getGlobals().getPluginManager();
+        plugins = &cc->context().plugins();
         jassert (plugins != nullptr);
         available = plugins->getKnownPlugins().getTypes();
     }

@@ -73,7 +73,7 @@ public:
 
     void clearMessages();
 
-    const StringArray& getLog() const { return midiLog; }
+    const StringArray& logger() const { return midiLog; }
 
 private:
     friend class MidiMonitorNodeEditor;

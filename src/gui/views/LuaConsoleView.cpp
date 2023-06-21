@@ -32,14 +32,14 @@ LuaConsoleView::~LuaConsoleView()
     }
 }
 
-void LuaConsoleView::initializeView (ServiceManager& app)
+void LuaConsoleView::initializeView (Services& app)
 {
-    auto& se = app.getWorld().getScriptingEngine();
+    auto& se = app.context().scripting();
     sol::state_view view (se.getLuaState());
     console.setEnvironment (
         sol::environment (view, sol::create, view.globals()));
 
-    log = &app.getWorld().getLog();
+    log = &app.context().logger();
     log->addListener (this);
 
     String buffer;

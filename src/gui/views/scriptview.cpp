@@ -14,7 +14,7 @@ class ScriptView::Impl : public juce::Value::Listener
 {
 public:
     Impl (ScriptView& v, Context& c)
-        : view (v), context (c), scripting (c.getScriptingEngine()), env (scripting.getLuaState(), sol::create)
+        : view (v), context (c), scripting (c.scripting()), env (scripting.getLuaState(), sol::create)
     {
     }
 

@@ -27,7 +27,7 @@ public:
     virtual void initialise() override
     {
         globals.reset (new Context());
-        globals->getPluginManager().addDefaultFormats();
+        globals->plugins().addDefaultFormats();
     }
 
     virtual void shutdown() override

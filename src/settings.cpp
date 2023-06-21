@@ -403,8 +403,8 @@ void Settings::setMainContentType (const String& tp)
 //=============================================================================
 void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
 {
-    auto& devices (world.getDeviceManager());
-    auto& midi (world.getMidiEngine());
+    auto& devices (world.devices());
+    auto& midi (world.midi());
     PopupMenu sub;
 
     sub.addItem (CheckForUpdatesOnStart, "Check Updates at Startup", true, checkForUpdates());
@@ -479,8 +479,8 @@ void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
 
 bool Settings::performMenuResult (Context& world, const int result)
 {
-    auto& devices (world.getDeviceManager());
-    auto& midi (world.getMidiEngine());
+    auto& devices (world.devices());
+    auto& midi (world.midi());
     bool handled = true;
 
     switch (result)

@@ -30,15 +30,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L)
 
         "saveState",    &Session::saveGraphState,
         "restoreState", &Session::restoreGraphState
-
-#if 0
-        "clear",                    &Session::clear,
-        "get_num_graphs",           &Session::getNumGraphs,
-        "get_graph",                &Session::getGraph,
-        "get_active_graph",         &Session::getActiveGraph,
-        "get_active_graph_index",   &Session::getActiveGraphIndex,
-        "add_graph",                &Session::addGraph,
-#endif
     );
 
     sol::stack::push (L, element::lua::remove_and_clear (M, "Session"));

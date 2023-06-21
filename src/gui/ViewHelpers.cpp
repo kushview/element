@@ -102,28 +102,28 @@ ContentComponent* findContentComponent (Component* c)
 GuiService* getGuiController (Component* c)
 {
     if (auto* const cc = findContentComponent (c))
-        return cc->getServices().findChild<GuiService>();
+        return cc->services().find<GuiService>();
     return nullptr;
 }
 
 AudioEnginePtr getAudioEngine (Component* c)
 {
     if (auto* cc = findContentComponent (c))
-        return cc->getGlobals().getAudioEngine();
+        return cc->context().audio();
     return nullptr;
 }
 
 Context* getGlobals (Component* c)
 {
     if (auto* cc = findContentComponent (c))
-        return &cc->getGlobals();
+        return &cc->context();
     return nullptr;
 }
 
 SessionPtr getSession (Component* c)
 {
     if (auto* cc = findContentComponent (c))
-        return cc->getSession();
+        return cc->session();
     return nullptr;
 }
 
@@ -158,21 +158,21 @@ void postMessageFor (Component* c, Message* m)
 void presentPluginWindow (Component* c, const Node& node)
 {
     if (auto* cc = findContentComponent (c))
-        if (auto* gui = cc->getServices().findChild<GuiService>())
+        if (auto* gui = cc->services().find<GuiService>())
             gui->presentPluginWindow (node);
 }
 
 void closePluginWindows (Component* c, const bool visible)
 {
     if (auto* cc = findContentComponent (c))
-        if (auto* gui = cc->getServices().findChild<GuiService>())
+        if (auto* gui = cc->services().find<GuiService>())
             gui->closeAllPluginWindows (visible);
 }
 
 void closePluginWindowsFor (Component* c, Node& node, const bool visible)
 {
     if (auto* cc = findContentComponent (c))
-        if (auto* gui = cc->getServices().findChild<GuiService>())
+        if (auto* gui = cc->services().find<GuiService>())
             gui->closePluginWindowsFor (node, visible);
 }
 

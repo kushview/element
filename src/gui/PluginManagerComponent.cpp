@@ -387,7 +387,7 @@ static void saveSettings (Component* c, const bool saveUserPlugins = true)
     if (auto* g = ViewHelpers::getGlobals (c))
     {
         if (saveUserPlugins)
-            g->getPluginManager().saveUserPlugins (g->getSettings());
+            g->plugins().saveUserPlugins (g->getSettings());
         g->getSettings().saveIfNeeded();
     }
 }
@@ -903,7 +903,7 @@ void PluginManagerContentView::didBecomeActive()
 {
     jassert (ViewHelpers::getGlobals (this));
     auto& world (*ViewHelpers::getGlobals (this));
-    auto& plugins (world.getPluginManager());
+    auto& plugins (world.plugins());
     auto& settings (world.getSettings());
 
     if (pluginList)
@@ -960,7 +960,7 @@ void PluginListComponent::scanWithBackgroundScanner()
 bool PluginListComponent::isPluginVersion()
 {
     if (auto* cc = ViewHelpers::findContentComponent (this))
-        return cc->getServices().getRunMode() == RunMode::Plugin;
+        return cc->services().getRunMode() == RunMode::Plugin;
     return false;
 }
 

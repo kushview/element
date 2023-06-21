@@ -265,17 +265,17 @@ void MappingService::activate()
 {
     Service::activate();
     auto& capture (impl->capture);
-    capturedConnection = getWorld().getMappingEngine().capturedSignal().connect (
+    capturedConnection = context().mapping().capturedSignal().connect (
         std::bind (&MappingService::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
         std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
-    getWorld().getMappingEngine().startMapping();
+    context().mapping().startMapping();
 }
 
 void MappingService::deactivate()
 {
     Service::deactivate();
-    getWorld().getMappingEngine().stopMapping();
+    context().mapping().stopMapping();
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
 }
@@ -288,7 +288,7 @@ bool MappingService::isLearning() const
 void MappingService::learn (const bool shouldLearn)
 {
     auto& capture (impl->capture);
-    auto& mapping (getWorld().getMappingEngine());
+    auto& mapping (context().mapping());
 
     impl->learnState = CaptureStopped;
     capture.clear();
@@ -298,7 +298,7 @@ void MappingService::learn (const bool shouldLearn)
     {
         DBG ("[element] MappingService: start learning");
         impl->learnState = CaptureParameter;
-        capture.addNodes (getWorld().getSession());
+        capture.addNodes (context().session());
     }
 }
 
@@ -307,7 +307,7 @@ void MappingService::onParameterCaptured (const Node& node, int parameter)
     if (impl->learnState == CaptureParameter)
     {
         DBG ("[element] MappingService: got parameter: " << parameter);
-        auto& mapping (getWorld().getMappingEngine());
+        auto& mapping (context().mapping());
         impl->learnState = CaptureControl;
         impl->node = node;
         impl->parameter = parameter;
@@ -321,11 +321,11 @@ void MappingService::onParameterCaptured (const Node& node, int parameter)
 
 void MappingService::onControlCaptured()
 {
-    auto session = getWorld().getSession();
+    auto session = context().session();
 
     if (impl->learnState == CaptureControl)
     {
-        auto& mapping (getWorld().getMappingEngine());
+        auto& mapping (context().mapping());
         impl->learnState = CaptureStopped;
         impl->message = mapping.getCapturedMidiMessage();
         impl->control = mapping.getCapturedControl();
@@ -344,7 +344,7 @@ void MappingService::onControlCaptured()
                 auto maps = session->getValueTree().getChildWithName (Tags::maps);
                 maps.addChild (newMap, -1, nullptr);
 
-                if (auto* gui = findSibling<GuiService>())
+                if (auto* gui = sibling<GuiService>())
                     gui->stabilizeViews();
             }
         }
@@ -357,12 +357,12 @@ void MappingService::onControlCaptured()
 
 void MappingService::remove (const ControllerMap& controllerMap)
 {
-    auto session = getWorld().getSession();
+    auto session = context().session();
     auto maps = session->getValueTree().getChildWithName (Tags::maps);
     if (controllerMap.getValueTree().isAChildOf (maps))
     {
         maps.removeChild (controllerMap.getValueTree(), nullptr);
-        if (auto* devs = findSibling<DeviceService>())
+        if (auto* devs = sibling<DeviceService>())
             devs->refresh();
     }
 }

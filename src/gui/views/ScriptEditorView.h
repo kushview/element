@@ -56,7 +56,7 @@ public:
 
     //=========================================================================
     /** @internal */
-    void initializeView (ServiceManager&) override;
+    void initializeView (Services&) override;
 
 #if 0
     virtual void willBeRemoved() { }

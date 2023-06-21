@@ -94,7 +94,7 @@ private:
         if (sampleRate <= 0.0)
             return;
 
-        auto& devs = globals.getDeviceManager();
+        auto& devs = globals.devices();
         auto setup = devs.getAudioDeviceSetup();
         if (sampleRate != setup.sampleRate)
         {
@@ -148,10 +148,10 @@ public:
         if (listenersReady == true)
             return;
 
-        application.reset (new CommandOSCListener (owner.getWorld()));
+        application.reset (new CommandOSCListener (owner.context()));
         receiver.addListener (application.get(), EL_OSC_ADDRESS_COMMAND);
 
-        engine.reset (new EngineOSCListener (owner.getWorld()));
+        engine.reset (new EngineOSCListener (owner.context()));
         receiver.addListener (engine.get(), EL_OSC_ADDRESS_ENGINE);
 
         listenersReady = true;
@@ -199,7 +199,7 @@ OSCService::~OSCService()
 
 void OSCService::refreshWithSettings (bool alertOnFail)
 {
-    auto& settings = getWorld().getSettings();
+    auto& settings = context().getSettings();
     impl->stopServer();
     impl->setServerPort (settings.getOscHostPort());
 

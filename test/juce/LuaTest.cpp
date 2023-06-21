@@ -314,7 +314,7 @@ private:
     void testSession()
     {
         beginTest("session");
-        auto s = getWorld().getSession();
+        auto s = context().session();
         s->setName ("test session");
         
         try

@@ -134,7 +134,7 @@ public:
     void showPluginWindow (bool showIt = true)
     {
         auto* const cc = ViewHelpers::findContentComponent (getOwnerView());
-        auto* const gui = cc != nullptr ? cc->getServices().findChild<GuiService>() : nullptr;
+        auto* const gui = cc != nullptr ? cc->services().find<GuiService>() : nullptr;
         if (nullptr == gui)
             return;
 
@@ -153,7 +153,7 @@ public:
     {
         if (auto* const cc = ViewHelpers::findContentComponent (getOwnerView()))
         {
-            if (auto* const gui = cc->getServices().findChild<GuiService>())
+            if (auto* const gui = cc->services().find<GuiService>())
             {
                 if (auto* const window = gui->getPluginWindow (node))
                     gui->closePluginWindow (window);
@@ -182,7 +182,7 @@ public:
         if (session == nullptr || cc == nullptr)
             return;
 
-        auto* gui = cc->getServices().findChild<GuiService>();
+        auto* gui = cc->services().find<GuiService>();
         auto* const view = getOwnerView();
         auto* const tree = getSessionTreePanel();
         if (view == nullptr || tree == nullptr)
@@ -205,8 +205,8 @@ public:
             gui->closeAllPluginWindows (true);
             auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
             graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
-            auto& app (ViewHelpers::findContentComponent (getOwnerView())->getServices());
-            app.findChild<EngineService>()->setRootNode (root);
+            auto& app (ViewHelpers::findContentComponent (getOwnerView())->services());
+            app.find<EngineService>()->setRootNode (root);
             gui->showPluginWindowsFor (root, true, false, false);
         }
 
@@ -365,7 +365,7 @@ public:
         ignoreUnused (index);
 
         auto* world = ViewHelpers::getGlobals (getOwnerView());
-        auto session = world->getSession();
+        auto session = world->session();
         const auto& desc (details.description);
 
         const auto graph = node.isGraph() ? node : node.getParentGraph();
@@ -384,7 +384,7 @@ public:
         }
         else if (desc.isArray() && desc[0] == "plugin")
         {
-            if (auto p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString (desc[1].toString()))
+            if (auto p = world->plugins().getKnownPlugins().getTypeForIdentifierString (desc[1].toString()))
             {
                 ViewHelpers::postMessageFor (getOwnerView(),
                                              new AddPluginMessage (graph, *p));
@@ -554,7 +554,7 @@ public:
     void deleteItem() override
     {
         const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
-        ViewHelpers::findContentComponent (getOwnerView())->getServices().findChild<EngineService>()->removeGraph (index);
+        ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->removeGraph (index);
     }
 
     void showDocument() override
@@ -565,7 +565,7 @@ public:
         {
             if (auto* cc = getContentComponent())
             {
-                auto view = std::make_unique<ScriptView> (cc->getGlobals(), script);
+                auto view = std::make_unique<ScriptView> (cc->context(), script);
                 view->setNode (node);
                 cc->setMainView (view.release());
             }
@@ -584,7 +584,7 @@ public:
 
     void duplicateItem() override
     {
-        ViewHelpers::findContentComponent (getOwnerView())->getServices().findChild<EngineService>()->duplicateGraph (node);
+        ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->duplicateGraph (node);
     }
 
     void paintContent (Graphics& g, const Rectangle<int>& area) override
@@ -713,7 +713,7 @@ public:
 
     void addSubItems() override
     {
-        if (auto session = panel.getSession())
+        if (auto session = panel.session())
         {
             for (int i = 0; i < session->getNumGraphs(); ++i)
                 addSubItem (new SessionRootGraphTreeItem (session->getGraph (i)));
@@ -742,8 +742,8 @@ public:
         ignoreUnused (index);
 
         auto* world = ViewHelpers::getGlobals (getOwnerView());
-        auto session = world->getSession();
-        auto& app (ViewHelpers::findContentComponent (getOwnerView())->getServices());
+        auto session = world->session();
+        auto& app (ViewHelpers::findContentComponent (getOwnerView())->services());
         const auto& desc (details.description);
 
         if (desc.toString() == "ccNavConcertinaPanel")
@@ -753,7 +753,7 @@ public:
             const auto file ((panel) ? panel->getSelectedFile() : File());
             if (file.hasFileExtension ("elg"))
             {
-                if (auto* sess = app.findChild<SessionService>())
+                if (auto* sess = app.find<SessionService>())
                     sess->importGraph (file);
             }
         }
@@ -828,12 +828,12 @@ void SessionTreePanel::mouseDown (const MouseEvent& ev) {}
 
 void SessionTreePanel::setSession (SessionPtr s)
 {
-    session = s;
+    _session = s;
 
     if (! showingNode())
     {
         data.removeListener (this);
-        data = (session != nullptr) ? session->getValueTree() : ValueTree();
+        data = (_session != nullptr) ? _session->getValueTree() : ValueTree();
         data.addListener (this);
     }
 
@@ -864,8 +864,8 @@ void SessionTreePanel::showNode (const Node& newNode)
     }
     else
     {
-        auto os = session;
-        session = nullptr;
+        auto os = _session;
+        _session = nullptr;
         setSession (os);
     }
 
@@ -874,9 +874,9 @@ void SessionTreePanel::showNode (const Node& newNode)
 
 bool SessionTreePanel::showingNode() const noexcept { return node.isValid(); }
 
-SessionPtr SessionTreePanel::getSession() const
+SessionPtr SessionTreePanel::session() const
 {
-    return session;
+    return _session;
 }
 
 static TreeViewItem* findItemForNodeRecursive (TreeViewItem* item, const Node& node)
@@ -913,9 +913,9 @@ void SessionTreePanel::onNodeSelected()
 
 void SessionTreePanel::selectActiveRootGraph()
 {
-    if (ignoreActiveRootGraphSelectionHandler || ! session || nullptr == panel->rootItem)
+    if (ignoreActiveRootGraphSelectionHandler || ! _session || nullptr == panel->rootItem)
         return;
-    const auto activeGraph = session->getActiveGraph();
+    const auto activeGraph = _session->getActiveGraph();
     for (int i = 0; i < panel->rootItem->getNumSubItems(); ++i)
     {
         if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (panel->rootItem->getSubItem (i)))

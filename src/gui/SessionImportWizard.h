@@ -23,7 +23,7 @@
 
 namespace element {
 
-class ServiceManager;
+class Services;
 
 class SessionImportWizard final : public Component
 {
@@ -32,7 +32,7 @@ public:
     ~SessionImportWizard();
 
     void loadSession (const File& file);
-    SessionPtr getSession();
+    SessionPtr session();
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -40,7 +40,7 @@ public:
 private:
     class Content;
     std::unique_ptr<Content> content;
-    SessionPtr session;
+    SessionPtr _session;
 };
 
 class SessionImportWizardDialog : public DialogWindow
