@@ -18,32 +18,10 @@
 
 #pragma once
 
-#include <element/version.h>
+#include <element/version.hpp>
 #include <element/juce/events.hpp>
 
 namespace element {
-
-/** Representation of a version number */
-struct Version
-{
-    Version();
-    ~Version();
-
-    /** Returns the version string with git hash appended */
-    inline static juce::String withGitHash()
-    {
-        juce::String result (EL_VERSION_STRING);
-        if (strlen (EL_GIT_SHORT_HASH) > 0)
-            result << "-" << EL_GIT_SHORT_HASH;
-        return result;
-    }
-
-    /** Split a version string into an array of segments */
-    static juce::StringArray segments (const juce::String& versionString);
-
-    /** Converts version segments into an integer, good for version comparison */
-    static int asHexInteger (const juce::String& versionString);
-};
 
 class CurrentVersion : private juce::Timer,
                        private juce::Thread,

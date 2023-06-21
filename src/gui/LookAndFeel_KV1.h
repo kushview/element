@@ -21,6 +21,7 @@
 
 #include <element/juce.hpp>
 
+using namespace juce;
 namespace element {
 
 struct Colors

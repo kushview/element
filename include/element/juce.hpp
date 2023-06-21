@@ -1,30 +1,17 @@
-/** 
-    This file is part of Element.
-    Copyright (C) 2016-2021  Kushview, LLC.  All rights reserved.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-**/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
 
 #include <element/juce/config.h>
+#include <element/juce/core.hpp>
+
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_utils/juce_audio_utils.h>
-#include <juce_core/juce_core.h>
+
 #include <juce_cryptography/juce_cryptography.h>
 #include <juce_data_structures/juce_data_structures.h>
 #include <juce_dsp/juce_dsp.h>
@@ -34,15 +21,6 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_osc/juce_osc.h>
 
+using namespace juce; // FIXME:
 namespace element {
 }
-
-// FIXME:
-using namespace juce;
-
-namespace ProjectInfo {
-const char* const projectName = "Element";
-const char* const companyName = "Kushview";
-const char* const versionString = "0.47.0";
-const int versionNumber = 0x2f00;
-} // namespace ProjectInfo

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/juce/internalformat.hpp>
+#include <element/engine/internalformat.hpp>
 #include <element/transport.hpp>
 
 #include <element/node.hpp>

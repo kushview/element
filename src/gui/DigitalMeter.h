@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/core.hpp>
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 
@@ -27,7 +28,7 @@ class DigitalMeter;
 class DigitalMeterValue;
 
 /** Creates VU meters with scale in decibels */
-class DigitalMeterValue : public Component
+class DigitalMeterValue : public juce::Component
 {
 public:
     DigitalMeterValue (DigitalMeter* pMeter);
@@ -42,7 +43,7 @@ public:
     /** Reset peak holder. */
     void resetPeak();
 
-    virtual void paint (Graphics& g);
+    virtual void paint (juce::Graphics& g);
 
     /** @internal */
     void resized();
@@ -70,7 +71,7 @@ private:
 };
 
 /** Creates VU meters with scale in decibels */
-class DigitalMeter : public Component
+class DigitalMeter : public juce::Component
 {
 public:
     DigitalMeter (const int numPorts, bool horizontal = false);
@@ -102,7 +103,7 @@ public:
         ColorCount = 7
     };
 
-    const Colour& color (const int index) const;
+    const juce::Colour& color (const int index) const;
 
     enum ColoursIds
     {
@@ -116,7 +117,7 @@ public:
     };
 
     /** @internal */
-    void paint (Graphics& g);
+    void paint (juce::Graphics& g);
     /** @internal */
     void resized();
 
@@ -130,7 +131,7 @@ private:
     DigitalMeterValue** values;
     float scale;
     int levels[LevelCount];
-    Colour colors[ColorCount];
+    juce::Colour colors[ColorCount];
     int peakFalloff;
     bool horizontal;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DigitalMeter)

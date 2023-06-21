@@ -9,8 +9,9 @@
 #include <element/juce/gui_basics.hpp>
 
 #include <element/element.hpp>
-
+#include <element/ui/about.hpp>
 #include <element/ui/menumodels.hpp>
+
 #include <element/nodeobject.hpp>
 #include <element/session.hpp>
 
@@ -235,6 +236,9 @@ public:
         returns nullptr, Element will fallback to default titling.
      */
     virtual std::function<juce::String()> getMainWindowTitler() { return nullptr; }
+
+    /** The struct returned will be used when showing the About Dialog inside Element. */
+    virtual AboutInfo aboutInfo() { return {}; }
 
 protected:
     ContentFactory() = default;

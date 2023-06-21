@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #pragma once
 
 #include <element/juce/core.hpp>
@@ -22,9 +25,8 @@ inline static String encode (const String& input)
         }
         juce::Base64::convertToBase64 (out, mo.getData(), mo.getDataSize());
     }
-    String result; // = "data:application/gzip;base64, ";
-    result << out.toString();
-    return result;
+    // NOTE: "data:application/gzip;base64, ";
+    return out.toString();
 }
 
 inline static String decode (const String& input)

@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 
-class QuadrantLayout : public Component
+class QuadrantLayout : public juce::Component
 {
 public:
     enum Quadrant
@@ -37,11 +37,11 @@ public:
     QuadrantLayout();
     virtual ~QuadrantLayout();
 
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     virtual void resized() override;
 
-    void setQuadrantComponent (Quadrant, Component*);
-    Component* getQauadrantComponent (Quadrant) const;
+    void setQuadrantComponent (Quadrant, juce::Component*);
+    juce::Component* getQauadrantComponent (Quadrant) const;
 
 protected:
     virtual void updateCenter();
@@ -50,14 +50,14 @@ protected:
     void setCenterY (const int y);
 
 private:
-    Rectangle<int> q1area, q2area, q3area, q4area;
+    juce::Rectangle<int> q1area, q2area, q3area, q4area;
     int centerX, centerY;
-    OwnedArray<Component> quadrants;
+    juce::OwnedArray<Component> quadrants;
     bool deleteQuadrants;
     void updateQuadrantBounds();
 };
 
-class PatchMatrixComponent : public Component
+class PatchMatrixComponent : public juce::Component
 {
 public:
     PatchMatrixComponent();
@@ -68,9 +68,9 @@ public:
 
     virtual int getNumColumns() = 0;
     virtual int getNumRows() = 0;
-    virtual void paintMatrixCell (Graphics& g, const int width, const int height, const int row, const int column) = 0;
-    virtual void matrixCellClicked (const int row, const int col, const MouseEvent& ev);
-    virtual void matrixBackgroundClicked (const MouseEvent& ev) {}
+    virtual void paintMatrixCell (juce::Graphics& g, const int width, const int height, const int row, const int column) = 0;
+    virtual void matrixCellClicked (const int row, const int col, const juce::MouseEvent& ev);
+    virtual void matrixBackgroundClicked (const juce::MouseEvent& ev) {}
     virtual void matrixHoveredCellChanged (const int prevRow, const int prevCol, const int newRow, const int newCol) {}
 
     inline bool mouseIsOverRow (const int row) const { return row >= 0 && hoveredRow >= 0 && row == hoveredRow; }
@@ -79,12 +79,12 @@ public:
 
     inline bool mouseIsOverCell (const int row, const int col) const { return mouseIsOverRow (row) && mouseIsOverColumn (col); }
 
-    void mouseEnter (const MouseEvent& ev) override;
-    void mouseMove (const MouseEvent& ev) override;
-    void mouseExit (const MouseEvent& ev) override;
+    void mouseEnter (const juce::MouseEvent& ev) override;
+    void mouseMove (const juce::MouseEvent& ev) override;
+    void mouseExit (const juce::MouseEvent& ev) override;
 
-    void mouseDown (const MouseEvent& ev) override;
-    void paint (Graphics& g) override;
+    void mouseDown (const juce::MouseEvent& ev) override;
+    void paint (juce::Graphics& g) override;
 
     void setThickness (const int thickness)
     {

@@ -24,6 +24,7 @@
 #endif
 
 namespace element {
+using namespace juce;
 
 QuadrantLayout::QuadrantLayout()
 {

@@ -37,11 +37,11 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::setCapacity (int32 newCapacity)
 {
-    newCapacity = nextPowerOfTwo (newCapacity);
+    newCapacity = juce::nextPowerOfTwo (newCapacity);
 
     if (fifo.getTotalSize() != newCapacity)
     {
-        HeapBlock<uint8> newBlock;
+        juce::HeapBlock<uint8> newBlock;
         newBlock.allocate (newCapacity, true);
         {
             block.swapWith (newBlock);

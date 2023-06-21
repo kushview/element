@@ -11,6 +11,7 @@ test_element_sources = '''
 
     scripting/ScriptDescriptionTests.cpp
     scripting/ScriptManagerTests.cpp
+    updatetests.cpp
 '''.split()
 test_element_cpp_args = [
     '-DEL_TEST_SOURCE_ROOT="@0@"'.format (meson.project_source_root())
@@ -39,6 +40,7 @@ test ('Oversampler',    test_element_app, args : [ '-t', 'OversamplerTests' ])
 test ('PortList',       test_element_app, args : [ '-t', 'PortListTests' ])
 test ('NodeObject',     test_element_app, args : [ '-t', 'NodeObjectTests' ])
 test ('PluginManager',  test_element_app, args : [ '-t', 'PluginManagerTests' ])
+test ('Updates',        test_element_app, args : [ '-t', 'UpdateTests' ])
 
 test ('ScriptDescription', test_element_app, args : [ '-t', 'ScriptDescriptionTests' ],
     suite : 'scripting')

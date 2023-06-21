@@ -50,12 +50,12 @@ public:
 
     bool canAddBus (bool isInput) const override
     {
-        ignoreUnused (isInput);
+        juce::ignoreUnused (isInput);
         return false;
     }
     bool canRemoveBus (bool isInput) const override
     {
-        ignoreUnused (isInput);
+        juce::ignoreUnused (isInput);
         return false;
     }
 
@@ -70,10 +70,10 @@ public:
 
     int getNumPrograms() override { return 1; };
     int getCurrentProgram() override { return 0; };
-    void setCurrentProgram (int index) override { ignoreUnused (index); };
+    void setCurrentProgram (int index) override { juce::ignoreUnused (index); };
     const String getProgramName (int index) override
     {
-        ignoreUnused (index);
+        juce::ignoreUnused (index);
         return getName();
     }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }

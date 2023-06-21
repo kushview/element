@@ -23,7 +23,7 @@
 
 namespace element {
 
-class CommandManager : public ApplicationCommandManager
+class CommandManager : public juce::ApplicationCommandManager
 {
 public:
     CommandManager() {}

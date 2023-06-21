@@ -55,8 +55,10 @@ private:
     std::unique_ptr<Drawable> elementLogo;
     DrawableImage logo;
     TabbedComponent tabs { TabbedButtonBar::TabsAtTop };
+    TextButton copyVersionButton;
 
     void updateAboutInfo();
+    void copyVersion();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutComponent)
 };
 

@@ -18,13 +18,14 @@
 
 #pragma once
 
-#include <element/juce.hpp>
-#include "appinfo.hpp"
+#include <element/juce/core.hpp>
+#include <element/juce/audio_basics.hpp>
+#include <element/juce/osc.hpp>
 
 namespace element {
 namespace Util {
 
-inline static juce_wchar defaultPasswordChar() noexcept
+inline static juce::juce_wchar defaultPasswordChar() noexcept
 {
 #if JUCE_LINUX
     return 0x2022;
@@ -37,8 +38,8 @@ inline static juce_wchar defaultPasswordChar() noexcept
 inline static String minutesToString (const double input)
 {
     double minutes = 0, seconds = 60.0 * modf (input, &minutes);
-    String ms (roundToInt (floor (minutes)));
-    String mm (roundToInt (floor (seconds)));
+    String ms (juce::roundToInt (floor (minutes)));
+    String mm (juce::roundToInt (floor (seconds)));
     return ms.paddedLeft ('0', 2) + ":" + mm.paddedLeft ('0', 2);
 }
 
@@ -50,7 +51,7 @@ inline static String secondsToString (const double input)
 
 inline static String noteValueToString (double value)
 {
-    return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
+    return juce::MidiMessage::getMidiNoteName (juce::roundToInt (value), true, true, 3);
 }
 
 /** Returns the application name depending on product.
@@ -73,7 +74,7 @@ inline static String appName (const String& beforeText = String(),
 
 inline static bool isGmailExtended (const String& email)
 {
-    if (! URL::isProbablyAnEmailAddress (email))
+    if (! juce::URL::isProbablyAnEmailAddress (email))
         return false;
     if (! email.toLowerCase().contains ("gmail.com"))
         return false;
@@ -96,7 +97,7 @@ inline static bool isValidOscPort (int port)
     return port > 0 && port < 65536;
 }
 
-inline static std::vector<std::string> parseOscAddressPaths (const OSCMessage& message)
+inline static std::vector<std::string> parseOscAddressPaths (const juce::OSCMessage& message)
 {
     /** AddressPattern.oscSymbols is already parsed, but it's a private member */
     const auto addr = message.getAddressPattern().toString().toStdString();
@@ -128,7 +129,7 @@ inline static std::vector<std::string> parseOscAddressPaths (const OSCMessage& m
     return paths;
 }
 
-inline static var getOscArgumentAsPrimitiveValue (const OSCArgument& arg)
+inline static juce::var getOscArgumentAsPrimitiveValue (const juce::OSCArgument& arg)
 {
     if (arg.isFloat32())
         return arg.getFloat32();
@@ -139,7 +140,7 @@ inline static var getOscArgumentAsPrimitiveValue (const OSCArgument& arg)
     return 0;
 }
 
-inline static String getOscArgumentAsString (const OSCArgument& arg)
+inline static String getOscArgumentAsString (const juce::OSCArgument& arg)
 {
     String type;
     String value;
@@ -173,9 +174,9 @@ inline static String getOscArgumentAsString (const OSCArgument& arg)
     return type + " " + value;
 }
 
-inline static String getOscMessageAsString (const OSCMessage& message)
+inline static String getOscMessageAsString (const juce::OSCMessage& message)
 {
-    OSCAddressPattern addressPattern = message.getAddressPattern();
+    juce::OSCAddressPattern addressPattern = message.getAddressPattern();
     String str = addressPattern.toString();
 
     if (message.isEmpty())
@@ -194,13 +195,13 @@ inline static String getOscMessageAsString (const OSCMessage& message)
     return str;
 }
 
-inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
+inline static juce::MidiMessage processOscToMidiMessage (const juce::OSCMessage& message)
 {
     std::vector<std::string> paths = parseOscAddressPaths (message);
 
     if (paths[0] != "midi")
     {
-        return MidiMessage();
+        return juce::MidiMessage();
     }
 
     std::string deviceName;
@@ -220,14 +221,14 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
     }
     else
     {
-        return MidiMessage();
+        return juce::MidiMessage();
     }
 
     /** Cast the rest of values to their respective types */
 
     const int numArgs = message.size();
-    std::unique_ptr<var[]> values;
-    values.reset (new var[numArgs]);
+    std::unique_ptr<juce::var[]> values;
+    values.reset (new juce::var[numArgs]);
 
     int blobIndexInMessage = -1;
 
@@ -252,9 +253,9 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
     {
         if (blobIndexInMessage >= 0)
         {
-            const MemoryBlock& blob = message[blobIndexInMessage].getBlob();
+            const juce::MemoryBlock& blob = message[blobIndexInMessage].getBlob();
             // return String::fromUTF8 ((const char*) blob.getData(), (int) blob.getSize());
-            return MidiMessage (blob.getData(), (int) blob.getSize());
+            return juce::MidiMessage (blob.getData(), (int) blob.getSize());
         }
     }
     else if (command == "noteOn")
@@ -262,7 +263,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 3)
         {
             /** channel, noteNumber, velocity */
-            return MidiMessage::noteOn ((int) values[0], (int) values[1], (float) values[2]);
+            return juce::MidiMessage::noteOn ((int) values[0], (int) values[1], (float) values[2]);
         }
     }
     else if (command == "noteOff")
@@ -270,7 +271,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 3)
         {
             /** channel, noteNumber, velocity */
-            return MidiMessage::noteOff ((int) values[0], (int) values[1], (float) values[2]);
+            return juce::MidiMessage::noteOff ((int) values[0], (int) values[1], (float) values[2]);
         }
     }
     else if (command == "programChange")
@@ -278,7 +279,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 2)
         {
             /** channel, programNumber */
-            return MidiMessage::programChange ((int) values[0], (int) values[1]);
+            return juce::MidiMessage::programChange ((int) values[0], (int) values[1]);
         }
     }
     else if (command == "pitchBend" || command == "pitchWheel")
@@ -286,7 +287,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 2)
         {
             /** channel, position */
-            return MidiMessage::pitchWheel ((int) values[0], (int) values[1]);
+            return juce::MidiMessage::pitchWheel ((int) values[0], (int) values[1]);
         }
     }
     else if (command == "afterTouch")
@@ -294,7 +295,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 2)
         {
             /** channel, noteNumber, aftertouchAmount */
-            return MidiMessage::aftertouchChange ((int) values[0], (int) values[1], (int) values[2]);
+            return juce::MidiMessage::aftertouchChange ((int) values[0], (int) values[1], (int) values[2]);
         }
     }
     else if (command == "channelPressure")
@@ -302,7 +303,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 2)
         {
             /** channel, pressure */
-            return MidiMessage::noteOff ((int) values[0], (int) values[1]);
+            return juce::MidiMessage::noteOff ((int) values[0], (int) values[1]);
         }
     }
     else if (command == "controlChange")
@@ -310,7 +311,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 3)
         {
             /** channel, controllerType, value */
-            return MidiMessage::controllerEvent ((int) values[0], (int) values[1], (int) values[2]);
+            return juce::MidiMessage::controllerEvent ((int) values[0], (int) values[1], (int) values[2]);
         }
     }
     else if (command == "allNotesOff")
@@ -318,7 +319,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 1)
         {
             /** channel */
-            return MidiMessage::allNotesOff ((int) values[0]);
+            return juce::MidiMessage::allNotesOff ((int) values[0]);
         }
     }
     else if (command == "allSoundOff")
@@ -326,7 +327,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 1)
         {
             /** channel */
-            return MidiMessage::allSoundOff ((int) values[0]);
+            return juce::MidiMessage::allSoundOff ((int) values[0]);
         }
     }
     else if (command == "allControllersOff")
@@ -334,45 +335,45 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 1)
         {
             /** channel */
-            return MidiMessage::allControllersOff ((int) values[0]);
+            return juce::MidiMessage::allControllersOff ((int) values[0]);
         }
     }
     else if (command == "start")
     {
-        return MidiMessage::midiStart();
+        return juce::MidiMessage::midiStart();
     }
     else if (command == "continue")
     {
-        return MidiMessage::midiContinue();
+        return juce::MidiMessage::midiContinue();
     }
     else if (command == "stop")
     {
-        return MidiMessage::midiStop();
+        return juce::MidiMessage::midiStop();
     }
     else if (command == "clock")
     {
-        return MidiMessage::midiClock();
+        return juce::MidiMessage::midiClock();
     }
     else if (command == "songPositionPointer")
     {
         if (numArgs >= 1)
         {
             /** positionInMidiBeats */
-            return MidiMessage::songPositionPointer ((int) values[0]);
+            return juce::MidiMessage::songPositionPointer ((int) values[0]);
         }
     }
     else if (command == "activeSense")
     {
-        return MidiMessage();
+        return juce::MidiMessage();
     }
 
     // Command "polyPressure" not supported?
 
     /** Unknown command */
-    return MidiMessage();
+    return juce::MidiMessage();
 }
 
-inline static OSCMessage processMidiToOscMessage (const MidiMessage& m)
+inline static juce::OSCMessage processMidiToOscMessage (const juce::MidiMessage& m)
 {
     /** Address: /midi/{command} or /midi/{deviceName}/{command} */
 
@@ -382,70 +383,70 @@ inline static OSCMessage processMidiToOscMessage (const MidiMessage& m)
 
     if (m.isNoteOn())
     {
-        return OSCMessage (path + "noteOn", channel, m.getNoteNumber(), m.getFloatVelocity());
+        return juce::OSCMessage (path + "noteOn", channel, m.getNoteNumber(), m.getFloatVelocity());
     }
     else if (m.isNoteOff())
     {
-        return OSCMessage (path + "noteOff", channel, m.getNoteNumber(), m.getFloatVelocity());
+        return juce::OSCMessage (path + "noteOff", channel, m.getNoteNumber(), m.getFloatVelocity());
     }
     else if (m.isProgramChange())
     {
-        return OSCMessage (path + "programChange", channel, m.getProgramChangeNumber());
+        return juce::OSCMessage (path + "programChange", channel, m.getProgramChangeNumber());
     }
     else if (m.isPitchWheel())
     {
-        return OSCMessage (path + "pitchBend", channel, m.getPitchWheelValue());
+        return juce::OSCMessage (path + "pitchBend", channel, m.getPitchWheelValue());
     }
     else if (m.isAftertouch())
     {
-        return OSCMessage (path + "afterTouch", channel, m.getNoteNumber(), m.getAfterTouchValue());
+        return juce::OSCMessage (path + "afterTouch", channel, m.getNoteNumber(), m.getAfterTouchValue());
     }
     else if (m.isChannelPressure())
     {
-        return OSCMessage (path + "channelPressure", channel, m.getChannelPressureValue());
+        return juce::OSCMessage (path + "channelPressure", channel, m.getChannelPressureValue());
     }
     else if (m.isController())
     {
-        return OSCMessage (path + "controlChange", channel, m.getControllerNumber(), m.getControllerValue());
+        return juce::OSCMessage (path + "controlChange", channel, m.getControllerNumber(), m.getControllerValue());
     }
     else if (m.isAllNotesOff())
     {
-        return OSCMessage (path + "allNotesOff");
+        return juce::OSCMessage (path + "allNotesOff");
     }
     else if (m.isAllSoundOff())
     {
-        return OSCMessage (path + "allNotesOff");
+        return juce::OSCMessage (path + "allNotesOff");
     }
     else if (m.isResetAllControllers())
     {
-        return OSCMessage (path + "allControllersOff");
+        return juce::OSCMessage (path + "allControllersOff");
     }
     else if (m.isMidiStart())
     {
-        return OSCMessage (path + "start");
+        return juce::OSCMessage (path + "start");
     }
     else if (m.isMidiContinue())
     {
-        return OSCMessage (path + "continue");
+        return juce::OSCMessage (path + "continue");
     }
     else if (m.isMidiStop())
     {
-        return OSCMessage (path + "stop");
+        return juce::OSCMessage (path + "stop");
     }
     else if (m.isMidiClock())
     {
-        return OSCMessage (path + "clock");
+        return juce::OSCMessage (path + "clock");
     }
     else if (m.isSongPositionPointer())
     {
-        return OSCMessage (path + "songPositionPointer", m.getSongPositionPointerMidiBeat());
+        return juce::OSCMessage (path + "songPositionPointer", m.getSongPositionPointerMidiBeat());
     }
     else if (m.isActiveSense())
     {
-        return OSCMessage (path + "activeSense");
+        return juce::OSCMessage (path + "activeSense");
     }
 
-    return OSCMessage (path + "unknown");
+    return juce::OSCMessage (path + "unknown");
 }
 
 inline static String toBase64 (const String& input)
@@ -455,8 +456,8 @@ inline static String toBase64 (const String& input)
 
 inline static String fromBase64 (const String& input)
 {
-    MemoryOutputStream mo;
-    Base64::convertFromBase64 (mo, input);
+    juce::MemoryOutputStream mo;
+    juce::Base64::convertFromBase64 (mo, input);
     return mo.toString();
 }
 

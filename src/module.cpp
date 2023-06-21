@@ -3,7 +3,7 @@
 #include "scripting.hpp"
 
 #include "dynlib.h"
-#include "filesystem.hpp"
+#include <element/filesystem.hpp>
 #include "module.hpp"
 
 namespace fs = std::filesystem;

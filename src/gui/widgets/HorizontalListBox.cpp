@@ -19,6 +19,8 @@
 
 #include "gui/widgets/HorizontalListBox.h"
 
+namespace element {
+
 class HorizontalListBox::RowComponent : public Component,
                                         public TooltipClient
 {
@@ -952,3 +954,5 @@ void HorizontalListBox::startDragAndDrop (const MouseEvent& e, const var& dragDe
         jassertfalse;
     }
 }
+
+} // namespace element

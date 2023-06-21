@@ -18,7 +18,7 @@
 */
 
 #include <element/audioengine.hpp>
-#include <element/juce/internalformat.hpp>
+#include <element/engine/internalformat.hpp>
 #include "engine/midiclock.hpp"
 #include "engine/midichannelmap.hpp"
 #include "engine/midiengine.hpp"

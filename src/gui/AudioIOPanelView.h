@@ -24,7 +24,7 @@
 
 namespace element {
 class Node;
-}
+
 //[/Headers]
 
 //==============================================================================
@@ -70,4 +70,5 @@ private:
 };
 
 //[EndFile] You can add extra defines here...
+} // namespace element
 //[/EndFile]

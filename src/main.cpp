@@ -19,7 +19,7 @@
 #include "ElementApp.h"
 #include <element/services.hpp>
 
-#include <element/juce/internalformat.hpp>
+#include <element/engine/internalformat.hpp>
 
 #include <element/context.hpp>
 #include <element/devicemanager.hpp>
@@ -150,8 +150,8 @@ public:
     Application() {}
     virtual ~Application() {}
 
-    const String getApplicationName() override { return Util::appName(); }
-    const String getApplicationVersion() override { return ProjectInfo::versionString; }
+    const String getApplicationName() override { return "Element"; }
+    const String getApplicationVersion() override { return EL_VERSION_STRING; }
     bool moreThanOneInstanceAllowed() override { return true; }
 
     void initialise (const String& commandLine) override
@@ -191,8 +191,10 @@ public:
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
 
-        world->getServices().saveSettings();
-        world->getServices().deactivate();
+        auto& srvs = world->getServices();
+        srvs.saveSettings();
+        srvs.deactivate();
+        srvs.shutdown();
 
         plugins.saveUserPlugins (settings);
         midi.writeSettings (settings);

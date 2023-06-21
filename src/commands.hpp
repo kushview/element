@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/core.hpp>
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 namespace Commands {
-
-using namespace StandardApplicationCommandIDs;
+using namespace juce::StandardApplicationCommandIDs;
 
 namespace Categories {
 static const char* const Application = "Application";
@@ -114,7 +114,7 @@ enum AppCommands
     recentsClear = 0x1000
 };
 
-inline static Array<CommandID> getAllCommands()
+inline static Array<juce::CommandID> getAllCommands()
 {
     return {
         quit,
@@ -194,7 +194,7 @@ inline static Array<CommandID> getAllCommands()
     };
 }
 
-inline static String toString (CommandID command)
+inline static String toString (juce::CommandID command)
 {
     switch (command)
     {
@@ -289,7 +289,7 @@ inline static String toString (CommandID command)
     return {};
 }
 
-inline static CommandID fromString (const String& str)
+inline static juce::CommandID fromString (const String& str)
 {
     if (str == "quit")
         return Commands::quit;
@@ -352,7 +352,7 @@ inline static CommandID fromString (const String& str)
     return Commands::invalid;
 }
 
-inline static String toOSCAddress (CommandID command)
+inline static String toOSCAddress (juce::CommandID command)
 {
     auto commandStr = toString (command);
     if (commandStr.isEmpty())

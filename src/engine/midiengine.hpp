@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/juce.hpp>
+#include "ElementApp.h" // FIXME:
 
 #pragma once
 
@@ -25,7 +25,7 @@ namespace element {
 
 class Settings;
 
-class MidiEngine : public ChangeBroadcaster
+class MidiEngine : public juce::ChangeBroadcaster
 {
 public:
     MidiEngine();
@@ -155,7 +155,7 @@ private:
     std::unique_ptr<CallbackHandler> callbackHandler;
 
     MidiInputHolder* getMidiInput (const String& deviceName, bool openIfNotAlready);
-    void handleIncomingMidiMessageInt (MidiInput*, const MidiMessage&);
+    void handleIncomingMidiMessageInt (juce::MidiInput*, const juce::MidiMessage&);
 };
 
 } // namespace element

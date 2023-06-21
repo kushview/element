@@ -23,6 +23,7 @@
 #include <element/parameter.hpp>
 #include "scripting/scriptinstance.hpp"
 #include <element/juce.hpp>
+using namespace juce; // FIXME:
 
 namespace element {
 

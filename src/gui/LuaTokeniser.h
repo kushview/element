@@ -24,6 +24,7 @@
 #pragma once
 
 #include <element/juce.hpp>
+using namespace juce; // FIXME
 
 namespace element {
 

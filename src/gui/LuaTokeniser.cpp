@@ -22,6 +22,7 @@
 */
 
 #include "gui/LuaTokeniser.h"
+using namespace juce;
 
 namespace element {
 

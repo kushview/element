@@ -41,7 +41,7 @@
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
 
-#include <element/juce/internalformat.hpp>
+#include <element/engine/internalformat.hpp>
 #include "engine/ionode.hpp"
 
 namespace element {

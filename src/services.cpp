@@ -531,7 +531,7 @@ bool ServiceManager::perform (const InvocationInfo& info)
         break;
 
         case Commands::checkNewerVersion:
-            CurrentVersion::checkAfterDelay (20, true);
+            findChild<GuiService>()->checkUpdates();
             break;
 
         case Commands::recentsClear: {

@@ -26,6 +26,7 @@
 #include "sol/sol.hpp"
 
 namespace element {
+using namespace juce;
 
 //=============================================================================
 LuaConsole::LuaConsole()

@@ -31,6 +31,7 @@
 #define DIGITAL_METER_PEAK_FALLOFF 16
 
 namespace element {
+using namespace juce;
 
 DigitalMeterValue::DigitalMeterValue (DigitalMeter* parent)
     : meter (parent),
@@ -323,7 +324,7 @@ void DigitalMeter::refresh()
 
 void DigitalMeter::setValue (const int port, const float value)
 {
-    if (values != nullptr && isPositiveAndBelow (port, portCount))
+    if (values != nullptr && juce::isPositiveAndBelow (port, portCount))
     {
         if (value != values[port]->getValue())
             values[port]->setValue (value);

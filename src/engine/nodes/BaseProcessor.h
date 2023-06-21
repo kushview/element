@@ -19,24 +19,27 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/core.hpp>
 #include "engine/nodes/NodeTypes.h"
+#include "ElementApp.h" // FIXME
 
 namespace element {
 
-class BaseProcessor : public AudioPluginInstance
+class BaseProcessor : public juce::AudioPluginInstance
 {
 public:
-    BaseProcessor() : AudioPluginInstance() {}
+    using HostedParameter = juce::HostedAudioProcessorParameter;
+
+    BaseProcessor() : juce::AudioPluginInstance() {}
     BaseProcessor (const BusesProperties& ioLayouts)
-        : AudioPluginInstance (ioLayouts) {}
+        : juce::AudioPluginInstance (ioLayouts) {}
     virtual ~BaseProcessor() {}
 
 protected:
     /** This is for backward compatibility with juce 6. Don't use in new processors */
-    inline void addLegacyParameter (HostedAudioProcessorParameter* param)
+    inline void addLegacyParameter (HostedParameter* param)
     {
-        addHostedParameter (std::unique_ptr<HostedAudioProcessorParameter> (param));
+        addHostedParameter (std::unique_ptr<HostedParameter> (param));
     }
 #if 0
     // Audio Processor Template

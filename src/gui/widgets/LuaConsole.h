@@ -19,13 +19,15 @@
 
 #pragma once
 
+#include <element/juce/core.hpp>
+
 #include "gui/widgets/Console.h"
 #include "scripting.hpp"
 
 namespace element {
 
 class LuaConsole : public Console,
-                   private Timer
+                   private juce::Timer
 {
 public:
     LuaConsole();
@@ -41,7 +43,7 @@ private:
     StringArray printMessages;
     LuaResult errorHandler (lua_State* L, LuaResult pfr);
 
-    friend class Timer;
+    friend class juce::Timer;
     void timerCallback() override;
 };
 

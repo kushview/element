@@ -8,6 +8,8 @@
 #include "sol_helpers.hpp"
 #include <element/juce.hpp>
 
+using namespace juce;
+
 namespace element {
 namespace lua {
 

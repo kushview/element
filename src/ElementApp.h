@@ -27,6 +27,7 @@
 #include "datapath.hpp"
 
 namespace element {
+using namespace juce;
 
 inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
 {
@@ -69,9 +70,10 @@ inline static void traceMidi (MidiBuffer& buf)
         traceMidi (msg, frame);
 }
 
-inline static bool canConnectToWebsite (const URL& url, const int timeout = 2000)
+inline static bool canConnectToWebsite (const juce::URL& url, const int timeout = 2000)
 {
-    std::unique_ptr<InputStream> in (url.createInputStream (false, nullptr, nullptr, String(), timeout, nullptr));
+    std::unique_ptr<juce::InputStream> in (
+        url.createInputStream (false, nullptr, nullptr, String(), timeout, nullptr));
     return in != nullptr;
 }
 
@@ -82,7 +84,7 @@ inline static bool areMajorWebsitesAvailable()
     };
 
     for (const char** url = urlsToTry; *url != nullptr; ++url)
-        if (canConnectToWebsite (URL (*url)))
+        if (canConnectToWebsite (juce::URL (*url)))
             return true;
 
     return false;

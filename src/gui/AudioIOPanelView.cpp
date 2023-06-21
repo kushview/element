@@ -1,28 +1,11 @@
-/*
-  ==============================================================================
 
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.3.1
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
-
-  ==============================================================================
-*/
 
 //[Headers] You can add your own extra header files here...
 #include <element/node.hpp>
-using namespace element;
-//[/Headers]
-
 #include "AudioIOPanelView.h"
+
+namespace element {
+//[/Headers]
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
@@ -200,68 +183,4 @@ void AudioIOPanelView::setNode (const Node& node)
     ValueTree n = node.getValueTree();
     nodeNameLabel->getTextValue().referTo (n.getPropertyAsValue (Tags::name, nullptr));
 }
-//[/MiscUserCode]
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="AudioIOPanelView" componentName="audioIOPanelView"
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="16" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="220" initialHeight="100">
-  <BACKGROUND backgroundColour="ff3b3b3b"/>
-  <SLIDER name="inputGainDial" id="ad10f98d10a1ba0f" memberName="inputGainDial"
-          virtualName="" explicitFocusOrder="0" pos="17 38 48 48" rotarysliderfill="ff4ed23f"
-          min="-70.00000000000000000000" max="12.00000000000000000000"
-          int="0.00000000000000000000" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.00000000000000000000"
-          needsCallback="1"/>
-  <SLIDER name="outputGainDial" id="4c4d97e94f46242" memberName="outputGainDial"
-          virtualName="" explicitFocusOrder="0" pos="13C 38 48 48" thumbcol="ff53752b"
-          rotarysliderfill="ff5f8f12" rotaryslideroutline="66000000" min="-70.00000000000000000000"
-          max="12.00000000000000000000" int="0.00000000000000000000" style="RotaryVerticalDrag"
-          textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
-  <LABEL name="inputGainLabel" id="578cfef930d9cb9b" memberName="inputGainLabel"
-         virtualName="" explicitFocusOrder="0" pos="0Cc 74 64 24" posRelativeX="ad10f98d10a1ba0f"
-         textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="Input Gain"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="12.00000000000000000000" kerning="0.00000000000000000000"
-         bold="0" italic="0" justification="33"/>
-  <LABEL name="outputGainLabel" id="381cc0608cacfbbf" memberName="outputGainLabel"
-         virtualName="" explicitFocusOrder="0" pos="55R 74 64 24" posRelativeX="4c4d97e94f46242"
-         textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="Output Gain"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="12.00000000000000000000" kerning="0.00000000000000000000"
-         bold="0" italic="0" justification="33"/>
-  <LABEL name="inputGainDbLabel" id="38e51ba306e21626" memberName="inputGainDbLabel"
-         virtualName="" explicitFocusOrder="0" pos="0R 50 57 24" posRelativeX="ad10f98d10a1ba0f"
-         textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="0.00 dB"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14.00000000000000000000" kerning="0.00000000000000000000"
-         bold="0" italic="0" justification="33"/>
-  <LABEL name="outputGainDbLabel" id="9037e588101840e6" memberName="outputGainDbLabel"
-         virtualName="" explicitFocusOrder="0" pos="0R 50 63 24" posRelativeX="4c4d97e94f46242"
-         textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="0.00 dB"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14.00000000000000000000" kerning="0.00000000000000000000"
-         bold="0" italic="0" justification="33"/>
-  <LABEL name="nodeNameLabel" id="ad398bbca3f6dfab" memberName="nodeNameLabel"
-         virtualName="" explicitFocusOrder="0" pos="10 11 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="1"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="18.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
+} // namespace element

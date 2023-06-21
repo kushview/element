@@ -20,7 +20,9 @@
 #pragma once
 
 #include <element/juce.hpp>
+#include "ElementApp.h" // FIXME
 
+namespace element {
 /**
     A horizontal list of items that can be scrolled vertically.
 
@@ -431,3 +433,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HorizontalListBox)
 };
+
+} // namespace element

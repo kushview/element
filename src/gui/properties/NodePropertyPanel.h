@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 
@@ -27,7 +27,7 @@ class Node;
 class NodeObjectSync;
 
 /** A PropertyPanel which display node properties */
-class NodePropertyPanel : public PropertyPanel
+class NodePropertyPanel : public juce::PropertyPanel
 {
 public:
     NodePropertyPanel()

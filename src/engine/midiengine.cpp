@@ -17,12 +17,21 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/juce/audio_basics.hpp>
+#include <element/juce/audio_devices.hpp>
+#include <element/juce/data_structures.hpp>
+
 #include <element/settings.hpp>
 #include <element/tags.hpp>
 
 #include "engine/midiengine.hpp"
 
 namespace element {
+using juce::MidiInput;
+using juce::MidiInputCallback;
+using juce::MidiMessage;
+using juce::ValueTree;
+using juce::XmlElement;
 
 //==============================================================================
 void MidiEngine::applySettings (Settings& settings)
@@ -88,9 +97,9 @@ void MidiEngine::writeSettings (Settings& settings)
 }
 
 //==============================================================================
-class MidiEngine::CallbackHandler : public AudioIODeviceCallback,
-                                    public MidiInputCallback,
-                                    public AudioIODeviceType::Listener
+class MidiEngine::CallbackHandler : public juce::AudioIODeviceCallback,
+                                    public juce::MidiInputCallback,
+                                    public juce::AudioIODeviceType::Listener
 {
 public:
     CallbackHandler (MidiEngine& me) noexcept : owner (me) {}
@@ -101,12 +110,12 @@ private:
                                            float* const* outputChannelData,
                                            int numOutputChannels,
                                            int numSamples,
-                                           const AudioIODeviceCallbackContext& context) override
+                                           const juce::AudioIODeviceCallbackContext& context) override
     {
         ignoreUnused (inputChannelData, numInputChannels, outputChannelData, numOutputChannels, numSamples, context);
     }
 
-    void audioDeviceAboutToStart (AudioIODevice* device) override
+    void audioDeviceAboutToStart (juce::AudioIODevice* device) override
     {
         ignoreUnused (device);
     }

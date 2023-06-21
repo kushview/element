@@ -153,6 +153,7 @@ libelement_sources = '''
     gui/widgets/SessionGraphsListBox.cpp
     gui/Window.cpp
     gui/WindowManager.cpp
+    gui/updater.cpp
     
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp

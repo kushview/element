@@ -6,7 +6,7 @@ from optparse import OptionParser
 from subprocess import call, Popen, PIPE
 import os
 
-VERSION="0.47.0"
+VERSION="1.0.0"
 LAST_VERSION="0.46.4"
 
 def options():

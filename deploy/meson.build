@@ -4,15 +4,15 @@ if not meson.is_subproject()
 element_deploy_targetdir = ''
 element_release_url = ''
 
-element_repo_url = 'https://kushview.s3.amazonaws.com/ci/repos/element'
+element_repo_url = 'https://cd.kushview.net/element'
 
 if host_machine.system() == 'darwin'
     element_release_url = element_repo_url + '/release/osx'
-    element_deploy_targetdir = '/Library/Application Support/Kushview/Element'
+    element_deploy_targetdir = '@HomeDir@/Library/Application Support/Kushview/Element'
     subdir ('osx')
 elif host_machine.system() == 'windows'
     element_release_url = element_repo_url + '/release/windows'
-    element_deploy_targetdir = '@ApplicationsDirX64@/Kushview/Element'
+    element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element'
     subdir ('windows')
 endif
 

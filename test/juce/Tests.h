@@ -25,7 +25,7 @@
 
 #include <element/audioengine.hpp>
 #include "engine/mappingengine.hpp"
-#include <element/juce/internalformat.hpp>
+#include <element/engine/internalformat.hpp>
 #include "engine/LinearFade.h"
 #include "engine/velocitycurve.hpp"
 #include "engine/ToggleGrid.h"

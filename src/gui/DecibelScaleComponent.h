@@ -20,6 +20,7 @@
 #pragma once
 
 #include <element/juce.hpp>
+using namespace juce; // fixme
 
 namespace element {
 //==============================================================================

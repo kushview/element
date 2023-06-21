@@ -23,7 +23,7 @@
 
 namespace element {
 
-class Console : public Component
+class Console : public juce::Component
 {
 public:
     explicit Console (const String& name = String());
@@ -51,7 +51,7 @@ public:
     /** @internal */
     void resized() override;
     /** @internal */
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
 
 private:
     class Content;

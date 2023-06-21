@@ -68,10 +68,10 @@ public:
 
     @tags{GUI}
 */
-class JUCE_API FileComboBox : public Component,
-                              public SettableTooltipClient,
-                              public FileDragAndDropTarget,
-                              private AsyncUpdater
+class JUCE_API FileComboBox : public juce::Component,
+                              public juce::SettableTooltipClient,
+                              public juce::FileDragAndDropTarget,
+                              private juce::AsyncUpdater
 {
 public:
     //==============================================================================
@@ -122,7 +122,7 @@ public:
     */
     void setCurrentFile (File newFile,
                          bool addToRecentlyUsedList,
-                         NotificationType notification = sendNotificationAsync);
+                         juce::NotificationType notification = juce::sendNotificationAsync);
 
     /** Changes whether the use can type into the filename box.
     */
@@ -206,7 +206,7 @@ public:
 
     //==============================================================================
     /** @internal */
-    void paintOverChildren (Graphics&) override;
+    void paintOverChildren (juce::Graphics&) override;
     /** @internal */
     void resized() override;
     /** @internal */
@@ -220,19 +220,19 @@ public:
     /** @internal */
     void fileDragExit (const StringArray&) override;
     /** @internal */
-    std::unique_ptr<ComponentTraverser> createFocusTraverser() override;
+    std::unique_ptr<juce::ComponentTraverser> createFocusTraverser() override;
 
 private:
     //==============================================================================
-    ComboBox filenameBox;
+    juce::ComboBox filenameBox;
     StringArray recentFiles;
     String lastFilename;
-    std::unique_ptr<Button> browseButton;
+    std::unique_ptr<juce::Button> browseButton;
     int maxRecentFiles = 30;
     bool isDir, isSaving, isFileDragOver = false;
     bool showFullPathNames = true;
     String wildcard, enforcedSuffix, browseButtonText;
-    ListenerList<FileComboBoxListener> listeners;
+    juce::ListenerList<FileComboBoxListener> listeners;
     File defaultBrowseFile;
 
     void showChooser();

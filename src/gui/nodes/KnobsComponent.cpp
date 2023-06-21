@@ -23,6 +23,7 @@
 #include "../LookAndFeel.h"
 
 namespace element {
+using namespace juce;
 
 KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> paramLambda)
 {

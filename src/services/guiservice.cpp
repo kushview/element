@@ -18,6 +18,7 @@
 */
 
 #include <element/ui/content.hpp>
+#include <element/ui/updater.hpp>
 
 #include <element/audioengine.hpp>
 #include <element/services.hpp>
@@ -161,6 +162,80 @@ private:
 static std::unique_ptr<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiService*> sGuiControllerInstances;
 
+class GuiService::UpdateManager
+{
+public:
+    UpdateManager()
+    {
+        setupUpdater();
+    }
+
+    ~UpdateManager()
+    {
+        _conn.disconnect();
+    }
+
+    bool launchRequested() const noexcept { return launchUpdaterOnExit; }
+    void launchDetached()
+    {
+        updater.launch();
+    }
+
+    void check() { updater.check (true); }
+
+private:
+    void setupUpdater()
+    {
+        juce::String ver (EL_VERSION_STRING);
+        ver << "-" << EL_BUILD_NUMBER;
+        // ver = "0.20.0.0";
+        updater.setInfo ("net.kushview.element", ver.toStdString());
+        updater.setRepository ("https://cd.kushview.net/element/release");
+#if JUCE_MAC
+        updater.setRepository (updater.repository() + "/osx");
+#elif JUCE_WINDOWS
+        updater.setRepository (updater.repository() + "/windows");
+#else
+        updater.setRepository (updater.repository() + "/linux");
+#endif
+        _conn.disconnect();
+        _conn = updater.sigUpdatesAvailable.connect ([this]() {
+            if (updater.available().size() > 0)
+            {
+                auto res = AlertWindow::showYesNoCancelBox (
+                    AlertWindow::InfoIcon,
+                    "Updates Ready",
+                    "There are updates ready.  Would you like to quit Element and launch the Updater?");
+                if (res == 1)
+                {
+                    if (! updater.exists())
+                    {
+                        AlertWindow::showMessageBoxAsync (
+                            AlertWindow::WarningIcon,
+                            "Updates",
+                            "Could not find the updater program on your system.");
+                    }
+                    else
+                    {
+                        launchUpdaterOnExit = true;
+                        juce::JUCEApplication::getInstance()->quit();
+                    }
+                }
+            }
+            else
+            {
+                AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                                  "Updates",
+                                                  "You're up to date with the latest Element");
+            }
+        });
+    }
+
+    bool launchUpdaterOnExit { false };
+    ui::Updater updater;
+    boost::signals2::connection _conn;
+};
+
 //=============================================================================
 void GuiService::ForegroundCheck::timerCallback()
 {
@@ -207,6 +282,7 @@ void GuiService::setContentFactory (std::unique_ptr<ContentFactory> newDecorator
     factory = std::move (newDecorator);
     if (! factory)
         factory = std::make_unique<DefaultContentFactory> (getWorld());
+    appInfo = factory->aboutInfo();
 }
 
 //=============================================================================
@@ -218,6 +294,7 @@ GuiService::GuiService (Context& w, ServiceManager& a)
       mainWindow (nullptr),
       foregroundCheck (*this)
 {
+    updates = std::make_unique<UpdateManager>();
     keys.reset (new KeyPressManager (*this));
     if (sGuiControllerInstances.size() <= 0)
         sGlobalLookAndFeel.reset (new GlobalLookAndFeel());
@@ -228,6 +305,7 @@ GuiService::GuiService (Context& w, ServiceManager& a)
 
 GuiService::~GuiService()
 {
+    updates.reset();
     sGuiControllerInstances.removeFirstMatchingValue (this);
     if (sGuiControllerInstances.size() <= 0)
         sGlobalLookAndFeel = nullptr;
@@ -313,6 +391,8 @@ void GuiService::closeAllWindows()
 
 CommandManager& GuiService::commander() { return world.getCommandManager(); }
 
+void GuiService::checkUpdates() { updates->check(); }
+
 void GuiService::runDialog (const String& uri)
 {
     if (uri == "preferences")
@@ -341,11 +421,6 @@ void GuiService::runDialog (const String& uri)
             windowManager->push (dw, true);
         }
     }
-}
-
-void GuiService::setAboutInfo (const AboutInfo& info)
-{
-    appInfo = info;
 }
 
 void GuiService::closePluginWindow (PluginWindow* w)
@@ -1010,6 +1085,12 @@ bool GuiService::handleMessage (const AppMessage& msg)
     }
 
     return false;
+}
+
+void GuiService::shutdown()
+{
+    if (updates->launchRequested())
+        updates->launchDetached();
 }
 
 void GuiService::changeListenerCallback (ChangeBroadcaster* broadcaster)

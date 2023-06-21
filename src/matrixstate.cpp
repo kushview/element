@@ -20,6 +20,7 @@
 #include "matrixstate.hpp"
 
 namespace element {
+using namespace juce;
 
 void MatrixState::setFrom (const MatrixState& o)
 {

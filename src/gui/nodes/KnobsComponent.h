@@ -21,22 +21,23 @@
 
 #pragma once
 
-#include <element/juce.hpp>
+#include <element/juce/gui_basics.hpp>
+#include <element/juce/audio_processors.hpp>
 
 namespace element {
 
-class KnobsComponent : public Component
+class KnobsComponent : public juce::Component
 {
 public:
-    KnobsComponent (AudioProcessor& proc, std::function<void()> paramLambda = {});
+    KnobsComponent (juce::AudioProcessor& proc, std::function<void()> paramLambda = {});
     ~KnobsComponent() {}
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
 private:
-    OwnedArray<Slider> sliders;
-    OwnedArray<ComboBox> boxes;
+    juce::OwnedArray<juce::Slider> sliders;
+    juce::OwnedArray<juce::ComboBox> boxes;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnobsComponent)
 };

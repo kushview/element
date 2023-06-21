@@ -26,6 +26,7 @@
 #include "gui/FileComboBox.h"
 
 namespace element {
+using namespace juce;
 
 FileComboBox::FileComboBox (const String& name,
                             const File& currentFile,

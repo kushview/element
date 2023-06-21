@@ -20,6 +20,7 @@
 #include "gui/AboutComponent.h"
 #include "version.hpp"
 #include "BinaryData.h"
+#include "appinfo.hpp"
 
 #define EL_LICENSE_TEXT                                                        \
     "Copyright (C) 2014-%YEAR%  Kushview, LLC.  All rights reserved.\r\n\r\n"  \
@@ -191,6 +192,8 @@ private:
 
 AboutComponent::AboutComponent()
 {
+    setOpaque (true);
+
     elementLogo = Drawable::createFromImageData (
         BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize);
 
@@ -240,7 +243,20 @@ AboutComponent::AboutComponent()
     tabs.addTab ("Donors", tabc, donors, true);
     tabs.addTab ("License", tabc, new LicenseTextComponent(), true);
     tabs.addTab ("Credits", tabc, new AckTextComponent(), true);
+
+    addAndMakeVisible (copyVersionButton);
+    copyVersionButton.setButtonText (TRANS ("Copy"));
+    copyVersionButton.onClick = [this]() { copyVersion(); };
+
     setSize (510, 330);
+
+    AboutInfo i;
+    i.title = EL_APP_NAME;
+    i.licenseText = EL_LICENSE_TEXT;
+    i.copyright << "Copyright " << String (CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
+    i.copyright = i.copyright.replace ("XXX", String (buildDate.getYear()));
+    i.version = ("Version: ") + Version::withGitHash();
+    setAboutInfo (i);
 }
 
 void AboutComponent::resized()
@@ -254,6 +270,8 @@ void AboutComponent::resized()
     copyrightLabel.setBounds (topSlice.removeFromTop (24));
     bounds.removeFromTop (2);
     tabs.setBounds (bounds.reduced (4));
+    copyVersionButton.setBounds (
+        getWidth() - 44, tabs.getY() - 2, 36, 20);
 }
 
 void AboutComponent::paint (Graphics& g)
@@ -270,6 +288,8 @@ void AboutComponent::paint (Graphics& g)
 
 void AboutComponent::updateAboutInfo()
 {
+    const auto buildDate = Time::getCompilationDate();
+
     if (info.title.isNotEmpty())
     {
         titleLabel.setText (info.title, sendNotification);
@@ -277,7 +297,10 @@ void AboutComponent::updateAboutInfo()
 
     if (info.version.isNotEmpty())
     {
-        versionLabel.setText (info.version, sendNotification);
+        String version = info.version;
+        version << "\nBuild date: " << String (buildDate.getDayOfMonth()) << " " + Time::getMonthName (buildDate.getMonth(), true) << " " + String (buildDate.getYear());
+
+        versionLabel.setText (version, sendNotification);
     }
 
     if (info.copyright.isNotEmpty())
@@ -315,6 +338,13 @@ void AboutComponent::updateAboutInfo()
 
     resized();
     repaint();
+}
+
+void AboutComponent::copyVersion()
+{
+    String txt = info.title;
+    txt << juce::newLine << "-------" << juce::newLine << info.version << juce::newLine << info.copyright;
+    juce::SystemClipboard::copyTextToClipboard (txt);
 }
 
 } // namespace element

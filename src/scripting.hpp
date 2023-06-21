@@ -41,7 +41,7 @@ public:
     lua_State* getLuaState() const;
 
     //==========================================================================
-    Result execute (const String& code);
+    juce::Result execute (const String& code);
 
     std::vector<std::string> getPackageNames() const noexcept;
     void addPackage (const std::string& name, lua::CFunction loader);

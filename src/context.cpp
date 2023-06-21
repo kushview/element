@@ -16,20 +16,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <element/engine/internalformat.hpp>
 #include <element/devicemanager.hpp>
 #include <element/session.hpp>
 #include <element/settings.hpp>
-
-#include <element/juce/internalformat.hpp>
-#include "engine/mappingengine.hpp"
-#include "engine/midiengine.hpp"
 #include <element/pluginmanager.hpp>
-#include "session/presetmanager.hpp"
-#include "session/commandmanager.hpp"
-
 #include <element/services.hpp>
 #include <element/context.hpp>
 
+#include "engine/mappingengine.hpp"
+#include "engine/midiengine.hpp"
+#include "session/presetmanager.hpp"
+#include "session/commandmanager.hpp"
 #include "appinfo.hpp"
 #include "log.hpp"
 #include "module.hpp"
