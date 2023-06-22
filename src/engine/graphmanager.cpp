@@ -46,15 +46,15 @@ static void showFailedInstantiationAlert (const PluginDescription& desc, const b
 //==============================================================================
 static void removeCoordinatesProperties (ValueTree data)
 {
-    data.removeProperty (Tags::relativeX, nullptr);
-    data.removeProperty (Tags::relativeY, nullptr);
+    data.removeProperty (tags::relativeX, nullptr);
+    data.removeProperty (tags::relativeY, nullptr);
 }
 
 static void removeWindowProperties (ValueTree data)
 {
-    data.removeProperty (Tags::windowX, nullptr);
-    data.removeProperty (Tags::windowY, nullptr);
-    data.removeProperty (Tags::windowVisible, nullptr);
+    data.removeProperty (tags::windowX, nullptr);
+    data.removeProperty (tags::windowY, nullptr);
+    data.removeProperty (tags::windowVisible, nullptr);
 }
 
 //==============================================================================
@@ -182,7 +182,7 @@ private:
     void onPortsChanged()
     {
         const auto newPorts = object->createPortsData();
-        int index = data.indexOf (data.getChildWithName (Tags::ports));
+        int index = data.indexOf (data.getChildWithName (tags::ports));
         if (newPorts.isValid())
         {
             if (index >= 0)
@@ -210,10 +210,10 @@ public:
           object (o),
           node (n)
     {
-        data = node.getValueTree();
+        data = node.data();
         setDataProperties();
 
-        if (node.getNodeType() == Tags::graph && object && object->isGraph())
+        if (node.getNodeType() == tags::graph && object && object->isGraph())
         {
             auto sub = dynamic_cast<GraphNode*> (object.get());
             jassert (sub);
@@ -223,7 +223,7 @@ public:
         }
         else
         {
-            if (node.getNodeType() != Tags::graph)
+            if (node.getNodeType() != tags::graph)
             {
                 DBG ("data type is not a graph");
             }
@@ -253,9 +253,9 @@ public:
     {
         if (! data.isValid() || object == nullptr)
             return;
-        data.setProperty (Tags::id, static_cast<int64> (object->nodeId), nullptr)
-            .setProperty (Tags::object, object.get(), nullptr)
-            .setProperty (Tags::name, object->getName(), nullptr);
+        data.setProperty (tags::id, static_cast<int64> (object->nodeId), nullptr)
+            .setProperty (tags::object, object.get(), nullptr)
+            .setProperty (tags::name, object->getName(), nullptr);
     }
 
 private:
@@ -299,7 +299,7 @@ const NodeObjectPtr GraphManager::getNodeForId (const uint32 uid) const noexcept
 
 const Node GraphManager::getNodeModelForId (const uint32 nodeId) const noexcept
 {
-    return Node (nodes.getChildWithProperty (Tags::id, static_cast<int64> (nodeId)), false);
+    return Node (nodes.getChildWithProperty (tags::id, static_cast<int64> (nodeId)), false);
 }
 
 GraphManager* GraphManager::findGraphManagerForGraph (const Node& graph) const noexcept
@@ -361,17 +361,17 @@ uint32 GraphManager::addNode (const Node& newNode)
 
     uint32 nodeId = EL_INVALID_NODE;
     const PluginDescription desc (pluginManager.findDescriptionFor (newNode));
-    if (auto* node = createFilter (&desc, 0, 0, newNode.hasProperty (Tags::id) ? newNode.getNodeId() : 0))
+    if (auto* node = createFilter (&desc, 0, 0, newNode.hasProperty (tags::id) ? newNode.getNodeId() : 0))
     {
         nodeId = node->nodeId;
-        ValueTree data = newNode.getValueTree().createCopy();
+        ValueTree data = newNode.data().createCopy();
         removeCoordinatesProperties (data);
         removeWindowProperties (data);
 
-        data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
-            .setProperty (Tags::object, node, nullptr)
-            .setProperty (Tags::type, node->getTypeString(), nullptr)
-            .setProperty (Tags::pluginIdentifierString, desc.createIdentifierString(), nullptr);
+        data.setProperty (tags::id, static_cast<int64> (nodeId), nullptr)
+            .setProperty (tags::object, node, nullptr)
+            .setProperty (tags::type, node->getTypeString(), nullptr)
+            .setProperty (tags::pluginIdentifierString, desc.createIdentifierString(), nullptr);
 
         setupNode (data, node);
 
@@ -400,19 +400,19 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
     if (auto* object = createFilter (desc, rx, ry, nodeId))
     {
         nodeId = object->nodeId;
-        ValueTree data = ! object->isGraph() ? ValueTree (Tags::node)
-                                             : Node::createDefaultGraph (desc->name).getValueTree();
+        ValueTree data = ! object->isGraph() ? ValueTree (tags::node)
+                                             : Node::createDefaultGraph (desc->name).data();
 
-        data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
-            .setProperty (Tags::format, desc->pluginFormatName, nullptr)
-            .setProperty (Tags::identifier, desc->fileOrIdentifier, nullptr)
-            .setProperty (Tags::type, object->getTypeString(), nullptr)
-            .setProperty (Tags::name, desc->name, nullptr)
-            .setProperty (Tags::object, object, nullptr)
-            .setProperty (Tags::updater, new NodeModelUpdater (*this, data, object), nullptr)
-            .setProperty (Tags::relativeX, rx, nullptr)
-            .setProperty (Tags::relativeY, ry, nullptr)
-            .setProperty (Tags::pluginIdentifierString,
+        data.setProperty (tags::id, static_cast<int64> (nodeId), nullptr)
+            .setProperty (tags::format, desc->pluginFormatName, nullptr)
+            .setProperty (tags::identifier, desc->fileOrIdentifier, nullptr)
+            .setProperty (tags::type, object->getTypeString(), nullptr)
+            .setProperty (tags::name, desc->name, nullptr)
+            .setProperty (tags::object, object, nullptr)
+            .setProperty (tags::updater, new NodeModelUpdater (*this, data, object), nullptr)
+            .setProperty (tags::relativeX, rx, nullptr)
+            .setProperty (tags::relativeY, ry, nullptr)
+            .setProperty (tags::pluginIdentifierString,
                           desc->createIdentifierString(),
                           nullptr);
 
@@ -501,7 +501,7 @@ void GraphManager::removeNode (const uint32 uid)
                     bindings.remove (i, true);
             }
 
-            auto data = node.getValueTree();
+            auto data = node.data();
             nodes.removeChild (data, nullptr);
             // clear all referecnce counted objects
             Node::sanitizeProperties (data, true);
@@ -593,7 +593,7 @@ void GraphManager::setNodeModel (const Node& node)
     loaded = false;
 
     processor.clear();
-    graph = node.getValueTree();
+    graph = node.data();
     arcs = node.getArcsValueTree();
     nodes = node.getNodesValueTree();
 
@@ -604,20 +604,20 @@ void GraphManager::setNodeModel (const Node& node)
         const PluginDescription desc (pluginManager.findDescriptionFor (node));
         if (NodeObjectPtr obj = createFilter (&desc, 0, 0, node.getNodeId()))
         {
-            setupNode (node.getValueTree(), obj);
+            setupNode (node.data(), obj);
             obj->setEnabled (node.isEnabled());
-            node.setProperty (Tags::enabled, obj->isEnabled());
+            node.setProperty (tags::enabled, obj->isEnabled());
         }
         else if (NodeObjectPtr ph = createPlaceholder (node))
         {
             DBG ("[element] couldn't create node: " << node.getName() << ". Creating offline placeholder");
-            node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
-            node.getValueTree().setProperty (Tags::missing, true, nullptr);
+            node.data().setProperty (tags::object, ph.get(), nullptr);
+            node.data().setProperty (tags::missing, true, nullptr);
         }
         else
         {
             DBG ("[element] couldn't create node: " << node.getName());
-            failed.add (node.getValueTree());
+            failed.add (node.data());
         }
     }
 
@@ -638,8 +638,8 @@ void GraphManager::setNodeModel (const Node& node)
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         ValueTree arc (arcs.getChild (i));
-        const auto sourceNode = (uint32) (int) arc.getProperty (Tags::sourceNode);
-        const auto destNode = (uint32) (int) arc.getProperty (Tags::destNode);
+        const auto sourceNode = (uint32) (int) arc.getProperty (tags::sourceNode);
+        const auto destNode = (uint32) (int) arc.getProperty (tags::destNode);
 
 #if 0
         auto src = processor.getNodeForId (sourceNode);
@@ -648,11 +648,11 @@ void GraphManager::setNodeModel (const Node& node)
             DBG("connection " << src->getName() << " to " << dst->getName());
         }
 #endif
-        bool worked = processor.addConnection (sourceNode, (uint32) (int) arc.getProperty (Tags::sourcePort), destNode, (uint32) (int) arc.getProperty (Tags::destPort));
+        bool worked = processor.addConnection (sourceNode, (uint32) (int) arc.getProperty (tags::sourcePort), destNode, (uint32) (int) arc.getProperty (tags::destPort));
 
         if (worked)
         {
-            arc.removeProperty (Tags::missing, 0);
+            arc.removeProperty (tags::missing, 0);
         }
         else
         {
@@ -663,7 +663,7 @@ void GraphManager::setNodeModel (const Node& node)
             {
                 DBG ("[element] set missing connection");
                 // if the nodes are valid then preserve it
-                arc.setProperty (Tags::missing, true, 0);
+                arc.setProperty (tags::missing, true, 0);
             }
             else
             {
@@ -716,23 +716,23 @@ void GraphManager::clear()
 
 void GraphManager::processorArcsChanged()
 {
-    ValueTree newArcs = ValueTree (Tags::arcs);
+    ValueTree newArcs = ValueTree (tags::arcs);
     for (int i = 0; i < processor.getNumConnections(); ++i)
         newArcs.addChild (Node::makeArc (*processor.getConnection (i)), -1, nullptr);
 
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         const ValueTree arc (arcs.getChild (i));
-        if (true == (bool) arc[Tags::missing])
+        if (true == (bool) arc[tags::missing])
         {
             ValueTree missingArc = arc.createCopy();
             if (processor.addConnection (
-                    (uint32) (int) missingArc[Tags::sourceNode],
-                    (uint32) (int) missingArc[Tags::sourcePort],
-                    (uint32) (int) missingArc[Tags::destNode],
-                    (uint32) (int) missingArc[Tags::destPort]))
+                    (uint32) (int) missingArc[tags::sourceNode],
+                    (uint32) (int) missingArc[tags::sourcePort],
+                    (uint32) (int) missingArc[tags::destNode],
+                    (uint32) (int) missingArc[tags::destPort]))
             {
-                missingArc.removeProperty (Tags::missing, 0);
+                missingArc.removeProperty (tags::missing, 0);
             }
 
             newArcs.addChild (missingArc, -1, 0);
@@ -742,17 +742,17 @@ void GraphManager::processorArcsChanged()
     const auto index = graph.indexOf (arcs);
     graph.removeChild (arcs, nullptr);
     graph.addChild (newArcs, index, nullptr);
-    arcs = graph.getChildWithName (Tags::arcs);
+    arcs = graph.getChildWithName (tags::arcs);
     changed();
 }
 
 void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 {
-    jassert (obj && data.hasType (Tags::node));
+    jassert (obj && data.hasType (tags::node));
     Node node (data, false);
-    node.setProperty (Tags::type, obj->getTypeString())
-        .setProperty (Tags::object, obj.get())
-        .setProperty (Tags::updater, new NodeModelUpdater (*this, data, obj.get()));
+    node.setProperty (tags::type, obj->getTypeString())
+        .setProperty (tags::object, obj.get())
+        .setProperty (tags::updater, new NodeModelUpdater (*this, data, obj.get()));
 
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);

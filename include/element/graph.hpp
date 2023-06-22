@@ -12,8 +12,8 @@ namespace element {
 class EL_API Graph : public Node {
 public:
     Graph() : Node() {}
-    Graph (const Node& node) : Node (node.getValueTree(), false) {}
-    Graph (const Node& node, bool init) : Node (node.getValueTree(), init) {}
+    Graph (const Node& node) : Node (node.data(), false) {}
+    Graph (const Node& node, bool init) : Node (node.data(), init) {}
 
     inline Script findViewScript() const noexcept
     {

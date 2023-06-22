@@ -27,7 +27,6 @@
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
 #include "session/presetmanager.hpp"
-#include "session/commandmanager.hpp"
 #include "appinfo.hpp"
 #include "log.hpp"
 #include "module.hpp"
@@ -50,7 +49,6 @@ public:
     AudioEnginePtr engine;
     SessionPtr session;
 
-    std::unique_ptr<CommandManager> commands;
     std::unique_ptr<DeviceManager> devices;
     std::unique_ptr<PluginManager> plugins;
     std::unique_ptr<Settings> settings;
@@ -70,7 +68,6 @@ private:
         plugins.reset (new PluginManager());
         devices.reset (new DeviceManager());
         settings.reset (new Settings());
-        commands.reset (new CommandManager());
         mapping.reset (new MappingEngine());
         midi.reset (new MidiEngine());
         presets.reset (new PresetManager());
@@ -86,7 +83,6 @@ private:
     void freeAll()
     {
         services.reset();
-        commands = nullptr;
         plugins = nullptr;
         settings = nullptr;
         engine = nullptr;
@@ -101,7 +97,6 @@ private:
 
 Context::Context (const String& _cli)
 {
-    appName = "Element";
     impl.reset (new Impl (*this));
     impl->init();
 }
@@ -116,12 +111,6 @@ Services& Context::services()
 {
     jassert (impl && impl->services);
     return *impl->services;
-}
-
-CommandManager& Context::getCommandManager()
-{
-    jassert (impl && impl->commands);
-    return *impl->commands;
 }
 
 DeviceManager& Context::devices()
@@ -168,7 +157,7 @@ PresetManager& Context::presets()
     return *impl->presets;
 }
 
-Settings& Context::getSettings()
+Settings& Context::settings()
 {
     jassert (impl->settings != nullptr);
     return *impl->settings;

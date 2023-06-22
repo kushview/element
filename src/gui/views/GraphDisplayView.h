@@ -52,16 +52,16 @@ public:
 
     inline void buttonClicked (Button* b) override
     {
-        auto* const world = ViewHelpers::getGlobals (this);
+        auto* const world = ViewHelpers::getGuiController (this);
         if (! world)
             return;
         if (b == &configButton)
         {
-            world->getCommandManager().invokeDirectly (Commands::showGraphConfig, true);
+            world->commands().invokeDirectly (Commands::showGraphConfig, true);
         }
         else if (b == &sessionConfigButton)
         {
-            world->getCommandManager().invokeDirectly (Commands::showSessionConfig, true);
+            world->commands().invokeDirectly (Commands::showSessionConfig, true);
         }
     }
 

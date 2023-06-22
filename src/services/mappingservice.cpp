@@ -21,7 +21,7 @@
 #include "services/deviceservice.hpp"
 #include <element/services/guiservice.hpp>
 #include "engine/mappingengine.hpp"
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 #include <element/context.hpp>
 #include <element/signals.hpp>
 
@@ -219,7 +219,7 @@ private:
             const auto child (node.getNode (j));
             if (NodeObject* const object = child.getObject())
                 mappables.add (new Mappable (*this, child));
-            if (child.getNumChildren() > 0)
+            if (child.data().getNumChildren() > 0)
                 addNodesRecursive (child);
         }
     }
@@ -237,7 +237,7 @@ public:
     bool isCaptureComplete() const
     {
         NodeObjectPtr object = node.getObject();
-        return object != nullptr && (parameter == NodeObject::EnabledParameter || parameter == NodeObject::BypassParameter || parameter == NodeObject::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOn()) && control.getValueTree().isValid();
+        return object != nullptr && (parameter == NodeObject::EnabledParameter || parameter == NodeObject::BypassParameter || parameter == NodeObject::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOn()) && control.data().isValid();
     }
 
     AudioProcessorParameterCapture capture;
@@ -246,7 +246,7 @@ public:
     Node node = Node();
     int parameter = -1;
     MidiMessage message;
-    ControllerDevice::Control control;
+    Control control;
 };
 
 MappingService::MappingService()
@@ -336,12 +336,12 @@ void MappingService::onControlCaptured()
         {
             if (mapping.addHandler (impl->control, impl->node, impl->parameter))
             {
-                ValueTree newMap (Tags::map);
-                newMap.setProperty (Tags::controller, impl->control.getControllerDevice().getUuidString(), nullptr)
-                    .setProperty (Tags::control, impl->control.getUuidString(), nullptr)
-                    .setProperty (Tags::node, impl->node.getUuidString(), nullptr)
-                    .setProperty (Tags::parameter, impl->parameter, nullptr);
-                auto maps = session->getValueTree().getChildWithName (Tags::maps);
+                ValueTree newMap (tags::map);
+                newMap.setProperty (tags::controller, impl->control.controller().getUuidString(), nullptr)
+                    .setProperty (tags::control, impl->control.getUuidString(), nullptr)
+                    .setProperty (tags::node, impl->node.getUuidString(), nullptr)
+                    .setProperty (tags::parameter, impl->parameter, nullptr);
+                auto maps = session->data().getChildWithName (tags::maps);
                 maps.addChild (newMap, -1, nullptr);
 
                 if (auto* gui = sibling<GuiService>())
@@ -358,10 +358,10 @@ void MappingService::onControlCaptured()
 void MappingService::remove (const ControllerMap& controllerMap)
 {
     auto session = context().session();
-    auto maps = session->getValueTree().getChildWithName (Tags::maps);
-    if (controllerMap.getValueTree().isAChildOf (maps))
+    auto maps = session->data().getChildWithName (tags::maps);
+    if (controllerMap.data().isAChildOf (maps))
     {
-        maps.removeChild (controllerMap.getValueTree(), nullptr);
+        maps.removeChild (controllerMap.data(), nullptr);
         if (auto* devs = sibling<DeviceService>())
             devs->refresh();
     }

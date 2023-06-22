@@ -115,7 +115,7 @@ String NodeObject::getSpecialParameterName (int parameter)
 
 const String& NodeObject::getTypeString() const
 {
-    return isA<GraphNode>() ? Tags::graph.toString() : Tags::plugin.toString();
+    return isA<GraphNode>() ? tags::graph.toString() : tags::plugin.toString();
 }
 
 bool NodeObject::containsParameter (const int index) const
@@ -511,7 +511,7 @@ void NodeObject::MidiProgramLoader::handleAsyncUpdate()
         if (programFile.existsAsFile())
         {
             const auto programData = Node::parse (programFile);
-            auto data = programData.getProperty (Tags::state).toString().trim();
+            auto data = programData.getProperty (tags::state).toString().trim();
             if (data.isNotEmpty())
             {
                 MemoryBlock state;
@@ -591,9 +591,9 @@ void NodeObject::getMidiProgramsState (String& state) const
     {
         auto& state = program->state;
         ValueTree data ("program");
-        data.setProperty (Tags::program, program->program, nullptr)
-            .setProperty (Tags::name, program->name, nullptr)
-            .setProperty (Tags::state, state.toBase64Encoding(), nullptr);
+        data.setProperty (tags::program, program->program, nullptr)
+            .setProperty (tags::name, program->name, nullptr)
+            .setProperty (tags::state, state.toBase64Encoding(), nullptr);
         tree.appendChild (data, nullptr);
     }
 
@@ -622,9 +622,9 @@ void NodeObject::setMidiProgramsState (const String& state)
         const auto data = tree.getChild (i);
         std::unique_ptr<NodeObject::MidiProgram> program;
         program.reset (new NodeObject::MidiProgram());
-        program->program = (int) data[Tags::program];
-        program->name = data[Tags::name].toString();
-        const auto state = data.getProperty (Tags::state).toString().trim();
+        program->program = (int) data[tags::program];
+        program->name = data[tags::name].toString();
+        const auto state = data.getProperty (tags::state).toString().trim();
         if (state.isNotEmpty() && isPositiveAndBelow (program->program, 128))
         {
             program->state.fromBase64Encoding (state);
@@ -674,15 +674,15 @@ void NodeObject::setPorts (const PortList& newPorts)
 
 ValueTree NodeObject::createPortsData() const
 {
-    ValueTree portList (Tags::ports);
+    ValueTree portList (tags::ports);
 
     for (int i = 0; i < ports.size(); ++i)
     {
         ValueTree port = ports.createValueTree (i);
-        port.setProperty (Tags::flow, ports.isInput (i) ? "input" : "output", nullptr);
-        port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
+        port.setProperty (tags::flow, ports.isInput (i) ? "input" : "output", nullptr);
+        port.removeProperty (tags::input, nullptr); // added by KV modules, not needed yet
         portList.addChild (port, -1, 0);
-        jassert (isPositiveAndBelow ((int) port.getProperty (Tags::index), ports.size()));
+        jassert (isPositiveAndBelow ((int) port.getProperty (tags::index), ports.size()));
     }
 
     return portList;

@@ -140,7 +140,7 @@ public:
     OSCSettingsPage (Context& w, GuiService& g)
         : world (w), gui (g)
     {
-        auto& settings = world.getSettings();
+        auto& settings = world.settings();
         addAndMakeVisible (enabledLabel);
         enabledLabel.setFont (Font (12.0, Font::bold));
         enabledLabel.setText ("OSC Host Enabled?", dontSendNotification);
@@ -172,7 +172,7 @@ public:
         portSlider.setSliderStyle (Slider::IncDecButtons);
         portSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
         portSlider.onValueChange = [this]() {
-            world.getSettings().setOscHostPort (roundToInt (portSlider.getValue()));
+            world.settings().setOscHostPort (roundToInt (portSlider.getValue()));
             triggerAsyncUpdate();
         };
     }
@@ -210,7 +210,7 @@ private:
 
     void updateEnablement()
     {
-        world.getSettings().setOscHostEnabled (enabledButton.getToggleState());
+        world.settings().setOscHostEnabled (enabledButton.getToggleState());
         hostField.setEnabled (enabledButton.getToggleState());
         portSlider.setEnabled (enabledButton.getToggleState());
     }
@@ -224,7 +224,7 @@ class PluginSettingsComponent : public SettingsPage,
 public:
     PluginSettingsComponent (Context& w)
         : plugins (w.plugins()),
-          settings (w.getSettings())
+          settings (w.settings())
 
     {
         addAndMakeVisible (activeFormats);
@@ -350,7 +350,7 @@ public:
                               "", //const String& enforcedSuffix,
                               "None"), //const String& textWhenNothingSelected)
 
-          settings (world.getSettings()),
+          settings (world.settings()),
           engine (world.audio()),
           gui (g)
     {
@@ -725,7 +725,7 @@ class MidiSettingsPage : public SettingsPage,
 public:
     MidiSettingsPage (Context& g)
         : devices (g.devices()),
-          settings (g.getSettings()),
+          settings (g.settings()),
           midi (g.midi()),
           world (g)
     {
@@ -750,9 +750,9 @@ public:
         midiOutLatency.setSliderStyle (Slider::IncDecButtons);
         midiOutLatency.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
         midiOutLatency.onValueChange = [this]() {
-            world.getSettings().setMidiOutLatency (midiOutLatency.getValue());
+            world.settings().setMidiOutLatency (midiOutLatency.getValue());
             if (auto e = world.audio())
-                e->applySettings (world.getSettings());
+                e->applySettings (world.settings());
         };
 #if JUCE_WINDOWS
         midiOutLatencyLabel.setEnabled (false);

@@ -18,12 +18,13 @@
 */
 
 #include <element/services/guiservice.hpp>
-#include "gui/Buttons.h"
-#include "gui/views/ControllerDevicesView.h"
-#include "gui/ViewHelpers.h"
-#include <element/controllerdevice.hpp>
-#include "messages.hpp"
 #include <element/context.hpp>
+#include <element/controller.hpp>
+
+#include "gui/Buttons.h"
+#include "gui/views/ControllersView.h"
+#include "gui/ViewHelpers.h"
+#include "messages.hpp"
 #include "engine/midiengine.hpp"
 
 namespace element {
@@ -34,10 +35,10 @@ class ControllerMapsTable : public TableListBox,
 public:
     enum Columns
     {
-        Device = 1,
-        Control,
-        Node,
-        Parameter
+        ColumnDevice = 1,
+        ColumnControl,
+        ColumnNode,
+        ColumnParameter
     };
 
     ControllerMapsTable()
@@ -45,9 +46,9 @@ public:
         setModel (this);
         const int flags = TableHeaderComponent::notSortable;
         // getHeader().addColumn ("Device", Device, 100, 30, -1, flags);
-        getHeader().addColumn ("Node", Node, 100, 30, -1, flags);
-        getHeader().addColumn ("Control", Control, 100, 30, -1, flags);
-        getHeader().addColumn ("Parameter", Parameter, 100, 30, -1, flags);
+        getHeader().addColumn ("Node", ColumnNode, 100, 30, -1, flags);
+        getHeader().addColumn ("Control", ColumnControl, 100, 30, -1, flags);
+        getHeader().addColumn ("Parameter", ColumnParameter, 100, 30, -1, flags);
         setHeaderHeight (22);
         setRowHeight (20);
     }
@@ -63,8 +64,8 @@ public:
         updateContent();
     }
 
-    void refreshContent (const ControllerDevice& device = ControllerDevice(),
-                         const ControllerDevice::Control& control = ControllerDevice::Control())
+    void refreshContent (const Controller& device = Controller(),
+                         const Control& control = Control())
     {
         maps.clear (true);
 
@@ -86,8 +87,8 @@ public:
     }
 
     void updateWith (SessionPtr sess,
-                     const ControllerDevice& device = ControllerDevice(),
-                     const ControllerDevice::Control& control = ControllerDevice::Control())
+                     const Controller& device = Controller(),
+                     const Control& control = Control())
     {
         session = sess;
         refreshContent (device, control);
@@ -115,22 +116,22 @@ public:
         String text = "N/A";
         switch (columnId)
         {
-            case Device: {
+            case ColumnDevice: {
                 text = device.getName().toString();
             }
             break;
 
-            case Control: {
+            case ColumnControl: {
                 text = control.getName().toString();
             }
             break;
 
-            case Node: {
+            case ColumnNode: {
                 text = node.getName();
             }
             break;
 
-            case Parameter: {
+            case ColumnParameter: {
                 text = "Parameter ";
                 text << mapp.getParameterIndex();
 
@@ -165,7 +166,7 @@ public:
         {
             switch (columnId)
             {
-                case Node:
+                case ColumnNode:
                     ViewHelpers::presentPluginWindow (this, objects->node);
                     break;
                 default:
@@ -370,23 +371,23 @@ public:
         setModel (nullptr);
     }
 
-    void setControllerDevice (const ControllerDevice& dev)
+    void setController (const Controller& dev)
     {
         editedDevice = dev;
         updateContent();
         repaint();
     }
 
-    ControllerDevice::Control getSelectedControl() const
+    Control getSelectedControl() const
     {
         if (getNumSelectedRows() > 0 && getSelectedRow() < editedDevice.getNumControls())
             return editedDevice.getControl (getSelectedRow());
-        return ControllerDevice::Control();
+        return Control();
     }
 
     int getNumRows() override
     {
-        return editedDevice.getNumChildren();
+        return editedDevice.data().getNumChildren();
     }
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
@@ -416,7 +417,7 @@ public:
 
     void deleteKeyPressed (int lastRowSelected) override
     {
-        const auto selected (ControllerDevice::Control (
+        const auto selected (Control (
             editedDevice.getControl (lastRowSelected)));
         ViewHelpers::postMessageFor (this, new RemoveControlMessage (editedDevice, selected));
     }
@@ -435,7 +436,7 @@ public:
 #endif
 
 private:
-    ControllerDevice editedDevice;
+    Controller editedDevice;
 
     class ControllerRow : public Component,
                           public Button::Listener
@@ -476,7 +477,7 @@ private:
             status.setBounds (r.removeFromRight (getWidth() / 2));
         }
 
-        void refresh (const ControllerDevice::Control& ctl, int row, bool isNowSelected)
+        void refresh (const Control& ctl, int row, bool isNowSelected)
         {
             control = ctl;
             rowNumber = row;
@@ -504,7 +505,7 @@ private:
             selected = isNowSelected;
         }
 
-        ControllerDevice::Control control;
+        Control control;
         int rowNumber = -1;
         bool selected = false;
         Label status;
@@ -514,11 +515,11 @@ private:
     };
 };
 
-class ControllerDevicesView::Content : public Component,
-                                       public Button::Listener,
-                                       public ComboBox::Listener,
-                                       public Value::Listener,
-                                       public AsyncUpdater
+class ControllersView::Content : public Component,
+                                 public Button::Listener,
+                                 public ComboBox::Listener,
+                                 public Value::Listener,
+                                 public AsyncUpdater
 {
 public:
     Content()
@@ -538,7 +539,7 @@ public:
         deleteButton.addListener (this);
         addAndMakeVisible (deleteButton);
 
-        controls.setControllerDevice (editedDevice);
+        controls.setController (editedDevice);
         controls.selectionChanged = std::bind (&Content::triggerAsyncUpdate, this);
         addAndMakeVisible (controls);
 
@@ -595,7 +596,7 @@ public:
 
     void handleAsyncUpdate() override { stabilizeContent(); }
 
-    static bool supportedForMapping (const MidiMessage& message, const ControllerDevice::Control& control)
+    static bool supportedForMapping (const MidiMessage& message, const Control& control)
     {
         ignoreUnused (control);
         return (message.isController() || message.isNoteOn())
@@ -610,17 +611,17 @@ public:
         {
             const var mappingData ((void*) message.getRawData(),
                                    (size_t) message.getRawDataSize());
-            ValueTree data = control.getValueTree();
-            data.setProperty (Tags::mappingData, mappingData, nullptr);
+            ValueTree data = control.data();
+            data.setProperty (tags::mappingData, mappingData, nullptr);
         }
         controls.updateContent();
-        ViewHelpers::postMessageFor (this, new RefreshControllerDeviceMessage (editedDevice));
+        ViewHelpers::postMessageFor (this, new RefreshControllerMessage (editedDevice));
     }
 
     bool haveControllers() const
     {
         if (auto sess = (const_cast<Content*> (this))->session)
-            return sess->getNumControllerDevices() > 0;
+            return sess->getNumControllers() > 0;
         return false;
     }
 
@@ -634,7 +635,7 @@ public:
         else if (value.refersToSameSourceAs (inputDevice))
         {
             ViewHelpers::postMessageFor (this,
-                                         new RefreshControllerDeviceMessage (editedDevice));
+                                         new RefreshControllerMessage (editedDevice));
         }
         else if (value.refersToSameSourceAs (controlName))
         {
@@ -703,7 +704,7 @@ public:
             if (chooser.browseForFileToSave (true))
             {
                 DBG ("[element] save device");
-                if (auto xml = editedDevice.getValueTree().createXml())
+                if (auto xml = editedDevice.data().createXml())
                     xml->writeToFile (chooser.getResult(), String());
             }
         }
@@ -717,14 +718,14 @@ public:
             if (chooser.browseForFileToOpen())
             {
                 ViewHelpers::postMessageFor (this,
-                                             new AddControllerDeviceMessage (chooser.getResult()));
+                                             new AddControllerMessage (chooser.getResult()));
             }
         }
     }
 
     void comboBoxChanged (ComboBox* box) override
     {
-        editedDevice = ControllerDevice (session->getControllerDeviceValueTree (box->getSelectedItemIndex()));
+        editedDevice = Controller (session->getControllerValueTree (box->getSelectedItemIndex()));
         stabilizeContent();
     }
 
@@ -768,7 +769,7 @@ public:
 
     void clear()
     {
-        editedDevice = ControllerDevice();
+        editedDevice = Controller();
         controllersBox.clear();
         properties.clear();
         maps.clear();
@@ -799,7 +800,7 @@ public:
                 comboBoxChanged (&controllersBox);
             }
 
-            controls.setControllerDevice (editedDevice);
+            controls.setController (editedDevice);
             maps.updateWith (sess, editedDevice, controls.getSelectedControl());
         }
         else
@@ -809,7 +810,7 @@ public:
         }
     }
 
-    void getControllerDeviceProperties (Array<PropertyComponent*>& props)
+    void getControllerProperties (Array<PropertyComponent*>& props)
     {
         deviceName.removeListener (this);
         inputDevice.removeListener (this);
@@ -819,7 +820,7 @@ public:
         toggleMode.removeListener (this);
         momentary.removeListener (this);
 
-        deviceName = editedDevice.getPropertyAsValue (Tags::name);
+        deviceName = editedDevice.getPropertyAsValue (tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
         jassert (ViewHelpers::findContentComponent (this) != nullptr);
@@ -868,7 +869,7 @@ public:
 
         if (control.isValid())
         {
-            controlName = control.getPropertyAsValue (Tags::name);
+            controlName = control.getPropertyAsValue (tags::name);
             props.add (new TextPropertyComponent (controlName,
                                                   "Control Name",
                                                   120,
@@ -884,7 +885,7 @@ public:
             else if (control.isControllerEvent())
                 eventName = "CC Number";
 
-            props.add (new ChoicePropertyComponent (control.getPropertyAsValue (Tags::midiChannel),
+            props.add (new ChoicePropertyComponent (control.getPropertyAsValue (tags::midiChannel),
                                                     "Channel",
                                                     { "Omni", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" },
                                                     { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }));
@@ -894,7 +895,7 @@ public:
 
             if (control.isControllerEvent())
             {
-                toggleMode = control.getToggleModeObject();
+                toggleMode = control.toggleModeObject();
                 props.add (new ChoicePropertyComponent (toggleMode, "Toggle Mode", { "Equal or Higher", "Same Value" }, { "eqorhi", "eq" }));
 
                 Value toggleValue = control.getPropertyAsValue ("toggleValue");
@@ -930,11 +931,11 @@ public:
 
     void createNewController()
     {
-        auto newDevice = ControllerDevice ("New Device");
-        ViewHelpers::postMessageFor (this, new AddControllerDeviceMessage (newDevice));
+        auto newDevice = Controller ("New Device");
+        ViewHelpers::postMessageFor (this, new AddControllerMessage (newDevice));
     }
 
-    void controllerAdded (const ControllerDevice& device)
+    void controllerAdded (const Controller& device)
     {
         editedDevice = device;
         stabilizeContent();
@@ -942,17 +943,17 @@ public:
 
     void deleteEditedController()
     {
-        ViewHelpers::postMessageFor (this, new RemoveControllerDeviceMessage (editedDevice));
+        ViewHelpers::postMessageFor (this, new RemoveControllerMessage (editedDevice));
     }
 
-    void controllerRemoved (const ControllerDevice&)
+    void controllerRemoved (const Controller&)
     {
         int index = controllersBox.getSelectedItemIndex();
-        index = jmin (index, session->getNumControllerDevices() - 1);
-        if (index >= 0 && index < session->getNumControllerDevices())
-            editedDevice = session->getControllerDevice (index);
+        index = jmin (index, session->getNumControllers() - 1);
+        if (index >= 0 && index < session->getNumControllers())
+            editedDevice = session->getController (index);
         else
-            editedDevice = ControllerDevice();
+            editedDevice = Controller();
         stabilizeContent();
     }
 
@@ -960,11 +961,11 @@ public:
     {
         String controlName = "Control ";
         controlName << (controls.getNumRows() + 1);
-        const ControllerDevice::Control newControl (controlName);
+        const Control newControl (controlName);
         ViewHelpers::postMessageFor (this, new AddControlMessage (editedDevice, newControl));
     }
 
-    void onControlAdded (const ControllerDevice::Control& control)
+    void onControlAdded (const Control& control)
     {
         controls.updateContent();
         const auto index = editedDevice.indexOf (control);
@@ -977,12 +978,12 @@ public:
 
     void deleteSelectedControl()
     {
-        const auto selected (ControllerDevice::Control (
+        const auto selected (Control (
             editedDevice.getControl (controls.getSelectedRow())));
         ViewHelpers::postMessageFor (this, new RemoveControlMessage (editedDevice, selected));
     }
 
-    void onControlRemoved (const ControllerDevice::Control& control)
+    void onControlRemoved (const Control& control)
     {
         auto selected = controls.getSelectedRow();
         controls.updateContent();
@@ -1030,7 +1031,7 @@ public:
     }
 
 private:
-    ControllerDevice editedDevice;
+    Controller editedDevice;
     SettingButton testButton;
     SettingButton createButton;
     SettingButton deleteButton;
@@ -1051,12 +1052,12 @@ private:
     int mappingsSize = 150;
     void updateComboBoxes()
     {
-        const auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
+        const auto controllers = session->data().getChildWithName (tags::controllers);
         controllersBox.clear (dontSendNotification);
         for (int i = 0; i < controllers.getNumChildren(); ++i)
         {
             const auto controller = controllers.getChild (i);
-            const auto name = controller.getProperty (Tags::name).toString();
+            const auto name = controller.getProperty (tags::name).toString();
             const int itemId = i + 1;
             controllersBox.addItem (name, itemId);
         }
@@ -1066,7 +1067,7 @@ private:
     {
         int index = 0;
         const auto controllerName (editedDevice.getName().toString());
-        const auto controllerIndex (editedDevice.getValueTree().getParent().indexOf (editedDevice.getValueTree()));
+        const auto controllerIndex (editedDevice.data().getParent().indexOf (editedDevice.data()));
         if (controllerIndex < 0)
             return;
 
@@ -1080,11 +1081,11 @@ private:
     {
         properties.clear();
         Array<PropertyComponent*> props;
-        getControllerDeviceProperties (props);
+        getControllerProperties (props);
         properties.addProperties (props);
         props.clearQuick();
 
-        // getControllerDeviceProperties (props);
+        // getControllerProperties (props);
         // properties.addSection ("Section", props);
     }
 
@@ -1114,30 +1115,30 @@ private:
     Array<boost::signals2::connection> connections;
 };
 
-ControllerDevicesView::ControllerDevicesView()
+ControllersView::ControllersView()
 {
-    setName ("ControllerDevicesView");
+    setName ("ControllersView");
     content.reset (new Content());
     addAndMakeVisible (content.get());
 }
 
-void ControllerDevicesView::initializeView (Services& app)
+void ControllersView::initializeView (Services& app)
 {
     if (content)
         content->setSession (app.context().session(), false);
 }
 
-ControllerDevicesView::~ControllerDevicesView()
+ControllersView::~ControllersView()
 {
     content.reset (nullptr);
 }
 
-void ControllerDevicesView::resized()
+void ControllersView::resized()
 {
     content->setBounds (getLocalBounds().reduced (2));
 }
 
-void ControllerDevicesView::stabilizeContent()
+void ControllersView::stabilizeContent()
 {
     content->stabilizeContent();
 }

@@ -1,12 +1,12 @@
 --- Commands.
 -- @module el.command
 
-local CommandManager    = require ('el.CommandManager')
+local Commands    = require ('el.Commands')
 local Context           = require ('el.Context')
 
 local M = {}
 
---- Returns the global el.CommandManager
+--- Returns the global el.Commands
 function M.manager()
     local g = Context.instance()
     return g and g:commands() or nil
@@ -24,7 +24,7 @@ function M.invoke (cmd, async)
 
     if cmd > 0 then
         local m = M.manager()
-        assert (m ~= nil, "nil el.CommandManager")
+        assert (m ~= nil, "nil el.Commands")
         return m:invokeDirectly (cmd, async or false)
     end
 
@@ -60,9 +60,9 @@ end
 
 -- Define standard commands as constants. 
 -- e.g. Commands::showAbout in C++ becomes command.SHOW_ABOUT
-for _,cmd in ipairs (CommandManager.standard()) do
+for _,cmd in ipairs (Commands.standard()) do
     local slug = require ('el.slug')
-    local s = CommandManager.toString (cmd)
+    local s = Commands.toString (cmd)
     if string.len(s) > 0 and slug.valid(s) then
         local k = slug.tosnake (s)
         M[string.upper (k)] = cmd

@@ -39,7 +39,7 @@
 
 namespace element {
 
-MainMenu::MainMenu (MainWindow& parent, CommandManager& c)
+MainMenu::MainMenu (MainWindow& parent, Commands& c)
     : owner (parent), world (parent.context()), cmd (c) {}
 
 MainMenu::~MainMenu()
@@ -150,7 +150,7 @@ void MainMenu::menuItemSelected (int index, int menu)
 
     if (menu == Options)
     {
-        world.getSettings().performMenuResult (world, index);
+        world.settings().performMenuResult (world, index);
         owner.refreshMenu();
     }
 
@@ -167,7 +167,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     if (index == 1000)
     {
         DBG ("[element] === SESSION DUMP ===");
-        auto data = session->getValueTree().createCopy();
+        auto data = session->data().createCopy();
         Node::sanitizeProperties (data, true);
         DBG (data.toXmlString());
     }
@@ -239,8 +239,10 @@ void MainMenu::menuItemSelected (int index, int menu)
     if (menu == File && index >= recentMenuOffset)
     {
         const int fileIdx = index - recentMenuOffset;
-        class File f = owner.services().getRecentlyOpenedFilesList().getFile (fileIdx);
-        owner.services().find<SessionService>()->openFile (f);
+        juce::ignoreUnused (fileIdx);
+        // FIXME: Recents
+        // class File f = owner.services().getRecentlyOpenedFilesList().getFile (fileIdx);
+        // owner.services().find<SessionService>()->openFile (f);
     }
 }
 
@@ -248,18 +250,19 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 {
     if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
     {
-        PopupMenu recents;
-        auto& app (cc->services());
-        auto& list (app.getRecentlyOpenedFilesList());
-        if (list.getNumFiles() > 0)
-        {
-            list.createPopupMenuItems (recents, recentMenuOffset, false, true);
-            recents.addSeparator();
-        }
+        // FIXME: Recents
+        // PopupMenu recents;
+        // auto& app (cc->services());
+        // auto& list (app.getRecentlyOpenedFilesList());
+        // if (list.getNumFiles() > 0)
+        // {
+        //     list.createPopupMenuItems (recents, recentMenuOffset, false, true);
+        //     recents.addSeparator();
+        // }
 
-        recents.addCommandItem (&cmd, Commands::recentsClear, "Clear Recent Files");
-        menu.addSubMenu ("Open Recent", recents);
-        menu.addSeparator();
+        // recents.addCommandItem (&cmd, Commands::recentsClear, "Clear Recent Files");
+        // menu.addSubMenu ("Open Recent", recents);
+        // menu.addSeparator();
     }
 }
 
@@ -299,7 +302,7 @@ void MainMenu::buildWorkspaceMenu (PopupMenu& menu)
 
 void MainMenu::buildOptionsMenu (PopupMenu& menu)
 {
-    Settings& settings (world.getSettings());
+    Settings& settings (world.settings());
     settings.addItemsToMenu (world, menu);
 }
 
@@ -337,7 +340,7 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
 #endif
 }
 
-void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
+void MainMenu::buildSessionMenu (Commands& cmd, PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
     menu.addSeparator();
@@ -351,7 +354,7 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
 }
 
-void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
+void MainMenu::buildEditMenu (Commands& cmd, PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
     menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
@@ -367,7 +370,7 @@ void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
 }
 
-void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
+void MainMenu::buildViewMenu (Commands& cmd, PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
@@ -385,10 +388,10 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
-    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
+    menu.addCommandItem (&cmd, Commands::showControllers, "Controllers");
 }
 
-void MainMenu::buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
+void MainMenu::buildPluginMainMenu (Commands& cmd, PopupMenu& menu)
 {
     buildSessionMenu (cmd, menu);
     menu.addSeparator();

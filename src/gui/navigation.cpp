@@ -53,7 +53,13 @@ public:
         ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
         g.setColour (Colours::white);
         Rectangle<int> r (area.withTrimmedLeft (20));
-        g.drawText (comp.getName(), 20, 0, r.getWidth(), r.getHeight(), Justification::centredLeft);
+        g.setFont (g.getCurrentFont().withHeight (13));
+        g.drawText (comp.getName().toUpperCase(),
+                    20,
+                    0,
+                    r.getWidth(),
+                    r.getHeight(),
+                    Justification::centredLeft);
     }
 };
 
@@ -204,7 +210,7 @@ private:
 
 //====
 NavigationConcertinaPanel::NavigationConcertinaPanel (Context& g)
-    : globals (g), headerHeight (30), defaultPanelHeight (80)
+    : globals (g), headerHeight (22), defaultPanelHeight (80)
 {
     lookAndFeel = std::make_unique<NavigationConcertinaPanel::LookAndFeel>();
     setLookAndFeel (lookAndFeel.get());
@@ -227,7 +233,7 @@ Component* NavigationConcertinaPanel::findPanelByName (const String& name)
 
 void NavigationConcertinaPanel::saveState (PropertiesFile* props)
 {
-    ValueTree state (Tags::state);
+    ValueTree state (tags::state);
 
     for (int i = 0; i < getNumPanels(); ++i)
     {

@@ -25,6 +25,7 @@
 #include <element/devicemanager.hpp>
 #include <element/pluginmanager.hpp>
 #include <element/settings.hpp>
+#include <element/services/guiservice.hpp>
 
 #include "session/commandmanager.hpp"
 #include "engine/midiengine.hpp"
@@ -49,7 +50,7 @@ public:
 
     void launchApplication()
     {
-        Settings& settings (world.getSettings());
+        Settings& settings (world.settings());
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
 
         setupLogging();
@@ -69,7 +70,7 @@ private:
 
     void setupAudioEngine()
     {
-        auto& settings = world.getSettings();
+        auto& settings = world.settings();
         DeviceManager& devices (world.devices());
         String tp = devices.getCurrentAudioDeviceType();
 
@@ -99,26 +100,26 @@ private:
     void setupMidiEngine()
     {
         auto& midi = world.midi();
-        midi.applySettings (world.getSettings());
+        midi.applySettings (world.settings());
     }
 
     void setupKeyMappings()
     {
-        auto* const props = world.getSettings().getUserSettings();
-        auto* const keymp = world.getCommandManager().getKeyMappings();
+        auto* const props = world.settings().getUserSettings();
+        auto* const keymp = world.services().find<GuiService>()->commands().getKeyMappings();
         if (props && keymp)
         {
             std::unique_ptr<XmlElement> xml;
             xml = props->getXmlValue (Settings::keymappingsKey);
             if (xml != nullptr)
-                world.getCommandManager().getKeyMappings()->restoreFromXml (*xml);
+                keymp->restoreFromXml (*xml);
             xml = nullptr;
         }
     }
 
     void setupPlugins()
     {
-        auto& settings (world.getSettings());
+        auto& settings (world.settings());
         auto& plugins (world.plugins());
         auto engine (world.audio());
 
@@ -186,7 +187,7 @@ public:
 
         auto engine (world->audio());
         auto& plugins (world->plugins());
-        auto& settings (world->getSettings());
+        auto& settings (world->settings());
         auto& midi (world->midi());
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
@@ -201,8 +202,9 @@ public:
 
         if (auto el = world->devices().createStateXml())
             props->setValue (Settings::devicesKey, el.get());
-        if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
-            props->setValue (Settings::keymappingsKey, keymappings.get());
+        // FIXME: KeyMappings
+        // if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
+        //     props->setValue (Settings::keymappingsKey, keymappings.get());
 
         engine = nullptr;
         Logger::setCurrentLogger (nullptr);
@@ -220,7 +222,7 @@ public:
 
         auto* sc = world->services().find<SessionService>();
 
-        if (world->getSettings().askToSaveSession())
+        if (world->settings().askToSaveSession())
         {
             // - 0 if the third button was pressed ('cancel')
             // - 1 if the first button was pressed ('yes')
@@ -283,14 +285,14 @@ public:
         if (nullptr == startup)
             return;
 
-        if (world->getSettings().scanForPluginsOnStartup())
+        if (world->settings().scanForPluginsOnStartup())
             world->plugins().scanAudioPlugins();
 
         startup.reset();
 
         world->services().run();
 
-        if (world->getSettings().checkForUpdates())
+        if (world->settings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
         const auto path = getCommandLineParameters();

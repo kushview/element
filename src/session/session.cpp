@@ -59,7 +59,7 @@ private:
 };
 
 Session::Session()
-    : ObjectModel (Tags::session)
+    : Model (tags::session)
 {
     impl.reset (new Impl (*this));
     setMissingProperties (true);
@@ -76,11 +76,11 @@ Session::~Session()
 
 bool Session::addGraph (const Node& node, const bool setActive)
 {
-    jassert (! node.getValueTree().getParent().isValid());
+    jassert (! node.data().getParent().isValid());
     auto graphs = getGraphsValueTree();
-    graphs.addChild (node.getValueTree(), -1, nullptr);
+    graphs.addChild (node.data(), -1, nullptr);
     if (setActive)
-        graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), nullptr);
+        graphs.setProperty (tags::active, graphs.indexOf (node.data()), nullptr);
     return true;
 }
 
@@ -92,13 +92,13 @@ Node Session::getActiveGraph() const
 
     ScopedFrozenLock sfl (*this);
     ValueTree graphs = getGraphsValueTree();
-    graphs.setProperty (Tags::active, graphs.getNumChildren() > 0 ? 0 : -1, nullptr);
+    graphs.setProperty (tags::active, graphs.getNumChildren() > 0 ? 0 : -1, nullptr);
     return graphs.getNumChildren() > 0 ? getGraph (0) : Node();
 }
 
 int Session::getActiveGraphIndex() const
 {
-    return getGraphsValueTree().getProperty (Tags::active, -1);
+    return getGraphsValueTree().getProperty (tags::active, -1);
 }
 
 void Session::clear()
@@ -108,7 +108,7 @@ void Session::clear()
 
 bool Session::loadData (const ValueTree& data)
 {
-    if (! data.hasType (Tags::session))
+    if (! data.hasType (tags::session))
         return false;
     objectData.removeListener (this);
     objectData = data;
@@ -129,23 +129,23 @@ void Session::setMissingProperties (bool resetExisting)
     if (resetExisting)
         objectData.removeAllProperties (nullptr);
 
-    if (! objectData.hasProperty (Tags::name))
-        setProperty (Tags::name, "");
-    if (! objectData.hasProperty (Tags::tempo))
-        setProperty (Tags::tempo, (double) 120.0);
-    if (! objectData.hasProperty (Tags::notes))
-        setProperty (Tags::notes, String());
-    if (! objectData.hasProperty (Tags::beatsPerBar))
-        setProperty (Tags::beatsPerBar, 4);
-    if (! objectData.hasProperty (Tags::beatDivisor))
-        setProperty (Tags::beatDivisor, (int) BeatType::QuarterNote);
+    if (! objectData.hasProperty (tags::name))
+        setProperty (tags::name, "");
+    if (! objectData.hasProperty (tags::tempo))
+        setProperty (tags::tempo, (double) 120.0);
+    if (! objectData.hasProperty (tags::notes))
+        setProperty (tags::notes, String());
+    if (! objectData.hasProperty (tags::beatsPerBar))
+        setProperty (tags::beatsPerBar, 4);
+    if (! objectData.hasProperty (tags::beatDivisor))
+        setProperty (tags::beatDivisor, (int) BeatType::QuarterNote);
 
     if (resetExisting)
         objectData.removeAllChildren (nullptr);
 
-    objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
-    objectData.getOrCreateChildWithName (Tags::controllers, nullptr);
-    objectData.getOrCreateChildWithName (Tags::maps, nullptr);
+    objectData.getOrCreateChildWithName (tags::graphs, nullptr);
+    objectData.getOrCreateChildWithName (tags::controllers, nullptr);
+    objectData.getOrCreateChildWithName (tags::maps, nullptr);
 }
 
 Node Session::findNodeById (const Uuid& uuid)
@@ -162,13 +162,13 @@ Node Session::findNodeById (const Uuid& uuid)
     return node;
 }
 
-ControllerDevice Session::findControllerDeviceById (const Uuid& uuid)
+Controller Session::findControllerById (const Uuid& uuid)
 {
-    ControllerDevice device;
+    Controller device;
     const auto controllerId = uuid.toString();
-    for (int i = getNumControllerDevices(); --i >= 0;)
+    for (int i = getNumControllers(); --i >= 0;)
     {
-        device = getControllerDevice (i);
+        device = getController (i);
         if (device.getUuidString() == controllerId)
             return device;
     }
@@ -184,12 +184,12 @@ void Session::notifyChanged()
 
 void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (property == Tags::object || (tree.hasType (Tags::node) && (property == Tags::state || property == Tags::updater)))
+    if (property == tags::object || (tree.hasType (tags::node) && (property == tags::state || property == tags::updater)))
     {
         return;
     }
 
-    if (tree == objectData && property == Tags::tempo)
+    if (tree == objectData && property == tags::tempo)
     {
     }
 
@@ -199,16 +199,16 @@ void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& prope
 void Session::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     // controller device added
-    if (parent.getParent() == objectData && parent.hasType (Tags::controllers) && child.hasType (Tags::controller))
+    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (tags::controller))
     {
-        const ControllerDevice device (child);
+        const Controller device (child);
         controllerDeviceAdded (device);
     }
 
     // controller device control added
-    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (Tags::controllers) && parent.hasType (Tags::controller) && child.hasType (Tags::control))
+    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (tags::controller) && child.hasType (tags::control))
     {
-        const ControllerDevice::Control control (child);
+        const Control control (child);
         controlAdded (control);
     }
 
@@ -218,16 +218,16 @@ void Session::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 void Session::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
 {
     // controller device removed
-    if (parent.getParent() == objectData && parent.hasType (Tags::controllers) && child.hasType (Tags::controller))
+    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (tags::controller))
     {
-        const ControllerDevice device (child);
+        const Controller device (child);
         controllerDeviceRemoved (device);
     }
 
     // controller device control removed
-    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (Tags::controllers) && parent.hasType (Tags::controller) && child.hasType (Tags::control))
+    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (tags::controller) && child.hasType (tags::control))
     {
-        const ControllerDevice::Control control (child);
+        const Control control (child);
         controlRemoved (control);
     }
 
@@ -277,7 +277,7 @@ void Session::cleanOrphanControllerMaps()
     {
         const ControllerMapObjects objects (this, getControllerMap (i));
         if (! objects.isValid())
-            toRemove.add (objects.controllerMap.getValueTree());
+            toRemove.add (objects.controllerMap.data());
     }
     if (toRemove.size() > 0)
     {
@@ -292,8 +292,8 @@ void Session::setActiveGraph (int index)
 {
     if (! isPositiveAndBelow (index, getNumGraphs()))
         return;
-    objectData.getChildWithName (Tags::graphs)
-        .setProperty (Tags::active, index, nullptr);
+    objectData.getChildWithName (tags::graphs)
+        .setProperty (tags::active, index, nullptr);
 }
 
 bool Session::writeToFile (const File& file) const

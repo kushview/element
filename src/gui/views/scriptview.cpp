@@ -46,7 +46,7 @@ public:
 
     void setScript (Script s)
     {
-        if (s.getValueTree() == script.getValueTree())
+        if (s.data() == script.data())
             return;
 
         if (auto old = proxyView())

@@ -84,7 +84,7 @@ GraphEditorView::GraphEditorView()
     };
 
     graph.onZoomChanged = [this]() {
-        auto s = getSettings();
+        auto s = settings();
         if (s.isValid())
         {
             s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);
@@ -105,7 +105,7 @@ GraphEditorView::GraphEditorView()
     nodePropsToggle.setJustificationType (Justification::centred);
     nodePropsToggle.onClick = [this]() {
         nodeProps.setVisible (! nodeProps.isVisible());
-        auto s = getSettings();
+        auto s = settings();
         if (s.isValid())
             s.setProperty ("nodePropsVisible", nodeProps.isVisible(), nullptr);
         resized();
@@ -217,11 +217,11 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int>& area)
     if (graph.getWidth() < view.getWidth() || graph.getHeight() < view.getHeight())
         graph.setBounds (view.getBounds());
 
-    auto s = getSettings();
+    auto s = settings();
     if (s.isValid())
     {
-        s.setProperty (Tags::width, graph.getWidth(), nullptr)
-            .setProperty (Tags::height, graph.getHeight(), nullptr);
+        s.setProperty (tags::width, graph.getWidth(), nullptr)
+            .setProperty (tags::height, graph.getHeight(), nullptr);
     }
 }
 
@@ -280,7 +280,7 @@ void GraphEditorView::updateSizeInternal (const bool force)
         graph.setBounds (r);
 }
 
-ValueTree GraphEditorView::getSettings() const
+ValueTree GraphEditorView::settings() const
 {
     ValueTree uivt = getGraph().getUIValueTree();
     return uivt.isValid() ? uivt.getOrCreateChildWithName ("GraphEditorView", nullptr)
@@ -289,15 +289,15 @@ ValueTree GraphEditorView::getSettings() const
 
 void GraphEditorView::restoreSettings()
 {
-    auto s = getSettings();
+    auto s = settings();
     if (! s.isValid())
     {
         updateSizeInternal();
         return;
     }
 
-    graph.setSize (s.getProperty (Tags::width, getWidth()),
-                   s.getProperty (Tags::height, getHeight()));
+    graph.setSize (s.getProperty (tags::width, getWidth()),
+                   s.getProperty (tags::height, getHeight()));
     graph.setZoomScale (s.getProperty ("zoomScale", 1.0f));
     view.getHorizontalScrollBar().setCurrentRangeStart (s.getProperty ("horizontalRangeStart", 0.0));
     view.getVerticalScrollBar().setCurrentRangeStart (s.getProperty ("verticalRangeStart", 0.0));
@@ -308,12 +308,12 @@ void GraphEditorView::restoreSettings()
 
 void GraphEditorView::saveSettings()
 {
-    auto s = getSettings();
+    auto s = settings();
     if (! s.isValid())
         return;
 
-    s.setProperty (Tags::width, graph.getWidth(), nullptr);
-    s.setProperty (Tags::height, graph.getHeight(), nullptr);
+    s.setProperty (tags::width, graph.getWidth(), nullptr);
+    s.setProperty (tags::height, graph.getHeight(), nullptr);
     s.setProperty ("horizontalRangeStart", view.getHorizontalScrollBar().getCurrentRangeStart(), nullptr);
     s.setProperty ("verticalRangeStart", view.getVerticalScrollBar().getCurrentRangeStart(), nullptr);
     s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);

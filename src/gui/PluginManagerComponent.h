@@ -147,7 +147,7 @@ public:
 
 private:
     std::unique_ptr<PluginListComponent> pluginList;
-    Settings* getSettings();
+    Settings* settings();
     void saveSettings();
     void restoreSettings();
 };

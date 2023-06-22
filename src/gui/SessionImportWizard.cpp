@@ -109,7 +109,7 @@ public:
         importButton.onClick = [this]() {
             if (auto* dialog = findParentComponentOfClass<SessionImportWizardDialog>())
             {
-                const auto data = graphsList.getSelectedGraph().getValueTree();
+                const auto data = graphsList.getSelectedGraph().data();
                 const Node graph (data.createCopy(), false);
                 if (dialog->onGraphChosen)
                     dialog->onGraphChosen (graph);

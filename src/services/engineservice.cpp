@@ -47,7 +47,7 @@ struct RootGraphHolder
     {
         jassert (! attached());
         controller = nullptr;
-        model.getValueTree().removeProperty (Tags::object, 0);
+        model.data().removeProperty (tags::object, 0);
         node = nullptr;
         model = Node();
     }
@@ -71,7 +71,7 @@ struct RootGraphHolder
 
         if (auto* root = getRootGraph())
         {
-            const auto modeStr = model.getProperty (Tags::renderMode, "single").toString().trim().toLowerCase();
+            const auto modeStr = model.getProperty (tags::renderMode, "single").toString().trim().toLowerCase();
             const auto mode = modeStr == "single" ? RootGraph::SingleGraph : RootGraph::Parallel;
             const auto channels = model.getMidiChannels();
             const auto program = (int) model.getProperty ("midiProgram", -1);
@@ -84,7 +84,7 @@ struct RootGraphHolder
             if (engine->addGraph (root))
             {
                 controller = std::make_unique<RootGraphManager> (*root, plugins);
-                model.setProperty (Tags::object, node.get());
+                model.setProperty (tags::object, node.get());
                 controller->setNodeModel (model);
                 resetIONodePorts();
             }
@@ -298,8 +298,8 @@ void EngineService::addGraph (const Node& newGraph)
     jassert (newGraph.isGraph());
 
     Node ret;
-    Node node = newGraph.getValueTree().getParent().isValid() ? newGraph
-                                                              : Node (newGraph.getValueTree().createCopy(), false);
+    Node node = newGraph.data().getParent().isValid() ? newGraph
+                                                      : Node (newGraph.data().createCopy(), false);
     auto engine = context().audio();
     auto session = context().session();
     String err = node.isGraph() ? String() : "Not a graph";
@@ -337,18 +337,18 @@ void EngineService::addGraph (const Node& newGraph)
 
 void EngineService::duplicateGraph (const Node& graph)
 {
-    Node duplicate (graph.getValueTree().createCopy());
+    Node duplicate (graph.data().createCopy());
     duplicate.savePluginState(); // need objects present to update processor states
-    Node::sanitizeRuntimeProperties (duplicate.getValueTree());
+    Node::sanitizeRuntimeProperties (duplicate.data());
     // reset UUIDs to avoid compilcations with undoable actions
     duplicate.forEach ([] (const ValueTree& tree) {
-        if (! tree.hasType (Tags::node))
+        if (! tree.hasType (tags::node))
             return;
         auto nodeRef = tree;
-        nodeRef.setProperty (Tags::uuid, Uuid().toString(), nullptr);
+        nodeRef.setProperty (tags::uuid, Uuid().toString(), nullptr);
     });
 
-    duplicate.setProperty (Tags::name, duplicate.getName().replace ("(copy)", "").trim() + String (" (copy)"));
+    duplicate.setProperty (tags::name, duplicate.getName().replace ("(copy)", "").trim() + String (" (copy)"));
     addGraph (duplicate);
 }
 
@@ -375,8 +375,8 @@ void EngineService::removeGraph (int index)
         bool removeIt = false;
         if (holder->detach (engine))
         {
-            ValueTree sgraphs = session->getValueTree().getChildWithName (Tags::graphs);
-            sgraphs.removeChild (holder->model.getValueTree(), nullptr);
+            ValueTree sgraphs = session->data().getChildWithName (tags::graphs);
+            sgraphs.removeChild (holder->model.data(), nullptr);
             removeIt = true;
         }
         else
@@ -388,12 +388,12 @@ void EngineService::removeGraph (int index)
         {
             graphs->remove (holder);
             DBG ("[element] graph removed: index: " << index);
-            ValueTree sgraphs = session->getValueTree().getChildWithName (Tags::graphs);
+            ValueTree sgraphs = session->data().getChildWithName (tags::graphs);
 
             if (index < 0 || index >= session->getNumGraphs())
                 index = session->getNumGraphs() - 1;
 
-            sgraphs.setProperty (Tags::active, index, 0);
+            sgraphs.setProperty (tags::active, index, 0);
             const Node nextGraph = session->getCurrentGraph();
 
             if (nextGraph.isRootGraph())
@@ -404,7 +404,7 @@ void EngineService::removeGraph (int index)
             else if (session->getNumGraphs() > 0)
             {
                 DBG ("[element] failed to find appropriate index.");
-                sgraphs.setProperty (Tags::active, 0, 0);
+                sgraphs.setProperty (tags::active, 0, 0);
                 setRootNode (session->getActiveGraph());
             }
         }
@@ -525,7 +525,7 @@ void EngineService::addNode (const Node& node)
     if (EL_INVALID_NODE != nodeId)
     {
         const Node actual (root->getNodeModelForId (nodeId));
-        if (context().getSettings().showPluginWindowsWhenAdded())
+        if (context().settings().showPluginWindowsWhenAdded())
             sibling<GuiService>()->presentPluginWindow (actual);
     }
     else
@@ -551,7 +551,7 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
         list.removeFromBlacklist (desc.fileOrIdentifier);
         if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
         {
-            context().plugins().saveUserPlugins (context().getSettings());
+            context().plugins().saveUserPlugins (context().settings());
         }
     }
     else
@@ -566,7 +566,7 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
         if (EL_INVALID_NODE != nodeId)
         {
             node = root->getNodeModelForId (nodeId);
-            if (! dontShowUI && context().getSettings().showPluginWindowsWhenAdded())
+            if (! dontShowUI && context().settings().showPluginWindowsWhenAdded())
                 sibling<GuiService>()->presentPluginWindow (node);
         }
     }
@@ -710,7 +710,7 @@ void EngineService::setRootNode (const Node& newRootNode)
         if (auto* gui = sibling<GuiService>())
             gui->closeAllPluginWindows();
         
-        if (! (bool) active->model.getProperty(Tags::persistent) && active->attached())
+        if (! (bool) active->model.getProperty(tags::persistent) && active->attached())
         {
             active->controller->savePluginStates();
             active->controller->unloadGraph();
@@ -723,7 +723,7 @@ void EngineService::setRootNode (const Node& newRootNode)
     {
         proc->setMidiChannels (newRootNode.getMidiChannels().get());
         proc->setVelocityCurveMode ((VelocityCurve::Mode) (int) newRootNode.getProperty (
-            Tags::velocityCurveMode, (int) VelocityCurve::Linear));
+            tags::velocityCurveMode, (int) VelocityCurve::Linear));
     }
     else
     {
@@ -826,7 +826,7 @@ Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc,
         list.removeFromBlacklist (desc.fileOrIdentifier);
         if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
         {
-            context().plugins().saveUserPlugins (context().getSettings());
+            context().plugins().saveUserPlugins (context().settings());
         }
     }
     else
@@ -886,7 +886,7 @@ Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
         plugins.addToKnownPlugins (desc);
 
         const Node node (c.getNodeModelForId (nodeId));
-        if (context().getSettings().showPluginWindowsWhenAdded())
+        if (context().settings().showPluginWindowsWhenAdded())
             sibling<GuiService>()->presentPluginWindow (node);
         if (! node.isValid())
         {
@@ -896,8 +896,8 @@ Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
         if (node.getUuid().isNull())
         {
             jassertfalse;
-            ValueTree nodeData = node.getValueTree();
-            nodeData.setProperty (Tags::uuid, Uuid().toString(), 0);
+            ValueTree nodeData = node.data();
+            nodeData.setProperty (tags::uuid, Uuid().toString(), 0);
         }
         return node;
     }
@@ -932,7 +932,7 @@ Node EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool 
             auto node (graph.getNode (i));
             if (node.getObject() == ptr.get())
             {
-                node.setProperty (Tags::name, proc->getDeviceName());
+                node.setProperty (tags::name, proc->getDeviceName());
                 node.resetPorts();
                 deviceNode = node;
                 break;

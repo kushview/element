@@ -46,11 +46,11 @@ void MidiEngine::applySettings (Settings& settings)
             const auto child (data.getChild (i));
             if (child.hasType ("input"))
             {
-                if (auto* const holder = getMidiInput (child[Tags::name], true))
+                if (auto* const holder = getMidiInput (child[tags::name], true))
                 {
                     holder->active = false; // open but not active initially
-                    if ((bool) child[Tags::active])
-                        midiInsFromXml.add (child[Tags::name]);
+                    if ((bool) child[tags::active])
+                        midiInsFromXml.add (child[tags::name]);
                 }
             }
         }
@@ -68,8 +68,8 @@ void MidiEngine::writeSettings (Settings& settings)
     for (auto* const holder : openMidiInputs)
     {
         ValueTree input ("input");
-        input.setProperty (Tags::name, holder->input->getName(), nullptr)
-            .setProperty (Tags::active, holder->active, nullptr);
+        input.setProperty (tags::name, holder->input->getName(), nullptr)
+            .setProperty (tags::active, holder->active, nullptr);
         data.appendChild (input, nullptr);
     }
 
@@ -84,8 +84,8 @@ void MidiEngine::writeSettings (Settings& settings)
             if (availableMidiDevices.contains (midiInsFromXml[i], true))
                 continue;
             ValueTree input ("input");
-            input.setProperty (Tags::name, midiInsFromXml[i], nullptr)
-                .setProperty (Tags::active, true, nullptr);
+            input.setProperty (tags::name, midiInsFromXml[i], nullptr)
+                .setProperty (tags::active, true, nullptr);
             data.appendChild (input, nullptr);
         }
     }

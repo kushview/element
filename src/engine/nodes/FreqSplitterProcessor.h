@@ -150,7 +150,7 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override
     {
-        ValueTree state (Tags::state);
+        ValueTree state (tags::state);
         state.setProperty ("lowFreq", (float) *lowFreq, 0);
         state.setProperty ("highFreq", (float) *highFreq, 0);
         if (auto e = state.createXml())

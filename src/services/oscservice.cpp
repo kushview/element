@@ -45,8 +45,9 @@ struct CommandOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
         const auto command = Commands::fromString (msg.getString());
         if (command != Commands::invalid)
         {
-            world.getCommandManager().invokeDirectly (
-                Commands::quit, true);
+            // FIXME: Commands
+            // world.getCommandManager().invokeDirectly (
+            //     Commands::quit, true);
         }
     }
 
@@ -199,7 +200,7 @@ OSCService::~OSCService()
 
 void OSCService::refreshWithSettings (bool alertOnFail)
 {
-    auto& settings = context().getSettings();
+    auto& settings = context().settings();
     impl->stopServer();
     impl->setServerPort (settings.getOscHostPort());
 

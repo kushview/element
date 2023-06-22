@@ -587,7 +587,7 @@ void AudioMixerProcessor::getStateInformation (juce::MemoryBlock& block)
     }
 
     ValueTree state ("audiomixer");
-    state.setProperty (Tags::volume, volume, 0)
+    state.setProperty (tags::volume, volume, 0)
         .setProperty ("mute", mute, 0);
     for (int i = 0; i < numTracks; ++i)
     {
@@ -643,7 +643,7 @@ void AudioMixerProcessor::setStateInformation (const void* data, int size)
 
     {
         ScopedLock sl (getCallbackLock());
-        *masterVolume = (float) state.getProperty (Tags::volume, 0.0);
+        *masterVolume = (float) state.getProperty (tags::volume, 0.0);
         *masterMute = (bool) state.getProperty ("mute", false);
         masterMonitor->nextGain.set (Decibels::decibelsToGain ((float) *masterVolume, (float) EL_FADER_MIN_DB));
         masterMonitor->gain.set (masterMonitor->nextGain.get());

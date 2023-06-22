@@ -158,8 +158,8 @@ public:
         session = ViewHelpers::getSession (this);
         if (! session)
             return;
-        meter->updateMeter (session->getProperty (Tags::beatsPerBar),
-                            session->getProperty (Tags::beatDivisor),
+        meter->updateMeter (session->getProperty (tags::beatsPerBar),
+                            session->getProperty (tags::beatDivisor),
                             notify);
     }
 
@@ -414,8 +414,8 @@ private:
                     e->setMeter (getBeatsPerBar(), getBeatDivisor());
                 if (auto s = owner.session)
                 {
-                    s->getValueTree().setProperty (Tags::beatsPerBar, getBeatsPerBar(), 0);
-                    s->getValueTree().setProperty (Tags::beatDivisor, getBeatDivisor(), 0);
+                    s->data().setProperty (tags::beatsPerBar, getBeatsPerBar(), 0);
+                    s->data().setProperty (tags::beatDivisor, getBeatDivisor(), 0);
                 }
             }
         }

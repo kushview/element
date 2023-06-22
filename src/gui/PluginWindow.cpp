@@ -65,7 +65,7 @@ public:
         powerButton.setColour (SettingButton::backgroundOnColourId,
                                findColour (SettingButton::backgroundColourId));
         powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
-        powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
+        powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (tags::bypass));
         powerButton.setClickingTogglesState (true);
         powerButton.addListener (this);
 
@@ -77,7 +77,7 @@ public:
         addAndMakeVisible (muteButton);
         muteButton.setYesNoText ("M", "M");
         muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
-        muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
+        muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (tags::mute));
         muteButton.setClickingTogglesState (true);
         muteButton.addListener (this);
 
@@ -167,7 +167,7 @@ public:
             if (auto* pw = findParentComponentOfClass<PluginWindow>())
             {
                 pw->setAlwaysOnTop (! pw->isAlwaysOnTop());
-                node.setProperty (Tags::windowOnTop, pw->isAlwaysOnTop());
+                node.setProperty (tags::windowOnTop, pw->isAlwaysOnTop());
             }
         }
         else if (button == &muteButton)
@@ -261,15 +261,15 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     setUsingNativeTitleBar (true);
     setSize (400, 300);
 
-    name = node.getPropertyAsValue (Tags::name);
+    name = node.getPropertyAsValue (tags::name);
     name.addListener (this);
     setName (node.getDisplayName());
 
     if (node.isValid())
     {
-        setTopLeftPosition (node.getValueTree().getProperty (Tags::windowX, Random::getSystemRandom().nextInt (500)),
-                            node.getValueTree().getProperty (Tags::windowY, Random::getSystemRandom().nextInt (500)));
-        node.getValueTree().setProperty (Tags::windowVisible, true, 0);
+        setTopLeftPosition (node.data().getProperty (tags::windowX, Random::getSystemRandom().nextInt (500)),
+                            node.data().getProperty (tags::windowY, Random::getSystemRandom().nextInt (500)));
+        node.data().setProperty (tags::windowVisible, true, 0);
     }
 
     bool windowResize = false;
@@ -297,8 +297,8 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
 
     setResizable (windowResize, useResizeHandle);
 
-    const bool defaultOnTop = g.context().getSettings().pluginWindowsOnTop();
-    setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, defaultOnTop));
+    const bool defaultOnTop = g.context().settings().pluginWindowsOnTop();
+    setAlwaysOnTop ((bool) node.getProperty (tags::windowOnTop, defaultOnTop));
 
     auto* const content = new PluginWindowContent (ui, node);
     setContentOwned (content, true);
@@ -333,7 +333,7 @@ void PluginWindow::restoreAlwaysOnTopState()
 {
     if (node.isValid())
     {
-        const auto shouldBeOnTop = (bool) node.getProperty (Tags::windowOnTop);
+        const auto shouldBeOnTop = (bool) node.getProperty (tags::windowOnTop);
         setAlwaysOnTop (shouldBeOnTop);
         if (shouldBeOnTop)
             toFront (false);
@@ -372,8 +372,8 @@ void PluginWindow::updateGraphNode (NodeObject* newNode, Component* newEditor)
 
 void PluginWindow::moved()
 {
-    node.setProperty (Tags::windowX, getX());
-    node.setProperty (Tags::windowY, getY());
+    node.setProperty (tags::windowX, getX());
+    node.setProperty (tags::windowY, getY());
 }
 
 void PluginWindow::closeButtonPressed()

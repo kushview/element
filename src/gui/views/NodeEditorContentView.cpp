@@ -55,7 +55,7 @@ public:
         if (node == newNode)
             return;
         node = newNode;
-        data = node.getValueTree().getParent().getParent();
+        data = node.data().getParent().getParent();
     }
 
     Node getWatchedNode() const { return node; }
@@ -73,14 +73,14 @@ private:
     void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
     {
         // watched node changed
-        if (tree == node.getValueTree() && property == Tags::name)
+        if (tree == node.data() && property == tags::name)
         {
             if (onNodeNameChanged)
                 onNodeNameChanged();
         }
 
         // Sibling node name changed
-        if (property == Tags::name && data.getChildWithName (Tags::nodes).indexOf (tree) > 0)
+        if (property == tags::name && data.getChildWithName (tags::nodes).indexOf (tree) > 0)
         {
             if (onNodeNameChanged)
                 onNodeNameChanged();
@@ -89,7 +89,7 @@ private:
 
     void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override
     {
-        if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
+        if (parent.hasType (tags::nodes) && child.hasType (tags::node) && child != data)
         {
             if (onSiblingNodeAdded)
                 onSiblingNodeAdded();
@@ -98,7 +98,7 @@ private:
 
     void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override
     {
-        if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
+        if (parent.hasType (tags::nodes) && child.hasType (tags::node) && child != data)
         {
             if (onSiblingNodeRemoved)
                 onSiblingNodeRemoved();
@@ -108,7 +108,7 @@ private:
     void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
     {
         ignoreUnused (oldIndex, newIndex);
-        if (parent.hasType (Tags::nodes) && parent == node.getValueTree().getParent())
+        if (parent.hasType (tags::nodes) && parent == node.data().getParent())
             if (onNodesReOrdered)
                 onNodesReOrdered();
     }
@@ -168,7 +168,7 @@ void NodeEditorContentView::getState (String& state)
 {
     ValueTree tree ("state");
     // DBG("[element] ned saving node: " << node.getUuidString());
-    tree.setProperty (Tags::node, node.getUuidString(), nullptr)
+    tree.setProperty (tags::node, node.getUuidString(), nullptr)
         .setProperty ("sticky", sticky, nullptr);
 
     MemoryOutputStream mo;
@@ -199,7 +199,7 @@ void NodeEditorContentView::setState (const String& state)
         return;
     }
 
-    const auto nodeStr = tree[Tags::node].toString();
+    const auto nodeStr = tree[tags::node].toString();
     Node newNode;
     if (nodeStr.isNotEmpty())
     {
@@ -323,7 +323,7 @@ void NodeEditorContentView::setNode (const Node& newNode)
         clearEditor();
         watcher->setNodeToWatch (newNode);
         node = watcher->getWatchedNode();
-        nodeObjectValue = node.getPropertyAsValue (Tags::object, true);
+        nodeObjectValue = node.getPropertyAsValue (tags::object, true);
         editor.reset (createEmbededEditor());
         if (editor)
             addAndMakeVisible (editor.get());

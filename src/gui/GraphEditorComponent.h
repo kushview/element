@@ -87,7 +87,7 @@ public:
             return;
         resizePositionsFrozen = shouldBeFrozen;
         if (graph.isValid())
-            graph.setProperty (Tags::staticPos, resizePositionsFrozen);
+            graph.setProperty (tags::staticPos, resizePositionsFrozen);
     }
 
     //=========================================================================

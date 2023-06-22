@@ -98,7 +98,7 @@ AudioProcessorEditor* EQFilterProcessor::createEditor()
 
 void EQFilterProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    ValueTree state (Tags::state);
+    ValueTree state (tags::state);
     state.setProperty ("freq", (float) *freq, 0);
     state.setProperty ("q", (float) *q, 0);
     state.setProperty ("gainDB", (float) *gainDB, 0);

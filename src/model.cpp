@@ -25,17 +25,12 @@ using namespace juce;
 Model::Model (const ValueTree& data) : objectData (data) {}
 Model::Model (const Identifier& type) : objectData (type) {}
 
-bool Model::canAcceptData (const ValueTree& data)
+int Model::countChildrenOfType (const Identifier& slug) const
 {
-    return objectData.hasType (data.getType());
-}
+    int cnt = 0;
 
-int32 Model::countChildrenOfType (const Identifier& slug) const
-{
-    int32 cnt = 0;
-
-    for (int i = getValueTree().getNumChildren(); --i >= 0;)
-        if (getValueTree().getChild (i).hasType (slug))
+    for (int i = data().getNumChildren(); --i >= 0;)
+        if (data().getChild (i).hasType (slug))
             ++cnt;
 
     return cnt;
@@ -44,20 +39,6 @@ int32 Model::countChildrenOfType (const Identifier& slug) const
 Value Model::getPropertyAsValue (const Identifier& property, bool updateSynchronously)
 {
     return objectData.getPropertyAsValue (property, nullptr, updateSynchronously);
-}
-
-ValueTree Model::setData (const ValueTree& data)
-{
-    if (! canAcceptData (data))
-        return data;
-
-    setNodeData (data);
-    return objectData;
-}
-
-void Model::setNodeData (const ValueTree& data)
-{
-    objectData = data;
 }
 
 } // namespace element

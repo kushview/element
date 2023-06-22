@@ -19,7 +19,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 #include <element/node.hpp>
 
 namespace element {
@@ -160,7 +160,7 @@ class AddNodeMessage : public Message
 {
 public:
     AddNodeMessage (const Node& n, const Node& t = Node(), const File& f = File())
-        : node (Node::resetIds (n.getValueTree().createCopy()), false),
+        : node (Node::resetIds (n.data().createCopy()), false),
           target (t),
           sourceFile (f)
     {
@@ -263,49 +263,49 @@ struct OpenSessionMessage : public AppMessage
 };
 
 //=============================================================================
-struct RefreshControllerDeviceMessage : public AppMessage
+struct RefreshControllerMessage : public AppMessage
 {
-    RefreshControllerDeviceMessage (const ControllerDevice& d)
+    RefreshControllerMessage (const Controller& d)
         : device (d) {}
-    ~RefreshControllerDeviceMessage() {}
-    const ControllerDevice device;
+    ~RefreshControllerMessage() {}
+    const Controller device;
 };
 
-struct AddControllerDeviceMessage : public AppMessage
+struct AddControllerMessage : public AppMessage
 {
-    AddControllerDeviceMessage (const ControllerDevice& d)
+    AddControllerMessage (const Controller& d)
         : device (d) {}
-    AddControllerDeviceMessage (const File& f)
+    AddControllerMessage (const File& f)
         : file (f) {}
-    ~AddControllerDeviceMessage() noexcept {}
-    const ControllerDevice device;
+    ~AddControllerMessage() noexcept {}
+    const Controller device;
     const File file;
 };
 
-struct RemoveControllerDeviceMessage : public AppMessage
+struct RemoveControllerMessage : public AppMessage
 {
-    RemoveControllerDeviceMessage (const ControllerDevice& d)
+    RemoveControllerMessage (const Controller& d)
         : device (d) {}
-    ~RemoveControllerDeviceMessage() noexcept {}
-    const ControllerDevice device;
+    ~RemoveControllerMessage() noexcept {}
+    const Controller device;
 };
 
 struct AddControlMessage : public AppMessage
 {
-    AddControlMessage (const ControllerDevice& d, const ControllerDevice::Control& c)
+    AddControlMessage (const Controller& d, const Control& c)
         : device (d), control (c) {}
     ~AddControlMessage() noexcept {}
-    const ControllerDevice device;
-    const ControllerDevice::Control control;
+    const Controller device;
+    const Control control;
 };
 
 struct RemoveControlMessage : public AppMessage
 {
-    RemoveControlMessage (const ControllerDevice& d, const ControllerDevice::Control& c)
+    RemoveControlMessage (const Controller& d, const Control& c)
         : device (d), control (c) {}
     ~RemoveControlMessage() noexcept {}
-    const ControllerDevice device;
-    const ControllerDevice::Control control;
+    const Controller device;
+    const Control control;
 };
 
 struct RemoveControllerMapMessage : public AppMessage

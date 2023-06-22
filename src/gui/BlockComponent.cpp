@@ -149,9 +149,9 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     : filterID (node_.getNodeId()), graph (graph_), node (node_), font (11.0f)
 {
     setBufferedToImage (true);
-    nodeEnabled = node.getPropertyAsValue (Tags::enabled);
+    nodeEnabled = node.getPropertyAsValue (tags::enabled);
     nodeEnabled.addListener (this);
-    nodeName = node.getPropertyAsValue (Tags::name);
+    nodeName = node.getPropertyAsValue (tags::name);
     nodeName.addListener (this);
 
     shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
@@ -165,28 +165,28 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     powerButton.setColour (SettingButton::backgroundOnColourId,
                            findColour (SettingButton::backgroundColourId));
     powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
-    powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
+    powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (tags::bypass));
     powerButton.setClickingTogglesState (true);
     powerButton.addListener (this);
 
     addAndMakeVisible (muteButton);
     muteButton.setYesNoText ("M", "M");
     muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
-    muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
+    muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (tags::mute));
     muteButton.setClickingTogglesState (true);
     muteButton.addListener (this);
 
     hiddenPorts = node.getBlockValueTree()
-                      .getPropertyAsValue (Tags::hiddenPorts, nullptr);
+                      .getPropertyAsValue (tags::hiddenPorts, nullptr);
     hiddenPorts.addListener (this);
 
     displayModeValue = node.getBlockValueTree()
-                           .getPropertyAsValue (Tags::displayMode, nullptr);
+                           .getPropertyAsValue (tags::displayMode, nullptr);
     displayMode = getDisplayModeFromString (displayModeValue.toString());
     displayModeValue.addListener (this);
 
-    customWidth = node.getBlockValueTree().getProperty (Tags::width, customWidth);
-    customHeight = node.getBlockValueTree().getProperty (Tags::height, customHeight);
+    customWidth = node.getBlockValueTree().getProperty (tags::width, customWidth);
+    customHeight = node.getBlockValueTree().getProperty (tags::height, customHeight);
     setSize (customWidth > 0 ? customWidth : 170,
              customHeight > 0 ? customHeight : 60);
 }
@@ -512,7 +512,7 @@ void BlockComponent::makeEditorActive()
         if (auto* cc = ViewHelpers::findContentComponent (this))
             cc->setCurrentNode (node);
     }
-    else if (node.hasProperty (Tags::missing))
+    else if (node.hasProperty (tags::missing))
     {
         String message = "This node is unavailable and running as a Placeholder.\n";
         message << node.getName() << " (" << node.getFormat().toString()
@@ -793,7 +793,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         return;
     }
 
-    if (! node.getValueTree().getParent().hasType (Tags::nodes))
+    if (! node.data().getParent().hasType (tags::nodes))
     {
         delete this;
         return;
@@ -927,9 +927,9 @@ void BlockComponent::updateSize()
         return;
 
     customWidth = (int) node.getBlockValueTree()
-                      .getProperty (Tags::width, customWidth);
+                      .getProperty (tags::width, customWidth);
     customHeight = (int) node.getBlockValueTree()
-                       .getProperty (Tags::height, customHeight);
+                       .getProperty (tags::height, customHeight);
 
     int minW = 0, minH = 0;
     getMinimumSize (minW, minH);
@@ -971,8 +971,8 @@ void BlockComponent::setCustomSize (int width, int height)
         customWidth = width;
         customHeight = height;
         node.getBlockValueTree()
-            .setProperty (Tags::width, customWidth, nullptr)
-            .setProperty (Tags::height, customHeight, nullptr);
+            .setProperty (tags::width, customWidth, nullptr)
+            .setProperty (tags::height, customHeight, nullptr);
 
         if (displayMode == Small || displayMode == Compact)
         {
@@ -992,15 +992,15 @@ void BlockComponent::setNodePosition (const int x, const int y)
     {
         node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
                                   (y + getHeight() / 2) / (double) getParentHeight());
-        node.setProperty (Tags::x, (double) x);
-        node.setProperty (Tags::y, (double) y);
+        node.setProperty (tags::x, (double) x);
+        node.setProperty (tags::y, (double) y);
     }
     else
     {
         node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
                                   (x + getWidth() / 2) / (double) getParentWidth());
-        node.setProperty (Tags::y, (double) x);
-        node.setProperty (Tags::x, (double) y);
+        node.setProperty (tags::y, (double) x);
+        node.setProperty (tags::x, (double) y);
     }
 }
 
@@ -1099,20 +1099,20 @@ GraphEditorComponent* BlockComponent::getGraphPanel() const noexcept
 void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
 {
     PopupMenu dMenu;
-    const auto block = node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
+    const auto block = node.getUIValueTree().getOrCreateChildWithName (tags::block, nullptr);
     const auto mode = BlockComponent::getDisplayModeFromString (
-        block.getProperty (Tags::displayMode).toString());
+        block.getProperty (tags::displayMode).toString());
     for (int i = 0; i <= BlockComponent::Embed; ++i)
     {
         auto m = static_cast<BlockComponent::DisplayMode> (i);
         dMenu.addItem (BlockComponent::getDisplayModeName (m), true, mode == m, [this, block, m]() {
             auto b = block;
-            b.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
+            b.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
-                auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (Tags::block, nullptr);
-                sb.setProperty (Tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
+                auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (tags::block, nullptr);
+                sb.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             });
 
             if (auto* gp = getGraphPanel())

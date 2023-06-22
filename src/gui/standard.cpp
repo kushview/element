@@ -27,7 +27,7 @@
 #include "gui/AudioIOPanelView.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
-#include "gui/views/ControllerDevicesView.h"
+#include "gui/views/ControllersView.h"
 #include "gui/views/GraphEditorView.h"
 #include "gui/views/GraphMixerView.h"
 #include "gui/views/KeymapEditorView.h"
@@ -490,8 +490,8 @@ static ContentView* createLastContentView (Settings& settings)
         view = std::make_unique<ConnectionGrid>();
     else if (lastContentView == "GraphEditor")
         view.reset (createGraphEditorView());
-    else if (lastContentView == "ControllerDevicesView")
-        view = std::make_unique<ControllerDevicesView>();
+    else if (lastContentView == "ControllersView")
+        view = std::make_unique<ControllersView>();
     else
         view = std::make_unique<DefaultView>();
 
@@ -542,7 +542,7 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
 StandardContentComponent::StandardContentComponent (Context& ctl_)
     : ContentComponent (ctl_)
 {
-    auto& settings (context().getSettings());
+    auto& settings (context().settings());
 
     setOpaque (true);
 
@@ -645,9 +645,9 @@ void StandardContentComponent::setMainView (const String& name)
     {
         setContentView (new KeymapEditorView());
     }
-    else if (name == "ControllerDevicesView")
+    else if (name == "ControllersView")
     {
-        setContentView (new ControllerDevicesView());
+        setContentView (new ControllersView());
     }
     else
     {
@@ -777,7 +777,7 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
         else if (file.hasFileExtension ("elpreset"))
         {
             const auto data = Node::parse (file);
-            if (data.hasType (Tags::node))
+            if (data.hasType (tags::node))
             {
                 const Node node (data, false);
                 this->post (new AddNodeMessage (node));
@@ -903,7 +903,7 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
 
 void StandardContentComponent::setCurrentNode (const Node& node)
 {
-    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllerDevicesView") && session()->getNumGraphs() > 0)
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllersView") && session()->getNumGraphs() > 0)
     {
         setMainView ("GraphEditor");
     }
@@ -1005,8 +1005,8 @@ bool StandardContentComponent::perform (const InvocationInfo& info)
     bool result = true;
     switch (info.commandID)
     {
-        case Commands::showControllerDevices: {
-            setMainView ("ControllerDevicesView");
+        case Commands::showControllers: {
+            setMainView ("ControllersView");
             break;
         }
         case Commands::showKeymapEditor:

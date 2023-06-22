@@ -35,7 +35,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
     
     M.new_usertype<Context> ("Context", sol::no_constructor,
                             "instance", el_Context_userdata,
-                            "commands", &Context::getCommandManager,
                             "audio",    &Context::audio,
                             "devices",  &Context::devices,
                             "mapping",  &Context::mapping,
@@ -43,10 +42,10 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
                             "plugins",  &Context::plugins,
                             "presets",  &Context::presets,
                             "session",  &Context::session,
-                            "settings", &Context::getSettings);
+                            "settings", &Context::settings);
 
     lua.script (R"(
-        require ('el.CommandManager')
+        require ('el.Commands')
         require ('el.Node')
         require ('el.Session')
     )");

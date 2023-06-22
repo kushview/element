@@ -60,7 +60,7 @@ public:
         for (auto& node : nodes)
         {
             auto* seg = segments.add (new Label());
-            seg->getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+            seg->getTextValue().referTo (node.getPropertyAsValue (tags::name));
             seg->setSize (2 + seg->getFont().getStringWidth (node.getName()), getHeight());
             seg->setJustificationType (Justification::centred);
             addAndMakeVisible (seg);

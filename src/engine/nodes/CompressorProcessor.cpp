@@ -135,7 +135,7 @@ AudioProcessorEditor* CompressorProcessor::createEditor() { return new Compresso
 
 void CompressorProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    ValueTree state (Tags::state);
+    ValueTree state (tags::state);
     state.setProperty ("thresh", (float) *threshDB, 0);
     state.setProperty ("ratio", (float) *ratio, 0);
     state.setProperty ("knee", (float) *kneeDB, 0);

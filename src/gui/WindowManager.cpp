@@ -71,8 +71,8 @@ void WindowManager::deletePluginWindow (const int index, const bool windowVisibl
 {
     if (auto* window = activePluginWindows.getUnchecked (index))
     {
-        window->node.setProperty (Tags::windowVisible, windowVisible);
-        window->removeKeyListener (gui.commander().getKeyMappings());
+        window->node.setProperty (tags::windowVisible, windowVisible);
+        window->removeKeyListener (gui.commands().getKeyMappings());
         window->removeKeyListener (gui.getKeyListener());
         activePluginWindows.remove (index);
     }
@@ -82,7 +82,7 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& n, Component* e)
 {
     auto* window = activePluginWindows.add (new PluginWindow (gui, e, n));
     window->addKeyListener (gui.getKeyListener());
-    window->addKeyListener (gui.commander().getKeyMappings());
+    window->addKeyListener (gui.commands().getKeyMappings());
     return window;
 }
 

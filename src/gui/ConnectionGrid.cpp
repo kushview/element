@@ -47,7 +47,7 @@ public:
     {
         setSize (300, 200);
         setMatrixCellSize (EL_MATRIX_SIZE);
-        nodeModels = ValueTree (Tags::nodes);
+        nodeModels = ValueTree (tags::nodes);
         nodes.clear();
         nodeModels.addListener (this);
         graphModel.addListener (this);
@@ -374,7 +374,7 @@ private:
             else if (hasRequestedType)
             {
                 const ValueTree nodeToRemove = graph.getNodesValueTree()
-                                                   .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
+                                                   .getChildWithProperty (tags::identifier, desc.fileOrIdentifier);
                 const Node model (nodeToRemove, false);
                 ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
             }
@@ -412,7 +412,7 @@ private:
         for (int i = arcs.getNumChildren(); --i >= 0;)
         {
             const ValueTree arc (arcs.getChild (i));
-            if (sourceNode == (uint32) (int64) arc.getProperty (Tags::sourceNode) && sourceChannel == (int) arc.getProperty (Tags::sourceChannel) && destNode == (uint32) (int64) arc.getProperty (Tags::destNode) && destChannel == (int) arc.getProperty (Tags::destChannel))
+            if (sourceNode == (uint32) (int64) arc.getProperty (tags::sourceNode) && sourceChannel == (int) arc.getProperty (tags::sourceChannel) && destNode == (uint32) (int64) arc.getProperty (tags::destNode) && destChannel == (int) arc.getProperty (tags::destChannel))
             {
                 return arc;
             }
@@ -426,7 +426,7 @@ private:
         for (int i = arcs.getNumChildren(); --i >= 0;)
         {
             const ValueTree arc (arcs.getChild (i));
-            if (static_cast<int> (sourceNode) == (int) arc.getProperty (Tags::sourceNode) && static_cast<int> (sourcePort) == (int) arc.getProperty (Tags::sourcePort) && static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) && static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
+            if (static_cast<int> (sourceNode) == (int) arc.getProperty (tags::sourceNode) && static_cast<int> (sourcePort) == (int) arc.getProperty (tags::sourcePort) && static_cast<int> (destNode) == (int) arc.getProperty (tags::destNode) && static_cast<int> (destPort) == (int) arc.getProperty (tags::destPort))
             {
                 return arc;
             }
@@ -442,8 +442,8 @@ private:
 
     void resetMatrix()
     {
-        const ValueTree arcs (nodeModels.getParent().getChildWithName (Tags::arcs));
-        //FIXME: jassert (arcs.hasType (Tags::arcs));
+        const ValueTree arcs (nodeModels.getParent().getChildWithName (tags::arcs));
+        //FIXME: jassert (arcs.hasType (tags::arcs));
         for (int row = 0; row < matrix.getNumRows(); ++row)
         {
             for (int col = 0; col < matrix.getNumColumns(); ++col)
@@ -481,20 +481,20 @@ private:
     virtual void valueTreeChildAdded (ValueTree& parentTree,
                                       ValueTree& childWhichHasBeenAdded) override
     {
-        if (parentTree == nodeModels.getParent() && childWhichHasBeenAdded.hasType (Tags::nodes))
+        if (parentTree == nodeModels.getParent() && childWhichHasBeenAdded.hasType (tags::nodes))
         {
             buildNodeArray();
             resetMatrix();
         }
-        else if (nodeModels == parentTree && childWhichHasBeenAdded.hasType (Tags::node))
+        else if (nodeModels == parentTree && childWhichHasBeenAdded.hasType (tags::node))
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenAdded.hasType (Tags::ports) || childWhichHasBeenAdded.hasType (Tags::port))
+        else if (childWhichHasBeenAdded.hasType (tags::ports) || childWhichHasBeenAdded.hasType (tags::port))
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenAdded.hasType (Tags::arcs) || childWhichHasBeenAdded.hasType (Tags::arc))
+        else if (childWhichHasBeenAdded.hasType (tags::arcs) || childWhichHasBeenAdded.hasType (tags::arc))
         {
             buildNodeArray();
         }
@@ -502,20 +502,20 @@ private:
 
     virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override
     {
-        if (parentTree == nodeModels.getParent() && childWhichHasBeenRemoved.hasType (Tags::nodes))
+        if (parentTree == nodeModels.getParent() && childWhichHasBeenRemoved.hasType (tags::nodes))
         {
             buildNodeArray();
             resetMatrix();
         }
-        else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (Tags::node))
+        else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (tags::node))
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenRemoved.hasType (Tags::ports) || childWhichHasBeenRemoved.hasType (Tags::port))
+        else if (childWhichHasBeenRemoved.hasType (tags::ports) || childWhichHasBeenRemoved.hasType (tags::port))
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenRemoved.hasType (Tags::arcs) || childWhichHasBeenRemoved.hasType (Tags::arc))
+        else if (childWhichHasBeenRemoved.hasType (tags::arcs) || childWhichHasBeenRemoved.hasType (tags::arc))
         {
             buildNodeArray();
         }
@@ -527,7 +527,7 @@ private:
 
     virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override
     {
-        if (treeWhoseParentHasChanged.hasType (Tags::nodes))
+        if (treeWhoseParentHasChanged.hasType (tags::nodes))
         {
             nodeModels = treeWhoseParentHasChanged;
         }
@@ -831,9 +831,9 @@ void ConnectionGrid::setNode (const Node& newNode)
         setInterceptsMouseClicks (true, true);
     }
 
-    ValueTree newNodes = newNode.hasNodeType (Tags::graph)
+    ValueTree newNodes = newNode.hasNodeType (tags::graph)
                              ? newNode.getNodesValueTree()
-                             : ValueTree (Tags::nodes);
+                             : ValueTree (tags::nodes);
     jassert (this->matrix != nullptr);
     matrix->nodeModels = newNodes;
     if (breadcrumb)

@@ -82,7 +82,7 @@ public:
         Node mutableNode (node);
         mutableNode.savePluginState();
         node.getRelativePosition (x, y);
-        nodeData = node.getValueTree().createCopy();
+        nodeData = node.data().createCopy();
         Node::sanitizeRuntimeProperties (nodeData);
     }
 

@@ -157,7 +157,7 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override
     {
-        ValueTree state (Tags::state);
+        ValueTree state (tags::state);
         state.setProperty ("length", (float) *length, 0);
         if (auto e = state.createXml())
             AudioProcessor::copyXmlToBinary (*e, destData);

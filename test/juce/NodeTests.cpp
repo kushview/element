@@ -55,25 +55,25 @@ private:
     void testHiddenBlockPorts()
     {
         beginTest ("Hidden Block Ports");
-        Node node (Tags::node);
+        Node node (tags::node);
         auto ports = node.getPortsValueTree();
         for (int i = 0; i < 16; ++i) {
             Port port;
-            auto vtPort = port.getValueTree();
-            vtPort.setProperty (Tags::index, i, nullptr)
-                .setProperty (Tags::type, "audio", nullptr)
-                .setProperty (Tags::symbol, String ("symbol_in_") + String (i), nullptr)
-                .setProperty (Tags::flow, "input", nullptr);
+            auto vtPort = port.data();
+            vtPort.setProperty (tags::index, i, nullptr)
+                .setProperty (tags::type, "audio", nullptr)
+                .setProperty (tags::symbol, String ("symbol_in_") + String (i), nullptr)
+                .setProperty (tags::flow, "input", nullptr);
             ports.appendChild (vtPort, nullptr);
         }
 
         for (int i = 16; i < 32; ++i) {
             Port port;
-            auto vtPort = port.getValueTree();
-            vtPort.setProperty (Tags::index, i, nullptr)
-                .setProperty (Tags::type, "audio", nullptr)
-                .setProperty (Tags::symbol, String ("symbol_out_") + String (i - 16), nullptr)
-                .setProperty (Tags::flow, "output", nullptr);
+            auto vtPort = port.data();
+            vtPort.setProperty (tags::index, i, nullptr)
+                .setProperty (tags::type, "audio", nullptr)
+                .setProperty (tags::symbol, String ("symbol_out_") + String (i - 16), nullptr)
+                .setProperty (tags::flow, "output", nullptr);
             ports.appendChild (vtPort, nullptr);
         }
 

@@ -51,11 +51,8 @@
                 ]
             },
             "osx": {
-                "name": "Element.app",
-                "type": "cppdbg",
-                "request": "launch",
                 "MIMode": "lldb",
-                "program": "${workspaceRoot}/build/stage/Element.app/Contents/MacOS/element",
+                "program": "${workspaceRoot}/build/deploy/osx/Element.app/Contents/MacOS/element",
                 "environment": [
                     { "name": "DYLD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }
                 ],

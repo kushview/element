@@ -12,7 +12,7 @@
 
 namespace element {
 
-class CommandManager;
+class Commands;
 class ContentComponent;
 class ContentFactory;
 class Context;
@@ -38,7 +38,7 @@ public:
     void shutdown() override;
 
     void run();
-    CommandManager& commander();
+    Commands& commands();
 
     void checkUpdates();
 
@@ -132,6 +132,8 @@ public:
 private:
     class UpdateManager;
     std::unique_ptr<UpdateManager> updates;
+    class Impl;
+    std::unique_ptr<Impl> impl;
 
     Services& controller;
     Context& world;

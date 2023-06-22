@@ -42,7 +42,7 @@ public:
     inline T* sibling() const;
 
     Services& services() const;
-    Settings& getSettings();
+    Settings& settings();
     Context& context();
     RunMode getRunMode() const;
 
@@ -55,8 +55,7 @@ private:
 };
 
 //=============================================================================
-class Services : public juce::MessageListener,
-                 protected juce::ApplicationCommandTarget {
+class Services : public juce::MessageListener {
 public:
     Services (Context&, RunMode mode = RunMode::Standalone);
     ~Services();
@@ -67,12 +66,10 @@ public:
     /** Alias of context() */
     Context& context();
 
-    /** Returns the undo manager */
-    juce::UndoManager& getUndoManager();
-
     /** Add a service */
     void add (Service* service);
 
+    /** Find a service by type */
     template <class T>
     inline T* find() const
     {
@@ -84,10 +81,8 @@ public:
 
     void saveSettings();
 
-    /** Child controllers should use this when files are opened and need
-        to be saved in recent files.
-    */
-    void addRecentFile (const juce::File& file);
+    /** Activate this and children */
+    void initialize();
 
     /** Activate this and children */
     void activate();
@@ -99,19 +94,18 @@ public:
 
     void shutdown();
 
-    juce::RecentlyOpenedFilesList& getRecentlyOpenedFilesList();
-
     Service** begin() noexcept;
     Service* const* begin() const noexcept;
     Service** end() noexcept;
     Service* const* end() const noexcept;
 
-protected:
-    friend class juce::ApplicationCommandTarget;
-    juce::ApplicationCommandTarget* getNextCommandTarget() override;
-    void getAllCommands (juce::Array<juce::CommandID>& commands) override;
-    void getCommandInfo (juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
-    bool perform (const InvocationInfo& info) override;
+    // protected:
+    //     friend class juce::ApplicationCommandTarget;
+    //     juce::ApplicationCommandTarget* getNextCommandTarget() override;
+    //     void getAllCommands (juce::Array<juce::CommandID>& commands) override;
+    //     void getCommandInfo (juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
+    //     bool perform (const InvocationInfo& info) override;
+
     void handleMessage (const juce::Message&) override;
 
 private:
@@ -119,7 +113,6 @@ private:
     friend class Context;
     class Impl;
     std::unique_ptr<Impl> impl;
-    std::vector<Service*> services;
 
     /** Run/Launch the core application. */
     void run();

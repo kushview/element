@@ -112,7 +112,7 @@ public:
     SessionNodeTreeItem (const Node& n)
         : node (n)
     {
-        ValueTree child (n.getValueTree());
+        ValueTree child (n.data());
         ValueTree parent (child.getParent());
 
         if (parent.isValid())
@@ -129,7 +129,7 @@ public:
     Node getNode() const { return node; }
 
     /** Returns true if the given node refers to the viewed node */
-    bool refersTo (const Node& o) const { return o.getValueTree() == node.getValueTree(); }
+    bool refersTo (const Node& o) const { return o.data() == node.data(); }
 
     void showPluginWindow (bool showIt = true)
     {
@@ -203,8 +203,8 @@ public:
             ScopedFlag scopedFlag (tree->ignoreActiveRootGraphSelectionHandler, true);
 
             gui->closeAllPluginWindows (true);
-            auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
-            graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
+            auto graphs = session->data().getChildWithName (tags::graphs);
+            graphs.setProperty (tags::active, graphs.indexOf (root.data()), 0);
             auto& app (ViewHelpers::findContentComponent (getOwnerView())->services());
             app.find<EngineService>()->setRootNode (root);
             gui->showPluginWindowsFor (root, true, false, false);
@@ -235,7 +235,7 @@ public:
 
     void setName (const String& newName) override
     {
-        node.setProperty (Tags::name, newName);
+        node.setProperty (tags::name, newName);
     }
 
     bool isMissing() override { return false; }
@@ -553,7 +553,7 @@ public:
 
     void deleteItem() override
     {
-        const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
+        const int index = node.data().getParent().indexOf (node.data());
         ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->removeGraph (index);
     }
 
@@ -595,7 +595,7 @@ public:
 
         // Paint the program number if it is enabled
         const auto h = area.getHeight();
-        const int p = (int) node.getProperty (Tags::midiProgram, -1);
+        const int p = (int) node.getProperty (tags::midiProgram, -1);
         if (p >= 0)
         {
             const auto txt = String (1 + p);
@@ -627,13 +627,13 @@ public:
 
     int getIndexInParent() const
     {
-        return node.getValueTree().getParent().indexOf (node.getValueTree());
+        return node.data().getParent().indexOf (node.data());
     }
 
     void updateIndexInParent()
     {
         const int index = getIndexInParent();
-        node.getValueTree().getParent().setProperty (Tags::active, index, 0);
+        node.data().getParent().setProperty (tags::active, index, 0);
     }
 
     void handlePopupMenuResult (int result) override
@@ -833,7 +833,7 @@ void SessionTreePanel::setSession (SessionPtr s)
     if (! showingNode())
     {
         data.removeListener (this);
-        data = (_session != nullptr) ? _session->getValueTree() : ValueTree();
+        data = (_session != nullptr) ? _session->data() : ValueTree();
         data.addListener (this);
     }
 
@@ -853,13 +853,13 @@ void SessionTreePanel::showNode (const Node& newNode)
     if (node.isRootGraph())
     {
         panel->setRoot (new SessionRootGraphTreeItem (node));
-        data = node.getValueTree();
+        data = node.data();
         refresh();
     }
     else if (node.isGraph())
     {
         panel->setRoot (new SessionGraphTreeItem (node));
-        data = node.getValueTree();
+        data = node.data();
         refresh();
     }
     else
@@ -935,14 +935,14 @@ void SessionTreePanel::selectActiveRootGraph()
 
 void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (tree.hasType (Tags::graphs) && property == Tags::active)
+    if (tree.hasType (tags::graphs) && property == tags::active)
     {
         selectActiveRootGraph();
     }
-    else if (tree.hasType (Tags::node))
+    else if (tree.hasType (tags::node))
     {
         const Node graph (tree, false);
-        if (property == Tags::name || (graph.isRootGraph() && property == Tags::midiProgram))
+        if (property == tags::name || (graph.isRootGraph() && property == tags::midiProgram))
             repaint();
     }
 }
@@ -950,9 +950,9 @@ void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifi
 static bool couldBeSessionObjects (ValueTree& parent, ValueTree& child)
 {
     // clang-format off
-    return parent.hasType (Tags::session) || 
-        (parent.hasType (Tags::graphs) && child.hasType (Tags::node)) || 
-        (parent.hasType (Tags::nodes) && child.hasType (Tags::node));
+    return parent.hasType (tags::session) || 
+        (parent.hasType (tags::graphs) && child.hasType (tags::node)) || 
+        (parent.hasType (tags::nodes) && child.hasType (tags::node));
     // clang-format on
 }
 

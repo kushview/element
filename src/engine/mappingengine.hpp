@@ -20,7 +20,7 @@
 #pragma once
 
 #include <element/juce.hpp>
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 #include <element/signals.hpp>
 
 namespace element {
@@ -39,18 +39,18 @@ public:
     MappingEngine();
     ~MappingEngine();
 
-    bool addInput (const ControllerDevice&, MidiEngine&);
-    bool addHandler (const ControllerDevice::Control&, const Node&, const int);
+    bool addInput (const Controller&, MidiEngine&);
+    bool addHandler (const Control&, const Node&, const int);
 
-    bool removeInput (const ControllerDevice&);
-    bool refreshInput (const ControllerDevice&);
+    bool removeInput (const Controller&);
+    bool refreshInput (const Controller&);
     void clear();
     void startMapping();
     void stopMapping();
 
     void capture (const bool start = true) { capturedEvent.capture.set (start); }
     MidiMessage getCapturedMidiMessage() const { return capturedEvent.message; }
-    ControllerDevice::Control getCapturedControl() const { return capturedEvent.control; }
+    Control getCapturedControl() const { return capturedEvent.control; }
     CapturedEventSignal& capturedSignal() { return capturedEvent.callback; }
 
 private:
@@ -72,12 +72,12 @@ private:
     private:
         friend class MappingEngine;
         Atomic<bool> capture;
-        ControllerDevice::Control control;
+        Control control;
         MidiMessage message;
         CapturedEventSignal callback;
     } capturedEvent;
 
-    bool captureNextEvent (ControllerMapInput&, const ControllerDevice::Control&, const MidiMessage&);
+    bool captureNextEvent (ControllerMapInput&, const Control&, const MidiMessage&);
 };
 
 } // namespace element

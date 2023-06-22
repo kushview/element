@@ -73,7 +73,7 @@ protected:
         world->plugins().addFormat (new InternalFormat (*world));
         app.reset (new Services (*world));
         app->activate();
-        auto& settings = context().getSettings();
+        auto& settings = context().settings();
         PropertiesFile::Options opts = settings.getStorageParameters();
         opts.applicationName = "ElementTests";
         settings.setStorageParameters (opts);

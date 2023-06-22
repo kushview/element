@@ -126,7 +126,7 @@ libelement_sources = '''
     gui/ViewHelpers.cpp
     gui/views/scriptview.cpp
     gui/views/ContentView.cpp
-    gui/views/ControllerDevicesView.cpp
+    gui/views/ControllersView.cpp
     gui/views/ControllerMapsView.cpp
     gui/views/GraphEditorView.cpp
     gui/views/GraphMixerView.cpp

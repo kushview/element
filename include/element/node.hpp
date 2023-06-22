@@ -24,9 +24,9 @@ class Script;
 /** Representation of a Port of a Node. */
 class Port : public Model {
 public:
-    Port() : ObjectModel (Tags::port) {}
+    Port() : Model (tags::port) {}
     Port (const ValueTree& p)
-        : ObjectModel (p) { jassert (p.hasType (Tags::port)); }
+        : Model (p) { jassert (p.hasType (tags::port)); }
     ~Port() {}
 
     /** Returns the ValueTree of the Node containing this port
@@ -38,7 +38,7 @@ public:
     Node getNode() const;
 
     /** Returns true if this port probably lives on a Node */
-    inline bool hasParentNode() const { return getNodeValueTree().hasType (Tags::node); }
+    inline bool hasParentNode() const { return getNodeValueTree().hasType (tags::node); }
 
     const bool isInput() const
     {
@@ -53,10 +53,10 @@ public:
     }
 
     /** Returns the port name. */
-    const String getName() const { return getProperty (Tags::name, "Port"); }
+    const String getName() const { return getProperty (tags::name, "Port"); }
 
     /** Returns the type of this Port. */
-    const PortType getType() const { return PortType (getProperty (Tags::type, "unknown").toString()); }
+    const PortType getType() const { return PortType (getProperty (tags::type, "unknown").toString()); }
 
     bool isA (const PortType type, const bool isInputFlow) const { return getType() == type && isInputFlow == isInput(); }
 
@@ -131,13 +131,13 @@ public:
 
     //=========================================================================
     /** Returns true if the underlying data is probably a node */
-    bool isValid() const { return objectData.hasType (Tags::node); }
+    bool isValid() const { return objectData.hasType (tags::node); }
 
     /** Returns the user-modifiable name of this node */
-    const String getName() const { return getProperty (Tags::name); }
+    const String getName() const { return getProperty (tags::name); }
 
     /** Change the user-defined name */
-    void setName (const String& name) { setProperty (Tags::name, name); }
+    void setName (const String& name) { setProperty (tags::name, name); }
 
     /** Returns the node name defined by the user. If not set it returns the
         node name set when loaded.
@@ -156,10 +156,10 @@ public:
 
     //=========================================================================
     /** Returns the nodeId as defined in the engine */
-    const uint32 getNodeId() const { return (uint32) (int64) getProperty (Tags::id); }
+    const uint32 getNodeId() const { return (uint32) (int64) getProperty (tags::id); }
 
     /** Returns this Node's UUID as a string */
-    String getUuidString() const { return objectData.getProperty (Tags::uuid).toString(); }
+    String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }
 
     /** Returns this Node's UUID */
     Uuid getUuid() const { return Uuid (getUuidString()); }
@@ -171,13 +171,13 @@ public:
     /** Returns true if this is a root graph on the session */
     bool isRootGraph() const
     {
-        return objectData.getParent().hasType (Tags::graphs) && objectData.getParent().getParent().hasType (Tags::session);
+        return objectData.getParent().hasType (tags::graphs) && objectData.getParent().getParent().hasType (tags::session);
     }
 
     /** Returns an Identifier indicating this nodes type */
     const Identifier getNodeType() const
     {
-        auto type = getProperty (Tags::type).toString();
+        auto type = getProperty (tags::type).toString();
         return type.isNotEmpty() ? type : Identifier ("unknown");
     }
 
@@ -204,10 +204,10 @@ public:
     //=========================================================================
     /** Returns true if this node couldn't be loaded but still remains on it's
         parenet graph */
-    bool isMissing() const { return hasProperty (Tags::missing); }
+    bool isMissing() const { return hasProperty (tags::missing); }
 
     /** Returns true if this node should be enabled */
-    inline const bool isEnabled() const { return (bool) getProperty (Tags::enabled, true); }
+    inline const bool isEnabled() const { return (bool) getProperty (tags::enabled, true); }
 
     //=========================================================================
     /** Returns the enabled MIDI channels on this Node */
@@ -215,17 +215,17 @@ public:
 
     //=========================================================================
     /** Returns true if bypass is on for this Node */
-    bool isBypassed() const { return objectData.getProperty (Tags::bypass, false); }
+    bool isBypassed() const { return objectData.getProperty (tags::bypass, false); }
 
     /** Returns the Value object for the bypass property */
-    Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
+    Value getBypassedValue() { return getPropertyAsValue (tags::bypass); }
 
     //=========================================================================
     /** Returns true if this Node is muted */
-    bool isMuted() const { return (bool) getProperty (Tags::mute, false); }
+    bool isMuted() const { return (bool) getProperty (tags::mute, false); }
 
     /** Returns the Value object for the mute property */
-    Value getMutedValue() { return getPropertyAsValue (Tags::mute); }
+    Value getMutedValue() { return getPropertyAsValue (tags::mute); }
 
     /** Returns true if inputs are muted */
     bool isMutingInputs() const { return (bool) getProperty ("muteInput", false); }
@@ -290,34 +290,34 @@ public:
 
     inline bool isAudioIONode() const
     {
-        return objectData.getProperty (Tags::format) == "Internal" && (objectData.getProperty (Tags::identifier) == "audio.input" || objectData.getProperty (Tags::identifier) == "audio.output");
+        return objectData.getProperty (tags::format) == "Internal" && (objectData.getProperty (tags::identifier) == "audio.input" || objectData.getProperty (tags::identifier) == "audio.output");
     }
 
     inline bool isAudioInputNode() const
     {
-        return objectData.getProperty (Tags::format) == "Internal" && objectData.getProperty (Tags::identifier) == "audio.input";
+        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "audio.input";
     }
 
     inline bool isAudioOutputNode() const
     {
-        return objectData.getProperty (Tags::format) == "Internal" && objectData.getProperty (Tags::identifier) == "audio.output";
+        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "audio.output";
     }
 
     inline bool isMidiIONode() const
     {
-        return objectData.getProperty (Tags::format) == "Internal" && (objectData.getProperty (Tags::identifier) == "midi.input" || objectData.getProperty (Tags::identifier) == "midi.output");
+        return objectData.getProperty (tags::format) == "Internal" && (objectData.getProperty (tags::identifier) == "midi.input" || objectData.getProperty (tags::identifier) == "midi.output");
     }
 
     /** Returns true if a global MIDI input node. e.g */
     inline bool isMidiInputNode() const
     {
-        return objectData.getProperty (Tags::format) == "Internal" && objectData.getProperty (Tags::identifier) == "midi.input";
+        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "midi.input";
     }
 
     /** Returns true if a global MIDI output node. e.g */
     inline bool isMidiOutputNode() const
     {
-        return objectData.getProperty (Tags::format) == "Internal" && objectData.getProperty (Tags::identifier) == "midi.output";
+        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "midi.output";
     }
 
     inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
@@ -332,16 +332,16 @@ public:
     bool isMidiDevice() { return isMidiInputDevice() || isMidiOutputDevice(); }
 
     /** Returns the format of this node */
-    inline const var& getFormat() const { return objectData.getProperty (Tags::format); }
+    inline const var& getFormat() const { return objectData.getProperty (tags::format); }
 
     /** Returns this nodes identifier */
-    inline const var& getIdentifier() const { return objectData.getProperty (Tags::identifier); }
+    inline const var& getIdentifier() const { return objectData.getProperty (tags::identifier); }
 
     /** Returns a file property if exists, otherwise the identifier property */
     inline const var& getFileOrIdentifier() const
     {
-        return objectData.hasProperty (Tags::file)
-                   ? objectData.getProperty (Tags::file)
+        return objectData.hasProperty (tags::file)
+                   ? objectData.getProperty (tags::file)
                    : getIdentifier();
     }
 
@@ -352,7 +352,7 @@ public:
 
         for (int i = 0; i < nodes.getNumChildren(); ++i) {
             auto child = nodes.getChild (i);
-            if (child[Tags::format] == format && child[Tags::identifier] == identifier)
+            if (child[tags::format] == format && child[tags::identifier] == identifier)
                 return Node (child, false);
         }
 
@@ -374,7 +374,7 @@ public:
         auto nodes = getNodesValueTree();
         for (int i = 0; i < nodes.getNumChildren(); ++i) {
             auto child = nodes.getChild (i);
-            if (child[Tags::format] == format && child[Tags::identifier] == identifier)
+            if (child[tags::format] == format && child[tags::identifier] == identifier)
                 return true;
         }
         return false;
@@ -470,12 +470,12 @@ public:
     void setMidiProgramName (int program, const String& name);
 
     //=========================================================================
-    ValueTree getArcsValueTree() const { return objectData.getChildWithName (Tags::arcs); }
-    ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
+    ValueTree getArcsValueTree() const { return objectData.getChildWithName (tags::arcs); }
+    ValueTree getNodesValueTree() const { return objectData.getChildWithName (tags::nodes); }
     ValueTree getParentArcsNode() const;
-    ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
-    ValueTree getUIValueTree() const { return objectData.getChildWithName (Tags::ui); }
-    ValueTree getBlockValueTree() const noexcept { return getUIValueTree().getChildWithName (Tags::block); }
+    ValueTree getPortsValueTree() const { return objectData.getChildWithName (tags::ports); }
+    ValueTree getUIValueTree() const { return objectData.getChildWithName (tags::ui); }
+    ValueTree getBlockValueTree() const noexcept { return getUIValueTree().getChildWithName (tags::block); }
     ValueTree getScriptsValueTree() const noexcept { return objectData.getChildWithName (tags::scripts); }
 
     //=========================================================================
@@ -570,9 +570,9 @@ struct ConnectionBuilder {
         return *this;
     }
 
-    ConnectionBuilder() : arcs (Tags::arcs) {}
+    ConnectionBuilder() : arcs (tags::arcs) {}
     ConnectionBuilder (const Node& tgt)
-        : arcs (Tags::arcs), target (tgt)
+        : arcs (tags::arcs), target (tgt)
     {
     }
 
@@ -598,11 +598,11 @@ struct ConnectionBuilder {
             dstOffset = 0;
 
         for (int i = 0; i < 2; ++i) {
-            ValueTree connection (Tags::arc);
-            connection.setProperty (Tags::sourceNode, (int64) src.getNodeId(), 0)
-                .setProperty (Tags::destNode, (int64) dst.getNodeId(), 0)
-                .setProperty (Tags::sourceChannel, i + srcOffset, 0)
-                .setProperty (Tags::destChannel, i + dstOffset, 0);
+            ValueTree connection (tags::arc);
+            connection.setProperty (tags::sourceNode, (int64) src.getNodeId(), 0)
+                .setProperty (tags::destNode, (int64) dst.getNodeId(), 0)
+                .setProperty (tags::sourceChannel, i + srcOffset, 0)
+                .setProperty (tags::destChannel, i + dstOffset, 0);
             arcs.addChild (connection, -1, 0);
         }
     }

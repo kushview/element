@@ -370,8 +370,8 @@ public:
             // NOTE: this is a cheap way to refresh the GUI, in the future this
             // will need to be smarter by determining whether or not EC needs to
             // handle the change at the model layer.
-            auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
-            graphs.setProperty (Tags::active, currentGraph, nullptr);
+            auto graphs = session->data().getChildWithName (tags::graphs);
+            graphs.setProperty (tags::active, currentGraph, nullptr);
         }
     }
 
@@ -642,10 +642,10 @@ public:
     {
         if (session)
         {
-            tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
+            tempoValue.referTo (session->getPropertyAsValue (tags::tempo));
             externalClockValue.referTo (session->getPropertyAsValue ("externalSync"));
-            transport.requestMeter (session->getProperty (Tags::beatsPerBar, 4),
-                                    session->getProperty (Tags::beatDivisor, 2));
+            transport.requestMeter (session->getProperty (tags::beatsPerBar, 4),
+                                    session->getProperty (tags::beatDivisor, 2));
         }
         else
         {

@@ -6,6 +6,13 @@
 #include <element/element.h>
 #include <element/juce/data_structures.hpp>
 
+#define EL_MODEL_GETTER(a, b) \
+    inline const var& a() const noexcept { return objectData.getProperty (b); }
+#define EL_MODEL_GETTER_WITH_TYPE(a, b, r) \
+    inline r a() const noexcept { return (r) objectData.getProperty (b); }
+#define EL_MODEL_SETTER(a, b) \
+    inline void set##a (const juce::var& value) { objectData.setProperty (b, value, nullptr); }
+
 namespace juce {
 class UndoManager;
 }
@@ -45,10 +52,10 @@ public:
     inline bool hasType (const juce::Identifier& type) const { return objectData.hasType (type); }
 
     /** Access to the underlying juce::ValueTree (const version) */
-    inline const juce::ValueTree& getValueTree() const noexcept { return objectData; }
+    inline const juce::ValueTree& data() const noexcept { return objectData; }
 
     /** Access to the underlying juce::ValueTree */
-    inline juce::ValueTree getValueTree() noexcept { return objectData; }
+    inline juce::ValueTree data() noexcept { return objectData; }
 
     /** Returns a juce::XmlElement representation of this Model. */
     virtual std::unique_ptr<juce::XmlElement> createXml() const { return objectData.createXml(); }
@@ -56,19 +63,11 @@ public:
     /** Returns an Xml string of this Model. */
     juce::String toXmlString() const noexcept { return objectData.toXmlString(); }
 
-    /** Replace this objects juce::ValueTree with another
-        If you need to do something special when data is set, then override
-        the canAcceptData and setNodeData methods
-
-        @param data new data to use
-    */
-    juce::ValueTree setData (const juce::ValueTree& data);
-
     /** Returns the number of children the underlying juce::ValueTree has */
-    juce::int32 getNumChildren() const { return objectData.getNumChildren(); }
+    // int getNumChildren() const { return objectData.getNumChildren(); }
 
     /** Count the number of children with a type */
-    juce::int32 countChildrenOfType (const juce::Identifier& slug) const;
+    int countChildrenOfType (const juce::Identifier& slug) const;
 
     inline static void removeFromParent (const juce::ValueTree& data, juce::UndoManager* undo = nullptr)
     {
@@ -80,23 +79,10 @@ public:
 
     inline static void removeFromParent (const Model& model, juce::UndoManager* undo = nullptr)
     {
-        removeFromParent (model.getValueTree(), undo);
+        removeFromParent (model.data(), undo);
     }
 
 protected:
-    /** Override this to handle special data validation This is called
-        during setData
-
-        @param data The new data to set
-    */
-    virtual bool canAcceptData (const juce::ValueTree& data);
-
-    /** Override this to handle special data setting. This is called during
-        setData and only if canAcceptData returns true
-
-        @param data The data being setData
-    */
-    virtual void setNodeData (const juce::ValueTree& data);
     juce::ValueTree objectData;
 
     template <typename POD>
@@ -118,8 +104,5 @@ protected:
             objectData.setProperty (prop, objectData.getProperty (prop, defaultValue), nullptr);
     }
 };
-
-/** Alias for backward compatibility. */
-using ObjectModel = Model;
 
 } // namespace element

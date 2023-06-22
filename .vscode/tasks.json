@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build",
+            "label": "Compile",
             "type": "shell",
             "command": "meson compile -C build",
             "group": {
@@ -28,9 +28,9 @@
             }
         },
         {
-            "label": "Bundle",
+            "label": "Stage",
             "type": "shell",
-            "command": "cd build && meson install --destdir=\".\" --quiet",
+            "command": "cd build && meson install --destdir=\"../stage\" --quiet",
             "dependsOn": ["Format"],
             "group": {
                 "kind": "build",
@@ -79,8 +79,8 @@
         {
             "label": "Launch OSX",
             "type": "shell",
-            "command": "open build/stage/Element.app",
-            "dependsOn": "Bundle",
+            "command": "open build/deploy/osx/Element.app",
+            "dependsOn": "Compile",
             "group": {
                 "kind": "build",
                 "isDefault": false

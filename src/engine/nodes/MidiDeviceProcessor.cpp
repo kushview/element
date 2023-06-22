@@ -365,7 +365,7 @@ void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
     ValueTree state ("state");
     state.setProperty ("inputDevice", isInputDevice(), 0)
         .setProperty ("deviceName", deviceWanted.name, 0)
-        .setProperty (Tags::identifier, deviceWanted.identifier, nullptr)
+        .setProperty (tags::identifier, deviceWanted.identifier, nullptr)
         .setProperty ("midiLatency", midiOutLatency.get(), nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
@@ -386,7 +386,7 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
 
     MidiDeviceInfo info;
     info.name = state.getProperty ("deviceName", "").toString();
-    info.identifier = state.getProperty (Tags::identifier).toString();
+    info.identifier = state.getProperty (tags::identifier).toString();
     DBG ("[element] restoring device state: " << info.name);
     DBG ("[element] MIDI Device ID: " << info.identifier);
     closeDevice();

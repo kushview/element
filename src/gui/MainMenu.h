@@ -23,7 +23,7 @@
 
 namespace element {
 
-class CommandManager;
+class Commands;
 class ContentComponent;
 class Context;
 class MainWindow;
@@ -46,15 +46,15 @@ public:
         NumMenus
     };
 
-    MainMenu (MainWindow& parent, CommandManager& c);
+    MainMenu (MainWindow& parent, Commands& c);
     ~MainMenu();
 
     void setupMenu();
 
-    static void buildSessionMenu (CommandManager& cmd, PopupMenu& menu);
-    static void buildEditMenu (CommandManager& cmd, PopupMenu& menu);
-    static void buildViewMenu (CommandManager& cmd, PopupMenu& menu);
-    static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu);
+    static void buildSessionMenu (Commands& cmd, PopupMenu& menu);
+    static void buildEditMenu (Commands& cmd, PopupMenu& menu);
+    static void buildViewMenu (Commands& cmd, PopupMenu& menu);
+    static void buildPluginMainMenu (Commands& cmd, PopupMenu& menu);
 
     ContentComponent* getContentComponent();
 
@@ -72,7 +72,7 @@ public:
 private:
     MainWindow& owner;
     Context& world;
-    CommandManager& cmd;
+    Commands& cmd;
     std::unique_ptr<PopupMenu> macMenu;
     const int recentMenuOffset = 20000;
 

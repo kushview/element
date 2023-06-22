@@ -17,33 +17,39 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 
 namespace element {
 
-ControllerDevice::ControllerDevice (const ValueTree& data)
-    : ObjectModel (data)
+Controller::Controller (const ValueTree& data)
+    : Model (data)
 {
     if (data.isValid())
     {
-        jassert (data.hasType (Tags::controller));
-        jassert (data.hasProperty (Tags::uuid));
+        jassert (data.hasType (tags::controller));
+        jassert (data.hasProperty (tags::uuid));
         setMissingProperties();
     }
 }
 
-ControllerDevice::ControllerDevice (const String& name)
-    : ObjectModel (Tags::controller)
+Controller::Controller (const String& name)
+    : Model (tags::controller)
 {
     setName (name);
     setMissingProperties();
 }
 
-void ControllerDevice::setMissingProperties()
+void Controller::setMissingProperties()
 {
-    stabilizePropertyString (Tags::uuid, Uuid().toString());
-    stabilizePropertyString (Tags::name, "New Device");
-    stabilizePropertyString ("inputDevice", "");
+    stabilizePropertyString (tags::uuid, Uuid().toString());
+    stabilizePropertyString (tags::name, "New Device");
+    stabilizePropertyString (tags::inputDevice, "");
+}
+
+Controller Control::controller() const
+{
+    const Controller device (objectData.getParent());
+    return device;
 }
 
 } // namespace element

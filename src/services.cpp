@@ -49,6 +49,15 @@ class Services::Impl
 public:
     Impl (Services& sm, Context& g, RunMode m)
         : owner (sm), world (g), runMode (m) {}
+
+    void initialize()
+    {
+        if (initialized)
+            return;
+        for (auto* srv : services)
+            srv->initialize();
+    }
+
     void activate()
     {
         if (activated)
@@ -57,10 +66,6 @@ public:
         if (! initialized)
         {
             lastExportedGraph = DataPath::defaultGraphDir();
-            auto& commands = owner.context().getCommandManager();
-            commands.registerAllCommandsForTarget (&owner);
-            commands.registerAllCommandsForTarget (owner.find<GuiService>());
-            commands.setFirstCommandTarget (&owner);
             initialized = true;
         }
 
@@ -74,12 +79,13 @@ public:
         }
 
         // restore recents
-        const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
-        if (recentList.existsAsFile())
-        {
-            FileInputStream stream (recentList);
-            recentFiles.restoreFromString (stream.readEntireStreamAsString());
-        }
+        // FIXME
+        // const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
+        // if (recentList.existsAsFile())
+        // {
+        //     FileInputStream stream (recentList);
+        //     recentFiles.restoreFromString (stream.readEntireStreamAsString());
+        // }
 
         for (auto* s : services)
             s->activate();
@@ -89,11 +95,12 @@ public:
 
     void deactivate()
     {
-        const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
-        if (! recentList.existsAsFile())
-            recentList.create();
-        if (recentList.exists())
-            recentList.replaceWithText (recentFiles.toString(), false, false);
+        // FIXME
+        // const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
+        // if (! recentList.existsAsFile())
+        //     recentList.create();
+        // if (recentList.exists())
+        //     recentList.replaceWithText (recentFiles.toString(), false, false);
 
         for (auto* s : services)
             s->deactivate();
@@ -111,8 +118,6 @@ private:
     juce::File lastSavedFile;
     juce::File lastExportedGraph;
     Context& world;
-    juce::RecentlyOpenedFilesList recentFiles;
-    juce::UndoManager undo;
     RunMode runMode;
 };
 
@@ -124,7 +129,7 @@ Services& Service::services() const
 }
 
 Context& Service::context() { return services().context(); }
-Settings& Service::getSettings() { return context().getSettings(); }
+Settings& Service::settings() { return context().settings(); }
 RunMode Service::getRunMode() const { return services().getRunMode(); }
 
 Services::Services (Context& g, RunMode m)
@@ -144,15 +149,12 @@ Services::~Services()
     impl.reset();
 }
 
+void Services::initialize() { impl->initialize(); }
 void Services::activate() { impl->activate(); }
 void Services::deactivate() { impl->deactivate(); }
 
-juce::RecentlyOpenedFilesList& Services::getRecentlyOpenedFilesList() { return impl->recentFiles; }
-void Services::addRecentFile (const juce::File& file) { impl->recentFiles.addFile (file); }
-
 RunMode Services::getRunMode() const { return impl->runMode; }
 Context& Services::context() { return impl->world; }
-juce::UndoManager& Services::getUndoManager() { return impl->undo; }
 
 Service** Services::begin() noexcept { return impl->services.begin(); }
 Service* const* Services::begin() const noexcept { return impl->services.begin(); }
@@ -200,9 +202,9 @@ void Services::run()
     {
         bool loadDefault = true;
 
-        if (context().getSettings().openLastUsedSession())
+        if (context().settings().openLastUsedSession())
         {
-            const auto lastSession = context().getSettings().getUserSettings()->getValue (Settings::lastSessionKey);
+            const auto lastSession = context().settings().getUserSettings()->getValue (Settings::lastSessionKey);
             if (File::isAbsolutePath (lastSession) && File (lastSession).existsAsFile())
             {
                 sc->openFile (File (lastSession));
@@ -218,7 +220,7 @@ void Services::run()
     {
         gui->stabilizeContent();
         const Node graph (session->getCurrentGraph());
-        auto* const props = context().getSettings().getUserSettings();
+        auto* const props = context().settings().getUserSettings();
 
         if (graph.isValid())
         {
@@ -241,9 +243,9 @@ void Services::handleMessage (const Message& msg)
 
     bool handled = false; // final else condition will set false
 
-    auto& undo = impl->undo;
+    // auto& undo = impl->undo;
     auto& services = impl->services;
-    auto& recentFiles = impl->recentFiles;
+    // auto& recentFiles = impl->recentFiles;
 
     if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
     {
@@ -251,11 +253,12 @@ void Services::handleMessage (const Message& msg)
         message->createActions (*this, actions);
         if (! actions.isEmpty())
         {
-            undo.beginNewTransaction();
-            for (auto* action : actions)
-                undo.perform (action);
+            // FIXME: UndoManager
+            // undo.beginNewTransaction();
+            // for (auto* action : actions)
+            //     undo.perform (action);
             actions.clearQuick (false);
-            gui->stabilizeViews();
+            // gui->stabilizeViews();
             return;
         }
 
@@ -279,18 +282,18 @@ void Services::handleMessage (const Message& msg)
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))
     {
         Node node = dnm->node;
-        ValueTree parent (node.getValueTree().getParent());
-        if (parent.hasType (Tags::nodes))
+        ValueTree parent (node.data().getParent());
+        if (parent.hasType (tags::nodes))
             parent = parent.getParent();
-        jassert (parent.hasType (Tags::node));
+        jassert (parent.hasType (tags::node));
 
         const Node graph (parent, false);
         node.savePluginState();
-        Node newNode (node.getValueTree().createCopy(), false);
+        Node newNode (node.data().createCopy(), false);
 
         if (newNode.isValid() && graph.isValid())
         {
-            newNode = Node (Node::resetIds (newNode.getValueTree()), false);
+            newNode = Node (Node::resetIds (newNode.data()), false);
             ConnectionBuilder dummy;
             ec->addNode (newNode, graph, dummy);
         }
@@ -318,7 +321,7 @@ void Services::handleMessage (const Message& msg)
         if (! canceled)
         {
             presets->add (node, name);
-            node.setProperty (Tags::name, name);
+            node.setProperty (tags::name, name);
         }
     }
     else if (const auto* sdnm = dynamic_cast<const SaveDefaultNodeMessage*> (&msg))
@@ -334,8 +337,9 @@ void Services::handleMessage (const Message& msg)
         else
             ec->addNode (anm->node);
 
-        if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension (".elg"))
-            recentFiles.addFile (anm->sourceFile);
+        // FIXME: Recents
+        // if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension (".elg"))
+        //     recentFiles.addFile (anm->sourceFile);
     }
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {
@@ -344,26 +348,27 @@ void Services::handleMessage (const Message& msg)
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {
         sess->openFile (osm->file);
-        recentFiles.addFile (osm->file);
+        // FIXME: Recents
+        // recentFiles.addFile (osm->file);
     }
     else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))
     {
         ec->addMidiDeviceNode (mdm->device, mdm->inputDevice);
     }
-    else if (const auto* removeControllerDeviceMessage = dynamic_cast<const RemoveControllerDeviceMessage*> (&msg))
+    else if (const auto* removeControllerMessage = dynamic_cast<const RemoveControllerMessage*> (&msg))
     {
-        const auto device = removeControllerDeviceMessage->device;
+        const auto device = removeControllerMessage->device;
         devs->remove (device);
     }
-    else if (const auto* addControllerDeviceMessage = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
+    else if (const auto* addControllerMessage = dynamic_cast<const AddControllerMessage*> (&msg))
     {
-        const auto device = addControllerDeviceMessage->device;
-        const auto file = addControllerDeviceMessage->file;
+        const auto device = addControllerMessage->device;
+        const auto file = addControllerMessage->file;
         if (file.existsAsFile())
         {
             devs->add (file);
         }
-        else if (device.getValueTree().isValid())
+        else if (device.data().isValid())
         {
             devs->add (device);
         }
@@ -384,9 +389,9 @@ void Services::handleMessage (const Message& msg)
         const auto control (addControlMessage->control);
         devs->add (device, control);
     }
-    else if (const auto* refreshControllerDevice = dynamic_cast<const RefreshControllerDeviceMessage*> (&msg))
+    else if (const auto* refreshController = dynamic_cast<const RefreshControllerMessage*> (&msg))
     {
-        const auto device = refreshControllerDevice->device;
+        const auto device = refreshController->device;
         devs->refresh (device);
     }
     else if (const auto* removeMapMessage = dynamic_cast<const RemoveControllerMapMessage*> (&msg))
@@ -400,7 +405,7 @@ void Services::handleMessage (const Message& msg)
         const auto graph = replaceNodeMessage->graph;
         const auto node = replaceNodeMessage->node;
         const auto desc (replaceNodeMessage->description);
-        if (graph.isValid() && node.isValid() && graph.getNodesValueTree() == node.getValueTree().getParent())
+        if (graph.isValid() && node.isValid() && graph.getNodesValueTree() == node.data().getParent())
         {
             ec->replace (node, desc);
         }
@@ -414,190 +419,6 @@ void Services::handleMessage (const Message& msg)
     {
         DBG ("[element] unhandled Message received");
     }
-}
-
-ApplicationCommandTarget* Services::getNextCommandTarget()
-{
-    return find<GuiService>();
-}
-
-void Services::getAllCommands (Array<CommandID>& cids)
-{
-    cids.addArray ({
-        Commands::mediaNew,
-        Commands::mediaOpen,
-        Commands::mediaSave,
-        Commands::mediaSaveAs,
-
-        Commands::signIn,
-        Commands::signOut,
-        Commands::sessionNew,
-        Commands::sessionSave,
-        Commands::sessionSaveAs,
-        Commands::sessionOpen,
-        Commands::sessionAddGraph,
-        Commands::sessionDuplicateGraph,
-        Commands::sessionDeleteGraph,
-        Commands::sessionInsertPlugin,
-
-        Commands::importGraph,
-        Commands::exportGraph,
-        Commands::panic,
-        Commands::checkNewerVersion,
-        Commands::transportPlay,
-        Commands::graphNew,
-        Commands::graphOpen,
-        Commands::graphSave,
-        Commands::graphSaveAs,
-        Commands::importSession,
-        Commands::recentsClear,
-    });
-    cids.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
-}
-
-void Services::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
-{
-    find<GuiService>()->getCommandInfo (commandID, result);
-    // for (auto* const child : getChildren())
-    //     if (auto* const appChild = dynamic_cast<Controller*> (child))
-    //         appChild->getCommandInfo (commandID, result);
-}
-
-bool Services::perform (const InvocationInfo& info)
-{
-    auto& undo = impl->undo;
-    bool res = true;
-
-    switch (info.commandID)
-    {
-        case Commands::undo: {
-            if (undo.canUndo())
-                undo.undo();
-            if (auto* cc = find<GuiService>()->getContentComponent())
-                cc->stabilizeViews();
-            find<GuiService>()->refreshMainMenu();
-        }
-        break;
-
-        case Commands::redo: {
-            if (undo.canRedo())
-                undo.redo();
-            if (auto* cc = find<GuiService>()->getContentComponent())
-                cc->stabilizeViews();
-            find<GuiService>()->refreshMainMenu();
-        }
-        break;
-
-        case Commands::sessionOpen: {
-            FileChooser chooser ("Open Session", impl->lastSavedFile, "*.els", true, false);
-            if (chooser.browseForFileToOpen())
-            {
-                find<SessionService>()->openFile (chooser.getResult());
-                impl->recentFiles.addFile (chooser.getResult());
-            }
-        }
-        break;
-
-        case Commands::sessionNew:
-            find<SessionService>()->newSession();
-            break;
-        case Commands::sessionSave:
-            find<SessionService>()->saveSession (false);
-            break;
-        case Commands::sessionSaveAs:
-            find<SessionService>()->saveSession (true);
-            break;
-        case Commands::sessionClose:
-            find<SessionService>()->closeSession();
-            break;
-        case Commands::sessionAddGraph:
-            find<EngineService>()->addGraph();
-            break;
-        case Commands::sessionDuplicateGraph:
-            find<EngineService>()->duplicateGraph();
-            break;
-        case Commands::sessionDeleteGraph:
-            find<EngineService>()->removeGraph();
-            break;
-
-        case Commands::transportPlay:
-            context().audio()->togglePlayPause();
-            break;
-
-        case Commands::importGraph: {
-            FileChooser chooser ("Import Graph", impl->lastExportedGraph, "*.elg");
-            if (chooser.browseForFileToOpen())
-                find<SessionService>()->importGraph (chooser.getResult());
-        }
-        break;
-
-        case Commands::exportGraph: {
-            auto session = context().session();
-            auto node = session->getCurrentGraph();
-            node.savePluginState();
-
-            if (! impl->lastExportedGraph.isDirectory())
-                impl->lastExportedGraph = impl->lastExportedGraph.getParentDirectory();
-            if (impl->lastExportedGraph.isDirectory())
-            {
-                impl->lastExportedGraph = impl->lastExportedGraph.getChildFile (node.getName()).withFileExtension ("elg");
-                impl->lastExportedGraph = impl->lastExportedGraph.getNonexistentSibling();
-            }
-
-            {
-                FileChooser chooser ("Export Graph", impl->lastExportedGraph, "*.elg");
-                if (chooser.browseForFileToSave (true))
-                    find<SessionService>()->exportGraph (node, chooser.getResult());
-                if (auto* gui = find<GuiService>())
-                    gui->stabilizeContent();
-            }
-        }
-        break;
-
-        case Commands::panic: {
-            auto e = context().audio();
-            for (int c = 1; c <= 16; ++c)
-            {
-                auto msg = MidiMessage::allNotesOff (c);
-                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
-                e->addMidiMessage (msg);
-                msg = MidiMessage::allSoundOff (c);
-                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
-                e->addMidiMessage (msg);
-            }
-        }
-        break;
-
-        case Commands::mediaNew:
-        case Commands::mediaSave:
-        case Commands::mediaSaveAs:
-            break;
-
-        case Commands::signIn: {
-        }
-        break;
-
-        case Commands::signOut: {
-            // noop
-        }
-        break;
-
-        case Commands::checkNewerVersion:
-            find<GuiService>()->checkUpdates();
-            break;
-
-        case Commands::recentsClear: {
-            impl->recentFiles.clear();
-            find<GuiService>()->refreshMainMenu();
-        }
-        break;
-
-        default:
-            res = false;
-            break;
-    }
-
-    return res;
 }
 
 } // namespace element

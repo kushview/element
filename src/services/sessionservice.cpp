@@ -62,7 +62,7 @@ void SessionService::activate()
 void SessionService::deactivate()
 {
     auto& world = context();
-    auto& settings (world.getSettings());
+    auto& settings (world.settings());
     auto* props = settings.getUserSettings();
 
     if (document)
@@ -101,10 +101,10 @@ void SessionService::openFile (const File& file)
         {
             const Node model (node, true);
             model.forEach ([] (const ValueTree& tree) {
-                if (! tree.hasType (Tags::node))
+                if (! tree.hasType (tags::node))
                     return;
                 auto nodeRef = tree;
-                nodeRef.setProperty (Tags::uuid, Uuid().toString(), nullptr);
+                nodeRef.setProperty (tags::uuid, Uuid().toString(), nullptr);
             });
             if (auto* ec = sibling<EngineService>())
                 ec->addGraph (model);
@@ -124,7 +124,7 @@ void SessionService::openFile (const File& file)
 
             if (auto* cc = gui.getContentComponent())
             {
-                auto ui = currentSession->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
+                auto ui = currentSession->data().getOrCreateChildWithName (tags::ui, nullptr);
                 cc->applySessionState (ui.getProperty ("content").toString());
             }
 
@@ -149,7 +149,7 @@ void SessionService::openFile (const File& file)
 
 void SessionService::exportGraph (const Node& node, const File& targetFile)
 {
-    if (! node.hasNodeType (Tags::graph))
+    if (! node.hasNodeType (tags::graph))
     {
         jassertfalse;
         return;
@@ -190,7 +190,7 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
     {
         String state;
         cc->getSessionState (state);
-        auto ui = currentSession->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
+        auto ui = currentSession->data().getOrCreateChildWithName (tags::ui, nullptr);
         ui.setProperty ("content", state, nullptr);
     }
 
@@ -212,14 +212,15 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
         currentSession->dispatchPendingMessages();
         document->setChangedFlag (false);
         jassert (! hasSessionChanged());
-        if (auto* us = context().getSettings().getUserSettings())
+        if (auto* us = context().settings().getUserSettings())
             us->setValue (Settings::lastSessionKey, document->getFile().getFullPathName());
         if (saveAs)
         {
-            services().addRecentFile (document->getFile());
-            currentSession->getValueTree().setProperty (Tags::name,
-                                                        document->getFile().getFileNameWithoutExtension(),
-                                                        nullptr);
+            // FIXME:
+            // services().addRecentFile (document->getFile());
+            // currentSession->data().setProperty (tags::name,
+            //                                             document->getFile().getFileNameWithoutExtension(),
+            //                                             nullptr);
         }
     }
 }
@@ -249,7 +250,7 @@ void SessionService::newSession()
 void SessionService::loadNewSessionData()
 {
     currentSession->clear();
-    const auto file = context().getSettings().getDefaultNewSessionFile();
+    const auto file = context().settings().getDefaultNewSessionFile();
     bool wasLoaded = false;
 
     if (file.existsAsFile())
@@ -257,7 +258,7 @@ void SessionService::loadNewSessionData()
         ValueTree data;
         if (auto xml = XmlDocument::parse (file))
             data = ValueTree::fromXml (*xml);
-        if (data.isValid() && data.hasType (Tags::session))
+        if (data.isValid() && data.hasType (tags::session))
             wasLoaded = currentSession->loadData (data);
     }
 

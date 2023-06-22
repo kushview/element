@@ -141,7 +141,7 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override
     {
-        ValueTree state (Tags::state);
+        ValueTree state (tags::state);
         state.setProperty ("wetLevel", (float) *wetLevel, 0);
         state.setProperty ("dryLevel", (float) *dryLevel, 0);
         if (auto e = state.createXml())

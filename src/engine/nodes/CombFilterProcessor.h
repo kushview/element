@@ -188,7 +188,7 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override
     {
-        ValueTree state (Tags::state);
+        ValueTree state (tags::state);
         state.setProperty ("damping", (float) *damping, 0);
         state.setProperty ("feedback", (float) *feedback, 0);
         state.setProperty ("length", (float) *length, 0);

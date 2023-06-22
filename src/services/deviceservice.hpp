@@ -20,7 +20,7 @@
 #pragma once
 
 #include <element/services.hpp>
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 
 namespace element {
 
@@ -33,12 +33,12 @@ public:
     void activate() override;
     void deactivate() override;
 
-    void add (const ControllerDevice&);
-    void add (const ControllerDevice&, const ControllerDevice::Control&);
+    void add (const Controller&);
+    void add (const Controller&, const Control&);
     void add (const File& file);
-    void remove (const ControllerDevice&);
-    void remove (const ControllerDevice&, const ControllerDevice::Control&);
-    void refresh (const ControllerDevice&);
+    void remove (const Controller&);
+    void remove (const Controller&, const Control&);
+    void refresh (const Controller&);
     void refresh();
 
 private:

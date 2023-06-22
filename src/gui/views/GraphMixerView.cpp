@@ -135,8 +135,8 @@ public:
         if (details.description == "graphMixerStrip")
         {
             auto* strip = dynamic_cast<GraphMixerChannelStrip*> (details.sourceComponent.get());
-            auto myNode = getNode().getValueTree();
-            auto dNode = strip->getNode().getValueTree();
+            auto myNode = getNode().data();
+            auto dNode = strip->getNode().data();
             ValueTree parent = dNode.getParent();
 
             int myIndex = parent.indexOf (myNode);

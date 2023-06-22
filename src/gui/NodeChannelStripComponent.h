@@ -45,7 +45,7 @@ public:
         nodeName.setFont (10.f);
         nodeName.onTextChange = [this] {
             if (node.isValid())
-                node.setProperty (Tags::name, nodeName.getText());
+                node.setProperty (tags::name, nodeName.getText());
         };
 
         addAndMakeVisible (channelBox);
@@ -202,7 +202,7 @@ public:
         audioIns.clearQuick();
         audioOuts.clearQuick();
         node.getPorts (audioIns, audioOuts, PortType::Audio);
-        displayName.referTo (node.getPropertyAsValue (Tags::name));
+        displayName.referTo (node.getPropertyAsValue (tags::name));
         stabilizeContent();
         startTimerHz (meterSpeedHz);
 
@@ -362,7 +362,7 @@ private:
     void powerChanged()
     {
         if (node.isValid())
-            node.setProperty (Tags::bypass, ! channelStrip.isPowerOn());
+            node.setProperty (tags::bypass, ! channelStrip.isPowerOn());
         if (auto* obj = node.getObject())
             obj->suspendProcessing (! channelStrip.isPowerOn());
     }
@@ -397,7 +397,7 @@ private:
     void muteChanged()
     {
         if (node.isValid())
-            node.setProperty (Tags::mute, channelStrip.isMuted());
+            node.setProperty (tags::mute, channelStrip.isMuted());
         if (auto* obj = node.getObject())
             obj->setMuted (channelStrip.isMuted());
     }

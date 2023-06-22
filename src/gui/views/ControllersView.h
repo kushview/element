@@ -23,11 +23,11 @@
 
 namespace element {
 
-class ControllerDevicesView : public ContentView
+class ControllersView : public ContentView
 {
 public:
-    ControllerDevicesView();
-    virtual ~ControllerDevicesView();
+    ControllersView();
+    virtual ~ControllersView();
 
     void resized() override;
     void stabilizeContent() override;

@@ -404,13 +404,13 @@ void GraphEditorComponent::setNode (const Node& n)
         return;
     bool isGraph = n.isGraph();
     bool isValid = n.isValid();
-    graph = isValid && isGraph ? n : Node (Tags::graph);
+    graph = isValid && isGraph ? n : Node (tags::graph);
 
     data.removeListener (this);
-    data = graph.getValueTree();
+    data = graph.data();
 
-    verticalLayout = graph.getProperty (Tags::vertical, true);
-    resizePositionsFrozen = (bool) graph.getProperty (Tags::staticPos, false);
+    verticalLayout = graph.getProperty (tags::vertical, true);
+    resizePositionsFrozen = (bool) graph.getProperty (tags::staticPos, false);
 
     if (draggingConnector)
         removeChildComponent (draggingConnector.get());
@@ -648,7 +648,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             else if (hasRequestedType)
             {
                 const ValueTree requestedNode = graph.getNodesValueTree()
-                                                    .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
+                                                    .getChildWithProperty (tags::identifier, desc.fileOrIdentifier);
                 const Node model (requestedNode, false);
                 ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
             }
@@ -1095,19 +1095,19 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
 //=============================================================================
 void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
-    if (child.hasType (Tags::node))
+    if (child.hasType (tags::node))
     {
-        child.setProperty (Tags::x, verticalLayout ? lastDropX : lastDropY, 0);
-        child.setProperty (Tags::y, verticalLayout ? lastDropY : lastDropX, 0);
+        child.setProperty (tags::x, verticalLayout ? lastDropX : lastDropY, 0);
+        child.setProperty (tags::y, verticalLayout ? lastDropY : lastDropX, 0);
         auto* comp = createBlock (Node (child, false));
         addAndMakeVisible (comp, 20000);
         comp->update();
     }
-    else if (child.hasType (Tags::arc) || child.hasType (Tags::nodes) || child.hasType (Tags::arcs))
+    else if (child.hasType (tags::arc) || child.hasType (tags::nodes) || child.hasType (tags::arcs))
     {
         updateComponents();
     }
-    else if (child.hasType (Tags::ports))
+    else if (child.hasType (tags::ports))
     {
         const Node node (parent, false);
         for (int i = 0; i < getNumChildComponents(); ++i)

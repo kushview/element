@@ -54,7 +54,7 @@ public:
                      NotificationType notification = sendNotificationAsync)
     {
         const auto graph (node.getParentGraph());
-        const int index = graph.getNodesValueTree().indexOf (node.getValueTree());
+        const int index = graph.getNodesValueTree().indexOf (node.data());
         if (isPositiveAndBelow (index, getNumItems()))
             setSelectedItemIndex (index, notification);
     }

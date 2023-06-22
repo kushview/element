@@ -20,7 +20,7 @@
 #include <element/nodeobject.hpp>
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 #include <element/node.hpp>
 
 namespace element {
@@ -39,7 +39,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
                                public AsyncUpdater,
                                private Value::Listener
 {
-    MidiNoteControllerMap (const ControllerDevice::Control& ctl,
+    MidiNoteControllerMap (const Control& ctl,
                            const MidiMessage& message,
                            const Node& _node,
                            const int _parameter)
@@ -53,7 +53,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         jassert (message.isNoteOn());
         jassert (node);
 
-        channelObject = control.getPropertyAsValue (Tags::midiChannel);
+        channelObject = control.getPropertyAsValue (tags::midiChannel);
         channelObject.addListener (this);
         valueChanged (channelObject);
 
@@ -136,12 +136,12 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             if (parameterIndex == NodeObject::EnabledParameter)
             {
                 node->setEnabled (! node->isEnabled());
-                model.setProperty (Tags::enabled, node->isEnabled());
+                model.setProperty (tags::enabled, node->isEnabled());
             }
             else if (parameterIndex == NodeObject::BypassParameter)
             {
                 node->suspendProcessing (! node->isSuspended());
-                model.setProperty (Tags::bypass, node->isSuspended());
+                model.setProperty (tags::bypass, node->isSuspended());
             }
             else if (parameterIndex == NodeObject::MuteParameter)
             {
@@ -157,12 +157,12 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             if (parameterIndex == NodeObject::EnabledParameter)
             {
                 node->setEnabled (isInverse ? event.isNoteOff() : event.isNoteOn());
-                model.setProperty (Tags::enabled, node->isEnabled());
+                model.setProperty (tags::enabled, node->isEnabled());
             }
             else if (parameterIndex == NodeObject::BypassParameter)
             {
                 node->suspendProcessing (isInverse ? event.isNoteOn() : event.isNoteOff());
-                model.setProperty (Tags::bypass, node->isSuspended());
+                model.setProperty (tags::bypass, node->isSuspended());
             }
             else if (parameterIndex == NodeObject::MuteParameter)
             {
@@ -172,7 +172,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
     }
 
 private:
-    ControllerDevice::Control control;
+    Control control;
     Node model;
     NodeObjectPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
@@ -213,7 +213,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                                     public AsyncUpdater,
                                     private Value::Listener
 {
-    MidiCCControllerMapHandler (const ControllerDevice::Control& ctl,
+    MidiCCControllerMapHandler (const Control& ctl,
                                 const MidiMessage& message,
                                 const Node& _node,
                                 const int _parameter)
@@ -230,11 +230,11 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         inverseToggleObject.addListener (this);
         inverseToggle.set (control.inverseToggle() ? 1 : 0);
 
-        toggleModeObject = control.getToggleModeObject();
+        toggleModeObject = control.toggleModeObject();
         toggleModeObject.addListener (this);
-        toggleMode.set (static_cast<int> (control.getToggleMode()));
+        toggleMode.set (static_cast<int> (control.toggleMode()));
 
-        channelObject = control.getPropertyAsValue (Tags::midiChannel);
+        channelObject = control.getPropertyAsValue (tags::midiChannel);
         channelObject.addListener (this);
         valueChanged (channelObject);
 
@@ -277,7 +277,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             const auto currentToggleState = desiredToggleState.get();
             const auto mode = toggleMode.get();
 
-            if (mode == ControllerDevice::EqualsOrHigher)
+            if (mode == Control::toggleEqualsOrHigher)
             {
                 if (toggleValue.get() == 0)
                 {
@@ -313,7 +313,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                     }
                 }
             }
-            else if (mode == ControllerDevice::Equals)
+            else if (mode == Control::toggleEquals)
             {
                 if (toggleValue.get() == ccValue)
                 {
@@ -336,7 +336,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
     void handleAsyncUpdate() override
     {
         const auto mode = toggleMode.get();
-        const int stateToCompare = mode != ControllerDevice::Equals
+        const int stateToCompare = mode != Control::toggleEquals
                                        ? (inverseToggle.get() == 1 ? 0 : 1) // inverse on, then compare false
                                        : 1; // equals mode always compare true
 
@@ -344,14 +344,14 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         {
             node->setEnabled (desiredToggleState.get() == stateToCompare);
             if (model.isEnabled() != node->isEnabled())
-                model.setProperty (Tags::enabled, node->isEnabled());
+                model.setProperty (tags::enabled, node->isEnabled());
         }
         else if (parameterIndex == NodeObject::BypassParameter)
         {
             // inverted because UI displays bypass as inactive (or active for not bypassed)
             node->suspendProcessing (! (desiredToggleState.get() == stateToCompare));
             if (model.isBypassed() != node->isSuspended())
-                model.setProperty (Tags::bypass, node->isSuspended());
+                model.setProperty (tags::bypass, node->isSuspended());
         }
         else if (parameterIndex == NodeObject::MuteParameter)
         {
@@ -360,7 +360,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
     }
 
 private:
-    ControllerDevice::Control control;
+    Control control;
     Node model;
     NodeObjectPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
@@ -395,7 +395,7 @@ private:
         }
         else if (toggleModeObject.refersToSameSourceAs (value))
         {
-            toggleMode.set (static_cast<int> (ControllerDevice::Control::getToggleMode (
+            toggleMode.set (static_cast<int> (Control::toggleMode (
                 toggleModeObject.getValue().toString())));
         }
         else if (channelObject.refersToSameSourceAs (value))
@@ -408,7 +408,7 @@ private:
 class ControllerMapInput : public MidiInputCallback
 {
 public:
-    explicit ControllerMapInput (MappingEngine& owner, MidiEngine& m, const ControllerDevice& device)
+    explicit ControllerMapInput (MappingEngine& owner, MidiEngine& m, const Controller& device)
         : midi (m), mapping (owner), controllerDevice (device)
     {
     }
@@ -478,14 +478,14 @@ public:
         close();
     }
 
-    bool isInputFor (const ControllerDevice& device) const
+    bool isInputFor (const Controller& device) const
     {
-        return device.getValueTree() == controllerDevice.getValueTree();
+        return device.data() == controllerDevice.data();
     }
 
-    bool isInputFor (const ControllerDevice::Control& control) const
+    bool isInputFor (const Control& control) const
     {
-        return isInputFor (control.getControllerDevice());
+        return isInputFor (control.controller());
     }
 
     void addHandler (ControllerMapHandler* handler)
@@ -498,11 +498,11 @@ public:
 private:
     MidiEngine& midi;
     MappingEngine& mapping;
-    ControllerDevice controllerDevice;
+    Controller controllerDevice;
     std::unique_ptr<MidiInput> midiInput;
     OwnedArray<ControllerMapHandler> handlers;
     BigInteger controllerNumbers, noteNumbers;
-    HashMap<int, ControllerDevice::Control> controls, notes;
+    HashMap<int, Control> controls, notes;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControllerMapInput)
 };
 
@@ -522,7 +522,7 @@ public:
         return inputs.contains (input);
     }
 
-    bool remove (const ControllerDevice& device)
+    bool remove (const Controller& device)
     {
         if (auto* input = findInput (device))
         {
@@ -559,7 +559,7 @@ public:
             input->stop();
     }
 
-    ControllerMapInput* findInput (const ControllerDevice& controller) const
+    ControllerMapInput* findInput (const Controller& controller) const
     {
         if (! controller.isValid())
             return nullptr;
@@ -569,7 +569,7 @@ public:
         return nullptr;
     }
 
-    bool containsInputFor (const ControllerDevice& controller) const
+    bool containsInputFor (const Controller& controller) const
     {
         return findInput (controller) != nullptr;
     }
@@ -599,7 +599,7 @@ MappingEngine::~MappingEngine()
     inputs = nullptr;
 }
 
-bool MappingEngine::addInput (const ControllerDevice& controller, MidiEngine& midi)
+bool MappingEngine::addInput (const Controller& controller, MidiEngine& midi)
 {
     if (inputs->containsInputFor (controller))
         return true;
@@ -611,7 +611,7 @@ bool MappingEngine::addInput (const ControllerDevice& controller, MidiEngine& mi
     return inputs->add (input.release());
 }
 
-bool MappingEngine::addHandler (const ControllerDevice::Control& control,
+bool MappingEngine::addHandler (const Control& control,
                                 const Node& node,
                                 const int parameter)
 {
@@ -622,7 +622,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
         return false;
     if (object->containsParameter (parameter))
     {
-        if (auto* input = inputs->findInput (control.getControllerDevice()))
+        if (auto* input = inputs->findInput (control.controller()))
         {
             const auto message (control.getMidiMessage());
             std::unique_ptr<ControllerMapHandler> handler;
@@ -642,14 +642,14 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
     return false;
 }
 
-bool MappingEngine::removeInput (const ControllerDevice& controller)
+bool MappingEngine::removeInput (const Controller& controller)
 {
     if (! inputs->containsInputFor (controller))
         return true;
     return inputs->remove (controller);
 }
 
-bool MappingEngine::refreshInput (const ControllerDevice& device)
+bool MappingEngine::refreshInput (const Controller& device)
 {
     if (! inputs)
         return false;
@@ -682,7 +682,7 @@ void MappingEngine::stopMapping()
 }
 
 bool MappingEngine::captureNextEvent (ControllerMapInput& input,
-                                      const ControllerDevice::Control& control,
+                                      const Control& control,
                                       const MidiMessage& message)
 {
     if (! capturedEvent.capture.get())

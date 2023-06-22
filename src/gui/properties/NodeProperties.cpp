@@ -179,7 +179,7 @@ public:
         : node (n)
     {
         setChannels (node.getMidiChannels().get());
-        getChannelsValue().referTo (node.getPropertyAsValue (Tags::midiChannels, false));
+        getChannelsValue().referTo (node.getPropertyAsValue (tags::midiChannels, false));
         changed.connect (std::bind (&NodeMidiChannelsPropertyComponent::onChannelsChanged, this));
     }
 
@@ -240,14 +240,14 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
 
     if (nodeProps)
     {
-        add (new TextPropertyComponent (node.getPropertyAsValue (Tags::name),
+        add (new TextPropertyComponent (node.getPropertyAsValue (tags::name),
                                         "Name",
                                         100,
                                         false,
                                         true));
         if (! node.isIONode())
             add (new MillisecondSliderPropertyComponent (
-                node.getPropertyAsValue (Tags::delayCompensation), "Delay comp."));
+                node.getPropertyAsValue (tags::delayCompensation), "Delay comp."));
     }
 
     if (midiProps)
@@ -259,13 +259,13 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
         add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
 
         // Key Start
-        add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyStart, false), "Key Start"));
+        add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyStart, false), "Key Start"));
 
         // Key End
-        add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyEnd, false), "Key End"));
+        add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyEnd, false), "Key End"));
 
         // Transpose
-        add (new SliderPropertyComponent (node.getPropertyAsValue (Tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
+        add (new SliderPropertyComponent (node.getPropertyAsValue (tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
     }
 }
 

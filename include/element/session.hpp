@@ -4,7 +4,7 @@
 #pragma once
 
 #include <element/model.hpp>
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 #include <element/node.hpp>
 #include <element/signals.hpp>
 
@@ -16,7 +16,7 @@ class Session;
 class Context;
 
 /** Session, the main interface between the engine and model layers */
-class Session : public ObjectModel,
+class Session : public Model,
                 public ReferenceCountedObject,
                 public ChangeBroadcaster,
                 public ValueTree::Listener {
@@ -40,7 +40,7 @@ public:
 
     virtual ~Session();
 
-    inline int getNumGraphs() const { return objectData.getChildWithName (Tags::graphs).getNumChildren(); }
+    inline int getNumGraphs() const { return objectData.getChildWithName (tags::graphs).getNumChildren(); }
     inline Node getGraph (const int index) const { return Node (getGraphValueTree (index), false); }
     Node getCurrentGraph() const { return getActiveGraph(); }
     Node getActiveGraph() const;
@@ -52,9 +52,9 @@ public:
     bool loadData (const ValueTree& data);
     void clear();
 
-    inline void setName (const String& name) { setProperty (Tags::name, name); }
-    inline String getName() const { return objectData.getProperty (Tags::name, "Invalid Session"); }
-    inline Value getNameValue() { return getPropertyAsValue (Tags::name); }
+    inline void setName (const String& name) { setProperty (tags::name, name); }
+    inline String getName() const { return objectData.getProperty (tags::name, "Invalid Session"); }
+    inline Value getNameValue() { return getPropertyAsValue (tags::name); }
 
     inline bool useExternalClock() const { return (bool) getProperty ("externalSync", false); }
 
@@ -65,30 +65,30 @@ public:
     void saveGraphState();
     void restoreGraphState();
 
-    inline int getNumControllerDevices() const { return getControllerDevicesValueTree().getNumChildren(); }
+    inline int getNumControllers() const { return getControllersValueTree().getNumChildren(); }
 
-    inline ValueTree getControllerDeviceValueTree (const int i) const
+    inline ValueTree getControllerValueTree (const int i) const
     {
-        return getControllerDevicesValueTree().getChild (i);
+        return getControllersValueTree().getChild (i);
     }
 
-    inline ControllerDevice getControllerDevice (const int index) const
+    inline Controller getController (const int index) const
     {
-        ControllerDevice device (getControllerDeviceValueTree (index));
+        Controller device (getControllerValueTree (index));
         return device;
     }
 
-    inline int indexOf (const ControllerDevice& device) const
+    inline int indexOf (const Controller& device) const
     {
-        return getControllerDevicesValueTree().indexOf (device.getValueTree());
+        return getControllersValueTree().indexOf (device.data());
     }
 
     inline int getNumControllerMaps() const { return getControllerMapsValueTree().getNumChildren(); }
     inline ControllerMap getControllerMap (const int index) const { return ControllerMap (getControllerMapsValueTree().getChild (index)); }
-    inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.getValueTree()); }
+    inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.data()); }
 
     Node findNodeById (const Uuid&);
-    ControllerDevice findControllerDeviceById (const Uuid&);
+    Controller findControllerById (const Uuid&);
 
     void cleanOrphanControllerMaps();
 
@@ -104,7 +104,7 @@ public:
 
     Value getActiveGraphIndexObject (bool syncUpdate = false) const
     {
-        return getGraphsValueTree().getPropertyAsValue (Tags::active, nullptr, syncUpdate);
+        return getGraphsValueTree().getPropertyAsValue (tags::active, nullptr, syncUpdate);
     }
 
 protected:
@@ -129,10 +129,10 @@ private:
     std::unique_ptr<Impl> impl;
     void setMissingProperties (bool resetExisting = false);
 
-    inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
+    inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (tags::graphs); }
     inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
-    inline ValueTree getControllerDevicesValueTree() const { return objectData.getChildWithName (Tags::controllers); }
-    inline ValueTree getControllerMapsValueTree() const { return objectData.getChildWithName (Tags::maps); }
+    inline ValueTree getControllersValueTree() const { return objectData.getChildWithName (tags::controllers); }
+    inline ValueTree getControllerMapsValueTree() const { return objectData.getChildWithName (tags::maps); }
 
     friend class SessionService;
     friend class SessionImportWizard;
@@ -143,10 +143,10 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Session);
 
 public:
-    Signal<void (const ControllerDevice&)> controllerDeviceAdded;
-    Signal<void (const ControllerDevice&)> controllerDeviceRemoved;
-    Signal<void (const ControllerDevice::Control&)> controlAdded;
-    Signal<void (const ControllerDevice::Control&)> controlRemoved;
+    Signal<void (const Controller&)> controllerDeviceAdded;
+    Signal<void (const Controller&)> controllerDeviceRemoved;
+    Signal<void (const Control&)> controlAdded;
+    Signal<void (const Control&)> controlRemoved;
 };
 
 typedef ReferenceCountedObjectPtr<Session> SessionPtr;
@@ -158,9 +158,9 @@ struct ControllerMapObjects {
         : session (s), controllerMap (m)
     {
         if (session != nullptr) {
-            device = session->findControllerDeviceById (Uuid (controllerMap.getProperty (Tags::controller)));
-            control = device.findControlById (Uuid (controllerMap.getProperty (Tags::control)));
-            node = session->findNodeById (Uuid (controllerMap.getProperty (Tags::node)));
+            device = session->findControllerById (Uuid (controllerMap.getProperty (tags::controller)));
+            control = device.findControlById (Uuid (controllerMap.getProperty (tags::control)));
+            node = session->findNodeById (Uuid (controllerMap.getProperty (tags::node)));
         }
     }
 
@@ -182,7 +182,7 @@ struct ControllerMapObjects {
     SessionPtr session;
     ControllerMap controllerMap;
     Node node;
-    ControllerDevice device;
-    ControllerDevice::Control control;
+    Controller device;
+    Control control;
 };
 } // namespace element

@@ -120,7 +120,7 @@ public:
     void setSession (SessionPtr s)
     {
         session = s;
-        auto& settings (ViewHelpers::getGlobals (this)->getSettings());
+        auto& settings (ViewHelpers::getGlobals (this)->settings());
         auto engine (ViewHelpers::getGlobals (this)->audio());
 
         if (midiIOMonitor == nullptr)
@@ -149,8 +149,8 @@ public:
         if (session)
         {
             tempoBar.setUseExtButton (showExt);
-            tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
-            tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue (Tags::externalSync));
+            tempoBar.getTempoValue().referTo (session->getPropertyAsValue (tags::tempo));
+            tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue (tags::externalSync));
             tempoBar.stabilizeWithSession (false);
         }
 
@@ -233,8 +233,8 @@ public:
         else if (btn == &menuBtn)
         {
             PopupMenu menu;
-            if (auto* cc = ViewHelpers::findContentComponent (this))
-                MainMenu::buildPluginMainMenu (cc->context().getCommandManager(), menu);
+            if (auto* cc = ViewHelpers::getGuiController (this))
+                MainMenu::buildPluginMainMenu (cc->commands(), menu);
             auto result = menu.show();
             if (99999 == result)
             {
@@ -559,7 +559,7 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
         else if (file.hasFileExtension ("elpreset"))
         {
             const auto data = Node::parse (file);
-            if (data.hasType (Tags::node))
+            if (data.hasType (tags::node))
             {
                 const Node node (data, false);
                 this->post (new AddNodeMessage (node));

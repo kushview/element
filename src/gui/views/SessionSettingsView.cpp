@@ -49,16 +49,16 @@ private:
     SessionPtr session;
     static void getSessionProperties (PropertyArray& props, SessionPtr s)
     {
-        props.add (new TextPropertyComponent (s->getPropertyAsValue (Tags::name),
+        props.add (new TextPropertyComponent (s->getPropertyAsValue (tags::name),
                                               "Name",
                                               256,
                                               false));
-        props.add (new SliderPropertyComponent (s->getPropertyAsValue (Tags::tempo),
+        props.add (new SliderPropertyComponent (s->getPropertyAsValue (tags::tempo),
                                                 "Tempo",
                                                 EL_TEMPO_MIN,
                                                 EL_TEMPO_MAX,
                                                 1));
-        props.add (new TextPropertyComponent (s->getPropertyAsValue (Tags::notes),
+        props.add (new TextPropertyComponent (s->getPropertyAsValue (tags::notes),
                                               "Notes",
                                               512,
                                               true));
@@ -73,8 +73,9 @@ SessionContentView::SessionContentView()
     addAndMakeVisible (graphButton);
     graphButton.setTooltip ("Show graph editor");
     graphButton.onClick = [this]() {
-        if (auto* g = ViewHelpers::getGlobals (this))
-            g->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
+        // FIXME: Commands
+        // if (auto* g = ViewHelpers::getGlobals (this))
+        //     g->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
     };
 }
 

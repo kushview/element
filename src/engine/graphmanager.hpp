@@ -41,7 +41,7 @@ public:
     GraphNode& getGraph() noexcept { return processor; }
 
     /** Returns true if controlling the given graph model */
-    bool isManaging (const Node& model) const { return graph == model.getValueTree(); }
+    bool isManaging (const Node& model) const { return graph == model.data(); }
 
     /** Returns the number of nodes on the controlled graph */
     int getNumNodes() const noexcept;

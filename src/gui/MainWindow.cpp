@@ -34,14 +34,16 @@ MainWindow::MainWindow (Context& g)
     : DocumentWindow (Util::appName(), Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
-    auto _mainMenu = new MainMenu (*this, g.getCommandManager());
+    auto& gui = *g.services().find<GuiService>();
+
+    auto _mainMenu = new MainMenu (*this, gui.commands());
     mainMenu.reset (_mainMenu);
     _mainMenu->setupMenu();
 
     nameChanged();
 
     g.session()->addChangeListener (this);
-    addKeyListener (g.getCommandManager().getKeyMappings());
+    addKeyListener (gui.commands().getKeyMappings());
     setUsingNativeTitleBar (true);
     setResizable (true, false);
 }
@@ -136,8 +138,9 @@ void MainWindow::closeButtonPressed()
 
 void MainWindow::minimiseButtonPressed()
 {
-    if (world.getSettings().isSystrayEnabled())
-        world.getCommandManager().invokeDirectly (Commands::toggleUserInterface, true);
+    auto& gui = *world.services().find<GuiService>();
+    if (world.settings().isSystrayEnabled())
+        gui.commands().invokeDirectly (Commands::toggleUserInterface, true);
     else
         DocumentWindow::minimiseButtonPressed();
 }

@@ -245,7 +245,7 @@ public:
         const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
-        const String format = node.getProperty (Tags::format).toString();
+        const String format = node.getProperty (tags::format).toString();
         addItemInternal (menu, "Add Preset", new AddPresetOp (node));
         addItemInternal (menu, "Save as default...", new SaveDefaultNodeOp (node));
         addItemInternal (menu, "Reset default...", new ResetDefaultNodeOp (node));
@@ -265,9 +265,9 @@ public:
             menu.addSubMenu ("Native Presets", native);
         }
 
-        auto identifier = node.getProperty (Tags::identifier).toString();
+        auto identifier = node.getProperty (tags::identifier).toString();
         if (identifier.isEmpty())
-            identifier = node.getProperty (Tags::file);
+            identifier = node.getProperty (tags::file);
 
         presetItems.clear();
         collection.getPresetsFor (node, presetItems);
@@ -322,19 +322,19 @@ public:
             if (auto* const item = presetItems[index])
             {
                 const auto data = Node::parse (item->file);
-                if (n.isValid() && data.isValid() && data.hasProperty (Tags::state))
+                if (n.isValid() && data.isValid() && data.hasProperty (tags::state))
                 {
-                    const String state = data.getProperty (Tags::state).toString();
-                    n.getValueTree().setProperty (Tags::state, state, 0);
-                    if (data.hasProperty (Tags::programState))
-                        n.getValueTree().setProperty (Tags::programState, data.getProperty (Tags::programState), 0);
+                    const String state = data.getProperty (tags::state).toString();
+                    n.data().setProperty (tags::state, state, 0);
+                    if (data.hasProperty (tags::programState))
+                        n.data().setProperty (tags::programState, data.getProperty (tags::programState), 0);
                     n.restorePluginState();
                 }
 
-                if (n.isValid() && data.isValid() && data.hasProperty (Tags::name))
+                if (n.isValid() && data.isValid() && data.hasProperty (tags::name))
                 {
-                    if (data[Tags::name].toString().isNotEmpty())
-                        n.setProperty (Tags::name, data[Tags::name]);
+                    if (data[tags::name].toString().isNotEmpty())
+                        n.setProperty (tags::name, data[tags::name]);
                 }
             }
         }
@@ -421,8 +421,8 @@ private:
             if (NodeObjectPtr ptr = node.getObject())
             {
                 ptr->setEnabled (! ptr->isEnabled());
-                auto data = node.getValueTree();
-                data.setProperty (Tags::enabled, ptr->isEnabled(), nullptr);
+                auto data = node.data();
+                data.setProperty (tags::enabled, ptr->isEnabled(), nullptr);
                 return true;
             }
 
@@ -485,7 +485,7 @@ private:
         bool perform() override
         {
             String subpath = "nodes/";
-            subpath << node.getProperty (Tags::pluginIdentifierString).toString()
+            subpath << node.getProperty (tags::pluginIdentifierString).toString()
                     << "/default.eln";
             auto file = DataPath::applicationDataDir().getChildFile (subpath);
             if (file.existsAsFile())
@@ -503,7 +503,7 @@ private:
         bool perform() override
         {
 #if JUCE_PLUGINHOST_VST
-            const auto format = node.getProperty (Tags::format).toString();
+            const auto format = node.getProperty (tags::format).toString();
             if (format != "VST")
                 return false;
 
@@ -582,7 +582,7 @@ private:
             {
                 if (auto* const ed = win.getTextEditor ("name"))
                     if (ed->getText().isNotEmpty())
-                        node.setProperty (Tags::name, ed->getText());
+                        node.setProperty (tags::name, ed->getText());
             }
 
             return true;

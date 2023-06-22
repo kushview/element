@@ -117,7 +117,7 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override
     {
-        ValueTree state (Tags::state);
+        ValueTree state (tags::state);
         state.setProperty ("roomSize", (float) *roomSize, nullptr);
         state.setProperty ("damping", (float) *damping, nullptr);
         state.setProperty ("wetLevel", (float) *wetLevel, nullptr);

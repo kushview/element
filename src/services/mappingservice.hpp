@@ -19,7 +19,7 @@
 
 #include <element/services.hpp>
 #include <element/nodeobject.hpp>
-#include <element/controllerdevice.hpp>
+#include <element/controller.hpp>
 #include <element/signals.hpp>
 
 namespace element {

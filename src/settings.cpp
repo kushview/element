@@ -149,8 +149,8 @@ std::unique_ptr<XmlElement> Settings::getLastGraph() const
 
 void Settings::setLastGraph (const ValueTree& data)
 {
-    jassert (data.hasType (Tags::node));
-    if (! data.hasType (Tags::node))
+    jassert (data.hasType (tags::node));
+    if (! data.hasType (tags::node))
         return;
     if (auto* p = getProps())
         if (auto xml = data.createXml())

@@ -129,8 +129,8 @@ SessionPtr getSession (Component* c)
 
 bool invokeDirectly (Component* c, const int commandID, bool async)
 {
-    if (auto* g = getGlobals (c))
-        return g->getCommandManager().invokeDirectly (commandID, async);
+    if (auto* g = getGuiController (c))
+        return g->commands().invokeDirectly (commandID, async);
     return false;
 }
 

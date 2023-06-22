@@ -24,12 +24,12 @@ namespace element {
 
 static void setMissingNodeProperties (const ValueTree& tree)
 {
-    if (tree.hasType (Tags::node))
+    if (tree.hasType (tags::node))
     {
         const Node node (tree, true);
         ignoreUnused (node);
     }
-    else if (tree.hasType (Tags::controller) || tree.hasType (Tags::control))
+    else if (tree.hasType (tags::controller) || tree.hasType (tags::control))
     {
         // noop
     }

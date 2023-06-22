@@ -83,14 +83,14 @@ public:
 
     inline int getIndex() const override
     {
-        const String slug = graph.getProperty (Tags::renderMode, "single").toString();
+        const String slug = graph.getProperty (tags::renderMode, "single").toString();
         return (slug == "single") ? 0 : 1;
     }
 
     inline void setIndex (const int index) override
     {
         RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
-        graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
+        graph.setProperty (tags::renderMode, RootGraph::getSlugForRenderMode (mode));
         if (auto* root = dynamic_cast<RootGraph*> (graph.getObject()))
             root->setRenderMode (mode);
 
@@ -157,7 +157,7 @@ public:
                 if (auto* proc = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
                 {
                     proc->setMidiChannels (getChannels());
-                    graph.setProperty (Tags::midiChannels, getChannels().toMemoryBlock());
+                    graph.setProperty (tags::midiChannels, getChannels().toMemoryBlock());
                 }
     }
 
@@ -172,13 +172,13 @@ public:
           node (n)
     {
         jassert (node.isRootGraph());
-        midiChannel = node.getProperty (Tags::midiChannel, 0);
+        midiChannel = node.getProperty (tags::midiChannel, 0);
     }
 
     void midiChannelChanged() override
     {
         auto session = ViewHelpers::getSession (this);
-        node.setProperty (Tags::midiChannel, getMidiChannel());
+        node.setProperty (tags::midiChannel, getMidiChannel());
         if (NodeObjectPtr ptr = node.getObject())
             if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                 root->setMidiChannel (getMidiChannel());
@@ -211,7 +211,7 @@ public:
         // needed to ensure proper display when first loaded
         slider.updateText();
 
-        programValue = node.getPropertyAsValue (Tags::midiProgram);
+        programValue = node.getPropertyAsValue (tags::midiProgram);
         programValue.addListener (this);
     }
 
@@ -231,7 +231,7 @@ public:
 
     double getValue() const override
     {
-        return (double) node.getProperty (Tags::midiProgram, -1);
+        return (double) node.getProperty (tags::midiProgram, -1);
     }
 
 private:
@@ -254,7 +254,7 @@ public:
           textWithButton (*this)
     {
         node = n;
-        keyMapValue = node.getPropertyAsValue (Tags::keyMap);
+        keyMapValue = node.getPropertyAsValue (tags::keyMap);
         keyMapValue.addListener (this);
         addAndMakeVisible (textWithButton);
         valueChanged (keyMapValue);
@@ -391,7 +391,7 @@ private:
 
     void getSessionProperties (PropertyArray& props, Node g)
     {
-        props.add (new TextPropertyComponent (g.getPropertyAsValue (Tags::name),
+        props.add (new TextPropertyComponent (g.getPropertyAsValue (tags::name),
                                               TRANS ("Name"),
                                               256,
                                               false));
@@ -401,7 +401,7 @@ private:
         props.add (new RootGraphMidiChannels (g, getWidth() - 100));
         props.add (new MidiProgramPropertyComponent (g));
         props.add (new KeyMapPropertyComponent (g));
-        // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
+        // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (tags::persistent),
         //                                          TRANS("Persistent"),
         //                                          TRANS("Don't unload when deactivated")));
     }
@@ -469,9 +469,10 @@ void GraphSettingsView::resized()
 
 void GraphSettingsView::buttonClicked (Button* button)
 {
-    if (button == &graphButton)
-        if (auto* const world = ViewHelpers::getGlobals (this))
-            world->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
+    // FIXME: Commands
+    // if (button == &graphButton)
+    //     if (auto* const world = ViewHelpers::getGlobals (this))
+    //         world->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
 }
 
 void GraphSettingsView::setUpdateOnActiveGraphChange (bool shouldUpdate)

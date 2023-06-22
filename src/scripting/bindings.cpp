@@ -66,7 +66,7 @@ extern int luaopen_el_Range (lua_State*);
 extern int luaopen_el_Rectangle (lua_State*);
 extern int luaopen_el_Slider (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
-extern int luaopen_el_CommandManager (lua_State*);
+extern int luaopen_el_Commands (lua_State*);
 extern int luaopen_el_Context (lua_State*);
 extern int luaopen_el_Node (lua_State*);
 extern int luaopen_el_Session (lua_State*);
@@ -279,9 +279,9 @@ static int searchInternalModules (lua_State* L)
         sol::stack::push (L, load_el_slug);
     }
 
-    else if (mod == "el.CommandManager")
+    else if (mod == "el.Commands")
     {
-        sol::stack::push (L, luaopen_el_CommandManager);
+        sol::stack::push (L, luaopen_el_Commands);
     }
     else if (mod == "el.Context")
     {

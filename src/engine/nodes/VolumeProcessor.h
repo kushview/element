@@ -39,7 +39,7 @@ public:
                              .withOutput ("Main", _stereo ? AudioChannelSet::stereo() : AudioChannelSet::mono(), true)),
           stereo (_stereo)
     {
-        addLegacyParameter (volume = new AudioParameterFloat (Tags::volume.toString(),
+        addLegacyParameter (volume = new AudioParameterFloat (tags::volume.toString(),
                                                               "Volume",
                                                               minDb,
                                                               maxDb,
@@ -112,8 +112,8 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override
     {
-        ValueTree state (Tags::state);
-        state.setProperty (Tags::volume, (float) *volume, 0);
+        ValueTree state (tags::state);
+        state.setProperty (tags::volume, (float) *volume, 0);
         if (auto e = state.createXml())
             AudioProcessor::copyXmlToBinary (*e, destData);
     }
@@ -125,7 +125,7 @@ public:
             auto state = ValueTree::fromXml (*e);
             if (state.isValid())
             {
-                *volume = lastVolume = (float) state.getProperty (Tags::volume, (float) *volume);
+                *volume = lastVolume = (float) state.getProperty (tags::volume, (float) *volume);
                 gain = lastGain = Decibels::decibelsToGain ((float) *volume);
             }
         }

@@ -105,19 +105,20 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     auto* window = getMainWindow();
     if (! window)
         return;
-    auto* const cmd = &window->context().getCommandManager();
+    // FIXME: Commands
+    // auto* const cmd = &window->getComm .getCommandManager();
 
     if (mouseUpAction == ShowMenu)
     {
-        PopupMenu menu;
-        menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
-        menu.addSeparator();
-        menu.addCommandItem (cmd, Commands::quit, "Exit");
-#if JUCE_MAC
-        showDropdownMenu (menu);
-#else
-        menu.show();
-#endif
+        //         PopupMenu menu;
+        //         menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+        //         menu.addSeparator();
+        //         menu.addCommandItem (cmd, Commands::quit, "Exit");
+        // #if JUCE_MAC
+        //         showDropdownMenu (menu);
+        // #else
+        //         menu.show();
+        // #endif
     }
     else
     {
@@ -135,17 +136,18 @@ void SystemTray::runMenu()
     auto* window = getMainWindow();
     if (! window)
         return;
-    auto* const cmd = &window->context().getCommandManager();
+    // FIXME: Commands
+    // auto* const cmd = &window->context().getCommandManager();
 
-    PopupMenu menu;
-    menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
-    menu.addSeparator();
-    menu.addCommandItem (cmd, Commands::quit, "Exit");
-#if JUCE_MAC
-    showDropdownMenu (menu);
-#else
-    menu.show();
-#endif
+    // PopupMenu menu;
+    // menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+    // menu.addSeparator();
+    // menu.addCommandItem (cmd, Commands::quit, "Exit");
+    // #if JUCE_MAC
+    //     showDropdownMenu (menu);
+    // #else
+    //     menu.show();
+    // #endif
 }
 
 void SystemTray::mouseDown (const MouseEvent& ev)

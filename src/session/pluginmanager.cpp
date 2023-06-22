@@ -979,14 +979,14 @@ PluginDescription PluginManager::findDescriptionFor (const Node& node) const
 {
     PluginDescription desc;
 
-    const String identifierString (node.getProperty (Tags::pluginIdentifierString).toString());
+    const String identifierString (node.getProperty (tags::pluginIdentifierString).toString());
     bool wasFound = false;
 
     if (identifierString.isNotEmpty())
     {
         // fastest, find by identifer string in known plugins
         if (const auto type = getKnownPlugins().getTypeForIdentifierString (
-                node.getProperty (Tags::pluginIdentifierString).toString()))
+                node.getProperty (tags::pluginIdentifierString).toString()))
         {
             desc = *type;
             wasFound = true;
@@ -1037,7 +1037,7 @@ Node PluginManager::getDefaultNode (const PluginDescription& desc) const
     auto data = Node::parse (file);
     auto node = Node (Node::resetIds (data), false);
     Node::sanitizeProperties (data);
-    data.removeProperty (Tags::name, nullptr);
+    data.removeProperty (tags::name, nullptr);
     return node;
 }
 

@@ -55,7 +55,7 @@ void DeviceService::deactivate()
     Service::deactivate();
 }
 
-void DeviceService::add (const ControllerDevice& device)
+void DeviceService::add (const Controller& device)
 {
     auto& mapping (context().mapping());
     auto& midi (context().midi());
@@ -65,21 +65,21 @@ void DeviceService::add (const ControllerDevice& device)
     auto session = context().session();
     if (! session)
         return;
-    auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
-    if (controllers.indexOf (device.getValueTree()) < 0)
+    auto controllers = session->data().getChildWithName (tags::controllers);
+    if (controllers.indexOf (device.data()) < 0)
     {
-        controllers.addChild (device.getValueTree(), -1, nullptr);
+        controllers.addChild (device.data(), -1, nullptr);
         refresh (device);
     }
 }
 
-void DeviceService::add (const ControllerDevice& device, const ControllerDevice::Control& control)
+void DeviceService::add (const Controller& device, const Control& control)
 {
     auto session = context().session();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) < 0)
     {
-        auto data = device.getValueTree();
-        data.addChild (control.getValueTree(), -1, nullptr);
+        auto data = device.data();
+        data.addChild (control.data(), -1, nullptr);
         refresh (device);
     }
     else
@@ -94,16 +94,16 @@ void DeviceService::add (const File& file)
     if (auto xml = XmlDocument::parse (file))
         data = ValueTree::fromXml (*xml);
 
-    if (data.isValid() && data.hasType (Tags::controller))
+    if (data.isValid() && data.hasType (tags::controller))
     {
         // Avoid UUID conflicts by replacing all
-        data.setProperty (Tags::uuid, Uuid().toString(), 0);
+        data.setProperty (tags::uuid, Uuid().toString(), 0);
         for (int i = 0; i < data.getNumChildren(); ++i)
-            data.getChild (i).setProperty (Tags::uuid, Uuid().toString(), 0);
+            data.getChild (i).setProperty (tags::uuid, Uuid().toString(), 0);
 
         if (auto s = context().session())
         {
-            s->getValueTree().getChildWithName (Tags::controllers).addChild (data, -1, 0);
+            s->data().getChildWithName (tags::controllers).addChild (data, -1, 0);
             refresh();
         }
     }
@@ -113,22 +113,22 @@ void DeviceService::add (const File& file)
     }
 }
 
-void DeviceService::remove (const ControllerDevice& device)
+void DeviceService::remove (const Controller& device)
 {
     auto& mapping (context().mapping());
     if (! mapping.removeInput (device))
         return;
     if (auto session = context().session())
-        session->getValueTree().getChildWithName (Tags::controllers).removeChild (device.getValueTree(), nullptr);
+        session->data().getChildWithName (tags::controllers).removeChild (device.data(), nullptr);
 }
 
-void DeviceService::remove (const ControllerDevice& device, const ControllerDevice::Control& control)
+void DeviceService::remove (const Controller& device, const Control& control)
 {
     auto session = context().session();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) >= 0)
     {
-        auto data = device.getValueTree();
-        data.removeChild (control.getValueTree(), nullptr);
+        auto data = device.data();
+        data.removeChild (control.data(), nullptr);
         refresh (device);
     }
     else
@@ -137,7 +137,7 @@ void DeviceService::remove (const ControllerDevice& device, const ControllerDevi
     }
 }
 
-void DeviceService::refresh (const ControllerDevice& device)
+void DeviceService::refresh (const Controller& device)
 {
     refresh();
     return;
@@ -169,18 +169,18 @@ void DeviceService::refresh()
     auto session = context().session();
     mapping.clear();
 
-    for (int i = 0; i < session->getNumControllerDevices(); ++i)
-        mapping.addInput (session->getControllerDevice (i), midi);
+    for (int i = 0; i < session->getNumControllers(); ++i)
+        mapping.addInput (session->getController (i), midi);
 
     for (int i = 0; i < session->getNumControllerMaps(); ++i)
     {
         const auto child (session->getControllerMap (i));
         const int parameter = child.getParameterIndex();
-        Node node = session->findNodeById (Uuid (child.getProperty (Tags::node).toString()));
-        ControllerDevice device = session->findControllerDeviceById (
-            Uuid (child.getProperty (Tags::controller).toString()));
-        ControllerDevice::Control control = device.findControlById (
-            Uuid (child.getProperty (Tags::control).toString()));
+        Node node = session->findNodeById (Uuid (child.getProperty (tags::node).toString()));
+        Controller device = session->findControllerById (
+            Uuid (child.getProperty (tags::controller).toString()));
+        Control control = device.findControlById (
+            Uuid (child.getProperty (tags::control).toString()));
 
         if (mapping.addHandler (control, node, parameter))
         {

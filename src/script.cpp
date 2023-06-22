@@ -155,9 +155,9 @@ Script& Script::operator= (const Script& o)
 
 void Script::setName (const String& newName)
 {
-    setProperty (Tags::name, newName);
+    setProperty (tags::name, newName);
 }
-String Script::name() const noexcept { return getProperty (Tags::name); }
+String Script::name() const noexcept { return getProperty (tags::name); }
 
 juce::String Script::code() const noexcept { return gzip::decode (getProperty (tags::code).toString()); }
 void Script::setCode (const String& newCode) { setProperty (tags::code, gzip::encode (newCode)); }
@@ -197,7 +197,7 @@ Script Script::make (const juce::String& name, const juce::Identifier& type)
     // clang-format on
     Script script (buffer);
     script.setName (name);
-    script.getValueTree().setProperty (tags::type, type.toString(), nullptr);
+    script.data().setProperty (tags::type, type.toString(), nullptr);
     return script;
 }
 

@@ -37,7 +37,7 @@ public:
     void stabilizeContent() override;
     void willBeRemoved() override;
 
-    ValueTree getSettings() const;
+    ValueTree settings() const;
     void saveSettings();
     void restoreSettings();
 

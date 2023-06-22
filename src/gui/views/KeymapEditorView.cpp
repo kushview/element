@@ -29,9 +29,20 @@ class KeymapEditor : public KeyMappingEditorComponent
 public:
     KeymapEditor (KeyPressMappingSet& s) : KeyMappingEditorComponent (s, true)
     {
-        disallow.addArray ({ Commands::exportAudio, Commands::exportMidi, Commands::mediaClose, Commands::mediaNew, Commands::mediaOpen, Commands::mediaSave, Commands::mediaSaveAs, Commands::sessionInsertPlugin, Commands::signIn, Commands::signOut, Commands::workspaceClassic, Commands::workspaceEditing, Commands::workspaceOpen, Commands::workspaceResetActive, Commands::workspaceSave, Commands::workspaceSaveActive });
+        disallow.addArray ({ Commands::exportAudio,
+                             Commands::exportMidi,
+                             Commands::sessionInsertPlugin,
+                             Commands::workspaceClassic,
+                             Commands::workspaceEditing,
+                             Commands::workspaceOpen,
+                             Commands::workspaceResetActive,
+                             Commands::workspaceSave,
+                             Commands::workspaceSaveActive });
 
-        readOnly.addArray ({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
+        readOnly.addArray ({ Commands::copy,
+                             Commands::paste,
+                             Commands::undo,
+                             Commands::redo });
     }
 
     ~KeymapEditor() {}
@@ -79,8 +90,9 @@ void KeymapEditorView::stabilizeContent()
     editor = nullptr;
     if (auto* const cc = ViewHelpers::findContentComponent (this))
     {
-        auto* const mapping = cc->context().getCommandManager().getKeyMappings();
-        addAndMakeVisible (editor = new KeymapEditor (*mapping));
+        // FIXME: KeyMappings
+        // auto* const mapping = cc->context().getCommandManager().getKeyMappings();
+        // addAndMakeVisible (editor = new KeymapEditor (*mapping));
     }
     resized();
 }
@@ -100,11 +112,12 @@ void KeymapEditorView::resized()
 
 void KeymapEditorView::saveMappings()
 {
-    if (auto* const cc = ViewHelpers::findContentComponent (this))
-        if (auto* const mapping = cc->context().getCommandManager().getKeyMappings())
-            if (auto xml = mapping->createXml (false))
-                cc->context().getSettings().getUserSettings()->setValue (
-                    "keymappings", xml.get());
+    // FIXME: KeyMappings
+    // if (auto* const cc = ViewHelpers::findContentComponent (this))
+    //     if (auto* const mapping = cc->context().getCommandManager().getKeyMappings())
+    //         if (auto xml = mapping->createXml (false))
+    //             cc->context().settings().getUserSettings()->setValue (
+    //                 "keymappings", xml.get());
 }
 
 } // namespace element

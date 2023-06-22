@@ -387,8 +387,8 @@ static void saveSettings (Component* c, const bool saveUserPlugins = true)
     if (auto* g = ViewHelpers::getGlobals (c))
     {
         if (saveUserPlugins)
-            g->plugins().saveUserPlugins (g->getSettings());
-        g->getSettings().saveIfNeeded();
+            g->plugins().saveUserPlugins (g->settings());
+        g->settings().saveIfNeeded();
     }
 }
 
@@ -503,8 +503,8 @@ void PluginListComponent::buttonClicked (Button* button)
         {
             if (auto* world = ViewHelpers::getGlobals (this))
             {
-                world->getSettings().getUserSettings()->reload();
-                plugins.restoreUserPlugins (world->getSettings());
+                world->settings().getUserSettings()->reload();
+                plugins.restoreUserPlugins (world->settings());
             }
         }
     }
@@ -823,7 +823,7 @@ void PluginListComponent::scanAll()
     else
     {
         if (auto* world = ViewHelpers::getGlobals (this))
-            plugins.saveUserPlugins (world->getSettings());
+            plugins.saveUserPlugins (world->settings());
         currentScanner = new Scanner (*this, plugins, scanAllFormats (plugins), TRANS ("Scanning for plug-ins..."), TRANS ("Searching for all possible plug-in files..."));
     }
 }
@@ -845,7 +845,7 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
     else
     {
         if (auto* world = ViewHelpers::getGlobals (this))
-            plugins.saveUserPlugins (world->getSettings());
+            plugins.saveUserPlugins (world->settings());
         currentScanner = new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() ? dialogText : TRANS ("Searching for all possible plug-in files..."));
     }
 }
@@ -858,7 +858,7 @@ bool PluginListComponent::isScanning() const noexcept
 void PluginListComponent::saveListToSettings()
 {
     if (auto* world = ViewHelpers::getGlobals (this))
-        plugins.saveUserPlugins (world->getSettings());
+        plugins.saveUserPlugins (world->settings());
 }
 
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
@@ -892,10 +892,10 @@ PluginManagerContentView::PluginManagerContentView()
 
 PluginManagerContentView::~PluginManagerContentView() {}
 
-Settings* PluginManagerContentView::getSettings()
+Settings* PluginManagerContentView::settings()
 {
     if (auto world = ViewHelpers::getGlobals (this))
-        return &world->getSettings();
+        return &world->settings();
     return nullptr;
 }
 
@@ -904,7 +904,7 @@ void PluginManagerContentView::didBecomeActive()
     jassert (ViewHelpers::getGlobals (this));
     auto& world (*ViewHelpers::getGlobals (this));
     auto& plugins (world.plugins());
-    auto& settings (world.getSettings());
+    auto& settings (world.settings());
 
     if (pluginList)
         pluginList.reset();
@@ -933,8 +933,8 @@ void PluginManagerContentView::saveSettings()
     if (nullptr == pluginList)
         return;
     auto& header = pluginList->getTableListBox().getHeader();
-    if (auto settings = getSettings())
-        if (auto props = settings->getUserSettings())
+    if (auto s = settings())
+        if (auto props = s->getUserSettings())
             props->setValue (Settings::pluginListHeaderKey, header.toString());
 }
 
@@ -943,8 +943,8 @@ void PluginManagerContentView::restoreSettings()
     if (nullptr == pluginList)
         return;
     auto& header = pluginList->getTableListBox().getHeader();
-    if (auto settings = getSettings())
-        if (auto props = settings->getUserSettings())
+    if (auto s = settings())
+        if (auto props = s->getUserSettings())
             header.restoreFromString (props->getValue (Settings::pluginListHeaderKey));
 }
 

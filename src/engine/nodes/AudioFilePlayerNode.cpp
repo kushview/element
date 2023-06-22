@@ -547,7 +547,7 @@ AudioProcessorEditor* AudioFilePlayerNode::createEditor()
 
 void AudioFilePlayerNode::getStateInformation (juce::MemoryBlock& destData)
 {
-    ValueTree state (Tags::state);
+    ValueTree state (tags::state);
     state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
         .setProperty ("playing", (bool) *playing, nullptr)
         .setProperty ("slave", (bool) *slave, nullptr)

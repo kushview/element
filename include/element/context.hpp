@@ -11,7 +11,7 @@
 namespace element {
 
 class Services;
-class CommandManager;
+class Commands;
 class DeviceManager;
 class MappingEngine;
 class MidiEngine;
@@ -26,7 +26,6 @@ public:
     explicit Context (const juce::String& commandLine = juce::String());
     virtual ~Context();
 
-    Settings& getSettings();
     Log& logger();
     Services& services();
     AudioEnginePtr audio() const;
@@ -38,8 +37,8 @@ public:
     PresetManager& presets();
     ScriptingEngine& scripting();
     SessionPtr session();
-    CommandManager& getCommandManager();
-    const std::string& getAppName() const { return appName; }
+
+    Settings& settings();
 
     //=========================================================================
     void openModule (const std::string& path);
@@ -49,7 +48,6 @@ public:
 
 private:
     friend class Application;
-    std::string appName;
     class Impl;
     std::unique_ptr<Impl> impl;
 };
