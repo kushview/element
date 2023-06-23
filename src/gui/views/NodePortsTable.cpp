@@ -1,7 +1,7 @@
 
 #include "gui/views/NodePortsTable.h"
 #include "gui/ViewHelpers.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 

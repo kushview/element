@@ -18,10 +18,10 @@
 */
 
 #include "gui/widgets/LuaConsole.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/ViewHelpers.h"
 #include "scripting/bindings.hpp"
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 
 #include "sol/sol.hpp"
 

@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include <element/context.hpp>
 #include <element/controller.hpp>
 
@@ -111,7 +111,7 @@ public:
         const auto device (objects->device);
         const auto control (objects->control);
         const auto node (objects->node);
-        g.setColour (objects->isValid() ? LookAndFeel::textColor : Colours::red);
+        g.setColour (objects->isValid() ? Colors::textColor : Colours::red);
 
         String text = "N/A";
         switch (columnId)
@@ -135,9 +135,9 @@ public:
                 text = "Parameter ";
                 text << mapp.getParameterIndex();
 
-                if (NodeObject::isSpecialParameter (mapp.getParameterIndex()))
+                if (Processor::isSpecialParameter (mapp.getParameterIndex()))
                 {
-                    text = NodeObject::getSpecialParameterName (mapp.getParameterIndex());
+                    text = Processor::getSpecialParameterName (mapp.getParameterIndex());
                 }
                 else if (auto* obj = node.getObject())
                 {
@@ -445,7 +445,7 @@ private:
         ControllerRow (ControlListBox& l) : list (l)
         {
             status.setJustificationType (Justification::centredRight);
-            status.setColour (Label::textColourId, element::LookAndFeel::textColor.darker());
+            status.setColour (Label::textColourId, element::Colors::textColor.darker());
             status.setInterceptsMouseClicks (false, false);
             addAndMakeVisible (status);
         }

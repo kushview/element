@@ -24,7 +24,10 @@ class EL_API Model {
 public:
     explicit Model (const juce::ValueTree& data = juce::ValueTree());
     Model (const juce::Identifier& slugId);
+    Model (const juce::Identifier& slugId, int dataVersion);
     virtual ~Model() {}
+
+    int version() const noexcept;
 
     /** Get a property from the underlying juce::ValueTree */
     inline juce::var getProperty (const juce::Identifier& id, const juce::var& d = juce::var()) const

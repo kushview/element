@@ -21,14 +21,14 @@
 #pragma once
 
 #include "engine/nodes/ScriptNode.h"
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 #include "gui/widgets/LuaConsole.h"
 #include "gui/LuaTokeniser.h"
 
 namespace element {
 
 class ScriptingEngine;
-class ScriptNodeEditor : public NodeEditorComponent,
+class ScriptNodeEditor : public NodeEditor,
                          public ChangeListener
 {
 public:

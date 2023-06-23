@@ -18,8 +18,8 @@
 */
 
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
-#include "gui/LookAndFeel.h"
+#include <element/ui.hpp>
+#include <element/ui/style.hpp>
 #include "gui/properties/NodeProperties.h"
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/ViewHelpers.h"
@@ -45,7 +45,7 @@ NodeMidiContentView::~NodeMidiContentView()
 
 void NodeMidiContentView::paint (Graphics& g)
 {
-    g.fillAll (element::LookAndFeel::backgroundColor);
+    g.fillAll (element::Colors::backgroundColor);
 }
 
 void NodeMidiContentView::resized()
@@ -73,7 +73,7 @@ void NodeMidiContentView::stabilizeContent()
         setEnabled (true);
         updateProperties();
 
-        if (NodeObjectPtr ptr = node.getObject())
+        if (ProcessorPtr ptr = node.getObject())
         {
             midiProgramChangedConnection = ptr->midiProgramChanged.connect (
                 std::bind (&NodeMidiContentView::updateMidiProgram, this));

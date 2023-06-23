@@ -19,7 +19,7 @@
 
 #include <element/nodefactory.hpp>
 #include <element/node.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/settings.hpp>
 
 #include "engine/nodes/NodeTypes.h"
@@ -761,7 +761,7 @@ AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& 
         .release();
 }
 
-NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
+Processor* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
 {
     errorMsg.clear();
     auto& nodes = getNodeFactory();
@@ -789,13 +789,13 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
         }
     }
 
-    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME && desc.pluginFormatName != "LV2")
+    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_NODE_FORMAT_NAME && desc.pluginFormatName != "LV2")
     {
         return nullptr;
     }
 
     errorMsg.clear();
-    if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME && desc.pluginFormatName != "LV2")
+    if (desc.pluginFormatName != EL_NODE_FORMAT_NAME && desc.pluginFormatName != "LV2")
     {
         errorMsg = desc.name;
         errorMsg << ": invalid format: " << desc.pluginFormatName;

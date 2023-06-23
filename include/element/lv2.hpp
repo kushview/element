@@ -4,11 +4,11 @@
 #pragma once
 
 #include <element/nodefactory.hpp>
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
-class LV2Node : public NodeObject {
+class LV2Node : public Processor {
 public:
 };
 
@@ -17,7 +17,7 @@ public:
     LV2NodeProvider();
     ~LV2NodeProvider();
     String format() const override { return "LV2"; }
-    NodeObject* create (const String&) override;
+    Processor* create (const String&) override;
     StringArray findTypes() override;
 
 private:

@@ -190,7 +190,7 @@ void GraphEditorView::changeListenerCallback (ChangeBroadcaster*)
 
 void GraphEditorView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::contentBackgroundColor);
+    g.fillAll (Colors::contentBackgroundColor);
 }
 
 void GraphEditorView::graphDisplayResized (const Rectangle<int>& area)

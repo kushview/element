@@ -17,22 +17,20 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/audioengine.hpp>
+#include <element/devices.hpp>
+#include <element/engine.hpp>
+#include <element/services.hpp>
+
+#include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/ui/updater.hpp>
 
-#include <element/audioengine.hpp>
-#include <element/services.hpp>
-
-#include <element/services/guiservice.hpp>
 #include "services/sessionservice.hpp"
-#include "services/engineservice.hpp"
-
 #include "gui/views/VirtualKeyboardView.h"
-
 #include "gui/AboutComponent.h"
-#include <element/ui/content.hpp>
 #include "gui/GuiCommon.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/PreferencesComponent.h"
@@ -41,7 +39,7 @@
 #include <element/ui/standard.hpp>
 #include "gui/capslock.hpp"
 
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 
 #include "version.hpp"
 
@@ -67,9 +65,9 @@ private:
 //=============================================================================
 struct GlobalLookAndFeel
 {
-    GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (&look); }
-    ~GlobalLookAndFeel() { LookAndFeel::setDefaultLookAndFeel (nullptr); }
-    element::LookAndFeel look;
+    GlobalLookAndFeel() { LookAndFeel_E1::setDefaultLookAndFeel (&look); }
+    ~GlobalLookAndFeel() { LookAndFeel_E1::setDefaultLookAndFeel (nullptr); }
+    element::LookAndFeel_E1 look;
 };
 
 /** Dispatches global key presses */
@@ -278,6 +276,25 @@ public:
     Impl (GuiService& gs)
         : gui (gs) {}
 
+    void restoreRecents()
+    {
+        const auto recentList = DataPath::applicationDataDir().getChildFile ("recents.txt");
+        if (recentList.existsAsFile())
+        {
+            FileInputStream stream (recentList);
+            recents.restoreFromString (stream.readEntireStreamAsString());
+        }
+    }
+
+    void saveRecents()
+    {
+        const auto recentList = DataPath::applicationDataDir().getChildFile ("recents.txt");
+        if (! recentList.existsAsFile())
+            recentList.create();
+        if (recentList.exists())
+            recentList.replaceWithText (recents.toString(), false, false);
+    }
+
 private:
     friend class GuiService;
     GuiService& gui;
@@ -334,7 +351,7 @@ GuiService::~GuiService()
         sGlobalLookAndFeel.reset();
 }
 
-element::LookAndFeel& GuiService::getLookAndFeel()
+element::LookAndFeel_E1& GuiService::getLookAndFeel()
 {
     jassert (sGlobalLookAndFeel);
     return sGlobalLookAndFeel->look;
@@ -365,7 +382,7 @@ void GuiService::saveProperties (PropertiesFile* props)
 void GuiService::activate()
 {
     context().devices().addChangeListener (this);
-    Service::activate();
+    impl->restoreRecents();
 }
 
 void GuiService::deactivate()
@@ -401,7 +418,7 @@ void GuiService::deactivate()
         content = nullptr;
     }
 
-    Service::deactivate();
+    impl->saveRecents();
 }
 
 void GuiService::closeAllWindows()
@@ -1198,6 +1215,19 @@ KeyListener* GuiService::getKeyListener() const { return keys.get(); }
 
 bool GuiService::handleMessage (const AppMessage& msg)
 {
+    OwnedArray<UndoableAction> actions;
+    msg.createActions (services(), actions);
+    if (! actions.isEmpty())
+    {
+        auto& undo = impl->undo;
+        undo.beginNewTransaction();
+        for (auto* action : actions)
+            undo.perform (action);
+        actions.clearQuick (false);
+        stabilizeViews();
+        return true;
+    }
+
     if (nullptr != dynamic_cast<const ReloadMainContentMessage*> (&msg))
     {
         auto& settings = context().settings();
@@ -1228,6 +1258,8 @@ bool GuiService::handleMessage (const AppMessage& msg)
 
     return false;
 }
+
+GuiService::RecentFiles& GuiService::recentFiles() { return impl->recents; }
 
 void GuiService::shutdown()
 {

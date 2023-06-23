@@ -78,17 +78,17 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.fileOrIdentifier = EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER;
+        desc.fileOrIdentifier = EL_NODE_ID_MIDI_CHANNEL_SPLITTER;
         desc.name = "MIDI Channel Splitter";
         desc.descriptiveName = "MIDI Channel Splitter";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
-        desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
-        desc.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
+        desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
+        desc.pluginFormatName = EL_NODE_FORMAT_NAME;
         desc.version = "1.0.0";
-        desc.uniqueId = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
+        desc.uniqueId = EL_NODE_UID_MIDI_CHANNEL_SPLITTER;
     }
 
 protected:

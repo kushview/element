@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "matrixstate.hpp"
 
 namespace element {
 
-class AudioRouterEditor : public NodeEditorComponent,
+class AudioRouterEditor : public NodeEditor,
                           public ChangeListener
 {
 public:

@@ -20,7 +20,7 @@
 #include "ElementApp.h"
 
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "services/sessionservice.hpp"
 #include "engine/graphnode.hpp"
 #include "gui/nodes/AudioIONodeEditor.h"
@@ -30,10 +30,10 @@
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "gui/ViewHelpers.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/ContextMenus.h"
 #include "gui/NodeEditorFactory.h"
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 #include <element/context.hpp>
 
 namespace element {
@@ -227,7 +227,7 @@ void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView*
 
 void NodeEditorContentView::paint (Graphics& g)
 {
-    g.fillAll (element::LookAndFeel::backgroundColor);
+    g.fillAll (element::Colors::backgroundColor);
 }
 
 void NodeEditorContentView::comboBoxChanged (ComboBox*)
@@ -352,7 +352,7 @@ void NodeEditorContentView::clearEditor()
 {
     if (editor == nullptr)
         return;
-    NodeObjectPtr object = node.getObject();
+    ProcessorPtr object = node.getObject();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (auto* aped = dynamic_cast<AudioProcessorEditor*> (editor.get()))
     {
@@ -424,7 +424,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     if (auto editor = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
         return editor.release();
 
-    NodeObjectPtr object = node.getObject();
+    ProcessorPtr object = node.getObject();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (proc != nullptr && node.getFormat() == "Element" && proc->hasEditor())
         return proc->createEditor();

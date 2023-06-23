@@ -18,10 +18,10 @@
 */
 
 #include <element/services.hpp>
-#include "services/engineservice.hpp"
+#include <element/engine.hpp>
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "services/presetservice.hpp"
 #include "services/sessionservice.hpp"
 
@@ -32,6 +32,16 @@
 #include <element/settings.hpp>
 
 namespace element {
+namespace detail {
+static void alertOldFile (const File& file)
+{
+    String msg = "@0@ file was created with an older version of Element and cannot yet be opened";
+    msg = msg.replace ("@0@", file.getFileName());
+    juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::InfoIcon,
+                                            "Old File",
+                                            msg);
+}
+} // namespace detail
 
 class SessionService::ChangeResetter : public AsyncUpdater
 {
@@ -100,6 +110,11 @@ void SessionService::openFile (const File& file)
         if (Node::isProbablyGraphNode (node))
         {
             const Node model (node, true);
+            if (model.version() < EL_GRAPH_VERSION)
+            {
+                return detail::alertOldFile (file);
+            }
+
             model.forEach ([] (const ValueTree& tree) {
                 if (! tree.hasType (tags::node))
                     return;
@@ -214,13 +229,13 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
         jassert (! hasSessionChanged());
         if (auto* us = context().settings().getUserSettings())
             us->setValue (Settings::lastSessionKey, document->getFile().getFullPathName());
+
         if (saveAs)
         {
-            // FIXME:
-            // services().addRecentFile (document->getFile());
-            // currentSession->data().setProperty (tags::name,
-            //                                             document->getFile().getFileNameWithoutExtension(),
-            //                                             nullptr);
+            sibling<UI>()->recentFiles().addFile (document->getFile());
+            currentSession->data().setProperty (tags::name,
+                                                document->getFile().getFileNameWithoutExtension(),
+                                                nullptr);
         }
     }
 }
@@ -258,7 +273,7 @@ void SessionService::loadNewSessionData()
         ValueTree data;
         if (auto xml = XmlDocument::parse (file))
             data = ValueTree::fromXml (*xml);
-        if (data.isValid() && data.hasType (tags::session))
+        if (data.isValid() && data.hasType (tags::session) && EL_SESSION_VERSION == (int) data.getProperty (tags::version))
             wasLoaded = currentSession->loadData (data);
     }
 

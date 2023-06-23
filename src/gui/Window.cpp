@@ -18,7 +18,7 @@
 */
 
 #include "gui/Window.h"
-#include "gui/LookAndFeel_KV1.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -41,7 +41,7 @@ void Dialog::closeButtonPressed()
 }
 
 Window::Window (const String& name)
-    : DocumentWindow (name, LookAndFeel_KV1::widgetBackgroundColor, DocumentWindow::closeButton | DocumentWindow::minimiseButton, true)
+    : DocumentWindow (name, Colors::widgetBackgroundColor, DocumentWindow::closeButton | DocumentWindow::minimiseButton, true)
 {
 #if JUCE_IOS
     setUsingNativeTitleBar (false);

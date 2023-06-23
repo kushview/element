@@ -20,19 +20,30 @@
 #include "ElementApp.h"
 
 #include <element/context.hpp>
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 #include <element/node.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/services.hpp>
 #include <element/settings.hpp>
 
 #include "engine/graphmanager.hpp"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/rootgraph.hpp"
-#include "services/engineservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/engine.hpp>
+#include <element/ui.hpp>
 
 namespace element {
+
+namespace detail {
+static void alertOldNode (const Node& g)
+{
+    String msg = "@0@ was created with an older version of Element and cannot yet be opened";
+    msg = msg.replace ("@0@", g.getDisplayName());
+    juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::InfoIcon,
+                                            "Old File",
+                                            msg);
+}
+} // namespace detail
 
 struct RootGraphHolder
 {
@@ -125,7 +136,7 @@ struct RootGraphHolder
         for (int i = nodes.getNumChildren(); --i >= 0;)
         {
             Node model (nodes.getChild (i), false);
-            NodeObjectPtr node = model.getObject();
+            ProcessorPtr node = model.getObject();
             if (node && (node->isAudioIONode() || node->isMidiIONode()))
                 model.resetPorts();
         }
@@ -138,7 +149,7 @@ private:
     DeviceManager& devices;
     std::unique_ptr<RootGraphManager> controller;
     Node model;
-    NodeObjectPtr node;
+    ProcessorPtr node;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RootGraphHolder);
 };
@@ -496,6 +507,12 @@ void EngineService::removeConnection (const uint32 s, const uint32 sp, const uin
 
 Node EngineService::addNode (const Node& node, const Node& target, const ConnectionBuilder& builder)
 {
+    if (EL_NODE_VERSION > node.version())
+    {
+        detail::alertOldNode (node);
+        return {};
+    }
+
     if (auto* controller = graphs->findGraphManagerFor (target))
     {
         const uint32 nodeId = controller->addNode (node);
@@ -520,6 +537,12 @@ Node EngineService::addNode (const String& ID, const String& format)
 
 void EngineService::addNode (const Node& node)
 {
+    if (EL_NODE_VERSION > node.version())
+    {
+        detail::alertOldNode (node);
+        return;
+    }
+
     auto* root = graphs->findActiveRootGraphManager();
     const uint32 nodeId = (root != nullptr) ? root->addNode (node) : EL_INVALID_NODE;
     if (EL_INVALID_NODE != nodeId)
@@ -907,7 +930,7 @@ Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)
 
 Node EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput)
 {
-    NodeObjectPtr ptr;
+    ProcessorPtr ptr;
     Node graph;
     if (auto s = context().session())
         graph = s->getActiveGraph();
@@ -951,14 +974,14 @@ void EngineService::changeBusesLayout (const Node& n, const AudioProcessor::Buse
 {
     Node node = n;
     Node graph = node.getParentGraph();
-    NodeObjectPtr ptr = node.getObject();
+    ProcessorPtr ptr = node.getObject();
     auto* controller = graphs->findGraphManagerFor (graph);
     if (! controller)
         return;
 
     if (AudioProcessor* proc = ptr ? ptr->getAudioProcessor() : nullptr)
     {
-        NodeObjectPtr ptr2 = graph.getObject();
+        ProcessorPtr ptr2 = graph.getObject();
         if (auto* gp = dynamic_cast<GraphNode*> (ptr2.get()))
         {
             if (proc->checkBusesLayoutSupported (layout))
@@ -1001,8 +1024,8 @@ void EngineService::replace (const Node& node, const PluginDescription& desc)
         const auto nodeId = ctl->addNode (&desc, x, y);
         if (nodeId != EL_INVALID_NODE)
         {
-            NodeObjectPtr newptr = ctl->getNodeForId (nodeId);
-            const NodeObjectPtr oldptr = node.getObject();
+            ProcessorPtr newptr = ctl->getNodeForId (nodeId);
+            const ProcessorPtr oldptr = node.getObject();
             jassert (newptr && oldptr);
             // attempt to retain connections from the replaced node
             for (int i = ctl->getNumConnections(); --i >= 0;)

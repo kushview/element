@@ -12,7 +12,7 @@
 #include <element/ui/about.hpp>
 #include <element/ui/menumodels.hpp>
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include <element/session.hpp>
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"

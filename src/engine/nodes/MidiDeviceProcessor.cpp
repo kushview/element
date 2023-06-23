@@ -19,7 +19,7 @@
 
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/midiengine.hpp"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -92,7 +92,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (element::LookAndFeel::backgroundColor);
+        g.fillAll (element::Colors::backgroundColor);
     }
 
     void resized() override

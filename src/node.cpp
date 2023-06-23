@@ -146,12 +146,16 @@ Node::Node (const ValueTree& data, const bool setMissing)
     }
 }
 
+// clang-format off
 Node::Node (const Identifier& nodeType)
-    : Model (tags::node)
+    : Model (tags::node, (nodeType == tags::node ? EL_NODE_VERSION 
+                        : nodeType == tags::graph ? EL_GRAPH_VERSION
+                        : -1))
 {
     objectData.setProperty (tags::type, nodeType.toString(), nullptr);
     setMissingProperties();
 }
+// clang-format on
 
 Node::~Node() noexcept {}
 
@@ -256,7 +260,7 @@ Node Node::createDefaultGraph (const String& name)
 
 const String Node::getPluginName() const
 {
-    if (NodeObjectPtr object = getObject())
+    if (ProcessorPtr object = getObject())
         return object->getName();
     return {};
 }
@@ -489,12 +493,12 @@ void Node::setMissingProperties()
     ui.getOrCreateChildWithName (tags::block, nullptr);
 }
 
-NodeObject* Node::getObject() const
+Processor* Node::getObject() const
 {
-    return dynamic_cast<NodeObject*> (objectData.getProperty (tags::object, var()).getObject());
+    return dynamic_cast<Processor*> (objectData.getProperty (tags::object, var()).getObject());
 }
 
-NodeObject* Node::getObjectForId (const uint32 nodeId) const
+Processor* Node::getObjectForId (const uint32 nodeId) const
 {
     const Node node (getNodeById (nodeId));
     return node.isValid() ? node.getObject() : nullptr;
@@ -537,18 +541,18 @@ void Node::getAudioOutputs (PortArray& ports) const
 //==============================================================================
 bool Node::isMidiInputDevice() const
 {
-    return objectData.getProperty (tags::format) == "Element" && objectData.getProperty (tags::identifier) == EL_INTERNAL_ID_MIDI_INPUT_DEVICE;
+    return objectData.getProperty (tags::format) == "Element" && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_INPUT_DEVICE;
 }
 
 bool Node::isMidiOutputDevice() const
 {
-    return objectData.getProperty (tags::format) == "Element" && objectData.getProperty (tags::identifier) == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE;
+    return objectData.getProperty (tags::format) == "Element" && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_OUTPUT_DEVICE;
 }
 
 //==============================================================================
 void Node::resetPorts()
 {
-    if (NodeObjectPtr ptr = getObject())
+    if (ProcessorPtr ptr = getObject())
     {
         ptr->refreshPorts();
         ValueTree newPorts = ptr->createPortsData();
@@ -768,7 +772,7 @@ void Node::restorePluginState()
     if (! isValid())
         return;
 
-    if (NodeObjectPtr obj = getObject())
+    if (ProcessorPtr obj = getObject())
     {
         if (auto* const proc = obj->getAudioProcessor())
         {
@@ -882,7 +886,7 @@ void Node::savePluginState()
     if (! isValid())
         return;
 
-    NodeObjectPtr obj = getObject();
+    ProcessorPtr obj = getObject();
     if (obj && obj->isPrepared)
     {
         MemoryBlock state;
@@ -993,13 +997,13 @@ bool Node::hasEditor() const
 
 void ConnectionBuilder::addConnections (GraphManager& controller, const uint32 targetNodeId) const
 {
-    NodeObjectPtr tgt = controller.getNodeForId (targetNodeId);
+    ProcessorPtr tgt = controller.getNodeForId (targetNodeId);
     if (tgt)
     {
         bool anythingAdded = false;
         for (const auto* pc : portChannelMap)
         {
-            NodeObjectPtr ptr = controller.getNodeForId (pc->nodeId);
+            ProcessorPtr ptr = controller.getNodeForId (pc->nodeId);
             if (! ptr)
                 continue;
 
@@ -1048,11 +1052,11 @@ void Node::forEach (const ValueTree tree, std::function<void (const ValueTree& t
         forEach (tree.getChild (i), handler);
 }
 
-// default value here must match that as defined in NodeObject.h
+// default value here must match that as defined in Processor.h
 bool Node::useGlobalMidiPrograms() const { return (bool) getProperty (tags::globalMidiPrograms, false); }
 void Node::setUseGlobalMidiPrograms (bool useGlobal)
 {
-    if (NodeObjectPtr obj = getObject())
+    if (ProcessorPtr obj = getObject())
     {
         if (obj->useGlobalMidiPrograms() == useGlobal)
             return;
@@ -1061,11 +1065,11 @@ void Node::setUseGlobalMidiPrograms (bool useGlobal)
     }
 }
 
-// default value here must match that as defined in NodeObject.h
+// default value here must match that as defined in Processor.h
 bool Node::areMidiProgramsEnabled() const { return (bool) getProperty (tags::midiProgramsEnabled, false); }
 void Node::setMidiProgramsEnabled (bool useMidiPrograms)
 {
-    if (NodeObjectPtr obj = getObject())
+    if (ProcessorPtr obj = getObject())
     {
         if (obj->areMidiProgramsEnabled() == useMidiPrograms)
             return;
@@ -1077,7 +1081,7 @@ void Node::setMidiProgramsEnabled (bool useMidiPrograms)
 int Node::getMidiProgram() const { return (int) getProperty (tags::midiProgram, 0); }
 void Node::setMidiProgram (int program)
 {
-    if (NodeObjectPtr obj = getObject())
+    if (ProcessorPtr obj = getObject())
     {
         if (obj->getMidiProgram() == program)
             return;
@@ -1088,14 +1092,14 @@ void Node::setMidiProgram (int program)
 
 String Node::getMidiProgramName (int program) const
 {
-    if (NodeObjectPtr obj = getObject())
+    if (ProcessorPtr obj = getObject())
         return obj->getMidiProgramName (program);
     return {};
 }
 
 void Node::setMidiProgramName (int program, const String& name)
 {
-    if (NodeObjectPtr obj = getObject())
+    if (ProcessorPtr obj = getObject())
         obj->setMidiProgramName (program, name);
     // setProperty (tags::midiProgram, obj->areMidiProgramsEnabled());
 }
@@ -1126,7 +1130,7 @@ void NodeObjectSync::setNode (const Node& n)
 
 void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    NodeObjectPtr obj = node.getObject();
+    ProcessorPtr obj = node.getObject();
     if (tree != data || frozen || obj == nullptr)
         return;
 

@@ -148,7 +148,7 @@ public:
         desc.numOutputChannels = getTotalNumOutputChannels();
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
-        desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc.pluginFormatName = "Element";
         desc.version = "1.0.0";
     }

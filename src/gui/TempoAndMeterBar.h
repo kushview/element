@@ -202,7 +202,7 @@ private:
         {
             const bool isOn = getToggleState();
 
-            g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+            g.fillAll (isOn ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter());
 
             if (getButtonText().isNotEmpty())
             {
@@ -211,7 +211,7 @@ private:
                 g.drawText (getButtonText(), getLocalBounds(), Justification::centred);
             }
 
-            g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+            g.setColour (Colors::widgetBackgroundColor.brighter().brighter());
             g.drawRect (0, 0, getWidth(), getHeight());
         }
     } extButton;
@@ -262,7 +262,7 @@ private:
         {
             const bool isOn = false;
 
-            g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+            g.fillAll (isOn ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter());
 
             String text;
             if (isEnabled() && tempoValue.toString().isNotEmpty())
@@ -281,7 +281,7 @@ private:
                 g.drawText (text, getLocalBounds(), Justification::centred);
             }
 
-            g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+            g.setColour (Colors::widgetBackgroundColor.brighter().brighter());
             g.drawRect (0, 0, getWidth(), getHeight());
         }
 
@@ -359,7 +359,7 @@ private:
     protected:
         void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override
         {
-            g.fillAll (isButtonDown ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+            g.fillAll (isButtonDown ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter());
 
             if (getButtonText().isNotEmpty())
             {
@@ -368,7 +368,7 @@ private:
                 g.drawText (getButtonText(), getLocalBounds(), Justification::centred);
             }
 
-            g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+            g.setColour (Colors::widgetBackgroundColor.brighter().brighter());
             g.drawRect (0, 0, getWidth(), getHeight());
         }
 

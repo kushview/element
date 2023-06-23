@@ -78,7 +78,7 @@ public:
     //==========================================================================
     /** Override Online XML with local xml 
         Call clear() to wipe it out.
-    */
+     */
     void setUpdatesXml (const std::string& xml);
 
 private:

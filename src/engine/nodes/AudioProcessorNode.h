@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
 class MidiPipe;
 
-class AudioProcessorNode : public NodeObject
+class AudioProcessorNode : public Processor
 {
 public:
     AudioProcessorNode (uint32 nodeId, AudioProcessor* processor);

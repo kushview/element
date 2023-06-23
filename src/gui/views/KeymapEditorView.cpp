@@ -18,7 +18,7 @@
 */
 
 #include "gui/GuiCommon.h"
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include "gui/views/KeymapEditorView.h"
 

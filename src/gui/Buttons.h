@@ -19,10 +19,11 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include "gui/Icons.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include <element/node.hpp>
+
+// #include "ElementApp.h"
+#include "gui/Icons.h"
 #include "tempo.hpp"
 
 namespace element {
@@ -144,7 +145,7 @@ public:
     {
         const bool isOn = false;
 
-        g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+        g.fillAll (isOn ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter());
 
         String text;
         if (isEnabled() && tempoValue.toString().isNotEmpty())
@@ -167,7 +168,7 @@ public:
             g.drawText (text, getLocalBounds(), Justification::centred);
         }
 
-        g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+        g.setColour (Colors::widgetBackgroundColor.brighter().brighter());
         g.drawRect (0, 0, getWidth(), getHeight());
     }
 
@@ -286,7 +287,7 @@ public:
     {
         const bool isOn = false;
 
-        g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+        g.fillAll (isOn ? Colors::toggleOrange : element::Colors::widgetBackgroundColor.brighter());
 
         String text = beatsPerBar.toString();
         text << " / " << String (BeatType ((BeatType::ID) (int) beatDivisor.getValue()).divisor());
@@ -298,7 +299,7 @@ public:
             g.drawText (text, getLocalBounds(), Justification::centred);
         }
 
-        g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+        g.setColour (element::Colors::widgetBackgroundColor.brighter().brighter());
         g.drawRect (0, 0, getWidth(), getHeight());
     }
 

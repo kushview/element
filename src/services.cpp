@@ -18,26 +18,26 @@
 */
 
 #include <element/context.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/settings.hpp>
 #include <element/services.hpp>
 
 #include "services/deviceservice.hpp"
-#include "services/engineservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/engine.hpp>
+#include <element/ui.hpp>
 #include "services/mappingservice.hpp"
 #include "services/oscservice.hpp"
 #include "services/sessionservice.hpp"
 #include "services/presetservice.hpp"
 
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 #include "session/presetmanager.hpp"
 
 #include "engine/graphmanager.hpp"
 #include "gui/MainWindow.h"
 #include "gui/GuiCommon.h"
 
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 #include "messages.hpp"
 #include "version.hpp"
 
@@ -78,15 +78,6 @@ public:
             olddir.copyDirectoryTo (progsdir);
         }
 
-        // restore recents
-        // FIXME
-        // const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
-        // if (recentList.existsAsFile())
-        // {
-        //     FileInputStream stream (recentList);
-        //     recentFiles.restoreFromString (stream.readEntireStreamAsString());
-        // }
-
         for (auto* s : services)
             s->activate();
 
@@ -95,13 +86,6 @@ public:
 
     void deactivate()
     {
-        // FIXME
-        // const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
-        // if (! recentList.existsAsFile())
-        //     recentList.create();
-        // if (recentList.exists())
-        //     recentList.replaceWithText (recentFiles.toString(), false, false);
-
         for (auto* s : services)
             s->deactivate();
 
@@ -242,30 +226,13 @@ void Services::handleMessage (const Message& msg)
     jassert (ec && gui && sess && devs && maps && presets);
 
     bool handled = false; // final else condition will set false
-
-    // auto& undo = impl->undo;
     auto& services = impl->services;
-    // auto& recentFiles = impl->recentFiles;
 
     if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
     {
-        OwnedArray<UndoableAction> actions;
-        message->createActions (*this, actions);
-        if (! actions.isEmpty())
-        {
-            // FIXME: UndoManager
-            // undo.beginNewTransaction();
-            // for (auto* action : actions)
-            //     undo.perform (action);
-            actions.clearQuick (false);
-            // gui->stabilizeViews();
-            return;
-        }
-
         for (auto* const child : services)
         {
-            if (auto* const acc = dynamic_cast<Service*> (child))
-                handled = acc->handleMessage (*message);
+            handled = child->handleMessage (*message);
             if (handled)
                 break;
         }
@@ -337,9 +304,8 @@ void Services::handleMessage (const Message& msg)
         else
             ec->addNode (anm->node);
 
-        // FIXME: Recents
-        // if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension (".elg"))
-        //     recentFiles.addFile (anm->sourceFile);
+        if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension (".elg"))
+            find<UI>()->recentFiles().addFile (anm->sourceFile);
     }
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {
@@ -348,8 +314,7 @@ void Services::handleMessage (const Message& msg)
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {
         sess->openFile (osm->file);
-        // FIXME: Recents
-        // recentFiles.addFile (osm->file);
+        find<UI>()->recentFiles().addFile (osm->file);
     }
     else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))
     {

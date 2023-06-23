@@ -1,7 +1,7 @@
 
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "engine/nodes/NodeTypes.h"
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include <element/ui/grapheditor.hpp>
 
 #include "gui/nodes/AudioIONodeEditor.h"
@@ -33,16 +33,16 @@ public:
 
     void findEditors (Array<NodeEditorDescription>&) override {}
 
-    NodeEditorComponent* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
+    NodeEditor* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
 
     {
-        if (node.getFormat() != EL_INTERNAL_FORMAT_NAME || identifier != EL_NODE_EDITOR_DEFAULT_ID)
+        if (node.getFormat() != EL_NODE_FORMAT_NAME || identifier != EL_NODE_EDITOR_DEFAULT_ID)
         {
             return nullptr;
         }
 
         const auto NID = node.getIdentifier().toString();
-        if (NID == EL_INTERNAL_ID_GRAPH)
+        if (NID == EL_NODE_ID_GRAPH)
         {
             return new GraphEditor (node);
         }
@@ -67,38 +67,38 @@ public:
     }
 
 private:
-    NodeEditorComponent* instantiateForPluginWindow (const Node& node)
+    NodeEditor* instantiateForPluginWindow (const Node& node)
     {
         const auto NID = node.getIdentifier().toString();
-        if (NID == EL_INTERNAL_ID_MIDI_ROUTER)
+        if (NID == EL_NODE_ID_MIDI_ROUTER)
         {
             return new MidiRouterEditor (node);
         }
-        else if (NID == EL_INTERNAL_ID_MIDI_MONITOR)
+        else if (NID == EL_NODE_ID_MIDI_MONITOR)
         {
             return new MidiMonitorNodeEditor (node);
         }
-        else if (NID == EL_INTERNAL_ID_OSC_RECEIVER)
+        else if (NID == EL_NODE_ID_OSC_RECEIVER)
         {
             return new OSCReceiverNodeEditor (node);
         }
-        else if (NID == EL_INTERNAL_ID_OSC_SENDER)
+        else if (NID == EL_NODE_ID_OSC_SENDER)
         {
             return new OSCSenderNodeEditor (node);
         }
-        else if (NID.contains (EL_INTERNAL_ID_VOLUME))
+        else if (NID.contains (EL_NODE_ID_VOLUME))
         {
             return new VolumeNodeEditor (node, gui);
         }
-        else if (NID == EL_INTERNAL_ID_LUA)
+        else if (NID == EL_NODE_ID_LUA)
         {
             return new LuaNodeEditor (node);
         }
-        else if (NID == EL_INTERNAL_ID_SCRIPT)
+        else if (NID == EL_NODE_ID_SCRIPT)
         {
             return new ScriptNodeEditor (gui.context().scripting(), node);
         }
-        else if (NID == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
+        else if (NID == EL_NODE_ID_MIDI_PROGRAM_MAP)
         {
             auto* const pgced = new MidiProgramMapEditor (node);
             if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getObject()))
@@ -106,7 +106,7 @@ private:
 
             return pgced;
         }
-        else if (NID == EL_INTERNAL_ID_AUDIO_ROUTER)
+        else if (NID == EL_NODE_ID_AUDIO_ROUTER)
         {
             auto* ared = new AudioRouterEditor (node);
             ared->setAutoResize (true);
@@ -117,7 +117,7 @@ private:
         return nullptr;
     }
 
-    NodeEditorComponent* instantiateForNavigationPanel (const Node& node)
+    NodeEditor* instantiateForNavigationPanel (const Node& node)
     {
         if (node.isMidiInputNode())
         {
@@ -143,7 +143,7 @@ private:
             }
         }
 
-        if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
+        if (node.getIdentifier() == EL_NODE_ID_MIDI_PROGRAM_MAP)
         {
             auto* const programChangeMapEditor = new MidiProgramMapEditor (node);
             programChangeMapEditor->setStoreSize (false);
@@ -151,29 +151,29 @@ private:
             programChangeMapEditor->setFontControlsVisible (false);
             return programChangeMapEditor;
         }
-        else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_MONITOR)
+        else if (node.getIdentifier() == EL_NODE_ID_MIDI_MONITOR)
         {
             auto* const midiMonitorEditor = new MidiMonitorNodeEditor (node);
             return midiMonitorEditor;
         }
-        else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
+        else if (node.getIdentifier() == EL_NODE_ID_AUDIO_ROUTER)
         {
             auto* const audioRouterEditor = new AudioRouterEditor (node);
             return audioRouterEditor;
         }
-        else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_ROUTER)
+        else if (node.getIdentifier() == EL_NODE_ID_MIDI_ROUTER)
         {
             auto* const midiRouterEditor = new MidiRouterEditor (node);
             return midiRouterEditor;
         }
-        else if (node.getIdentifier() == EL_INTERNAL_ID_SCRIPT)
+        else if (node.getIdentifier() == EL_NODE_ID_SCRIPT)
         {
             auto* se = new ScriptNodeEditor (gui.context().scripting(), node);
             se->setToolbarVisible (false);
             return se;
         }
 
-        NodeObjectPtr object = node.getObject();
+        ProcessorPtr object = node.getObject();
         auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (proc != nullptr)
         {
@@ -187,7 +187,7 @@ private:
 
 NodeEditorFactory::NodeEditorFactory()
 {
-    add<AudioRouterEditor> (EL_INTERNAL_ID_AUDIO_ROUTER, NodeEditorPlacement::PluginWindow);
+    add<AudioRouterEditor> (EL_NODE_ID_AUDIO_ROUTER, NodeEditorPlacement::PluginWindow);
 }
 
 NodeEditorFactory::NodeEditorFactory (GuiService& g)
@@ -204,7 +204,7 @@ NodeEditorFactory::~NodeEditorFactory()
 std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEditor (const Node& node)
 {
     std::unique_ptr<AudioProcessorEditor> editor = nullptr;
-    NodeObjectPtr object = node.getObject();
+    ProcessorPtr object = node.getObject();
     AudioProcessor* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
 
     if (proc == nullptr)

@@ -51,7 +51,7 @@ namespace element {
 
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
-    : NodeObject (0)
+    : Processor (0)
 {
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
@@ -124,15 +124,15 @@ Result ScriptNode::loadScript (const String& newCode)
 void ScriptNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name = "Script";
-    desc.fileOrIdentifier = EL_INTERNAL_ID_SCRIPT;
-    desc.uniqueId = EL_INTERNAL_UID_SCRIPT;
+    desc.fileOrIdentifier = EL_NODE_ID_SCRIPT;
+    desc.uniqueId = EL_NODE_UID_SCRIPT;
     desc.descriptiveName = "A user scriptable Element node";
     desc.numInputChannels = 0;
     desc.numOutputChannels = 0;
     desc.hasSharedContainer = false;
     desc.isInstrument = false;
-    desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
-    desc.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
+    desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
+    desc.pluginFormatName = EL_NODE_FORMAT_NAME;
     desc.version = "1.0.0";
 }
 

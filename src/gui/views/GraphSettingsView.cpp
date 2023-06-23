@@ -19,8 +19,8 @@
 
 #include <element/services.hpp>
 
-#include "services/engineservice.hpp"
-#include "session/commandmanager.hpp"
+#include <element/engine.hpp>
+#include <element/ui/commands.hpp>
 
 #include "engine/rootgraph.hpp"
 #include "engine/velocitycurve.hpp"
@@ -179,7 +179,7 @@ public:
     {
         auto session = ViewHelpers::getSession (this);
         node.setProperty (tags::midiChannel, getMidiChannel());
-        if (NodeObjectPtr ptr = node.getObject())
+        if (ProcessorPtr ptr = node.getObject())
             if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                 root->setMidiChannel (getMidiChannel());
     }

@@ -24,7 +24,7 @@
 #include <element/ui/content.hpp>
 #include <element/signals.hpp>
 
-#include "services/engineservice.hpp"
+#include <element/engine.hpp>
 #include "gui/TreeviewBase.h"
 
 namespace element {

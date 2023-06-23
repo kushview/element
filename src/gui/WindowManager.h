@@ -24,7 +24,7 @@
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include <element/node.hpp>
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 
 namespace element {
 
@@ -105,7 +105,7 @@ public:
 
     void closeOpenPluginWindowsFor (GraphNode& proc, const bool windowVisible);
 
-    void closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible);
+    void closeOpenPluginWindowsFor (Processor* const node, const bool windowVisible);
 
     inline void closeOpenPluginWindowsFor (const uint32 nodeId, const bool windowVisible)
     {
@@ -145,7 +145,7 @@ public:
         deletePluginWindow (win, false);
     }
 
-    inline PluginWindow* getPluginWindowFor (NodeObject* node)
+    inline PluginWindow* getPluginWindowFor (Processor* node)
     {
         for (auto* const window : activePluginWindows)
             if (window->owner == node)

@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/Icons.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -152,7 +152,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel::contentBackgroundColor);
+        g.fillAll (Colors::contentBackgroundColor);
         if (! emptyTreeMessage.getValue().isUndefined() && (rootItem == nullptr || rootItem->getNumSubItems() == 0))
             drawEmptyPanelMessage (*this, g, emptyTreeMessage.getValue());
     }

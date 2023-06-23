@@ -71,7 +71,7 @@ public:
 
         program.trashButton.setTooltip ("Delete MIDI program");
         program.trashButton.onClick = [this]() {
-            if (NodeObjectPtr ptr = node.getObject())
+            if (ProcessorPtr ptr = node.getObject())
             {
                 if (! ptr->areMidiProgramsEnabled())
                     return;
@@ -82,7 +82,7 @@ public:
 
         program.saveButton.setTooltip ("Save MIDI program");
         program.saveButton.onClick = [this]() {
-            if (NodeObjectPtr ptr = node.getObject())
+            if (ProcessorPtr ptr = node.getObject())
             {
                 if (node.useGlobalMidiPrograms())
                 {
@@ -101,7 +101,7 @@ public:
 
         program.loadButton.setTooltip ("Reload saved MIDI program");
         program.loadButton.onClick = [this]() {
-            if (NodeObjectPtr ptr = node.getObject())
+            if (ProcessorPtr ptr = node.getObject())
             {
                 if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
                 {
@@ -135,7 +135,7 @@ private:
     {
         const bool enabled = node.areMidiProgramsEnabled();
         String programName;
-        if (NodeObjectPtr object = node.getObject())
+        if (ProcessorPtr object = node.getObject())
         {
             const bool global = object->useGlobalMidiPrograms();
             // use the object because there isn't a notifaction directly back to node model

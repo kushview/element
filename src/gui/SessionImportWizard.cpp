@@ -89,7 +89,7 @@ public:
         setOpaque (true);
         addAndMakeVisible (instructions);
         instructions.setFont (Font (12.f));
-        instructions.setColour (Label::textColourId, LookAndFeel::textColor);
+        instructions.setColour (Label::textColourId, Colors::textColor);
         instructions.setText ("Chose a graph to import", dontSendNotification);
         instructions.setJustificationType (Justification::centred);
         addAndMakeVisible (graphsList);
@@ -126,7 +126,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel::contentBackgroundColor);
+        g.fillAll (Colors::contentBackgroundColor);
     }
 
     void resized() override
@@ -193,7 +193,7 @@ SessionPtr SessionImportWizard::session()
 
 void SessionImportWizard::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::widgetBackgroundColor.darker());
+    g.fillAll (Colors::widgetBackgroundColor.darker());
 }
 
 void SessionImportWizard::resized()
@@ -208,7 +208,7 @@ const String& name,
                   bool addToDesktop = true);
                   */
 SessionImportWizardDialog::SessionImportWizardDialog (std::unique_ptr<Component>& h, const File& file)
-    : DialogWindow ("Import Session", LookAndFeel::widgetBackgroundColor.darker(), true, true),
+    : DialogWindow ("Import Session", Colors::widgetBackgroundColor.darker(), true, true),
       holder (h)
 {
     holder.reset (this);

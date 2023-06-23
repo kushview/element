@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include "gui/nodes/GenericNodeEditor.h"
 
 namespace element {
@@ -45,7 +45,7 @@ class NodeEditorSource
 public:
     NodeEditorSource() = default;
     virtual ~NodeEditorSource() = default;
-    virtual NodeEditorComponent* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) = 0;
+    virtual NodeEditor* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) = 0;
     virtual void findEditors (Array<NodeEditorDescription>&) = 0;
 };
 
@@ -80,9 +80,9 @@ public:
     }
 
     /** Create the active or default editor for the given node and placement */
-    std::unique_ptr<NodeEditorComponent> instantiate (const Node& node, NodeEditorPlacement placement)
+    std::unique_ptr<NodeEditor> instantiate (const Node& node, NodeEditorPlacement placement)
     {
-        std::unique_ptr<NodeEditorComponent> ed;
+        std::unique_ptr<NodeEditor> ed;
         for (auto* s : sources)
             if (auto* e = s->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
             {
@@ -117,7 +117,7 @@ private:
             desc.nodes.add (nodeID);
         }
 
-        NodeEditorComponent* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
+        NodeEditor* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
         {
             if (desc.placement == placement && desc.ID == identifier && desc.nodes.contains (node.getIdentifier().toString()))
             {

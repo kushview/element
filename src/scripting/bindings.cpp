@@ -20,18 +20,18 @@
 #include <memory>
 
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include <element/audioengine.hpp>
 #include <element/midipipe.hpp>
 #include <element/node.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/session.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
 
 #include "gui/SystemTray.h"
 #include "scripting/scriptmanager.hpp"
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 #include "session/presetmanager.hpp"
 #include "datapath.hpp"
 #include "sol/sol.hpp"

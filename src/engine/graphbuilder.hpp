@@ -6,7 +6,7 @@
 namespace element {
 
 class GraphNode;
-class NodeObject;
+class Processor;
 
 class GraphOp
 {
@@ -58,7 +58,7 @@ private:
 
     int getInputLatency (const uint32 nodeID) const;
 
-    void createRenderingOpsForNode (NodeObject* const node, Array<void*>& renderingOps, const int ourRenderingIndex);
+    void createRenderingOpsForNode (Processor* const node, Array<void*>& renderingOps, const int ourRenderingIndex);
 
     int getFreeBuffer (PortType type);
     int getReadOnlyEmptyBuffer() const noexcept;

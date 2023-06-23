@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
@@ -21,7 +21,7 @@ class GraphNode;
 
     @see GraphNode
 */
-class IONode : public NodeObject
+class IONode : public Processor
 {
 public:
     /** Specifies the mode in which this processor will operate.

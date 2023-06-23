@@ -16,10 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <element/signals.hpp>
-#include "services/engineservice.hpp"
 #include <element/context.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/engine.hpp>
+#include <element/plugins.hpp>
+#include <element/signals.hpp>
+
 #include "messages.hpp"
 
 namespace element {

@@ -18,23 +18,21 @@
 */
 
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "engine/graphmanager.hpp"
 #include <element/audioengine.hpp>
 #include <element/ui/content.hpp>
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/ViewHelpers.h"
 #include <element/node.hpp>
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include "messages.hpp"
 
 namespace element {
 namespace ViewHelpers {
-
-typedef element::LookAndFeel LF;
 
 void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding, Justification alignment)
 {
@@ -47,7 +45,7 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
         g.fillRect (0, 0, w, h);
     }
 
-    g.setColour ((selected) ? LF::textColor.brighter (0.2f) : LF::textColor);
+    g.setColour ((selected) ? Colors::textColor.brighter (0.2f) : Colors::textColor);
     if (text.isNotEmpty())
         g.drawText (text, padding, 0, w - padding - 2, h, alignment);
 
@@ -61,7 +59,7 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 
     if (selected)
     {
-        g.setColour (LF::textColor.darker (0.6000006));
+        g.setColour (Colors::textColor.darker (0.6000006));
         g.setOpacity (0.60);
         g.fillRect (0, 0, h, w);
     }
@@ -70,7 +68,7 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
     // g.setFont (Resources::normalFontSize);
 #endif
 
-    g.setColour ((selected) ? LF::textColor.contrasting() : LF::textColor);
+    g.setColour ((selected) ? Colors::textColor.contrasting() : Colors::textColor);
     g.drawText (text, 40, 0, h - 40, w, Justification::centredLeft);
 
     g.restoreState();
@@ -134,9 +132,9 @@ bool invokeDirectly (Component* c, const int commandID, bool async)
     return false;
 }
 
-NodeObjectPtr findGraphNodeFor (Component* c, const Node& node)
+ProcessorPtr findGraphNodeFor (Component* c, const Node& node)
 {
-    NodeObjectPtr obj = node.getObject();
+    ProcessorPtr obj = node.getObject();
 
     if (nullptr == obj)
     {
@@ -148,7 +146,7 @@ NodeObjectPtr findGraphNodeFor (Component* c, const Node& node)
 
 void postMessageFor (Component* c, Message* m)
 {
-    ScopedPointer<Message> deleter (m);
+    std::unique_ptr<Message> deleter (m);
     if (auto* const cc = findContentComponent (c))
         return cc->post (deleter.release());
     jassertfalse; // message not delivered

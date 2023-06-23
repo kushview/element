@@ -17,12 +17,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/ui/decibelscale.hpp>
+#include <element/ui/simplemeter.hpp>
+#include <element/signals.hpp>
+
 #include "ElementApp.h"
 #include "gui/Buttons.h"
-#include "gui/DigitalMeter.h"
-#include "gui/DecibelScaleComponent.h"
-
-#include <element/signals.hpp>
 
 namespace element {
 
@@ -35,7 +35,7 @@ public:
     ChannelStripComponent();
     ~ChannelStripComponent() noexcept;
 
-    inline DigitalMeter& getDigitalMeter() { return meter; }
+    inline SimpleMeter& getSimpleMeter() { return meter; }
     inline void setVolume (const double dB, NotificationType notify = sendNotificationAsync)
     {
         fader.setValue (dB, notify);
@@ -101,8 +101,8 @@ public:
 
 private:
     Slider fader;
-    DigitalMeter meter;
-    DecibelScaleComponent scale;
+    SimpleMeter meter;
+    DecibelScale scale;
     Label name;
     class VolumeLabel : public DragableIntLabel
     {

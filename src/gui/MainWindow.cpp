@@ -17,13 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include <element/ui/menumodels.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "services/sessionservice.hpp"
 #include <element/ui/content.hpp>
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
-#include "session/commandmanager.hpp"
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"

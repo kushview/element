@@ -19,19 +19,19 @@
 
 #pragma once
 
-#include "gui/nodes/NodeEditorComponent.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/nodeeditor.hpp>
+#include <element/ui/style.hpp>
 
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 
 namespace element {
 
-class AudioIONodeEditor : public NodeEditorComponent,
+class AudioIONodeEditor : public NodeEditor,
                           public ChangeListener
 {
 public:
     AudioIONodeEditor (const Node& node, DeviceManager& devs, bool ins = true, bool outs = true)
-        : NodeEditorComponent (node), devices (devs), showIns (ins), showOuts (outs)
+        : NodeEditor (node), devices (devs), showIns (ins), showOuts (outs)
     {
         content.reset (new Content (*this));
         view.setViewedComponent (content.get(), false);
@@ -50,7 +50,7 @@ public:
     void paint (Graphics& g) override
     {
         g.setFont (13.f);
-        g.setColour (LookAndFeel::textColor);
+        g.setColour (Colors::textColor);
         String text = "Host Audio ";
         if (getNode().isAudioInputNode())
             text << "Input";

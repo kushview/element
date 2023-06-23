@@ -3,17 +3,17 @@
 // @classmod el.Context
 // @pragma nostrip
 
-#include "lua.hpp"
-#include "sol_helpers.hpp"
-
+#include <element/ui/commands.hpp>
+#include <element/context.hpp>
+#include <element/devices.hpp>
+#include <element/plugins.hpp>
 #include <element/settings.hpp>
 
+#include "lua.hpp"
+#include "sol_helpers.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/mappingengine.hpp"
-#include "session/commandmanager.hpp"
-#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
-#include <element/context.hpp>
 
 using namespace juce;
 namespace lua = element::lua;

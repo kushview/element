@@ -19,7 +19,7 @@
 
 #include <element/services.hpp>
 #include <element/ui/meterbridge.hpp>
-#include <element/ui/datapathbrowser.hpp>
+#include "gui/datapathbrowser.hpp"
 
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
@@ -39,7 +39,7 @@
 #include "gui/views/NavigationView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/PluginManagerComponent.h"
 #include "gui/views/SessionSettingsView.h"
 #include "gui/views/GraphSettingsView.h"
@@ -54,11 +54,11 @@
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
 
-#include <element/devicemanager.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/devices.hpp>
+#include <element/plugins.hpp>
 #include <element/node.hpp>
 
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
 

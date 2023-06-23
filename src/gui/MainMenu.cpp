@@ -20,16 +20,16 @@
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
 #include <element/audioengine.hpp>
 #include <element/session.hpp>
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 #include <element/node.hpp>
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
@@ -240,9 +240,9 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         const int fileIdx = index - recentMenuOffset;
         juce::ignoreUnused (fileIdx);
-        // FIXME: Recents
-        // class File f = owner.services().getRecentlyOpenedFilesList().getFile (fileIdx);
-        // owner.services().find<SessionService>()->openFile (f);
+
+        class File f = (*owner.services().find<UI>()).recentFiles().getFile (fileIdx);
+        owner.services().find<SessionService>()->openFile (f);
     }
 }
 
@@ -250,19 +250,19 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 {
     if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
     {
-        // FIXME: Recents
-        // PopupMenu recents;
-        // auto& app (cc->services());
-        // auto& list (app.getRecentlyOpenedFilesList());
-        // if (list.getNumFiles() > 0)
-        // {
-        //     list.createPopupMenuItems (recents, recentMenuOffset, false, true);
-        //     recents.addSeparator();
-        // }
+        PopupMenu recents;
+        auto& app (cc->services());
+        auto& ui = *app.find<UI>();
+        auto& list (ui.recentFiles());
+        if (list.getNumFiles() > 0)
+        {
+            list.createPopupMenuItems (recents, recentMenuOffset, false, true);
+            recents.addSeparator();
+        }
 
-        // recents.addCommandItem (&cmd, Commands::recentsClear, "Clear Recent Files");
-        // menu.addSubMenu ("Open Recent", recents);
-        // menu.addSeparator();
+        recents.addCommandItem (&cmd, Commands::recentsClear, "Clear Recent Files");
+        menu.addSubMenu (TRANS ("Open Recent"), recents);
+        menu.addSeparator();
     }
 }
 

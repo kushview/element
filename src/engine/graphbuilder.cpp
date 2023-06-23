@@ -1,5 +1,5 @@
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include "engine/miditranspose.hpp"
 #include "engine/graphnode.hpp"
 #include "engine/graphbuilder.hpp"
@@ -197,7 +197,7 @@ private:
 class ProcessBufferOp : public GraphOp
 {
 public:
-    ProcessBufferOp (const NodeObjectPtr& node_,
+    ProcessBufferOp (const ProcessorPtr& node_,
                      const Array<int>& audioChannelsToUse_,
                      const int totalChans_,
                      const int midiBufferToUse_,
@@ -450,7 +450,7 @@ public:
             node->setOutputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
     }
 
-    const NodeObjectPtr node;
+    const ProcessorPtr node;
     AudioProcessor* const processor;
 
 private:
@@ -483,7 +483,7 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
 
     for (int i = 0; i < orderedNodes.size(); ++i)
     {
-        createRenderingOpsForNode ((NodeObject*) orderedNodes.getUnchecked (i),
+        createRenderingOpsForNode ((Processor*) orderedNodes.getUnchecked (i),
                                    renderingOps,
                                    i);
         markUnusedBuffersFree (i);
@@ -522,7 +522,7 @@ int GraphBuilder::getInputLatency (const uint32 nodeID) const
     return maxLatency;
 }
 
-void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
+void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                                               Array<void*>& renderingOps,
                                               const int ourRenderingIndex)
 {
@@ -851,7 +851,7 @@ bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputC
 {
     while (stepIndexToSearchFrom < orderedNodes.size())
     {
-        const NodeObject* const node = (const NodeObject*) orderedNodes.getUnchecked (stepIndexToSearchFrom);
+        const Processor* const node = (const Processor*) orderedNodes.getUnchecked (stepIndexToSearchFrom);
 
         {
             for (uint32 port = 0; port < node->getNumPorts(); ++port)

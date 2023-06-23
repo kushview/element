@@ -20,7 +20,7 @@
 */
 
 #include "KnobsComponent.h"
-#include "../LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 using namespace juce;

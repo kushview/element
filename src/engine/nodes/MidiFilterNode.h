@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
-class MidiFilterNode : public NodeObject
+class MidiFilterNode : public Processor
 {
 public:
     virtual ~MidiFilterNode();

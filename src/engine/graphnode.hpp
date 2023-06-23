@@ -20,14 +20,14 @@
 #pragma once
 
 #include "ElementApp.h"
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include "engine/velocitycurve.hpp"
 #include <element/arc.hpp>
 #include <element/signals.hpp>
 
 namespace element {
 
-class GraphNode : public NodeObject,
+class GraphNode : public Processor,
                   private AsyncUpdater
 {
 public:
@@ -71,13 +71,13 @@ public:
         This will return nullptr if the index is out of range.
         @see getNodeForId
     */
-    NodeObject* getNode (const int index) const { return nodes[index]; }
+    Processor* getNode (const int index) const { return nodes[index]; }
 
     /** Searches the graph for a node with the given ID number and returns it.
         If no such node was found, this returns nullptr.
         @see getNode
     */
-    NodeObject* getNodeForId (const uint32 nodeId) const;
+    Processor* getNodeForId (const uint32 nodeId) const;
 
     /** Adds a node to the graph.
 
@@ -90,7 +90,7 @@ public:
 
         If this succeeds, it returns a pointer to the newly-created node.
     */
-    NodeObject* addNode (NodeObject* newNode, uint32 nodeId = 0);
+    Processor* addNode (Processor* newNode, uint32 nodeId = 0);
 
     /** Deletes a node within the graph which has the specified ID.
 
@@ -99,7 +99,7 @@ public:
     bool removeNode (uint32 nodeId);
 
     /** Builds an array of ordered nodes */
-    void getOrderedNodes (ReferenceCountedArray<NodeObject>& res);
+    void getOrderedNodes (ReferenceCountedArray<Processor>& res);
 
     /** Returns the number of connections in the graph. */
     int getNumConnections() const { return connections.size(); }
@@ -208,12 +208,12 @@ private:
     friend class GraphPort;
     friend class IONode;
     friend class GraphManager;
-    friend class NodeObject;
+    friend class Processor;
     friend class NodeObjectSync;
     friend class Node;
 
     typedef ArcTable<Connection> LookupTable;
-    ReferenceCountedArray<NodeObject> nodes;
+    ReferenceCountedArray<Processor> nodes;
     OwnedArray<Connection> connections;
     uint32 ioNodes[10];
 

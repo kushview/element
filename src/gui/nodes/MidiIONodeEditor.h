@@ -20,17 +20,17 @@
 #pragma once
 
 #include "engine/midiengine.hpp"
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
-class MidiIONodeEditor : public NodeEditorComponent,
+class MidiIONodeEditor : public NodeEditor,
                          public ChangeListener,
                          private Timer
 {
 public:
     MidiIONodeEditor (const Node& node, MidiEngine& engine, bool ins = true, bool outs = true)
-        : NodeEditorComponent (node), midi (engine), showIns (ins), showOuts (outs)
+        : NodeEditor (node), midi (engine), showIns (ins), showOuts (outs)
     {
         content.reset (new Content (*this));
         view.setViewedComponent (content.get(), false);
@@ -51,7 +51,7 @@ public:
     void paint (Graphics& g) override
     {
         g.setFont (13.f);
-        g.setColour (LookAndFeel::textColor);
+        g.setColour (Colors::textColor);
         String text = "Host MIDI ";
         if (getNode().isMidiInputNode())
             text << "Input";

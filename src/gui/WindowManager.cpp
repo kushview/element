@@ -18,13 +18,13 @@
 */
 
 #include <element/context.hpp>
-#include <element/services/guiservice.hpp>
-#include <element/nodeobject.hpp>
+#include <element/ui.hpp>
+#include <element/processor.hpp>
 #include "engine/graphnode.hpp"
 #include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 
 namespace element {
 
@@ -49,7 +49,7 @@ void WindowManager::closeOpenPluginWindowsFor (GraphNode& proc, const bool windo
                 }
 }
 
-void WindowManager::closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible)
+void WindowManager::closeOpenPluginWindowsFor (Processor* const node, const bool windowVisible)
 {
     if (! node)
         return;

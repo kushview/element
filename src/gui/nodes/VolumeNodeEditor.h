@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
 class Node;
 class GuiService;
 
-class VolumeNodeEditor : public NodeEditorComponent
+class VolumeNodeEditor : public NodeEditor
 {
 public:
     VolumeNodeEditor (const Node&, GuiService&);

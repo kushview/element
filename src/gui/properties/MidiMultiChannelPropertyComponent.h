@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/Buttons.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/PatchMatrixComponent.h"
 
 #include "matrixstate.hpp"
@@ -110,13 +110,13 @@ private:
             if (state.connected (row, col))
             {
                 if (owner.layout.omni.getToggleState())
-                    g.setColour (LookAndFeel::widgetBackgroundColor.darker (0.1f));
+                    g.setColour (Colors::widgetBackgroundColor.darker (0.1f));
                 else
                     g.setColour (Colors::toggleGreen);
             }
             else
             {
-                g.setColour (LookAndFeel::widgetBackgroundColor.brighter());
+                g.setColour (Colors::widgetBackgroundColor.brighter());
             }
 
             g.fillRect (1, 1, width - 2, height - 2);

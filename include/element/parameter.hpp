@@ -272,7 +272,7 @@ public:
     void sendGestureChangedMessageToListeners (bool touched);
 
 private:
-    friend class NodeObject;
+    friend class Processor;
 
     //==============================================================================
     int parameterIndex = -1;
@@ -310,7 +310,7 @@ public:
     /** Returns the index of this port. */
     int getPortIndex() const noexcept override { return port.index; }
 
-    /** Returns the index of this parameter as stored by the parent NodeObject. */
+    /** Returns the index of this parameter as stored by the parent Processor. */
     int getParameterIndex() const noexcept override { return port.channel; }
 
     /** Returns category for this control */

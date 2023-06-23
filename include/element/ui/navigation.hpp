@@ -62,9 +62,7 @@ private:
     class Header;
     class ElementsHeader;
     class UserDataPathHeader;
-
     class LookAndFeel;
-    std::unique_ptr<LookAndFeel> lookAndFeel;
 };
 
 } // namespace element

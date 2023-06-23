@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 
 namespace element {
 
@@ -31,7 +31,7 @@ public:
     Private() {}
     ~Private() {}
 
-    EnginePtr activeEngine;
+    AudioEnginePtr activeEngine;
 #if KV_JACK_AUDIO
     kv::JackClient jackClient { "Element", 2, "main_in_", 2, "main_out_" };
 #endif
@@ -50,12 +50,12 @@ DeviceManager::~DeviceManager()
     attach (nullptr);
 }
 
-void DeviceManager::attach (EnginePtr engine)
+void DeviceManager::attach (AudioEnginePtr engine)
 {
     if (impl->activeEngine == engine)
         return;
 
-    EnginePtr old = impl->activeEngine;
+    auto old = impl->activeEngine;
 
     if (old != nullptr)
     {

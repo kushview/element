@@ -20,8 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
-#include <element/services/guiservice.hpp>
-#include <element/nodeobject.hpp>
+#include <element/ui.hpp>
+#include <element/processor.hpp>
 #include "gui/ChannelStripComponent.h"
 #include <element/signals.hpp>
 
@@ -114,16 +114,16 @@ public:
 
     inline virtual void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel::widgetBackgroundColor);
+        g.setColour (Colors::widgetBackgroundColor);
         g.fillAll();
-        g.setColour (LookAndFeel::contentBackgroundColor);
+        g.setColour (Colors::contentBackgroundColor);
         g.drawLine (getWidth() - 1.f, 0.0, getWidth() - 1.f, getHeight());
     }
 
     inline void timerCallback() override
     {
-        auto& meter = channelStrip.getDigitalMeter();
-        if (NodeObjectPtr ptr = node.getObject())
+        auto& meter = channelStrip.getSimpleMeter();
+        if (ProcessorPtr ptr = node.getObject())
         {
             const int startChannel = jmax (0, channelBox.getSelectedId() - 1);
             if (ptr->getNumAudioOutputs() == 1)
@@ -172,7 +172,7 @@ public:
 
     inline void updateChannelStrip()
     {
-        if (NodeObjectPtr object = node.getObject())
+        if (ProcessorPtr object = node.getObject())
         {
             SharedConnectionBlock b1 (volumeChangedConnection);
             SharedConnectionBlock b2 (powerChangedConnection);
@@ -239,7 +239,7 @@ protected:
         default returns either the input or output gain of the node */
     virtual float getCurrentVolume()
     {
-        NodeObjectPtr object = node.getObject();
+        ProcessorPtr object = node.getObject();
         if (object == nullptr)
             return 0.f;
 
@@ -372,7 +372,7 @@ private:
         if (onVolumeChanged != nullptr)
             return onVolumeChanged (value);
 
-        if (NodeObjectPtr object = node.getObject())
+        if (ProcessorPtr object = node.getObject())
         {
             auto gain = Decibels::decibelsToGain (value, -60.0);
             if (isAudioOutNode || isMonitoringInputs())

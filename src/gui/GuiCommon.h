@@ -19,17 +19,17 @@
 
 #pragma once
 
-#include "ElementApp.h"
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
-#include "gui/Buttons.h"
+#include <element/ui.hpp>
+#include <element/ui/commands.hpp>
 #include <element/ui/content.hpp>
-#include "gui/LookAndFeel.h"
-#include "gui/ViewHelpers.h"
 #include <element/session.hpp>
 #include <element/node.hpp>
-
-#include "commands.hpp"
-#include "messages.hpp"
 #include <element/context.hpp>
 #include <element/settings.hpp>
+
+#include "ElementApp.h"
+#include "gui/Buttons.h"
+#include <element/ui/style.hpp>
+#include "gui/ViewHelpers.h"
+#include "messages.hpp"

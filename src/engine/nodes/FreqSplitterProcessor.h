@@ -51,16 +51,16 @@ public:
     void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier = EL_INTERNAL_ID_FREQ_SPLITTER;
+        desc.fileOrIdentifier = EL_NODE_ID_FREQ_SPLITTER;
         desc.descriptiveName = "Frequency Band Splitter";
         desc.numInputChannels = numChannelsIn;
         desc.numOutputChannels = numChannelsOut;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
-        desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc.pluginFormatName = "Element";
         desc.version = "1.0.0";
-        desc.uniqueId = EL_INTERNAL_UID_FREQ_SPLITTER;
+        desc.uniqueId = EL_NODE_UID_FREQ_SPLITTER;
     }
 
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override

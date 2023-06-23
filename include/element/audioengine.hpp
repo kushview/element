@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <element/devicemanager.hpp>
-#include <element/engine.hpp>
+#include <element/juce/audio_devices.hpp>
+
 #include <element/midiiomonitor.hpp>
 #include <element/runmode.hpp>
 #include <element/session.hpp>
@@ -12,13 +12,11 @@
 
 namespace element {
 
-class ClipFactory;
-class EngineControl;
 class Context;
 class Settings;
 class RootGraph;
 
-class AudioEngine : public Engine {
+class AudioEngine final : public juce::ReferenceCountedObject {
 public:
     Signal<void()> sampleLatencyChanged;
     AudioEngine (Context&, RunMode mode = RunMode::Standalone);
@@ -31,13 +29,14 @@ public:
     void activate();
     void deactivate();
 
-    /** Adds a message to the MIDI input.  This can be used by Controllers and UI
-        components that send MIDI in a non-realtime critical situation. DO NOT call
-        this from the audio thread 
+    /** Adds a message to the MIDI input.  This can be used by Controllers and 
+        UI components that send MIDI in a non-realtime critical situation. Do 
+        not call this from the audio thread.
      
         @param msg                      The MidiMessage to send
-        @param handleOnDeviceQueue      When true will treat it as if received by a
-                                        MidiInputDevice callback (don't use except for debugging)
+        @param handleOnDeviceQueue      When true will treat it as if received 
+                                        by a MidiInputDevice callback (don't use 
+                                        except for debugging)
      */
     void addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueue = false);
 
@@ -66,8 +65,8 @@ public:
 
     MidiKeyboardState& getKeyboardState();
     Transport::MonitorPtr getTransportMonitor() const;
-    AudioIODeviceCallback& getAudioIODeviceCallback() override;
-    MidiInputCallback& getMidiInputCallback() override;
+    AudioIODeviceCallback& getAudioIODeviceCallback();
+    MidiInputCallback& getMidiInputCallback();
 
     /** For use by external systems only! e.g. the AU/VST version of Element and
         possibly things like rendering in the future
@@ -105,6 +104,6 @@ private:
     RunMode runMode;
 };
 
-typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
+using AudioEnginePtr = ReferenceCountedObjectPtr<AudioEngine>;
 
 } // namespace element

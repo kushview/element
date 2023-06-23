@@ -19,25 +19,19 @@
 
 #pragma once
 
-#include "ElementApp.h"
 #include <element/node.hpp>
+#include <element/presets.hpp>
+
+#include "datapath.hpp"
 
 namespace element {
-
-struct PresetDescription
-{
-    String name;
-    String identifier;
-    String format;
-    File file;
-};
 
 class PresetManager
 {
 public:
     struct SortByName
     {
-        int compareElements (PresetDescription* first, PresetDescription* second) const
+        int compareElements (PresetInfo* first, PresetInfo* second) const
         {
             if (first->name < second->name)
                 return -1;
@@ -57,12 +51,12 @@ public:
         presets.clear();
     }
 
-    inline void getPresetsFor (const Node& node, OwnedArray<PresetDescription>& results) const
+    inline void getPresetsFor (const Node& node, OwnedArray<PresetInfo>& results) const
     {
         SortByName sorter;
         for (const auto* const preset : presets)
-            if (preset->identifier == node.getIdentifier().toString() && preset->format == node.getFormat().toString())
-                results.addSorted (sorter, new PresetDescription (*preset));
+            if (preset->ID == node.getIdentifier().toString() && preset->format == node.getFormat().toString())
+                results.addSorted (sorter, new PresetInfo (*preset));
     }
 
     inline void addPresetFor (const Node& node, const String& name)
@@ -76,21 +70,22 @@ public:
 
         StringArray files;
         path.findPresetFiles (files);
+
         for (const auto& filename : files)
         {
             const File file (filename);
             const Node node (Node::parse (file), false);
             if (node.isValid())
             {
-                std::unique_ptr<PresetDescription> item;
-                item.reset (new PresetDescription());
-                item->file = file;
-                item->name = node.getName();
-                if (item->name.isEmpty())
-                    item->name = file.getFileNameWithoutExtension();
-                item->format = node.getFormat();
-                item->identifier = node.getIdentifier();
-                if (item->format.isEmpty() || item->identifier.isEmpty())
+                std::unique_ptr<PresetInfo> item;
+                item.reset (new PresetInfo());
+                item->file = file.getFullPathName().toStdString();
+                item->name = node.getName().toStdString();
+                if (item->name.empty())
+                    item->name = file.getFileNameWithoutExtension().toStdString();
+                item->format = node.getFormat().toString().toStdString();
+                item->ID = node.getIdentifier().toString().toStdString();
+                if (item->format.empty() || item->ID.empty())
                     continue;
 
                 presets.add (item.release());
@@ -102,7 +97,7 @@ public:
 
 private:
     DataPath path;
-    OwnedArray<PresetDescription> presets;
+    OwnedArray<PresetInfo> presets;
 };
 
 } // namespace element

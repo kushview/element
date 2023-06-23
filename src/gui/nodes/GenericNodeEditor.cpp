@@ -18,7 +18,7 @@
 */
 
 #include "gui/nodes/GenericNodeEditor.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -431,7 +431,7 @@ struct GenericNodeEditor::Pimpl
     Pimpl (GenericNodeEditor& parent)
         : owner (parent)
     {
-        NodeObjectPtr ptr = parent.getNodeObject();
+        ProcessorPtr ptr = parent.getNodeObject();
         jassert (ptr != nullptr);
         owner.setOpaque (true);
         view.setViewedComponent (new ParametersPanel (ptr->getParameters()));
@@ -445,7 +445,7 @@ struct GenericNodeEditor::Pimpl
 };
 
 GenericNodeEditor::GenericNodeEditor (const Node& node)
-    : NodeEditorComponent (node), pimpl (new Pimpl (*this))
+    : NodeEditor (node), pimpl (new Pimpl (*this))
 {
     setSize (pimpl->view.getViewedComponent()->getWidth() + pimpl->view.getVerticalScrollBar().getWidth(),
              jmin (pimpl->view.getViewedComponent()->getHeight(), 400));
@@ -455,7 +455,7 @@ GenericNodeEditor::~GenericNodeEditor() {}
 
 void GenericNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (element::LookAndFeel::backgroundColor);
+    g.fillAll (element::Colors::backgroundColor);
 }
 
 void GenericNodeEditor::resized()

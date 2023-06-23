@@ -4,10 +4,11 @@
 #pragma once
 
 #include <element/juce/core.hpp>
-
+#include <element/element.hpp>
 namespace element {
 
-struct JUCE_API MidiChannels {
+class EL_API MidiChannels {
+public:
     inline MidiChannels()
     {
         reset();

@@ -1,15 +1,15 @@
 
 #pragma once
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
-class TestNode : public NodeObject {
+class TestNode : public Processor {
 public:
-    TestNode() : NodeObject (0) {}
+    TestNode() : Processor (0) {}
 
     TestNode (int audioIns, int audioOuts, int midiIns, int midiOuts)
-        : NodeObject (0),
+        : Processor (0),
           numAudioIns (audioIns),
           numAudioOuts (audioOuts),
           numMidiIns (midiIns),

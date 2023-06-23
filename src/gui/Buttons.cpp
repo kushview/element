@@ -35,14 +35,14 @@ void IconButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButton
 {
     getLookAndFeel().drawButtonBackground (g, *this, findColour (getToggleState() ? TextButton::buttonOnColourId : TextButton::buttonColourId), isMouseOverButton, isButtonDown);
     Rectangle<float> bounds (0.f, 0.f, (float) jmin (getWidth(), getHeight()), (float) jmin (getWidth(), getHeight()));
-    icon.colour = isEnabled() ? LookAndFeel::textColor : LookAndFeel::textColor.darker();
+    icon.colour = isEnabled() ? Colors::textColor : Colors::textColor.darker();
     icon.draw (g, bounds.reduced (iconReduceSize), false);
 }
 
 void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)
 {
     const bool isOn = getToggleState();
-    //    Colour fill = isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter();
+    //    Colour fill = isOn ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter();
 
     Colour fill = findColour (isOn ? backgroundOnColourId : backgroundColourId);
     if (isOn)
@@ -81,7 +81,7 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
         g.drawImage (icon, area.reduced (2).toFloat(), RectanglePlacement::onlyReduceInSize);
     }
 
-    g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+    g.setColour (Colors::widgetBackgroundColor.brighter().brighter());
     g.drawRect (0, 0, getWidth(), getHeight());
 }
 

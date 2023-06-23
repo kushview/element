@@ -75,7 +75,7 @@ private:
 };
 
 MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     setOpaque (true);
     logger.reset (new Logger (getNodeObjectOfType<MidiMonitorNode>()));

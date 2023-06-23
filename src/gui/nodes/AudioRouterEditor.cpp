@@ -20,7 +20,7 @@
 #include "engine/nodes/AudioRouterNode.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/PatchMatrixComponent.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/Artist.h"
 #include "common.hpp"
 
@@ -59,7 +59,7 @@ public:
         }
         else
         {
-            g.setColour (matrix.connected (row, column) ? Colour (Colors::elemental.brighter()) : Colour (LookAndFeel_KV1::defaultMatrixCellOffColor));
+            g.setColour (matrix.connected (row, column) ? Colour (Colors::elemental.brighter()) : Colour (LookAndFeel_E1::defaultMatrixCellOffColor));
 
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }
@@ -213,12 +213,12 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel::contentBackgroundColor);
+        g.fillAll (Colors::contentBackgroundColor);
         Rectangle<int> box (0, padding, labelWidth - padding, matrix->getHeight());
         auto rowThickness = matrix->getRowThickness();
         auto colThickness = matrix->getColumnThickness();
 
-        g.setColour (LookAndFeel::textColor);
+        g.setColour (Colors::textColor);
         for (int row = 0; row < owner.getMatrixState().getNumRows(); ++row)
             g.drawText (String ("Ch. ") + String (row + 1), box.removeFromTop (rowThickness), Justification::centredRight, false);
 
@@ -227,7 +227,7 @@ public:
         for (int col = 0; col < owner.getMatrixState().getNumColumns(); ++col)
         {
             auto r = box.removeFromLeft (colThickness);
-            g.setColour (LookAndFeel::textColor);
+            g.setColour (Colors::textColor);
             Artist::drawVerticalText (g, String ("Ch. ") + String (col + 1), r, Justification::centredRight);
         }
     }
@@ -244,7 +244,7 @@ private:
 };
 
 AudioRouterEditor::AudioRouterEditor (const Node& node)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     setOpaque (true);
     content.reset (new Content (*this));

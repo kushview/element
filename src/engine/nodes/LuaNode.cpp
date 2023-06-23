@@ -720,7 +720,7 @@ void LuaParameter::controlValueChanged (int index, float value)
 void LuaParameter::controlTouched (int, bool) {}
 
 LuaNode::LuaNode() noexcept
-    : NodeObject (0)
+    : Processor (0)
 {
     context = std::make_unique<Context>();
     loadScript (stereoAmpScript);
@@ -778,15 +778,15 @@ Result LuaNode::loadScript (const String& newScript)
 void LuaNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name = "Lua";
-    desc.fileOrIdentifier = EL_INTERNAL_ID_LUA;
-    desc.uniqueId = EL_INTERNAL_UID_LUA;
+    desc.fileOrIdentifier = EL_NODE_ID_LUA;
+    desc.uniqueId = EL_NODE_UID_LUA;
     desc.descriptiveName = "A user scriptable Element node";
     desc.numInputChannels = 0;
     desc.numOutputChannels = 0;
     desc.hasSharedContainer = false;
     desc.isInstrument = false;
-    desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
-    desc.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
+    desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
+    desc.pluginFormatName = EL_NODE_FORMAT_NAME;
     desc.version = "1.0.0";
 }
 

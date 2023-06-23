@@ -22,7 +22,7 @@
 #include "gui/views/NavigationView.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/context.hpp>
 
 namespace element {
@@ -220,7 +220,7 @@ private:
             if (! cc)
                 return;
 
-            ReferenceCountedArray<element::NodeObject> nodes;
+            ReferenceCountedArray<element::Processor> nodes;
             for (int i = 0; i < nodes.size(); ++i)
                 addSubItem (new PluginInstanceItem (nodes.getUnchecked (i)));
         }
@@ -237,7 +237,7 @@ private:
     class PluginInstanceItem : public TreeItemBase
     {
     public:
-        PluginInstanceItem (NodeObjectPtr n) : node (n)
+        PluginInstanceItem (ProcessorPtr n) : node (n)
         {
             jassert (node != nullptr);
             instance = node->getAudioPluginInstance();
@@ -262,7 +262,7 @@ private:
                 return;
         }
 
-        NodeObjectPtr node;
+        ProcessorPtr node;
         AudioPluginInstance* instance;
     };
 };
@@ -340,7 +340,7 @@ NavigationView::~NavigationView()
 
 void NavigationView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel_KV1::backgroundColor);
+    g.fillAll (Colors::backgroundColor);
 }
 
 void NavigationView::resized()

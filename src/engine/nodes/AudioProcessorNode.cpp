@@ -134,7 +134,7 @@ AudioProcessorNode::AudioProcessorNode (AudioProcessor* processor)
     : AudioProcessorNode (0, processor) {}
 
 AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor)
-    : NodeObject (nodeId),
+    : Processor (nodeId),
       enablement (*this)
 {
     proc.reset (processor);
@@ -150,7 +150,7 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
 AudioProcessorNode::~AudioProcessorNode()
 {
     params.clear();
-    NodeObject::clearParameters();
+    Processor::clearParameters();
     enablement.cancelPendingUpdate();
     pluginState.reset();
     proc = nullptr;

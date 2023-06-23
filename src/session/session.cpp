@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/engine/internalformat.hpp>
+#include "engine/internalformat.hpp"
 #include <element/transport.hpp>
 
 #include <element/node.hpp>
@@ -59,7 +59,7 @@ private:
 };
 
 Session::Session()
-    : Model (tags::session)
+    : Model (tags::session, EL_SESSION_VERSION)
 {
     impl.reset (new Impl (*this));
     setMissingProperties (true);
@@ -127,8 +127,12 @@ std::unique_ptr<XmlElement> Session::createXml() const
 void Session::setMissingProperties (bool resetExisting)
 {
     if (resetExisting)
+    {
         objectData.removeAllProperties (nullptr);
+    }
 
+    if (! objectData.hasProperty (tags::version))
+        setProperty (tags::version, EL_SESSION_VERSION);
     if (! objectData.hasProperty (tags::name))
         setProperty (tags::name, "");
     if (! objectData.hasProperty (tags::tempo))

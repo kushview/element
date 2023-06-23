@@ -24,7 +24,7 @@
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/rootgraph.hpp"
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/context.hpp>
 #include "utils.hpp"
 
@@ -83,10 +83,10 @@ private:
         const bool wantsMidiIn = graph.getNumPorts (PortType::Midi, true) > 0 && model.hasMidiInputNode();
         const bool wantsMidiOut = graph.getNumPorts (PortType::Midi, false) > 0 && model.hasMidiOutputNode();
 
-        NodeObjectPtr ioNodes[IONode::numDeviceTypes];
+        ProcessorPtr ioNodes[IONode::numDeviceTypes];
         for (int i = 0; i < manager.getNumNodes(); ++i)
         {
-            NodeObjectPtr node = manager.getNode (i);
+            ProcessorPtr node = manager.getNode (i);
             if (auto* ioProc = dynamic_cast<IONode*> (node.get()))
                 ioNodes[ioProc->getType()] = node;
         }
@@ -161,7 +161,7 @@ private:
 class NodeModelUpdater : public ReferenceCountedObject
 {
 public:
-    NodeModelUpdater (GraphManager& m, const ValueTree& d, NodeObject* o)
+    NodeModelUpdater (GraphManager& m, const ValueTree& d, Processor* o)
         : manager (m), data (d), object (o)
     {
         portsChangedConnection = object->portsChanged.connect (
@@ -176,7 +176,7 @@ public:
 private:
     GraphManager& manager;
     ValueTree data;
-    NodeObjectPtr object;
+    ProcessorPtr object;
     SignalConnection portsChangedConnection;
 
     void onPortsChanged()
@@ -205,7 +205,7 @@ class GraphManager::Binding
 {
 public:
     Binding() = delete;
-    Binding (GraphManager& g, NodeObjectPtr o, const Node& n)
+    Binding (GraphManager& g, ProcessorPtr o, const Node& n)
         : owner (g),
           object (o),
           node (n)
@@ -261,7 +261,7 @@ public:
 private:
     friend class GraphManager;
     GraphManager& owner;
-    NodeObjectPtr object;
+    ProcessorPtr object;
     Node node;
     ValueTree data;
     std::unique_ptr<GraphManager> manager;
@@ -276,7 +276,7 @@ GraphManager::GraphManager (GraphNode& pg, PluginManager& pm)
 
 GraphManager::~GraphManager()
 {
-    // Make sure to dereference NodeObject's so we don't leak memory
+    // Make sure to dereference Processor's so we don't leak memory
     // If you get warnings by juce's leak detector about graph related
     // objects, then there's probably "object" properties lingering that
     // are referenced in the model;
@@ -290,9 +290,9 @@ uint32 GraphManager::getNextUID() noexcept
 }
 
 int GraphManager::getNumNodes() const noexcept { return processor.getNumNodes(); }
-const NodeObjectPtr GraphManager::getNode (const int index) const noexcept { return processor.getNode (index); }
+const ProcessorPtr GraphManager::getNode (const int index) const noexcept { return processor.getNode (index); }
 
-const NodeObjectPtr GraphManager::getNodeForId (const uint32 uid) const noexcept
+const ProcessorPtr GraphManager::getNodeForId (const uint32 uid) const noexcept
 {
     return processor.getNodeForId (uid);
 }
@@ -322,10 +322,10 @@ bool GraphManager::contains (const uint32 nodeId) const
     return processor.getNodeForId (nodeId) != nullptr;
 }
 
-NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
+Processor* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
     String errorMessage;
-    auto node = std::unique_ptr<NodeObject> (
+    auto node = std::unique_ptr<Processor> (
         pluginManager.createGraphNode (*desc, errorMessage));
 
     if (errorMessage.isNotEmpty())
@@ -343,7 +343,7 @@ NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x,
     return node != nullptr ? processor.addNode (node.release(), nodeId) : nullptr;
 }
 
-NodeObject* GraphManager::createPlaceholder (const Node& node)
+Processor* GraphManager::createPlaceholder (const Node& node)
 {
     auto* ph = new PlaceholderProcessor();
     ph->setupFor (node, processor.getSampleRate(), processor.getBlockSize());
@@ -487,7 +487,7 @@ void GraphManager::removeNode (const uint32 uid)
         if (node.getNodeId() == uid)
         {
             // the model was probably referencing the node ptr
-            NodeObjectPtr obj = node.getObject();
+            ProcessorPtr obj = node.getObject();
             if (obj)
             {
                 obj->willBeRemoved();
@@ -525,8 +525,8 @@ void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const
         const auto* const c = processor.getConnection (i);
         if ((outputs && c->sourceNode == nodeId) || (inputs && c->destNode == nodeId))
         {
-            NodeObjectPtr src = processor.getNodeForId (c->sourceNode);
-            NodeObjectPtr dst = processor.getNodeForId (c->destNode);
+            ProcessorPtr src = processor.getNodeForId (c->sourceNode);
+            ProcessorPtr dst = processor.getNodeForId (c->destNode);
 
             if ((audio && src->getPortType (c->sourcePort) == PortType::Audio && dst->getPortType (c->destPort) == PortType::Audio) || (midi && src->getPortType (c->sourcePort) == PortType::Midi && dst->getPortType (c->destPort) == PortType::Midi))
             {
@@ -602,13 +602,13 @@ void GraphManager::setNodeModel (const Node& node)
     {
         Node node (nodes.getChild (i), false);
         const PluginDescription desc (pluginManager.findDescriptionFor (node));
-        if (NodeObjectPtr obj = createFilter (&desc, 0, 0, node.getNodeId()))
+        if (ProcessorPtr obj = createFilter (&desc, 0, 0, node.getNodeId()))
         {
             setupNode (node.data(), obj);
             obj->setEnabled (node.isEnabled());
             node.setProperty (tags::enabled, obj->isEnabled());
         }
-        else if (NodeObjectPtr ph = createPlaceholder (node))
+        else if (ProcessorPtr ph = createPlaceholder (node))
         {
             DBG ("[element] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.data().setProperty (tags::object, ph.get(), nullptr);
@@ -746,7 +746,7 @@ void GraphManager::processorArcsChanged()
     changed();
 }
 
-void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
+void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 {
     jassert (obj && data.hasType (tags::node));
     Node node (data, false);
@@ -788,7 +788,7 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 
     node.restorePluginState();
     node.resetPorts();
-    if (node.isA ("Element", EL_INTERNAL_ID_MIDI_INPUT_DEVICE) || node.isA ("Element", EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE))
+    if (node.isA ("Element", EL_NODE_ID_MIDI_INPUT_DEVICE) || node.isA ("Element", EL_NODE_ID_MIDI_OUTPUT_DEVICE))
     {
         jassert (node.getNumPorts() == 1);
     }

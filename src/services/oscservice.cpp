@@ -17,26 +17,29 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services/oscservice.hpp"
-#include "session/commandmanager.hpp"
-#include <element/devicemanager.hpp>
-#include "commands.hpp"
+#include <element/juce/osc.hpp>
+
+#include <element/ui/commands.hpp>
+
 #include <element/context.hpp>
+#include <element/devices.hpp>
 #include <element/settings.hpp>
+
+#include "services/oscservice.hpp"
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
 #define EL_OSC_ADDRESS_ENGINE "/element/engine"
 
 namespace element {
 
-struct CommandOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
+struct CommandOSCListener final : juce::OSCReceiver::ListenerWithOSCAddress<>
 {
     CommandOSCListener (Context& w)
         : world (w)
     {
     }
 
-    void oscMessageReceived (const OSCMessage& message) override
+    void oscMessageReceived (const juce::OSCMessage& message) override
     {
         const auto msg = message[0];
         if (! msg.isString())
@@ -63,7 +66,7 @@ struct EngineOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
     {
     }
 
-    void oscMessageReceived (const OSCMessage& message) override
+    void oscMessageReceived (const juce::OSCMessage& message) override
     {
         const auto slug = message[0];
         if (! slug.isString())

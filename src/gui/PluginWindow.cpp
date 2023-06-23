@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/services/guiservice.hpp>
-#include <element/nodeobject.hpp>
+#include <element/ui.hpp>
+#include <element/processor.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"
@@ -212,7 +212,7 @@ private:
     Value bypassValue;
     bool nativeEditor = false;
     ScopedPointer<Component> editor, leftPanel, rightPanel;
-    NodeObjectPtr object;
+    ProcessorPtr object;
     Node node;
 
     class MenuCallback : public ModalComponentManager::Callback
@@ -251,7 +251,7 @@ void PluginWindow::DelayedNodeFocus::timerCallback()
 }
 
 PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
-    : DocumentWindow (n.getName(), LookAndFeel::backgroundColor, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
+    : DocumentWindow (n.getName(), Colors::backgroundColor, DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
       gui (g),
       owner (n.getObject()),
       node (n),
@@ -363,7 +363,7 @@ void PluginWindow::activeWindowStatusChanged()
     gui.checkForegroundStatus();
 }
 
-void PluginWindow::updateGraphNode (NodeObject* newNode, Component* newEditor)
+void PluginWindow::updateGraphNode (Processor* newNode, Component* newEditor)
 {
     jassert (nullptr != newNode && nullptr != newEditor);
     owner = newNode;

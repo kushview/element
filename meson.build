@@ -3,9 +3,9 @@ project ('element', ['c', 'cpp' ],
     meson_version : '>= 0.58.0',
     default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
 
-date_py = files ('tools/date.py')
+date_py = files ('util/date.py')
 element_release_date = run_command ('python', date_py).stdout().strip()
-version_py = files ('tools/version.py')
+version_py = files ('util/version.py')
 version_with_build = run_command ('python',
     [version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
 
@@ -33,6 +33,10 @@ if host_machine.system() == 'darwin'
   objcpp = meson.get_compiler ('objcpp')
 endif
 
+element_include_subdir = 'element-1.0' / 'element'
+element_include_dir = get_option ('includedir') / element_include_subdir
+subdir ('meson/juce')
+
 # Boost
 boost_dep = dependency ('boost', required : true)
 lvtk_proj = subproject ('lvtk')
@@ -50,16 +54,18 @@ if not cpp.check_header ('filesystem', required : false)
     endif
 endif
 
-subdir ('include/element')
-
 element_includes = include_directories ('include')
 
-subdir ('libs/lua')
-subdir ('libs/compat')
-subdir ('include/element/juce')
-subdir ('tools')
+###############################################################################
+subdir ('src/lua')
+subdir ('src/juce')
+subdir ('util')
 subdir ('scripts')
 subdir ('src')
+
+###############################################################################
+subdir ('include/element')
+subdir ('include/element/juce')
 
 ###############################################################################
 # Element Application
@@ -90,7 +96,7 @@ endif
 
 subdir ('test')
 
-if not meson.is_subproject()
+if not get_option ('apps').disabled()
 element_app = executable ('element', element_app_sources,
     install : element_exe_install,
     install_dir : element_exe_install_dir,
@@ -103,3 +109,8 @@ element_app = executable ('element', element_app_sources,
 endif
 
 subdir ('deploy')
+
+summary ('Prefix', get_option('prefix'), section : 'Paths')
+summary ('Programs', get_option('prefix') / get_option('bindir'), section : 'Paths')
+summary ('Headers', get_option('prefix') / get_option('includedir'), section : 'Paths')
+summary ('Libraries', get_option('prefix') / get_option('libdir'), section : 'Paths')

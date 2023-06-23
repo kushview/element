@@ -40,7 +40,7 @@ LV2NodeProvider::~LV2NodeProvider()
     lv2.reset();
 }
 
-NodeObject* LV2NodeProvider::create (const String& uri)
+Processor* LV2NodeProvider::create (const String& uri)
 {
     return nullptr;
 }

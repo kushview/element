@@ -11,23 +11,23 @@ BOOST_AUTO_TEST_CASE (Internals)
 {
     NodeFactory nodes;
     const StringArray expectedIDs (
-        EL_INTERNAL_ID_AUDIO_ROUTER,
-        EL_INTERNAL_ID_GRAPH,
-        EL_INTERNAL_ID_LUA,
-        EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER,
-        EL_INTERNAL_ID_MIDI_MONITOR,
-        EL_INTERNAL_ID_MIDI_PROGRAM_MAP,
-        EL_INTERNAL_ID_MIDI_ROUTER,
-        // EL_INTERNAL_ID_MIDI_SEQUENCER,
-        EL_INTERNAL_ID_OSC_RECEIVER,
-        EL_INTERNAL_ID_OSC_SENDER,
-        EL_INTERNAL_ID_SCRIPT,
-        EL_INTERNAL_ID_MCU);
+        EL_NODE_ID_AUDIO_ROUTER,
+        EL_NODE_ID_GRAPH,
+        EL_NODE_ID_LUA,
+        EL_NODE_ID_MIDI_CHANNEL_SPLITTER,
+        EL_NODE_ID_MIDI_MONITOR,
+        EL_NODE_ID_MIDI_PROGRAM_MAP,
+        EL_NODE_ID_MIDI_ROUTER,
+        // EL_NODE_ID_MIDI_SEQUENCER,
+        EL_NODE_ID_OSC_RECEIVER,
+        EL_NODE_ID_OSC_SENDER,
+        EL_NODE_ID_SCRIPT,
+        EL_NODE_ID_MCU);
 
     OwnedArray<PluginDescription> types;
     for (const auto& ID : expectedIDs) {
         BOOST_REQUIRE (nodes.getKnownIDs().contains (ID));
-        BOOST_REQUIRE (nullptr != std::unique_ptr<NodeObject> (nodes.instantiate (ID)));
+        BOOST_REQUIRE (nullptr != std::unique_ptr<Processor> (nodes.instantiate (ID)));
         nodes.getPluginDescriptions (types, ID);
     }
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (Internals)
     for (const auto* tp : types) {
         BOOST_REQUIRE (tp->name.isNotEmpty());
         BOOST_REQUIRE (expectedIDs.contains (tp->fileOrIdentifier));
-        BOOST_REQUIRE (tp->pluginFormatName == EL_INTERNAL_FORMAT_NAME);
+        BOOST_REQUIRE (tp->pluginFormatName == EL_NODE_FORMAT_NAME);
     }
 }
 

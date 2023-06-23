@@ -22,10 +22,10 @@
 #include <element/ui/about.hpp>
 
 #include "ElementApp.h"
-#include <element/services/guiservice.hpp>
-#include "gui/LookAndFeel.h"
-#include "session/commandmanager.hpp"
-#include "commands.hpp"
+#include <element/ui.hpp>
+#include <element/ui/style.hpp>
+#include <element/ui/commands.hpp>
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include "utils.hpp"
 

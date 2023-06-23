@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
+#include <element/ui/nodeeditor.hpp>
+#include <element/processor.hpp>
 #include <element/porttype.hpp>
 
 #include "engine/nodes/NodeTypes.h"
-#include "gui/nodes/NodeEditorComponent.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -36,12 +36,12 @@ struct Program
     int program { -1 };
 };
 
-class MackieControlUniversal : public NodeObject,
+class MackieControlUniversal : public Processor,
                                public ChangeBroadcaster
 {
 public:
     MackieControlUniversal()
-        : NodeObject (PortCount().with (PortType::Midi, 1, 0).with (PortType::Control, 0, 9).toPortList()) {}
+        : Processor (PortCount().with (PortType::Midi, 1, 0).with (PortType::Control, 0, 9).toPortList()) {}
     ~MackieControlUniversal() {}
 
     /** Open the device. e.g. go online. */
@@ -98,15 +98,15 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.fileOrIdentifier = EL_INTERNAL_ID_MCU;
-        desc.uniqueId = EL_INTERNAL_UID_MCU;
+        desc.fileOrIdentifier = EL_NODE_ID_MCU;
+        desc.uniqueId = EL_NODE_UID_MCU;
         desc.name = "MCU Brain";
         desc.descriptiveName = "Support for Mackie Control Universal";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
-        desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc.pluginFormatName = "Element";
         desc.version = "1.0.0";
     }
@@ -121,11 +121,11 @@ private:
     juce::MidiMessageCollector col;
 };
 
-class MackieControlEditor : public NodeEditorComponent
+class MackieControlEditor : public NodeEditor
 {
 public:
     MackieControlEditor (const Node& node)
-        : NodeEditorComponent (node)
+        : NodeEditor (node)
     {
         setOpaque (true);
         addAndMakeVisible (testButton);
@@ -170,7 +170,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (element::LookAndFeel::widgetBackgroundColor);
+        g.fillAll (element::Colors::widgetBackgroundColor);
     }
 
 private:

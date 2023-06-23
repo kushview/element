@@ -19,7 +19,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/PluginManagerComponent.h"
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
@@ -105,7 +105,7 @@ public:
         if (text.isNotEmpty())
         {
             g.setColour (isBlacklisted         ? Colours::red
-                         : columnId == nameCol ? LookAndFeel_KV1::textColor
+                         : columnId == nameCol ? Colors::textColor
                                                : Colours::grey);
             g.setFont (Font (height * 0.7f));
             g.drawFittedText (text, 4, 0, width - 6, height, Justification::centredLeft, 1, 0.9f);

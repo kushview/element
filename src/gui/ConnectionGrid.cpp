@@ -24,7 +24,7 @@
 #include "gui/ConnectionGrid.h"
 #include "gui/Artist.h"
 
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include "session/presetmanager.hpp"
 
 #include "matrixstate.hpp"
@@ -121,7 +121,7 @@ public:
         {
             g.setColour (matrix.connected (row, column)
                              ? Colour (Colors::elemental.brighter())
-                             : Colour (LookAndFeel_KV1::defaultMatrixCellOffColor));
+                             : Colour (LookAndFeel_E1::defaultMatrixCellOffColor));
             g.fillRect (0, 0, width - gridPadding, height - gridPadding);
         }
     }
@@ -285,7 +285,7 @@ private:
 
         const bool hover = (isSource) ? mouseIsOverRow (rowNumber)
                                       : mouseIsOverColumn (rowNumber);
-        g.setColour (hover ? Colors::elemental.withAlpha (0.4f) : LookAndFeel::widgetBackgroundColor);
+        g.setColour (hover ? Colors::elemental.withAlpha (0.4f) : Colors::widgetBackgroundColor);
 
         if (isSource)
             g.fillRect (0, 0, width - 1, height - 1);
@@ -842,7 +842,7 @@ void ConnectionGrid::setNode (const Node& newNode)
 
 void ConnectionGrid::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::contentBackgroundColor);
+    g.fillAll (Colors::contentBackgroundColor);
 }
 
 void ConnectionGrid::resized()

@@ -22,9 +22,9 @@
 
 #include "engine/nodes/OSCSenderNode.h"
 #include "gui/ViewHelpers.h"
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 #include "gui/widgets/LogListBox.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "utils.hpp"
 
 namespace element {
@@ -41,7 +41,7 @@ public:
     void paint (Graphics& g)
     {
         // In case parent background is different
-        g.fillAll (element::LookAndFeel::backgroundColor);
+        g.fillAll (element::Colors::backgroundColor);
     }
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
@@ -75,7 +75,7 @@ private:
     }
 };
 
-class OSCSenderNodeEditor : public NodeEditorComponent,
+class OSCSenderNodeEditor : public NodeEditor,
                             public ChangeListener,
                             private Timer
 {

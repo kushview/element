@@ -6,7 +6,7 @@
 namespace element {
 
 IONode::IONode (const IODeviceType type_)
-    : NodeObject (0),
+    : Processor (0),
       type (type_),
       graph (nullptr)
 {
@@ -62,7 +62,7 @@ void IONode::fillInPluginDescription (PluginDescription& d) const
     d.uniqueId = d.name.hashCode();
     d.category = "I/O Devices";
     d.pluginFormatName = "Internal";
-    d.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+    d.manufacturerName = EL_NODE_FORMAT_AUTHOR;
     d.version = "1.0";
     d.isInstrument = false;
 

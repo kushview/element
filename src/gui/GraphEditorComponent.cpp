@@ -18,7 +18,7 @@
 */
 
 #include <element/ui/popups.hpp>
-#include <element/ui/datapathbrowser.hpp>
+#include "gui/datapathbrowser.hpp"
 
 #include "ElementApp.h"
 #include "engine/graphmanager.hpp"
@@ -43,7 +43,7 @@
 #include "gui/NodeIOConfiguration.h"
 #include "engine/nodes/BaseProcessor.h"
 
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include "session/presetmanager.hpp"
 #include <element/node.hpp>
 
@@ -909,7 +909,7 @@ void GraphEditorComponent::dragConnector (const MouseEvent& e)
     }
 }
 
-Component* GraphEditorComponent::createContainerForNode (NodeObjectPtr node, bool useGenericEditor)
+Component* GraphEditorComponent::createContainerForNode (ProcessorPtr node, bool useGenericEditor)
 {
     if (AudioProcessorEditor* ed = createEditorForNode (node, useGenericEditor))
         if (Component* comp = wrapAudioProcessorEditor (ed, node))
@@ -917,9 +917,9 @@ Component* GraphEditorComponent::createContainerForNode (NodeObjectPtr node, boo
     return nullptr;
 }
 
-Component* GraphEditorComponent::wrapAudioProcessorEditor (AudioProcessorEditor* ed, NodeObjectPtr) { return ed; }
+Component* GraphEditorComponent::wrapAudioProcessorEditor (AudioProcessorEditor* ed, ProcessorPtr) { return ed; }
 
-AudioProcessorEditor* GraphEditorComponent::createEditorForNode (NodeObjectPtr node, bool useGenericEditor)
+AudioProcessorEditor* GraphEditorComponent::createEditorForNode (ProcessorPtr node, bool useGenericEditor)
 {
     std::unique_ptr<AudioProcessorEditor> ui = nullptr;
 

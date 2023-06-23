@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://gitlab.com/lvtk/evg.git/
+push-url = git@gitlab.com:lvtk/evg.git
+revision = main
+
+[provide]
+dependency_names = evg-0

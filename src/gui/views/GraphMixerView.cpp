@@ -22,7 +22,7 @@
 #include "gui/views/GraphMixerView.h"
 #include "gui/views/GraphMixerView.h"
 #include "gui/widgets/HorizontalListBox.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/ViewHelpers.h"
 
 #include "common.hpp"
@@ -233,7 +233,7 @@ public:
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             const auto node = graph.getNode (i);
-            if (node.isMidiIONode() || node.getIdentifier() == EL_INTERNAL_ID_MIDI_INPUT_DEVICE || node.getIdentifier() == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
+            if (node.isMidiIONode() || node.getIdentifier() == EL_NODE_ID_MIDI_INPUT_DEVICE || node.getIdentifier() == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
             {
                 continue;
             }
@@ -295,12 +295,12 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel::widgetBackgroundColor.darker());
+        g.setColour (Colors::widgetBackgroundColor.darker());
         g.fillAll();
 
         if (model->getNumRows() <= 0)
         {
-            g.setColour (LookAndFeel::textColor);
+            g.setColour (Colors::textColor);
             g.setFont (Font (15.f));
             g.drawText (TRANS ("No channels to display"),
                         getLocalBounds().toFloat(),

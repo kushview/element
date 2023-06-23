@@ -19,8 +19,8 @@
 
 #include "engine/nodes/AudioMixerProcessor.h"
 #include "gui/widgets/HorizontalListBox.h"
-#include "gui/LookAndFeel.h"
-#include "gui/DigitalMeter.h"
+#include <element/ui/style.hpp>
+#include <element/ui/simplemeter.hpp>
 
 #define EL_FADER_MIN_DB -90.0
 #define EL_FADER_MAX_DB 12.0
@@ -144,7 +144,7 @@ private:
 
         void paint (Graphics& g) override
         {
-            g.fillAll (LookAndFeel::widgetBackgroundColor);
+            g.fillAll (Colors::widgetBackgroundColor);
         }
 
         void resized() override
@@ -186,7 +186,7 @@ private:
         AudioMixerEditor& editor;
         AudioMixerProcessor::MonitorPtr monitor;
         Slider fader;
-        DigitalMeter meter;
+        SimpleMeter meter;
         TextButton mute;
         Label name;
         Label volume;

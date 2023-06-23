@@ -17,7 +17,7 @@
 */
 
 #include <element/context.hpp>
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 #include <element/settings.hpp>
 #include "engine/midiengine.hpp"
 

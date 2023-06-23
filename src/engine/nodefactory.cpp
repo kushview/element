@@ -39,16 +39,16 @@ namespace element {
 
 NodeFactory::NodeFactory()
 {
-    add<AudioRouterNode> (EL_INTERNAL_ID_AUDIO_ROUTER);
-    add<LuaNode> (EL_INTERNAL_ID_LUA);
-    add<MidiChannelSplitterNode> (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
-    add<MidiMonitorNode> (EL_INTERNAL_ID_MIDI_MONITOR);
-    add<MidiProgramMapNode> (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
-    add<MidiRouterNode> (EL_INTERNAL_ID_MIDI_ROUTER);
-    add<OSCSenderNode> (EL_INTERNAL_ID_OSC_SENDER);
-    add<OSCReceiverNode> (EL_INTERNAL_ID_OSC_RECEIVER);
-    add<ScriptNode> (EL_INTERNAL_ID_SCRIPT);
-    add<GraphNode> (EL_INTERNAL_ID_GRAPH);
+    add<AudioRouterNode> (EL_NODE_ID_AUDIO_ROUTER);
+    add<LuaNode> (EL_NODE_ID_LUA);
+    add<MidiChannelSplitterNode> (EL_NODE_ID_MIDI_CHANNEL_SPLITTER);
+    add<MidiMonitorNode> (EL_NODE_ID_MIDI_MONITOR);
+    add<MidiProgramMapNode> (EL_NODE_ID_MIDI_PROGRAM_MAP);
+    add<MidiRouterNode> (EL_NODE_ID_MIDI_ROUTER);
+    add<OSCSenderNode> (EL_NODE_ID_OSC_SENDER);
+    add<OSCReceiverNode> (EL_NODE_ID_OSC_RECEIVER);
+    add<ScriptNode> (EL_NODE_ID_SCRIPT);
+    add<GraphNode> (EL_NODE_ID_GRAPH);
     add<MackieControlUniversal> ("el.MCU");
 }
 
@@ -66,7 +66,7 @@ void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, con
 
     for (auto* f : providers)
     {
-        if (NodeObjectPtr ptr = f->create (ID))
+        if (ProcessorPtr ptr = f->create (ID))
         {
             auto* desc = out.add (new PluginDescription());
             ptr->getPluginDescription (*desc);
@@ -91,14 +91,14 @@ NodeFactory& NodeFactory::add (NodeProvider* f)
 }
 
 //==============================================================================
-NodeObject* NodeFactory::instantiate (const PluginDescription& desc)
+Processor* NodeFactory::instantiate (const PluginDescription& desc)
 {
     return instantiate (desc.fileOrIdentifier);
 }
 
-NodeObject* NodeFactory::instantiate (const String& identifier)
+Processor* NodeFactory::instantiate (const String& identifier)
 {
-    NodeObject* node = nullptr;
+    Processor* node = nullptr;
     for (const auto& f : providers)
         if (auto* const n = f->create (identifier))
         {
@@ -114,7 +114,7 @@ NodeObject* NodeFactory::instantiate (const String& identifier)
     return node;
 }
 
-NodeObject* NodeFactory::wrap (AudioProcessor* processor)
+Processor* NodeFactory::wrap (AudioProcessor* processor)
 {
     jassert (processor);
     auto node = std::make_unique<AudioProcessorNode> (0, processor);

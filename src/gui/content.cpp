@@ -20,21 +20,21 @@
 #include <element/services.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 #include <element/node.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "gui/widgets/MidiBlinker.h"
 
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
 #include "gui/TempoAndMeterBar.h"
 #include "gui/TransportBar.h"
 #include "gui/ViewHelpers.h"
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 
 #include <element/ui/content.hpp>
 
@@ -54,7 +54,7 @@ ContentView::~ContentView()
 
 void ContentView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::backgroundColor);
+    g.fillAll (Colors::backgroundColor);
 }
 
 bool ContentView::keyPressed (const KeyPress& k)
@@ -213,7 +213,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1f));
+        g.setColour (Colors::contentBackgroundColor.brighter (0.1f));
         g.fillRect (getLocalBounds());
     }
 
@@ -331,7 +331,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1f));
+        g.setColour (Colors::contentBackgroundColor.brighter (0.1f));
         g.fillRect (getLocalBounds());
 
         const Colour lineColor (0xff545454);
@@ -464,7 +464,7 @@ ContentComponent::~ContentComponent() noexcept
 
 void ContentComponent::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::backgroundColor);
+    g.fillAll (Colors::backgroundColor);
 }
 
 void ContentComponent::resized()

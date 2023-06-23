@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
-class GenericNodeEditor : public NodeEditorComponent
+class GenericNodeEditor : public NodeEditor
 {
 public:
     GenericNodeEditor (const Node&);

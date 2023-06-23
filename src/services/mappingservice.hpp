@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include <element/controller.hpp>
 #include <element/signals.hpp>
 

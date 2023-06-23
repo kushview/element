@@ -5,7 +5,7 @@
 
 namespace element {
 
-class GraphEditor : public NodeEditorComponent {
+class GraphEditor : public NodeEditor {
 public:
     GraphEditor (const Node& graph);
     ~GraphEditor();

@@ -19,7 +19,7 @@
 
 #include "services/mappingservice.hpp"
 #include "services/deviceservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "engine/mappingengine.hpp"
 #include <element/controller.hpp>
 #include <element/context.hpp>
@@ -50,9 +50,9 @@ public:
     void handleAsyncUpdate() override
     {
         AudioProcessor* capturedProcessor = nullptr;
-        NodeObjectPtr capturedObject = nullptr;
+        ProcessorPtr capturedObject = nullptr;
         Node capturedNode = Node();
-        int capturedParameter = NodeObject::NoParameter;
+        int capturedParameter = Processor::NoParameter;
 
         {
             ScopedLock sl (lock);
@@ -65,12 +65,12 @@ public:
             node = Node();
             object = nullptr;
             processor = nullptr;
-            parameter = NodeObject::NoParameter;
+            parameter = Processor::NoParameter;
         }
 
         if (capturedObject != nullptr && capturedObject.get() == capturedNode.getObject())
         {
-            if (capturedParameter == NodeObject::EnabledParameter || capturedParameter == NodeObject::BypassParameter || capturedParameter == NodeObject::MuteParameter || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
+            if (capturedParameter == Processor::EnabledParameter || capturedParameter == Processor::BypassParameter || capturedParameter == Processor::MuteParameter || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
             {
                 callback (capturedNode, capturedParameter);
             }
@@ -106,7 +106,7 @@ public:
     Signal<void (const Node&, int)> callback;
     Atomic<bool> capture = false;
     Node node;
-    NodeObjectPtr object = nullptr;
+    ProcessorPtr object = nullptr;
     AudioProcessor* processor = nullptr;
     int parameter = -1;
 
@@ -164,7 +164,7 @@ private:
 
         void controlTouched (int, bool) override {}
 
-        void onEnablementChanged (NodeObject*)
+        void onEnablementChanged (Processor*)
         {
             if (capture.capture.get() == false)
                 return;
@@ -173,11 +173,11 @@ private:
             capture.node = node;
             capture.object = object;
             capture.processor = object->getAudioProcessor();
-            capture.parameter = NodeObject::EnabledParameter;
+            capture.parameter = Processor::EnabledParameter;
             capture.triggerAsyncUpdate();
         }
 
-        void onBypassChanged (NodeObject*)
+        void onBypassChanged (Processor*)
         {
             if (capture.capture.get() == false)
                 return;
@@ -186,11 +186,11 @@ private:
             capture.node = node;
             capture.object = object;
             capture.processor = object->getAudioProcessor();
-            capture.parameter = NodeObject::BypassParameter;
+            capture.parameter = Processor::BypassParameter;
             capture.triggerAsyncUpdate();
         }
 
-        void onMuteChanged (NodeObject*)
+        void onMuteChanged (Processor*)
         {
             if (capture.capture.get() == false)
                 return;
@@ -199,14 +199,14 @@ private:
             capture.node = node;
             capture.object = object;
             capture.processor = object->getAudioProcessor();
-            capture.parameter = NodeObject::MuteParameter;
+            capture.parameter = Processor::MuteParameter;
             capture.triggerAsyncUpdate();
         }
 
     private:
         AudioProcessorParameterCapture& capture;
         Node node;
-        NodeObjectPtr object;
+        ProcessorPtr object;
         Array<SignalConnection> connections;
     };
 
@@ -217,7 +217,7 @@ private:
         for (int j = 0; j < node.getNumNodes(); ++j)
         {
             const auto child (node.getNode (j));
-            if (NodeObject* const object = child.getObject())
+            if (Processor* const object = child.getObject())
                 mappables.add (new Mappable (*this, child));
             if (child.data().getNumChildren() > 0)
                 addNodesRecursive (child);
@@ -236,8 +236,8 @@ public:
 
     bool isCaptureComplete() const
     {
-        NodeObjectPtr object = node.getObject();
-        return object != nullptr && (parameter == NodeObject::EnabledParameter || parameter == NodeObject::BypassParameter || parameter == NodeObject::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOn()) && control.data().isValid();
+        ProcessorPtr object = node.getObject();
+        return object != nullptr && (parameter == Processor::EnabledParameter || parameter == Processor::BypassParameter || parameter == Processor::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOn()) && control.data().isValid();
     }
 
     AudioProcessorParameterCapture capture;

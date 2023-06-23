@@ -1,5 +1,5 @@
 
-scripts_gen = generator (jrc,
+scripts_gen = generator (bin2c,
     output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
     arguments : [ '@INPUT@', '@BUILD_DIR@', 'scripts' ])
 scripts_includes = include_directories ('.', '../scripts')

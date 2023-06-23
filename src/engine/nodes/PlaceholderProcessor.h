@@ -89,8 +89,8 @@ public:
         d.name = "Placeholder";
         d.version = "1.0.0";
         d.pluginFormatName = "Element";
-        d.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
-        d.fileOrIdentifier = EL_INTERNAL_ID_PLACEHOLDER;
+        d.manufacturerName = EL_NODE_FORMAT_AUTHOR;
+        d.fileOrIdentifier = EL_NODE_ID_PLACEHOLDER;
         d.numInputChannels = numInputs;
         d.numOutputChannels = numOutputs;
     }

@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #ifndef ELEMENT_H_INCLUDED
 #define ELEMENT_H_INCLUDED
 
@@ -51,7 +54,7 @@ typedef enum {
     EL_PORT_TYPE_UNKNOWN
 } elPortType;
 
-//=============================================================================
+//==============================================================================
 #define EL_MT_AUDIO_BUFFER_64 "el.AudioBuffer64"
 #define EL_MT_AUDIO_BUFFER_32 "el.AudioBuffer32"
 #define EL_MT_BYTE_ARRAY      "el.ByteArray"

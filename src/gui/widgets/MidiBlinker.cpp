@@ -18,7 +18,7 @@
 */
 
 #include "gui/widgets/MidiBlinker.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 

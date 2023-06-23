@@ -18,7 +18,7 @@
 */
 
 #include "gui/RackContentView.h"
-#include "gui/LookAndFeel_KV1.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -41,7 +41,7 @@ RackView::~RackView()
 
 void RackView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel_KV1::backgroundColor);
+    g.fillAll (Colors::backgroundColor);
 
     g.setColour (Colors::elemental);
     g.setFont (14.0f);

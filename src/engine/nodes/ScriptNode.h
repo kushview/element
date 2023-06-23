@@ -20,14 +20,14 @@
 #pragma once
 
 #include "engine/nodes/BaseProcessor.h"
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include "sol/sol.hpp"
 
 namespace element {
 
 class DSPScript;
 
-class ScriptNode : public NodeObject,
+class ScriptNode : public Processor,
                    public ChangeBroadcaster
 {
 public:

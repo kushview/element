@@ -13,7 +13,7 @@ public:
 };
 
 GraphEditor::GraphEditor (const Node& n)
-    : NodeEditorComponent (n)
+    : NodeEditor (n)
 {
     setOpaque (true);
     graph = std::make_unique<Graph> (*this);

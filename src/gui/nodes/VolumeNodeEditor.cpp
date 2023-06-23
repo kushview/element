@@ -38,7 +38,7 @@ public:
         ioButton->setPath (getIcons().fasCog);
         ioButton->onClick = [this]() {
             auto node = getNode();
-            NodeObjectPtr obj = node.getObject();
+            ProcessorPtr obj = node.getObject();
             auto* proc = (obj) ? obj->getAudioProcessor() : 0;
             if (! proc)
                 return;
@@ -128,7 +128,7 @@ private:
 };
 
 VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiService& gui)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     setOpaque (true);
     strip.reset (new ChannelStrip (gui));

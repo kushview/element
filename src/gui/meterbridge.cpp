@@ -1,9 +1,9 @@
 #include <element/ui/meterbridge.hpp>
 #include <element/services.hpp>
 #include <element/context.hpp>
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -257,7 +257,7 @@ public:
 
     void paint (Graphics& g)
     {
-        // g.fillAll (LookAndFeel::widgetBackgroundColor);
+        // g.fillAll (Colors::widgetBackgroundColor);
     }
 
     void init (Context& context)

@@ -16,11 +16,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <element/engine/internalformat.hpp>
-#include <element/devicemanager.hpp>
+#include "engine/internalformat.hpp"
+#include <element/devices.hpp>
 #include <element/session.hpp>
 #include <element/settings.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include <element/services.hpp>
 #include <element/context.hpp>
 
@@ -65,7 +65,7 @@ private:
     void init()
     {
         log.reset (new Log());
-        plugins.reset (new PluginManager());
+
         devices.reset (new DeviceManager());
         settings.reset (new Settings());
         mapping.reset (new MappingEngine());
@@ -78,6 +78,11 @@ private:
 
         owner.setEngine (new AudioEngine (owner, RunMode::Standalone));
         services = std::make_unique<Services> (owner, RunMode::Standalone);
+
+        plugins.reset (new PluginManager());
+        plugins->addFormat (new InternalFormat (owner));
+        plugins->addFormat (new ElementAudioPluginFormat (owner));
+        plugins->addDefaultFormats();
     }
 
     void freeAll()

@@ -26,7 +26,7 @@
 namespace element {
 
 AudioRouterNode::AudioRouterNode (int ins, int outs)
-    : NodeObject (0),
+    : Processor (0),
       numSources (ins),
       numDestinations (outs),
       state (ins, outs),

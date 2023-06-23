@@ -11,6 +11,8 @@
 #define EL_TEMPO_MIN 20
 #define EL_TEMPO_MAX 999
 
+#define EL_SESSION_VERSION 0
+
 namespace element {
 class Session;
 class Context;

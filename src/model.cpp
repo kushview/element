@@ -18,12 +18,28 @@
 */
 
 #include <element/model.hpp>
+#include <element/tags.hpp>
 
 namespace element {
 
 using namespace juce;
 Model::Model (const ValueTree& data) : objectData (data) {}
 Model::Model (const Identifier& type) : objectData (type) {}
+Model::Model (const juce::Identifier& type, int dataVersion)
+    : objectData (type)
+{
+    jassert (dataVersion >= 0);
+    setProperty (tags::version, dataVersion);
+}
+
+int Model::version() const noexcept
+{
+    if (! objectData.hasProperty (tags::version))
+        return -1;
+    const auto vers = (int) objectData.getProperty (tags::version);
+    jassert (vers >= 0);
+    return vers;
+}
 
 int Model::countChildrenOfType (const Identifier& slug) const
 {

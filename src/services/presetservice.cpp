@@ -17,20 +17,23 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "services/presetservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/session.hpp>
 #include "session/presetmanager.hpp"
 #include <element/context.hpp>
+
 #include "datapath.hpp"
+#include "services/presetservice.hpp"
+
+using juce::String;
 
 namespace element {
 
-struct PresetService::Pimpl
+struct PresetService::Impl
 {
-    Pimpl() {}
-    ~Pimpl() {}
+    Impl() {}
+    ~Impl() {}
 
     void refresh()
     {
@@ -39,12 +42,12 @@ struct PresetService::Pimpl
 
 PresetService::PresetService()
 {
-    pimpl.reset (new Pimpl());
+    impl.reset (new Impl());
 }
 
 PresetService::~PresetService()
 {
-    pimpl.reset (nullptr);
+    impl.reset (nullptr);
 }
 
 void PresetService::activate()
@@ -74,9 +77,8 @@ void PresetService::add (const Node& node, const String& presetName)
         context().presets().refresh();
     }
 
-    if (auto* gui = sibling<GuiService>())
-        if (auto* cc = gui->getContentComponent())
-            cc->stabilize (true);
+    if (auto* ui = sibling<UI>())
+        ui->stabilizeContent();
 }
 
 } // namespace element

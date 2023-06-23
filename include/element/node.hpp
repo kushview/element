@@ -3,11 +3,18 @@
 
 #pragma once
 
+#include <element/element.h>
+#include <element/node.h>
+
 #include <element/arc.hpp>
 #include <element/model.hpp>
 #include <element/midichannels.hpp>
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include <element/tags.hpp>
+
+#define EL_NODE_VERSION  0
+#define EL_PORT_VERSION  EL_NODE_VERSION
+#define EL_GRAPH_VERSION EL_NODE_VERSION
 
 namespace element {
 
@@ -22,9 +29,9 @@ class Node;
 class Script;
 
 /** Representation of a Port of a Node. */
-class Port : public Model {
+class EL_API Port : public Model {
 public:
-    Port() : Model (tags::port) {}
+    Port() : Model (tags::port, EL_PORT_VERSION) {}
     Port (const ValueTree& p)
         : Model (p) { jassert (p.hasType (tags::port)); }
     ~Port() {}
@@ -77,7 +84,7 @@ public:
 };
 
 /** Representation of a Node */
-class Node : public Model {
+class EL_API Node : public Model {
 public:
     /** Create an invalid node */
     Node();
@@ -264,10 +271,10 @@ public:
 
     //=========================================================================
     /** Returns the engine-side graphnode implementation */
-    NodeObject* getObject() const;
+    Processor* getObject() const;
 
     /** Returns a child graph node object by id */
-    NodeObject* getObjectForId (const uint32) const;
+    Processor* getObjectForId (const uint32) const;
 
     /** Returns true if this node can connect to another in any capacity */
     const bool canConnectTo (const Node& o) const;
@@ -415,7 +422,7 @@ public:
     Node getNodeByUuid (const Uuid& uuid, const bool recursive = true) const;
 
     //=========================================================================
-    /** Rebuild this node's ports based on it's NodeObject object */
+    /** Rebuild this node's ports based on it's Processor object */
     void resetPorts();
 
     /** Get a port by index */
@@ -425,10 +432,10 @@ public:
     bool canConnect (const uint32 sourceNode, const uint32 sourcePort, const uint32 destNode, const uint32 destPort) const;
 
     //=========================================================================
-    /** Saves the node state from NodeObject to state property */
+    /** Saves the node state from Processor to state property */
     void savePluginState();
 
-    /** Reads state property and applies to NodeObject */
+    /** Reads state property and applies to Processor */
     void restorePluginState();
 
     //=========================================================================
@@ -512,8 +519,6 @@ private:
     void setMissingProperties();
     void forEach (const ValueTree tree, std::function<void (const ValueTree& tree)>) const;
 };
-
-typedef Node NodeModel;
 
 class NodeObjectSync final : private ValueTree::Listener {
 public:

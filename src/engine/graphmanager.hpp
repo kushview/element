@@ -47,10 +47,10 @@ public:
     int getNumNodes() const noexcept;
 
     /** Returns a node by index */
-    const NodeObjectPtr getNode (const int index) const noexcept;
+    const ProcessorPtr getNode (const int index) const noexcept;
 
     /** Returns a node by NodeId */
-    const NodeObjectPtr getNodeForId (const uint32 uid) const noexcept;
+    const ProcessorPtr getNodeForId (const uint32 uid) const noexcept;
 
     /** Returns a node model by Node ID */
     const Node getNodeModelForId (const uint32 nodeId) const noexcept;
@@ -122,10 +122,10 @@ private:
 
     uint32 getNextUID() noexcept;
     inline void changed() { sendChangeMessage(); }
-    NodeObject* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
-    NodeObject* createPlaceholder (const Node& node);
+    Processor* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
+    Processor* createPlaceholder (const Node& node);
 
-    void setupNode (const ValueTree& data, NodeObjectPtr object);
+    void setupNode (const ValueTree& data, ProcessorPtr object);
 
     void processorArcsChanged();
 

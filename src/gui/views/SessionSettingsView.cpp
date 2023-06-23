@@ -19,7 +19,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/views/SessionSettingsView.h"
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 
 namespace element {
 typedef Array<PropertyComponent*> PropertyArray;
@@ -72,7 +72,7 @@ SessionContentView::SessionContentView()
     setEscapeTriggersClose (true);
     addAndMakeVisible (graphButton);
     graphButton.setTooltip ("Show graph editor");
-    graphButton.onClick = [this]() {
+    graphButton.onClick = []() {
         // FIXME: Commands
         // if (auto* g = ViewHelpers::getGlobals (this))
         //     g->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
@@ -93,7 +93,7 @@ void SessionContentView::didBecomeActive()
 
 void SessionContentView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::contentBackgroundColor);
+    g.fillAll (Colors::contentBackgroundColor);
 }
 
 void SessionContentView::resized()

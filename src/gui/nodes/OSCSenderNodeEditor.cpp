@@ -18,13 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/nodes/OSCSenderNodeEditor.h"
 
 namespace element {
 
 OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     oscSenderNodePtr = getNodeObjectOfType<OSCSenderNode>();
 
@@ -161,7 +161,7 @@ void OSCSenderNodeEditor::resetBounds (int fullWidth, int fullHeight)
 
 void OSCSenderNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::backgroundColor.brighter (0.1));
+    g.fillAll (Colors::backgroundColor.brighter (0.1));
 }
 
 void OSCSenderNodeEditor::connectButtonClicked()

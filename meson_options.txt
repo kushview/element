@@ -1,3 +1,4 @@
+option ('apps', type : 'feature', value : 'auto',  description : 'Build applications')
 
 option ('lv2dir', type : 'string',  value : '', description: 'LV2 install path')
 

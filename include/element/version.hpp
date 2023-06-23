@@ -1,9 +1,13 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #pragma once
 
 #include <string>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+
 #include <element/version.h>
 
 namespace element {
@@ -13,13 +17,13 @@ using VersionSegments = std::vector<std::string>;
 /** Representation of a version number */
 class Version {
 public:
-    explicit Version (const std::string& version = "")
+    inline explicit Version (const std::string& version = "")
     {
         _hex = toHex (version);
         _build = build (version);
     }
 
-    ~Version() = default;
+    inline ~Version() = default;
 
     /** Returns the version string with git hash appended */
     inline static std::string withGitHash()
@@ -30,6 +34,7 @@ public:
         return result;
     }
 
+    /** Parse to segments */
     inline static VersionSegments segments (const std::string& version,
                                             const std::string& delim = ",.-")
     {
@@ -43,6 +48,7 @@ public:
         return s;
     }
 
+    /** Parses the versin string to a hex integer. */
     inline static int toHex (const std::string& version)
     {
         const auto segs (segments (version));
@@ -59,6 +65,9 @@ public:
         return value;
     }
 
+    /** Parses the build number from a version string. i.e. the 4th version 
+        segment.
+     */
     inline static int build (const std::string& version)
     {
         const auto segs (segments (version));
@@ -67,11 +76,16 @@ public:
         return 0;
     }
 
+    /** Returns the version as a hex integer. */
     inline int asHex() const noexcept { return _hex; }
+
+    /** Returns the build number. */
     inline int build() const noexcept { return _build; }
 
-    Version (const Version& o) { operator= (o); }
-    Version& operator= (const Version& o)
+    /** @internal */
+    inline Version (const Version& o) { operator= (o); }
+    /** @internal */
+    inline Version& operator= (const Version& o)
     {
         this->_build = o._build;
         this->_hex = o._hex;

@@ -20,9 +20,10 @@
 #pragma once
 
 #include <element/services.hpp>
-#include "documents/sessiondocument.hpp"
 #include <element/session.hpp>
 #include <element/signals.hpp>
+
+#include "gui/sessiondocument.hpp"
 
 namespace element {
 class SessionService : public Service

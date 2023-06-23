@@ -2,9 +2,9 @@
 // @classmod el.Commands
 // @pragma nostrip
 
+#include <element/element.h>
+#include <element/ui/commands.hpp>
 #include "sol_helpers.hpp"
-#include "session/commandmanager.hpp"
-#include "commands.hpp"
 
 EL_PLUGIN_EXPORT int luaopen_el_Commands (lua_State* L)
 {
@@ -26,7 +26,7 @@ EL_PLUGIN_EXPORT int luaopen_el_Commands (lua_State* L)
         // @function Commands.tostring
         // @see Commands.standard
         "toString",
-        [] (CommandID cmd) { return Commands::toString (cmd).toStdString(); },
+        [] (juce::CommandID cmd) { return Commands::toString (cmd).toStdString(); },
 
         sol::base_classes,
         sol::bases<juce::ApplicationCommandManager>());

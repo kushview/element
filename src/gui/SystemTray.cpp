@@ -19,8 +19,8 @@
 
 #include "gui/MainWindow.h"
 #include "gui/SystemTray.h"
-#include "session/commandmanager.hpp"
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
+#include <element/ui/commands.hpp>
 #include <element/context.hpp>
 #include "utils.hpp"
 

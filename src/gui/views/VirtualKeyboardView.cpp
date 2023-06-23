@@ -231,7 +231,7 @@ VirtualKeyboardView::~VirtualKeyboardView()
 
 void VirtualKeyboardView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::widgetBackgroundColor);
+    g.fillAll (Colors::widgetBackgroundColor);
 }
 
 void VirtualKeyboardView::resized()

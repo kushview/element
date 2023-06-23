@@ -20,7 +20,7 @@
 */
 
 #include "EQFilterNodeEditor.h"
-#include "../LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 

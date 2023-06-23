@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
-class MidiMonitorNodeEditor : public NodeEditorComponent
+class MidiMonitorNodeEditor : public NodeEditor
 {
 public:
     MidiMonitorNodeEditor (const Node& node);

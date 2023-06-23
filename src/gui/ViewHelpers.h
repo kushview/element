@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 #include <element/audioengine.hpp>
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include <element/session.hpp>
 
 namespace element {
@@ -76,7 +76,7 @@ void postMessageFor (Component*, Message*);
 /** Get a graph node for a given node.  If the node doesn't have an
     object property, then controllers are used to find the object
  */
-NodeObjectPtr findGraphNodeFor (Component*, const Node&);
+ProcessorPtr findGraphNodeFor (Component*, const Node&);
 
 /** This will present a plugin window */
 void presentPluginWindow (Component*, const Node&);

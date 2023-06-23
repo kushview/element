@@ -41,7 +41,7 @@
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
 
-#include <element/engine/internalformat.hpp>
+#include "engine/internalformat.hpp"
 #include "engine/ionode.hpp"
 
 namespace element {
@@ -63,15 +63,15 @@ InternalFormat::InternalFormat (Context& ctx)
 
 AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
 {
-    if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_INPUT_DEVICE)
+    if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_INPUT_DEVICE)
     {
         return new MidiDeviceProcessor (true, context.midi());
     }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
     {
         return new MidiDeviceProcessor (false, context.midi());
     }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_PLACEHOLDER)
     {
         return new PlaceholderProcessor();
     }
@@ -114,7 +114,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* desc = ds.add (new PluginDescription());
         desc->pluginFormatName = getName();
         desc->name = "Comb Filter (mono)";
-        desc->manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc->manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc->category = "Effect";
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
@@ -131,7 +131,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* desc = ds.add (new PluginDescription());
         desc->pluginFormatName = getName();
         desc->name = "AllPass Filter (mono)";
-        desc->manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc->manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc->category = "Effect";
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
@@ -148,7 +148,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* desc = ds.add (new PluginDescription());
         desc->pluginFormatName = getName();
         desc->name = "Volume (mono)";
-        desc->manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc->manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc->category = "Effect";
         desc->fileOrIdentifier = fileOrId + ".mono";
         desc->numInputChannels = 1;
@@ -160,58 +160,58 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         desc->numInputChannels = 2;
         desc->numOutputChannels = 2;
     }
-    else if (fileOrId == EL_INTERNAL_ID_WET_DRY)
+    else if (fileOrId == EL_NODE_ID_WET_DRY)
     {
         auto* desc = ds.add (new PluginDescription());
         WetDryProcessor wetDry;
         wetDry.fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_REVERB)
+    else if (fileOrId == EL_NODE_ID_REVERB)
     {
         auto* desc = ds.add (new PluginDescription());
         ReverbProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_EQ_FILTER)
+    else if (fileOrId == EL_NODE_ID_EQ_FILTER)
     {
         auto* desc = ds.add (new PluginDescription());
         EQFilterProcessor (2).fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_FREQ_SPLITTER)
+    else if (fileOrId == EL_NODE_ID_FREQ_SPLITTER)
     {
         auto* desc = ds.add (new PluginDescription());
         FreqSplitterProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_COMPRESSOR)
+    else if (fileOrId == EL_NODE_ID_COMPRESSOR)
     {
         auto* desc = ds.add (new PluginDescription());
         CompressorProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_AUDIO_MIXER)
+    else if (fileOrId == EL_NODE_ID_AUDIO_MIXER)
     {
         auto* const desc = ds.add (new PluginDescription());
         AudioMixerProcessor (4).fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_CHANNELIZE)
+    else if (fileOrId == EL_NODE_ID_CHANNELIZE)
     {
         auto* const desc = ds.add (new PluginDescription());
         ChannelizeProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
+    else if (fileOrId == EL_NODE_ID_MIDI_CHANNEL_MAP)
     {
         auto* const desc = ds.add (new PluginDescription());
         MidiChannelMapProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
+    else if (fileOrId == EL_NODE_ID_AUDIO_FILE_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
         AudioFilePlayerNode().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
+    else if (fileOrId == EL_NODE_ID_MEDIA_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
         MediaPlayerProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_PLACEHOLDER)
+    else if (fileOrId == EL_NODE_ID_PLACEHOLDER)
     {
         auto* const desc = ds.add (new PluginDescription());
         PlaceholderProcessor().fillInPluginDescription (*desc);
@@ -221,20 +221,20 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
 StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
 {
     StringArray results;
-    results.add (EL_INTERNAL_ID_COMB_FILTER);
-    results.add (EL_INTERNAL_ID_COMPRESSOR);
-    results.add (EL_INTERNAL_ID_EQ_FILTER);
-    results.add (EL_INTERNAL_ID_FREQ_SPLITTER);
-    results.add (EL_INTERNAL_ID_ALLPASS_FILTER);
-    results.add (EL_INTERNAL_ID_VOLUME);
-    results.add (EL_INTERNAL_ID_WET_DRY);
-    results.add (EL_INTERNAL_ID_REVERB);
-    results.add (EL_INTERNAL_ID_AUDIO_MIXER);
-    results.add (EL_INTERNAL_ID_CHANNELIZE);
-    results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
-    results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
-    results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
-    results.add (EL_INTERNAL_ID_PLACEHOLDER);
+    results.add (EL_NODE_ID_COMB_FILTER);
+    results.add (EL_NODE_ID_COMPRESSOR);
+    results.add (EL_NODE_ID_EQ_FILTER);
+    results.add (EL_NODE_ID_FREQ_SPLITTER);
+    results.add (EL_NODE_ID_ALLPASS_FILTER);
+    results.add (EL_NODE_ID_VOLUME);
+    results.add (EL_NODE_ID_WET_DRY);
+    results.add (EL_NODE_ID_REVERB);
+    results.add (EL_NODE_ID_AUDIO_MIXER);
+    results.add (EL_NODE_ID_CHANNELIZE);
+    results.add (EL_NODE_ID_MEDIA_PLAYER);
+    results.add (EL_NODE_ID_MIDI_CHANNEL_MAP);
+    results.add (EL_NODE_ID_AUDIO_FILE_PLAYER);
+    results.add (EL_NODE_ID_PLACEHOLDER);
     return results;
 }
 
@@ -256,27 +256,27 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new VolumeProcessor (-30.0, 12.0, false);
     else if (desc.fileOrIdentifier == "element.volume.stereo")
         base = new VolumeProcessor (-30.0, 12.0, true);
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_WET_DRY)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_WET_DRY)
         base = new WetDryProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_REVERB)
         base = new ReverbProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_EQ_FILTER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_EQ_FILTER)
         base = new EQFilterProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_FREQ_SPLITTER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_FREQ_SPLITTER)
         base = new FreqSplitterProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_COMPRESSOR)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_COMPRESSOR)
         base = new CompressorProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_AUDIO_MIXER)
         base = new AudioMixerProcessor (4, sampleRate, blockSize);
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_CHANNELIZE)
         base = new ChannelizeProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_CHANNEL_MAP)
         base = new MidiChannelMapProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_AUDIO_FILE_PLAYER)
         base = new AudioFilePlayerNode();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_MEDIA_PLAYER)
         base = new MediaPlayerProcessor();
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
+    else if (desc.fileOrIdentifier == EL_NODE_ID_PLACEHOLDER)
         base = new PlaceholderProcessor();
 
     return base != nullptr ? base.release() : nullptr;

@@ -18,7 +18,7 @@
 */
 
 #include "gui/widgets/Console.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -203,11 +203,11 @@ private:
         prompt.moveCaretToEnd();
     }
 
-    struct Style : public element::LookAndFeel
+    struct Style : public element::LookAndFeel_E1
     {
         void fillTextEditorBackground (Graphics& g, int w, int h, TextEditor& e) override
         {
-            LookAndFeel::fillTextEditorBackground (g, w, h, e);
+            LookAndFeel_E1::fillTextEditorBackground (g, w, h, e);
         }
 
         void drawTextEditorOutline (Graphics&, int, int, TextEditor&) override {}

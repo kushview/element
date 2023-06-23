@@ -18,13 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "gui/nodes/OSCReceiverNodeEditor.h"
 
 namespace element {
 
 OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     oscReceiverNodePtr = getNodeObjectOfType<OSCReceiverNode>();
 
@@ -147,7 +147,7 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
 
 void OSCReceiverNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::backgroundColor.brighter (0.1f));
+    g.fillAll (Colors::backgroundColor.brighter (0.1f));
 }
 
 void OSCReceiverNodeEditor::connectButtonClicked()

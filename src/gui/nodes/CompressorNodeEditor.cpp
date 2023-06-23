@@ -19,8 +19,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/ui/style.hpp>
+
 #include "CompressorNodeEditor.h"
-#include "../LookAndFeel.h"
 
 namespace element {
 

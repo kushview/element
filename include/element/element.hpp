@@ -12,8 +12,11 @@
     ClassName& operator= (const ClassName&&) = delete;
 
 namespace element {
+
+/** Ignore a set of variables... */
 template <typename... Args>
-void ignore_unused (Args&&...) noexcept
+inline void ignore (Args&&...) noexcept
 {
 }
+
 } // namespace element

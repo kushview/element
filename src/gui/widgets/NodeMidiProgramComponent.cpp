@@ -34,23 +34,23 @@ NodeMidiProgramComponent::NodeMidiProgramComponent()
     slider.setRange (1.0, 128.0, 1.0);
 
     addAndMakeVisible (loadButton);
-    loadButton.setIcon (Icon (getIcons().farRedoAlt, LookAndFeel::textColor), 11.6f);
+    loadButton.setIcon (Icon (getIcons().farRedoAlt, Colors::textColor), 11.6f);
     addAndMakeVisible (saveButton);
-    saveButton.setIcon (Icon (getIcons().farSave, LookAndFeel::textColor));
+    saveButton.setIcon (Icon (getIcons().farSave, Colors::textColor));
     addAndMakeVisible (trashButton);
-    trashButton.setIcon (Icon (getIcons().farTrashAlt, LookAndFeel::textColor));
+    trashButton.setIcon (Icon (getIcons().farTrashAlt, Colors::textColor));
 
     addAndMakeVisible (globalButton);
     globalButton.setTooltip ("Use global MIDI programs");
     globalButton.setColour (TextButton::buttonOnColourId, Colors::toggleGreen);
     globalButton.setClickingTogglesState (true);
-    globalButton.setIcon (Icon (getIcons().farGlobe, LookAndFeel::textColor));
+    globalButton.setIcon (Icon (getIcons().farGlobe, Colors::textColor));
 
     addAndMakeVisible (powerButton);
     powerButton.setTooltip ("Enable/disable MIDI programs");
     powerButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
     powerButton.setClickingTogglesState (true);
-    powerButton.setIcon (Icon (getIcons().fasPowerOff, LookAndFeel::textColor));
+    powerButton.setIcon (Icon (getIcons().fasPowerOff, Colors::textColor));
 }
 
 void NodeMidiProgramComponent::resized()

@@ -20,7 +20,7 @@
 
 #include "el/object.hpp"
 #include "gui/nodes/ScriptNodeEditor.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "scripting/bindings.hpp"
 #include "scripting.hpp"
 #include "scripting/scriptmanager.hpp"
@@ -194,7 +194,7 @@ static ValueTree getScriptNodeEditorState (const Node& node)
 
 //==============================================================================
 ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
-    : NodeEditorComponent (node),
+    : NodeEditor (node),
       engine (scripts),
       state (engine.getLuaState()),
       env (state, sol::create, state.globals()),
@@ -450,7 +450,7 @@ void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void ScriptNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (element::LookAndFeel::widgetBackgroundColor.darker());
+    g.fillAll (element::Colors::widgetBackgroundColor.darker());
 }
 
 void ScriptNodeEditor::resized()

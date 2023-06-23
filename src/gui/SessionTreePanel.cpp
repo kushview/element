@@ -19,7 +19,7 @@
 
 #include <element/script.hpp>
 #include <element/graph.hpp>
-#include <element/ui/datapathbrowser.hpp>
+#include "gui/datapathbrowser.hpp"
 
 #include "gui/views/scriptview.hpp"
 #include "services/sessionservice.hpp"
@@ -403,7 +403,7 @@ public:
     SessionScriptNodeTreeItem (const Node& n)
         : SessionNodeTreeItem (n)
     {
-        jassert (node.isA (EL_INTERNAL_FORMAT_NAME, EL_INTERNAL_ID_SCRIPT));
+        jassert (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_SCRIPT));
     }
 
     bool mightContainSubItems() override { return true; }
@@ -531,7 +531,7 @@ public:
             if (c.isIONode())
                 continue;
 
-            if (c.isA (EL_INTERNAL_FORMAT_NAME, EL_INTERNAL_ID_SCRIPT))
+            if (c.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_SCRIPT))
                 addSubItem (new SessionScriptNodeTreeItem (c));
             else if (c.isGraph())
                 addSubItem (new SessionGraphTreeItem (c));

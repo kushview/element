@@ -19,18 +19,18 @@
 #include "ElementApp.h"
 #include <element/services.hpp>
 
-#include <element/engine/internalformat.hpp>
+#include "engine/internalformat.hpp"
 
 #include <element/context.hpp>
-#include <element/devicemanager.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/devices.hpp>
+#include <element/plugins.hpp>
 #include <element/settings.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 
-#include "session/commandmanager.hpp"
+#include <element/ui/commands.hpp>
 #include "engine/midiengine.hpp"
 #include "scripting.hpp"
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 #include "datapath.hpp"
 #include "services/sessionservice.hpp"
 #include "log.hpp"
@@ -122,10 +122,6 @@ private:
         auto& settings (world.settings());
         auto& plugins (world.plugins());
         auto engine (world.audio());
-
-        plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (world));
-        plugins.addFormat (new ElementAudioPluginFormat (world));
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();

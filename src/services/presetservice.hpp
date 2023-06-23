@@ -20,10 +20,10 @@
 #pragma once
 
 #include <element/services.hpp>
-#include "documents/sessiondocument.hpp"
-#include <element/session.hpp>
 
 namespace element {
+
+class Node;
 
 class PresetService : public Service
 {
@@ -34,12 +34,12 @@ public:
     void deactivate() override;
 
     void refresh();
-    void add (const Node& Node, const String& presetName = String());
+    void add (const Node& Node, const juce::String& presetName = juce::String());
 
 private:
-    friend struct Pimpl;
-    struct Pimpl;
-    std::unique_ptr<Pimpl> pimpl;
+    friend struct Impl;
+    struct Impl;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace element

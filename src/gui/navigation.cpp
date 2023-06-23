@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/ui/datapathbrowser.hpp>
+#include "gui/datapathbrowser.hpp"
 
 #include <element/context.hpp>
 
@@ -28,40 +28,12 @@
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
-#include "gui/LookAndFeel.h"
-#include "commands.hpp"
+#include <element/ui/style.hpp>
+#include <element/ui/commands.hpp>
 
 #include <element/ui/navigation.hpp>
 
 namespace element {
-
-class NavigationConcertinaPanel::LookAndFeel : public element::LookAndFeel
-{
-public:
-    using ELF = element::LookAndFeel;
-
-    LookAndFeel() {}
-    ~LookAndFeel() {}
-
-    void drawConcertinaPanelHeader (Graphics& g,
-                                    const Rectangle<int>& area,
-                                    bool isMouseOver,
-                                    bool isMouseDown,
-                                    ConcertinaPanel& panel,
-                                    Component& comp)
-    {
-        ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
-        g.setColour (Colours::white);
-        Rectangle<int> r (area.withTrimmedLeft (20));
-        g.setFont (g.getCurrentFont().withHeight (13));
-        g.drawText (comp.getName().toUpperCase(),
-                    20,
-                    0,
-                    r.getWidth(),
-                    r.getHeight(),
-                    Justification::centredLeft);
-    }
-};
 
 class NavigationConcertinaPanel::Header : public Component
 {
@@ -70,18 +42,11 @@ public:
         : parent (_parent), panel (_panel)
     {
         setInterceptsMouseClicks (false, true);
-        addAndMakeVisible (text);
-        text.setColour (Label::textColourId, LookAndFeel_KV1::textColor);
-        text.setInterceptsMouseClicks (false, true);
     }
 
     virtual ~Header() {}
 
-    virtual void resized() override
-    {
-        text.setBounds (4, 1, 100, getHeight() - 2);
-    }
-
+    virtual void resized() override {}
     virtual void paint (Graphics& g) override
     {
         getLookAndFeel().drawConcertinaPanelHeader (
@@ -91,7 +56,6 @@ public:
 protected:
     NavigationConcertinaPanel& parent;
     Component& panel;
-    Label text;
 };
 
 class NavigationConcertinaPanel::ElementsHeader : public Header,
@@ -212,15 +176,12 @@ private:
 NavigationConcertinaPanel::NavigationConcertinaPanel (Context& g)
     : globals (g), headerHeight (22), defaultPanelHeight (80)
 {
-    lookAndFeel = std::make_unique<NavigationConcertinaPanel::LookAndFeel>();
-    setLookAndFeel (lookAndFeel.get());
 }
 
 NavigationConcertinaPanel::~NavigationConcertinaPanel()
 {
     clearPanels();
     setLookAndFeel (nullptr);
-    lookAndFeel.reset();
 }
 
 Component* NavigationConcertinaPanel::findPanelByName (const String& name)

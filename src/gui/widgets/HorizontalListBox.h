@@ -301,10 +301,10 @@ public:
 
     /** A set of colour IDs to use to change the colour of various aspects of the label.
      
-     These constants can be used either via the Component::setColour(), or LookAndFeel::setColour()
+     These constants can be used either via the Component::setColour(), or LookAndFeel_E1::setColour()
      methods.
      
-     @see Component::setColour, Component::findColour, LookAndFeel::setColour, LookAndFeel::findColour
+     @see Component::setColour, Component::findColour, LookAndFeel_E1::setColour, LookAndFeel_E1::findColour
      */
     enum ColourIds
     {

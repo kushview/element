@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
@@ -15,7 +15,7 @@ public:
     NodeProvider() = default;
     virtual ~NodeProvider() = default;
     virtual String format() const { return "Element"; }
-    virtual NodeObject* create (const String&) = 0;
+    virtual Processor* create (const String&) = 0;
     virtual StringArray findTypes() = 0;
     virtual StringArray getHiddenTypes() { return {}; }
 };
@@ -61,9 +61,9 @@ public:
             denyIDs.remove (idx);
     }
 
-    NodeObject* instantiate (const PluginDescription&);
-    NodeObject* instantiate (const String& identifier);
-    NodeObject* wrap (AudioProcessor*);
+    Processor* instantiate (const PluginDescription&);
+    Processor* instantiate (const String& identifier);
+    Processor* wrap (AudioProcessor*);
 
     const OwnedArray<NodeProvider>& getNodeProviders() const { return providers; }
 
@@ -87,7 +87,7 @@ private:
             return StringArray (ID);
         }
 
-        NodeObject* create (const String& nodeId) override
+        Processor* create (const String& nodeId) override
         {
             return (this->ID == nodeId) ? new NT() : nullptr;
         }

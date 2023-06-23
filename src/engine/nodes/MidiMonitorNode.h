@@ -37,14 +37,14 @@ public:
     void getPluginDescription (PluginDescription& desc) const override
     {
         desc.name = "MIDI Monitor";
-        desc.fileOrIdentifier = EL_INTERNAL_ID_MIDI_MONITOR;
-        desc.uniqueId = EL_INTERNAL_UID_MIDI_MONITOR;
+        desc.fileOrIdentifier = EL_NODE_ID_MIDI_MONITOR;
+        desc.uniqueId = EL_NODE_UID_MIDI_MONITOR;
         desc.descriptiveName = "MIDI Monitor";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
-        desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+        desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc.pluginFormatName = "Element";
         desc.version = "1.0.0";
     }

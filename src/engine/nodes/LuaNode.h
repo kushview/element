@@ -20,11 +20,11 @@
 #pragma once
 
 #include "engine/nodes/BaseProcessor.h"
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 namespace element {
 
-class LuaNode : public NodeObject,
+class LuaNode : public Processor,
                 public ChangeBroadcaster
 {
 public:

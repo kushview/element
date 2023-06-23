@@ -18,8 +18,8 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include <element/devicemanager.hpp>
-#include <element/pluginmanager.hpp>
+#include <element/devices.hpp>
+#include <element/plugins.hpp>
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include <element/ui/content.hpp>
 #include "gui/GuiCommon.h"
@@ -66,7 +66,7 @@ public:
 
     void paint (Graphics& g)
     {
-        g.fillAll (LookAndFeel::widgetBackgroundColor.darker (0.45));
+        g.fillAll (Colors::widgetBackgroundColor.darker (0.45));
     }
     virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected)
     {
@@ -244,7 +244,7 @@ public:
             addAndMakeVisible (toggle);
             toggle->setName (f);
             toggle->setButtonText (nameForFormat (f));
-            toggle->setColour (ToggleButton::textColourId, LookAndFeel::textColor);
+            toggle->setColour (ToggleButton::textColourId, Colors::textColor);
             toggle->setColour (ToggleButton::tickColourId, Colours::black);
             toggle->addListener (this);
         }
@@ -1075,7 +1075,7 @@ PreferencesComponent::~PreferencesComponent()
 void PreferencesComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
-    g.fillAll (LookAndFeel::widgetBackgroundColor);
+    g.fillAll (Colors::widgetBackgroundColor);
     //[/UserPrePaint]
 
     //[UserPaint] Add your own custom painting code here..

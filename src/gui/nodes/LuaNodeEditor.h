@@ -21,12 +21,12 @@
 #pragma once
 
 #include "engine/nodes/LuaNode.h"
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 #include "gui/LuaTokeniser.h"
 
 namespace element {
 
-class LuaNodeEditor : public NodeEditorComponent,
+class LuaNodeEditor : public NodeEditor,
                       public ChangeListener
 {
 public:

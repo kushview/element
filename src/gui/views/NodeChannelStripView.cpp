@@ -18,10 +18,10 @@
 */
 
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include <element/session.hpp>
 #include <element/context.hpp>
 #include <element/signals.hpp>
@@ -45,7 +45,7 @@ public:
     void paint (Graphics& g) override
     {
         NodeChannelStripComponent::paint (g);
-        g.setColour (LookAndFeel::contentBackgroundColor);
+        g.setColour (Colors::contentBackgroundColor);
         g.drawLine (0.0, 0.0, 0.0, getHeight());
     }
 };

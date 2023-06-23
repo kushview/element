@@ -24,8 +24,8 @@
 
 #include <element/services.hpp>
 #include "services/deviceservice.hpp"
-#include "services/engineservice.hpp"
-#include <element/services/guiservice.hpp>
+#include <element/engine.hpp>
+#include <element/ui.hpp>
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "services/presetservice.hpp"
@@ -35,7 +35,7 @@
 #include <element/node.hpp>
 #include <element/session.hpp>
 
-#include "commands.hpp"
+#include <element/ui/commands.hpp>
 #include "messages.hpp"
 #include <element/context.hpp>
 #include <element/settings.hpp>

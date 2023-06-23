@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "gui/nodes/NodeEditorComponent.h"
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
-class MidiRouterEditor : public NodeEditorComponent,
+class MidiRouterEditor : public NodeEditor,
                          public ChangeListener
 {
 public:

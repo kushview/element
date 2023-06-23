@@ -20,7 +20,7 @@
 #pragma once
 
 #include <element/ui/content.hpp>
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -34,8 +34,8 @@ public:
 
     inline void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel::contentBackgroundColor);
-        g.setColour (LookAndFeel::textColor);
+        g.fillAll (Colors::contentBackgroundColor);
+        g.setColour (Colors::textColor);
         g.setFont (16.f);
 
 #if JUCE_MAC

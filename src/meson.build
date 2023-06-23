@@ -4,7 +4,9 @@ libelement_sources = '''
     bindings.cpp
     commands.cpp
     context.cpp
+    controller.cpp
     datapath.cpp
+    gzip.cpp
     lv2.cpp
     matrixstate.cpp
     messages.cpp
@@ -31,7 +33,7 @@ libelement_sources = '''
     services/presetservice.cpp
     services/sessionservice.cpp
     
-    documents/sessiondocument.cpp
+    gui/sessiondocument.cpp
 
     engine/ionode.cpp
     engine/oversampler.cpp
@@ -39,7 +41,7 @@ libelement_sources = '''
     engine/internalformat.cpp
     engine/midiengine.cpp
     engine/mappingengine.cpp
-    engine/nodeobject.cpp
+    engine/processor.cpp
     engine/midipipe.cpp
     engine/nodes/ScriptNode.cpp
     engine/nodes/MidiProgramMapNode.cpp
@@ -58,6 +60,7 @@ libelement_sources = '''
     engine/nodes/AudioFilePlayerNode.cpp
     engine/nodes/OSCSenderNode.cpp
     engine/nodes/AudioProcessorNode.cpp
+    
     engine/graphnode.cpp
     engine/transport.cpp
     engine/graphbuilder.cpp
@@ -71,7 +74,9 @@ libelement_sources = '''
     gui/designer.cpp
     gui/grapheditor.cpp
     gui/meterbridge.cpp
-    
+    gui/navigation.cpp
+    gui/nodeeditor.cpp
+
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp
     gui/BlockComponent.cpp
@@ -81,17 +86,16 @@ libelement_sources = '''
     gui/ConnectionGrid.cpp
     gui/content.cpp
     gui/ContextMenus.cpp
-    gui/DecibelScaleComponent.cpp
-    gui/DigitalMeter.cpp
+    gui/decibelscale.cpp
+    gui/SimpleMeter.cpp
     gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
-    gui/LookAndFeel_KV1.cpp
-    gui/LookAndFeel.cpp
+    gui/LookAndFeel_E1.cpp
     gui/LuaTokeniser.cpp
     gui/MainMenu.cpp
     gui/MainWindow.cpp
-    gui/navigation.cpp
+    
     gui/NodeEditorFactory.cpp
     gui/NodeIOConfiguration.cpp
     gui/PatchMatrixComponent.cpp
@@ -104,7 +108,7 @@ libelement_sources = '''
     gui/nodes/MidiMonitorNodeEditor.cpp
     gui/nodes/MidiProgramMapEditor.cpp
     gui/nodes/MidiRouterEditor.cpp
-    gui/nodes/NodeEditorComponent.cpp
+    
     gui/nodes/OSCReceiverNodeEditor.cpp
     gui/nodes/OSCSenderNodeEditor.cpp
     gui/nodes/ScriptNodeEditor.cpp
@@ -161,7 +165,6 @@ libelement_sources = '''
     scripting/scriptloader.cpp
     scripting/scriptmanager.cpp
 
-    session/controllerdevice.cpp
     session/devicemanager.cpp
     session/pluginmanager.cpp
     session/session.cpp
@@ -193,18 +196,17 @@ libelement_sources = '''
     el/TextButton.cpp
     el/View.cpp
     el/Widget.cpp
-
-    ../libs/compat/BinaryData.cpp
+    juce/BinaryData.cpp
 '''.split()
 
 libelement_includes =  [ 
     include_directories (
-        '../libs/sol',
-        '../include',
+        'lua/sol',
         '../scripts',
         'el',
         '.'
     ),
+    element_includes,
     lua_includes, 
     juce_includes, 
     juce_vst3_includes, 
@@ -225,7 +227,7 @@ if host_machine.system() == 'windows'
     libelement_sources += [ 'dlfcn-win32.c' ]
 endif
 
-luael_gen = generator (jrc,
+luael_gen = generator (bin2c,
     output : [ '@PLAINNAME@.cpp', '@PLAINNAME@.h'],
     arguments : [ '@INPUT@', '@BUILD_DIR@', 'LuaLib' ])
 libelement_sources += luael_gen.process (
@@ -251,9 +253,7 @@ libelement = static_library ('element',
     objects : [ libelement_lua.extract_all_objects (recursive : false),
                 libelement_juce.extract_all_objects (recursive : false) ])
 
-if meson.is_subproject()
-    element_dep = declare_dependency (
-        include_directories : libelement_includes,
-        link_with : libelement,
-        dependencies : [ deps, juce_dep ])
-endif
+element_dep = declare_dependency (
+    include_directories : libelement_includes,
+    link_with : libelement,
+    dependencies : [ deps, juce_dep ])

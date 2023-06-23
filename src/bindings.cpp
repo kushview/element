@@ -47,7 +47,7 @@ void fill_builtins (PackageLoaderMap& pkgs)
           { "el.midi", luaopen_el_midi },
           { "el.round", luaopen_el_round } });
 #else
-    ignore_unused (pkgs);
+    element::ignore (pkgs);
 #endif
 }
 

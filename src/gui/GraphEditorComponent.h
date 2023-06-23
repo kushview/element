@@ -111,7 +111,7 @@ public:
     std::function<void()> onZoomChanged;
 
 protected:
-    virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, NodeObjectPtr editorNode);
+    virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, ProcessorPtr editorNode);
     void createNewPlugin (const PluginDescription* desc, int x, int y);
 
 private:
@@ -150,9 +150,9 @@ private:
     void selectNode (const Node& node, ModifierKeys mods);
     void setSelectedNodesCompact (bool selected);
 
-    Component* createContainerForNode (NodeObjectPtr node, bool useGenericEditor);
-    AudioProcessorEditor* createEditorForNode (NodeObjectPtr node, bool useGenericEditor);
-    PluginWindow* getOrCreateWindowForNode (NodeObjectPtr f, bool useGeneric);
+    Component* createContainerForNode (ProcessorPtr node, bool useGenericEditor);
+    AudioProcessorEditor* createEditorForNode (ProcessorPtr node, bool useGenericEditor);
+    PluginWindow* getOrCreateWindowForNode (ProcessorPtr f, bool useGeneric);
 
     void updateBlockComponents (const bool doPosition = true);
     void updateConnectorComponents (bool async = false);

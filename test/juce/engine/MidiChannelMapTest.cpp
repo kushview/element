@@ -103,7 +103,7 @@ private:
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
 
-        NodeObjectPtr node = proc.addNode (new AudioProcessorNode (processor));
+        ProcessorPtr node = proc.addNode (new AudioProcessorNode (processor));
         MessageManager::getInstance()->runDispatchLoopUntil (10);
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
@@ -134,7 +134,7 @@ private:
 
         expect (node->getPortType (18) == PortType::Unknown);
 
-        NodeObjectPtr midiIn = proc.addNode (new element::IONode (element::IONode::midiInputNode));
+        ProcessorPtr midiIn = proc.addNode (new element::IONode (element::IONode::midiInputNode));
 
         beginTest ("connectivity");
         expect (midiIn->getNumPorts() == 1);

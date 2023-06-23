@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/pluginmanager.hpp>
+#include <element/plugins.hpp>
 #include "gui/GuiCommon.h"
 #include "gui/views/PluginsPanelView.h"
 
@@ -51,7 +51,7 @@ public:
     }
     void paintItem (Graphics& g, int width, int height) override
     {
-        g.setColour (element::LookAndFeel::textColor.darker (0.22f));
+        g.setColour (element::Colors::textColor.darker (0.22f));
         String text = desc->name;
         String extra = shortFormatName (desc->pluginFormatName);
 
@@ -59,7 +59,7 @@ public:
         g.drawText (text, 0, 0, leftSide, height, Justification::centredLeft);
         if (extra.isNotEmpty())
         {
-            g.setColour (element::LookAndFeel::textColor.withAlpha (0.8f));
+            g.setColour (element::Colors::textColor.withAlpha (0.8f));
             extra = String ("(") + extra + String (")");
             g.setFont (Font (12.f));
             g.drawText (extra, leftSide, 0, width - leftSide - 3, height, Justification::centredRight);
@@ -80,7 +80,7 @@ public:
     PluginsPanelView& panel;
     void paintItem (Graphics& g, int width, int height) override
     {
-        g.setColour (element::LookAndFeel::textColor);
+        g.setColour (element::Colors::textColor);
         g.drawText (tree.folder, 6, 0, width - 6, height, Justification::centredLeft);
     }
 
@@ -137,7 +137,7 @@ PluginsPanelView::PluginsPanelView (PluginManager& p)
     : plugins (p)
 {
     addAndMakeVisible (search);
-    search.setTextToShowWhenEmpty (TRANS ("Search..."), LookAndFeel::textColor.darker());
+    search.setTextToShowWhenEmpty (TRANS ("Search..."), Colors::textColor.darker());
     search.addListener (this);
 
     addAndMakeVisible (tree);

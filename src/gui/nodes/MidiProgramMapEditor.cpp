@@ -226,7 +226,7 @@ public:
 };
 
 MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     addAndMakeVisible (table);
     table.setHeaderHeight (22);

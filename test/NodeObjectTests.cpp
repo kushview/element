@@ -2,7 +2,7 @@
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
 #include "engine/ionode.hpp"
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 
 using namespace element;
 
@@ -17,12 +17,12 @@ BOOST_AUTO_TEST_CASE (DelayCompensation)
     PreparedGraph fix;
     GraphNode& graph = fix.graph;
 
-    NodeObjectPtr node1 = graph.addNode (new TestNode());
+    ProcessorPtr node1 = graph.addNode (new TestNode());
     node1->setDelayCompensation (delayComp);
     BOOST_REQUIRE (node1->getDelayCompensation() == delayComp);
     BOOST_REQUIRE (node1->getDelayCompensationSamples() == roundToInt (sampleRate * delayComp * 0.001));
 
-    NodeObjectPtr node2 = graph.addNode (new IONode (IONode::audioOutputNode));
+    ProcessorPtr node2 = graph.addNode (new IONode (IONode::audioOutputNode));
     node1->connectAudioTo (node2);
     MessageManager::getInstance()->runDispatchLoopUntil (14);
     BOOST_REQUIRE (graph.getNumConnections() == 2);
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE (DelayCompensation)
 BOOST_AUTO_TEST_CASE (Enablement)
 {
     PreparedGraph fix;
-    NodeObjectPtr node = fix.graph.addNode (new TestNode());
+    ProcessorPtr node = fix.graph.addNode (new TestNode());
 
     BOOST_REQUIRE (node->isEnabled());
     node->setEnabled (false);
@@ -53,11 +53,11 @@ BOOST_AUTO_TEST_CASE (PortChannelMapping)
     graph.setRenderDetails (44100.0, 512);
     graph.prepareToRender (44100.0, 512);
 
-    NodeObjectPtr midiIn = graph.addNode (new element::IONode (
+    ProcessorPtr midiIn = graph.addNode (new element::IONode (
         IONode::midiInputNode));
-    NodeObjectPtr midiOut = graph.addNode (new element::IONode (
+    ProcessorPtr midiOut = graph.addNode (new element::IONode (
         IONode::midiOutputNode));
-    NodeObjectPtr filter = graph.addNode (new TestNode (0, 0, 1, 16));
+    ProcessorPtr filter = graph.addNode (new TestNode (0, 0, 1, 16));
     MessageManager::getInstance()->runDispatchLoopUntil (14);
 
     BOOST_REQUIRE (filter->getNumPorts() == 17);

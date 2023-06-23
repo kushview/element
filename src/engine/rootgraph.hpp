@@ -3,7 +3,7 @@
 
 #include "engine/graphnode.hpp"
 #include "engine/ionode.hpp"
-#include <element/devicemanager.hpp>
+#include <element/devices.hpp>
 
 namespace element {
 
@@ -80,7 +80,7 @@ private:
     friend class AudioEngine;
     friend struct RootGraphRender;
     using IODeviceType = IONode::IODeviceType;
-    NodeObjectPtr ioNodes[IONode::numDeviceTypes];
+    ProcessorPtr ioNodes[IONode::numDeviceTypes];
     String graphName = "Device";
     StringArray audioInputNames;
     StringArray audioOutputNames;

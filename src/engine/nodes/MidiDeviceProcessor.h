@@ -48,10 +48,10 @@ public:
     void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = "MIDI I/O Device";
-        desc.fileOrIdentifier = inputDevice ? EL_INTERNAL_ID_MIDI_INPUT_DEVICE
-                                            : EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE;
-        desc.uniqueId = inputDevice ? EL_INTERNAL_UID_MIDI_INPUT_DEVICE
-                                    : EL_INTERNAL_UID_MIDI_OUTPUT_DEVICE;
+        desc.fileOrIdentifier = inputDevice ? EL_NODE_ID_MIDI_INPUT_DEVICE
+                                            : EL_NODE_ID_MIDI_OUTPUT_DEVICE;
+        desc.uniqueId = inputDevice ? EL_NODE_UID_MIDI_INPUT_DEVICE
+                                    : EL_NODE_UID_MIDI_OUTPUT_DEVICE;
         desc.descriptiveName = "MIDI device node";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;

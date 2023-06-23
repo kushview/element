@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/nodeobject.hpp>
+#include <element/processor.hpp>
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
 #include <element/controller.hpp>
@@ -116,7 +116,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == NodeObject::EnabledParameter || parameterIndex == NodeObject::BypassParameter || parameterIndex == NodeObject::MuteParameter)
+        else if (parameterIndex == Processor::EnabledParameter || parameterIndex == Processor::BypassParameter || parameterIndex == Processor::MuteParameter)
         {
             triggerAsyncUpdate();
         }
@@ -133,17 +133,17 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
         if (momentary.get() == 0)
         {
-            if (parameterIndex == NodeObject::EnabledParameter)
+            if (parameterIndex == Processor::EnabledParameter)
             {
                 node->setEnabled (! node->isEnabled());
                 model.setProperty (tags::enabled, node->isEnabled());
             }
-            else if (parameterIndex == NodeObject::BypassParameter)
+            else if (parameterIndex == Processor::BypassParameter)
             {
                 node->suspendProcessing (! node->isSuspended());
                 model.setProperty (tags::bypass, node->isSuspended());
             }
-            else if (parameterIndex == NodeObject::MuteParameter)
+            else if (parameterIndex == Processor::MuteParameter)
             {
                 model.setMuted (! model.isMuted());
             }
@@ -154,17 +154,17 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             // DBG("async note off: " << (int) event.isNoteOff());
             const bool isInverse = inverse.get() == 1;
 
-            if (parameterIndex == NodeObject::EnabledParameter)
+            if (parameterIndex == Processor::EnabledParameter)
             {
                 node->setEnabled (isInverse ? event.isNoteOff() : event.isNoteOn());
                 model.setProperty (tags::enabled, node->isEnabled());
             }
-            else if (parameterIndex == NodeObject::BypassParameter)
+            else if (parameterIndex == Processor::BypassParameter)
             {
                 node->suspendProcessing (isInverse ? event.isNoteOn() : event.isNoteOff());
                 model.setProperty (tags::bypass, node->isSuspended());
             }
-            else if (parameterIndex == NodeObject::MuteParameter)
+            else if (parameterIndex == Processor::MuteParameter)
             {
                 model.setMuted (isInverse ? event.isNoteOff() : event.isNoteOn());
             }
@@ -174,7 +174,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 private:
     Control control;
     Node model;
-    NodeObjectPtr node { nullptr };
+    ProcessorPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
     int parameterIndex = -1;
 
@@ -243,7 +243,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter = node->getParameters()[parameterIndex];
             jassert (nullptr != parameter);
         }
-        else if (parameterIndex == NodeObject::EnabledParameter)
+        else if (parameterIndex == Processor::EnabledParameter)
         {
             lastControllerValue = model.isEnabled() ? 127 : 0;
         }
@@ -272,7 +272,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter->setValueNotifyingHost (static_cast<float> (ccValue) / 127.f);
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == NodeObject::EnabledParameter || parameterIndex == NodeObject::BypassParameter || parameterIndex == NodeObject::MuteParameter)
+        else if (parameterIndex == Processor::EnabledParameter || parameterIndex == Processor::BypassParameter || parameterIndex == Processor::MuteParameter)
         {
             const auto currentToggleState = desiredToggleState.get();
             const auto mode = toggleMode.get();
@@ -340,20 +340,20 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                                        ? (inverseToggle.get() == 1 ? 0 : 1) // inverse on, then compare false
                                        : 1; // equals mode always compare true
 
-        if (parameterIndex == NodeObject::EnabledParameter)
+        if (parameterIndex == Processor::EnabledParameter)
         {
             node->setEnabled (desiredToggleState.get() == stateToCompare);
             if (model.isEnabled() != node->isEnabled())
                 model.setProperty (tags::enabled, node->isEnabled());
         }
-        else if (parameterIndex == NodeObject::BypassParameter)
+        else if (parameterIndex == Processor::BypassParameter)
         {
             // inverted because UI displays bypass as inactive (or active for not bypassed)
             node->suspendProcessing (! (desiredToggleState.get() == stateToCompare));
             if (model.isBypassed() != node->isSuspended())
                 model.setProperty (tags::bypass, node->isSuspended());
         }
-        else if (parameterIndex == NodeObject::MuteParameter)
+        else if (parameterIndex == Processor::MuteParameter)
         {
             model.setMuted (desiredToggleState.get() == stateToCompare);
         }
@@ -362,7 +362,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 private:
     Control control;
     Node model;
-    NodeObjectPtr node { nullptr };
+    ProcessorPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
 
     const int controllerNumber { -1 };

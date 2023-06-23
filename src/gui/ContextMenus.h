@@ -19,10 +19,11 @@
 
 #pragma once
 
+#include <element/plugins.hpp>
+
 #include "gui/GuiCommon.h"
-#include "gui/BlockComponent.h"
-#include <element/pluginmanager.hpp>
 #include "session/presetmanager.hpp"
+#include "gui/BlockComponent.h"
 #include "./utils.hpp"
 
 namespace element {
@@ -182,7 +183,7 @@ public:
     {
         PopupMenu menu;
         int index = 30000;
-        NodeObjectPtr ptr = node.getObject();
+        ProcessorPtr ptr = node.getObject();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
         addOversamplingSubmenu (menu);
         addSubMenu (TRANS ("Options"), menu, ptr != nullptr);
@@ -204,7 +205,7 @@ public:
     {
         PopupMenu osMenu;
         int index = 40000;
-        NodeObjectPtr ptr = node.getObject();
+        ProcessorPtr ptr = node.getObject();
 
         if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
             return;
@@ -321,7 +322,9 @@ public:
             const int index = result - 20000;
             if (auto* const item = presetItems[index])
             {
-                const auto data = Node::parse (item->file);
+                const auto data = File::isAbsolutePath (item->file)
+                                      ? Node::parse (File (item->file))
+                                      : ValueTree();
                 if (n.isValid() && data.isValid() && data.hasProperty (tags::state))
                 {
                     const String state = data.getProperty (tags::state).toString();
@@ -394,7 +397,7 @@ public:
 
 private:
     Node node;
-    OwnedArray<PresetDescription> presetItems;
+    OwnedArray<PresetInfo> presetItems;
     Port port;
     const int firstResultOpId = 1024;
     int currentResultOpId = 1024;
@@ -418,7 +421,7 @@ private:
         bool isTicked() override { return false; }
         bool perform() override
         {
-            if (NodeObjectPtr ptr = node.getObject())
+            if (ProcessorPtr ptr = node.getObject())
             {
                 ptr->setEnabled (! ptr->isEnabled());
                 auto data = node.data();

@@ -19,7 +19,7 @@
 */
 
 #include "gui/nodes/LuaNodeEditor.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 
 namespace element {
 
@@ -129,7 +129,7 @@ private:
 };
 
 LuaNodeEditor::LuaNodeEditor (const Node& node)
-    : NodeEditorComponent (node)
+    : NodeEditor (node)
 {
     lua = getNodeObjectOfType<LuaNode>();
     jassert (lua);
@@ -214,7 +214,7 @@ void LuaNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void LuaNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (element::LookAndFeel::backgroundColor);
+    g.fillAll (element::Colors::backgroundColor);
 }
 
 void LuaNodeEditor::resized()

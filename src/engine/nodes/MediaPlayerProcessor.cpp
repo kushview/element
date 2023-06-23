@@ -18,7 +18,7 @@
 */
 
 #include "engine/nodes/MediaPlayerProcessor.h"
-#include "gui/LookAndFeel.h"
+#include <element/ui/style.hpp>
 #include "utils.hpp"
 
 namespace element {
@@ -112,7 +112,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel::widgetBackgroundColor);
+        g.fillAll (Colors::widgetBackgroundColor);
     }
 
 private:
@@ -196,13 +196,13 @@ MediaPlayerProcessor::~MediaPlayerProcessor()
 void MediaPlayerProcessor::fillInPluginDescription (PluginDescription& desc) const
 {
     desc.name = getName();
-    desc.fileOrIdentifier = EL_INTERNAL_ID_MEDIA_PLAYER;
-    desc.descriptiveName = EL_INTERNAL_ID_MEDIA_PLAYER;
+    desc.fileOrIdentifier = EL_NODE_ID_MEDIA_PLAYER;
+    desc.descriptiveName = EL_NODE_ID_MEDIA_PLAYER;
     desc.numInputChannels = 0;
     desc.numOutputChannels = 2;
     desc.hasSharedContainer = false;
     desc.isInstrument = false;
-    desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+    desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
     desc.pluginFormatName = "Element";
     desc.version = "1.0.0";
 }

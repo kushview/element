@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE (AddRemove)
 {
     PreparedGraph fix;
     GraphNode& graph = fix.graph;
-    NodeObjectPtr node = graph.addNode (new TestNode());
+    ProcessorPtr node = graph.addNode (new TestNode());
     MessageManager::getInstance()->runDispatchLoopUntil (10);
     BOOST_REQUIRE (graph.getNumNodes() == 1);
     BOOST_REQUIRE (node != nullptr);

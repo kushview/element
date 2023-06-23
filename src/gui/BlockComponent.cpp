@@ -18,7 +18,7 @@
 */
 
 #include <element/services.hpp>
-#include <element/services/guiservice.hpp>
+#include <element/ui.hpp>
 #include "gui/views/NodePortsTable.h"
 #include "gui/Artist.h"
 #include "gui/BlockComponent.h"
@@ -40,7 +40,7 @@ namespace element {
 PortComponent::PortComponent (const Node& g, const Node& n, const uint32 nid, const uint32 i, const bool dir, const PortType t, const bool v)
     : graph (g), node (n), nodeID (nid), port (i), type (t), input (dir), vertical (v)
 {
-    if (const NodeObjectPtr obj = node.getObject())
+    if (const ProcessorPtr obj = node.getObject())
     {
         const Port p (node.getPort ((int) port));
         String tip = p.getName();
@@ -255,7 +255,7 @@ void BlockComponent::buttonClicked (Button* b)
     if (! isEnabled())
         return;
 
-    NodeObjectPtr obj = node.getObject();
+    ProcessorPtr obj = node.getObject();
     auto* proc = (obj) ? obj->getAudioProcessor() : 0;
     if (! obj)
         return;
@@ -559,8 +559,8 @@ void BlockComponent::paint (Graphics& g)
     const int colorBarHeight = vertical ? 20 : 18;
     bool colorize = color != Colour (0x00000000);
     Colour bgc = isEnabled() && node.isEnabled()
-                     ? LookAndFeel::widgetBackgroundColor.brighter (0.8f)
-                     : LookAndFeel::widgetBackgroundColor.brighter (0.2f);
+                     ? Colors::widgetBackgroundColor.brighter (0.8f)
+                     : Colors::widgetBackgroundColor.brighter (0.2f);
 
     auto barColor = isEnabled() && node.isEnabled() ? color : color.darker (.1f);
 

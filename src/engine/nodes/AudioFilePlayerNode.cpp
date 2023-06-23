@@ -17,21 +17,21 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/ui/datapathbrowser.hpp>
+#include <element/ui/navigation.hpp>
 
 #include "engine/nodes/AudioFilePlayerNode.h"
-#include "gui/LookAndFeel.h"
-#include "gui/ViewHelpers.h"
+
 #include "gui/Buttons.h"
+#include "gui/datapathbrowser.hpp"
+#include <element/ui/style.hpp>
+#include "gui/ViewHelpers.h"
 
 // nav panel needs these headers included
-#include "services/engineservice.hpp"
+#include <element/engine.hpp>
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/views/PluginsPanelView.h"
-#include <element/ui/navigation.hpp>
 #include "gui/FileComboBox.h"
-
 #include "utils.hpp"
 
 namespace element {
@@ -176,7 +176,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel::widgetBackgroundColor);
+        g.fillAll (Colors::widgetBackgroundColor);
     }
 
     //=========================================================================
@@ -367,16 +367,16 @@ bool AudioFilePlayerNode::respondsToStartStopContinue() const
 void AudioFilePlayerNode::fillInPluginDescription (PluginDescription& desc) const
 {
     desc.name = getName();
-    desc.fileOrIdentifier = EL_INTERNAL_ID_AUDIO_FILE_PLAYER;
+    desc.fileOrIdentifier = EL_NODE_ID_AUDIO_FILE_PLAYER;
     desc.descriptiveName = "A single audio file player";
     desc.numInputChannels = 0;
     desc.numOutputChannels = 2;
     desc.hasSharedContainer = false;
     desc.isInstrument = false;
-    desc.manufacturerName = EL_INTERNAL_FORMAT_AUTHOR;
+    desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
     desc.pluginFormatName = "Element";
     desc.version = "1.0.0";
-    desc.uniqueId = EL_INTERNAL_UID_AUDIO_FILE_PLAYER;
+    desc.uniqueId = EL_NODE_UID_AUDIO_FILE_PLAYER;
 }
 
 void AudioFilePlayerNode::clearPlayer()
