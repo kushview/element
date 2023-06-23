@@ -8,7 +8,14 @@ test_element_sources = '''
     NodeObjectTests.cpp   
     PluginManagerTests.cpp  
     RootGraphTests.cpp
+    NodeTests.cpp
+    MidiProgramMapTests.cpp
 
+    engine/VelocityCurveTest.cpp
+    engine/MidiChannelMapTest.cpp
+    engine/ToggleGridTests.cpp
+    engine/LinearFadeTest.cpp
+    
     scripting/ScriptDescriptionTests.cpp
     scripting/ScriptManagerTests.cpp
     updatetests.cpp
@@ -42,7 +49,15 @@ test ('Processor',     test_element_app, args : [ '-t', 'NodeObjectTests' ])
 test ('PluginManager',  test_element_app, args : [ '-t', 'PluginManagerTests' ])
 test ('Updates',        test_element_app, args : [ '-t', 'UpdateTests' ])
 
-test ('ScriptDescription', test_element_app, args : [ '-t', 'ScriptDescriptionTests' ],
-    suite : 'scripting')
-test ('ScriptManager', test_element_app, args : [ '-t', 'ScriptManagerTests' ],
-    suite : 'scripting')
+test ('Node',           test_element_app, args : [ '-t', 'NodeTests' ], suite: 'model')
+
+test ('LinearFade',     test_element_app, args : [ '-t', 'LinearFadeTest'], suite: 'engine' )
+test ('MidiChannelMap', test_element_app, args : [ '-t', 'MidiChannelMapTest'], suite: 'engine' )
+test ('MidiProgramMap', test_element_app, args : [ '-t', 'MidiProgramMapTests'], suite: 'engine' )
+test ('Processor',      test_element_app, args : [ '-t',  'NodeObjectTests' ], suite : 'engine')
+test ('ToggleGrid',     test_element_app, args : [ '-t', 'ToggleGridTests'], suite: 'engine' )
+
+test ('VelocityCurve',  test_element_app, args : [ '-t', 'VelocityCurveTest'], suite: 'engine' )
+
+test ('ScriptDescription', test_element_app, args : [ '-t', 'ScriptDescriptionTests' ], suite : 'scripting')
+test ('ScriptManager',  test_element_app,    args : [ '-t', 'ScriptManagerTests' ], suite : 'scripting')
