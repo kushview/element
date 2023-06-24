@@ -34,8 +34,7 @@ class NodeChannelStripView;
 
 using namespace juce;
 
-class ContentView : public juce::Component,
-                    public juce::ApplicationCommandTarget {
+class ContentView : public juce::Component {
 public:
     ContentView();
     virtual ~ContentView();
@@ -61,14 +60,9 @@ public:
     /** Set true if pressing escape should close the view */
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
 
-    virtual void getAllCommands (Array<CommandID>&) override {}
-    virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
-    virtual bool perform (const InvocationInfo&) override { return false; }
-
+    // FIXME: this shouldn't exist here.
     Signal<void()> nodeMoved;
 
-    /** @internal */
-    ApplicationCommandTarget* getNextCommandTarget() override { return nextCommandTarget; }
     /** @internal */
     virtual void paint (Graphics& g) override;
     /** @internal */
@@ -76,22 +70,17 @@ public:
 
 private:
     bool escapeTriggersClose = false;
-    ApplicationCommandTarget* nextCommandTarget = nullptr;
 };
 
-class ContentComponent : public Component,
-                         public ApplicationCommandTarget,
-                         public DragAndDropContainer,
-                         public DragAndDropTarget,
-                         public FileDragAndDropTarget {
+class ContentComponent : public juce::Component,
+                         public juce::DragAndDropContainer,
+                         public juce::DragAndDropTarget,
+                         public juce::FileDragAndDropTarget {
 protected:
     ContentComponent (Context& app);
 
 public:
     virtual ~ContentComponent() noexcept;
-
-    /** Creates an appropriate content component based on the product that is running */
-    static ContentComponent* create (Context&);
 
     /** Post a message to the app controller */
     void post (Message*);
@@ -121,40 +110,11 @@ public:
     /** Override this to resize the main content */
     virtual void resizeContent (const Rectangle<int>& area) { ignoreUnused (area); }
 
-    virtual NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nullptr; }
-
-    /** Implement if can set a view directly. Subclasses should take ownership
-        of the view.
-    */
-    virtual void setMainView (ContentView* v)
-    {
-        jassertfalse;
-        delete v;
-    }
-
-    virtual void setMainView (const String& name);
-    virtual void setAccessoryView (const String& name);
-    virtual String getMainViewName() const;
-    virtual String getAccessoryViewName() const;
-
-    virtual void nextMainView();
-    virtual void backMainView();
-
     //=========================================================================
     virtual void saveState (PropertiesFile*);
     virtual void restoreState (PropertiesFile*);
     virtual void getSessionState (String&) {}
     virtual void applySessionState (const String&) {}
-
-    virtual int getNavSize();
-
-    virtual bool isVirtualKeyboardVisible() const { return false; }
-    virtual void setVirtualKeyboardVisible (const bool isVisible);
-    virtual void toggleVirtualKeyboard();
-    virtual VirtualKeyboardView* getVirtualKeyboardView() const { return nullptr; }
-
-    virtual void setMeterBridgeVisible (bool) {}
-    virtual bool isMeterBridgeVisible() const { return false; }
 
     virtual void setNodeChannelStripVisible (const bool isVisible);
     virtual bool isNodeChannelStripVisible() const;
@@ -162,14 +122,6 @@ public:
     virtual void setCurrentNode (const Node& node);
     virtual void stabilize (const bool refreshDataPathTrees = false);
     virtual void stabilizeViews();
-
-    virtual void setShowAccessoryView (const bool show);
-    virtual bool showAccessoryView() const;
-
-    //=========================================================================
-    void setExtraView (Component* c);
-
-    Component* getExtraView() const { return extra.get(); }
 
     /** @internal */
     void paint (Graphics& g) override;
@@ -183,15 +135,6 @@ public:
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     /** @internal */
     void itemDropped (const SourceDetails& dragSourceDetails) override;
-
-    /** @internal */
-    void getAllCommands (Array<CommandID>&) override {}
-    /** @internal */
-    void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
-    /** @internal */
-    bool perform (const InvocationInfo&) override { return false; }
-    /** @internal */
-    ApplicationCommandTarget* getNextCommandTarget() override;
 
 private:
     Context& _context;
@@ -207,9 +150,6 @@ private:
     class StatusBar;
     friend class StatusBar;
     ScopedPointer<StatusBar> statusBar;
-
-    std::unique_ptr<Component> extra;
-    int extraViewHeight = 44;
 
     bool statusBarVisible { true };
     int statusBarSize;

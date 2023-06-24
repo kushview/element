@@ -10,7 +10,6 @@
 #include "gui/nodes/MidiMonitorNodeEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/nodes/MidiRouterEditor.h"
-#include "gui/nodes/LuaNodeEditor.h"
 #include "gui/nodes/OSCReceiverNodeEditor.h"
 #include "gui/nodes/OSCSenderNodeEditor.h"
 #include "gui/nodes/VolumeNodeEditor.h"
@@ -89,10 +88,6 @@ private:
         else if (NID.contains (EL_NODE_ID_VOLUME))
         {
             return new VolumeNodeEditor (node, gui);
-        }
-        else if (NID == EL_NODE_ID_LUA)
-        {
-            return new LuaNodeEditor (node);
         }
         else if (NID == EL_NODE_ID_SCRIPT)
         {

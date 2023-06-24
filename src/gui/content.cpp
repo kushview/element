@@ -68,14 +68,6 @@ bool ContentView::keyPressed (const KeyPress& k)
     return false;
 }
 
-void ContentComponent::setExtraView (Component* c)
-{
-    extra.reset (c);
-    if (extra)
-        addAndMakeVisible (extra.get());
-    resized();
-}
-
 //=============================================================================
 class ContentComponent::Toolbar : public Component,
                                   public Button::Listener,
@@ -221,10 +213,7 @@ public:
     {
         if (btn == &viewBtn)
         {
-            const int command = owner.getMainViewName() == "PatchBay" || owner.getMainViewName() == "GraphEditor"
-                                    ? Commands::rotateContentView
-                                    : Commands::showLastContentView;
-            ViewHelpers::invokeDirectly (this, command, true);
+            // FIXME:
         }
         else if (btn == &panicBtn)
         {
@@ -475,8 +464,6 @@ void ContentComponent::resized()
         toolBar->setBounds (r.removeFromTop (toolBarSize));
     if (statusBarVisible && statusBar)
         statusBar->setBounds (r.removeFromBottom (statusBarSize));
-    if (extra && extraViewHeight > 0)
-        extra->setBounds (r.removeFromBottom (extraViewHeight));
 
     resizeContent (r);
 }
@@ -503,7 +490,9 @@ void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
         if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
-            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin", "The plugin you dropped could not be loaded for an unknown reason.");
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                              "Could not load plugin",
+                                              "The plugin you dropped could not be loaded for an unknown reason.");
     }
 }
 
@@ -523,24 +512,7 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
     for (const auto& path : files)
     {
         const File file (path);
-        if (file.hasFileExtension ("elc"))
-        {
-            FileInputStream src (file);
-            // if (unlock.applyKeyFile (src.readString()))
-            // {
-            //     unlock.save();
-            //     unlock.loadAll();
-            //     stabilizeViews();
-            //     AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File",
-            //         "Your software has successfully been unlocked.");
-            // }
-            // else
-            // {
-            //     AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-            //         "Apply License File", "Your software could not be unlocked.");
-            // }
-        }
-        else if (file.hasFileExtension ("els"))
+        if (file.hasFileExtension ("els"))
         {
             this->post (new OpenSessionMessage (file));
         }
@@ -569,11 +541,12 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
             }
         }
-        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
+        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")))
         {
             PluginDescription desc;
             desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
             desc.fileOrIdentifier = file.getFullPathName();
+
             this->post (new LoadPluginMessage (desc, false));
         }
     }
@@ -616,30 +589,12 @@ void ContentComponent::refreshStatusBar()
 
 Context& ContentComponent::context() { return _context; }
 SessionPtr ContentComponent::session() { return _context.session(); }
-String ContentComponent::getMainViewName() const { return String(); }
-String ContentComponent::getAccessoryViewName() const { return String(); }
-int ContentComponent::getNavSize() { return 220; }
-void ContentComponent::setMainView (const String& name) { ignoreUnused (name); }
-void ContentComponent::backMainView() {}
-void ContentComponent::nextMainView() {}
-void ContentComponent::setAccessoryView (const String& name) { ignoreUnused (name); }
 void ContentComponent::stabilize (const bool refreshDataPathTrees) {}
 void ContentComponent::stabilizeViews() {}
 void ContentComponent::saveState (PropertiesFile*) {}
 void ContentComponent::restoreState (PropertiesFile*) {}
 void ContentComponent::setCurrentNode (const Node& node) { ignoreUnused (node); }
-void ContentComponent::setVirtualKeyboardVisible (const bool) {}
 void ContentComponent::setNodeChannelStripVisible (const bool) {}
 bool ContentComponent::isNodeChannelStripVisible() const { return false; }
-
-void ContentComponent::toggleVirtualKeyboard()
-{
-    setVirtualKeyboardVisible (! isVirtualKeyboardVisible());
-}
-
-ApplicationCommandTarget* ContentComponent::getNextCommandTarget() { return nullptr; }
-
-void ContentComponent::setShowAccessoryView (const bool) {}
-bool ContentComponent::showAccessoryView() const { return false; }
 
 } // namespace element

@@ -204,18 +204,6 @@ void MainMenu::menuItemSelected (int index, int menu)
         if (auto* cc = getContentComponent())
             cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
     }
-    else if (index == 6666)
-    {
-        DBG ("no workspace debug window");
-    }
-    else if (index == 7777)
-    {
-        cmd.invokeDirectly (Commands::workspaceSave, true);
-    }
-    else if (index == 7778)
-    {
-        cmd.invokeDirectly (Commands::workspaceOpen, true);
-    }
     else if (index == 8000)
     {
     }

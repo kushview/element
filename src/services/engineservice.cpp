@@ -563,7 +563,9 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
 {
     auto* root = graphs->findActiveRootGraphManager();
     if (! root)
+    {
         return {};
+    }
 
     OwnedArray<PluginDescription> plugs;
     if (! verified)
@@ -572,6 +574,7 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
         jassert (format != nullptr);
         auto& list (context().plugins().getKnownPlugins());
         list.removeFromBlacklist (desc.fileOrIdentifier);
+        list.removeType (desc);
         if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
         {
             context().plugins().saveUserPlugins (context().settings());

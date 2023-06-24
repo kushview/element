@@ -32,7 +32,6 @@ public:
     static const char* lastGraphKey;
     static const char* lastSessionKey;
     static const char* legacyInterfaceKey;
-    static const char* workspaceKey;
     static const char* midiEngineKey;
     static const char* oscHostPortKey;
     static const char* oscHostEnabledKey;

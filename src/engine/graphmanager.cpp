@@ -330,7 +330,7 @@ Processor* GraphManager::createFilter (const PluginDescription* desc, double x, 
 
     if (errorMessage.isNotEmpty())
     {
-        DBG ("[element] error creating audio plugin: " << errorMessage);
+        std::clog << "[element] error creating audio plugin: " << errorMessage.toStdString() << std::endl;
         jassert (node == nullptr);
     }
 

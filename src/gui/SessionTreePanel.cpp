@@ -214,8 +214,8 @@ public:
         {
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
             c->setCurrentNode (graph);
-            if (c->getMainViewName() != "GraphEditor" && c->getMainViewName() != "GraphEditorView")
-                c->setMainView ("GraphEditor");
+            // if (c->getMainViewName() != "GraphEditor" && c->getMainViewName() != "GraphEditorView")
+            //     c->setMainView ("GraphEditor");
         }
 
         if (! node.isRootGraph())
@@ -435,8 +435,8 @@ private:
 
         void showDocument() override
         {
-            if (auto* cc = getContentComponent())
-                cc->setMainView (new ScriptNodeScriptEditorView (node, forUI));
+            // if (auto* cc = getContentComponent())
+            //     cc->setMainView (new ScriptNodeScriptEditorView (node, forUI));
         }
 
         String getDisplayName() const override
@@ -471,8 +471,8 @@ public:
 
     void showDocument() override
     {
-        if (auto* cc = getContentComponent())
-            cc->setMainView (new ScriptEditorView (script));
+        // if (auto* cc = getContentComponent())
+        //     cc->setMainView (new ScriptEditorView (script));
     }
 
     bool isMissing() override { return false; }
@@ -567,7 +567,7 @@ public:
             {
                 auto view = std::make_unique<ScriptView> (cc->context(), script);
                 view->setNode (node);
-                cc->setMainView (view.release());
+                // FIXME: cc->setMainView (view.release());
             }
         }
     }

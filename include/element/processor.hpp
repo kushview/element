@@ -100,12 +100,12 @@ public:
     //=========================================================================
     const ParameterArray& getParameters (bool inputs = true) const noexcept { return inputs ? parameters : parametersOut; }
 
-    Parameter::Ptr getParameter (int index, bool isInput) const noexcept
+    ParameterPtr getParameter (int index, bool isInput) const noexcept
     {
         return getParameters (isInput)[index];
     }
 
-    Parameter::Ptr getParameter (int port)
+    ParameterPtr getParameter (int port)
     {
         auto desc = getPort (port);
         return desc.type == PortType::Control ? getParameter (desc.channel, desc.input)
@@ -415,7 +415,7 @@ protected:
     void setLatencySamples (int latency);
 
     //==========================================================================
-    virtual Parameter::Ptr getParameter (const PortDescription& port) { return nullptr; }
+    virtual ParameterPtr getParameter (const PortDescription& port) { return nullptr; }
 
     //==========================================================================
     void triggerPortReset();
@@ -498,7 +498,7 @@ private:
     float osLatency = 0.0f;
     dsp::Oversampling<float>* getOversamplingProcessor();
 
-    Parameter::Ptr getOrCreateParameter (const PortDescription&);
+    ParameterPtr getOrCreateParameter (const PortDescription&);
 
     double delayCompMillis = 0.0;
     int delayCompSamples = 0;

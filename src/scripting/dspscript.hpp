@@ -72,7 +72,7 @@ public:
 
     //==========================================================================
     int getNumParameters() const { return numParams; }
-    element::Parameter::Ptr getParameterObject (int index, bool input = true) const;
+    element::ParameterPtr getParameterObject (int index, bool input = true) const;
     void copyParameterValues (const DSPScript&);
 
     //==========================================================================

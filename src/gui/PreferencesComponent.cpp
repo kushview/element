@@ -474,8 +474,6 @@ public:
         // mainContentBox.addItem ("Workspace", 2);
         if (settings.getMainContentType() == "standard")
             mainContentBox.setSelectedId (1, dontSendNotification);
-        else if (settings.getMainContentType() == "workspace")
-            mainContentBox.setSelectedId (2, dontSendNotification);
         else
         {
             jassertfalse;
@@ -611,21 +609,10 @@ public:
             auto uitype = settings.getMainContentType();
             if (1 == mainContentBox.getSelectedId())
                 uitype = "standard";
-            else if (2 == mainContentBox.getSelectedId())
-                uitype = "workspace";
 
             if (uitype != settings.getMainContentType())
             {
                 bool changeType = true;
-                if (uitype == "workspace")
-                {
-                    changeType = AlertWindow::showOkCancelBox (AlertWindow::InfoIcon,
-                                                               "Experimental Feature",
-                                                               "Workspaces is an experimental feature. Are you sure you want to enable it?",
-                                                               "Yes",
-                                                               "No");
-                }
-
                 if (changeType)
                 {
                     settings.setMainContentType (uitype);

@@ -11,7 +11,7 @@ class BindParameterOp : public GraphOp,
                         public Parameter::Listener
 {
 public:
-    BindParameterOp (Parameter::Ptr src, Parameter::Ptr dst)
+    BindParameterOp (ParameterPtr src, ParameterPtr dst)
         : param1 (src), param2 (dst)
     {
         param1->addListener (this);
@@ -35,7 +35,7 @@ public:
     void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const int) override {}
 
 private:
-    Parameter::Ptr param1, param2;
+    ParameterPtr param1, param2;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BindParameterOp)
 };
 

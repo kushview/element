@@ -25,12 +25,12 @@ using namespace element;
 namespace element {
 
 //==============================================================================
-class DSPScript::Parameter : public ControlPortParameter,
+class DSPScript::Parameter : public RangedParameter,
                              public element::Parameter::Listener
 {
 public:
     Parameter (DSPScript* c, const PortDescription& port)
-        : ControlPortParameter (port),
+        : RangedParameter (port),
           ctx (c)
     {
         const auto sp = getPort();
@@ -517,7 +517,7 @@ void DSPScript::addAudioMidiPorts()
     }
 }
 
-element::Parameter::Ptr
+element::ParameterPtr
     DSPScript::getParameterObject (int index, bool input) const
 {
     return input ? inParams[index] : outParams[index];

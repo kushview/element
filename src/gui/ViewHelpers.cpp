@@ -181,8 +181,9 @@ void presentPluginWindow (const Node& node)
 
 NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c)
 {
-    if (auto* cc = findContentComponent (c))
-        return cc->getNavigationConcertinaPanel();
+    // FIXME:
+    // if (auto* cc = findContentComponent (c))
+    //     return cc->getNavigationConcertinaPanel();
     return nullptr;
 }
 } // namespace ViewHelpers

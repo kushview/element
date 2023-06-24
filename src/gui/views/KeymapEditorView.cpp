@@ -29,16 +29,7 @@ class KeymapEditor : public KeyMappingEditorComponent
 public:
     KeymapEditor (KeyPressMappingSet& s) : KeyMappingEditorComponent (s, true)
     {
-        disallow.addArray ({ Commands::exportAudio,
-                             Commands::exportMidi,
-                             Commands::sessionInsertPlugin,
-                             Commands::workspaceClassic,
-                             Commands::workspaceEditing,
-                             Commands::workspaceOpen,
-                             Commands::workspaceResetActive,
-                             Commands::workspaceSave,
-                             Commands::workspaceSaveActive });
-
+        disallow.addArray ({ Commands::sessionInsertPlugin });
         readOnly.addArray ({ Commands::copy,
                              Commands::paste,
                              Commands::undo,

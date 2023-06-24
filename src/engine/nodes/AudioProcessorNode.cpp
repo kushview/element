@@ -257,7 +257,7 @@ void AudioProcessorNode::refreshPorts()
     setPorts (newPorts);
 }
 
-Parameter::Ptr AudioProcessorNode::getParameter (const PortDescription& port)
+ParameterPtr AudioProcessorNode::getParameter (const PortDescription& port)
 {
     jassert (isPositiveAndBelow (port.channel, params.size()));
     auto* const param = dynamic_cast<AudioProcessorNodeParameter*> (

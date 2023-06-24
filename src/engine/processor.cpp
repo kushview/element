@@ -840,7 +840,7 @@ void Processor::setLatencySamples (int latency)
 }
 
 //=========================================================================
-Parameter::Ptr Processor::getOrCreateParameter (const PortDescription& port)
+ParameterPtr Processor::getOrCreateParameter (const PortDescription& port)
 {
     jassert (port.type == PortType::Control);
     if (port.type != PortType::Control)
@@ -850,7 +850,7 @@ Parameter::Ptr Processor::getOrCreateParameter (const PortDescription& port)
 
     if (param == nullptr)
     {
-        param = new ControlPortParameter (port);
+        param = new RangedParameter (port);
     }
 
     if (param != nullptr)

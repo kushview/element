@@ -175,7 +175,7 @@ private:
     Control control;
     Node model;
     ProcessorPtr node { nullptr };
-    Parameter::Ptr parameter { nullptr };
+    ParameterPtr parameter { nullptr };
     int parameterIndex = -1;
 
     Value channelObject;
@@ -363,7 +363,7 @@ private:
     Control control;
     Node model;
     ProcessorPtr node { nullptr };
-    Parameter::Ptr parameter { nullptr };
+    ParameterPtr parameter { nullptr };
 
     const int controllerNumber { -1 };
     const int parameterIndex { -1 };

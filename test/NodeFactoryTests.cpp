@@ -13,7 +13,6 @@ BOOST_AUTO_TEST_CASE (Internals)
     const StringArray expectedIDs (
         EL_NODE_ID_AUDIO_ROUTER,
         EL_NODE_ID_GRAPH,
-        EL_NODE_ID_LUA,
         EL_NODE_ID_MIDI_CHANNEL_SPLITTER,
         EL_NODE_ID_MIDI_MONITOR,
         EL_NODE_ID_MIDI_PROGRAM_MAP,
@@ -38,6 +37,11 @@ BOOST_AUTO_TEST_CASE (Internals)
         BOOST_REQUIRE (expectedIDs.contains (tp->fileOrIdentifier));
         BOOST_REQUIRE (tp->pluginFormatName == EL_NODE_FORMAT_NAME);
     }
+
+    nodes.hideType (EL_NODE_ID_MCU);
+    BOOST_REQUIRE (nodes.isTypeHidden (EL_NODE_ID_MCU));
+    nodes.removeHiddenType (EL_NODE_ID_MCU);
+    BOOST_REQUIRE (! nodes.isTypeHidden (EL_NODE_ID_MCU));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

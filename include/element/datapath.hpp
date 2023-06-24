@@ -46,9 +46,6 @@ public:
     /** Returns the default Controllers directory */
     static const juce::File defaultControllersDir();
 
-    /** Returns the default Workspaces directory */
-    static const juce::File workspacesDir();
-
     /** Returns the installation directory. May return an invalid file,
         especially when in debug mode. Use this sparingly.
       */

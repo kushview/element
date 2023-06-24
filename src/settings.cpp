@@ -37,7 +37,6 @@ const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhen
 const char* Settings::lastGraphKey = "lastGraph";
 const char* Settings::lastSessionKey = "lastSession";
 const char* Settings::legacyInterfaceKey = "legacyInterface";
-const char* Settings::workspaceKey = "workspace";
 const char* Settings::midiEngineKey = "midiEngine";
 const char* Settings::oscHostPortKey = "oscHostPortKey";
 const char* Settings::oscHostEnabledKey = "oscHostEnabledKey";

@@ -36,7 +36,7 @@ public:
         : ParameterObserver (parameter)
     {
         param = parameter;
-        control = dynamic_cast<ControlPortParameter*> (param.get());
+        control = dynamic_cast<RangedParameter*> (param.get());
     }
 
     virtual ~ControlPort()
@@ -68,8 +68,8 @@ public:
     std::function<void()> onValueChange;
 
 private:
-    Parameter::Ptr param;
-    ControlPortParameter::Ptr control;
+    ParameterPtr param;
+    RangedParameterPtr control;
     void handleNewParameterValue() override
     {
         if (onValueChange)
@@ -103,7 +103,7 @@ class LuaNodeParameterPropertyFloat : public PropertyComponent,
                                       private ParameterObserver
 {
 public:
-    LuaNodeParameterPropertyFloat (Parameter::Ptr p)
+    LuaNodeParameterPropertyFloat (ParameterPtr p)
         : PropertyComponent (p->getName (1024)),
           ParameterObserver (p),
           param (p)
@@ -145,14 +145,14 @@ public:
         };
 
         slider.valueFromTextFunction = [this] (const String& text) -> double {
-            if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
+            if (auto* cp = dynamic_cast<RangedParameter*> (param.get()))
                 return (double) cp->convertTo0to1 (text.getFloatValue());
             return text.getDoubleValue();
         };
 
         slider.textFromValueFunction = [this] (double value) -> String {
             String text;
-            if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
+            if (auto* cp = dynamic_cast<RangedParameter*> (param.get()))
                 return cp->getText (static_cast<float> (value), 1024);
             return String (value, 6);
         };
@@ -169,7 +169,7 @@ public:
 
 private:
     Slider slider;
-    Parameter::Ptr param;
+    ParameterPtr param;
     bool dragging = false;
 
     void handleNewParameterValue() override

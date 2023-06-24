@@ -41,7 +41,7 @@ public:
         return add (new Single<NT> (identifier));
     }
 
-    void addHiddenType (const String& tp)
+    void hideType (const String& tp)
     {
         denyIDs.addIfNotAlreadyThere (tp);
     }
@@ -52,6 +52,11 @@ public:
             denyIDs.add (tp);
         denyIDs.removeDuplicates (false);
         denyIDs.removeEmptyStrings();
+    }
+
+    bool isTypeHidden (const String& tp) const noexcept
+    {
+        return denyIDs.contains (tp);
     }
 
     void removeHiddenType (const String& tp)

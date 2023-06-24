@@ -22,7 +22,6 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/AudioRouterNode.h"
-#include "engine/nodes/LuaNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiMonitorNode.h"
 #include "engine/nodes/MidiProgramMapNode.h"
@@ -40,7 +39,6 @@ namespace element {
 NodeFactory::NodeFactory()
 {
     add<AudioRouterNode> (EL_NODE_ID_AUDIO_ROUTER);
-    add<LuaNode> (EL_NODE_ID_LUA);
     add<MidiChannelSplitterNode> (EL_NODE_ID_MIDI_CHANNEL_SPLITTER);
     add<MidiMonitorNode> (EL_NODE_ID_MIDI_MONITOR);
     add<MidiProgramMapNode> (EL_NODE_ID_MIDI_PROGRAM_MAP);

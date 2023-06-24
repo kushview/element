@@ -77,7 +77,7 @@ void ScriptNode::refreshPorts()
     setPorts (newPorts);
 }
 
-Parameter::Ptr ScriptNode::getParameter (const PortDescription& port)
+ParameterPtr ScriptNode::getParameter (const PortDescription& port)
 {
     jassert (port.type == PortType::Control);
     return script ? script->getParameterObject (port.channel, port.input) : nullptr;

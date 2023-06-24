@@ -17,8 +17,6 @@ namespace element {
 */
 class Parameter : public juce::ReferenceCountedObject {
 public:
-    using Ptr = juce::ReferenceCountedObjectPtr<Parameter>;
-
     /** Contructor */
     Parameter() noexcept;
 
@@ -287,15 +285,14 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Parameter)
 };
 
+using ParameterPtr = juce::ReferenceCountedObjectPtr<Parameter>;
 using ParameterArray = juce::ReferenceCountedArray<Parameter>;
 
 /** A parameter type which represents a Control port. */
-class ControlPortParameter : public Parameter {
+class RangedParameter : public Parameter {
 public:
-    using Ptr = juce::ReferenceCountedObjectPtr<ControlPortParameter>;
-
-    ControlPortParameter (const PortDescription&);
-    ~ControlPortParameter();
+    RangedParameter (const PortDescription&);
+    ~RangedParameter();
 
     /** Returns the human understandable value. */
     float get() const { return value; }
@@ -305,7 +302,7 @@ public:
         @param newValue Human understandable value.
     */
     void set (float newValue) { operator= (newValue); }
-    ControlPortParameter& operator= (float newValue);
+    RangedParameter& operator= (float newValue);
 
     /** Returns the index of this port. */
     int getPortIndex() const noexcept override { return port.index; }
@@ -363,6 +360,8 @@ private:
     float value { 0.0 };
 };
 
+using RangedParameterPtr = juce::ReferenceCountedObjectPtr<RangedParameter>;
+
 //==============================================================================
 /** Class to aid in handling changes in a parameter.
     Currently just a placeholder until API can be created.
@@ -379,7 +378,7 @@ class ParameterObserver : private PortObserver,
                           private juce::Timer {
 public:
     ParameterObserver() = default;
-    ParameterObserver (Parameter::Ptr param)
+    ParameterObserver (ParameterPtr param)
         : parameter (param)
     {
         observeParameter (param);
@@ -394,7 +393,7 @@ public:
         }
     }
 
-    void observeParameter (Parameter::Ptr param)
+    void observeParameter (ParameterPtr param)
     {
         if (parameter == param)
             return;
@@ -411,7 +410,7 @@ public:
     }
 
     /** Returns the parameter being observed. */
-    Parameter::Ptr getParameter() noexcept { return parameter; }
+    ParameterPtr getParameter() noexcept { return parameter; }
 
     /** Invoked on the UI thread when the parameter changes. */
     boost::signals2::signal<void()> sigValueChanged;
@@ -441,7 +440,7 @@ private:
         }
     }
 
-    Parameter::Ptr parameter;
+    ParameterPtr parameter;
     juce::Atomic<int> parameterValueHasChanged { 0 };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterObserver)
 };

@@ -60,7 +60,7 @@ public:
 
 protected:
     inline bool wantsMidiPipe() const override { return true; }
-    Parameter::Ptr getParameter (const PortDescription& port) override;
+    ParameterPtr getParameter (const PortDescription& port) override;
 
 private:
     CriticalSection lock;

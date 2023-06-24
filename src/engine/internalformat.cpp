@@ -22,6 +22,8 @@
 #include <element/audioengine.hpp>
 #include <element/context.hpp>
 #include <element/session.hpp>
+#include <element/plugins.hpp>
+#include <element/nodefactory.hpp>
 
 #include "engine/midiengine.hpp"
 
@@ -109,6 +111,10 @@ ElementAudioPluginFormat::ElementAudioPluginFormat (Context& g)
 
 void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription>& ds, const String& fileOrId)
 {
+    auto& factory = world.plugins().getNodeFactory();
+    if (factory.isTypeHidden (fileOrId))
+        return;
+
     if (fileOrId == "element.comb")
     {
         auto* desc = ds.add (new PluginDescription());

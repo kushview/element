@@ -32,7 +32,6 @@ extern "C" {
 // Processor subclass
 #define EL_NODE_ID_AUDIO_ROUTER          "element.audioRouter"
 #define EL_NODE_ID_GRAPH                 "element.graph"
-#define EL_NODE_ID_LUA                   "element.lua"
 #define EL_NODE_ID_MIDI_CHANNEL_SPLITTER "element.midiChannelSplitter"
 #define EL_NODE_ID_MIDI_MONITOR          "element.midiMonitor"
 #define EL_NODE_ID_MIDI_PROGRAM_MAP      "element.programChangeMap"
@@ -65,7 +64,6 @@ extern "C" {
 #define EL_NODE_UID_OSC_SENDER            1018
 #define EL_NODE_UID_EQ_FILTER             1019
 #define EL_NODE_UID_FREQ_SPLITTER         1020
-#define EL_NODE_UID_LUA                   1021
 #define EL_NODE_UID_COMPRESSOR            1022
 #define EL_NODE_UID_MIDI_ROUTER           1023
 #define EL_NODE_UID_SCRIPT                1024

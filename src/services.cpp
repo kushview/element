@@ -22,22 +22,17 @@
 #include <element/settings.hpp>
 #include <element/services.hpp>
 
-#include "services/deviceservice.hpp"
 #include <element/engine.hpp>
 #include <element/ui.hpp>
+
+#include "engine/graphmanager.hpp"
+#include "session/presetmanager.hpp"
+
+#include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/oscservice.hpp"
 #include "services/sessionservice.hpp"
 #include "services/presetservice.hpp"
-
-#include <element/ui/commands.hpp>
-#include "session/presetmanager.hpp"
-
-#include "engine/graphmanager.hpp"
-#include "gui/MainWindow.h"
-#include "gui/GuiCommon.h"
-
-#include <element/ui/commands.hpp>
 #include "messages.hpp"
 #include "version.hpp"
 

@@ -8,46 +8,48 @@
 namespace element {
 class Context;
 class MeterBridgeView;
+class GuiService;
 
-class StandardContentComponent : public ContentComponent {
+class StandardContentComponent : public ContentComponent,
+                                 public juce::ApplicationCommandTarget {
 public:
     StandardContentComponent (Context& ctx);
     ~StandardContentComponent() noexcept;
 
     void resizeContent (const Rectangle<int>& area) override;
 
-    NavigationConcertinaPanel* getNavigationConcertinaPanel() const override { return nav.get(); }
+    NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nav.get(); }
 
-    void setMainView (const String& name) override;
-    void setAccessoryView (const String& name) override;
-    String getMainViewName() const override;
-    String getAccessoryViewName() const override;
+    void setMainView (const String& name);
+    void setAccessoryView (const String& name);
+    String getMainViewName() const;
+    String getAccessoryViewName() const;
 
-    void nextMainView() override;
-    void backMainView() override;
+    void nextMainView();
+    void backMainView();
 
     void saveState (PropertiesFile*) override;
     void restoreState (PropertiesFile*) override;
 
-    int getNavSize() override;
+    int getNavSize();
 
-    bool isVirtualKeyboardVisible() const override;
-    void setVirtualKeyboardVisible (const bool isVisible) override;
-    void toggleVirtualKeyboard() override;
-    VirtualKeyboardView* getVirtualKeyboardView() const override;
+    bool isVirtualKeyboardVisible() const;
+    void setVirtualKeyboardVisible (const bool isVisible);
+    void toggleVirtualKeyboard();
+    VirtualKeyboardView* getVirtualKeyboardView() const;
 
     void setNodeChannelStripVisible (const bool isVisible) override;
     bool isNodeChannelStripVisible() const override;
 
-    void setMeterBridgeVisible (bool) override;
-    bool isMeterBridgeVisible() const override;
+    void setMeterBridgeVisible (bool);
+    bool isMeterBridgeVisible() const;
 
     void setCurrentNode (const Node& node) override;
     void stabilize (const bool refreshDataPathTrees = false) override;
     void stabilizeViews() override;
 
-    void setShowAccessoryView (const bool show) override;
-    bool showAccessoryView() const override;
+    void setShowAccessoryView (const bool show);
+    bool showAccessoryView() const;
 
     // Drag and drop
     bool isInterestedInFileDrag (const StringArray& files) override;
@@ -59,13 +61,7 @@ public:
     void getSessionState (String&) override;
     void applySessionState (const String&) override;
 
-    void setMainView (ContentView* v) override;
-
-    // App commands
-    void getAllCommands (Array<CommandID>&) override {}
-    void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
-    bool perform (const InvocationInfo&) override;
-    ApplicationCommandTarget* getNextCommandTarget() override;
+    void setMainView (ContentView* v);
 
 private:
     ScopedPointer<NavigationConcertinaPanel> nav;
@@ -91,6 +87,12 @@ private:
     void resizerMouseUp();
     void updateLayout();
     void setContentView (ContentView* view, const bool accessory = false);
+
+    friend class GuiService;
+    ApplicationCommandTarget* getNextCommandTarget() override;
+    void getAllCommands (Array<CommandID>& commands) override;
+    void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
+    bool perform (const InvocationInfo& info) override;
 };
 
 using StandardContent = element::StandardContentComponent;

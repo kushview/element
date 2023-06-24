@@ -49,7 +49,6 @@ libelement_sources = '''
     engine/nodes/MidiRouterNode.cpp
     engine/nodes/MediaPlayerProcessor.cpp
     engine/nodes/OSCReceiverNode.cpp
-    engine/nodes/LuaNode.cpp
     engine/nodes/MidiMonitorNode.cpp
     engine/nodes/MidiFilterNode.cpp
     engine/nodes/MidiChannelSplitterNode.cpp
@@ -104,7 +103,6 @@ libelement_sources = '''
     gui/nodes/EQFilterNodeEditor.cpp
     gui/nodes/GenericNodeEditor.cpp
     gui/nodes/KnobsComponent.cpp
-    gui/nodes/LuaNodeEditor.cpp
     gui/nodes/MidiMonitorNodeEditor.cpp
     gui/nodes/MidiProgramMapEditor.cpp
     gui/nodes/MidiRouterEditor.cpp

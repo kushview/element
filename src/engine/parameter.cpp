@@ -133,20 +133,20 @@ void Parameter::removeListener (Parameter::Listener* listenerToRemove)
     listeners.removeFirstMatchingValue (listenerToRemove);
 }
 
-ControlPortParameter::ControlPortParameter (const PortDescription& p)
+RangedParameter::RangedParameter (const PortDescription& p)
 {
     jassert (p.type == PortType::Control);
     setPort (p);
 }
 
-ControlPortParameter::~ControlPortParameter() {}
+RangedParameter::~RangedParameter() {}
 
-String ControlPortParameter::getText (float normalisedValue, int /*maxLength*/) const
+String RangedParameter::getText (float normalisedValue, int /*maxLength*/) const
 {
     return String (convertFrom0to1 (normalisedValue), 6);
 }
 
-void ControlPortParameter::setPort (const PortDescription& newPort, bool preserveValue)
+void RangedParameter::setPort (const PortDescription& newPort, bool preserveValue)
 {
     port = newPort;
     range.start = port.minValue;
@@ -161,7 +161,7 @@ void ControlPortParameter::setPort (const PortDescription& newPort, bool preserv
     }
 }
 
-ControlPortParameter& ControlPortParameter::operator= (float newValue)
+RangedParameter& RangedParameter::operator= (float newValue)
 {
     if (value != newValue)
         setValueNotifyingHost (convertTo0to1 (newValue));

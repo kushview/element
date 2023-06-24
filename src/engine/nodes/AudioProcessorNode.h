@@ -49,7 +49,7 @@ public:
     void refreshPorts() override;
 
 protected:
-    Parameter::Ptr getParameter (const PortDescription& port) override;
+    ParameterPtr getParameter (const PortDescription& port) override;
 
 private:
     std::unique_ptr<AudioProcessor> proc;

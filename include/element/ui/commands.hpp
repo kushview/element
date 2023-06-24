@@ -54,8 +54,6 @@ public:
         sessionDeleteGraph = 901,
         sessionInsertPlugin = 902,
 
-        exportAudio = 0x0400,
-        exportMidi,
         exportGraph,
         importGraph,
 
@@ -78,14 +76,6 @@ public:
         graphOpen,
         graphSave,
         graphSaveAs,
-
-        workspaceSave = 0x0800,
-        workspaceOpen,
-        workspaceResetActive,
-        workspaceSaveActive,
-
-        workspaceClassic = 0x0900,
-        workspaceEditing,
 
         recentsClear = 0x1000,
 
@@ -146,8 +136,6 @@ public:
             sessionDeleteGraph,
             sessionInsertPlugin,
 
-            exportAudio,
-            exportMidi,
             exportGraph,
             importGraph,
 
@@ -170,13 +158,6 @@ public:
             graphOpen,
             graphSave,
             graphSaveAs,
-
-            workspaceSave,
-            workspaceOpen,
-            workspaceResetActive,
-            workspaceSaveActive,
-            workspaceClassic,
-            workspaceEditing,
 
             recentsClear,
         };
