@@ -404,7 +404,7 @@ void GraphEditorComponent::setNode (const Node& n)
         return;
     bool isGraph = n.isGraph();
     bool isValid = n.isValid();
-    graph = isValid && isGraph ? n : Node (tags::graph);
+    graph = isValid && isGraph ? n : Node (types::Graph);
 
     data.removeListener (this);
     data = graph.data();
@@ -1095,7 +1095,7 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
 //=============================================================================
 void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
-    if (child.hasType (tags::node))
+    if (child.hasType (types::Node))
     {
         child.setProperty (tags::x, verticalLayout ? lastDropX : lastDropY, 0);
         child.setProperty (tags::y, verticalLayout ? lastDropY : lastDropX, 0);

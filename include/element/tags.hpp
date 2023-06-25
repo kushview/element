@@ -12,19 +12,27 @@ EL_TAG (DSP)
 EL_TAG (View)
 EL_TAG (GraphView)
 EL_TAG (Anonymous)
+
 EL_TAG (Control)
 EL_TAG (Controller)
 EL_TAG (Graph)
 EL_TAG (Node)
+EL_TAG (Port)
 EL_TAG (Script)
 EL_TAG (Session)
 } // namespace types
 
 namespace tags {
+EL_TAG (attack)
+EL_TAG (audio)
+EL_TAG (block)
+
+EL_TAG (flow)
+EL_TAG (input)
+EL_TAG (midi)
+
 static const juce::Identifier asset = "asset";
 static const juce::Identifier assetId = "assetId";
-static const juce::Identifier attack = "attack";
-static const juce::Identifier block = "block";
 static const juce::Identifier bpm = "bpm";
 static const juce::Identifier category = "category";
 static const juce::Identifier channel = "channel";
@@ -108,8 +116,6 @@ static const juce::Identifier destChannel = "destChannel";
 static const juce::Identifier identifier = "identifier";
 static const juce::Identifier symbol = "symbol";
 static const juce::Identifier format = "format";
-static const juce::Identifier flow = "flow";
-static const juce::Identifier input = "input";
 static const juce::Identifier inputDevice = "inputDevice";
 
 static const juce::Identifier object = "object";

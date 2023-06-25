@@ -40,6 +40,8 @@ struct ScriptInfo final {
     bool valid() const noexcept { return name.isNotEmpty(); }
 };
 
+#define EL_SCRIPT_VERSION 0
+
 class EL_API Script : public Model {
 public:
     Script();

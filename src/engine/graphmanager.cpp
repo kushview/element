@@ -213,7 +213,7 @@ public:
         data = node.data();
         setDataProperties();
 
-        if (node.getNodeType() == tags::graph && object && object->isGraph())
+        if (node.getNodeType() == types::Graph && object && object->isGraph())
         {
             auto sub = dynamic_cast<GraphNode*> (object.get());
             jassert (sub);
@@ -223,13 +223,13 @@ public:
         }
         else
         {
-            if (node.getNodeType() != tags::graph)
+            if (node.getNodeType() != types::Graph)
             {
-                DBG ("data type is not a graph");
+                DBG ("[element] data type is not a graph");
             }
             if (object && ! object->isGraph())
             {
-                DBG ("object is not a graph type");
+                DBG ("[element] object is not a graph type");
             }
         }
     }
@@ -400,7 +400,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
     if (auto* object = createFilter (desc, rx, ry, nodeId))
     {
         nodeId = object->nodeId;
-        ValueTree data = ! object->isGraph() ? ValueTree (tags::node)
+        ValueTree data = ! object->isGraph() ? ValueTree (types::Node)
                                              : Node::createDefaultGraph (desc->name).data();
 
         data.setProperty (tags::id, static_cast<int64> (nodeId), nullptr)
@@ -748,7 +748,7 @@ void GraphManager::processorArcsChanged()
 
 void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 {
-    jassert (obj && data.hasType (tags::node));
+    jassert (obj && data.hasType (types::Node));
     Node node (data, false);
     node.setProperty (tags::type, obj->getTypeString())
         .setProperty (tags::object, obj.get())

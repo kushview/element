@@ -11,9 +11,21 @@ namespace element {
 
 class EL_API Graph : public Node {
 public:
+    /** Make an invalid graph. */
     Graph() : Node() {}
-    Graph (const Node& node) : Node (node.data(), false) {}
-    Graph (const Node& node, bool init) : Node (node.data(), init) {}
+    Graph (const Node& node) : Node (node.data(), false)
+    {
+        if (isValid()) {
+            jassert (getProperty (tags::type) == types::Graph.toString());
+        }
+    }
+
+    Graph (const Node& node, bool init) : Node (node.data(), init)
+    {
+        if (isValid()) {
+            jassert (getProperty (tags::type) == types::Graph.toString());
+        }
+    }
 
     inline Script findViewScript() const noexcept
     {

@@ -268,9 +268,9 @@ public:
             return;
 
         PluginDescription desc;
-        desc.fileOrIdentifier = "element.graph";
-        desc.pluginFormatName = "Element";
-        desc.name = "Graph";
+        desc.fileOrIdentifier = EL_NODE_ID_GRAPH;
+        desc.pluginFormatName = EL_NODE_FORMAT_NAME;
+        desc.name = types::Graph.toString();
         ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
     }
 
@@ -435,8 +435,10 @@ private:
 
         void showDocument() override
         {
-            // if (auto* cc = getContentComponent())
-            //     cc->setMainView (new ScriptNodeScriptEditorView (node, forUI));
+            if (auto* cc = getContentComponent())
+            {
+                cc->presentView (std::make_unique<ScriptNodeScriptEditorView> (node, forUI));
+            }
         }
 
         String getDisplayName() const override
@@ -471,8 +473,8 @@ public:
 
     void showDocument() override
     {
-        // if (auto* cc = getContentComponent())
-        //     cc->setMainView (new ScriptEditorView (script));
+        if (auto* cc = getContentComponent())
+            cc->presentView (std::unique_ptr<ContentView> (new ScriptEditorView (script)));
     }
 
     bool isMissing() override { return false; }
@@ -565,10 +567,14 @@ public:
         {
             if (auto* cc = getContentComponent())
             {
-                auto view = std::make_unique<ScriptView> (cc->context(), script);
+                auto view = new ScriptView (cc->context(), script);
                 view->setNode (node);
-                // FIXME: cc->setMainView (view.release());
+                cc->presentView (std::unique_ptr<ContentView> (view));
             }
+        }
+        else
+        {
+            std::clog << "[element] GraphView script not valid\n";
         }
     }
 
@@ -613,9 +619,9 @@ public:
     void addGraph()
     {
         PluginDescription desc;
-        desc.fileOrIdentifier = "element.graph";
-        desc.pluginFormatName = "Element";
-        desc.name = "Graph";
+        desc.fileOrIdentifier = EL_NODE_ID_GRAPH;
+        desc.pluginFormatName = EL_NODE_FORMAT_NAME;
+        desc.name = types::Graph.toString();
         ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
     }
 
@@ -845,7 +851,6 @@ void SessionTreePanel::showNode (const Node& newNode)
     if (newNode == node)
         return;
 
-    std::clog << "[element] SessionTreePanel: showing node: " << newNode.getName().toStdString() << std::endl;
     data.removeListener (this);
     node = newNode;
 
@@ -939,7 +944,7 @@ void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifi
     {
         selectActiveRootGraph();
     }
-    else if (tree.hasType (tags::node))
+    else if (tree.hasType (types::Node))
     {
         const Node graph (tree, false);
         if (property == tags::name || (graph.isRootGraph() && property == tags::midiProgram))
@@ -950,9 +955,9 @@ void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifi
 static bool couldBeSessionObjects (ValueTree& parent, ValueTree& child)
 {
     // clang-format off
-    return parent.hasType (tags::session) || 
-        (parent.hasType (tags::graphs) && child.hasType (tags::node)) || 
-        (parent.hasType (tags::nodes) && child.hasType (tags::node));
+    return parent.hasType (types::Session) || 
+        (parent.hasType (tags::graphs) && child.hasType (types::Node)) || 
+        (parent.hasType (tags::nodes) && child.hasType (types::Node));
     // clang-format on
 }
 

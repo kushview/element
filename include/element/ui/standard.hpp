@@ -21,7 +21,7 @@ public:
     NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nav.get(); }
 
     void setMainView (const String& name);
-    void setAccessoryView (const String& name);
+    void setSecondaryView (const String& name);
     String getMainViewName() const;
     String getAccessoryViewName() const;
 
@@ -61,6 +61,7 @@ public:
     void getSessionState (String&) override;
     void applySessionState (const String&) override;
 
+    void presentView (std::unique_ptr<ContentView>) override;
     void setMainView (ContentView* v);
 
 private:

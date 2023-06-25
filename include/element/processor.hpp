@@ -170,7 +170,7 @@ public:
     bool isSubGraph() const noexcept;
 
     /** Get the type string for this Node */
-    const String& getTypeString() const;
+    const String getTypeString() const noexcept;
 
     /** Returns true if the parameter is valid.
         Valid = special param index or positive and below

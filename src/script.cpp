@@ -136,11 +136,11 @@ ScriptInfo ScriptInfo::parse (File file)
 }
 
 //==============================================================================
-Script::Script() : Model (types::Script) { setMissing(); }
+Script::Script() : Model (types::Script, EL_SCRIPT_VERSION) { setMissing(); }
 Script::Script (const juce::ValueTree& data) : Model (data) {}
 
 Script::Script (const juce::String& source)
-    : Model (types::Script)
+    : Model (types::Script, EL_SCRIPT_VERSION)
 {
     setMissing();
     setCode (source);

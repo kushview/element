@@ -89,7 +89,7 @@ private:
 
     void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override
     {
-        if (parent.hasType (tags::nodes) && child.hasType (tags::node) && child != data)
+        if (parent.hasType (tags::nodes) && child.hasType (types::Node) && child != data)
         {
             if (onSiblingNodeAdded)
                 onSiblingNodeAdded();
@@ -98,7 +98,7 @@ private:
 
     void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override
     {
-        if (parent.hasType (tags::nodes) && child.hasType (tags::node) && child != data)
+        if (parent.hasType (tags::nodes) && child.hasType (types::Node) && child != data)
         {
             if (onSiblingNodeRemoved)
                 onSiblingNodeRemoved();

@@ -43,11 +43,11 @@ static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescripti
 {
     const auto& type = p.getProperty (tags::type);
 
-    if (type == "graph")
+    if (type == types::Graph.toString())
     {
         pd.name = p.getProperty (tags::name);
-        pd.fileOrIdentifier = "element.graph";
-        pd.pluginFormatName = "Element";
+        pd.fileOrIdentifier = EL_NODE_ID_GRAPH;
+        pd.pluginFormatName = EL_NODE_FORMAT_NAME;
     }
     else
     {
@@ -62,7 +62,7 @@ static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescripti
 
 static ValueTree getBlockValueTree (const Node& node)
 {
-    return node.getUIValueTree().getOrCreateChildWithName ("block", nullptr);
+    return node.getUIValueTree().getOrCreateChildWithName (tags::block, nullptr);
 }
 
 static StringArray getHiddenPortsProperty (const Node& node)
@@ -141,18 +141,20 @@ Node::Node (const ValueTree& data, const bool setMissing)
 {
     if (setMissing)
     {
-        jassert (data.hasType (tags::node));
+        jassert (data.hasType (types::Node));
         setMissingProperties();
     }
 }
 
 // clang-format off
-Node::Node (const Identifier& nodeType)
-    : Model (tags::node, (nodeType == tags::node ? EL_NODE_VERSION 
-                        : nodeType == tags::graph ? EL_GRAPH_VERSION
-                        : -1))
+Node::Node (const Identifier& tp)
+    : Model (types::Node, (tp == types::Graph ? EL_GRAPH_VERSION : EL_NODE_VERSION))
 {
-    objectData.setProperty (tags::type, nodeType.toString(), nullptr);
+#if JUCE_DEBUG
+    Array<Identifier> supported ({ types::Node, types::Graph });
+    jassert (supported.contains (tp));
+#endif
+    objectData.setProperty (tags::type, tp.toString(), nullptr);
     setMissingProperties();
 }
 // clang-format on
@@ -160,10 +162,37 @@ Node::Node (const Identifier& nodeType)
 Node::~Node() noexcept {}
 
 //=============================================================================
+bool Node::isValid() const noexcept { return objectData.hasType (types::Node); }
+const String Node::getName() const noexcept { return getProperty (tags::name).toString(); }
+void Node::setName (const String& name) { setProperty (tags::name, name); }
+
+const String Node::getPluginName() const noexcept
+{
+    if (ProcessorPtr object = getObject())
+        return object->getName();
+    return {};
+}
+
+const String Node::getDisplayName() const noexcept
+{
+    String name = getName();
+    if (name.isEmpty())
+        name = getPluginName();
+    return name;
+}
+
+bool Node::hasModifiedName() const noexcept
+{
+    auto dname = getName();
+    return dname.isNotEmpty() && dname != getPluginName();
+}
+
+//=============================================================================
 Node Node::createDefaultGraph (const String& name)
 {
-    Node graph (tags::graph);
+    Node graph (types::Graph);
     graph.setProperty (tags::name, name);
+
     ValueTree nodes = graph.getNodesValueTree();
 
     const auto types = StringArray ({ "audio.input", "audio.output", "midi.input", "midi.output" });
@@ -172,7 +201,7 @@ Node Node::createDefaultGraph (const String& name)
 
     for (const auto& t : types)
     {
-        ValueTree ioNode (tags::node);
+        ValueTree ioNode (types::Node);
         ValueTree ports = ioNode.getOrCreateChildWithName (tags::ports, 0);
         int portIdx = 0;
 
@@ -189,40 +218,21 @@ Node Node::createDefaultGraph (const String& name)
                 .setProperty ("numAudioIns", 0, 0)
                 .setProperty ("numAudioOuts", 2, 0);
 
-            ValueTree port (tags::port);
-            port.setProperty ("name", "Port", 0)
-                .setProperty ("index", portIdx++, 0)
-                .setProperty ("type", "audio", 0)
-                .setProperty ("flow", "output", 0);
-            ports.addChild (port, -1, 0);
-
-            port = ValueTree (tags::port);
-            port.setProperty ("name", "Port", 0)
-                .setProperty ("index", portIdx++, 0)
-                .setProperty ("type", "audio", 0)
-                .setProperty ("flow", "output", 0);
-            ports.addChild (port, -1, 0);
+            Port port ("Port", tags::audio, tags::output, (uint32) portIdx++);
+            ports.addChild (port.data(), -1, 0);
+            port = Port ("Port", tags::audio, tags::output, (int) portIdx++);
+            ports.addChild (port.data(), -1, 0);
         }
         else if (t == "audio.output")
         {
             ioNode.setProperty (tags::relativeX, 0.25f, 0)
                 .setProperty (tags::relativeY, 0.75f, 0)
-                .setProperty ("numAudioIns", 2, 0)
-                .setProperty ("numAudioOuts", 0, 0);
+                .setProperty ("numAudioIns", 2, 0) // TODO: Needed?
+                .setProperty ("numAudioOuts", 0, 0); // TODO: Needed?
 
-            ValueTree port (tags::port);
-            port.setProperty ("name", "Port", 0)
-                .setProperty ("index", portIdx++, 0)
-                .setProperty ("type", "audio", 0)
-                .setProperty ("flow", "input", 0);
-            ports.addChild (port, -1, 0);
-
-            port = ValueTree (tags::port);
-            port.setProperty ("name", "Port", 0)
-                .setProperty ("index", portIdx++, 0)
-                .setProperty ("type", "audio", 0)
-                .setProperty ("flow", "input", 0);
-            ports.addChild (port, -1, 0);
+            Port port ("Port", tags::audio, tags::input, (uint32) portIdx++);
+            ports.addChild (port.data(), -1, 0);
+            port = Port ("Port", tags::audio, tags::input, (int) portIdx++);
         }
         else if (t == "midi.input")
         {
@@ -230,12 +240,8 @@ Node Node::createDefaultGraph (const String& name)
                 .setProperty (tags::relativeY, 0.25f, 0)
                 .setProperty ("numAudioIns", 0, 0)
                 .setProperty ("numAudioOuts", 0, 0);
-            ValueTree port (tags::port);
-            port.setProperty ("name", "Port", 0)
-                .setProperty ("index", portIdx++, 0)
-                .setProperty ("type", "midi", 0)
-                .setProperty ("flow", "output", 0);
-            ports.addChild (port, -1, 0);
+            Port port ("Port", tags::midi, tags::output, (uint32) portIdx++);
+            ports.addChild (port.data(), -1, 0);
         }
         else if (t == "midi.output")
         {
@@ -243,12 +249,8 @@ Node Node::createDefaultGraph (const String& name)
                 .setProperty (tags::relativeY, 0.75f, 0)
                 .setProperty ("numAudioIns", 0, 0)
                 .setProperty ("numAudioOuts", 0, 0);
-            ValueTree port (tags::port);
-            port.setProperty ("name", "Port", 0)
-                .setProperty ("index", portIdx++, 0)
-                .setProperty ("type", "midi", 0)
-                .setProperty ("flow", "input", 0);
-            ports.addChild (port, -1, 0);
+            Port port ("Port", tags::midi, tags::input, (uint32) portIdx++);
+            ports.addChild (port.data(), -1, 0);
         }
 
         Node finalNode (ioNode, true);
@@ -258,22 +260,20 @@ Node Node::createDefaultGraph (const String& name)
     return graph;
 }
 
-const String Node::getPluginName() const
-{
-    if (ProcessorPtr object = getObject())
-        return object->getName();
-    return {};
-}
-
 bool Node::isProbablyGraphNode (const ValueTree& data)
 {
-    return data.hasType (tags::node) && tags::graph.toString() == data.getProperty (tags::type).toString();
+    // clang-format off
+    const var& tp = data.getProperty (tags::type);
+    return data.hasType (types::Node) && 
+        (tags::graph.toString() == tp.toString() || 
+         types::Graph.toString() == tp.toString());
+    // clang-format on
 }
 
 ValueTree Node::resetIds (const ValueTree& data)
 {
     ValueTree result = data;
-    jassert (result.hasType (tags::node)); // must be a node
+    jassert (result.hasType (types::Node)); // must be a node
     jassert (! result.getParent().isValid()); // cannot be part of another object tree
     if (result.getParent().isValid())
         return result;
@@ -305,13 +305,13 @@ ValueTree Node::parse (const File& file)
         data = ValueTree::readFromStream (input);
     }
 
-    if (data.hasType (tags::node))
+    if (data.hasType (types::Node))
     {
         nodeData = data;
     }
     else
     {
-        nodeData = data.getChildWithName (tags::node);
+        nodeData = data.getChildWithName (types::Node);
         // Rename the node appropriately
         if (data.hasProperty (tags::name))
             nodeData.setProperty (tags::name, data.getProperty (tags::name), 0);
@@ -319,7 +319,7 @@ ValueTree Node::parse (const File& file)
             nodeData.setProperty (tags::name, file.getFileNameWithoutExtension(), 0);
     }
 
-    if (nodeData.isValid() && nodeData.hasType (tags::node))
+    if (nodeData.isValid() && nodeData.hasType (types::Node))
     {
         if (data.indexOf (nodeData) >= 0)
             data.removeChild (nodeData, 0);
@@ -336,7 +336,7 @@ void Node::sanitizeProperties (ValueTree node, const bool recursive)
     node.removeProperty (tags::updater, nullptr);
     node.removeProperty (tags::object, nullptr);
 
-    if (node.hasType (tags::node))
+    if (node.hasType (types::Node))
     {
         Array<Identifier> properties ({ tags::offline,
                                         tags::placeholder,
@@ -389,6 +389,7 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
     preset.addChild (data, -1, 0);
 
     const auto targetFile = path.createNewPresetFile (*this, name);
+    data.setProperty (tags::version, EL_NODE_VERSION, 0);
     data.setProperty (tags::name, targetFile.getFileNameWithoutExtension(), 0);
     data.setProperty (tags::type, tags::node.toString(), 0);
 
@@ -409,7 +410,7 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
 
 Node Node::createGraph (const String& name)
 {
-    Node node (tags::graph);
+    Node node (types::Graph);
     ValueTree root = node.data();
     root.setProperty (tags::name, name, nullptr);
     root.getOrCreateChildWithName (tags::nodes, nullptr);
@@ -439,22 +440,14 @@ const bool Node::canConnectTo (const Node& o) const
 
 ValueTree Node::getParentArcsNode() const
 {
-    ValueTree arcs = objectData.getParent();
-    if (arcs.hasType (tags::nodes))
-        arcs = arcs.getParent();
-    if (! arcs.isValid())
+    ValueTree tmp = objectData.getParent();
+    if (tmp.hasType (tags::nodes))
+        tmp = tmp.getParent();
+    if (! tmp.isValid())
         return ValueTree();
 
-    jassert (arcs.hasType (tags::node));
-    return arcs.getOrCreateChildWithName (tags::arcs, nullptr);
-}
-
-const String Node::getDisplayName() const
-{
-    String name = getName();
-    if (name.isEmpty())
-        name = getPluginName();
-    return name;
+    jassert (tmp.hasType (types::Node));
+    return tmp.getOrCreateChildWithName (tags::arcs, nullptr);
 }
 
 void Node::getPluginDescription (PluginDescription& p) const
@@ -476,7 +469,7 @@ ValueTree Node::addScript (const Script& script)
 void Node::setMissingProperties()
 {
     stabilizePropertyString (tags::uuid, Uuid().toString());
-    stabilizePropertyString (tags::type, "default");
+    stabilizePropertyString (tags::type, types::Node.toString());
     stabilizePropertyString (tags::name, "Node");
     stabilizeProperty (tags::bypass, false);
     stabilizeProperty (tags::persistent, true);

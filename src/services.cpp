@@ -247,7 +247,7 @@ void Services::handleMessage (const Message& msg)
         ValueTree parent (node.data().getParent());
         if (parent.hasType (tags::nodes))
             parent = parent.getParent();
-        jassert (parent.hasType (tags::node));
+        jassert (parent.hasType (types::Node));
 
         const Node graph (parent, false);
         node.savePluginState();

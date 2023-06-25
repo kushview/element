@@ -35,7 +35,7 @@ Model::Model (const juce::Identifier& type, int dataVersion)
 int Model::version() const noexcept
 {
     if (! objectData.hasProperty (tags::version))
-        return -1;
+        return 0;
     const auto vers = (int) objectData.getProperty (tags::version);
     jassert (vers >= 0);
     return vers;

@@ -116,7 +116,7 @@ void SessionService::openFile (const File& file)
             }
 
             model.forEach ([] (const ValueTree& tree) {
-                if (! tree.hasType (tags::node))
+                if (! tree.hasType (types::Node))
                     return;
                 auto nodeRef = tree;
                 nodeRef.setProperty (tags::uuid, Uuid().toString(), nullptr);
@@ -164,7 +164,7 @@ void SessionService::openFile (const File& file)
 
 void SessionService::exportGraph (const Node& node, const File& targetFile)
 {
-    if (! node.hasNodeType (tags::graph))
+    if (! node.hasNodeType (types::Graph))
     {
         jassertfalse;
         return;
@@ -273,7 +273,7 @@ void SessionService::loadNewSessionData()
         ValueTree data;
         if (auto xml = XmlDocument::parse (file))
             data = ValueTree::fromXml (*xml);
-        if (data.isValid() && data.hasType (tags::session) && EL_SESSION_VERSION == (int) data.getProperty (tags::version))
+        if (data.isValid() && data.hasType (types::Session) && EL_SESSION_VERSION == (int) data.getProperty (tags::version))
             wasLoaded = currentSession->loadData (data);
     }
 

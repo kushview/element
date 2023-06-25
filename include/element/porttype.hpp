@@ -8,6 +8,8 @@
 #include <element/juce/core.hpp>
 #include <element/juce/data_structures.hpp>
 
+#include <element/tags.hpp>
+
 #ifndef EL_INVALID_CHANNEL
     #define EL_INVALID_CHANNEL -1
 #endif
@@ -525,7 +527,7 @@ public:
     inline juce::ValueTree createValueTree (const int port) const
     {
         if (const auto* desc = findByIndexInternal (port)) {
-            juce::ValueTree data ("port");
+            juce::ValueTree data (types::Port);
             data.setProperty ("index", desc->index, nullptr)
                 .setProperty ("channel", desc->channel, nullptr)
                 .setProperty ("type", PortType::getSlug (desc->type), nullptr)

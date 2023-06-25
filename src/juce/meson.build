@@ -36,7 +36,7 @@ foreach m : juce_modules
     juce_conf_data.set10 ('JUCE_MODULE_AVAILABLE_@0@'.format (m), true)
 endforeach
 
-if get_option ('debug')
+if get_option ('debug') or get_option('buildtype') == 'debug'
     juce_conf_data.set10 ('_DEBUG', true)
 else
     juce_conf_data.set10 ('NDEBUG', true)

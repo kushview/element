@@ -26,14 +26,14 @@ Controller::Controller (const ValueTree& data)
 {
     if (data.isValid())
     {
-        jassert (data.hasType (tags::controller));
+        jassert (data.hasType (types::Controller));
         jassert (data.hasProperty (tags::uuid));
         setMissingProperties();
     }
 }
 
 Controller::Controller (const String& name)
-    : Model (tags::controller)
+    : Model (types::Controller, EL_CONTROLLER_VERSION)
 {
     setName (name);
     setMissingProperties();

@@ -8,6 +8,9 @@
 #include <element/model.hpp>
 #include <element/tags.hpp>
 
+#define EL_CONTROL_VERSION    1
+#define EL_CONTROLLER_VERSION 1
+
 namespace element {
 
 // FIXME:
@@ -29,7 +32,7 @@ public:
     };
 
     Control (const String& name)
-        : Model (tags::control)
+        : Model (types::Control, EL_CONTROL_VERSION)
     {
         setName (name);
         setMissingProperties();
@@ -37,7 +40,7 @@ public:
 
     ~Control() noexcept {}
 
-    bool isValid() const { return objectData.isValid() && objectData.hasType (tags::control); }
+    bool isValid() const { return objectData.isValid() && objectData.hasType (types::Control); }
 
     EL_MODEL_GETTER (getName, tags::name);
     EL_MODEL_SETTER (Name, tags::name);
@@ -136,7 +139,7 @@ public:
     Controller (const String& name);
     virtual ~Controller() {}
 
-    inline bool isValid() const { return objectData.isValid() && objectData.hasType (tags::controller); }
+    inline bool isValid() const { return objectData.isValid() && objectData.hasType (types::Controller); }
 
     EL_MODEL_GETTER (getName, tags::name)
     EL_MODEL_SETTER (Name, tags::name)

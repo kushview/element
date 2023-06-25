@@ -486,11 +486,11 @@ private:
             buildNodeArray();
             resetMatrix();
         }
-        else if (nodeModels == parentTree && childWhichHasBeenAdded.hasType (tags::node))
+        else if (nodeModels == parentTree && childWhichHasBeenAdded.hasType (types::Node))
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenAdded.hasType (tags::ports) || childWhichHasBeenAdded.hasType (tags::port))
+        else if (childWhichHasBeenAdded.hasType (tags::ports) || childWhichHasBeenAdded.hasType (types::Port))
         {
             buildNodeArray();
         }
@@ -507,11 +507,11 @@ private:
             buildNodeArray();
             resetMatrix();
         }
-        else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (tags::node))
+        else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (types::Node))
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenRemoved.hasType (tags::ports) || childWhichHasBeenRemoved.hasType (tags::port))
+        else if (childWhichHasBeenRemoved.hasType (tags::ports) || childWhichHasBeenRemoved.hasType (types::Port))
         {
             buildNodeArray();
         }
@@ -831,7 +831,7 @@ void ConnectionGrid::setNode (const Node& newNode)
         setInterceptsMouseClicks (true, true);
     }
 
-    ValueTree newNodes = newNode.hasNodeType (tags::graph)
+    ValueTree newNodes = newNode.hasNodeType (types::Graph)
                              ? newNode.getNodesValueTree()
                              : ValueTree (tags::nodes);
     jassert (this->matrix != nullptr);

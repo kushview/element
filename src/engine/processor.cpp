@@ -113,9 +113,10 @@ String Processor::getSpecialParameterName (int parameter)
     return name;
 }
 
-const String& Processor::getTypeString() const
+const String Processor::getTypeString() const noexcept
 {
-    return isA<GraphNode>() ? tags::graph.toString() : tags::plugin.toString();
+    return isA<GraphNode>() ? types::Graph.toString()
+                            : tags::plugin.toString();
 }
 
 bool Processor::containsParameter (const int index) const

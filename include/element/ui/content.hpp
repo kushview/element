@@ -111,6 +111,9 @@ public:
     virtual void resizeContent (const Rectangle<int>& area) { ignoreUnused (area); }
 
     //=========================================================================
+    virtual void presentView (std::unique_ptr<ContentView>) = 0;
+
+    //=========================================================================
     virtual void saveState (PropertiesFile*);
     virtual void restoreState (PropertiesFile*);
     virtual void getSessionState (String&) {}

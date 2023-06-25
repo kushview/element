@@ -94,7 +94,7 @@ void DeviceService::add (const File& file)
     if (auto xml = XmlDocument::parse (file))
         data = ValueTree::fromXml (*xml);
 
-    if (data.isValid() && data.hasType (tags::controller))
+    if (data.isValid() && data.hasType (types::Controller))
     {
         // Avoid UUID conflicts by replacing all
         data.setProperty (tags::uuid, Uuid().toString(), 0);
@@ -178,7 +178,7 @@ void DeviceService::refresh()
         const int parameter = child.getParameterIndex();
         Node node = session->findNodeById (Uuid (child.getProperty (tags::node).toString()));
         Controller device = session->findControllerById (
-            Uuid (child.getProperty (tags::controller).toString()));
+            Uuid (child.getProperty (types::Controller).toString()));
         Control control = device.findControlById (
             Uuid (child.getProperty (tags::control).toString()));
 

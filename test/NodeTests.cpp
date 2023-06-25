@@ -6,6 +6,23 @@ using namespace element;
 
 BOOST_AUTO_TEST_SUITE (NodeTests)
 
+BOOST_AUTO_TEST_CASE (Ctors)
+{
+    Node node;
+    BOOST_REQUIRE (! node.isValid());
+    node = element::Node (types::Node);
+    BOOST_REQUIRE (node.getName().isNotEmpty());
+    BOOST_REQUIRE (node.getNodeType() == types::Node);
+    BOOST_REQUIRE (node.getUuidString().isNotEmpty());
+    BOOST_REQUIRE (! node.getUuid().isNull());
+
+    node = element::Node (node.data().createCopy(), false);
+    BOOST_REQUIRE (node.getName().isNotEmpty());
+    BOOST_REQUIRE (node.getNodeType() == types::Node);
+    BOOST_REQUIRE (node.getUuidString().isNotEmpty());
+    BOOST_REQUIRE (! node.getUuid().isNull());
+}
+
 BOOST_AUTO_TEST_CASE (DefaultGraph)
 {
     auto node = Node::createDefaultGraph ("CustomName");
@@ -19,7 +36,7 @@ BOOST_AUTO_TEST_CASE (DefaultGraph)
 
 BOOST_AUTO_TEST_CASE (HiddenBlockPorts)
 {
-    Node node (tags::node);
+    Node node (types::Node);
     auto ports = node.getPortsValueTree();
     for (int i = 0; i < 16; ++i) {
         Port port;
@@ -47,7 +64,11 @@ BOOST_AUTO_TEST_CASE (HiddenBlockPorts)
     }
 
     auto port = node.getPort (0);
+    std::clog << port.toXmlString().toStdString() << std::endl;
+    std::clog << port.getNode().toXmlString().toStdString() << std::endl;
+
     BOOST_REQUIRE_MESSAGE (! port.isHiddenOnBlock(), "Unmodified should not be hidden on block");
+
     port = node.getPort (10);
     BOOST_REQUIRE_MESSAGE (port.isHiddenOnBlock(),
                            port.symbol().toStdString() + std::string (" Should be hidden on block"));

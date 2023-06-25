@@ -353,7 +353,7 @@ void EngineService::duplicateGraph (const Node& graph)
     Node::sanitizeRuntimeProperties (duplicate.data());
     // reset UUIDs to avoid compilcations with undoable actions
     duplicate.forEach ([] (const ValueTree& tree) {
-        if (! tree.hasType (tags::node))
+        if (! tree.hasType (types::Node))
             return;
         auto nodeRef = tree;
         nodeRef.setProperty (tags::uuid, Uuid().toString(), nullptr);

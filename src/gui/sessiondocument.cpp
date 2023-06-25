@@ -24,12 +24,12 @@ namespace element {
 
 static void setMissingNodeProperties (const ValueTree& tree)
 {
-    if (tree.hasType (tags::node))
+    if (tree.hasType (types::Node))
     {
         const Node node (tree, true);
         ignoreUnused (node);
     }
-    else if (tree.hasType (tags::controller) || tree.hasType (tags::control))
+    else if (tree.hasType (types::Controller) || tree.hasType (types::Control))
     {
         // noop
     }
@@ -64,7 +64,7 @@ Result SessionDocument::loadDocument (const File& file)
     {
         ValueTree newData (ValueTree::fromXml (*e));
 
-        if (! newData.isValid() && newData.hasType ("session"))
+        if (! newData.isValid() && newData.hasType (types::Session))
             error = "Not a valid session file";
 
         int loadedVersion = (int) newData.getProperty (tags::version, -1);

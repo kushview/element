@@ -531,7 +531,7 @@ void ContentComponent::filesDropped (const StringArray& files, int x, int y)
         else if (file.hasFileExtension ("elpreset"))
         {
             const auto data = Node::parse (file);
-            if (data.hasType (tags::node))
+            if (data.hasType (types::Node))
             {
                 const Node node (data, false);
                 this->post (new AddNodeMessage (node));

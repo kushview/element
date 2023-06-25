@@ -171,7 +171,7 @@ void SessionImportWizard::loadSession (const File& file)
     if (auto e = XmlDocument::parse (file))
     {
         ValueTree newData (ValueTree::fromXml (*e));
-        if (newData.isValid() && newData.hasType ("session"))
+        if (newData.isValid() && newData.hasType (types::Session))
         {
             newSession = new Session();
             loaded = newSession->loadData (newData);

@@ -59,7 +59,7 @@ private:
 };
 
 Session::Session()
-    : Model (tags::session, EL_SESSION_VERSION)
+    : Model (types::Session, EL_SESSION_VERSION)
 {
     impl.reset (new Impl (*this));
     setMissingProperties (true);
@@ -108,7 +108,7 @@ void Session::clear()
 
 bool Session::loadData (const ValueTree& data)
 {
-    if (! data.hasType (tags::session))
+    if (! data.hasType (types::Session))
         return false;
     objectData.removeListener (this);
     objectData = data;
@@ -188,7 +188,7 @@ void Session::notifyChanged()
 
 void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (property == tags::object || (tree.hasType (tags::node) && (property == tags::state || property == tags::updater)))
+    if (property == tags::object || (tree.hasType (types::Node) && (property == tags::state || property == tags::updater)))
     {
         return;
     }
@@ -203,14 +203,14 @@ void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& prope
 void Session::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     // controller device added
-    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (tags::controller))
+    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (types::Controller))
     {
         const Controller device (child);
         controllerDeviceAdded (device);
     }
 
     // controller device control added
-    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (tags::controller) && child.hasType (tags::control))
+    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (types::Controller) && child.hasType (types::Control))
     {
         const Control control (child);
         controlAdded (control);
@@ -222,14 +222,14 @@ void Session::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 void Session::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
 {
     // controller device removed
-    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (tags::controller))
+    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (types::Controller))
     {
         const Controller device (child);
         controllerDeviceRemoved (device);
     }
 
     // controller device control removed
-    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (tags::controller) && child.hasType (tags::control))
+    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (types::Controller) && child.hasType (types::Control))
     {
         const Control control (child);
         controlRemoved (control);

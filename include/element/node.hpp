@@ -12,9 +12,9 @@
 #include <element/processor.hpp>
 #include <element/tags.hpp>
 
-#define EL_NODE_VERSION  0
-#define EL_PORT_VERSION  EL_NODE_VERSION
-#define EL_GRAPH_VERSION EL_NODE_VERSION
+#define EL_NODE_VERSION  1
+#define EL_PORT_VERSION  1
+#define EL_GRAPH_VERSION 1
 
 namespace element {
 
@@ -31,9 +31,18 @@ class Script;
 /** Representation of a Port of a Node. */
 class EL_API Port : public Model {
 public:
-    Port() : Model (tags::port, EL_PORT_VERSION) {}
+    Port() : Model (types::Port, EL_PORT_VERSION) {}
     Port (const ValueTree& p)
-        : Model (p) { jassert (p.hasType (tags::port)); }
+        : Model (p) { jassert (p.hasType (types::Port)); }
+    Port (const juce::String& name, const juce::Identifier& type, const juce::Identifier& flow, uint32 index = 0)
+        : Model (types::Port, EL_PORT_VERSION)
+    {
+        objectData.setProperty (tags::name, name, nullptr)
+            .setProperty (tags::index, static_cast<int> (index), nullptr)
+            .setProperty (tags::type, type.toString(), nullptr)
+            .setProperty (tags::flow, flow.toString(), nullptr);
+    }
+
     ~Port() {}
 
     /** Returns the ValueTree of the Node containing this port
@@ -45,7 +54,7 @@ public:
     Node getNode() const;
 
     /** Returns true if this port probably lives on a Node */
-    inline bool hasParentNode() const { return getNodeValueTree().hasType (tags::node); }
+    inline bool hasParentNode() const { return getNodeValueTree().hasType (types::Node); }
 
     const bool isInput() const
     {
@@ -98,68 +107,26 @@ public:
     /** Destructor */
     ~Node() noexcept;
 
-    /** Returns true if the connection exists in the provided ValueTree
-
-        @param arcs          Value tree containing connections
-        @param sourceNode    The source node ID
-        @param sourcePort    The source port index
-        @param destNode      The target node ID
-        @param destPort      The target port index
-        @param checkMissing  If true, will return false if found but has the missing property
-    */
-    static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort, const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
-
-    /** Creates a default graph structure with optional name */
-    static Node createDefaultGraph (const String& name = String());
-
-    /** Creates an empty graph model */
-    static Node createGraph (const String& name = String());
-
-    /** Returns true if the value tree is probably a graph node */
-    static bool isProbablyGraphNode (const ValueTree& data);
-
-    /** Removes unused id properties and resets the uuid */
-    static ValueTree resetIds (const ValueTree& data);
-
-    /** Load node data from file */
-    static ValueTree parse (const File& file);
-
-    /** Removes properties that can't be saved to a file. e.g. object properties */
-    static void sanitizeProperties (ValueTree node, const bool recursive = false);
-
-    /** This is just an alias right now */
-    static void sanitizeRuntimeProperties (ValueTree node, const bool recursive = false);
-
-    /** Create a value tree version of an arc */
-    static ValueTree makeArc (const Arc& arc);
-
-    /** Create an Arc from a ValueTree */
-    static Arc arcFromValueTree (const ValueTree& data);
-
     //=========================================================================
     /** Returns true if the underlying data is probably a node */
-    bool isValid() const { return objectData.hasType (tags::node); }
+    bool isValid() const noexcept;
 
     /** Returns the user-modifiable name of this node */
-    const String getName() const { return getProperty (tags::name); }
+    const String getName() const noexcept;
 
     /** Change the user-defined name */
-    void setName (const String& name) { setProperty (tags::name, name); }
+    void setName (const String& name);
 
     /** Returns the node name defined by the user. If not set it returns the
         node name set when loaded.
     */
-    const String getDisplayName() const;
+    const juce::String getDisplayName() const noexcept;
 
     /** Returns the name as defined by the loaded plugin */
-    const String getPluginName() const;
+    const juce::String getPluginName() const noexcept;
 
     /** Returns true if the name has been user-modified */
-    bool hasModifiedName() const
-    {
-        auto dname = getName();
-        return dname.isNotEmpty() && dname != getPluginName();
-    }
+    bool hasModifiedName() const noexcept;
 
     //=========================================================================
     /** Returns the nodeId as defined in the engine */
@@ -178,7 +145,7 @@ public:
     /** Returns true if this is a root graph on the session */
     bool isRootGraph() const
     {
-        return objectData.getParent().hasType (tags::graphs) && objectData.getParent().getParent().hasType (tags::session);
+        return objectData.getParent().hasType (tags::graphs) && objectData.getParent().getParent().hasType (types::Session);
     }
 
     /** Returns an Identifier indicating this nodes type */
@@ -514,6 +481,45 @@ public:
         If failure, the returned will be invalid;
     */
     ValueTree addScript (const Script& script);
+
+    //==========================================================================
+    /** Returns true if the connection exists in the provided ValueTree
+
+        @param arcs          Value tree containing connections
+        @param sourceNode    The source node ID
+        @param sourcePort    The source port index
+        @param destNode      The target node ID
+        @param destPort      The target port index
+        @param checkMissing  If true, will return false if found but has the missing property
+    */
+    static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort, const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
+
+    /** Creates a default graph structure with optional name */
+    static Node createDefaultGraph (const String& name = String());
+
+    /** Creates an empty graph model */
+    static Node createGraph (const String& name = String());
+
+    /** Returns true if the value tree is probably a graph node */
+    static bool isProbablyGraphNode (const ValueTree& data);
+
+    /** Removes unused id properties and resets the uuid */
+    static ValueTree resetIds (const ValueTree& data);
+
+    /** Load node data from file */
+    static ValueTree parse (const File& file);
+
+    /** Removes properties that can't be saved to a file. e.g. object properties */
+    static void sanitizeProperties (ValueTree node, const bool recursive = false);
+
+    /** This is just an alias right now */
+    static void sanitizeRuntimeProperties (ValueTree node, const bool recursive = false);
+
+    /** Create a value tree version of an arc */
+    static ValueTree makeArc (const Arc& arc);
+
+    /** Create an Arc from a ValueTree */
+    static Arc arcFromValueTree (const ValueTree& data);
 
 private:
     void setMissingProperties();
