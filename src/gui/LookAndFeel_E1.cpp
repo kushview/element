@@ -43,11 +43,11 @@ const Colour Colors::contentBackgroundColor = Colors::widgetBackgroundColor.dark
 const Colour Colors::textColor = Colour ((uint32) LookAndFeel_E1::defaultTextColor);
 const Colour Colors::textActiveColor = Colour ((uint32) LookAndFeel_E1::defaultTextActiveColor);
 const Colour Colors::textBoldColor = Colour ((uint32) LookAndFeel_E1::defaultTextBoldColor);
-const Colour Colors::highlightBackgroundColor = Colors::textColor.darker (0.6000006).withAlpha (0.6f);
+const Colour Colors::highlightBackgroundColor = Colors::textColor.darker (0.6000006f).withAlpha (0.6f);
 
 LookAndFeel_E1::LookAndFeel_E1()
 {
-    setColour (ResizableWindow::backgroundColourId, Colors::widgetBackgroundColor.darker (0.3));
+    setColour (ResizableWindow::backgroundColourId, Colors::widgetBackgroundColor.darker (0.3f));
 
     // Text Buttons
     setColour (TextButton::buttonColourId, Colour (0xff525252));
@@ -118,7 +118,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (TextEditor::highlightColourId, Colors::elemental.brighter (0.31f));
     setColour (TextEditor::highlightedTextColourId, Colours::black.brighter (0.22f));
     setColour (TextEditor::outlineColourId, Colours::black);
-    setColour (TextEditor::focusedOutlineColourId, Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
+    setColour (TextEditor::focusedOutlineColourId, Colors::toggleBlue.darker (0.002f).withAlpha (0.6f));
 
     // Slider
     setColour (Slider::thumbColourId, Colours::black);
@@ -162,10 +162,10 @@ LookAndFeel_E1::LookAndFeel_E1()
 
     // Element Colors
     setColour (Style::backgroundColorId, Colour (0xff16191a));
-    setColour (Style::backgroundHighlightColorId, Colour (0xffcccccc).darker (0.6000006).withAlpha (0.6f));
+    setColour (Style::backgroundHighlightColorId, Colour (0xffcccccc).darker (0.6000006f).withAlpha (0.6f));
 
     setColour (Style::widgetBackgroundColorId, Colour (0xff3b3b3b));
-    setColour (Style::contentBackgroundColorId, Colour (0xff3b3b3b).darker (0.6));
+    setColour (Style::contentBackgroundColorId, Colour (0xff3b3b3b).darker (0.6f));
 
     setColour (Style::textColorId, Colour (0xffcccccc));
     setColour (Style::textActiveColorId, Colour (0xffe5e5e5));
@@ -176,7 +176,7 @@ LookAndFeel_E1::LookAndFeel_E1()
 
     // Property Component
     setColour (PropertyComponent::labelTextColourId, Colors::textColor);
-    setColour (PropertyComponent::backgroundColourId, Colors::backgroundColor.brighter (0.02));
+    setColour (PropertyComponent::backgroundColourId, Colors::backgroundColor.brighter (0.02f));
 
     // // Text Editor
     // setColour (TextEditor::textColourId,            Colors::textColor);
@@ -185,7 +185,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     // setColour (TextEditor::outlineColourId,         Colours::black);
     // setColour (TextEditor::focusedOutlineColourId,  Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
 
-    setColour (Label::textWhenEditingColourId, findColour (TextEditor::textColourId).darker (0.003));
+    setColour (Label::textWhenEditingColourId, findColour (TextEditor::textColourId).darker (0.003f));
 
     setColour (TextPropertyComponent::outlineColourId, findColour (TextEditor::outlineColourId));
     setColour (TextPropertyComponent::backgroundColourId, findColour (TextEditor::backgroundColourId));
@@ -246,16 +246,16 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (ToggleButton::tickColourId, Colors::toggleBlue.darker());
 
     // rotary
-    setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker (0.3));
+    setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker (0.3f));
 
     // Scrollbar
     setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.25f));
 
     // code editor. TODO
-    setColour (CodeEditorComponent::backgroundColourId, findColour (Style::widgetBackgroundColorId).darker (0.6));
+    setColour (CodeEditorComponent::backgroundColourId, findColour (Style::widgetBackgroundColorId).darker (0.6f));
     setColour (CodeEditorComponent::highlightColourId, Colour (0xff1b5381));
     setColour (CodeEditorComponent::defaultTextColourId, Colour (0xffc4c4c4));
-    setColour (CodeEditorComponent::lineNumberBackgroundId, findColour (Style::widgetBackgroundColorId).darker (0.55));
+    setColour (CodeEditorComponent::lineNumberBackgroundId, findColour (Style::widgetBackgroundColorId).darker (0.55f));
     setColour (CodeEditorComponent::lineNumberTextId, Colour (0xff555555));
 }
 
@@ -493,7 +493,7 @@ void LookAndFeel_E1::drawPropertyPanelSectionHeader (Graphics& g, const String& 
 void LookAndFeel_E1::drawPropertyComponentBackground (Graphics& g, int width, int height, PropertyComponent& pc)
 {
     const auto r = getPropertyComponentContentPosition (pc);
-    g.setColour (Colors::widgetBackgroundColor.darker (0.0015));
+    g.setColour (Colors::widgetBackgroundColor.darker (0.0015f));
     g.fillRect (0, 0, r.getX(), height - 1);
 
     g.setColour (pc.findColour (PropertyComponent::backgroundColourId));
@@ -574,7 +574,7 @@ void LookAndFeel_E1::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int
     Rectangle<int> r (area.withSizeKeepingCentre (area.getWidth(), area.getHeight() - 2));
     g.fillRect (r);
 
-    const Colour bkg (Colors::widgetBackgroundColor.brighter (0.1));
+    const Colour bkg (Colors::widgetBackgroundColor.brighter (0.1f));
 
     // g.setGradientFill (ColourGradient (Colours::white.withAlpha (isMouseOver ? 0.4f : 0.2f), 0, (float) area.getY(), Colours::darkgrey.withAlpha (0.2f), 0, (float) area.getBottom(), false));
     g.fillAll();

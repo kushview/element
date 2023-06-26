@@ -66,7 +66,7 @@ public:
 
     void paint (Graphics& g)
     {
-        g.fillAll (Colors::widgetBackgroundColor.darker (0.45));
+        g.fillAll (Colors::widgetBackgroundColor.darker (0.45f));
     }
     virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected)
     {

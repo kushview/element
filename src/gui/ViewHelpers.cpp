@@ -59,8 +59,8 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 
     if (selected)
     {
-        g.setColour (Colors::textColor.darker (0.6000006));
-        g.setOpacity (0.60);
+        g.setColour (Colors::textColor.darker (0.6000006f));
+        g.setOpacity (0.60f);
         g.fillRect (0, 0, h, w);
     }
 

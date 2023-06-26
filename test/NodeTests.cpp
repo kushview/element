@@ -64,9 +64,6 @@ BOOST_AUTO_TEST_CASE (HiddenBlockPorts)
     }
 
     auto port = node.getPort (0);
-    std::clog << port.toXmlString().toStdString() << std::endl;
-    std::clog << port.getNode().toXmlString().toStdString() << std::endl;
-
     BOOST_REQUIRE_MESSAGE (! port.isHiddenOnBlock(), "Unmodified should not be hidden on block");
 
     port = node.getPort (10);

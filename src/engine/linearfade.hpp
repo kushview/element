@@ -45,10 +45,11 @@ public:
         state = State::Idle;
     }
 
-    void setLength (float newLength)
+    template<typename Ft>
+    void setLength (Ft newLength)
     {
-        jassert (newLength > 0.f);
-        length = newLength;
+        jassert (newLength > (Ft) 0.f);
+        length = static_cast<float> (newLength);
         updateFadeRate();
     }
 

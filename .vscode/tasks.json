@@ -28,6 +28,30 @@
             }
         },
         {
+            "label": "Test",
+            "type": "shell",
+            "command": "meson test -C build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "clang",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
             "label": "Stage",
             "type": "shell",
             "command": "cd build && meson install --destdir=\"../stage\" --quiet",

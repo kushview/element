@@ -161,7 +161,7 @@ void OSCSenderNodeEditor::resetBounds (int fullWidth, int fullHeight)
 
 void OSCSenderNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (Colors::backgroundColor.brighter (0.1));
+    g.fillAll (Colors::backgroundColor.brighter (0.1f));
 }
 
 void OSCSenderNodeEditor::connectButtonClicked()
@@ -286,7 +286,7 @@ void OSCSenderNodeEditor::updateConnectButton()
 void OSCSenderNodeEditor::updateConnectionStatusLabel()
 {
     String text = connected ? "On" : "Off";
-    auto textColour = connected ? Colours::green.brighter (0.3) : Colours::red.brighter (0.3);
+    auto textColour = connected ? Colours::green.brighter (0.3f) : Colours::red.brighter (0.3f);
 
     connectionStatusLabel.setText (text, dontSendNotification);
     connectionStatusLabel.setColour (Label::textColourId, textColour);

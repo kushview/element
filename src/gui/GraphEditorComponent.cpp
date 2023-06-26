@@ -203,7 +203,7 @@ public:
     {
         auto c = Colours::black.brighter();
         if (hover || dragging)
-            c = c.brighter (0.2);
+            c = c.brighter (0.2f);
         g.setColour (c);
         g.fillPath (linePath);
     }
