@@ -69,33 +69,23 @@ bool ContentView::keyPressed (const KeyPress& k)
 }
 
 //=============================================================================
-class ContentComponent::Toolbar : public Component,
-                                  public Button::Listener,
-                                  public Timer
+class Content::Toolbar : public Component,
+                         public Button::Listener,
+                         public Timer
 {
 public:
-    Toolbar (ContentComponent& o)
+    Toolbar (Content& o)
         : owner (o), viewBtn ("e")
     {
         addAndMakeVisible (viewBtn);
-        viewBtn.setButtonText ("view");
+        viewBtn.setButtonText (TRANS ("view"));
 
-#if EL_USE_ACCESSORY_BUTTONS
-        addAndMakeVisible (panicBtn);
-#endif
-
-        if (isPluginVersion())
-        {
-            addAndMakeVisible (menuBtn);
-            menuBtn.setButtonText ("settings");
-        }
-
-        for (auto* b : { (Button*) &viewBtn, (Button*) &panicBtn, (Button*) &menuBtn })
+        for (auto* b : { (Button*) &viewBtn })
             b->addListener (this);
         addAndMakeVisible (tempoBar);
         addAndMakeVisible (transport);
 
-        mapButton.setButtonText ("map");
+        mapButton.setButtonText (TRANS ("map"));
         mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
         mapButton.addListener (this);
         addAndMakeVisible (mapButton);
@@ -127,16 +117,7 @@ public:
         auto* props = settings.getUserSettings();
 
         bool showExt = false;
-        if (isPluginVersion())
-        {
-            // Plugin always has host sync option
-            showExt = true;
-            ignoreUnused (props);
-        }
-        else
-        {
-            showExt = props->getValue ("clockSource") == "midiClock";
-        }
+        showExt = props->getValue ("clockSource") == "midiClock";
 
         if (session)
         {
@@ -160,20 +141,6 @@ public:
         tempoBar.setBounds (10, 8, tempoBarWidth, tempoBarHeight);
 
         r.removeFromRight (10);
-
-        if (menuBtn.isVisible())
-        {
-            menuBtn.setBounds (r.removeFromRight (tempoBarHeight * 3)
-                                   .withSizeKeepingCentre (tempoBarHeight * 3, tempoBarHeight));
-            r.removeFromRight (4);
-        }
-
-        if (panicBtn.isVisible())
-        {
-            panicBtn.setBounds (r.removeFromRight (tempoBarHeight)
-                                    .withSizeKeepingCentre (tempoBarHeight, tempoBarHeight));
-            r.removeFromRight (4);
-        }
 
         if (midiBlinker.isVisible())
         {
@@ -213,22 +180,7 @@ public:
     {
         if (btn == &viewBtn)
         {
-            // FIXME:
-        }
-        else if (btn == &panicBtn)
-        {
-            ViewHelpers::invokeDirectly (this, Commands::panic, true);
-        }
-        else if (btn == &menuBtn)
-        {
-            PopupMenu menu;
-            if (auto* cc = ViewHelpers::getGuiController (this))
-                MainMenu::buildPluginMainMenu (cc->commands(), menu);
-            auto result = menu.show();
-            if (99999 == result)
-            {
-                ViewHelpers::closePluginWindows (this, false);
-            }
+            ViewHelpers::invokeDirectly (this, Commands::rotateContentView, true);
         }
         else if (btn == &mapButton)
         {
@@ -257,26 +209,20 @@ public:
     }
 
 private:
-    ContentComponent& owner;
+    Content& owner;
     SessionPtr session;
     MidiIOMonitorPtr midiIOMonitor;
-    SettingButton menuBtn;
     SettingButton viewBtn;
     SettingButton mapButton;
-    PanicButton panicBtn;
     TempoAndMeterBar tempoBar;
     TransportBar transport;
     MidiBlinker midiBlinker;
     Array<SignalConnection> connections;
-    bool isPluginVersion() const
-    {
-        return owner.services().getRunMode() == RunMode::Plugin;
-    }
 };
 
-class ContentComponent::StatusBar : public Component,
-                                    public Value::Listener,
-                                    private Timer
+class Content::StatusBar : public Component,
+                           public Value::Listener,
+                           private Timer
 {
 public:
     StatusBar (Context& g)
@@ -286,9 +232,6 @@ public:
     {
         sampleRate.addListener (this);
         streamingStatus.addListener (this);
-        if (isPluginVersion())
-            latencySamplesChangedConnection = world.audio()->sampleLatencyChanged.connect (
-                std::bind (&StatusBar::updateLabels, this));
 
         addAndMakeVisible (sampleRateLabel);
         addAndMakeVisible (streamingStatusLabel);
@@ -350,49 +293,38 @@ public:
     void updateLabels()
     {
         auto engine = world.audio();
-        if (isPluginVersion())
+        if (auto* dev = devices.getCurrentAudioDevice())
         {
-            String text = "Latency: ";
-            text << "unknown";
+            String text = "Sample Rate: ";
+            text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
+            text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
             sampleRateLabel.setText (text, dontSendNotification);
-            streamingStatusLabel.setText ("", dontSendNotification);
-            statusLabel.setText ("Plugin", dontSendNotification);
+
+            text.clear();
+            String strText = streamingStatus.getValue().toString();
+            if (strText.isEmpty())
+                strText = "Running";
+            text << "Engine: " << strText << ":  CPU: " << String (devices.getCpuUsage() * 100.f, 1) << "%";
+            streamingStatusLabel.setText (text, dontSendNotification);
+
+            statusLabel.setText (String ("Device: ") + dev->getName(), dontSendNotification);
         }
         else
         {
-            if (auto* dev = devices.getCurrentAudioDevice())
-            {
-                String text = "Sample Rate: ";
-                text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
-                text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
-                sampleRateLabel.setText (text, dontSendNotification);
+            sampleRateLabel.setText ("", dontSendNotification);
+            streamingStatusLabel.setText ("", dontSendNotification);
+            statusLabel.setText ("No Device", dontSendNotification);
+        }
 
-                text.clear();
-                String strText = streamingStatus.getValue().toString();
-                if (strText.isEmpty())
-                    strText = "Running";
-                text << "Engine: " << strText << ":  CPU: " << String (devices.getCpuUsage() * 100.f, 1) << "%";
+        if (plugins.isScanningAudioPlugins())
+        {
+            auto text = streamingStatusLabel.getText();
+            auto name = plugins.getCurrentlyScannedPluginName();
+            name = File::createFileWithoutCheckingPath (name).getFileName();
+
+            text << " - Scanning: " << name;
+            if (name.isNotEmpty())
                 streamingStatusLabel.setText (text, dontSendNotification);
-
-                statusLabel.setText (String ("Device: ") + dev->getName(), dontSendNotification);
-            }
-            else
-            {
-                sampleRateLabel.setText ("", dontSendNotification);
-                streamingStatusLabel.setText ("", dontSendNotification);
-                statusLabel.setText ("No Device", dontSendNotification);
-            }
-
-            if (plugins.isScanningAudioPlugins())
-            {
-                auto text = streamingStatusLabel.getText();
-                auto name = plugins.getCurrentlyScannedPluginName();
-                name = File::createFileWithoutCheckingPath (name).getFileName();
-
-                text << " - Scanning: " << name;
-                if (name.isNotEmpty())
-                    streamingStatusLabel.setText (text, dontSendNotification);
-            }
         }
     }
 
@@ -412,21 +344,15 @@ private:
     {
         updateLabels();
     }
-    bool isPluginVersion()
-    {
-        if (auto* cc = ViewHelpers::findContentComponent (this))
-            return cc->services().getRunMode() == RunMode::Plugin;
-        return false;
-    }
 };
 
-struct ContentComponent::Tooltips
+struct Content::Tooltips
 {
     Tooltips() { tooltipWindow = new TooltipWindow(); }
     ScopedPointer<TooltipWindow> tooltipWindow;
 };
 
-ContentComponent::ContentComponent (Context& ctl_)
+Content::Content (Context& ctl_)
     : _context (ctl_),
       controller (ctl_.services())
 {
@@ -447,16 +373,16 @@ ContentComponent::ContentComponent (Context& ctl_)
     resized();
 }
 
-ContentComponent::~ContentComponent() noexcept
+Content::~Content() noexcept
 {
 }
 
-void ContentComponent::paint (Graphics& g)
+void Content::paint (Graphics& g)
 {
     g.fillAll (Colors::backgroundColor);
 }
 
-void ContentComponent::resized()
+void Content::resized()
 {
     Rectangle<int> r (getLocalBounds());
 
@@ -468,96 +394,12 @@ void ContentComponent::resized()
     resizeContent (r);
 }
 
-bool ContentComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
-{
-    const auto& desc (dragSourceDetails.description);
-    return desc.toString() == "ccNavConcertinaPanel" || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
-}
-
-void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
-{
-    const auto& desc (dragSourceDetails.description);
-    if (desc.toString() == "ccNavConcertinaPanel")
-    {
-        // if (auto* panel = nav->findPanel<DataPathTreeComponent>())
-        //     filesDropped (StringArray ({ panel->getSelectedFile().getFullPathName() }),
-        //                   dragSourceDetails.localPosition.getX(),
-        //                   dragSourceDetails.localPosition.getY());
-    }
-    else if (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin")
-    {
-        auto& list (context().plugins().getKnownPlugins());
-        if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
-            this->post (new LoadPluginMessage (*plugin, true));
-        else
-            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                              "Could not load plugin",
-                                              "The plugin you dropped could not be loaded for an unknown reason.");
-    }
-}
-
-bool ContentComponent::isInterestedInFileDrag (const StringArray& files)
-{
-    for (const auto& path : files)
-    {
-        const File file (path);
-        if (file.hasFileExtension ("elc;elg;els;dll;vst3;vst;elpreset"))
-            return true;
-    }
-    return false;
-}
-
-void ContentComponent::filesDropped (const StringArray& files, int x, int y)
-{
-    for (const auto& path : files)
-    {
-        const File file (path);
-        if (file.hasFileExtension ("els"))
-        {
-            this->post (new OpenSessionMessage (file));
-        }
-        else if (file.hasFileExtension ("elg"))
-        {
-            if (true)
-            {
-                if (auto* sess = controller.find<SessionService>())
-                    sess->importGraph (file);
-            }
-            else
-            {
-                //
-            }
-        }
-        else if (file.hasFileExtension ("elpreset"))
-        {
-            const auto data = Node::parse (file);
-            if (data.hasType (types::Node))
-            {
-                const Node node (data, false);
-                this->post (new AddNodeMessage (node));
-            }
-            else
-            {
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
-            }
-        }
-        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")))
-        {
-            PluginDescription desc;
-            desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
-            desc.fileOrIdentifier = file.getFullPathName();
-
-            this->post (new LoadPluginMessage (desc, false));
-        }
-    }
-}
-
-void ContentComponent::post (Message* message)
+void Content::post (Message* message)
 {
     controller.postMessage (message);
 }
 
-void ContentComponent::setToolbarVisible (bool visible)
+void Content::setToolbarVisible (bool visible)
 {
     if (toolBarVisible == visible)
         return;
@@ -567,12 +409,12 @@ void ContentComponent::setToolbarVisible (bool visible)
     refreshToolbar();
 }
 
-void ContentComponent::refreshToolbar()
+void Content::refreshToolbar()
 {
     toolBar->setSession (context().session());
 }
 
-void ContentComponent::setStatusBarVisible (bool vis)
+void Content::setStatusBarVisible (bool vis)
 {
     if (statusBarVisible == vis)
         return;
@@ -582,19 +424,17 @@ void ContentComponent::setStatusBarVisible (bool vis)
     refreshStatusBar();
 }
 
-void ContentComponent::refreshStatusBar()
+void Content::refreshStatusBar()
 {
     statusBar->updateLabels();
 }
 
-Context& ContentComponent::context() { return _context; }
-SessionPtr ContentComponent::session() { return _context.session(); }
-void ContentComponent::stabilize (const bool refreshDataPathTrees) {}
-void ContentComponent::stabilizeViews() {}
-void ContentComponent::saveState (PropertiesFile*) {}
-void ContentComponent::restoreState (PropertiesFile*) {}
-void ContentComponent::setCurrentNode (const Node& node) { ignoreUnused (node); }
-void ContentComponent::setNodeChannelStripVisible (const bool) {}
-bool ContentComponent::isNodeChannelStripVisible() const { return false; }
+Context& Content::context() { return _context; }
+SessionPtr Content::session() { return _context.session(); }
+void Content::stabilize (const bool refreshDataPathTrees) {}
+void Content::stabilizeViews() {}
+void Content::saveState (PropertiesFile*) {}
+void Content::restoreState (PropertiesFile*) {}
+void Content::setCurrentNode (const Node& node) { ignoreUnused (node); }
 
 } // namespace element

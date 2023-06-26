@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #ifndef LKV_BYTES_H
 #define LKV_BYTES_H
 

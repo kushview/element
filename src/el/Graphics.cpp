@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A drawing context.
 // @classmod el.Graphics
 // @pragma nostrip
@@ -9,6 +12,7 @@
 using namespace juce;
 namespace lua = element::lua;
 
+// clang-format off
 EL_PLUGIN_EXPORT
 int luaopen_el_Graphics (lua_State* L)
 {
@@ -22,19 +26,18 @@ int luaopen_el_Graphics (lua_State* L)
 
         /// Save the current state.
         // @function Graphics:savestate
-        "savestate",
-        &Graphics::saveState,
+        "save",     &Graphics::saveState,
 
         /// Restore the last saved state.
         // @function Graphics:restorestate
-        "restorestate",
-        &Graphics::restoreState,
+        "restore",  &Graphics::restoreState,
 
         /// Change the color.
         // @function Graphics:setcolor
         // @int color New ARGB color as integer. e.g.`0xAARRGGBB`
-        "setcolor",
-        [] (Graphics& g, int color) { g.setColour (Colour (color)); },
+        "setColor", [] (Graphics& g, lua_Integer color) { 
+            g.setColour (Colour (color)); 
+        },
 
         /// Draw some text.
         // @function Graphics:drawtext
@@ -48,14 +51,28 @@ int luaopen_el_Graphics (lua_State* L)
         // @int y Vertical position
         // @int w Width of containing area
         // @int h Height of containing area
-        "drawtext",
-        sol::overload ([] (Graphics& g, const char* text, Rectangle<double> r) { g.drawText (text, r.toFloat(), Justification::centred, true); }, [] (Graphics& g, std::string t, int x, int y, int w, int h) { g.drawText (t, x, y, w, h, Justification::centred, true); }),
+        "drawText", sol::overload (
+            [] (Graphics& g, const char* text, Rectangle<int> r) { 
+                g.drawText (text, r.toFloat(), Justification::centred, true); 
+            },
+            [] (Graphics& g, const char* text, Rectangle<double> r) { 
+                g.drawText (text, r.toFloat(), Justification::centred, true); 
+            },
+            [] (Graphics& g, const char* text, Rectangle<float> r) { 
+                g.drawText (text, r, Justification::centred, true); 
+            }, 
+            [] (Graphics& g, std::string t, int x, int y, int w, int h) { 
+                g.drawText (t, x, y, w, h, Justification::centred, true); 
+            }
+        ),
 
         /// Fill the entire drawing area.
         // Fills the drawing area with the current color.
         // @function Graphics:fillall
-        "fillall",
-        sol::overload ([] (Graphics& g) { g.fillAll(); }, [] (Graphics& g, int color) { g.fillAll (Colour (color)); }));
-    sol::stack::push (L, lua::remove_and_clear (M, "Graphics"));
+        "fillAll", sol::overload (
+            [] (Graphics& g) { g.fillAll(); }, 
+            [] (Graphics& g, int color) { g.fillAll (Colour (color)); })
+        );
+    sol::stack::push (L, lua::removeAndClear (M, "Graphics"));
     return 1;
 }

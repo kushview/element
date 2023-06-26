@@ -16,7 +16,7 @@ public:
     ScriptView (Context&, const Script& s);
     virtual ~ScriptView();
 
-    void stabilizeContent() override;
+    void stabilize();
     void resized() override;
 
     /** Set the node to make available in the loaded script. */

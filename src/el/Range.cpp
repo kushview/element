@@ -1,3 +1,5 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 /// A numeric value range.
 // @classmod el.Range
@@ -71,6 +73,6 @@ int luaopen_el_Range (lua_State* L)
         "setlength",
         &RT::setLength);
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_RANGE));
+    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_RANGE));
     return 1;
 }

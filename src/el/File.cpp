@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A file or directory on your system.
 // @classmod el.File
 // @pragma nostrip

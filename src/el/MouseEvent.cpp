@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A mouse event
 // @classmod el.MouseEvent
 // @pragma nostrip
@@ -61,6 +64,6 @@ int luaopen_el_MouseEvent (lua_State* L)
                                 "tilty",
                                 &MouseEvent::tiltY);
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_MOUSE_EVENT));
+    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_MOUSE_EVENT));
     return 1;
 }

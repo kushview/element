@@ -93,6 +93,7 @@ public:
 
             if (auto pv = proxyView())
             {
+                scripting.logError ("got proxy");
                 view.addAndMakeVisible (pv);
             }
         }
@@ -142,7 +143,7 @@ private:
         if (! descriptor.valid())
             return;
         if (sol::safe_function f = descriptor["graph_changed"])
-            f (proxy, graph);
+            f (proxy, Node (graph.data(), false));
     }
 
     void notifyNodeChanged()
@@ -162,6 +163,7 @@ private:
 ScriptView::ScriptView (Context& ctx, const Script& src)
 {
     setName ("ScriptView");
+    setComponentID ("el.ScriptView");
     impl = std::make_unique<Impl> (*this, ctx);
     setSize (100, 100);
     impl->setScript (src);
@@ -172,7 +174,7 @@ ScriptView::~ScriptView()
     impl.reset();
 }
 
-void ScriptView::stabilizeContent() { impl->stabilize(); }
+void ScriptView::stabilize() { impl->stabilize(); }
 void ScriptView::resized() { impl->resized(); }
 void ScriptView::setNode (const Node& node) { impl->setNode (node); }
 const Node& ScriptView::node() const noexcept { return impl->node; }

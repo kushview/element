@@ -199,7 +199,7 @@ ScriptingEngine::~ScriptingEngine()
 
 void ScriptingEngine::logError (const String& msg)
 {
-    std::clog << msg.toStdString() << std::endl;
+    std::clog << "[scripting] " << msg.toStdString() << std::endl;
 }
 
 void ScriptingEngine::initialize (Context& g)

@@ -1,30 +1,30 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-/// An Element View.
+/// Slider widget.
 // Is a @{el.Widget}
 // @classmod el.View
 // @pragma nostrip
 
 #include <element/element.h>
-#include <element/ui/view.hpp>
+#include "gui/GraphEditorComponent.h"
 #include "object.hpp"
 #include "widget.hpp"
 
-#define LKV_TYPE_NAME_VIEW "View"
+#define LKV_TYPE_NAME_VIEW "GraphEditor"
 
 namespace element {
 namespace lua {
 
-class View : public element::View
+class GraphEditor : public element::GraphEditorComponent
 {
 public:
-    View (const sol::table&) {}
-    ~View() {}
+    GraphEditor() {}
+    ~GraphEditor() {}
 
     static void init (const sol::table& view)
     {
-        if (auto* impl = object_userdata<lua::View> (view))
+        if (auto* impl = object_userdata<lua::GraphEditor> (view))
         {
             impl->view = view;
             impl->initialize();
@@ -34,49 +34,47 @@ public:
     static auto newUserData (lua_State* L)
     {
         juce::ignoreUnused (L);
-        return std::make_unique<lua::View> (sol::table());
+        return std::make_unique<lua::GraphEditor>();
     }
 
     void initialize()
     {
-        proxy.init (view);
-    }
-
-    sol::table addWithZ (const sol::object& child, int zorder)
-    {
-        return proxy.addWithZ (child, zorder);
-    }
-
-    sol::table add (const sol::object& child)
-    {
-        return proxy.add (child);
+        // proxy.init (view);
     }
 
 private:
     sol::table view;
-    EL_LUA_IMPLEMENT_WIDGET_PROXY
+    // EL_LUA_IMPLEMENT_WIDGET_PROXY
 };
 
 } // namespace lua
 } // namespace element
 
 EL_PLUGIN_EXPORT
-int luaopen_el_View (lua_State* L)
+int luaopen_el_GraphEditor (lua_State* L)
 {
     // clang-format off
     using namespace juce;
-    using element::lua::View;
+    using element::lua::GraphEditor;
     namespace lua = element::lua;
 
-    auto T = lua::defineWidget<View> (
-        L, LKV_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (View& self) { 
+    auto T = lua::defineWidget<GraphEditor> (
+        L, LKV_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (GraphEditor& self) { 
             return lua::to_string (self, LKV_TYPE_NAME_VIEW); 
         },
-        "add", sol::overload (&View::add, &View::addWithZ),
+        "graph", sol::property (&GraphEditor::getGraph, &GraphEditor::setNode),
         sol::base_classes, sol::bases<juce::Component>()
     );
 
-    lua::Object<View>::addMethods (T, "add");
+    // lua::Object<GraphEditor>::addMethods (T, "setGraph");
+    lua::Object<GraphEditor>::exportAttributes (T, "graph");
+
+    sol::state_view view (L);
+    view.script (R"(
+        require ('el.Node')
+    )");
+
     sol::stack::push (L, T);
+
     return 1;
 }

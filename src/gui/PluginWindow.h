@@ -24,7 +24,7 @@
 
 namespace element {
 
-class ContentComponent;
+class Content;
 class GuiService;
 class Processor;
 
@@ -43,7 +43,7 @@ public:
 
     float getDesktopScaleFactor() const override;
 
-    ContentComponent* getElementContentComponent() const;
+    Content* getElementContentComponent() const;
 
     Toolbar* getToolbar() const;
     void updateGraphNode (Processor* newNode, Component* newEditor);

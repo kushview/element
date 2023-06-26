@@ -4,6 +4,9 @@
 // @classmod el.Bounds
 // @pragma nostrip
 
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #include <element/element.hpp>
 #include "rectangle.hpp"
 #define LKV_TYPE_NAME_BOUNDS "Bounds"

@@ -28,7 +28,7 @@ namespace element {
 
 GraphEditorView::GraphEditorView()
 {
-    setName ("GraphEditor");
+    setName (EL_VIEW_GRAPH_EDITOR);
 
     graph.onBlockMoved = [this] (BlockComponent& block) {
         const int resizeBy = 12;

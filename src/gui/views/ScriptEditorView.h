@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <element/ui/content.hpp>
+#include <element/ui/view.hpp>
 #include "gui/widgets/ScriptEditorComponent.h"
 #include "scripting/scriptsource.hpp"
 #include <element/node.hpp>
@@ -29,7 +29,7 @@ namespace element {
 
 class ScriptNode;
 
-class BaseScriptEditorView : public ContentView
+class BaseScriptEditorView : public View
 {
 protected:
     BaseScriptEditorView();
@@ -56,9 +56,9 @@ public:
 
     //=========================================================================
     /** @internal */
-    void initializeView (Services&) override;
 
 #if 0
+    void initializeView (Services&) override;
     virtual void willBeRemoved() { }
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }

@@ -25,7 +25,7 @@
 namespace element {
 
 class GraphNode;
-class ContentComponent;
+class Content;
 class GraphEditorComponent;
 
 class NodeAudioBusesComponent : public AudioProcessorEditor,
@@ -34,7 +34,7 @@ class NodeAudioBusesComponent : public AudioProcessorEditor,
 public:
     class InputOutputConfig;
 
-    NodeAudioBusesComponent (const Node& n, AudioProcessor* const p, ContentComponent* cc = nullptr);
+    NodeAudioBusesComponent (const Node& n, AudioProcessor* const p, Content* cc = nullptr);
     ~NodeAudioBusesComponent();
 
     void paint (Graphics& g) override;
@@ -46,8 +46,8 @@ public:
     void buttonClicked (Button*) override;
 
 private:
-    ContentComponent* content = nullptr;
-    ContentComponent* getContentComponent();
+    Content* _content = nullptr;
+    Content* content();
     GraphEditorComponent* getGraphEditor() const;
     GraphNode* getGraph() const;
     int32 getNodeId() const;

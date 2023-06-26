@@ -98,7 +98,7 @@ private:
     bool showIns = true;
     bool showOuts = true;
     Viewport view;
-    friend struct Content;
+    
 
     struct Content : public Component,
                      public Button::Listener
@@ -242,7 +242,8 @@ private:
         Label midiInputLabel;
         OwnedArray<ToggleButton> midiInputs;
     };
-
+    
+    friend struct Content;
     std::unique_ptr<Content> content;
 
     void timerCallback() override

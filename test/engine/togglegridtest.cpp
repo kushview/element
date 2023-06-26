@@ -43,7 +43,7 @@ private:
     }
 };
 
-BOOST_AUTO_TEST_SUITE (ToggleGridTests)
+BOOST_AUTO_TEST_SUITE (ToggleGridTest)
 
 BOOST_AUTO_TEST_CASE (Basics)
 {

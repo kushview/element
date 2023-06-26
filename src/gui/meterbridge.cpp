@@ -347,6 +347,8 @@ private:
 
 MeterBridge::MeterBridge (Context& ctx)
 {
+    setName ("Meter Bridge");
+    setComponentID ("el.MeterBridge");
     impl = std::make_unique<Impl> (*this);
     impl->init (ctx);
     setSize (4 * 30, 80);
@@ -357,7 +359,7 @@ MeterBridge::~MeterBridge() {}
 void MeterBridge::resized() { impl->resized(); }
 void MeterBridge::paint (juce::Graphics& g) { impl->paint (g); }
 
-int MeterBridge::getMeterSize() const { return impl->meterSize; }
+int MeterBridge::meterSize() const { return impl->meterSize; }
 void MeterBridge::setMeterSize (int newSize)
 {
     newSize = jmax (12, newSize);
@@ -365,6 +367,11 @@ void MeterBridge::setMeterSize (int newSize)
 }
 
 //==============================================================================
+uint32 MeterBridge::visibility() const noexcept
+{
+    return impl->visibility;
+}
+
 void MeterBridge::setVisibility (uint32 visibility)
 {
     impl->setVisibility (visibility);
@@ -376,14 +383,9 @@ bool MeterBridge::hasVisibility (uint32 visibility) const noexcept
     return (impl->visibility & visibility) != 0;
 }
 
-uint32 MeterBridge::visibility() const noexcept
-{
-    return impl->visibility;
-}
-
 //==============================================================================
 MeterBridgeView::MeterBridgeView()
-    : View()
+    : ContentView()
 {
     setName ("Meter Bridge");
     setComponentID ("el.MeterBridgeView");
@@ -392,6 +394,7 @@ MeterBridgeView::MeterBridgeView()
 
 MeterBridgeView::~MeterBridgeView() {}
 
+#if 1
 void MeterBridgeView::initializeView (Services& sm)
 {
     if (bridge == nullptr)
@@ -402,8 +405,9 @@ void MeterBridgeView::initializeView (Services& sm)
     }
     resized();
 }
+#endif
 
-MeterBridge& MeterBridgeView::getMeterBridge()
+MeterBridge& MeterBridgeView::meterBridge()
 {
     jassert (bridge);
     return *bridge;
@@ -439,10 +443,10 @@ void MeterBridgeView::mouseDown (const juce::MouseEvent& ev)
 
         menu.addSeparator();
 
-        menu.addItem (12, "Small", true, bridge->getMeterSize() == 12);
-        menu.addItem (18, "Normal", true, bridge->getMeterSize() == 18);
-        menu.addItem (24, "Large", true, bridge->getMeterSize() == 24);
-        menu.addItem (32, "Extra Large", true, bridge->getMeterSize() == 32);
+        menu.addItem (12, "Small", true, bridge->meterSize() == 12);
+        menu.addItem (18, "Normal", true, bridge->meterSize() == 18);
+        menu.addItem (24, "Large", true, bridge->meterSize() == 24);
+        menu.addItem (32, "Extra Large", true, bridge->meterSize() == 32);
 
         auto res = menu.show();
 

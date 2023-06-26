@@ -62,8 +62,8 @@ end
 
 function HelloWorld:resized()
     local r = self.localbounds():reduced (8)
-    self.button.bounds = r:slicebottom (30)
-                          :sliceright (90)
+    self.button.bounds = r:sliceBottom (30)
+                          :sliceRight (90)
     self.label.bounds  = r:reduced (20)
 end
 

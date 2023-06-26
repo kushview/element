@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// Slider widget.
 // Is a @{el.Widget}
 // @classmod el.Slider
@@ -26,6 +29,12 @@ public:
             impl->proxy = proxy;
             impl->initialize();
         }
+    }
+
+    static auto newUserData (lua_State* L)
+    {
+        juce::ignoreUnused (L);
+        return std::make_unique<lua::Slider> (sol::table());
     }
 
     void initialize()
@@ -73,6 +82,7 @@ private:
 } // namespace lua
 } // namespace element
 
+// clang-format off
 EL_PLUGIN_EXPORT
 int luaopen_el_Slider (lua_State* L)
 {
@@ -80,8 +90,10 @@ int luaopen_el_Slider (lua_State* L)
     using element::lua::Slider;
     namespace lua = element::lua;
 
-    auto T = lua::new_widgettype<Slider> (
-        L, LKV_TYPE_NAME_SLIDER, sol::meta_method::to_string, [] (Slider& self) { return lua::to_string (self, LKV_TYPE_NAME_SLIDER); },
+    auto T = lua::defineWidget<Slider> ( L, LKV_TYPE_NAME_SLIDER, 
+        sol::meta_method::to_string, [] (Slider& self) { 
+            return lua::to_string (self, LKV_TYPE_NAME_SLIDER); 
+        },
 
         /// Attributes.
         // @section attributes
@@ -89,25 +101,21 @@ int luaopen_el_Slider (lua_State* L)
         /// Minimum range (readonly).
         // @see Slider.range
         // @tfield number Slider.min
-        "min",
-        sol::readonly_property (&Slider::getMinimum),
+        "min", sol::readonly_property (&Slider::getMinimum),
 
         /// Maximum range (readonly).
         // @see Slider.range
         // @tfield number Slider.max
-        "max",
-        sol::readonly_property (&Slider::getMaximum),
+        "max", sol::readonly_property (&Slider::getMaximum),
 
         /// Current step-size (readonly).
         // @see Slider.range
         // @tfield number Slider.interval
-        "interval",
-        sol::readonly_property (&Slider::getInterval),
+        "interval", sol::readonly_property (&Slider::getInterval),
 
         /// Kind of slider.
         // @tfield int Slider.style
-        "style",
-        sol::property ([] (Slider& self) -> int { return static_cast<int> (self.getSliderStyle()); }, [] (Slider& self, int style) -> void {
+        "style", sol::property ([] (Slider& self) -> int { return static_cast<int> (self.getSliderStyle()); }, [] (Slider& self, int style) -> void {
                 if (! isPositiveAndBelow (style, Slider::ThreeValueVertical))
                     style = Slider::LinearHorizontal;
                 self.setSliderStyle (static_cast<Slider::SliderStyle> (style)); }),

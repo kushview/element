@@ -24,7 +24,7 @@
 namespace element {
 
 class Commands;
-class ContentComponent;
+class Content;
 class Context;
 class MainWindow;
 
@@ -56,7 +56,7 @@ public:
     static void buildViewMenu (Commands& cmd, PopupMenu& menu);
     static void buildPluginMainMenu (Commands& cmd, PopupMenu& menu);
 
-    ContentComponent* getContentComponent();
+    Content* content();
 
     // Menu Bar
     StringArray getMenuBarNames() override;

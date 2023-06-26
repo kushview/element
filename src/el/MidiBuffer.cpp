@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A MIDI buffer.
 // Designed for real time performance, therefore does virtually no type
 // checking in method calls.

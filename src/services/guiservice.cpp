@@ -53,9 +53,9 @@ public:
         : context (ctx) {}
     ~DefaultContentFactory() {}
 
-    std::unique_ptr<ContentComponent> createMainContent (const String& type) override
+    std::unique_ptr<Content> createMainContent (const String& type) override
     {
-        return std::make_unique<StandardContentComponent> (context);
+        return std::make_unique<StandardContent> (context);
     }
 
 private:
@@ -99,14 +99,14 @@ struct GuiService::KeyPressManager : public KeyListener
 private:
     bool isVirtualKeyboardVisible() const
     {
-        // if (auto* cc = owner.getContentComponent())
+        // if (auto* cc = owner.content())
         //     return cc->isVirtualKeyboardVisible();
         return false;
     }
 
     VirtualKeyboardView* getVirtualKeyboardView() const
     {
-        // if (auto* cc = owner.getContentComponent())
+        // if (auto* cc = owner.content())
         //     return cc->getVirtualKeyboardView();
         return nullptr;
     }
@@ -368,10 +368,9 @@ void GuiService::saveProperties (PropertiesFile* props)
         props->setValue ("mainWindowVisible", mainWindow->isOnDesktop() && mainWindow->isVisible());
     }
 
-    if (content)
+    if (_content)
     {
-        props->setValue ("channelStrip", content->isNodeChannelStripVisible());
-        content->saveState (props);
+        _content->saveState (props);
     }
 }
 
@@ -409,9 +408,9 @@ void GuiService::deactivate()
         windowManager = nullptr;
     }
 
-    if (content)
+    if (_content)
     {
-        content = nullptr;
+        _content = nullptr;
     }
 
     impl->saveRecents();
@@ -493,25 +492,25 @@ void GuiService::runDialog (Component* c, const String& title)
 
 void GuiService::showSplash() {}
 
-ContentComponent* GuiService::getContentComponent()
+Content* GuiService::content()
 {
     jassert (factory != nullptr);
 
-    if (! content)
+    if (! _content)
     {
         const auto uitype = context().settings().getMainContentType();
-        content.reset();
-        content = factory->createMainContent (uitype);
-        if (content)
+        _content.reset();
+        _content = factory->createMainContent (uitype);
+        if (_content)
         {
-            content->setSize (760, 480);
-            if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (content.get()))
+            _content->setSize (760, 480);
+            if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (_content.get()))
                 commands().registerAllCommandsForTarget (tgt);
         }
         commands().commandStatusChanged();
     }
 
-    return content.get();
+    return _content.get();
 }
 
 int GuiService::getNumPluginWindows() const
@@ -602,12 +601,12 @@ void GuiService::run()
         mainWindow->setMainMenuModel (std::move (menu));
     }
 
-    mainWindow->setContentNonOwned (getContentComponent(), true);
-    mainWindow->centreWithSize (content->getWidth(), content->getHeight());
+    mainWindow->setContentNonOwned (content(), true);
+    mainWindow->centreWithSize (_content->getWidth(), _content->getHeight());
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commands().getKeyMappings());
-    getContentComponent()->restoreState (pf);
+    _content->restoreState (pf);
     mainWindow->addToDesktop();
 
     Desktop::getInstance().setGlobalScaleFactor (
@@ -639,7 +638,7 @@ SessionRef GuiService::session()
 
 ApplicationCommandTarget* GuiService::getNextCommandTarget()
 {
-    if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (content.get()))
+    if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (_content.get()))
         return tgt;
     return nullptr;
 }
@@ -857,7 +856,7 @@ bool GuiService::perform (const InvocationInfo& info)
         case Commands::undo: {
             if (undo.canUndo())
                 undo.undo();
-            if (auto* cc = getContentComponent())
+            if (auto* cc = content())
                 cc->stabilizeViews();
             refreshMainMenu();
             break;
@@ -865,7 +864,7 @@ bool GuiService::perform (const InvocationInfo& info)
         case Commands::redo: {
             if (undo.canRedo())
                 undo.redo();
-            if (auto* cc = getContentComponent())
+            if (auto* cc = content())
                 cc->stabilizeViews();
             refreshMainMenu();
             break;
@@ -1009,7 +1008,7 @@ bool GuiService::perform (const InvocationInfo& info)
 
 void GuiService::stabilizeContent()
 {
-    if (auto* cc = content.get())
+    if (auto* cc = _content.get())
         cc->stabilize();
     refreshMainMenu();
     refreshSystemTray();
@@ -1020,7 +1019,7 @@ void GuiService::stabilizeContent()
 
 void GuiService::stabilizeViews()
 {
-    if (auto* cc = content.get())
+    if (auto* cc = _content.get())
     {
         const auto shouldBeEnabled = true;
         if (cc->isEnabled() != shouldBeEnabled)
@@ -1110,9 +1109,9 @@ bool GuiService::handleMessage (const AppMessage& msg)
         {
             const auto ws = mainWindow->getWindowStateAsString();
             clearContentComponent();
-            mainWindow->setContentNonOwned (getContentComponent(), true);
+            mainWindow->setContentNonOwned (content(), true);
             mainWindow->restoreWindowStateFromString (ws);
-            content->restoreState (pf);
+            _content->restoreState (pf);
             stabilizeContent();
             refreshMainMenu();
             refreshSystemTray();
@@ -1123,9 +1122,9 @@ bool GuiService::handleMessage (const AppMessage& msg)
     else if (auto m = dynamic_cast<const PresentViewMessage*> (&msg))
     {
         // FIXME:
-        // if (m->create && content != nullptr)
+        // if (m->create && _content != nullptr)
         //     if (auto* v = m->create())
-        //         content->setMainView (v);
+        //         _content->setMainView (v);
 
         return true;
     }
@@ -1162,16 +1161,16 @@ void GuiService::clearContentComponent()
         mainWindow->clearContentComponent();
     }
 
-    if (content)
+    if (_content)
     {
-        if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (content.get()))
+        if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (_content.get()))
         {
             Array<CommandID> cmds;
             tgt->getAllCommands (cmds);
             for (const auto c : cmds)
                 commands().removeCommand (c);
         }
-        content.reset();
+        _content.reset();
     }
 
     commands().commandStatusChanged();

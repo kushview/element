@@ -26,7 +26,7 @@
 
 namespace element {
 
-class ContentComponent;
+class Content;
 class Context;
 class Node;
 class NavigationConcertinaPanel;
@@ -41,12 +41,12 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
 void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool selected);
 
 /** Finds the content component by traversing parent component(s) */
-ContentComponent* findContentComponent (Component* c);
+Content* findContentComponent (Component* c);
 
 /** Finds the content component by traversing toplevel windows
     This will NOT work in the plugin versions
 */
-ContentComponent* findContentComponent();
+Content* findContentComponent();
 
 /** Get the engine */
 AudioEnginePtr getAudioEngine (Component*);
@@ -67,7 +67,7 @@ bool invokeDirectly (Component* c, const int commandID, bool async);
 
 /** Post a message to Services
  
-    This works by finding the ContentComponent and letting it handle message posting.
+    This works by finding the Content and letting it handle message posting.
     If the content component wasn't found, then the passed in Message will be deleted
     immediately.  DO NOT keep a reference to messages passed in here 
  */
@@ -92,7 +92,7 @@ class ViewHelperMixin
 public:
     virtual ~ViewHelperMixin() {}
 
-    inline ContentComponent* getContentComponent() const { return ViewHelpers::findContentComponent (componentCast()); }
+    inline Content* content() const { return ViewHelpers::findContentComponent (componentCast()); }
     inline SessionPtr session() const { return ViewHelpers::getSession (componentCast()); }
     inline void postMessage (Message* message) { return ViewHelpers::postMessageFor (componentCast(), message); }
 

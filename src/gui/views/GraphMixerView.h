@@ -21,6 +21,8 @@
 
 #include <element/ui/content.hpp>
 
+#define EL_VIEW_GRAPH_MIXER "GraphMixerView"
+
 namespace element {
 
 class GraphMixerView : public ContentView

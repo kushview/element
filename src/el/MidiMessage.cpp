@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A MIDI Message.
 // @classmod el.MidiMessage
 // @pragma nostrip

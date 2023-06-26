@@ -444,9 +444,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputOutputConfig)
 };
 
-NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor* const p, ContentComponent* cc)
+NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor* const p, Content* cc)
     : AudioProcessorEditor (p),
-      content (cc),
+      _content (cc),
       node (n),
       title ("title", p->getName())
 {
@@ -485,7 +485,7 @@ void NodeAudioBusesComponent::buttonClicked (Button* b)
     {
         bool posted = false;
 
-        if (auto* cc = getContentComponent())
+        if (auto* cc = content())
         {
             cc->post (new ChangeBusesLayout (node, currentLayout));
             posted = true;
@@ -545,20 +545,20 @@ int32 NodeAudioBusesComponent::getNodeId() const
     return -1;
 }
 
-ContentComponent* NodeAudioBusesComponent::getContentComponent()
+Content* NodeAudioBusesComponent::content()
 {
-    if (! content)
+    if (! _content)
     {
         Component* comp;
         for (int idx = 0; (comp = Desktop::getInstance().getComponent (idx)) != nullptr; ++idx)
         {
             if (auto* window = dynamic_cast<MainWindow*> (comp))
-                content = dynamic_cast<ContentComponent*> (window->getContentComponent());
-            if (content != nullptr)
+                _content = dynamic_cast<Content*> (window->getContentComponent());
+            if (_content != nullptr)
                 break;
         }
     }
-    return content;
+    return _content;
 }
 
 GraphEditorComponent* NodeAudioBusesComponent::getGraphEditor() const

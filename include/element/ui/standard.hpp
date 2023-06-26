@@ -6,30 +6,38 @@
 #include <element/ui/content.hpp>
 
 namespace element {
+
 class Context;
 class MeterBridgeView;
 class GuiService;
+class ContentContainer;
+class NavigationConcertinaPanel;
+class NodeChannelStripView;
+class VirtualKeyboardView;
 
-class StandardContentComponent : public ContentComponent,
-                                 public juce::ApplicationCommandTarget {
+class StandardContent : public Content,
+                        public juce::ApplicationCommandTarget,
+                        public juce::DragAndDropContainer,
+                        public juce::DragAndDropTarget,
+                        public juce::FileDragAndDropTarget {
 public:
-    StandardContentComponent (Context& ctx);
-    ~StandardContentComponent() noexcept;
+    StandardContent (Context& ctx);
+    ~StandardContent() noexcept;
 
-    void resizeContent (const Rectangle<int>& area) override;
+    void resizeContent (const juce::Rectangle<int>& area) override;
 
     NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nav.get(); }
 
-    void setMainView (const String& name);
-    void setSecondaryView (const String& name);
-    String getMainViewName() const;
-    String getAccessoryViewName() const;
+    void setMainView (const juce::String& name);
+    void setSecondaryView (const juce::String& name);
+    juce::String getMainViewName() const;
+    juce::String getAccessoryViewName() const;
 
     void nextMainView();
     void backMainView();
 
-    void saveState (PropertiesFile*) override;
-    void restoreState (PropertiesFile*) override;
+    void saveState (juce::PropertiesFile*) override;
+    void restoreState (juce::PropertiesFile*) override;
 
     int getNavSize();
 
@@ -38,8 +46,8 @@ public:
     void toggleVirtualKeyboard();
     VirtualKeyboardView* getVirtualKeyboardView() const;
 
-    void setNodeChannelStripVisible (const bool isVisible) override;
-    bool isNodeChannelStripVisible() const override;
+    void setNodeChannelStripVisible (const bool isVisible);
+    bool isNodeChannelStripVisible() const;
 
     void setMeterBridgeVisible (bool);
     bool isMeterBridgeVisible() const;
@@ -52,16 +60,18 @@ public:
     bool showAccessoryView() const;
 
     // Drag and drop
-    bool isInterestedInFileDrag (const StringArray& files) override;
-    void filesDropped (const StringArray& files, int x, int y) override;
+    bool isInterestedInFileDrag (const juce::StringArray& files) override;
+    void filesDropped (const juce::StringArray& files, int x, int y) override;
 
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
 
-    void getSessionState (String&) override;
-    void applySessionState (const String&) override;
+    void getSessionState (juce::String&) override;
+    void applySessionState (const juce::String&) override;
 
-    void presentView (std::unique_ptr<ContentView>) override;
+    void presentView (std::unique_ptr<View>) override;
+    void presentView (const juce::String&) override;
+
     void setMainView (ContentView* v);
 
 private:
@@ -71,9 +81,9 @@ private:
     StretchableLayoutManager layout;
     class Resizer;
     friend class Resizer;
-    ScopedPointer<Resizer> bar1;
+    juce::ScopedPointer<Resizer> bar1;
 
-    ScopedPointer<NodeChannelStripView> nodeStrip;
+    juce::ScopedPointer<NodeChannelStripView> nodeStrip;
 
     bool statusBarVisible { true };
     int statusBarSize;
@@ -82,7 +92,7 @@ private:
     int virtualKeyboardSize = 80;
     int nodeStripSize = 80;
 
-    String lastMainView;
+    juce::String lastMainView;
 
     void resizerMouseDown();
     void resizerMouseUp();
@@ -90,12 +100,10 @@ private:
     void setContentView (ContentView* view, const bool accessory = false);
 
     friend class GuiService;
-    ApplicationCommandTarget* getNextCommandTarget() override;
-    void getAllCommands (Array<CommandID>& commands) override;
-    void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
+    juce::ApplicationCommandTarget* getNextCommandTarget() override;
+    void getAllCommands (juce::Array<juce::CommandID>& commands) override;
+    void getCommandInfo (juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
 };
-
-using StandardContent = element::StandardContentComponent;
 
 } // namespace element

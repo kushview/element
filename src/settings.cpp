@@ -19,6 +19,8 @@
 #include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/settings.hpp>
+
+#include "appinfo.hpp"
 #include "engine/midiengine.hpp"
 
 namespace element {
@@ -96,20 +98,20 @@ const char* Settings::pluginListKey = "pluginList64";
 Settings::Settings()
 {
     PropertiesFile::Options opts;
-    opts.applicationName = "Element";
+    opts.applicationName = EL_APP_NAME;
     opts.filenameSuffix = "conf";
     opts.osxLibrarySubFolder = "Application Support";
     opts.storageFormat = PropertiesFile::storeAsCompressedBinary;
 
 #if JUCE_DEBUG
-    opts.applicationName << "Debug";
+    opts.applicationName << "_Debug";
     opts.storageFormat = PropertiesFile::storeAsXML;
 #endif
 
 #if JUCE_LINUX
-    opts.folderName = ".config/Element";
+    opts.folderName = ".config/@0@".replace ("@0@", EL_APP_DATA_SUBDIR);
 #else
-    opts.folderName = "Element";
+    opts.folderName = EL_APP_DATA_SUBDIR;
 #endif
 
     setStorageParameters (opts);

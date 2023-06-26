@@ -1,6 +1,9 @@
 /// An audio sample buffer
 // @classmod el.AudioBuffer
 
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #if LKV_AUDIO_BUFFER_COMPILE
 
 #include <element/element.h>

@@ -53,7 +53,7 @@ SequencerComponent::~SequencerComponent()
 
 void SequencerComponent::clipClicked (TimelineClip *clip, const MouseEvent&)
 {
-    //ContentComponent* cc = findParentComponentOfClass<ContentComponent>();
+    //Content* cc = findParentComponentOfClass<Content>();
     // cc->stabilize();
 }
 
@@ -62,7 +62,7 @@ void SequencerComponent::clipDoubleClicked (TimelineClip *clip, const MouseEvent
 #if 0
     if (SequencerClipItem* c = dynamic_cast<SequencerClipItem*> (clip))
     {
-        if (ContentComponent* cc = findParentComponentOfClass<ContentComponent>())
+        if (Content* cc = findParentComponentOfClass<Content>())
         {
             const String assetId = c->model.getProperty (Slugs::assetId);
             AssetItem item (session->assets().root().findItemForId (assetId));

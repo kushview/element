@@ -4,14 +4,6 @@
 -- local Animal = object()
 local M = {}
 
-local function lookup (T, name)
-    while T do
-        if rawget(T, name) then return rawget(T, name), T end
-        T = getmetatable(T).__base
-    end
-    return false, false
-end
-
 local function lookupmeta (T, name)
     while T do
         local mt = getmetatable (T)
@@ -28,7 +20,7 @@ end
 -- @tparam table T Derived type
 -- @tparam table U Type table which created userdata
 -- @tparam userdata _impl The userdata to wrap.
-local function make_userdata_proxy (T, U, _impl)
+local function UserDataProxy (T, U, _impl)
     local impl = _impl
     assert (type(impl) == 'userdata', "not userdata")
     local atts = getmetatable(T).__atts or false
@@ -44,6 +36,7 @@ local function make_userdata_proxy (T, U, _impl)
 
     for _, m in ipairs (methods) do
         exported[m] = function (self, ...)
+            -- print ("call: " .. tostring(impl) .. ' self:' .. m .. ' (...): nargs=' .. select ("#", ...))
             return impl[m] (impl, ...)
         end
     end
@@ -73,10 +66,10 @@ local function make_userdata_proxy (T, U, _impl)
 
         if props[k] then return impl[k] end
 
-        val = T ~= U and T[k] or nil;        
+        val = T ~= U and T[k] or nil;
         if val then return val end
-        
-        val = exported[k]; 
+
+        val = exported[k];
         if val then return val end
 
         return nil
@@ -101,7 +94,7 @@ local function make_userdata_proxy (T, U, _impl)
     return setmetatable (proxy, proxy_mt)
 end
 
-local function make_table_proxy (T, impl, expose)
+local function TableProxy (T, impl, expose)
     expose = expose or false
     impl = impl or {}
 
@@ -140,9 +133,9 @@ local function instantiate (T, ...)
        type(U) == 'table'
     then
         local obj = newuserdata()
-        proxy = make_userdata_proxy (T, U, obj)
+        proxy = UserDataProxy (T, U, obj)
     else
-        proxy = make_table_proxy (T, {})
+        proxy = TableProxy (T, {})
     end
 
     if 'function' == type (T['init']) then
@@ -218,6 +211,9 @@ M.define = define_type
 -- @tparam any ... Arguments passed to `T:init`
 -- @treturn table The newly created object
 function M.new (T, ...)
+    if type(T) == 'string' then
+        T = require (T)
+    end
     return instantiate (T, ...)
 end
 
@@ -231,7 +227,7 @@ function M.ref (T, obj, init)
     init = init ~= nil and init or true
     if type (T)   ~= 'table'    then error ("param #1 is not a table") end
     if type (obj) ~= 'userdata' then error ("param #2 is not userdata") end
-    return make_userdata_proxy (T, T, obj)
+    return UserDataProxy (T, T, obj)
 end
 
 setmetatable (M, {

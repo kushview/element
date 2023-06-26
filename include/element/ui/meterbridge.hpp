@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include <element/ui/view.hpp>
+#include <element/element.hpp>
+#include <element/ui/content.hpp>
 
 namespace element {
 
@@ -11,7 +12,7 @@ class Context;
 
 class MeterBridge : public juce::Component {
 public:
-    enum Visibility : uint32 {
+    enum Visibility : uint32_t {
         AudioIns = (1u << 0u),
         AudioOuts = (1u << 1u),
         MidiIns = (1u << 2u),
@@ -22,33 +23,40 @@ public:
     MeterBridge (Context&);
     ~MeterBridge();
 
-    void resized() override;
-    void paint (juce::Graphics&) override;
+    uint32 visibility() const noexcept;
     void setVisibility (uint32);
     bool hasVisibility (uint32) const noexcept;
-    uint32 visibility() const noexcept;
 
-    int getMeterSize() const;
+    int meterSize() const;
     void setMeterSize (int);
+
+    /** @internal */
+    void resized() override;
+    /** @internal */
+    void paint (juce::Graphics&) override;
 
 private:
     class Impl;
     friend class Impl;
     std::unique_ptr<Impl> impl;
+    EL_DISABLE_COPY (MeterBridge)
 };
 
-class MeterBridgeView : public View {
+//==============================================================================
+class MeterBridgeView : public ContentView {
 public:
     MeterBridgeView();
     ~MeterBridgeView();
-    void initializeView (Services&) override;
+
+    void initializeView (Services& sm) override;
+
     void resized() override;
     void mouseDown (const juce::MouseEvent&) override;
-
-    MeterBridge& getMeterBridge();
+    MeterBridge& meterBridge();
 
 private:
     std::unique_ptr<MeterBridge> bridge;
+    EL_DISABLE_COPY (MeterBridgeView)
 };
 
 } // namespace element

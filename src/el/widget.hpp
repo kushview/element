@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A GUI Widget.
 // @classmod el.Widget
 // @pragma nostrip
@@ -12,6 +15,95 @@ using namespace juce;
 
 namespace element {
 namespace lua {
+
+class WidgetProxy
+{
+public:
+    WidgetProxy() = default;
+    ~WidgetProxy()
+    {
+        widget = sol::lua_nil;
+        data = nullptr;
+    }
+
+    void resized()
+    {
+        if (sol::safe_function f = widget["resized"])
+        {
+            f (widget);
+        }
+    }
+
+    void paint (Graphics& g)
+    {
+        if (sol::safe_function f = widget["paint"])
+        {
+            f (widget, std::ref<Graphics> (g));
+        }
+    }
+
+    void mouseDrag (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseDrag"])
+            f (widget, ev);
+    }
+
+    void mouseDown (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseDown"])
+            f (widget, ev);
+    }
+
+    void mouseUp (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseUp"])
+            f (widget, ev);
+    }
+
+    sol::table addWithZ (const sol::object& child, int zorder)
+    {
+        jassert (child.valid());
+        if (auto* const w = object_userdata<Component> (widget))
+        {
+            if (Component* const impl = object_userdata<Component> (child))
+            {
+                w->addAndMakeVisible (*impl, zorder);
+            }
+        }
+        return child;
+    }
+
+    sol::table add (const sol::object& child)
+    {
+        return addWithZ (child, -1);
+    }
+
+    void init (const sol::table& proxy)
+    {
+        widget = proxy;
+        data = object_userdata<Component> (widget);
+    }
+
+    sol::table getBoundsTable()
+    {
+        sol::state_view L (widget.lua_state());
+        auto r = data->getBounds();
+        auto t = L.create_table();
+        t["x"] = r.getX();
+        t["y"] = r.getY();
+        t["width"] = r.getWidth();
+        t["height"] = r.getHeight();
+        return t;
+    }
+
+    Component* component() noexcept { return data; }
+
+private:
+    sol::table widget;
+    Component* data = nullptr;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WidgetProxy)
+};
 
 template <typename WidgetType>
 static void widget_setbounds (WidgetType& self, const sol::object& obj)
@@ -31,201 +123,168 @@ static void widget_setbounds (WidgetType& self, const sol::object& obj)
     }
 }
 
-template <typename WidgetType, typename... Args>
-inline static sol::table new_widgettype (lua_State* L, const char* name, Args&&... args)
+template <typename Fn>
+inline static void setFactoryFunction (const sol::table& T, Fn&& f)
 {
+    auto T_mt = T[sol::metatable_key];
+    T_mt["__newuserdata"] = f;
+}
+
+template <typename WidgetType, typename... Args>
+inline static sol::table defineWidget (lua_State* L, const char* name, Args&&... args)
+{
+    // clang-format off
+    namespace lua = element::lua;
     using Widget = WidgetType;
-    sol::state_view lua (L);
-    sol::table M = lua.create_table();
+    sol::state_view view (L);
+    sol::table M = view.create_table();
 
     M.new_usertype<Widget> (name, sol::no_constructor,
-                            /// Initialize the widget.
-                            // Override this to customize your widget.
-                            // @function Widget.init
-                            "init",
-                            Widget::init,
+        /// Initialize the widget.
+        // Override this to customize your widget.
+        // @function Widget.init
+        "init",         Widget::init,
 
-                            /// Attributes.
-                            // @section attributes
+        /// Widget name (string).
+        // @field Widget.name
+        "name",         sol::property ([] (Widget& self) { return self.getName().toStdString(); }, [] (Widget& self, const char* name) { self.setName (name); }),
 
-                            /// Widget name (string).
-                            // @field Widget.name
-                            "name",
-                            sol::property ([] (Widget& self) { return self.getName().toStdString(); }, [] (Widget& self, const char* name) { self.setName (name); }),
+        /// X position (readonly).
+        // @field Widget.x
+        "x",            sol::readonly_property (&Widget::getX),
 
-                            /// X position (readonly).
-                            // @field Widget.x
-                            "x",
-                            sol::readonly_property (&Widget::getX),
+        /// Y position (readonly).
+        // @field Widget.y
+        "y",            sol::readonly_property (&Widget::getY),
 
-                            /// Y position (readonly).
-                            // @field Widget.y
-                            "y",
-                            sol::readonly_property (&Widget::getY),
+        /// Widget width (readonly).
+        // @field Widget.width
+        "width",        sol::readonly_property (&Widget::getWidth),
 
-                            /// Widget width (readonly).
-                            // @field Widget.width
-                            "width",
-                            sol::readonly_property (&Widget::getWidth),
+        /// Widget height (readonly).
+        // @field Widget.height
+        "height",       sol::readonly_property (&Widget::getHeight),
 
-                            /// Widget height (readonly).
-                            // @field Widget.height
-                            "height",
-                            sol::readonly_property (&Widget::getHeight),
+        /// Widget visibility (bool).
+        // Shows or hides this Widget
+        // @field Widget.visible
+        "visible",      sol::property (&Widget::isVisible, &Widget::setVisible),
 
-                            /// Widget visibility (bool).
-                            // Shows or hides this Widget
-                            // @field Widget.visible
-                            "visible",
-                            sol::property (&Widget::isVisible, &Widget::setVisible),
+        /// Widget is opaque (bool).
+        // If set true you must fill the entire Widget background.
+        // @field Widget.opaque
+        "opaque",       sol::property (&Widget::isOpaque, &Widget::setOpaque),
 
-                            /// Widget is opaque (bool).
-                            // If set true you must fill the entire Widget background.
-                            // @field Widget.opaque
-                            "opaque",
-                            sol::property (&Widget::isOpaque, &Widget::setOpaque),
+        /// Methods.
+        // @section methods
 
-                            /// Methods.
-                            // @section methods
+        /// Returns the bounding box.
+        // @function Widget:bounds
+        "bounds",       &Widget::getBounds,
 
-                            /// Returns the bounding box.
-                            // @function Widget:bounds
-                            "bounds",
-                            &Widget::getBounds,
+        /// Change the bounding box.
+        // The coords returned is relative to the top/left of the widget's parent.
+        // @function Widget:setbounds
+        // @int x X pos
+        // @int y Y pos
+        // @int w Width
+        // @int h Height
 
-                            /// Change the bounding box.
-                            // The coords returned is relative to the top/left of the widget's parent.
-                            // @function Widget:setbounds
-                            // @int x X pos
-                            // @int y Y pos
-                            // @int w Width
-                            // @int h Height
+        /// Change the bounding box.
+        // The coords returned is relative to the top/left of the widget's parent.
+        // @function Widget:setbounds
+        // @tparam mixed New bounds as a kv.Bounds or table
+        // @usage
+        // -- Can also set a table. e.g.
+        // widget:setbounds ({
+        //     x      = 0,
+        //     y      = 0,
+        //     width  = 100,
+        //     height = 200
+        // })
+        "setBounds", sol::overload (
+            [] (Widget& self, double x, double y, double w, double h) { 
+                self.setBounds (Rectangle<double> (x, y, w, h).toNearestInt()); }, 
+            [] (Widget& self, const sol::object& obj) { widget_setbounds (self, obj); }
+        ),
 
-                            /// Change the bounding box.
-                            // The coords returned is relative to the top/left of the widget's parent.
-                            // @function Widget:setbounds
-                            // @tparam mixed New bounds as a kv.Bounds or table
-                            // @usage
-                            // -- Can also set a table. e.g.
-                            // widget:setbounds ({
-                            //     x      = 0,
-                            //     y      = 0,
-                            //     width  = 100,
-                            //     height = 200
-                            // })
-                            "setbounds",
-                            sol::overload ([] (Widget& self, double x, double y, double w, double h) { self.setBounds (Rectangle<double> (x, y, w, h).toNearestInt()); }, [] (Widget& self, const sol::object& obj) { widget_setbounds (self, obj); }),
+        /// Local bounding box.
+        // Same as bounds with zero x and y coords
+        // @function Widget:localbounds
+        "localBounds",      &Widget::getLocalBounds,
 
-                            /// Local bounding box.
-                            // Same as bounds with zero x and y coords
-                            // @function Widget:localbounds
-                            "localbounds",
-                            &Widget::getLocalBounds,
+        /// Widget right edge.
+        // @function Widget:right
+        "right",            &Widget::getRight,
 
-                            /// Widget right edge.
-                            // @function Widget:right
-                            "right",
-                            &Widget::getRight,
+        /// Widget bottom edge (int).
+        // @function Widget:bottom
+        "bottom",           &Widget::getBottom,
 
-                            /// Widget bottom edge (int).
-                            // @function Widget:bottom
-                            "bottom",
-                            &Widget::getBottom,
+        /// Widget Screen X position (int).
+        // @function Widget:screenx
+        "screenX",          &Widget::getScreenX,
 
-                            /// Widget Screen X position (int).
-                            // @function Widget:screenx
-                            "screenx",
-                            &Widget::getScreenX,
+        /// Widget Screen Y position (int).
+        // @function Widget:screeny
+        "screenY",          &Widget::getScreenY,
 
-                            /// Widget Screen Y position (int).
-                            // @function Widget:screeny
-                            "screeny",
-                            &Widget::getScreenY,
+        "repaint", sol::overload (
+            /// Repaint the entire widget.
+            // @function Widget:repaint
+            [] (Widget& self) { self.repaint(); },
 
-                            "repaint",
-                            sol::overload (
-                                /// Repaint the entire widget.
-                                // @function Widget:repaint
-                                [] (Widget& self) { self.repaint(); },
+            /// Repaint a section.
+            // @function Widget:repaint
+            // @tparam kv.Bounds b Area to repaint
+            [] (Widget& self, const juce::Rectangle<int>& r) {
+                self.repaint (r);
+            },
+            [] (Widget& self, const juce::Rectangle<double>& r) {
+                self.repaint (r.toNearestInt());
+            },
 
-                                /// Repaint a section.
-                                // @function Widget:repaint
-                                // @tparam kv.Bounds b Area to repaint
-                                [] (Widget& self, const juce::Rectangle<int>& r) {
-                                    self.repaint (r);
-                                },
-                                [] (Widget& self, const juce::Rectangle<double>& r) {
-                                    self.repaint (r.toNearestInt());
-                                },
+            /// Repaint section.
+            // @function Widget:repaint
+            // @int x
+            // @int y
+            // @int w
+            // @int h
+            [] (Widget& self, int x, int y, int w, int h) {
+                self.repaint (x, y, w, h);
+            }
+        ),
 
-                                /// Repaint section.
-                                // @function Widget:repaint
-                                // @int x
-                                // @int y
-                                // @int w
-                                // @int h
-                                [] (Widget& self, int x, int y, int w, int h) {
-                                    self.repaint (x, y, w, h);
-                                }),
+        /// Resize the widget.
+        // @int w New width
+        // @int h New height
+        // @function Widget:resize
+        "resize",       &Widget::setSize,
 
-                            /// Resize the widget.
-                            // @int w New width
-                            // @int h New height
-                            // @function Widget:resize
-                            "resize",
-                            &Widget::setSize,
+        /// Bring to front.
+        // @function Widget:tofront
+        // @bool focus If true, will also try to focus this widget.
+        "toFront",      &Widget::toFront,
 
-                            /// Bring to front.
-                            // @function Widget:tofront
-                            // @bool focus If true, will also try to focus this widget.
-                            "tofront",
-                            &Widget::toFront,
+        /// To Back.
+        // @function Widget:toback
+        "toBack",       &Widget::toBack,
 
-                            /// To Back.
-                            // @function Widget:toback
-                            "toback",
-                            &Widget::toBack,
-
-                            /// Remove from desktop.
-                            // @function Widget:removefromdesktop
-                            "removefromdesktop",
-                            &Widget::removeFromDesktop,
-
-                            // Makes this widget appear as a window on the desktop.
-                            //
-                            // Note that before calling this, you should make sure that the widget's opacity is
-                            // set correctly using setOpaque(). If the widget is non-opaque, the windowing
-                            // system will try to create a special transparent window for it, which will generally take
-                            // a lot more CPU to operate (and might not even be possible on some platforms).
-                            //
-                            // If the widget is inside a parent widget at the time this method is called, it
-                            // will first be removed from that parent. Likewise if a widget is on the desktop
-                            // and is subsequently added to another widget, it'll be removed from the desktop.
-                            //
-                            // @function Widget:addtodesktop
-                            // @int flags Window flags
-                            // @param[opt] window Native window handle to attach to
-
-                            // TODO: addtodesktop
-
-                            /// True if the widget is showing on the desktop.
-                            // @function Widget:isondesktop
-                            "isondesktop",
-                            &Widget::isOnDesktop,
-
-                            std::forward<Args> (args)...
-                            // sol::base_classes,      sol::bases<juce::Component>()
+        std::forward<Args> (args)...
+        // sol::base_classes,      sol::bases<juce::Component>()
     );
 
-    auto T = element::lua::remove_and_clear (M, name);
-    auto T_mt = T[sol::metatable_key];
+    auto T = lua::removeAndClear (M, name);
+    auto T_mt = T [sol::metatable_key];
     T_mt["__newindex"] = sol::lua_nil;
+
     T_mt["__newuserdata"] = [L]() {
-        sol::state_view view (L);
-        return std::make_unique<Widget> (view.create_table());
+        // sol::state_view view (L);
+        // return std::make_unique<WidgetType> (view.create_table());
+        return WidgetType::newUserData (L);
     };
 
-    T_mt["__props"] = lua.create_table().add (
+    T_mt["__props"] = view.create_table().add (
         "name",
         "x",
         "y",
@@ -234,25 +293,23 @@ inline static sol::table new_widgettype (lua_State* L, const char* name, Args&&.
         "visible"
         "opaque");
 
-    T_mt["__methods"] = lua.create_table().add (
+    T_mt["__methods"] = view.create_table().add (
         "bounds",
-        "setbounds",
-        "localbounds",
+        "setBounds",
+        "localBounds",
         "right",
         "bottom",
-        "screenx",
-        "screeny",
+        "screenX",
+        "screenY",
 
         "repaint",
         "resize",
-        "tofront",
-        "toback",
 
-        "addtodesktop",
-        "removefromdesktop",
-        "isondesktop");
+        "toFront",
+        "toBack"
+    );
 
-    lua.script (R"(
+    view.script (R"(
         require ('el.Bounds')
         require ('el.Graphics')
         require ('el.Point')
@@ -260,15 +317,26 @@ inline static sol::table new_widgettype (lua_State* L, const char* name, Args&&.
     )");
 
     return T;
+    // clang-format on
 }
 
 template <typename SliderType, typename... Args>
-inline static sol::table
-    new_slidertype (lua_State* L, const char* name, Args&&... args)
+inline static sol::table registerSlider (lua_State* L, const char* name, Args&&... args)
 {
-    return new_widgettype<SliderType> (name,
-                                       std::forward<Args> (args)...);
+    return defineWidget<SliderType> (L, name, std::forward<Args> (args)...);
 }
 
 } // namespace lua
 } // namespace element
+
+// clang-format off
+#define EL_LUA_IMPLEMENT_WIDGET_PROXY \
+protected: \
+    element::lua::WidgetProxy proxy; \
+public: \
+    void paint (juce::Graphics& g) override { proxy.paint (g); } \
+    void resized() override { proxy.resized(); } \
+    void mouseDrag (const MouseEvent& ev) override { proxy.mouseDrag (ev); } \
+    void mouseDown (const MouseEvent& ev) override { proxy.mouseDown (ev); } \
+    void mouseUp (const MouseEvent& ev) override { proxy.mouseUp (ev); }
+// clang-format on

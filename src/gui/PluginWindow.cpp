@@ -317,9 +317,9 @@ PluginWindow::~PluginWindow()
 
 float PluginWindow::getDesktopScaleFactor() const { return 1.f; }
 
-ContentComponent* PluginWindow::getElementContentComponent() const
+Content* PluginWindow::getElementContentComponent() const
 {
-    return gui.getContentComponent();
+    return gui.content();
 }
 
 Toolbar* PluginWindow::getToolbar() const

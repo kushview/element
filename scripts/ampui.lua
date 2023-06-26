@@ -46,16 +46,16 @@ function Editor:paint (g)
 end
 
 function Editor:resized()
-    local r = self:localbounds()
-    self.knob:setbounds (r:reduced (20))
+    local r = self:localBounds()
+    self.knob:setBounds (r:reduced (20))
 end
 
 -- Editor factory function.
-local function create_editor (ctx)
+local function instantiate (ctx)
     return object.new (Editor, ctx)
 end
 
 return {
     type    = 'DSPUI',
-    editor  = create_editor
+    editor  = instantiate
 }

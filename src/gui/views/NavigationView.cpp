@@ -216,7 +216,7 @@ private:
 
         void addSubItems() override
         {
-            ContentComponent* cc = getOwnerView()->findParentComponentOfClass<ContentComponent>();
+            Content* cc = getOwnerView()->findParentComponentOfClass<Content>();
             if (! cc)
                 return;
 

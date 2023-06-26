@@ -22,6 +22,8 @@
 #include "gui/widgets/LuaConsole.h"
 #include "log.hpp"
 
+#define EL_VIEW_CONSOLE "LuaConsoleViw"
+
 namespace element {
 
 class Services;

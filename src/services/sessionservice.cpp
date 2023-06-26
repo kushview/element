@@ -137,7 +137,7 @@ void SessionService::openFile (const File& file)
             gui.closeAllPluginWindows();
             refreshOtherControllers();
 
-            if (auto* cc = gui.getContentComponent())
+            if (auto* cc = gui.content())
             {
                 auto ui = currentSession->data().getOrCreateChildWithName (tags::ui, nullptr);
                 cc->applySessionState (ui.getProperty ("content").toString());
@@ -201,7 +201,7 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
 
     auto& gui = *sibling<GuiService>();
 
-    if (auto* cc = gui.getContentComponent())
+    if (auto* cc = gui.content())
     {
         String state;
         cc->getSessionState (state);

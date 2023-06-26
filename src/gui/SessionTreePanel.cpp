@@ -21,6 +21,7 @@
 #include <element/graph.hpp>
 #include "gui/datapathbrowser.hpp"
 
+#include "gui/views/GraphEditorView.h"
 #include "gui/views/scriptview.hpp"
 #include "services/sessionservice.hpp"
 #include "engine/nodes/NodeTypes.h"
@@ -49,7 +50,7 @@ public:
     virtual ~SessionBaseTreeItem() = default;
 
     //=========================================================================
-    ContentComponent* getContentComponent() const noexcept
+    Content* content() const noexcept
     {
         if (auto* const tv = getOwnerView())
             return ViewHelpers::findContentComponent (tv);
@@ -213,9 +214,7 @@ public:
         if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
         {
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
-            c->setCurrentNode (graph);
-            // if (c->getMainViewName() != "GraphEditor" && c->getMainViewName() != "GraphEditorView")
-            //     c->setMainView ("GraphEditor");
+            c->presentView (EL_VIEW_GRAPH_EDITOR);
         }
 
         if (! node.isRootGraph())
@@ -435,9 +434,9 @@ private:
 
         void showDocument() override
         {
-            if (auto* cc = getContentComponent())
+            if (auto* cc = content())
             {
-                cc->presentView (std::make_unique<ScriptNodeScriptEditorView> (node, forUI));
+                cc->presentView (std::unique_ptr<View> (new ScriptNodeScriptEditorView (node, forUI)));
             }
         }
 
@@ -473,8 +472,8 @@ public:
 
     void showDocument() override
     {
-        if (auto* cc = getContentComponent())
-            cc->presentView (std::unique_ptr<ContentView> (new ScriptEditorView (script)));
+        if (auto* cc = content())
+            cc->presentView (std::unique_ptr<View> (new ScriptEditorView (script)));
     }
 
     bool isMissing() override { return false; }
@@ -565,16 +564,27 @@ public:
         Script script = graph.findViewScript();
         if (script.valid())
         {
-            if (auto* cc = getContentComponent())
+            if (auto* cc = content())
             {
                 auto view = new ScriptView (cc->context(), script);
                 view->setNode (node);
-                cc->presentView (std::unique_ptr<ContentView> (view));
+                cc->presentView (std::unique_ptr<View> (view));
             }
         }
         else
         {
-            std::clog << "[element] GraphView script not valid\n";
+            if (auto* cc = content())
+            {
+                auto s = cc->session();
+                for (int i = 0; i < s->getNumGraphs(); ++i)
+                {
+                    if (s->getGraph (i) == graph)
+                    {
+                        cc->session()->setActiveGraph (i);
+                        cc->presentView (EL_VIEW_GRAPH_EDITOR);
+                    }
+                }
+            }
         }
     }
 

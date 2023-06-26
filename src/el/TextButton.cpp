@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A Text Button.
 // Is a @{el.Widget}.
 // @classmod el.TextButton
@@ -23,6 +26,12 @@ public:
     ~TextButton()
     {
         removeListener (this);
+    }
+
+    static auto newUserData (lua_State* L)
+    {
+        juce::ignoreUnused (L);
+        return std::make_unique<lua::TextButton> (sol::table());
     }
 
     static void init (const sol::table& proxy)
@@ -65,7 +74,7 @@ int luaopen_el_TextButton (lua_State* L)
     namespace lua = element::lua;
     using lua::TextButton;
 
-    auto T = lua::new_widgettype<TextButton> (
+    auto T = lua::defineWidget<TextButton> (
         L, LKV_TYPE_NAME_TEXT_BUTTON, sol::meta_method::to_string, [] (TextButton& self) {
             return lua::to_string (self, LKV_TYPE_NAME_TEXT_BUTTON);
         },

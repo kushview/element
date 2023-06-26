@@ -22,7 +22,8 @@ install_data (sources : [
     'amp.lua',
     'ampui.lua',
     'channelize.lua',
-    'console.lua'
+    'console.lua',
+    'view.lua'
     ],
     install_dir : scripts_install_dir
 )

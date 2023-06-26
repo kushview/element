@@ -24,9 +24,15 @@
  */
 
 // clang-format off
-#ifndef EL_APP_NAME
-    #define EL_APP_NAME "Element"
+#ifndef EL_APP_AUTHOR
+ #define EL_APP_AUTHOR "Kushview"
 #endif
+
+#ifndef EL_APP_NAME
+ #define EL_APP_NAME "Element"
+#endif
+
+#define EL_APP_DATA_SUBDIR EL_APP_AUTHOR "/" EL_APP_NAME
 // clang-format on
 
 namespace element {

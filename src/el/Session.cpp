@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #include <element/element.h>
 #include <element/node.hpp>
 #include <element/session.hpp>
@@ -32,6 +35,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L)
         "restoreState", &Session::restoreGraphState
     );
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, "Session"));
+    sol::stack::push (L, element::lua::removeAndClear (M, "Session"));
     return 1;
 }

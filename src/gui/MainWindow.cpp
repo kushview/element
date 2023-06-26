@@ -103,7 +103,7 @@ void MainWindow::nameChangedSession()
 
     auto session = world.session();
     SessionService* controller = nullptr;
-    if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
+    if (nullptr != dynamic_cast<Content*> (getContentComponent()))
         controller = services().find<SessionService>();
 
     if (nullptr == session || nullptr == controller)
@@ -149,7 +149,7 @@ void MainWindow::activeWindowStatusChanged()
 {
     if (nullptr == getContentComponent())
         return;
-    auto& gui = *services().find<GuiService>();
+    auto& gui = *services().find<UI>();
     gui.checkForegroundStatus();
 }
 
@@ -161,9 +161,8 @@ void MainWindow::refreshMenu()
 
 Services& MainWindow::services()
 {
-    jassert (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()));
-    return (dynamic_cast<ContentComponent*> (getContentComponent()))
-        ->services();
+    jassert (nullptr != dynamic_cast<Content*> (getContentComponent()));
+    return (dynamic_cast<Content*> (getContentComponent()))->services();
 }
 
 } // namespace element

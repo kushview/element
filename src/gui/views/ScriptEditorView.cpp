@@ -138,11 +138,6 @@ void BaseScriptEditorView::reload()
     code.setSavePoint();
 }
 
-void BaseScriptEditorView::initializeView (Services&)
-{
-    reload();
-}
-
 //=============================================================================
 ScriptEditorView::ScriptEditorView (const Script& s)
     : BaseScriptEditorView(),
@@ -157,6 +152,8 @@ ScriptEditorView::ScriptEditorView (const Script& s)
         script.setCode (getCodeDocument().getAllContent());
         getCodeDocument().setSavePoint();
     };
+
+    reload();
 }
 
 ScriptEditorView::~ScriptEditorView()
@@ -216,6 +213,8 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (const Node& n, bool edit
                                               r.getErrorMessage());
         }
     };
+
+    reload();
 }
 
 String ScriptNodeScriptEditorView::getScriptContent() const

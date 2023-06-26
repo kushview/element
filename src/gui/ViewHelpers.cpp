@@ -75,17 +75,17 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 }
 
 /** Finds the content component by traversing toplevel windows */
-ContentComponent* findContentComponent()
+Content* findContentComponent()
 {
     for (int i = 0; i < DocumentWindow::getNumTopLevelWindows(); ++i)
         if (auto* main = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))
-            return dynamic_cast<ContentComponent*> (main->getContentComponent());
+            return dynamic_cast<Content*> (main->getContentComponent());
     return nullptr;
 }
 
-ContentComponent* findContentComponent (Component* c)
+Content* findContentComponent (Component* c)
 {
-    if (auto* cc = c->findParentComponentOfClass<ContentComponent>())
+    if (auto* cc = c->findParentComponentOfClass<Content>())
         return cc;
 
     if (auto* pw = c->findParentComponentOfClass<PluginWindow>())

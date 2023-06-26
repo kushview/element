@@ -24,6 +24,8 @@
 #include "gui/GraphEditorComponent.h"
 #include <element/signals.hpp>
 
+#define EL_VIEW_GRAPH_EDITOR "GraphEditorView"
+
 namespace element {
 
 class GraphEditorView : public GraphDisplayView,

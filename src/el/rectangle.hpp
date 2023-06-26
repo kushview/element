@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A rectangle.
 // Easy to use Rectangle object backed by JUCE Rectangle.
 // @classmod el.Rectangle
@@ -188,30 +191,30 @@ inline static sol::table
 
         /// Slice top.
         // Remomve and return a portion of this rectangle.
-        // @function Rectangle:slicetop
+        // @function Rectangle:sliceTop
         // @param amt Amount to remove
-        "slicetop",
+        "sliceTop",
         &R::removeFromTop,
 
         /// Slice left.
         // Remomve and return a portion of this rectangle.
-        // @function Rectangle:sliceleft
+        // @function Rectangle:sliceLeft
         // @param amt Amount to remove
-        "sliceleft",
+        "sliceLeft",
         &R::removeFromLeft,
 
         /// Slice right.
         // Remomve and return a portion of this rectangle.
-        // @function Rectangle:sliceright
+        // @function Rectangle:sliceRight
         // @param amt Amount to remove
-        "sliceright",
+        "sliceRight",
         &R::removeFromRight,
 
         /// Slice bottom.
         // Remomve and return a portion of this rectangle.
-        // @function Rectangle:slicebottom
+        // @function Rectangle:sliceBottom
         // @param amt Amount to remove
-        "slicebottom",
+        "sliceBottom",
         &R::removeFromBottom,
 
         /// Convert to integer.
@@ -300,7 +303,7 @@ inline static sol::table
 #endif
     );
 
-    return element::lua::remove_and_clear (M, name);
+    return element::lua::removeAndClear (M, name);
 }
 
 } // namespace lua

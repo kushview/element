@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// The main context in which Element is running.
 // A collection of global objects.
 // @classmod el.Context
@@ -48,9 +51,10 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
         require ('el.Commands')
         require ('el.Node')
         require ('el.Session')
+        require ('el.Settings')
     )");
 
-    sol::stack::push (L, lua::remove_and_clear (M, "Context"));
+    sol::stack::push (L, lua::removeAndClear (M, "Context"));
     return 1;
 }
 // clang-format on

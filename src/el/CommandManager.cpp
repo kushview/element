@@ -2,6 +2,9 @@
 // @classmod el.Commands
 // @pragma nostrip
 
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #include <element/element.h>
 #include <element/ui/commands.hpp>
 #include "sol_helpers.hpp"
@@ -31,6 +34,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Commands (lua_State* L)
         sol::base_classes,
         sol::bases<juce::ApplicationCommandManager>());
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, "Commands"));
+    sol::stack::push (L, element::lua::removeAndClear (M, "Commands"));
     return 1;
 }

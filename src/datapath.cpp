@@ -58,10 +58,10 @@ const File DataPath::applicationDataDir()
 #if JUCE_MAC
     return File::getSpecialLocation (File::userApplicationDataDirectory)
         .getChildFile ("Application Support")
-        .getChildFile (EL_APP_NAME);
+        .getChildFile (EL_APP_DATA_SUBDIR);
 #else
     return File::getSpecialLocation (File::userApplicationDataDirectory)
-        .getChildFile (EL_APP_NAME);
+        .getChildFile (EL_APP_DATA_SUBDIR);
 #endif
 }
 

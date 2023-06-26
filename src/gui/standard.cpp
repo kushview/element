@@ -157,7 +157,7 @@ public:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (StandardContentComponent& cc, Services& app)
+    ContentContainer (StandardContent& cc, Services& app)
         : owner (cc)
     {
         primary.reset (new ContentView());
@@ -313,8 +313,8 @@ public:
     }
 
 private:
-    friend class StandardContentComponent;
-    StandardContentComponent& owner;
+    friend class StandardContent;
+    StandardContent& owner;
 
     StretchableLayoutManager layout;
     std::unique_ptr<ContentView> primary;
@@ -424,12 +424,12 @@ private:
     }
 };
 
-class StandardContentComponent::Resizer : public StretchableLayoutResizerBar
+class StandardContent::Resizer : public StretchableLayoutResizerBar
 {
 public:
-    Resizer (StandardContentComponent& StandardContentComponent, StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical)
+    Resizer (StandardContent& StandardContent, StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical)
         : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-          owner (StandardContentComponent)
+          owner (StandardContent)
     {
     }
 
@@ -446,7 +446,7 @@ public:
     }
 
 private:
-    StandardContentComponent& owner;
+    StandardContent& owner;
 };
 
 //==============================================================================
@@ -462,7 +462,7 @@ static ContentView* createLastContentView (Settings& settings)
         view = std::make_unique<DefaultView>();
     else if (lastContentView == "PatchBay")
         view = std::make_unique<ConnectionGrid>();
-    else if (lastContentView == "GraphEditor")
+    else if (lastContentView == EL_VIEW_GRAPH_EDITOR)
         view.reset (createGraphEditorView());
     else if (lastContentView == "ControllersView")
         view = std::make_unique<ControllersView>();
@@ -515,8 +515,8 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
 #endif
 
 //==============================================================================
-StandardContentComponent::StandardContentComponent (Context& ctl_)
-    : ContentComponent (ctl_)
+StandardContent::StandardContent (Context& ctl_)
+    : Content (ctl_)
 {
     setOpaque (true);
 
@@ -545,13 +545,13 @@ StandardContentComponent::StandardContentComponent (Context& ctl_)
     setMeterBridgeVisible (false);
 }
 
-StandardContentComponent::~StandardContentComponent() noexcept
+StandardContent::~StandardContent() noexcept
 {
     setContentView (nullptr, false);
     setContentView (nullptr, true);
 }
 
-String StandardContentComponent::getMainViewName() const
+String StandardContent::getMainViewName() const
 {
     String name;
     if (auto c1 = container->primary.get())
@@ -559,7 +559,7 @@ String StandardContentComponent::getMainViewName() const
     return name;
 }
 
-String StandardContentComponent::getAccessoryViewName() const
+String StandardContent::getAccessoryViewName() const
 {
     String name;
     if (auto c2 = container->secondary.get())
@@ -567,18 +567,18 @@ String StandardContentComponent::getAccessoryViewName() const
     return name;
 }
 
-int StandardContentComponent::getNavSize()
+int StandardContent::getNavSize()
 {
     return nav != nullptr ? nav->getWidth() : 220;
 }
 
-void StandardContentComponent::setMainView (const String& name)
+void StandardContent::setMainView (const String& name)
 {
     if (name == "PatchBay")
     {
         setContentView (new ConnectionGrid());
     }
-    else if (name == "GraphEditor" || name == "GraphEditorView")
+    else if (name == EL_VIEW_GRAPH_EDITOR)
     {
         setContentView (createGraphEditorView());
     }
@@ -618,21 +618,21 @@ void StandardContentComponent::setMainView (const String& name)
     }
 }
 
-void StandardContentComponent::backMainView()
+void StandardContent::backMainView()
 {
-    setMainView (lastMainView.isEmpty() ? "GraphEditor" : lastMainView);
+    setMainView (lastMainView.isEmpty() ? EL_VIEW_GRAPH_EDITOR : lastMainView);
 }
 
-void StandardContentComponent::nextMainView()
+void StandardContent::nextMainView()
 {
     // only have two rotatable views as of now
     if (getMainViewName() == "EmptyView")
         return;
-    const String nextName = getMainViewName() == "GraphEditor" ? "PatchBay" : "GraphEditor";
+    const String nextName = getMainViewName() == EL_VIEW_GRAPH_EDITOR ? "PatchBay" : EL_VIEW_GRAPH_EDITOR;
     setMainView (nextName);
 }
 
-void StandardContentComponent::setContentView (ContentView* view, const bool accessory)
+void StandardContent::setContentView (ContentView* view, const bool accessory)
 {
     std::unique_ptr<ContentView> deleter (view);
     if (accessory)
@@ -646,7 +646,7 @@ void StandardContentComponent::setContentView (ContentView* view, const bool acc
     }
 }
 
-void StandardContentComponent::setSecondaryView (const String& name)
+void StandardContent::setSecondaryView (const String& name)
 {
     if (name == EL_VIEW_GRAPH_MIXER)
     {
@@ -658,7 +658,7 @@ void StandardContentComponent::setSecondaryView (const String& name)
     }
 }
 
-void StandardContentComponent::resizeContent (const Rectangle<int>& area)
+void StandardContent::resizeContent (const Rectangle<int>& area)
 {
     Rectangle<int> r (area);
 
@@ -669,13 +669,13 @@ void StandardContentComponent::resizeContent (const Rectangle<int>& area)
     layout.layOutComponents (comps, 3, r.getX(), r.getY(), r.getWidth(), r.getHeight(), false, true);
 }
 
-bool StandardContentComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
+bool StandardContent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
     return desc.toString() == "ccNavConcertinaPanel" || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
 }
 
-void StandardContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
+void StandardContent::itemDropped (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
     if (desc.toString() == "ccNavConcertinaPanel")
@@ -695,7 +695,7 @@ void StandardContentComponent::itemDropped (const SourceDetails& dragSourceDetai
     }
 }
 
-bool StandardContentComponent::isInterestedInFileDrag (const StringArray& files)
+bool StandardContent::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
     {
@@ -706,7 +706,7 @@ bool StandardContentComponent::isInterestedInFileDrag (const StringArray& files)
     return false;
 }
 
-void StandardContentComponent::filesDropped (const StringArray& files, int x, int y)
+void StandardContent::filesDropped (const StringArray& files, int x, int y)
 {
     for (const auto& path : files)
     {
@@ -733,7 +733,7 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
             }
         }
-        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
+        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == EL_VIEW_GRAPH_EDITOR || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
         {
             auto s = session();
             auto graph = s->getActiveGraph();
@@ -767,7 +767,7 @@ void StandardContentComponent::filesDropped (const StringArray& files, int x, in
     }
 }
 
-void StandardContentComponent::stabilize (const bool refreshDataPathTrees)
+void StandardContent::stabilize (const bool refreshDataPathTrees)
 {
     auto session = context().session();
     if (session->getNumGraphs() > 0)
@@ -802,7 +802,7 @@ void StandardContentComponent::stabilize (const bool refreshDataPathTrees)
     refreshStatusBar();
 }
 
-void StandardContentComponent::stabilizeViews()
+void StandardContent::stabilizeViews()
 {
     if (container->primary)
         container->primary->stabilizeContent();
@@ -812,7 +812,7 @@ void StandardContentComponent::stabilizeViews()
         nodeStrip->stabilizeContent();
 }
 
-void StandardContentComponent::saveState (PropertiesFile* props)
+void StandardContent::saveState (PropertiesFile* props)
 {
     jassert (props);
     if (nav)
@@ -825,13 +825,15 @@ void StandardContentComponent::saveState (PropertiesFile* props)
         props->setValue ("virtualKeyboard", isVirtualKeyboardVisible());
     }
 
-    auto& mo = container->bottom->bridge->getMeterBridge();
+    props->setValue ("channelStrip", isNodeChannelStripVisible());
+
+    auto& mo = container->bottom->bridge->meterBridge();
     props->setValue ("meterBridge", isMeterBridgeVisible());
-    props->setValue ("meterBridgeSize", mo.getMeterSize());
+    props->setValue ("meterBridgeSize", mo.meterSize());
     props->setValue ("meterBridgeVisibility", (int) mo.visibility());
 }
 
-void StandardContentComponent::restoreState (PropertiesFile* props)
+void StandardContent::restoreState (PropertiesFile* props)
 {
     jassert (props);
     if (nav)
@@ -844,36 +846,38 @@ void StandardContentComponent::restoreState (PropertiesFile* props)
         setVirtualKeyboardVisible (props->getBoolValue ("virtualKeyboard", isVirtualKeyboardVisible()));
     }
 
-    auto& bo = container->bottom->bridge->getMeterBridge();
-    bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.getMeterSize()));
+    setNodeChannelStripVisible (props->getBoolValue ("channelStrip", isNodeChannelStripVisible()));
+
+    auto& bo = container->bottom->bridge->meterBridge();
+    bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.meterSize()));
     bo.setVisibility ((uint32) props->getIntValue ("meterBridgeVisibility", bo.visibility()));
     setMeterBridgeVisible (props->getBoolValue ("meterBridge", isMeterBridgeVisible()));
     resized();
 }
 
-void StandardContentComponent::setCurrentNode (const Node& node)
+void StandardContent::setCurrentNode (const Node& node)
 {
     if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllersView") && session()->getNumGraphs() > 0)
     {
-        setMainView ("GraphEditor");
+        setMainView (EL_VIEW_GRAPH_EDITOR);
     }
 
     container->setNode (node);
 }
 
-void StandardContentComponent::updateLayout()
+void StandardContent::updateLayout()
 {
     layout.setItemLayout (0, EL_NAV_MIN_WIDTH, EL_NAV_MAX_WIDTH, nav->getWidth());
     layout.setItemLayout (1, 2, 2, 2);
     layout.setItemLayout (2, 100, -1, 400);
 }
 
-void StandardContentComponent::resizerMouseDown()
+void StandardContent::resizerMouseDown()
 {
     updateLayout();
 }
 
-void StandardContentComponent::resizerMouseUp()
+void StandardContent::resizerMouseUp()
 {
     layout.setItemLayout (0, nav->getWidth(), nav->getWidth(), nav->getWidth());
     layout.setItemLayout (1, 2, 2, 2);
@@ -881,7 +885,7 @@ void StandardContentComponent::resizerMouseUp()
     resized();
 }
 
-void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
+void StandardContent::setNodeChannelStripVisible (const bool isVisible)
 {
     if (! nodeStrip)
     {
@@ -908,17 +912,17 @@ void StandardContentComponent::setNodeChannelStripVisible (const bool isVisible)
 
     resized();
 }
-bool StandardContentComponent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
+bool StandardContent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
 
 //=====
-bool StandardContentComponent::isVirtualKeyboardVisible() const
+bool StandardContent::isVirtualKeyboardVisible() const
 {
     if (auto vc = getVirtualKeyboardView())
         return vc->isVisible();
     return false;
 }
 
-void StandardContentComponent::setVirtualKeyboardVisible (const bool vis)
+void StandardContent::setVirtualKeyboardVisible (const bool vis)
 {
     auto keyboard = getVirtualKeyboardView();
     if (keyboard->isVisible() == vis)
@@ -938,23 +942,23 @@ void StandardContentComponent::setVirtualKeyboardVisible (const bool vis)
     container->resized();
 }
 
-void StandardContentComponent::toggleVirtualKeyboard()
+void StandardContent::toggleVirtualKeyboard()
 {
     setVirtualKeyboardVisible (! isVirtualKeyboardVisible());
 }
 
-VirtualKeyboardView* StandardContentComponent::getVirtualKeyboardView() const
+VirtualKeyboardView* StandardContent::getVirtualKeyboardView() const
 {
     return container->bottom->keyboard.get();
 }
 
 //==============================================================================
-ApplicationCommandTarget* StandardContentComponent::getNextCommandTarget()
+ApplicationCommandTarget* StandardContent::getNextCommandTarget()
 {
     return nullptr;
 }
 
-void StandardContentComponent::getAllCommands (Array<CommandID>& commands)
+void StandardContent::getAllCommands (Array<CommandID>& commands)
 {
     // clang-format off
     commands.addArray ({
@@ -976,7 +980,7 @@ void StandardContentComponent::getAllCommands (Array<CommandID>& commands)
     // clang-format on
 }
 
-void StandardContentComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
+void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
     using Info = ApplicationCommandInfo;
 
@@ -1032,7 +1036,7 @@ void StandardContentComponent::getCommandInfo (CommandID commandID, ApplicationC
 
         case Commands::showGraphEditor: {
             int flags = 0;
-            if (getMainViewName() == "GraphEditor")
+            if (getMainViewName() == EL_VIEW_GRAPH_EDITOR)
                 flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F2Key, 0);
             result.setInfo ("Graph Editor", "Show the graph editor", "UI", flags);
@@ -1087,7 +1091,7 @@ void StandardContentComponent::getCommandInfo (CommandID commandID, ApplicationC
     }
 }
 
-bool StandardContentComponent::perform (const InvocationInfo& info)
+bool StandardContent::perform (const InvocationInfo& info)
 {
     bool result = true;
     switch (info.commandID)
@@ -1115,7 +1119,7 @@ bool StandardContentComponent::perform (const InvocationInfo& info)
             setMainView ("PatchBay");
             break;
         case Commands::showGraphEditor:
-            setMainView ("GraphEditor");
+            setMainView (EL_VIEW_GRAPH_EDITOR);
             break;
         //======================================================================
         case Commands::showGraphMixer: {
@@ -1168,18 +1172,18 @@ bool StandardContentComponent::perform (const InvocationInfo& info)
     return result;
 }
 
-void StandardContentComponent::setShowAccessoryView (const bool show)
+void StandardContent::setShowAccessoryView (const bool show)
 {
     if (container)
         container->setShowAccessoryView (show);
 }
 
-bool StandardContentComponent::showAccessoryView() const
+bool StandardContent::showAccessoryView() const
 {
     return (container) ? container->showAccessoryView : false;
 }
 
-void StandardContentComponent::getSessionState (String& state)
+void StandardContent::getSessionState (String& state)
 {
     ValueTree data ("state");
 
@@ -1202,7 +1206,7 @@ void StandardContentComponent::getSessionState (String& state)
     state = mo.getMemoryBlock().toBase64Encoding();
 }
 
-void StandardContentComponent::applySessionState (const String& state)
+void StandardContent::applySessionState (const String& state)
 {
     MemoryBlock mb;
     mb.fromBase64Encoding (state);
@@ -1219,18 +1223,70 @@ void StandardContentComponent::applySessionState (const String& state)
     }
 }
 
-void StandardContentComponent::presentView (std::unique_ptr<ContentView> view)
+void StandardContent::presentView (const juce::String& view)
 {
-    setContentView (view.release(), false);
+    setMainView (view);
 }
 
-void StandardContentComponent::setMainView (ContentView* view)
+void StandardContent::presentView (std::unique_ptr<View> view)
+{
+    if (view == nullptr)
+        return;
+
+    class ViewWrapper : public ContentView
+    {
+    public:
+        ViewWrapper()
+        {
+            setSize (1, 1);
+            setInterceptsMouseClicks (false, true);
+        }
+
+        ~ViewWrapper() { view.reset(); }
+
+        void init()
+        {
+            addAndMakeVisible (view.get());
+        }
+
+        void paint (juce::Graphics& g) override
+        {
+            if (isOpaque())
+                g.fillAll (Colours::black);
+        }
+
+        void resized() override
+        {
+            if (view)
+                view->setBounds (getLocalBounds());
+        }
+
+        std::unique_ptr<View> view;
+    };
+
+    if (auto c = dynamic_cast<ContentView*> (view.get()))
+    {
+        view.release();
+        setContentView (c, false);
+    }
+    else
+    {
+        auto wrap = new ViewWrapper();
+        wrap->view = std::move (view);
+        wrap->setOpaque (wrap->view->isOpaque());
+        wrap->addAndMakeVisible (wrap->view.get());
+        wrap->resized();
+        setContentView (wrap, false);
+    }
+}
+
+void StandardContent::setMainView (ContentView* view)
 {
     jassert (view != nullptr);
     setContentView (view, false);
 }
 
-void StandardContentComponent::setMeterBridgeVisible (bool vis)
+void StandardContent::setMeterBridgeVisible (bool vis)
 {
     if (isMeterBridgeVisible() == vis)
         return;
@@ -1239,7 +1295,7 @@ void StandardContentComponent::setMeterBridgeVisible (bool vis)
     resized();
 }
 
-bool StandardContentComponent::isMeterBridgeVisible() const
+bool StandardContent::isMeterBridgeVisible() const
 {
     return container->bottom->bridge->isVisible();
 }

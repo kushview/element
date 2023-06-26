@@ -2,11 +2,16 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
-#include <element/ui/content.hpp>
+
+#include <element/element.hpp>
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 
-// temporary!
-using View = ContentView;
+class EL_API View : public juce::Component {
+public:
+    View() = default;
+    virtual ~View() = default;
+};
 
 } // namespace element

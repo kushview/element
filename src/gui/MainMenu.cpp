@@ -109,9 +109,9 @@ PopupMenu MainMenu::getMenuForIndex (int index, const String& name)
     return menu;
 }
 
-ContentComponent* MainMenu::getContentComponent()
+Content* MainMenu::content()
 {
-    return dynamic_cast<ContentComponent*> (owner.getContentComponent());
+    return dynamic_cast<Content*> (owner.getContentComponent());
 }
 
 void MainMenu::menuItemSelected (int index, int menu)
@@ -158,7 +158,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         if (index >= 100000)
         {
-            // if (auto* const cc = dynamic_cast<WorkspacesContentComponent*> (getContentComponent()))
+            // if (auto* const cc = dynamic_cast<WorkspacesContentComponent*> (content()))
             //     cc->handleWorkspaceMenuResult (index);
         }
     }
@@ -199,14 +199,7 @@ void MainMenu::menuItemSelected (int index, int menu)
         if (auto* gui = app.find<GuiService>())
             gui->stabilizeContent();
     }
-    else if (index == 5555)
-    {
-        if (auto* cc = getContentComponent())
-            cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
-    }
-    else if (index == 8000)
-    {
-    }
+
     else if (index == 9000)
     {
         engine->addMidiMessage (MidiMessage::midiStart().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
@@ -236,7 +229,7 @@ void MainMenu::menuItemSelected (int index, int menu)
 
 void MainMenu::addRecentFiles (PopupMenu& menu)
 {
-    if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
+    if (auto* cc = dynamic_cast<Content*> (owner.getContentComponent()))
     {
         PopupMenu recents;
         auto& app (cc->services());
@@ -304,11 +297,9 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     menu.addItem (2222, "Show changed status");
     menu.addItem (3333, "Quick Map");
     menu.addItem (4444, "Refresh Mapping Engine");
-    menu.addItem (5555, "Toggle Node Channel Strip");
     menu.addItem (6666, "Show Workspace Window");
     menu.addItem (7777, "Save Workspace");
     menu.addItem (7778, "Load Workspace");
-    menu.addItem (8000, "Dump License");
     menu.addItem (9000, "MIDI Start");
     menu.addItem (9001, "MIDI Stop");
     menu.addItem (9002, "MIDI Continue");

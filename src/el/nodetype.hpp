@@ -1,3 +1,5 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
 
@@ -56,7 +58,7 @@ inline static sol::table new_nodetype (lua_State* L, const char* name, Args&&...
         "restoreState", &Node::restorePluginState,
         std::forward<Args> (args)...
     );
-    return remove_and_clear (M, name);
+    return removeAndClear (M, name);
 }
 // clang-format off
 

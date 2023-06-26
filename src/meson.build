@@ -173,11 +173,13 @@ libelement_sources = '''
     el/Bounds.cpp
     el/bytes.c
     el/CommandManager.cpp
+    el/Content.cpp
     el/Desktop.cpp
     el/DocumentWindow.cpp
     el/File.cpp
     el/Context.cpp
     el/Graph.cpp
+    el/GraphEditor.cpp
     el/Graphics.cpp
     el/midi.c
     el/MidiBuffer.cpp
@@ -232,6 +234,7 @@ libelement_sources += luael_gen.process (
     'el/AudioBuffer.lua',
     'el/command.lua',
     'el/object.lua',
+    'el/color.lua',
     'el/script.lua',
     'el/session.lua',
     'el/slug.lua'

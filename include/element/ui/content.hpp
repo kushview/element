@@ -5,34 +5,23 @@
 
 #include <memory>
 
+#include <element/element.hpp>
+
 #include <element/juce/core.hpp>
 #include <element/juce/gui_basics.hpp>
 
-#include <element/element.hpp>
 #include <element/ui/about.hpp>
 #include <element/ui/menumodels.hpp>
+#include <element/ui/view.hpp>
 
-#include <element/processor.hpp>
 #include <element/session.hpp>
-
-#define EL_VIEW_GRAPH_MIXER "GraphMixerView"
-#define EL_VIEW_CONSOLE     "LuaConsoleViw"
+#include <element/signals.hpp>
 
 namespace element {
 
 class Services;
-class BreadCrumbComponent;
-class ContentContainer;
 class Context;
-class GraphEditorView;
-class NavigationConcertinaPanel;
 class Node;
-class RackView;
-class TransportBar;
-class VirtualKeyboardView;
-class NodeChannelStripView;
-
-using namespace juce;
 
 class ContentView : public juce::Component {
 public:
@@ -46,16 +35,16 @@ public:
     virtual void stabilizeContent() {}
 
     /** Save state to user settings */
-    virtual void saveState (PropertiesFile*) {}
+    virtual void saveState (juce::PropertiesFile*) {}
 
     /** Restore state from user settings */
-    virtual void restoreState (PropertiesFile*) {}
+    virtual void restoreState (juce::PropertiesFile*) {}
 
     /** Get state attached to session */
-    virtual void getState (String&) {}
+    virtual void getState (juce::String&) {}
 
     /** Apply state attached to session */
-    virtual void setState (const String&) {}
+    virtual void setState (const juce::String&) {}
 
     /** Set true if pressing escape should close the view */
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
@@ -64,36 +53,35 @@ public:
     Signal<void()> nodeMoved;
 
     /** @internal */
-    virtual void paint (Graphics& g) override;
+    virtual void paint (juce::Graphics& g) override;
     /** @internal */
-    virtual bool keyPressed (const KeyPress& k) override;
+    virtual bool keyPressed (const juce::KeyPress& k) override;
 
 private:
     bool escapeTriggersClose = false;
 };
 
-class ContentComponent : public juce::Component,
-                         public juce::DragAndDropContainer,
-                         public juce::DragAndDropTarget,
-                         public juce::FileDragAndDropTarget {
+//==============================================================================
+class Content : public juce::Component {
 protected:
-    ContentComponent (Context& app);
+    Content (Context& app);
 
 public:
-    virtual ~ContentComponent() noexcept;
-
-    /** Post a message to the app controller */
-    void post (Message*);
-
-    /** Access to the app controller */
-    Services& services() { return controller; }
+    virtual ~Content() noexcept;
 
     /** Access to global objects */
     Context& context();
 
+    /** Access to the app controller */
+    Services& services() { return controller; }
+
     /** Access to the currently opened session */
     SessionPtr session();
 
+    /** Post a message to Services */
+    void post (juce::Message*);
+
+    //=========================================================================
     /** Change toolbar visibility */
     void setToolbarVisible (bool);
 
@@ -107,52 +95,43 @@ public:
     /** Chang statusbar visibility */
     void setStatusBarVisible (bool);
 
-    /** Override this to resize the main content */
-    virtual void resizeContent (const Rectangle<int>& area) { ignoreUnused (area); }
+    //=========================================================================
+    virtual void presentView (std::unique_ptr<View>) = 0;
+    virtual void presentView (const juce::String&) = 0;
 
     //=========================================================================
-    virtual void presentView (std::unique_ptr<ContentView>) = 0;
-
-    //=========================================================================
-    virtual void saveState (PropertiesFile*);
-    virtual void restoreState (PropertiesFile*);
-    virtual void getSessionState (String&) {}
-    virtual void applySessionState (const String&) {}
-
-    virtual void setNodeChannelStripVisible (const bool isVisible);
-    virtual bool isNodeChannelStripVisible() const;
+    virtual void saveState (juce::PropertiesFile*);
+    virtual void restoreState (juce::PropertiesFile*);
+    virtual void getSessionState (juce::String&) {}
+    virtual void applySessionState (const juce::String&) {}
 
     virtual void setCurrentNode (const Node& node);
     virtual void stabilize (const bool refreshDataPathTrees = false);
     virtual void stabilizeViews();
 
     /** @internal */
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     /** @internal */
     void resized() override;
-    /** @internal */
-    bool isInterestedInFileDrag (const StringArray& files) override;
-    /** @internal */
-    void filesDropped (const StringArray& files, int x, int y) override;
-    /** @internal */
-    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
-    /** @internal */
-    void itemDropped (const SourceDetails& dragSourceDetails) override;
+
+protected:
+    /** Override this to resize the main content */
+    virtual void resizeContent (const juce::Rectangle<int>& area) { ignoreUnused (area); }
 
 private:
     Context& _context;
     Services& controller;
 
     struct Tooltips;
-    SharedResourcePointer<Tooltips> tips;
+    juce::SharedResourcePointer<Tooltips> tips;
 
     class Toolbar;
     friend class Toolbar;
-    ScopedPointer<Toolbar> toolBar;
+    juce::ScopedPointer<Toolbar> toolBar;
 
     class StatusBar;
     friend class StatusBar;
-    ScopedPointer<StatusBar> statusBar;
+    juce::ScopedPointer<StatusBar> statusBar;
 
     bool statusBarVisible { true };
     int statusBarSize;
@@ -160,6 +139,7 @@ private:
     int toolBarSize;
 };
 
+//==============================================================================
 class ContentFactory {
 public:
     virtual ~ContentFactory() = default;
@@ -170,7 +150,7 @@ public:
         you should still return a valid Content object.  The object returned
         will be used as the content component in the main window.
     */
-    virtual std::unique_ptr<ContentComponent> createMainContent (const juce::String& type) = 0;
+    virtual std::unique_ptr<Content> createMainContent (const juce::String& type) = 0;
 
     /** Create a menu bar model to use in the Main Window. */
     virtual std::unique_ptr<MainMenuBarModel> createMainMenuBarModel() { return nullptr; }

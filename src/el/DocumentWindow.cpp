@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A Document Window.
 // A window with a title bar and optional buttons. Is a @{el.Widget}
 // Backed by a JUCE DocumentWindow
@@ -26,6 +29,12 @@ public:
     ~DocumentWindow() override
     {
         widget = sol::lua_nil;
+    }
+
+    static auto newUserData (lua_State* L)
+    {
+        juce::ignoreUnused (L);
+        return std::make_unique<lua::DocumentWindow> (sol::table());
     }
 
     static void init (const sol::table& proxy)
@@ -99,7 +108,7 @@ int luaopen_el_DocumentWindow (lua_State* L)
     using element::lua::DocumentWindow;
     namespace lua = element::lua;
 
-    auto T = lua::new_widgettype<DocumentWindow> (
+    auto T = lua::defineWidget<DocumentWindow> (
         L, LKV_TYPE_NAME_WINDOW, sol::meta_method::to_string, 
             [] (DocumentWindow& self) {
                 return lua::to_string (self, LKV_TYPE_NAME_WINDOW); 

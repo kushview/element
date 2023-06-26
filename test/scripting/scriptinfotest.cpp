@@ -55,7 +55,7 @@ static String toString (const ScriptInfo& desc)
     return result;
 }
 
-BOOST_AUTO_TEST_SUITE (ScriptDescriptionTests)
+BOOST_AUTO_TEST_SUITE (ScriptInfoTest)
 
 BOOST_AUTO_TEST_CASE (ParseBuffer)
 {

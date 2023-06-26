@@ -3,67 +3,51 @@
 // @classmod el.Widget
 // @pragma nostrip
 
-#include "element/element.h"
+#include <element/element.h>
 #include "object.hpp"
 #include "widget.hpp"
-#define LKV_TYPE_NAME_WIDGET "Widget"
+#define EL_TYPE_NAME_WIDGET "Widget"
 
 using namespace juce;
 
 namespace element {
 namespace lua {
 
-class Widget : public juce::Component
+class Widget : public Component
 {
 public:
-    ~Widget()
+    Widget (const sol::table& t) {}
+    static void init (const sol::table& t)
     {
-        widget = sol::lua_nil;
-    }
-
-    Widget (const sol::table& obj)
-    {
-        widget = obj;
-    }
-
-    void resized() override
-    {
-        if (sol::safe_function f = widget["resized"])
-            f (widget);
-    }
-
-    void paint (Graphics& g) override
-    {
-        if (sol::safe_function f = widget["paint"])
+        if (auto impl = object_userdata<Widget> (t))
         {
-            f (widget, std::ref<Graphics> (g));
+            (*impl).proxy.init (t);
         }
     }
 
-    void mouseDrag (const MouseEvent& ev) override
+    static auto newUserData (lua_State* L)
     {
-        if (sol::safe_function f = widget["mousedrag"])
-            f (widget, ev);
-    }
-
-    void mouseDown (const MouseEvent& ev) override
-    {
-        if (sol::safe_function f = widget["mousedown"])
-            f (widget, ev);
-    }
-
-    void mouseUp (const MouseEvent& ev) override
-    {
-        if (sol::safe_function f = widget["mouseup"])
-            f (widget, ev);
+        juce::ignoreUnused (L);
+        return std::make_unique<Widget> (sol::table());
     }
 
     sol::table addWithZ (const sol::object& child, int zorder)
     {
         jassert (child.valid());
-        if (Component* const impl = object_userdata<Component> (child))
+        if (auto* const w = proxy.component())
         {
-            addAndMakeVisible (*impl, zorder);
+            if (Component* const impl = object_userdata<Component> (child))
+            {
+                w->addAndMakeVisible (*impl, zorder);
+            }
+            else
+            {
+                std::clog << "[element::lua] child is not a component." << std::endl;
+            }
+        }
+        else
+        {
+            std::clog << "[element::lua] proxy has no component." << std::endl;
         }
 
         return child;
@@ -74,61 +58,48 @@ public:
         return addWithZ (child, -1);
     }
 
-    static void init (const sol::table& proxy)
-    {
-        if (auto* const impl = object_userdata<Widget> (proxy))
-        {
-            impl->widget = proxy;
-        }
-    }
-
-    sol::table getBoundsTable()
-    {
-        sol::state_view L (widget.lua_state());
-        auto r = getBounds();
-        auto t = L.create_table();
-        t["x"] = r.getX();
-        t["y"] = r.getY();
-        t["width"] = r.getWidth();
-        t["height"] = r.getHeight();
-        return t;
-    }
-
-private:
-    Widget() = delete;
-    sol::table widget;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Widget)
+    /** Proxy */
+    // void paint (juce::Graphics& g) override { proxy.paint (g); }
+    // void resized() override { proxy.resized(); }
+    // void mouseDrag (const MouseEvent& ev) override { proxy.mouseDrag (ev); }
+    // void mouseDown (const MouseEvent& ev) override { proxy.mouseDown (ev); }
+    // void mouseUp (const MouseEvent& ev) override { proxy.mouseUp (ev); }
+    EL_LUA_IMPLEMENT_WIDGET_PROXY
 };
 
 } // namespace lua
 } // namespace element
 
+// clang-format off
 EL_PLUGIN_EXPORT
 int luaopen_el_Widget (lua_State* L)
 {
     namespace lua = element::lua;
-    using lua::Widget;
+    using Widget = element::lua::Widget;
 
-    auto T = lua::new_widgettype<Widget> (
-        L, LKV_TYPE_NAME_WIDGET, sol::meta_method::to_string, [] (Widget& self) {
-            return lua::to_string (self, LKV_TYPE_NAME_WIDGET);
+    auto T = lua::defineWidget<Widget> (
+        L, EL_TYPE_NAME_WIDGET, sol::meta_method::to_string, [] (Widget& self) {
+            return lua::to_string (self, EL_TYPE_NAME_WIDGET);
         },
         /// Add a child widget.
         // @function Widget:add
         // @tparam el.Widget widget Widget to add
         // @int[opt] zorder Z-order
         // @within Methods
-        "add",
-        sol::overload (&Widget::add, &Widget::addWithZ),
-        "addtodesktop",
-        sol::overload ([] (Widget& self, int flags) { self.addToDesktop (flags, nullptr); }, [] (Widget& self, int flags, void* handle) { self.addToDesktop (flags, handle); }),
-        sol::base_classes,
-        sol::bases<Component>());
+        "add", sol::overload (&Widget::add, &Widget::addWithZ),
 
-    sol::table T_mt = T[sol::metatable_key];
-    T_mt["__methods"].get_or_create<sol::table>().add (
-        "add");
+        "elevate", sol::overload (
+            [] (Widget& self, int flags) { 
+                self.addToDesktop (flags, nullptr);
+            }, 
+            [] (Widget& self, int flags, void* handle) { 
+                self.addToDesktop (flags, handle); 
+            }
+        ),
 
+        sol::base_classes, sol::bases<juce::Component>());
+
+    lua::Object<Widget>::addMethods (T, "add", "elevate");
     sol::stack::push (L, T);
 
     return 1;

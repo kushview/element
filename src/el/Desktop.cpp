@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// Desktop controls.
 // Describes and controls aspects of the computer's desktop.
 // @classmod el.Desktop
@@ -32,6 +35,6 @@ int luaopen_el_Desktop (lua_State* L)
                              "scale",
                              sol::property (&Desktop::getGlobalScaleFactor, &Desktop::setGlobalScaleFactor));
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, LKV_TYPE_NAME_DESKTOP));
+    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_DESKTOP));
     return 1;
 }

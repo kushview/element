@@ -38,6 +38,7 @@
 #include "el/sol_helpers.hpp"
 
 #include "AudioBuffer.lua.h"
+#include "color.lua.h"
 #include "command.lua.h"
 #include "object.lua.h"
 #include "script.lua.h"
@@ -72,6 +73,8 @@ extern int luaopen_el_Node (lua_State*);
 extern int luaopen_el_Session (lua_State*);
 extern int luaopen_el_View (lua_State*);
 extern int luaopen_el_Graph (lua_State*);
+extern int luaopen_el_GraphEditor (lua_State*);
+extern int luaopen_el_Content (lua_State*);
 }
 
 using namespace sol;
@@ -249,6 +252,7 @@ DEFINE_LUA_TXT_LOADER (object)
 DEFINE_LUA_TXT_LOADER (script)
 DEFINE_LUA_TXT_LOADER (session)
 DEFINE_LUA_TXT_LOADER (slug)
+DEFINE_LUA_TXT_LOADER (color)
 #undef DEFINE_LUA_TXT_LOADER
 
 static int searchInternalModules (lua_State* L)
@@ -277,6 +281,10 @@ static int searchInternalModules (lua_State* L)
     else if (mod == "el.slug")
     {
         sol::stack::push (L, load_el_slug);
+    }
+    else if (mod == "el.color")
+    {
+        sol::stack::push (L, load_el_color);
     }
 
     else if (mod == "el.Commands")
@@ -388,7 +396,14 @@ static int searchInternalModules (lua_State* L)
     {
         sol::stack::push (L, luaopen_el_Graph);
     }
-
+    else if (mod == "el.GraphEditor")
+    {
+        sol::stack::push (L, luaopen_el_GraphEditor);
+    }
+    else if (mod == "el.Content")
+    {
+        sol::stack::push (L, luaopen_el_Content);
+    }
     else
     {
         std::stringstream msg;

@@ -1,3 +1,5 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
 
@@ -12,6 +14,20 @@ class Object : public DerivedType
 public:
     Object() = default;
     ~Object() = default;
+
+    template <typename... Args>
+    static void addMethods (const sol::table& T, Args&&... args)
+    {
+        sol::table T_mt = T[sol::metatable_key];
+        T_mt["__methods"].get_or_create<sol::table>().add (std::forward<Args> (args)...);
+    }
+
+    template <typename... Args>
+    static void exportAttributes (const sol::table& T, Args&&... args)
+    {
+        sol::table T_mt = T[sol::metatable_key];
+        T_mt["__props"].get_or_create<sol::table>().add (std::forward<Args> (args)...);
+    }
 };
 
 template <typename T>

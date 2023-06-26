@@ -1,3 +1,5 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include <element/element.h>
 #include <element/graph.hpp>
@@ -15,6 +17,6 @@ EL_PLUGIN_EXPORT int luaopen_el_Graph (lua_State* L)
         "viewScript",     &Graph::findViewScript
     );
 
-    sol::stack::push (L, element::lua::remove_and_clear (M, "Graph"));
+    sol::stack::push (L, element::lua::removeAndClear (M, "Graph"));
     return 1;
 }

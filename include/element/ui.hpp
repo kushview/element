@@ -13,7 +13,7 @@
 namespace element {
 
 class Commands;
-class ContentComponent;
+class Content;
 class ContentFactory;
 class Context;
 class LookAndFeel_E1;
@@ -83,7 +83,7 @@ public:
     bool perform (const InvocationInfo& info) override;
 
     /** Returns the content component for this instance */
-    ContentComponent* getContentComponent();
+    Content* content();
 
     int getNumPluginWindows() const;
     PluginWindow* getPluginWindow (const int window) const;
@@ -145,7 +145,7 @@ private:
 
     std::unique_ptr<WindowManager> windowManager;
     std::unique_ptr<MainWindow> mainWindow;
-    std::unique_ptr<ContentComponent> content;
+    std::unique_ptr<Content> _content;
     std::unique_ptr<DialogWindow> about;
     std::unique_ptr<ContentFactory> factory;
     std::unique_ptr<Designer> designer;

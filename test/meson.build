@@ -1,4 +1,5 @@
 test_element_sources = '''
+    datapathtests.cpp
     GraphNodeTests.cpp  
     NodeFactoryTests.cpp  
     OversamplerTests.cpp    
@@ -13,11 +14,11 @@ test_element_sources = '''
 
     engine/VelocityCurveTest.cpp
     engine/MidiChannelMapTest.cpp
-    engine/ToggleGridTests.cpp
+    engine/togglegridtest.cpp
     engine/LinearFadeTest.cpp
     
-    scripting/ScriptDescriptionTests.cpp
-    scripting/ScriptManagerTests.cpp
+    scripting/scriptinfotest.cpp
+    scripting/scriptmanagertest.cpp
     updatetests.cpp
 '''.split()
 test_element_cpp_args = [
@@ -38,6 +39,7 @@ test_element_app = executable ('test_element',
     install : false
 )
 
+test ('DataPath',       test_element_app, args : [ '-t', 'DataPathTests' ])
 test ('GraphNode',      test_element_app, args : [ '-t', 'GraphNodeTests' ])
 test ('RootGraph',      test_element_app, args : [ '-t', 'RootGraphTests' ])
 test ('IONode',         test_element_app, args : [ '-t', 'IONodeTests' ])
@@ -55,9 +57,8 @@ test ('LinearFade',     test_element_app, args : [ '-t', 'LinearFadeTest'], suit
 test ('MidiChannelMap', test_element_app, args : [ '-t', 'MidiChannelMapTest'], suite: 'engine' )
 test ('MidiProgramMap', test_element_app, args : [ '-t', 'MidiProgramMapTests'], suite: 'engine' )
 test ('Processor',      test_element_app, args : [ '-t',  'NodeObjectTests' ], suite : 'engine')
-test ('ToggleGrid',     test_element_app, args : [ '-t', 'ToggleGridTests'], suite: 'engine' )
-
+test ('ToggleGrid',     test_element_app, args : [ '-t', 'ToggleGridTest'], suite: 'engine' )
 test ('VelocityCurve',  test_element_app, args : [ '-t', 'VelocityCurveTest'], suite: 'engine' )
 
-test ('ScriptDescription', test_element_app, args : [ '-t', 'ScriptDescriptionTests' ], suite : 'scripting')
-test ('ScriptManager',  test_element_app,    args : [ '-t', 'ScriptManagerTests' ], suite : 'scripting')
+test ('ScriptInfo',     test_element_app, args : [ '-t', 'ScriptInfoTest' ], suite : 'lua')
+test ('ScriptManager',  test_element_app, args : [ '-t', 'ScriptManagerTest' ], suite : 'lua')
