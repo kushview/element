@@ -1,4 +1,4 @@
-ldoc = find_program ('ldoc', version : '>= 1.5.0')
+ldoc = find_program ('ldoc', version : '>= 1.5.0', required: false)
 ldoc_install_dir = get_option ('datadir') / 'doc' / 'element-0' / 'lua'
 
 if get_option ('deploy')
