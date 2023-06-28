@@ -99,6 +99,6 @@ if not meson.is_subproject()
 if host_machine.system() == 'darwin'
     subdir ('osx')
 elif host_machine.system() == 'windows'
-    subdir ('windows')
+    # subdir ('windows')
 endif
 endif
