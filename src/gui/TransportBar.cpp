@@ -60,31 +60,37 @@ public:
 
 TransportBar::TransportBar()
 {
-    addAndMakeVisible (play = new SettingButton());
+    play = std::make_unique<SettingButton>();
+    addAndMakeVisible (play.get());
     play->setPath (getIcons().fasPlay, 4.4f);
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     play->addListener (this);
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
     play->setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
 
-    addAndMakeVisible (stop = new SettingButton());
+    stop = std::make_unique<SettingButton>();
+    addAndMakeVisible (stop.get());
     stop->setPath (getIcons().fasStop, 4.4f);
     stop->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stop->addListener (this);
 
-    addAndMakeVisible (record = new SettingButton());
+    record = std::make_unique<SettingButton>();
+    addAndMakeVisible (record.get());
     record->setPath (getIcons().fasCircle, 4.4f);
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
     record->setColour (SettingButton::backgroundOnColourId, Colours::red);
 
-    addAndMakeVisible (barLabel = new BarLabel (*this));
+    barLabel = std::make_unique<BarLabel> (*this);
+    addAndMakeVisible (barLabel.get());
     barLabel->setName ("barLabel");
 
-    addAndMakeVisible (beatLabel = new BeatLabel());
+    beatLabel = std::make_unique<BeatLabel>();
+    addAndMakeVisible (beatLabel.get());
     beatLabel->setName ("beatLabel");
 
-    addAndMakeVisible (subLabel = new SubBeatLabel());
+    subLabel = std::make_unique<SubBeatLabel>();
+    addAndMakeVisible (subLabel.get());
     subLabel->setName ("subLabel");
 
     setBeatTime (0.f);
@@ -152,21 +158,21 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     if (! checkForMonitor())
         return;
 
-    if (buttonThatWasClicked == play)
+    if (buttonThatWasClicked == play.get())
     {
         if (monitor->playing.get())
             engine->seekToAudioFrame (0);
         else
             engine->setPlaying (true);
     }
-    else if (buttonThatWasClicked == stop)
+    else if (buttonThatWasClicked == stop.get())
     {
         if (! monitor->playing.get())
             engine->seekToAudioFrame (0);
         else
             engine->setPlaying (false);
     }
-    else if (buttonThatWasClicked == record)
+    else if (buttonThatWasClicked == record.get())
     {
         engine->setRecording (! monitor->recording.get());
     }

@@ -38,7 +38,7 @@ public:
     //==============================================================================
     /** Enables or disables a midi input device.
 
-        The list of devices can be obtained with the MidiInput::getDevices() method.
+        The list of devices can be obtained with the MidiInput::getAvailableDevices() method.
 
         Any incoming messages from enabled input devices will be forwarded on to all the
         listeners that have been registered with the addMidiInputCallback() method. They
@@ -55,27 +55,29 @@ public:
 
         @see addMidiInputCallback, isMidiInputEnabled
     */
-    void setMidiInputEnabled (const String& deviceId, bool enabled);
+    void setMidiInputEnabled (const MidiDeviceInfo& deviceId, bool enabled);
 
     /** Returns true if a given midi input device is being used.
         @see setMidiInputEnabled
     */
-    bool isMidiInputEnabled (const String& deviceId) const;
+    bool isMidiInputEnabled (const MidiDeviceInfo& deviceId) const;
 
     /** Registers a listener for callbacks when midi events arrive from a midi input.
 
         The device name can be empty to indicate that it wants to receive all incoming
         events from all the enabled MIDI inputs. Or it can be the name of one of the
         MIDI input devices if it just wants the events from that device. (see
-        MidiInput::getDevices() for the list of device names).
+        MidiInput::getAvailableDevices() for the list of device names).
 
         Only devices which are enabled (see the setMidiInputEnabled() method) will have their
         events forwarded on to listeners.
      */
-    void addMidiInputCallback (const String& deviceId, MidiInputCallback* callback, bool consumer = false);
+    void addMidiInputCallback (const MidiDeviceInfo& device, MidiInputCallback* callback, bool consumer = false);
+    void addMidiInputCallback (const String& identifier, MidiInputCallback* callback, bool consumer = false);
+    void addMidiInputCallback (MidiInputCallback* callback, bool consumer = false);
 
     /** Removes a listener that was previously registered with addMidiInputCallback(). */
-    void removeMidiInputCallback (const String& deviceId, MidiInputCallback* callback);
+    void removeMidiInputCallback (const MidiDeviceInfo& device, MidiInputCallback* callback);
 
     /** Removes a listener that was previously registered with addMidiInputCallback().
         This version does not check device name.
@@ -88,22 +90,24 @@ public:
     //==============================================================================
     /** Sets a midi output device to use as the default.
 
-        The list of devices can be obtained with the MidiOutput::getDevices() method.
+        The list of devices can be obtained with the MidiOutput::getAvailableDevices() method.
 
         The specified device will be opened automatically and can be retrieved with the
         getDefaultMidiOutput() method.
 
         Pass in an empty string to deselect all devices. For the default device, you
-        can use MidiOutput::getDevices() [MidiOutput::getDefaultDeviceIndex()].
+        can use MidiOutput::getAvailableDevices() [MidiOutput::getDefaultDeviceIndex()].
 
         @see getDefaultMidiOutput, getDefaultMidiOutputName
     */
-    void setDefaultMidiOutput (const String& deviceName);
+    void setDefaultMidiOutput (const MidiDeviceInfo& device);
 
     /** Returns the name of the default midi output.
         @see setDefaultMidiOutput, getDefaultMidiOutput
      */
     const String& getDefaultMidiOutputName() const noexcept { return defaultMidiOutputName; }
+
+    const String& getDefaultMidiOutputID() const noexcept { return defaultMidiOutputName; }
 
     /** Returns the current default midi output device.
         If no device has been selected, or the device can't be opened, this will return nullptr.
@@ -147,14 +151,14 @@ private:
     OwnedArray<MidiInputHolder> openMidiInputs;
     Array<MidiCallbackInfo> midiCallbacks;
 
-    String defaultMidiOutputName;
+    String defaultMidiOutputName, defaultMidiOutputID;
     std::unique_ptr<MidiOutput> defaultMidiOutput;
     CriticalSection audioCallbackLock, midiCallbackLock, midiOutputLock;
 
     class CallbackHandler;
     std::unique_ptr<CallbackHandler> callbackHandler;
 
-    MidiInputHolder* getMidiInput (const String& deviceName, bool openIfNotAlready);
+    MidiInputHolder* getMidiInput (const String& identifier, bool openIfNotAlready);
     void handleIncomingMidiMessageInt (juce::MidiInput*, const juce::MidiMessage&);
 };
 

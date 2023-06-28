@@ -40,7 +40,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    InputOutputConfig* getConfig (bool isInput) noexcept { return isInput ? inConfig : outConfig; }
+    InputOutputConfig* getConfig (bool isInput) noexcept { return isInput ? inConfig.get() : outConfig.get(); }
     void update();
 
     void buttonClicked (Button*) override;
@@ -58,7 +58,7 @@ private:
     AudioProcessor::BusesLayout currentLayout;
 
     Label title;
-    ScopedPointer<InputOutputConfig> inConfig, outConfig;
+    std::unique_ptr<InputOutputConfig> inConfig, outConfig;
     TextButton saveButton, cancelButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeAudioBusesComponent)

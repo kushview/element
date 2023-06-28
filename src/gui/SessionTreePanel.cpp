@@ -369,19 +369,7 @@ public:
 
         const auto graph = node.isGraph() ? node : node.getParentGraph();
 
-        if (desc.toString() == "ccNavConcertinaPanel")
-        {
-            auto* nav = ViewHelpers::getNavigationConcertinaPanel (getOwnerView());
-            auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : 0;
-            const auto file ((panel) ? panel->getSelectedFile() : File());
-            if (file.hasFileExtension ("elg"))
-            {
-                const Node newGraph (Node::parse (file));
-                ViewHelpers::postMessageFor (getOwnerView(),
-                                             new AddNodeMessage (newGraph, graph));
-            }
-        }
-        else if (desc.isArray() && desc[0] == "plugin")
+        if (desc.isArray() && desc[0] == "plugin")
         {
             if (auto p = world->plugins().getKnownPlugins().getTypeForIdentifierString (desc[1].toString()))
             {
@@ -752,27 +740,17 @@ public:
 
     void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
     {
+        std::clog << "[element] SessionRootTreeItem::itemDropped()" << std::endl;
+
         // TODO: need to not directly bind index of graph in model from the actual
         // index used in the engine.  After this, it will be less complicated to
         // insert graphs anywhere from a visual standpoint.
         ignoreUnused (index);
-
         auto* world = ViewHelpers::getGlobals (getOwnerView());
         auto session = world->session();
         auto& app (ViewHelpers::findContentComponent (getOwnerView())->services());
         const auto& desc (details.description);
-
-        if (desc.toString() == "ccNavConcertinaPanel")
-        {
-            auto* nav = ViewHelpers::getNavigationConcertinaPanel (getOwnerView());
-            auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : 0;
-            const auto file ((panel) ? panel->getSelectedFile() : File());
-            if (file.hasFileExtension ("elg"))
-            {
-                if (auto* sess = app.find<SessionService>())
-                    sess->importGraph (file);
-            }
-        }
+        juce::ignoreUnused (session, app, desc);
     }
 
 #if 0

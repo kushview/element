@@ -331,12 +331,4 @@ struct ReloadMainContentMessage : public AppMessage
     const String type;
 };
 
-struct PresentViewMessage : public AppMessage
-{
-    using Factory = std::function<ContentView*()>;
-    PresentViewMessage (Factory f) : create (f) {}
-    PresentViewMessage() {}
-    Factory create;
-};
-
 } // namespace element

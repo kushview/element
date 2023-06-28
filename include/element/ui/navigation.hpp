@@ -5,8 +5,7 @@
 
 #include <element/juce/gui_basics.hpp>
 
-// FIXME: this class isn't in element namespace.
-class AudioIOPanelView;
+class AudioIOPanelView; // FIXME: this class isn't in element namespace.
 
 namespace element {
 
@@ -46,6 +45,8 @@ public:
     const int getHeaderHeight() const;
 
     void setHeaderHeight (const int newHeight);
+
+    void paint (juce::Graphics& g) override;
 
 private:
     Context& globals;

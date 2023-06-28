@@ -71,7 +71,7 @@ private:
 /** Creates VU meters with scale in decibels */
 class SimpleMeter : public juce::Component {
 public:
-    SimpleMeter (const int numPorts, bool horizontal = false);
+    explicit SimpleMeter (const int numPorts = 1, bool horizontal = false);
     ~SimpleMeter();
 
     /** Returns the number of ports on this meter */

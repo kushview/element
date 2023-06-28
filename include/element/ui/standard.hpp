@@ -75,15 +75,15 @@ public:
     void setMainView (ContentView* v);
 
 private:
-    ScopedPointer<NavigationConcertinaPanel> nav;
+    std::unique_ptr<NavigationConcertinaPanel> nav;
     friend class ContentContainer;
-    ScopedPointer<ContentContainer> container;
+    std::unique_ptr<ContentContainer> container;
     StretchableLayoutManager layout;
     class Resizer;
     friend class Resizer;
-    juce::ScopedPointer<Resizer> bar1;
+    std::unique_ptr<Resizer> bar1;
 
-    juce::ScopedPointer<NodeChannelStripView> nodeStrip;
+    std::unique_ptr<NodeChannelStripView> nodeStrip;
 
     bool statusBarVisible { true };
     int statusBarSize;

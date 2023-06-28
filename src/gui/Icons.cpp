@@ -108,7 +108,7 @@ static const unsigned char farTrashAlt[] = { 110, 109, 0, 0, 134, 67, 0, 0, 208,
     XmlElement* path = svg.createNewChildElement ("path");
     path->setAttribute ("d", pathString);
 
-    ScopedPointer<Drawable> d (Drawable::createFromSVG (svg));
+    std::unique_ptr<Drawable> d (Drawable::createFromSVG (svg));
     DrawablePath* dp = dynamic_cast <DrawablePath*> (d->getChildComponent(0));
     jassert (dp != nullptr);
     Path p (dp->getPath());

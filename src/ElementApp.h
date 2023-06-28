@@ -29,51 +29,14 @@
 namespace element {
 using namespace juce;
 
-inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
-{
-    if (msg.isMidiClock())
-    {
-        DBG ("clock:");
-    }
-    if (msg.isNoteOn())
-    {
-        DBG ("NOTE ON: " << msg.getMidiNoteName (msg.getNoteNumber(), true, false, 4));
-    }
-    if (msg.isNoteOff())
-    {
-        DBG ("NOTE OFF: " << msg.getMidiNoteName (msg.getNoteNumber(), true, false, 4));
-    }
-
-    if (msg.isController())
-    {
-        msg.isControllerOfType (0);
-        DBG ("MIDI CC: " << msg.getControllerNumber() << ":" << msg.getControllerValue());
-    }
-
-    if (msg.isProgramChange())
-    {
-        DBG ("program change: " << msg.getProgramChangeNumber() << " ch: " << msg.getChannel());
-    }
-
-    if (frame >= 0 && (msg.isAllNotesOff() || msg.isAllSoundOff()))
-    {
-        DBG ("got it: " << frame);
-    }
-}
-
-inline static void traceMidi (MidiBuffer& buf)
-{
-    MidiBuffer::Iterator iter (buf);
-    MidiMessage msg;
-    int frame = 0;
-    while (iter.getNextEvent (msg, frame))
-        traceMidi (msg, frame);
-}
-
 inline static bool canConnectToWebsite (const juce::URL& url, const int timeout = 2000)
 {
-    std::unique_ptr<juce::InputStream> in (
-        url.createInputStream (false, nullptr, nullptr, String(), timeout, nullptr));
+    int status = -1;
+    auto options = juce::URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                       .withHttpRequestCmd ("GET")
+                       .withStatusCode (&status)
+                       .withConnectionTimeoutMs (timeout);
+    std::unique_ptr<juce::InputStream> in (url.createInputStream (options));
     return in != nullptr;
 }
 

@@ -48,12 +48,12 @@ private:
     AudioEnginePtr engine;
     Transport::MonitorPtr monitor;
 
-    ScopedPointer<SettingButton> play;
-    ScopedPointer<SettingButton> stop;
-    ScopedPointer<SettingButton> record;
-    ScopedPointer<DragableIntLabel> barLabel;
-    ScopedPointer<DragableIntLabel> beatLabel;
-    ScopedPointer<DragableIntLabel> subLabel;
+    std::unique_ptr<SettingButton> play;
+    std::unique_ptr<SettingButton> stop;
+    std::unique_ptr<SettingButton> record;
+    std::unique_ptr<DragableIntLabel> barLabel;
+    std::unique_ptr<DragableIntLabel> beatLabel;
+    std::unique_ptr<DragableIntLabel> subLabel;
 
     friend class BarLabel;
     friend class Timer;

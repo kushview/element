@@ -11,6 +11,8 @@ Element_bundle = custom_target (
     install_dir: packagedir_element / 'data'
 )
 
+if get_option ('deploy')
+
 macdeployqt = find_program ('macdeployqt', required : true)
 command = [ macdeployqt, '@INPUT0@', '-no-plugins', '-dmg',
     '-executable=@INPUT1@', '-always-overwrite', '-verbose=3' ]
@@ -43,4 +45,5 @@ if get_option ('notarize') and get_option ('sign')
                         '--file', '@INPUT@'
                 ]
     )
+endif
 endif

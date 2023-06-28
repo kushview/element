@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE (PathsMatch)
     auto params = s.getStorageParameters();
     params.folderName = params.folderName.replace ("\\", "/");
     const auto fullPath = DataPath::applicationDataDir().getFullPathName().replace ("\\", "/");
-    
+
     BOOST_REQUIRE_MESSAGE (params.folderName.endsWith (EL_APP_DATA_SUBDIR),
                            params.folderName.toStdString());
     BOOST_REQUIRE_MESSAGE (fullPath.endsWith (EL_APP_DATA_SUBDIR), fullPath.toStdString());

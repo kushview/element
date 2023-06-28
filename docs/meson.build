@@ -1,0 +1,28 @@
+ldoc = find_program ('ldoc', version : '>= 1.5.0')
+ldoc_install_dir = get_option ('datadir') / 'doc' / 'element-0' / 'lua'
+
+if get_option ('deploy')
+    packagedir_element_doc = packagedir_element + '.doc'
+    ldoc_install_dir = packagedir_element_doc / 'data' / 'doc'
+    configure_file (input : 'package.xml',
+        install: true, install_dir: packagedir_element_doc / 'meta',
+        output: 'package.xml', configuration: {
+            'VERSION': version_with_build,
+            'RELEASEDATE': element_release_date
+        })
+endif
+
+if ldoc.found()
+    custom_target (
+        'Lua API Docs',
+        build_by_default: true,
+        command: [ ldoc, '-f', 'markdown', '-q',
+            '-c', '@INPUT@', 
+            '-d', meson.current_build_dir() / '..' / '@OUTPUT@',
+            meson.project_source_root()],
+        input: files('config.ld'),
+        output: 'lua',
+        install: true,
+        install_dir: ldoc_install_dir
+    )
+endif

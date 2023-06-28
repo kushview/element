@@ -249,10 +249,10 @@ private:
     PowerButton powerButton;
     SettingButton muteButton;
 
-    OptionalScopedPointer<CallOutBox> ioBox;
+    juce::OptionalScopedPointer<CallOutBox> ioBox;
 
     DropShadowEffect shadow;
-    ScopedPointer<Component> embedded;
+    std::unique_ptr<Component> embedded;
 
     Colour color { 0x00000000 };
     class BlockColorSelector : public juce::ColourSelector

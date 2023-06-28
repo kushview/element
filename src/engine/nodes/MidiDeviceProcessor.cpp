@@ -213,7 +213,7 @@ void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
         midi.removeMidiInputCallback (this);
         if (deviceWanted.identifier.isNotEmpty())
         {
-            midi.addMidiInputCallback (deviceWanted.identifier, this, true);
+            midi.addMidiInputCallback (deviceWanted, this, true);
             device = deviceWanted;
         }
     }

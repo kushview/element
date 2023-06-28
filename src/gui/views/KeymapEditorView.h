@@ -22,6 +22,8 @@
 #include "ElementApp.h"
 #include <element/ui/content.hpp>
 
+#define EL_VIEW_KEYMAP_EDITOR "KeymapEditorView"
+
 namespace element {
 class KeymapEditorView : public ContentView, public Button::Listener
 {
@@ -38,7 +40,7 @@ public:
     void buttonClicked (Button*) override;
 
 private:
-    ScopedPointer<KeyMappingEditorComponent> editor;
+    std::unique_ptr<KeyMappingEditorComponent> editor;
     TextButton closeButton;
 
     void saveMappings();

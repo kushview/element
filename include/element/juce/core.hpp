@@ -6,7 +6,7 @@
 #include <juce_core/juce_core.h>
 
 namespace element {
-// FIXME:
+// FIXME: juce aliases
 using int32 = juce::int32;
 using uint8 = juce::uint8;
 using uint16 = juce::uint16;

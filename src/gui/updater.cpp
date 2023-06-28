@@ -38,7 +38,7 @@ public:
     std::vector<UpdatePackage> toPackages (const juce::XmlElement& xml)
     {
         std::vector<UpdatePackage> packages;
-        forEachXmlChildElementWithTagName (xml, e, "PackageUpdate")
+        for (auto e : xml.getChildWithTagNameIterator ("PackageUpdate"))
         {
             auto eID = e->getChildByName ("Name");
             auto eVersion = e->getChildByName ("Version");
@@ -214,16 +214,17 @@ void Updater::clear()
 
 void Updater::check (bool async)
 {
+    if (async)
+    {
+        updates->clearCached();
+        updates->checkAsync();
+        return;
+    }
+
     const bool haveXml = ! updates->safeXml().empty();
     if (haveXml)
     {
         updates->updateCached();
-        return;
-    }
-
-    if (async)
-    {
-        updates->checkAsync();
         return;
     }
 
@@ -258,6 +259,8 @@ std::string Updater::findExe (const std::string& basename)
     fileName << "/Contents/MacOS/" << basename;
     juce::File updaterExe = File::getSpecialLocation (File::userHomeDirectory)
                                 .getChildFile (fileName);
+#else
+    juce::File updaterExe;
 #endif
 
     return updaterExe.getFullPathName().toStdString();

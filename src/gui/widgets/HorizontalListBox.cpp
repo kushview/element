@@ -49,11 +49,11 @@ public:
         {
             setMouseCursor (m->getMouseCursorForRow (row));
 
-            customComponent = m->refreshComponentForRow (newRow, nowSelected, customComponent.release());
+            customComponent.reset (m->refreshComponentForRow (newRow, nowSelected, customComponent.release()));
 
             if (customComponent != nullptr)
             {
-                addAndMakeVisible (customComponent);
+                addAndMakeVisible (customComponent.get());
                 customComponent->setBounds (getLocalBounds());
             }
         }
@@ -134,7 +134,7 @@ public:
         return String();
     }
 
-    ScopedPointer<Component> customComponent;
+    std::unique_ptr<Component> customComponent;
 
 private:
     HorizontalListBox& owner;
@@ -367,7 +367,8 @@ HorizontalListBox::HorizontalListBox (const String& name, ListBoxModel* const m)
       alwaysFlipSelection (false),
       hasDoneInitialUpdate (false)
 {
-    addAndMakeVisible (viewport = new ListViewport (*this));
+    viewport = std::make_unique<ListViewport> (*this);
+    addAndMakeVisible (viewport.get());
 
     HorizontalListBox::setWantsKeyboardFocus (true);
     HorizontalListBox::colourChanged();
@@ -404,7 +405,7 @@ void HorizontalListBox::setMouseMoveSelectsRows (bool b)
     if (b)
     {
         if (mouseMoveSelector == nullptr)
-            mouseMoveSelector = new ListBoxMouseMoveSelector (*this);
+            mouseMoveSelector = std::make_unique<ListBoxMouseMoveSelector> (*this);
     }
     else
     {
@@ -449,7 +450,7 @@ void HorizontalListBox::visibilityChanged()
 
 Viewport* HorizontalListBox::getViewport() const noexcept
 {
-    return viewport;
+    return viewport.get();
 }
 
 //==============================================================================
@@ -655,7 +656,7 @@ int HorizontalListBox::getInsertionIndexForPosition (const int x, const int y) c
 Component* HorizontalListBox::getComponentForRowNumber (const int row) const noexcept
 {
     if (RowComponent* const listRowComp = viewport->getComponentForRowIfOnscreen (row))
-        return static_cast<Component*> (listRowComp->customComponent);
+        return static_cast<Component*> (listRowComp->customComponent.get());
 
     return nullptr;
 }
@@ -879,9 +880,9 @@ void HorizontalListBox::setOutlineThickness (const int newThickness)
 
 void HorizontalListBox::setHeaderComponent (Component* const newHeaderComponent)
 {
-    if (headerComponent != newHeaderComponent)
+    if (headerComponent.get() != newHeaderComponent)
     {
-        headerComponent = newHeaderComponent;
+        headerComponent.reset (newHeaderComponent);
 
         addAndMakeVisible (newHeaderComponent);
         HorizontalListBox::resized();
@@ -945,7 +946,11 @@ void HorizontalListBox::startDragAndDrop (const MouseEvent& e, const var& dragDe
 
         MouseEvent e2 (e.getEventRelativeTo (this));
         const Point<int> p (x - e2.x, y - e2.y);
-        dragContainer->startDragging (dragDescription, this, dragImage, allowDraggingToOtherWindows, &p);
+        dragContainer->startDragging (dragDescription,
+                                      this,
+                                      ScaledImage (dragImage),
+                                      allowDraggingToOtherWindows,
+                                      &p);
     }
     else
     {

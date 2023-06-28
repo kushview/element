@@ -57,13 +57,13 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<Slider> inputGainDial;
-    ScopedPointer<Slider> outputGainDial;
-    ScopedPointer<Label> inputGainLabel;
-    ScopedPointer<Label> outputGainLabel;
-    ScopedPointer<Label> inputGainDbLabel;
-    ScopedPointer<Label> outputGainDbLabel;
-    ScopedPointer<Label> nodeNameLabel;
+    std::unique_ptr<Slider> inputGainDial;
+    std::unique_ptr<Slider> outputGainDial;
+    std::unique_ptr<Label> inputGainLabel;
+    std::unique_ptr<Label> outputGainLabel;
+    std::unique_ptr<Label> inputGainDbLabel;
+    std::unique_ptr<Label> outputGainDbLabel;
+    std::unique_ptr<Label> nodeNameLabel;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioIOPanelView)

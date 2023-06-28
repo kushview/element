@@ -138,7 +138,7 @@ public:
                 output[c][i] = allPass[c].process (input[c][i]);
     }
 
-    AudioProcessorEditor* createEditor() override { return new GenericAudioProcessorEditor (this); }
+    AudioProcessorEditor* createEditor() override { return new GenericAudioProcessorEditor (*this); }
     bool hasEditor() const override { return true; }
 
     double getTailLengthSeconds() const override { return 0.0; };

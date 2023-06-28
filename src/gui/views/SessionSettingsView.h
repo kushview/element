@@ -22,6 +22,8 @@
 #include "gui/Buttons.h"
 #include <element/ui/content.hpp>
 
+#define EL_VIEW_SESSION_SETTINGS "SessionSettingsView"
+
 namespace element {
 class SessionPropertyPanel;
 class SessionContentView : public ContentView
@@ -35,7 +37,7 @@ public:
     void paint (Graphics& g) override;
 
 private:
-    ScopedPointer<SessionPropertyPanel> props;
+    std::unique_ptr<SessionPropertyPanel> props;
     GraphButton graphButton;
 };
 

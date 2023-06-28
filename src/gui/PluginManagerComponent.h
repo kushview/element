@@ -22,6 +22,8 @@
 #include <element/juce.hpp>
 #include <element/ui/content.hpp>
 
+#define EL_VIEW_PLUGIN_MANAGER "PluginManagerView"
+
 namespace element {
 
 class PluginManager;
@@ -103,12 +105,12 @@ private:
     int numThreads;
 
     class TableModel;
-    ScopedPointer<TableListBoxModel> tableModel;
+    std::unique_ptr<TableListBoxModel> tableModel;
 
     class Scanner;
     friend class Scanner;
     friend struct ContainerDeletePolicy<Scanner>;
-    ScopedPointer<Scanner> currentScanner;
+    std::unique_ptr<Scanner> currentScanner;
 
     OwnedArray<TextButton> formatButtons;
 

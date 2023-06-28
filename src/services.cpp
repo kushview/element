@@ -34,7 +34,6 @@
 #include "services/sessionservice.hpp"
 #include "services/presetservice.hpp"
 #include "messages.hpp"
-#include "version.hpp"
 
 namespace element {
 using namespace juce;
@@ -252,6 +251,13 @@ void Services::handleMessage (const Message& msg)
         const Node graph (parent, false);
         node.savePluginState();
         Node newNode (node.data().createCopy(), false);
+        Node::sanitizeProperties (newNode.data(), true);
+        if (newNode.version() < EL_NODE_VERSION)
+        {
+            std::clog << "[element] Dupliate node out of date?" << std::endl;
+            // TODO: migrate
+            newNode.setProperty (tags::version, (int) EL_NODE_VERSION);
+        }
 
         if (newNode.isValid() && graph.isValid())
         {

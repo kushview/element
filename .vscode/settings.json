@@ -123,7 +123,8 @@
         "format": "cpp",
         "numbers": "cpp",
         "semaphore": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "__memory": "cpp"
     },
     "C_Cpp.intelliSenseMemoryLimit": 1024,
     "mesonbuild.buildFolder": "build",

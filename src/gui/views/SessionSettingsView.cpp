@@ -67,15 +67,15 @@ private:
 
 SessionContentView::SessionContentView()
 {
-    setName ("SessionSettings");
-    addAndMakeVisible (props = new SessionPropertyPanel());
+    setName (EL_VIEW_SESSION_SETTINGS);
+    props = std::make_unique<SessionPropertyPanel>();
+    addAndMakeVisible (props.get());
     setEscapeTriggersClose (true);
     addAndMakeVisible (graphButton);
     graphButton.setTooltip ("Show graph editor");
-    graphButton.onClick = []() {
-        // FIXME: Commands
-        // if (auto* g = ViewHelpers::getGlobals (this))
-        //     g->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
+    graphButton.onClick = [this]() {
+        if (auto* g = ViewHelpers::getGlobals (this))
+            g->services().find<UI>()->commands().invokeDirectly (Commands::showGraphEditor, true);
     };
 }
 

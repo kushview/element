@@ -90,8 +90,8 @@ void DeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list)
 #endif
 
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (true));
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (false));
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::exclusive));
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::sharedLowLatency));
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
 
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());

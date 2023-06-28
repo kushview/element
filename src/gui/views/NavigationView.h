@@ -38,9 +38,9 @@ public:
     void resized();
 
 private:
-    ScopedPointer<NavigationList> navList;
-    ScopedPointer<NavigationTree> navTree;
-    ScopedPointer<StretchableLayoutResizerBar> navBar;
+    std::unique_ptr<NavigationList> navList;
+    std::unique_ptr<NavigationTree> navTree;
+    std::unique_ptr<StretchableLayoutResizerBar> navBar;
     StretchableLayoutManager layout;
 
     friend class NavigationList;

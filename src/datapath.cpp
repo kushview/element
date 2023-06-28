@@ -111,10 +111,9 @@ void DataPath::findPresetsFor (const String& format, const String& identifier, N
     if (! presetsDir.exists() || ! presetsDir.isDirectory())
         return;
 
-    DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
-    while (iter.next())
+    for (DirectoryEntry entry : RangedDirectoryIterator (presetsDir, true, EL_PRESET_FILE_EXTENSIONS))
     {
-        Node node (Node::parse (iter.getFile()));
+        Node node (Node::parse (entry.getFile()));
         if (node.isValid() && node.getFileOrIdentifier() == identifier && node.getFormat() == format)
         {
             nodes.add (node);
@@ -127,9 +126,8 @@ void DataPath::findPresetFiles (StringArray& results) const
     const auto presetsDir = getRootDir().getChildFile ("Presets");
     if (! presetsDir.exists() || ! presetsDir.isDirectory())
         return;
-    DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
-    while (iter.next())
-        results.add (iter.getFile().getFullPathName());
+    for (DirectoryEntry entry : RangedDirectoryIterator (presetsDir, true, EL_PRESET_FILE_EXTENSIONS))
+        results.add (entry.getFile().getFullPathName());
 }
 
 const File DataPath::installDir()

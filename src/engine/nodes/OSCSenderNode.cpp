@@ -92,14 +92,12 @@ void OSCSenderNode::run()
         midiMessageQueue.removeNextBlockOfMessages (messages, numSamples.get());
         numSamples = 0;
 
-        MidiBuffer::Iterator iter1 (messages);
         MidiMessage msg;
-        int frame;
-
         ScopedLock sl (lock);
 
-        while (iter1.getNextEvent (msg, frame))
+        for (auto m : messages)
         {
+            msg = m.getMessage();
             OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
             oscSender.send (oscMsg);
 
@@ -158,14 +156,12 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         return;
     }
 
-    MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
-    int frame;
     auto timestamp = Time::getMillisecondCounterHiRes();
-
-    while (iter1.getNextEvent (msg, frame))
+    for (auto m : *midiIn)
     {
-        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)));
+        msg = m.getMessage();
+        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (m.samplePosition) / currentSampleRate)));
         midiMessageQueue.addMessageToQueue (msg);
     }
 

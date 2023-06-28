@@ -312,7 +312,7 @@ private:
             if (flowBox.getNumItems() > 0 && ! isAudioInNode && ! isAudioOutNode)
             {
                 flowBox.setVisible (useFlowBox);
-                flowBox.setSelectedId (flowId, false);
+                flowBox.setSelectedId (flowId, juce::dontSendNotification);
                 if (flowBox.getSelectedId() <= 0)
                     flowBox.setSelectedItemIndex (0);
             }

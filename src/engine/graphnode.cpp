@@ -524,12 +524,11 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
     else
     {
         filteredMidi.clear();
-        MidiBuffer::Iterator iter (midiMessages);
-        MidiMessage msg;
-        int frame = 0, chan = 0;
+        int chan = 0;
 
-        while (iter.getNextEvent (msg, frame))
+        for (auto m : midiMessages)
         {
+            auto msg = m.getMessage();
             chan = msg.getChannel();
             if (chan > 0 && midiChannels.isOff (chan))
                 continue;
@@ -539,7 +538,7 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
                 msg.setVelocity (velocityCurve.process (msg.getFloatVelocity()));
             }
 
-            filteredMidi.addEvent (msg, frame);
+            filteredMidi.addEvent (msg, m.samplePosition);
         }
 
         currentMidiInputBuffer = &filteredMidi;

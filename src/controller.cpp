@@ -20,6 +20,7 @@
 #include <element/controller.hpp>
 
 namespace element {
+using namespace juce;
 
 Controller::Controller (const ValueTree& data)
     : Model (data)

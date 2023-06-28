@@ -285,7 +285,7 @@ public:
         switch (item)
         {
             case NavigationList::pluginsItem:
-                // FIXME: setRoot (new PluginsNavigationItem ());
+                // TODO: setRoot (new PluginsNavigationItem ());
                 break;
             case NavigationList::sessionItem:
                 setRoot (new SessionNavigationItem());
@@ -322,9 +322,12 @@ void PluginTreeView::rootItemChanged (int item)
 
 NavigationView::NavigationView()
 {
-    addAndMakeVisible (navList = new NavigationList (this));
-    addAndMakeVisible (navBar = new StretchableLayoutResizerBar (&layout, 1, true));
-    addAndMakeVisible (navTree = new NavigationTree (this));
+    navList = std::make_unique<NavigationList> (this);
+    addAndMakeVisible (navList.get());
+    navBar = std::make_unique<StretchableLayoutResizerBar> (&layout, 1, true);
+    addAndMakeVisible (navBar.get());
+    navTree = std::make_unique<NavigationTree> (this);
+    addAndMakeVisible (navTree.get());
     updateLayout();
     resized();
 

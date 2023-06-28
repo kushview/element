@@ -88,16 +88,12 @@ public:
         if (outChan <= 0)
             return;
 
-        MidiBuffer::Iterator iter (midiMessages);
-        const uint8* data = nullptr;
-        int bytes = 0, frame = 0;
-        while (iter.getNextEvent (data, bytes, frame))
+        for (auto m : midiMessages)
         {
-            // TODO: optimize
-            MidiMessage msg (data, bytes, frame);
+            auto msg = m.getMessage();
             if (msg.getChannel() > 0)
                 msg.setChannel (outChan);
-            tempMidi.addEvent (msg, frame);
+            tempMidi.addEvent (msg, m.samplePosition);
         }
 
         midiMessages.swapWith (tempMidi);

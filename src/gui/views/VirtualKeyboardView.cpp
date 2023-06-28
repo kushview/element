@@ -97,8 +97,9 @@ bool VirtualKeyboardComponent::keyPressed (const KeyPress& key)
 VirtualKeyboardView::VirtualKeyboardView()
 {
     setOpaque (true);
-    addAndMakeVisible (keyboard = new VirtualKeyboardComponent (
-                           internalState, MidiKeyboardComponent::horizontalKeyboard));
+    keyboard = std::make_unique<VirtualKeyboardComponent> (
+        internalState, MidiKeyboardComponent::horizontalKeyboard);
+    addAndMakeVisible (keyboard.get());
     setupKeyboard (*keyboard);
 #if 1
 
@@ -268,12 +269,17 @@ void VirtualKeyboardView::resized()
 
 void VirtualKeyboardView::didBecomeActive()
 {
+    if (keyboardInitialized)
+        return;
+
     if (auto engine = ViewHelpers::getAudioEngine (this))
     {
-        keyboard = new VirtualKeyboardComponent (engine->getKeyboardState(),
-                                                 MidiKeyboardComponent::horizontalKeyboard);
+        keyboard = std::make_unique<VirtualKeyboardComponent> (engine->getKeyboardState(),
+                                                               MidiKeyboardComponent::horizontalKeyboard);
         setupKeyboard (*keyboard);
-        addAndMakeVisible (keyboard);
+        addAndMakeVisible (keyboard.get());
+        resized();
+        keyboardInitialized = true;
     }
 }
 
@@ -346,5 +352,8 @@ bool VirtualKeyboardView::keyStateChanged (bool isDown)
 {
     return keyboard != nullptr ? keyboard->keyStateChanged (isDown) : false;
 }
+
+void VirtualKeyboardView::visibilityChanged() { didBecomeActive(); }
+void VirtualKeyboardView::parentHierarchyChanged() { didBecomeActive(); }
 
 } // namespace element

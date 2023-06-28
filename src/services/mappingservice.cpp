@@ -336,9 +336,10 @@ void MappingService::onControlCaptured()
         {
             if (mapping.addHandler (impl->control, impl->node, impl->parameter))
             {
-                ValueTree newMap (tags::map);
-                newMap.setProperty (types::Controller, impl->control.controller().getUuidString(), nullptr)
-                    .setProperty (types::Control, impl->control.getUuidString(), nullptr)
+                ValueTree newMap (types::ControllerMap);
+                newMap.setProperty (tags::version, EL_CONTROLLER_MAP_VERSION, nullptr)
+                    .setProperty (tags::controller, impl->control.controller().getUuidString(), nullptr)
+                    .setProperty (tags::control, impl->control.getUuidString(), nullptr)
                     .setProperty (tags::node, impl->node.getUuidString(), nullptr)
                     .setProperty (tags::parameter, impl->parameter, nullptr);
                 auto maps = session->data().getChildWithName (tags::maps);

@@ -31,7 +31,7 @@ public:
 
 RackView::RackView()
 {
-    impl = new Impl();
+    impl = std::make_unique<Impl>();
 }
 
 RackView::~RackView()
@@ -60,13 +60,11 @@ void RackView::setMainComponent (Component* comp)
 {
     if (comp != nullptr && comp == main.get())
     {
-        // this clears the component if it equals main
-        // FIXME: hack EL-54, better GUI management
         main = nullptr;
     }
     else
     {
-        main = comp;
+        main.reset (comp);
         if (main)
             addAndMakeVisible (comp);
     }

@@ -21,6 +21,8 @@
 
 #include <element/ui/content.hpp>
 
+#define EL_VIEW_CONTROLLERS "ControllersView"
+
 namespace element {
 
 class ControllersView : public ContentView

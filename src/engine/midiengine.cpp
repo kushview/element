@@ -44,21 +44,24 @@ void MidiEngine::applySettings (Settings& settings)
         for (int i = 0; i < data.getNumChildren(); ++i)
         {
             const auto child (data.getChild (i));
-            if (child.hasType ("input"))
+            if (child.hasType (tags::input))
             {
-                if (auto* const holder = getMidiInput (child[tags::name], true))
+                if (auto* const holder = getMidiInput (child[tags::identifier], true))
                 {
                     holder->active = false; // open but not active initially
                     if ((bool) child[tags::active])
-                        midiInsFromXml.add (child[tags::name]);
+                        midiInsFromXml.add (child[tags::identifier]);
                 }
             }
         }
 
-        for (auto& m : MidiInput::getDevices())
-            setMidiInputEnabled (m, midiInsFromXml.contains (m));
+        for (auto& m : MidiInput::getAvailableDevices())
+            setMidiInputEnabled (m, midiInsFromXml.contains (m.identifier));
 
-        setDefaultMidiOutput (data["defaultMidiOutput"].toString());
+        MidiDeviceInfo info;
+        info.name = data["defaultMidiOutput"].toString();
+        info.identifier = data["defaultMidiOutputID"].toString();
+        setDefaultMidiOutput (info);
     }
 }
 
@@ -67,8 +70,9 @@ void MidiEngine::writeSettings (Settings& settings)
     ValueTree data ("MidiSettings");
     for (auto* const holder : openMidiInputs)
     {
-        ValueTree input ("input");
+        ValueTree input (tags::input);
         input.setProperty (tags::name, holder->input->getName(), nullptr)
+            .setProperty (tags::identifier, holder->input->getIdentifier(), nullptr)
             .setProperty (tags::active, holder->active, nullptr);
         data.appendChild (input, nullptr);
     }
@@ -77,20 +81,36 @@ void MidiEngine::writeSettings (Settings& settings)
     {
         // Add any midi devices that have been enabled before, but which aren't currently
         // open because the device has been disconnected.
-        const StringArray availableMidiDevices (MidiInput::getDevices());
+        const auto avail = MidiInput::getAvailableDevices();
 
+        StringArray availableIDs;
+        for (const auto& amd : avail)
+            availableIDs.add (amd.identifier);
         for (int i = 0; i < midiInsFromXml.size(); ++i)
         {
-            if (availableMidiDevices.contains (midiInsFromXml[i], true))
+            if (availableIDs.contains (midiInsFromXml[i], false))
                 continue;
-            ValueTree input ("input");
-            input.setProperty (tags::name, midiInsFromXml[i], nullptr)
+
+            MidiDeviceInfo info;
+            info.identifier = midiInsFromXml[i];
+            for (const auto& amd2 : avail)
+            {
+                if (amd2.identifier == info.identifier)
+                {
+                    info.name = amd2.name;
+                    break;
+                }
+            }
+            ValueTree input (tags::input);
+            input.setProperty (tags::name, info.name, nullptr)
+                .setProperty (tags::identifier, info.identifier, nullptr)
                 .setProperty (tags::active, true, nullptr);
             data.appendChild (input, nullptr);
         }
     }
 
     data.setProperty ("defaultMidiOutput", defaultMidiOutputName, nullptr);
+    data.setProperty ("defaultMidiOutputID", defaultMidiOutputID, nullptr);
 
     if (auto xml = std::unique_ptr<XmlElement> (data.createXml()))
         settings.getUserSettings()->setValue (Settings::midiEngineKey, xml.get());
@@ -208,18 +228,18 @@ MidiEngine::MidiInputHolder* MidiEngine::getMidiInput (const String& identifier,
 }
 
 //==============================================================================
-void MidiEngine::setMidiInputEnabled (const String& identifier, const bool enabled)
+void MidiEngine::setMidiInputEnabled (const MidiDeviceInfo& device, const bool enabled)
 {
-    if (enabled != isMidiInputEnabled (identifier))
+    if (enabled != isMidiInputEnabled (device))
     {
         if (enabled)
         {
-            if (auto* holder = getMidiInput (identifier, true))
+            if (auto* holder = getMidiInput (device.identifier, true))
                 holder->active = true;
         }
         else
         {
-            if (auto* holder = getMidiInput (identifier, false))
+            if (auto* holder = getMidiInput (device.identifier, false))
                 holder->active = false;
         }
 
@@ -227,29 +247,41 @@ void MidiEngine::setMidiInputEnabled (const String& identifier, const bool enabl
     }
 }
 
-bool MidiEngine::isMidiInputEnabled (const String& identifier) const
+bool MidiEngine::isMidiInputEnabled (const MidiDeviceInfo& device) const
 {
     for (auto* mi : openMidiInputs)
-        if (mi->input != nullptr && mi->input->getIdentifier() == identifier && mi->active)
+        if (mi->input != nullptr && mi->input->getIdentifier() == device.identifier && mi->active)
             return true;
 
     return false;
 }
 
-void MidiEngine::addMidiInputCallback (const String& identifier, MidiInputCallback* callbackToAdd, bool consumer)
+void MidiEngine::addMidiInputCallback (MidiInputCallback* callbackToAdd, bool consumer)
 {
-    removeMidiInputCallback (identifier, callbackToAdd);
+    addMidiInputCallback (MidiDeviceInfo(), callbackToAdd, consumer);
+}
 
-    if (identifier.isEmpty() || isMidiInputEnabled (identifier) || consumer)
+void MidiEngine::addMidiInputCallback (const String& identifier, MidiInputCallback* callback, bool consumer)
+{
+    MidiDeviceInfo info;
+    info.identifier = identifier;
+    addMidiInputCallback (info, callback, consumer);
+}
+
+void MidiEngine::addMidiInputCallback (const MidiDeviceInfo& device, MidiInputCallback* callbackToAdd, bool consumer)
+{
+    removeMidiInputCallback (device, callbackToAdd);
+
+    if (device.identifier.isEmpty() || isMidiInputEnabled (device) || consumer)
     {
         if (consumer)
         {
-            if (auto* holder = getMidiInput (identifier, true))
+            if (auto* holder = getMidiInput (device.identifier, true))
                 ignoreUnused (holder);
         }
 
         MidiCallbackInfo mc;
-        mc.device = identifier;
+        mc.device = device.identifier;
         mc.callback = callbackToAdd;
         mc.consumer = consumer;
 
@@ -258,13 +290,13 @@ void MidiEngine::addMidiInputCallback (const String& identifier, MidiInputCallba
     }
 }
 
-void MidiEngine::removeMidiInputCallback (const String& identifier, MidiInputCallback* callbackToRemove)
+void MidiEngine::removeMidiInputCallback (const MidiDeviceInfo& device, MidiInputCallback* callbackToRemove)
 {
     for (int i = midiCallbacks.size(); --i >= 0;)
     {
         auto& mc = midiCallbacks.getReference (i);
 
-        if (mc.callback == callbackToRemove && mc.device == identifier)
+        if (mc.callback == callbackToRemove && mc.device == device.identifier)
         {
             const ScopedLock sl (midiCallbackLock);
             midiCallbacks.remove (i);
@@ -299,19 +331,16 @@ void MidiEngine::handleIncomingMidiMessageInt (MidiInput* source, const MidiMess
 
 void MidiEngine::processMidiBuffer (const MidiBuffer& buffer, int nframes, double sampleRate)
 {
-    MidiBuffer::Iterator iter (buffer);
     MidiMessage message;
-    int frame = 0;
     const double timeNow = 1.5 + Time::getMillisecondCounterHiRes();
 
     const ScopedLock sl (midiCallbackLock);
-
-    while (iter.getNextEvent (message, frame))
+    for (auto m : buffer)
     {
-        if (frame >= nframes)
+        if (m.samplePosition >= nframes)
             break;
-
-        message.setTimeStamp (timeNow + (1000.0 * (static_cast<double> (frame) / sampleRate)));
+        message = m.getMessage();
+        message.setTimeStamp (timeNow + (1000.0 * (static_cast<double> (m.samplePosition) / sampleRate)));
         for (auto& mc : midiCallbacks)
             mc.callback->handleIncomingMidiMessage (nullptr, message);
     }
@@ -321,20 +350,20 @@ int MidiEngine::getNumActiveMidiInputs() const
 {
     int total = 0;
     for (const auto& dev : MidiInput::getAvailableDevices())
-        if (isMidiInputEnabled (dev.identifier))
+        if (isMidiInputEnabled (dev))
             ++total;
     return total;
 }
 
 //==============================================================================
-void MidiEngine::setDefaultMidiOutput (const String& deviceName)
+void MidiEngine::setDefaultMidiOutput (const MidiDeviceInfo& device)
 {
-    if (defaultMidiOutputName != deviceName)
+    if (defaultMidiOutputID != device.identifier)
     {
         std::unique_ptr<MidiOutput> newMidiOut;
 
-        if (deviceName.isNotEmpty())
-            newMidiOut = MidiOutput::openDevice (MidiOutput::getDevices().indexOf (deviceName));
+        if (device.identifier.isNotEmpty())
+            newMidiOut = MidiOutput::openDevice (device.identifier);
 
         if (newMidiOut)
         {
@@ -351,7 +380,8 @@ void MidiEngine::setDefaultMidiOutput (const String& deviceName)
             }
         }
 
-        defaultMidiOutputName = deviceName;
+        defaultMidiOutputName = device.name;
+        defaultMidiOutputID = device.identifier;
 
         sendChangeMessage();
     }

@@ -61,15 +61,12 @@ public:
         }
 
         MidiBuffer& input (*midi.getWriteBuffer (0));
-        MidiBuffer::Iterator iter (input);
-        MidiMessage msg;
-        int frame = 0;
-
-        while (iter.getNextEvent (msg, frame))
+        for (auto m : input)
         {
+            auto msg = m.getMessage();
             if (msg.getChannel() <= 0)
                 continue;
-            buffers[msg.getChannel() - 1]->addEvent (msg, frame);
+            buffers[msg.getChannel() - 1]->addEvent (msg, m.samplePosition);
         }
 
         input.swapWith (tempMidi);

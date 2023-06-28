@@ -40,6 +40,7 @@
 #define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT 20000 // 20 Seconds
 
 namespace element {
+using namespace juce;
 
 static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
@@ -307,8 +308,8 @@ public:
 
     void handleConnectionMade() override
     {
-        settings = new Settings();
-        plugins = new PluginManager();
+        settings = std::make_unique<Settings>();
+        plugins = std::make_unique<PluginManager>();
 
         if (! scanFile.existsAsFile())
             scanFile.create();
@@ -336,9 +337,9 @@ public:
     }
 
 private:
-    ScopedPointer<Settings> settings;
-    ScopedPointer<PluginManager> plugins;
-    ScopedPointer<PluginDirectoryScanner> scanner;
+    std::unique_ptr<Settings> settings;
+    std::unique_ptr<PluginManager> plugins;
+    std::unique_ptr<PluginDirectoryScanner> scanner;
     String fileOrIdentifier;
     KnownPluginList pluginList;
     StringArray filesToSkip;
@@ -355,7 +356,9 @@ private:
     {
         applyDeadPlugins();
         if (auto xml = pluginList.createXml())
-            return xml->writeToFile (scanFile, String());
+        {
+            return xml->writeTo (scanFile);
+        }
         return false;
     }
 
@@ -403,7 +406,7 @@ private:
 
         const auto key = String (settings->lastPluginScanPathPrefix) + format.getName();
         FileSearchPath path (settings->getUserSettings()->getValue (key));
-        scanner = new PluginDirectoryScanner (pluginList, format, path, true, plugins->getDeadAudioPluginsFile(), false);
+        scanner = std::make_unique<PluginDirectoryScanner> (pluginList, format, path, true, plugins->getDeadAudioPluginsFile(), false);
 
         while (doNextScan())
             sendString ("progress", String (scanner->getProgress()));

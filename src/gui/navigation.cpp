@@ -357,4 +357,10 @@ void NavigationConcertinaPanel::addPanelInternal (const int index,
         header = new Header (*this, *comp);
     setCustomPanelHeader (comp, header, true);
 }
+
+void NavigationConcertinaPanel::paint (juce::Graphics& g)
+{
+    g.fillAll (element::Colors::backgroundColor);
+}
+
 } // namespace element

@@ -70,14 +70,11 @@ public:
 
     inline void render (MidiBuffer& midi)
     {
-        MidiBuffer::Iterator iter (midi);
-        MidiMessage msg;
-        int frame = 0;
-
-        while (iter.getNextEvent (msg, frame))
+        for (auto m : midi)
         {
+            auto msg = m.getMessage();
             process (msg);
-            tempMidi.addEvent (msg, frame);
+            tempMidi.addEvent (msg, m.samplePosition);
         }
 
         midi.swapWith (tempMidi);

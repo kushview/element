@@ -55,7 +55,7 @@ public:
 #endif
 
 private:
-    ScopedPointer<BreadCrumbComponent> breadcrumb;
+    std::unique_ptr<BreadCrumbComponent> breadcrumb;
 
     friend class PatchMatrix;
     class PatchMatrix;
@@ -75,7 +75,7 @@ private:
 
     friend class Quads;
     class Quads;
-    ScopedPointer<QuadrantLayout> quads;
+    std::unique_ptr<QuadrantLayout> quads;
 };
 
 } // namespace element

@@ -292,11 +292,9 @@ public:
                 for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
                 {
                     auto& midi = *midiPipe.getWriteBuffer (i);
-                    MidiBuffer::Iterator iter (midi);
-                    int frame = 0;
-                    MidiMessage msg;
-                    while (iter.getNextEvent (msg, frame))
+                    for (auto m : midi)
                     {
+                        auto msg = m.getMessage();
                         if (msg.isNoteOnOrOff())
                         {
                             // out of range
@@ -315,7 +313,7 @@ public:
                         }
 
                         transpose.process (msg);
-                        tempMidi.addEvent (msg, frame);
+                        tempMidi.addEvent (msg, m.samplePosition);
                     }
 
                     midi.swapWith (tempMidi);
@@ -654,7 +652,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 // can't mess up this channel because it's needed later by another node, so we
                 // need to use a copy of it..
                 const int newFreeBuffer = getFreeBuffer (portType);
-
+                markBufferAsContaining (newFreeBuffer, portType, anonymousNodeID, 0);
                 switch (portType.id())
                 {
                     case PortType::Audio:

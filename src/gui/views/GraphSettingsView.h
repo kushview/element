@@ -43,7 +43,7 @@ public:
     void buttonClicked (Button*) override;
 
 private:
-    ScopedPointer<GraphPropertyPanel> props;
+    std::unique_ptr<GraphPropertyPanel> props;
     GraphButton graphButton;
     Value activeGraphIndex;
     bool updateWhenActiveGraphChanges = false;

@@ -18,7 +18,7 @@
 
 #include "ElementApp.h"
 #include <element/services.hpp>
-
+#include <element/version.hpp>
 #include "engine/internalformat.hpp"
 
 #include <element/context.hpp>
@@ -35,7 +35,6 @@
 #include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"
-#include "version.hpp"
 #include "utils.hpp"
 #include "slaveprocess.hpp"
 
@@ -198,9 +197,9 @@ public:
 
         if (auto el = world->devices().createStateXml())
             props->setValue (Settings::devicesKey, el.get());
-        // FIXME: KeyMappings
-        // if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
-        //     props->setValue (Settings::keymappingsKey, keymappings.get());
+        auto& ui = *world->services().find<UI>();
+        if (auto keymappings = ui.commands().getKeyMappings()->createXml (true))
+            props->setValue (Settings::keymappingsKey, keymappings.get());
 
         engine = nullptr;
         Logger::setCurrentLogger (nullptr);
@@ -289,7 +288,7 @@ public:
         world->services().run();
 
         if (world->settings().checkForUpdates())
-            CurrentVersion::checkAfterDelay (12 * 1000, false);
+            world->services().find<UI>()->checkUpdates();
 
         const auto path = getCommandLineParameters();
         const File sessionFile = File::isAbsolutePath (path) ? File (path)

@@ -251,7 +251,8 @@ class MidiLearnButton : public SettingButton,
 public:
     Signal<void()> messageReceived;
 
-    explicit MidiLearnButton (const String& deviceName = String())
+    explicit MidiLearnButton (const String& deviceId = String())
+        : inputDevice (deviceId)
     {
         addListener (this);
     }
@@ -270,13 +271,13 @@ public:
         setToggleState (isListening(), dontSendNotification);
     }
 
-    void setInputDevice (const String& deviceName)
+    void setInputDevice (const String& deviceId)
     {
-        if (inputName == deviceName)
+        if (inputDevice == deviceId)
             return;
         const bool wasListening = isListening();
         stopListening();
-        inputName = deviceName;
+        inputDevice = deviceId;
         if (wasListening)
             startListening();
     }
@@ -301,7 +302,7 @@ public:
 
     void startListening()
     {
-        if (inputName.isEmpty())
+        if (inputDevice.isEmpty())
             return;
 
         stopListening();
@@ -309,7 +310,7 @@ public:
 
         jassert (ViewHelpers::getGlobals (this));
         if (auto* world = ViewHelpers::getGlobals (this))
-            world->midi().addMidiInputCallback (inputName, this, true);
+            world->midi().addMidiInputCallback (inputDevice, this, true);
 
         listening = true;
         updateToggleState();
@@ -351,7 +352,7 @@ private:
     Atomic<bool> gotFirstMessage = false;
     Atomic<bool> stopOnFirstMessage = false;
     MidiMessage message;
-    String inputName;
+    String inputDevice;
 };
 
 class ControlListBox : public ListBox,
@@ -705,7 +706,7 @@ public:
             {
                 DBG ("[element] save device");
                 if (auto xml = editedDevice.data().createXml())
-                    xml->writeToFile (chooser.getResult(), String());
+                    xml->writeTo (chooser.getResult());
             }
         }
         else if (button == &openControllerButton)
@@ -826,23 +827,25 @@ public:
         jassert (ViewHelpers::findContentComponent (this) != nullptr);
         auto& app = ViewHelpers::findContentComponent (this)->services();
 
-        StringArray keys;
-        Array<var> values;
+        Array<var> keys, values;
         if (app.getRunMode() == RunMode::Standalone)
         {
-            keys.addArray (MidiInput::getDevices());
-            for (const auto& d : keys)
-                values.add (d);
+            for (const auto& d : MidiInput::getAvailableDevices())
+            {
+                keys.add (d.name);
+                values.add (d.identifier);
+            }
 
             const auto& inputDeviceVar = editedDevice.getInputDevice();
             if (inputDeviceVar.toString().isNotEmpty() && ! keys.contains (inputDeviceVar.toString()))
             {
-                keys.add (String());
+                keys.add ({});
                 values.add (String());
                 keys.add (inputDeviceVar.toString());
                 values.add (inputDeviceVar);
             }
-            inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
+
+            inputDevice = editedDevice.getPropertyAsValue (tags::inputDevice);
             if (inputDevice.toString().trim().isEmpty())
                 inputDevice.setValue (values.getFirst());
         }
@@ -1117,7 +1120,7 @@ private:
 
 ControllersView::ControllersView()
 {
-    setName ("ControllersView");
+    setName (EL_VIEW_CONTROLLERS);
     content.reset (new Content());
     addAndMakeVisible (content.get());
 }

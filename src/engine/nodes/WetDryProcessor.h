@@ -68,9 +68,9 @@ public:
         const float width = 1.f;
         const float wet = newWet * wetScaleFactor;
 
-        dryGain.setValue (newDry * dryScaleFactor);
-        wetGain1.setValue (0.5f * wet * (1.0f + width));
-        wetGain2.setValue (0.5f * wet * (1.0f - width));
+        dryGain.setTargetValue (newDry * dryScaleFactor);
+        wetGain1.setTargetValue (0.5f * wet * (1.0f + width));
+        wetGain2.setTargetValue (0.5f * wet * (1.0f - width));
     }
 
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
@@ -118,7 +118,7 @@ public:
 
     AudioProcessorEditor* createEditor() override
     {
-        auto* ed = new GenericAudioProcessorEditor (this);
+        auto* ed = new GenericAudioProcessorEditor (*this);
         ed->resized();
         return ed;
     }

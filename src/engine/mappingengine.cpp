@@ -437,7 +437,6 @@ public:
 
     bool close()
     {
-        const auto deviceName = controllerDevice.getInputDevice().toString();
         midi.removeMidiInputCallback (this);
         return true;
     }
@@ -462,8 +461,8 @@ public:
             }
         }
 
-        const auto deviceName = controllerDevice.getInputDevice().toString();
-        midi.addMidiInputCallback (deviceName, this, true);
+        const auto deviceId = controllerDevice.getInputDevice().toString();
+        midi.addMidiInputCallback (deviceId, this, true);
 
         return true;
     }

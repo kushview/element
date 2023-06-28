@@ -799,13 +799,15 @@ ConnectionGrid::ConnectionGrid()
 {
     setName ("PatchBay"); // Don't change this
 
-    addAndMakeVisible (quads = new Quads());
+    quads = std::make_unique<Quads>();
+    addAndMakeVisible (quads.get());
     quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix());
     quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
     quads->setQuadrantComponent (Quads::Q3, controls = new Controls (matrix));
     quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
 
-    addAndMakeVisible (breadcrumb = new BreadCrumbComponent());
+    breadcrumb = std::make_unique<BreadCrumbComponent>();
+    addAndMakeVisible (breadcrumb.get());
     breadcrumb->toFront (false);
     resized();
 }

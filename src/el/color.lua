@@ -1,3 +1,5 @@
+--- Color operations and utilities.
+-- @module el.color
 local M = {}
 
 function M.find()

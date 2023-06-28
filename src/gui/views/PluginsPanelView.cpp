@@ -29,7 +29,7 @@ public:
     PluginTreeViewItem (const PluginDescription& d)
         : desc (new PluginDescription (d)) {}
     bool mightContainSubItems() override { return false; }
-    const ScopedPointer<const PluginDescription> desc;
+    const std::unique_ptr<const PluginDescription> desc;
 
     var getDragSourceDescription() override
     {
@@ -109,7 +109,8 @@ public:
         : owner (o),
           plugins (p)
     {
-        data = p.getKnownPlugins().createTree (KnownPluginList::sortByCategory);
+        data = KnownPluginList::createTree (p.getKnownPlugins().getTypes(),
+                                            KnownPluginList::sortByCategory);
     }
 
     bool mightContainSubItems() override { return true; }

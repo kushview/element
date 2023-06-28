@@ -81,8 +81,8 @@ public:
         channels.updateContent();
 
         masterMonitor = owner.getMonitor();
-        masterStrip = new ChannelStrip (*this, masterMonitor);
-        addAndMakeVisible (masterStrip);
+        masterStrip = std::make_unique<ChannelStrip> (*this, masterMonitor);
+        addAndMakeVisible (masterStrip.get());
 
         resized();
     }
@@ -344,7 +344,7 @@ private:
     ChannelList channels;
     Array<ChannelStrip*> strips;
     MonitorList monitors;
-    ScopedPointer<ChannelStrip> masterStrip;
+    std::unique_ptr<ChannelStrip> masterStrip;
     MonitorPtr masterMonitor;
 
     friend class Timer;

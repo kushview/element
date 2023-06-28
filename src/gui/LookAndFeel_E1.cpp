@@ -24,6 +24,8 @@
 #include "gui/widgets/MidiBlinker.h"
 #include "BinaryData.h"
 
+// clang-format off
+
 using namespace juce;
 
 namespace element {
@@ -223,13 +225,23 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (ListBox::textColourId, Colors::textColor);
 
     // // Slider
-    // setColour (Slider::thumbColourId,               Colours::black);
-    // setColour (Slider::textBoxTextColourId,         Colors::textColor);
-    // setColour (Slider::trackColourId,               Colours::black);
-    // setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
-    // setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
-    // setColour (Slider::textBoxOutlineColourId,      findColour (TextEditor::outlineColourId));
-    // setColour (Slider::textBoxTextColourId,         findColour (TextEditor::textColourId));
+    //                                                    and feel class how this is used. */
+    //     trackColourId               = 0x1001310,  /**< The colour to draw the groove that the thumb moves along. */
+    //     rotarySliderFillColourId    = 0x1001311,  /**< For rotary sliders, this colour fills the outer curve. */
+    //     rotarySliderOutlineColourId = 0x1001312,  /**< For rotary sliders, this colour is used to draw the outer curve's outline. */
+
+    //     textBoxOutlineColourId      = 0x1001700   /**< The colour to use for a border around the text-editor box. */
+
+    setColour (Slider::backgroundColourId,          Colours::black.brighter (0.15f));
+    setColour (Slider::thumbColourId,               Colours::black.brighter (0.12f));
+    setColour (Slider::trackColourId,               Colours::black.brighter (0.05f));
+    
+    setColour (Slider::rotarySliderFillColourId,    Colors::toggleBlue.darker (0.3f));
+
+    setColour (Slider::textBoxTextColourId,         Colors::textColor);
+    setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
+    setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
+    setColour (Slider::textBoxOutlineColourId,      findColour (TextEditor::outlineColourId));
 
     // Hyperlink button
     setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
@@ -245,8 +257,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     // ToggleButton
     setColour (ToggleButton::tickColourId, Colors::toggleBlue.darker());
 
-    // rotary
-    setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker (0.3f));
+    
 
     // Scrollbar
     setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.25f));
@@ -257,6 +268,10 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (CodeEditorComponent::defaultTextColourId, Colour (0xffc4c4c4));
     setColour (CodeEditorComponent::lineNumberBackgroundId, findColour (Style::widgetBackgroundColorId).darker (0.55f));
     setColour (CodeEditorComponent::lineNumberTextId, Colour (0xff555555));
+
+
+    setColour (0x1000440 /*lassoFillColourId*/, Colours::transparentWhite.withAlpha (0.24f));
+    setColour (0x1000441 /*lassoOutlineColourId*/, Colours::whitesmoke.withAlpha (0.44f));
 }
 
 LookAndFeel_E1::~LookAndFeel_E1() {}
@@ -298,7 +313,13 @@ int LookAndFeel_E1::getDefaultScrollbarWidth() { return 12; }
 bool LookAndFeel_E1::areScrollbarButtonsVisible() { return false; }
 
 //=============================================================================
-// Sliders
+int LookAndFeel_E1::getSliderThumbRadius (Slider& slider)
+{
+    return jmin (12, slider.isHorizontal() 
+        ? static_cast<int> ((float) slider.getHeight() * 0.77f) 
+        : static_cast<int> ((float) slider.getWidth() * 0.77f));
+}
+
 void LookAndFeel_E1::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
 {
     const float radius = jmin (width / 2, height / 2) - 2.0f;
@@ -363,8 +384,15 @@ void LookAndFeel_E1::drawRotarySlider (Graphics& g, int x, int y, int width, int
     }
 }
 
-void LookAndFeel_E1::drawLinearSliderBackground (Graphics& g, int x, int y, int width, int height, float /*sliderPos*/, float /*minSliderPos*/, float /*maxSliderPos*/, const Slider::SliderStyle /*style*/, Slider& slider)
+void LookAndFeel_E1::drawLinearSlider (Graphics& g, int x, int y, int width, int height, float sliderPos, float minSliderPos, float maxSliderPos, const Slider::SliderStyle st, Slider& sl)
 {
+    juce::LookAndFeel_V4::drawLinearSlider (g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, st, sl);
+}
+
+void LookAndFeel_E1::drawLinearSliderBackground (Graphics& g, int x, int y, int width, int height, float sliderPos, float minSliderPos, float maxSliderPos, const Slider::SliderStyle style, Slider& slider)
+{
+    LookAndFeel_V4::drawLinearSliderBackground (g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
+#if 0
     const float sliderRadius = (float) (getSliderThumbRadius (slider) - 4);
 
     const Colour trackColour (slider.findColour (Slider::trackColourId));
@@ -390,8 +418,10 @@ void LookAndFeel_E1::drawLinearSliderBackground (Graphics& g, int x, int y, int 
 
     g.setColour (trackColour.contrasting (0.5f));
     g.strokePath (indent, PathStrokeType (0.5f));
+#endif
 }
 
+//==============================================================================
 Font LookAndFeel_E1::getComboBoxFont (ComboBox& box)
 {
     return Font (jmin (12.0f, box.getHeight() * 0.85f));
@@ -570,7 +600,7 @@ void LookAndFeel_E1::drawScrollbar (Graphics& g, ScrollBar& scrollbar, int x, in
 
 void LookAndFeel_E1::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area, bool isMouseOver, bool isMouseDown, ConcertinaPanel& concertina, Component& panel)
 {
-    g.setColour (Colour (0xff323232));
+    g.setColour (Colour (0xff292929));
     Rectangle<int> r (area.withSizeKeepingCentre (area.getWidth(), area.getHeight() - 2));
     g.fillRect (r);
 
@@ -864,11 +894,14 @@ void LookAndFeel_E1::drawComboBox (Graphics& g, int width, int height, const boo
                               buttonW - outlineThickness * 2.0f,
                               buttonH - outlineThickness * 2.0f);
 
-    drawButtonShape (g, buttonShape, buttonColour.withMultipliedSaturation (box.hasKeyboardFocus (true) ? 1.3f : 0.9f).withMultipliedAlpha (box.isEnabled() ? 0.9f : 0.5f), (float) height);
+    drawButtonShape (g,
+                     buttonShape,
+                     buttonColour.withMultipliedSaturation (box.hasKeyboardFocus (true) ? 1.3f : 0.9f).withMultipliedAlpha (box.isEnabled() ? 0.9f : 0.5f),
+                     (float) height);
 
     if (box.isEnabled())
     {
-        const float arrowX = 0.3f;
+        const float arrowX = 0.25f;
         const float arrowH = 0.2f;
 
         Path p;
@@ -881,6 +914,14 @@ void LookAndFeel_E1::drawComboBox (Graphics& g, int width, int height, const boo
     }
 }
 
+void LookAndFeel_E1::positionComboBoxText (ComboBox& box, Label& label)
+{
+    label.setBounds (1, 1, box.getWidth() - box.getHeight(), box.getHeight() - 2);
+
+    label.setFont (getComboBoxFont (box));
+}
+
+//==============================================================================
 // MARK: Popup Menu
 
 Font LookAndFeel_E1::getPopupMenuFont() { return LookAndFeel_V2::getPopupMenuFont(); }
@@ -956,3 +997,5 @@ void LookAndFeel_E1::drawKeymapChangeButton (Graphics& g, int width, int height,
 }
 
 } // namespace element
+
+// clang-format on

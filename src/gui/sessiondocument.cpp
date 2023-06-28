@@ -94,7 +94,7 @@ Result SessionDocument::saveDocument (const File& file)
     session->saveGraphState();
     if (auto e = session->createXml())
     {
-        Result res (e->writeToFile (file, String())
+        Result res (e->writeTo (file)
                         ? Result::ok()
                         : Result::fail ("Error writing session file"));
         return res;

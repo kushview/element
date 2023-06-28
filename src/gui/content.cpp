@@ -348,8 +348,8 @@ private:
 
 struct Content::Tooltips
 {
-    Tooltips() { tooltipWindow = new TooltipWindow(); }
-    ScopedPointer<TooltipWindow> tooltipWindow;
+    Tooltips() { tooltipWindow.reset (new TooltipWindow()); }
+    std::unique_ptr<TooltipWindow> tooltipWindow;
 };
 
 Content::Content (Context& ctl_)
@@ -358,11 +358,13 @@ Content::Content (Context& ctl_)
 {
     setOpaque (true);
 
-    addAndMakeVisible (statusBar = new StatusBar (context()));
+    statusBar = std::make_unique<StatusBar> (context());
+    addAndMakeVisible (statusBar.get());
     statusBarVisible = true;
     statusBarSize = 22;
 
-    addAndMakeVisible (toolBar = new Toolbar (*this));
+    toolBar = std::make_unique<Toolbar> (*this);
+    addAndMakeVisible (toolBar.get());
     toolBar->setSession (context().session());
     toolBarVisible = true;
     toolBarSize = 32;

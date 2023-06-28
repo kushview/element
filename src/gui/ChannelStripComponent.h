@@ -49,7 +49,7 @@ public:
     {
         if (powerOn == mute.getToggleState())
             return;
-        mute.setToggleState (powerOn, notify);
+        mute.setToggleState (powerOn, notify ? juce::sendNotificationAsync : juce::dontSendNotification);
         if (notify)
             powerChanged();
     }
@@ -58,7 +58,7 @@ public:
     {
         if (muted == mute2.getToggleState())
             return;
-        mute2.setToggleState (muted, notify);
+        mute2.setToggleState (muted, notify ? juce::sendNotificationAsync : juce::dontSendNotification);
         if (notify)
             muteChanged();
     }

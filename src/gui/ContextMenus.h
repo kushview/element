@@ -20,7 +20,9 @@
 #pragma once
 
 #include <element/plugins.hpp>
+#include <element/processor.hpp>
 
+#include "engine/graphnode.hpp"
 #include "gui/GuiCommon.h"
 #include "session/presetmanager.hpp"
 #include "gui/BlockComponent.h"
@@ -222,8 +224,10 @@ public:
     inline void addReplaceSubmenu (PluginManager& plugins)
     {
         PopupMenu menu;
-        plugins.getKnownPlugins()
-            .addToMenu (menu, KnownPluginList::sortByCategory, node.getFileOrIdentifier().toString());
+        KnownPluginList::addToMenu (menu,
+                                    plugins.getKnownPlugins().getTypes(),
+                                    KnownPluginList::sortByCategory,
+                                    node.getFileOrIdentifier().toString());
         addSubMenu ("Replace", menu);
     }
 
@@ -353,18 +357,17 @@ public:
         }
         else if (result >= 40000 && result < 50000)
         {
-#if 0
-            const int osFactor = (int) powf (2, float (result - 40000));            
+#if 1
+            const int osFactor = (int) powf (2, float (result - 40000));
             if (auto gNode = node.getObject())
             {
-                // FIXME:
                 auto* graph = gNode->getParentGraph();
                 // TODO: don't reload the entire graph
                 bool wasSuspended = graph->isSuspended();
                 graph->suspendProcessing (true);
                 graph->releaseResources();
                 gNode->setOversamplingFactor (osFactor);
-                graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
+                graph->prepareToRender (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
                 graph->suspendProcessing (wasSuspended);
             }
 #endif

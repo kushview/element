@@ -370,7 +370,7 @@ bool Node::writeToFile (const File& targetFile) const
     }
 #else
     if (auto e = data.createXml())
-        return e->writeToFile (targetFile, String());
+        return e->writeTo (targetFile);
 #endif
 
     return false;
@@ -403,7 +403,7 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
     }
 #else
     if (auto e = preset.createXml())
-        return e->writeToFile (targetFile, String());
+        return e->writeTo (targetFile);
 #endif
     return false;
 }

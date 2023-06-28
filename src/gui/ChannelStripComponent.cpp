@@ -129,12 +129,12 @@ void ChannelStripComponent::buttonClicked (Button* b)
 {
     if (b == &mute)
     {
-        mute.setToggleState (! mute.getToggleState(), false);
+        mute.setToggleState (! mute.getToggleState(), juce::dontSendNotification);
         powerChanged();
     }
     else if (b == &mute2)
     {
-        mute2.setToggleState (! mute2.getToggleState(), false);
+        mute2.setToggleState (! mute2.getToggleState(), juce::dontSendNotification);
         muteChanged();
     }
 }

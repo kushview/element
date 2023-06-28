@@ -147,9 +147,11 @@ public:
     void resized()
     {
         const int labSize = 15;
+        auto r = bridge.getLocalBounds().reduced (3);
+        r.removeFromTop (4);
+        r.removeFromBottom (4);
         if (audioInsVisible && ! audioOutsVisible)
         {
-            auto r = bridge.getLocalBounds();
             auto r1 = r.removeFromTop (labSize);
             auto r2 = r.removeFromBottom (showChannelLabels() ? labSize : 0);
 
@@ -179,7 +181,6 @@ public:
 
         else if (audioOutsVisible && ! audioInsVisible)
         {
-            auto r = bridge.getLocalBounds();
             auto r1 = r.removeFromTop (labSize);
             auto r2 = r.removeFromBottom (showChannelLabels() ? labSize : 0);
             int totalSpace = meterSpaceRequired (false);
@@ -206,7 +207,6 @@ public:
         }
         else if (audioInsVisible && audioOutsVisible)
         {
-            auto r = bridge.getLocalBounds();
             auto r1 = r.removeFromTop (labSize);
             auto r2 = r.removeFromBottom (showChannelLabels() ? labSize : 0);
 
@@ -257,7 +257,7 @@ public:
 
     void paint (Graphics& g)
     {
-        // g.fillAll (Colors::widgetBackgroundColor);
+        g.fillAll (Colors::widgetBackgroundColor.darker());
     }
 
     void init (Context& context)
@@ -416,7 +416,7 @@ MeterBridge& MeterBridgeView::meterBridge()
 void MeterBridgeView::resized()
 {
     if (bridge)
-        bridge->setBounds (getLocalBounds().reduced (6));
+        bridge->setBounds (getLocalBounds().reduced (1));
 }
 
 void MeterBridgeView::mouseDown (const juce::MouseEvent& ev)

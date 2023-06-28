@@ -41,6 +41,7 @@ struct Style {
     };
 };
 
+// clang-format off
 class JUCE_API LookAndFeel_E1 : public juce::LookAndFeel_V4 {
 public:
     enum DefaultColorCodes {
@@ -64,7 +65,6 @@ public:
 
     juce::Typeface::Ptr getTypefaceForFont (const juce::Font&) override;
     int getDefaultScrollbarWidth() override;
-    void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider& slider) override;
 
     juce::Font getComboBoxFont (juce::ComboBox& box) override;
     juce::Font getLabelFont (juce::Label&) override;
@@ -89,11 +89,22 @@ public:
     virtual int getTreeViewIndentSize (juce::TreeView&) override;
 
     virtual void drawComboBox (juce::Graphics& g, int width, int height, bool isButtonDown, int buttonX, int buttonY, int buttonW, int buttonH, juce::ComboBox& box) override;
+    virtual void positionComboBoxText (juce::ComboBox&, juce::Label&) override;
 
     virtual void drawKeymapChangeButton (juce::Graphics& g, int width, int height, juce::Button& button, const juce::String& keyDescription) override;
 
     // Sliders
-    void drawLinearSliderBackground (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style, juce::Slider& slider) override;
+    int getSliderThumbRadius (juce::Slider&) override;
+    void drawLinearSliderBackground (juce::Graphics& g, int x, int y, int width, int height,
+                                     float sliderPos, float minSliderPos, float maxSliderPos, 
+                                     const juce::Slider::SliderStyle style, juce::Slider& slider) override;
+    void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, 
+                           float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, 
+                           juce::Slider& slider) override;
+    void drawLinearSlider (juce::Graphics&, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const juce::Slider::SliderStyle, juce::Slider&) override;
+
     // Menus
     virtual juce::Font getPopupMenuFont() override;
     virtual void drawPopupMenuBackground (juce::Graphics& g, int width, int height) override;
@@ -135,5 +146,6 @@ private:
     juce::String defaultSansSerifName,
         defaultMonospaceName;
 };
+// clang-format on
 
 } // namespace element

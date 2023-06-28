@@ -21,6 +21,7 @@
 #include <element/devices.hpp>
 #include <element/engine.hpp>
 #include <element/services.hpp>
+#include <element/version.hpp>
 
 #include <element/ui.hpp>
 #include <element/ui/content.hpp>
@@ -40,8 +41,6 @@
 #include "gui/capslock.hpp"
 
 #include <element/ui/commands.hpp>
-
-#include "version.hpp"
 
 namespace element {
 
@@ -1116,15 +1115,6 @@ bool GuiService::handleMessage (const AppMessage& msg)
             refreshMainMenu();
             refreshSystemTray();
         }
-
-        return true;
-    }
-    else if (auto m = dynamic_cast<const PresentViewMessage*> (&msg))
-    {
-        // FIXME:
-        // if (m->create && _content != nullptr)
-        //     if (auto* v = m->create())
-        //         _content->setMainView (v);
 
         return true;
     }

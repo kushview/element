@@ -29,6 +29,8 @@
 #include <element/settings.hpp>
 #include "tempo.hpp"
 
+#include "engine/trace.hpp"
+
 namespace element {
 
 struct RootGraphRender : public AsyncUpdater
@@ -201,13 +203,12 @@ struct RootGraphRender : public AsyncUpdater
             for (int i = 0; i < numChans; ++i)
                 buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
 
-            MidiBuffer::Iterator iter (midi);
-            MidiMessage msg;
-            int frame = 0;
-
             // setup a program change if present
-            while (iter.getNextEvent (msg, frame) && frame < numSamples)
+            for (auto m : midi)
             {
+                auto msg = m.getMessage();
+                if (m.samplePosition >= numSamples)
+                    break;
                 if (! msg.isProgramChange())
                     continue;
                 program.program = msg.getProgramChangeNumber();
@@ -478,6 +479,7 @@ public:
     {
         const int numSamples = buffer.getNumSamples();
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
+        // element::traceMidi (midi);
 
         const ScopedLock sl (lock);
         const bool shouldProcess = shouldBeLocked.get() == 0;
@@ -792,7 +794,7 @@ void AudioEngine::activate()
     if (getRunMode() == RunMode::Standalone)
     {
         auto& midi (world.midi());
-        midi.addMidiInputCallback (String(), &getMidiInputCallback());
+        midi.addMidiInputCallback (&getMidiInputCallback());
     }
 }
 
@@ -801,7 +803,7 @@ void AudioEngine::deactivate()
     if (getRunMode() == RunMode::Standalone)
     {
         auto& midi (world.midi());
-        midi.removeMidiInputCallback (String(), &getMidiInputCallback());
+        midi.removeMidiInputCallback (&getMidiInputCallback());
     }
 }
 

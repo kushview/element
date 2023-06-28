@@ -45,7 +45,7 @@ public:
         state = State::Idle;
     }
 
-    template<typename Ft>
+    template <typename Ft>
     void setLength (Ft newLength)
     {
         jassert (newLength > (Ft) 0.f);

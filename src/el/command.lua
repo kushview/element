@@ -2,7 +2,7 @@
 -- @module el.command
 
 local Commands    = require ('el.Commands')
-local Context           = require ('el.Context')
+local Context     = require ('el.Context')
 
 local M = {}
 

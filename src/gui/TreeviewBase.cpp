@@ -42,7 +42,7 @@ TreePanelBase::~TreePanelBase()
 void TreePanelBase::setRoot (TreeItemBase* root)
 {
     tree.setRootItem (nullptr);
-    rootItem = root;
+    rootItem.reset (root);
     if (rootItem != nullptr)
     {
         tree.setRootItem (rootItem.get());
@@ -55,7 +55,7 @@ void TreePanelBase::saveOpenness()
 #if 0
     if (project != nullptr)
     {
-        const ScopedPointer<XmlElement> opennessState (tree.getOpennessState (true));
+        const std::unique_ptr<XmlElement> opennessState (tree.getOpennessState (true));
 
         if (opennessState != nullptr)
             project->getStoredProperties().setValue (opennessStateKey, opennessState);
@@ -77,7 +77,7 @@ TreeItemBase::~TreeItemBase()
 
 void TreeItemBase::refreshSubItems()
 {
-    // FIXME: sub classes MUST provide the unique name
+    // TODO: sub classes MUST provide the unique name
     WholeTreeOpennessRestorer wtor (*this);
     clearSubItems();
     addSubItems();
@@ -259,7 +259,7 @@ void TreeItemBase::itemSelectionChanged (bool isNowSelected)
 {
     if (isNowSelected)
     {
-        delayedSelectionTimer = new ItemSelectionTimer (*this);
+        delayedSelectionTimer = std::make_unique<ItemSelectionTimer> (*this);
         delayedSelectionTimer->startTimer (getMillisecsAllowedForDragGesture());
     }
     else

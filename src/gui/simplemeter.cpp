@@ -196,7 +196,7 @@ void SimpleMeterValue::resized()
 }
 
 SimpleMeter::SimpleMeter (const int numPorts, bool _horizontal)
-    : portCount (numPorts), // FIXME: Default port count.
+    : portCount (jmax (1, numPorts)),
       values (nullptr),
       scale (0.0f),
       peakFalloff (DIGITAL_METER_PEAK_FALLOFF),

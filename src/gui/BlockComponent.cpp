@@ -359,6 +359,8 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         const int result = menu.show();
         colorSelector.removeChangeListener (this);
 
+        const auto types = plugins.getKnownPlugins().getTypes();
+
         if (auto* message = menu.createMessageForResultCode (result))
         {
             ViewHelpers::postMessageFor (this, message);
@@ -376,11 +378,11 @@ void BlockComponent::mouseDown (const MouseEvent& e)
                 }
             }
         }
-        else if (plugins.getKnownPlugins().getIndexChosenByMenu (result) >= 0)
+        else if (KnownPluginList::getIndexChosenByMenu (types, result) >= 0)
         {
-            const auto index = plugins.getKnownPlugins().getIndexChosenByMenu (result);
-            if (const auto* desc = plugins.getKnownPlugins().getType (index))
-                ViewHelpers::postMessageFor (this, new ReplaceNodeMessage (node, *desc));
+            auto index = KnownPluginList::getIndexChosenByMenu (types, result);
+            ViewHelpers::postMessageFor (this,
+                                         new ReplaceNodeMessage (node, types.getUnchecked (index)));
         }
         else
         {
@@ -823,7 +825,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
             {
                 NodeEditorFactory factory (*ui);
                 if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
-                    embedded = e.release();
+                    embedded.reset (e.release());
                 // else
                 //     embedded = NodeEditorFactory::createAudioProcessorEditor (node).release();
             }
@@ -1039,8 +1041,8 @@ void BlockComponent::updatePosition()
         node.getPosition (x, y);
     }
 
-    setBounds ({ roundDoubleToInt (vertical ? x : y),
-                 roundDoubleToInt (vertical ? y : x),
+    setBounds ({ roundToInt (vertical ? x : y),
+                 roundToInt (vertical ? y : x),
                  getWidth(),
                  getHeight() });
 }

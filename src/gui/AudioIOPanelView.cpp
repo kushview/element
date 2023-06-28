@@ -1,23 +1,17 @@
 
 
-//[Headers] You can add your own extra header files here...
 #include <element/node.hpp>
 #include "AudioIOPanelView.h"
 
 namespace element {
-//[/Headers]
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
-//[/MiscUserDefs]
 
 //==============================================================================
 AudioIOPanelView::AudioIOPanelView()
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
     setName ("audioIOPanelView");
-    addAndMakeVisible (inputGainDial = new Slider ("inputGainDial"));
+
+    inputGainDial = std::make_unique<Slider> ("inputGainDial");
+    addAndMakeVisible (inputGainDial.get());
     inputGainDial->setRange (-70, 12, 0);
     inputGainDial->setSliderStyle (Slider::RotaryVerticalDrag);
     inputGainDial->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
@@ -26,7 +20,8 @@ AudioIOPanelView::AudioIOPanelView()
 
     inputGainDial->setBounds (17, 38, 48, 48);
 
-    addAndMakeVisible (outputGainDial = new Slider ("outputGainDial"));
+    outputGainDial = std::make_unique<Slider> ("outputGainDial");
+    addAndMakeVisible (outputGainDial.get());
     outputGainDial->setRange (-70, 12, 0);
     outputGainDial->setSliderStyle (Slider::RotaryVerticalDrag);
     outputGainDial->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
@@ -35,8 +30,9 @@ AudioIOPanelView::AudioIOPanelView()
     outputGainDial->setColour (Slider::rotarySliderOutlineColourId, Colour (0x66000000));
     outputGainDial->addListener (this);
 
-    addAndMakeVisible (inputGainLabel = new Label ("inputGainLabel",
-                                                   TRANS ("Input Gain")));
+    inputGainLabel = std::make_unique<Label> ("inputGainLabel",
+                                              TRANS ("Input Gain"));
+    addAndMakeVisible (inputGainLabel.get());
     inputGainLabel->setFont (Font (12.00f, Font::plain).withTypefaceStyle ("Regular"));
     inputGainLabel->setJustificationType (Justification::centredLeft);
     inputGainLabel->setEditable (false, false, false);
@@ -44,8 +40,9 @@ AudioIOPanelView::AudioIOPanelView()
     inputGainLabel->setColour (TextEditor::textColourId, Colours::black);
     inputGainLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (outputGainLabel = new Label ("outputGainLabel",
-                                                    TRANS ("Output Gain")));
+    outputGainLabel = std::make_unique<Label> ("outputGainLabel",
+                                               TRANS ("Output Gain"));
+    addAndMakeVisible (outputGainLabel.get());
     outputGainLabel->setFont (Font (12.00f, Font::plain).withTypefaceStyle ("Regular"));
     outputGainLabel->setJustificationType (Justification::centredLeft);
     outputGainLabel->setEditable (false, false, false);
@@ -53,8 +50,9 @@ AudioIOPanelView::AudioIOPanelView()
     outputGainLabel->setColour (TextEditor::textColourId, Colours::black);
     outputGainLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (inputGainDbLabel = new Label ("inputGainDbLabel",
-                                                     TRANS ("0.00 dB")));
+    inputGainDbLabel = std::make_unique<Label> ("inputGainDbLabel",
+                                                TRANS ("0.00 dB"));
+    addAndMakeVisible (inputGainDbLabel.get());
     inputGainDbLabel->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
     inputGainDbLabel->setJustificationType (Justification::centredLeft);
     inputGainDbLabel->setEditable (false, false, false);
@@ -62,8 +60,8 @@ AudioIOPanelView::AudioIOPanelView()
     inputGainDbLabel->setColour (TextEditor::textColourId, Colours::black);
     inputGainDbLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (outputGainDbLabel = new Label ("outputGainDbLabel",
-                                                      TRANS ("0.00 dB")));
+    outputGainDbLabel = std::make_unique<Label> ("outputGainDbLabel", TRANS ("0.00 dB"));
+    addAndMakeVisible (outputGainDbLabel.get());
     outputGainDbLabel->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
     outputGainDbLabel->setJustificationType (Justification::centredLeft);
     outputGainDbLabel->setEditable (false, false, false);
@@ -71,8 +69,9 @@ AudioIOPanelView::AudioIOPanelView()
     outputGainDbLabel->setColour (TextEditor::textColourId, Colours::black);
     outputGainDbLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (nodeNameLabel = new Label ("nodeNameLabel",
-                                                  String()));
+    nodeNameLabel = std::make_unique<Label> ("nodeNameLabel",
+                                             String());
+    addAndMakeVisible (nodeNameLabel.get());
     nodeNameLabel->setFont (Font (18.00f, Font::plain).withTypefaceStyle ("Regular"));
     nodeNameLabel->setJustificationType (Justification::centredLeft);
     nodeNameLabel->setEditable (false, true, false);
@@ -82,20 +81,11 @@ AudioIOPanelView::AudioIOPanelView()
 
     nodeNameLabel->setBounds (10, 11, 150, 24);
 
-    //[UserPreSize]
-    //[/UserPreSize]
-
     setSize (220, 100);
-
-    //[Constructor] You can add your own custom stuff here..
-    //[/Constructor]
 }
 
 AudioIOPanelView::~AudioIOPanelView()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
-    //[/Destructor_pre]
-
     inputGainDial = nullptr;
     outputGainDial = nullptr;
     inputGainLabel = nullptr;
@@ -103,71 +93,44 @@ AudioIOPanelView::~AudioIOPanelView()
     inputGainDbLabel = nullptr;
     outputGainDbLabel = nullptr;
     nodeNameLabel = nullptr;
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
 }
 
 //==============================================================================
 void AudioIOPanelView::paint (Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (Colour (0xff3b3b3b));
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
 }
 
 void AudioIOPanelView::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
-
     outputGainDial->setBounds ((getWidth() / 2) + 13, 38, 48, 48);
     inputGainLabel->setBounds (17 + 48 / 2 - (64 / 2), 74, 64, 24);
     outputGainLabel->setBounds (((getWidth() / 2) + 13) + 48 - 55, 74, 64, 24);
     inputGainDbLabel->setBounds (17 + 48, 50, 57, 24);
     outputGainDbLabel->setBounds (((getWidth() / 2) + 13) + 48, 50, 63, 24);
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
 
 void AudioIOPanelView::sliderValueChanged (Slider* sliderThatWasMoved)
 {
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
-    if (sliderThatWasMoved == inputGainDial)
+    if (sliderThatWasMoved == inputGainDial.get())
     {
-        //[UserSliderCode_inputGainDial] -- add your slider handling code here..
         const auto dB = inputGainDial->getValue();
         String text (dB, 2);
         text << " dB";
         inputGainDbLabel->setText (text, dontSendNotification);
-        //[/UserSliderCode_inputGainDial]
     }
-    else if (sliderThatWasMoved == outputGainDial)
+    else if (sliderThatWasMoved == outputGainDial.get())
     {
-        //[UserSliderCode_outputGainDial] -- add your slider handling code here..
         const auto dB = outputGainDial->getValue();
         String text (dB, 2);
         text << " dB";
         outputGainDbLabel->setText (text, dontSendNotification);
-        //[/UserSliderCode_outputGainDial]
     }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
 
 void AudioIOPanelView::labelTextChanged (Label* labelThatHasChanged)
 {
-    //[UserlabelTextChanged_Pre]
-    //[/UserlabelTextChanged_Pre]
-
-    if (labelThatHasChanged == nodeNameLabel)
+    if (labelThatHasChanged == nodeNameLabel.get())
     {
         //[UserLabelCode_nodeNameLabel] -- add your label text handling code here..
         //[/UserLabelCode_nodeNameLabel]
@@ -177,7 +140,6 @@ void AudioIOPanelView::labelTextChanged (Label* labelThatHasChanged)
     //[/UserlabelTextChanged_Post]
 }
 
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void AudioIOPanelView::setNode (const Node& node)
 {
     ValueTree n = node.data();

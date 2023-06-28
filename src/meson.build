@@ -23,7 +23,6 @@ libelement_sources = '''
     script.cpp
     timescale.cpp
     utils.cpp
-    version.cpp
 
     services/deviceservice.cpp
     services/engineservice.cpp
@@ -86,7 +85,7 @@ libelement_sources = '''
     gui/content.cpp
     gui/ContextMenus.cpp
     gui/decibelscale.cpp
-    gui/SimpleMeter.cpp
+    gui/simplemeter.cpp
     gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
@@ -172,7 +171,7 @@ libelement_sources = '''
     el/AudioBuffer64.cpp
     el/Bounds.cpp
     el/bytes.c
-    el/CommandManager.cpp
+    el/Commands.cpp
     el/Content.cpp
     el/Desktop.cpp
     el/DocumentWindow.cpp

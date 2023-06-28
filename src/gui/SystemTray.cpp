@@ -20,7 +20,8 @@
 #include "gui/MainWindow.h"
 #include "gui/SystemTray.h"
 #include <element/ui/commands.hpp>
-#include <element/ui/commands.hpp>
+#include <element/ui.hpp>
+
 #include <element/context.hpp>
 #include "utils.hpp"
 
@@ -105,20 +106,19 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     auto* window = getMainWindow();
     if (! window)
         return;
-    // FIXME: Commands
-    // auto* const cmd = &window->getComm .getCommandManager();
 
+    auto* const cmd = &window->services().find<UI>()->commands();
     if (mouseUpAction == ShowMenu)
     {
-        //         PopupMenu menu;
-        //         menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
-        //         menu.addSeparator();
-        //         menu.addCommandItem (cmd, Commands::quit, "Exit");
-        // #if JUCE_MAC
-        //         showDropdownMenu (menu);
-        // #else
-        //         menu.show();
-        // #endif
+        PopupMenu menu;
+        menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+        menu.addSeparator();
+        menu.addCommandItem (cmd, Commands::quit, "Exit");
+#if JUCE_MAC
+        showDropdownMenu (menu);
+#else
+        menu.show();
+#endif
     }
     else
     {
@@ -136,18 +136,18 @@ void SystemTray::runMenu()
     auto* window = getMainWindow();
     if (! window)
         return;
-    // FIXME: Commands
-    // auto* const cmd = &window->context().getCommandManager();
 
-    // PopupMenu menu;
-    // menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
-    // menu.addSeparator();
-    // menu.addCommandItem (cmd, Commands::quit, "Exit");
-    // #if JUCE_MAC
-    //     showDropdownMenu (menu);
-    // #else
-    //     menu.show();
-    // #endif
+    auto* const cmd = &window->services().find<UI>()->commands();
+
+    PopupMenu menu;
+    menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+    menu.addSeparator();
+    menu.addCommandItem (cmd, Commands::quit, "Exit");
+#if JUCE_MAC
+    showDropdownMenu (menu);
+#else
+    menu.show();
+#endif
 }
 
 void SystemTray::mouseDown (const MouseEvent& ev)

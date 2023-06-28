@@ -41,7 +41,8 @@ public:
         tempoLabel.tempoValue.addListener (this);
         extButton.getToggleStateValue().addListener (this);
 
-        addAndMakeVisible (meter = new TopMeter (*this));
+        meter = std::make_unique<TopMeter> (*this);
+        addAndMakeVisible (meter.get());
 
         setSize (152, 24);
     }
@@ -389,7 +390,7 @@ private:
             }
 
             // convert to BPM
-            int newTempo = roundDoubleToInt ((tapNum / interval) * 60000);
+            int newTempo = roundToInt ((tapNum / interval) * 60000);
             if (newTempo != tempoLabel.tempoValue)
                 tempoLabel.tempoValue.setValue (newTempo);
             tapNum++;
@@ -422,7 +423,7 @@ private:
 
         TempoAndMeterBar& owner;
     };
-    ScopedPointer<TopMeter> meter;
+    std::unique_ptr<TopMeter> meter;
 };
 
 } // namespace element

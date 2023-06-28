@@ -16,10 +16,7 @@ class NodeFactory;
 class PluginScannerMaster;
 class PluginScanner;
 
-// FIXME:
-using namespace juce;
-
-class PluginManager : public ChangeBroadcaster {
+class PluginManager : public juce::ChangeBroadcaster {
 public:
     PluginManager();
     ~PluginManager();
@@ -28,26 +25,26 @@ public:
     void addDefaultFormats();
 
     /** Add a plugin format */
-    void addFormat (AudioPluginFormat*);
+    void addFormat (juce::AudioPluginFormat*);
 
     /** Get the dead mans pedal file */
-    const File& getDeadAudioPluginsFile() const;
+    const juce::File& getDeadAudioPluginsFile() const;
 
     /** Access to the main known plugins list */
-    KnownPluginList& getKnownPlugins();
-    const KnownPluginList& getKnownPlugins() const;
+    juce::KnownPluginList& getKnownPlugins();
+    const juce::KnownPluginList& getKnownPlugins() const;
 
     /** Scan/Add a description to the known plugins */
-    void addToKnownPlugins (const PluginDescription& desc);
+    void addToKnownPlugins (const juce::PluginDescription& desc);
 
     /** Returns the audio plugin format manager */
-    AudioPluginFormatManager& getAudioPluginFormats();
+    juce::AudioPluginFormatManager& getAudioPluginFormats();
 
     /** Returns true if an audio plugin format is supported */
-    bool isAudioPluginFormatSupported (const String&) const;
+    bool isAudioPluginFormatSupported (const juce::String&) const;
 
     /** Returns an audio plugin format by name */
-    AudioPluginFormat* getAudioPluginFormat (const String& formatName) const;
+    juce::AudioPluginFormat* getAudioPluginFormat (const juce::String& formatName) const;
 
     /** Returns an audio plugin format by type */
     template <class FormatType>
@@ -73,70 +70,70 @@ public:
     PluginScanner* getBackgroundAudioPluginScanner();
 
     /** Scans for all audio plugin types using a child process */
-    void scanAudioPlugins (const StringArray& formats = StringArray());
+    void scanAudioPlugins (const juce::StringArray& formats = juce::StringArray());
 
     /** Returns true if a scan is in progress using the child process */
     bool isScanningAudioPlugins();
 
     /** Returns the name of the currently scanned plugin. This value
 	    is not suitable for use in loading plugins */
-    String getCurrentlyScannedPluginName() const;
+    juce::String getCurrentlyScannedPluginName() const;
 
     /** Looks for new or updated internal/element plugins */
     void scanInternalPlugins();
 
     /** Save the known plugins to user settings */
-    void saveUserPlugins (ApplicationProperties&);
+    void saveUserPlugins (juce::ApplicationProperties&);
 
     /** Restore user plugins. Will also scan internal plugins so they don't get removed
         by accident */
-    void restoreUserPlugins (ApplicationProperties&);
+    void restoreUserPlugins (juce::ApplicationProperties&);
 
     /** Restore user plugins. Will also scan internal plugins so they don't get removed
         by accident */
-    void restoreUserPlugins (const XmlElement& xml);
+    void restoreUserPlugins (const juce::XmlElement& xml);
 
-    AudioPluginInstance* createAudioPlugin (const PluginDescription& desc, String& errorMsg);
-    Processor* createGraphNode (const PluginDescription& desc, String& errorMsg);
+    juce::AudioPluginInstance* createAudioPlugin (const juce::PluginDescription& desc, juce::String& errorMsg);
+    Processor* createGraphNode (const juce::PluginDescription& desc, juce::String& errorMsg);
 
     /** Set the play config used when instantiating plugins */
     void setPlayConfig (double sampleRate, int blockSize);
 
     /** Give a properties file to be used when settings aren't available. FIXME */
-    void setPropertiesFile (PropertiesFile* pf) { props = pf; }
+    void setPropertiesFile (juce::PropertiesFile* pf) { props = pf; }
 
     /** Search for unverified plugins in background thread */
     void searchUnverifiedPlugins();
 
     /** This will get a possible list of plugins. Trying to load this might fail */
-    void getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins);
+    void getUnverifiedPlugins (const juce::String& formatName, juce::OwnedArray<juce::PluginDescription>& plugins);
 
     /** Restore User Plugins From a file */
-    void restoreAudioPlugins (const File&);
+    void restoreAudioPlugins (const juce::File&);
 
-    /** Get a PluginDescription for a Node */
-    PluginDescription findDescriptionFor (const Node&) const;
+    /** Get a juce:: PluginDescription for a Node */
+    juce::PluginDescription findDescriptionFor (const Node&) const;
 
     /** Saves the default node state */
     void saveDefaultNode (const Node& node);
 
     /** Returns the last saved default node state */
-    Node getDefaultNode (const PluginDescription& desc) const;
+    Node getDefaultNode (const juce::PluginDescription& desc) const;
 
 private:
-    PropertiesFile* props = nullptr;
+    juce::PropertiesFile* props = nullptr;
     class Private;
     std::unique_ptr<Private> priv;
 
     friend class PluginScannerMaster;
     void scanFinished();
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager)
 };
 
-class PluginScanner : private Timer {
+class PluginScanner : private juce::Timer {
 public:
-    PluginScanner (KnownPluginList&);
+    PluginScanner (juce::KnownPluginList&);
     ~PluginScanner();
 
     class Listener {
@@ -145,17 +142,17 @@ public:
         virtual ~Listener() {}
 
         virtual void audioPluginScanFinished() {}
-        virtual void audioPluginScanProgress (const float progress) { ignoreUnused (progress); }
-        virtual void audioPluginScanStarted (const String& name) {}
+        virtual void audioPluginScanProgress (const float progress) { juce::ignoreUnused (progress); }
+        virtual void audioPluginScanStarted (const juce::String& name) {}
     };
 
-    static const File& getSlavePluginListFile();
+    static const juce::File& getSlavePluginListFile();
 
     /** scan for plugins of type */
-    void scanForAudioPlugins (const String& formatName);
+    void scanForAudioPlugins (const juce::String& formatName);
 
     /** Scan for plugins of multiple types */
-    void scanForAudioPlugins (const StringArray& formats);
+    void scanForAudioPlugins (const juce::StringArray& formats);
 
     /** Cancels the current scan operation */
     void cancel();
@@ -170,15 +167,15 @@ public:
     void removeListener (Listener* listener) { listeners.remove (listener); }
 
     /** Returns a list of plugins that failed to load */
-    const StringArray& getFailedFiles() const { return failedIdentifiers; }
+    const juce::StringArray& getFailedFiles() const { return failedIdentifiers; }
 
 private:
     friend class PluginScannerMaster;
-    friend class Timer;
+    friend class juce::Timer;
     std::unique_ptr<PluginScannerMaster> master;
-    ListenerList<Listener> listeners;
-    StringArray failedIdentifiers;
-    KnownPluginList& list;
+    juce::ListenerList<Listener> listeners;
+    juce::StringArray failedIdentifiers;
+    juce::KnownPluginList& list;
     void timerCallback() override;
 };
 

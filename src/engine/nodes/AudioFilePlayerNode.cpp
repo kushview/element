@@ -94,12 +94,11 @@ public:
     {
         if (recentsDir.isDirectory())
         {
-            DirectoryIterator iter (recentsDir, recursive, processor.getWildcard(), File::findFiles);
-            while (iter.next())
+            for (DirectoryEntry entry : RangedDirectoryIterator (recentsDir, recursive, processor.getWildcard()))
             {
-                if (iter.getFile().isDirectory())
+                if (entry.getFile().isDirectory())
                     continue;
-                chooser->addRecentlyUsedFile (iter.getFile());
+                chooser->addRecentlyUsedFile (entry.getFile());
             }
 
             sortRecents();
@@ -187,19 +186,7 @@ public:
         return false;
     }
 
-    void itemDropped (const SourceDetails& details) override
-    {
-        if (details.description.toString() == "ccNavConcertinaPanel")
-        {
-            auto* const nav = ViewHelpers::getNavigationConcertinaPanel (this);
-            if (auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : nullptr)
-            {
-                File file = panel->getSelectedFile();
-                if (processor.canLoad (file))
-                    processor.openFile (file);
-            }
-        }
-    }
+    void itemDropped (const SourceDetails& details) override {}
 #if 0
     virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
     virtual void itemDragMove (const SourceDetails& dragSourceDetails);
@@ -451,24 +438,23 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     {
         if (auto* const playhead = getPlayHead())
         {
-            AudioPlayHead::CurrentPositionInfo pos;
-            playhead->getCurrentPosition (pos);
+            // TODO: Implement
         }
     }
 
-    MidiBuffer::Iterator iter (midi);
     MidiMessage msg;
-    int frame = 0, start = 0;
+    int start = 0;
     AudioSourceChannelInfo info;
     info.buffer = &buffer;
 
     ScopedLock sl (getCallbackLock());
     if (midiStartStopContinue.get() == 1)
     {
-        while (iter.getNextEvent (msg, frame))
+        for (auto m : midi)
         {
+            msg = m.getMessage();
             info.startSample = start;
-            info.numSamples = frame - start;
+            info.numSamples = m.samplePosition - start;
             player.getNextAudioBlock (info);
 
             if (msg.isMidiStart())
@@ -487,7 +473,7 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
                 triggerAsyncUpdate();
             }
 
-            start = frame;
+            start = m.samplePosition;
         }
     }
 

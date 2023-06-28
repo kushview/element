@@ -169,12 +169,10 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     jassert (midi.getNumBuffers() == 1);
     const auto& midiBuffer = *midi.getReadBuffer (0);
 
-    MidiBuffer::Iterator iter (midiBuffer);
     MidiMessage msg;
-    int midiFrame = 0;
-
-    while (iter.getNextEvent (msg, midiFrame))
+    for (auto m : midiBuffer)
     {
+        msg = m.getMessage();
         if (! msg.isProgramChange())
             continue;
         if (3 == msg.getProgramChangeNumber())

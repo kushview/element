@@ -58,9 +58,12 @@ public:
     void resized() override;
     bool keyPressed (const KeyPress&) override;
     bool keyStateChanged (bool) override;
+    void parentHierarchyChanged() override;
+    void visibilityChanged() override;
 
 private:
-    ScopedPointer<VirtualKeyboardComponent> keyboard;
+    std::unique_ptr<VirtualKeyboardComponent> keyboard;
+    bool keyboardInitialized = false;
     MidiKeyboardState internalState;
     int keyWidth = 16;
 

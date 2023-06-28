@@ -9,7 +9,9 @@
 #include <element/ui/commands.hpp>
 #include "sol_helpers.hpp"
 
-EL_PLUGIN_EXPORT int luaopen_el_Commands (lua_State* L)
+// clang-format off
+EL_PLUGIN_EXPORT 
+int luaopen_el_Commands (lua_State* L)
 {
     using namespace element;
     sol::state_view lua (L);
@@ -26,7 +28,7 @@ EL_PLUGIN_EXPORT int luaopen_el_Commands (lua_State* L)
         },
 
         /// Convert standard ID to string slug.
-        // @function Commands.tostring
+        // @function Commands.toString
         // @see Commands.standard
         "toString",
         [] (juce::CommandID cmd) { return Commands::toString (cmd).toStdString(); },

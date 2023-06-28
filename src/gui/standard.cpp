@@ -274,10 +274,7 @@ public:
             addAndMakeVisible (secondary.get());
         }
 
-        // TODO: Improve this logic.
-        bool shouldShow = secondary != nullptr;
-        showAccessoryView = ! shouldShow;
-        setShowAccessoryView (shouldShow);
+        setShowAccessoryView (secondary != nullptr, true);
 
         if (secondary)
         {
@@ -286,9 +283,9 @@ public:
         }
     }
 
-    void setShowAccessoryView (const bool show)
+    void setShowAccessoryView (const bool show, bool force = false)
     {
-        if (showAccessoryView == show)
+        if (showAccessoryView == show && ! force)
             return;
         showAccessoryView = show;
         if (showAccessoryView)
@@ -305,11 +302,24 @@ public:
     void saveState (PropertiesFile* props)
     {
         props->setValue ("ContentContainer_lastSecondaryHeight", lastSecondaryHeight);
+        props->setValue ("ContentContainer_showAccessoryView", showAccessoryView);
+        props->setValue ("ContentContainer_lastSecondaryView", owner.getAccessoryViewName());
     }
 
     void restoreState (PropertiesFile* props)
     {
-        lastSecondaryHeight = props->getIntValue ("ContentContainer_lastSecondaryHeight", 52);
+        lastSecondaryHeight = props->getIntValue ("ContentContainer_lastSecondaryHeight", lastSecondaryHeight);
+        lastSecondaryHeight = jmax (50, lastSecondaryHeight);
+        showAccessoryView = props->getIntValue ("ContentContainer_showAccessoryView", showAccessoryView);
+        auto lastSecondaryName = props->getValue ("ContentContainer_lastSecondaryView");
+        if (showAccessoryView)
+        {
+            owner.setSecondaryView (lastSecondaryName.trim());
+        }
+        else
+        {
+            setShowAccessoryView (false, true);
+        }
     }
 
 private:
@@ -464,7 +474,7 @@ static ContentView* createLastContentView (Settings& settings)
         view = std::make_unique<ConnectionGrid>();
     else if (lastContentView == EL_VIEW_GRAPH_EDITOR)
         view.reset (createGraphEditorView());
-    else if (lastContentView == "ControllersView")
+    else if (lastContentView == EL_VIEW_CONTROLLERS)
         view = std::make_unique<ControllersView>();
     else
         view = std::make_unique<DefaultView>();
@@ -520,9 +530,12 @@ StandardContent::StandardContent (Context& ctl_)
 {
     setOpaque (true);
 
-    addAndMakeVisible (container = new ContentContainer (*this, services()));
-    addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
-    addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_));
+    container = std::make_unique<ContentContainer> (*this, services());
+    addAndMakeVisible (container.get());
+    bar1 = std::make_unique<Resizer> (*this, &layout, 1, true);
+    addAndMakeVisible (bar1.get());
+    nav = std::make_unique<NavigationConcertinaPanel> (ctl_);
+    addAndMakeVisible (nav.get());
     nav->updateContent();
 
     toolBarVisible = true;
@@ -582,11 +595,11 @@ void StandardContent::setMainView (const String& name)
     {
         setContentView (createGraphEditorView());
     }
-    else if (name == "PluginManager")
+    else if (name == EL_VIEW_PLUGIN_MANAGER)
     {
         setContentView (new PluginManagerContentView());
     }
-    else if (name == "SessionSettings" || name == "SessionProperties")
+    else if (name == EL_VIEW_SESSION_SETTINGS || name == "SessionProperties")
     {
         setContentView (new SessionContentView());
     }
@@ -594,11 +607,11 @@ void StandardContent::setMainView (const String& name)
     {
         setContentView (new GraphSettingsView());
     }
-    else if (name == "KeymapEditorView")
+    else if (name == EL_VIEW_KEYMAP_EDITOR)
     {
         setContentView (new KeymapEditorView());
     }
-    else if (name == "ControllersView")
+    else if (name == EL_VIEW_CONTROLLERS)
     {
         setContentView (new ControllersView());
     }
@@ -733,7 +746,7 @@ void StandardContent::filesDropped (const StringArray& files, int x, int y)
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
             }
         }
-        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == EL_VIEW_GRAPH_EDITOR || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
+        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == EL_VIEW_GRAPH_EDITOR || getMainViewName() == "PatchBay" || getMainViewName() == EL_VIEW_PLUGIN_MANAGER))
         {
             auto s = session();
             auto graph = s->getActiveGraph();
@@ -857,7 +870,7 @@ void StandardContent::restoreState (PropertiesFile* props)
 
 void StandardContent::setCurrentNode (const Node& node)
 {
-    if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager" || getMainViewName() == "ControllersView") && session()->getNumGraphs() > 0)
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || getMainViewName() == EL_VIEW_SESSION_SETTINGS || getMainViewName() == EL_VIEW_PLUGIN_MANAGER || getMainViewName() == EL_VIEW_CONTROLLERS) && session()->getNumGraphs() > 0)
     {
         setMainView (EL_VIEW_GRAPH_EDITOR);
     }
@@ -889,7 +902,7 @@ void StandardContent::setNodeChannelStripVisible (const bool isVisible)
 {
     if (! nodeStrip)
     {
-        nodeStrip = new NodeChannelStripView();
+        nodeStrip = std::make_unique<NodeChannelStripView>();
         nodeStrip->initializeView (services());
     }
 
@@ -899,7 +912,7 @@ void StandardContent::setNodeChannelStripVisible (const bool isVisible)
     if (isVisible)
     {
         nodeStrip->willBecomeActive();
-        addAndMakeVisible (nodeStrip);
+        addAndMakeVisible (nodeStrip.get());
         nodeStrip->didBecomeActive();
         nodeStrip->stabilizeContent();
         if (nodeStrip->isShowing() || nodeStrip->isOnDesktop())
@@ -988,23 +1001,21 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
     {
         case Commands::showControllers: {
             int flags = 0;
-            if (getMainViewName() == "ControllersView")
+            if (getMainViewName() == EL_VIEW_CONTROLLERS)
                 flags |= Info::isTicked;
             result.setInfo ("Controllers", "Show the session's controllers", "UI", flags);
             break;
         }
         case Commands::showKeymapEditor: {
             int flags = 0;
-            // FIXME: wrong view name.
-            if (getMainViewName() == "KeymapView")
+            if (getMainViewName() == EL_VIEW_KEYMAP_EDITOR)
                 flags |= Info::isTicked;
             result.setInfo ("Keymappings", "Show the session's controllers", "UI", flags);
             break;
         }
         case Commands::showPluginManager: {
             int flags = 0;
-            // FIXME: wrong view name.
-            if (getMainViewName() == "PluginManagerView")
+            if (getMainViewName() == EL_VIEW_PLUGIN_MANAGER)
                 flags |= Info::isTicked;
             result.setInfo ("Plugin Manager", "Show the session's controllers", "UI", flags);
             break;
@@ -1012,7 +1023,7 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
         //=====
         case Commands::showSessionConfig: {
             int flags = 0;
-            if (getMainViewName() == "SessionSettings")
+            if (getMainViewName() == EL_VIEW_SESSION_SETTINGS)
                 flags |= Info::isTicked;
             result.setInfo ("Session Settings", "Session Settings", "Session", flags);
         }
@@ -1097,18 +1108,18 @@ bool StandardContent::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case Commands::showControllers: {
-            setMainView ("ControllersView");
+            setMainView (EL_VIEW_CONTROLLERS);
             break;
         }
         case Commands::showKeymapEditor:
-            setMainView ("KeymapEditorView");
+            setMainView (EL_VIEW_KEYMAP_EDITOR);
             break;
         case Commands::showPluginManager:
-            setMainView ("PluginManager");
+            setMainView (EL_VIEW_PLUGIN_MANAGER);
             break;
             //===
         case Commands::showSessionConfig:
-            setMainView ("SessionSettings");
+            setMainView (EL_VIEW_SESSION_SETTINGS);
             break;
         case Commands::showGraphConfig:
             setMainView ("GraphSettings");

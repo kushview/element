@@ -67,6 +67,8 @@ subdir ('src')
 subdir ('include/element')
 subdir ('include/element/juce')
 
+subdir ('docs')
+
 ###############################################################################
 # Element Application
 element_app_link_args = []

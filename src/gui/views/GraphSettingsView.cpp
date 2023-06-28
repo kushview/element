@@ -410,7 +410,8 @@ private:
 GraphSettingsView::GraphSettingsView()
 {
     setName ("GraphSettings");
-    addAndMakeVisible (props = new GraphPropertyPanel());
+    props = std::make_unique<GraphPropertyPanel>();
+    addAndMakeVisible (props.get());
     addAndMakeVisible (graphButton);
     graphButton.setTooltip ("Show graph editor");
     graphButton.addListener (this);
@@ -469,10 +470,9 @@ void GraphSettingsView::resized()
 
 void GraphSettingsView::buttonClicked (Button* button)
 {
-    // FIXME: Commands
-    // if (button == &graphButton)
-    //     if (auto* const world = ViewHelpers::getGlobals (this))
-    //         world->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
+    if (button == &graphButton)
+        if (auto* const world = ViewHelpers::getGlobals (this))
+            world->services().find<UI>()->commands().invokeDirectly (Commands::showGraphEditor, true);
 }
 
 void GraphSettingsView::setUpdateOnActiveGraphChange (bool shouldUpdate)

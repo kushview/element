@@ -60,8 +60,6 @@ Context* getGlobals (Component* c);
 /** Get Session */
 SessionPtr getSession (Component* c);
 
-NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c);
-
 /** Invoke a command directly */
 bool invokeDirectly (Component* c, const int commandID, bool async);
 

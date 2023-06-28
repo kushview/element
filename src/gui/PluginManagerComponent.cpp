@@ -205,7 +205,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
       allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
       numThreads (allowAsync ? 1 : 0)
 {
-    tableModel = new TableModel (*this, list);
+    tableModel.reset (new TableModel (*this, list));
 
     TableHeaderComponent& header = table.getHeader();
 
@@ -217,7 +217,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     header.addColumn (TRANS ("IO"), TableModel::ioCol, 80, 80, 80, TableHeaderComponent::notSortable);
     table.setHeaderHeight (22);
     table.setRowHeight (20);
-    table.setModel (tableModel);
+    table.setModel (tableModel.get());
     table.setMultipleSelectionEnabled (true);
     addAndMakeVisible (table);
 
@@ -315,8 +315,8 @@ void PluginListComponent::removeSelectedPlugins()
 void PluginListComponent::setTableModel (TableListBoxModel* model)
 {
     table.setModel (nullptr);
-    tableModel = model;
-    table.setModel (tableModel);
+    tableModel.reset (model);
+    table.setModel (tableModel.get());
 
     table.getHeader().reSortTable();
     table.updateContent();
@@ -625,7 +625,7 @@ private:
     double progress;
     int numThreads;
     bool allowAsync, finished;
-    ScopedPointer<ThreadPool> pool;
+    std::unique_ptr<ThreadPool> pool;
     bool useBackgroundScanner = false;
     StringArray formatsToScan;
 
@@ -824,7 +824,7 @@ void PluginListComponent::scanAll()
     {
         if (auto* world = ViewHelpers::getGlobals (this))
             plugins.saveUserPlugins (world->settings());
-        currentScanner = new Scanner (*this, plugins, scanAllFormats (plugins), TRANS ("Scanning for plug-ins..."), TRANS ("Searching for all possible plug-in files..."));
+        currentScanner.reset (new Scanner (*this, plugins, scanAllFormats (plugins), TRANS ("Scanning for plug-ins..."), TRANS ("Searching for all possible plug-in files...")));
     }
 }
 
@@ -846,7 +846,11 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
     {
         if (auto* world = ViewHelpers::getGlobals (this))
             plugins.saveUserPlugins (world->settings());
-        currentScanner = new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() ? dialogText : TRANS ("Searching for all possible plug-in files..."));
+        // clang-format off
+        currentScanner .reset (new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, 
+            dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() 
+                                     ? dialogText : TRANS ("Searching for all possible plug-in files...")));
+        // clang-format on
     }
 }
 
@@ -886,7 +890,7 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
 
 PluginManagerContentView::PluginManagerContentView()
 {
-    setName ("PluginManager");
+    setName (EL_VIEW_PLUGIN_MANAGER);
     setEscapeTriggersClose (true);
 }
 
@@ -954,7 +958,7 @@ void PluginListComponent::scanWithBackgroundScanner()
     {
         currentScanner = nullptr;
     }
-    currentScanner = new Scanner (*this, plugins, "Scanning for plugins", "Looking for new or updated plugins");
+    currentScanner.reset (new Scanner (*this, plugins, "Scanning for plugins", "Looking for new or updated plugins"));
 }
 
 bool PluginListComponent::isPluginVersion()

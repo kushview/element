@@ -460,11 +460,17 @@ NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor*
     title.setFont (title.getFont().withStyle (Font::bold));
     addAndMakeVisible (title);
 
-    if (p->getBusCount (true) > 0) // || p->canAddBus (true))
-        addAndMakeVisible (inConfig = new InputOutputConfig (*this, true));
+    if (p->getBusCount (true) > 0)
+    { // || p->canAddBus (true))
+        inConfig = std::make_unique<InputOutputConfig> (*this, true);
+        addAndMakeVisible (inConfig.get());
+    }
 
-    if (p->getBusCount (false) > 0) // || p->canAddBus (false))
-        addAndMakeVisible (outConfig = new InputOutputConfig (*this, false));
+    if (p->getBusCount (false) > 0)
+    { // || p->canAddBus (false))
+        outConfig = std::make_unique<InputOutputConfig> (*this, false);
+        addAndMakeVisible (outConfig.get());
+    }
 
     addAndMakeVisible (saveButton);
     saveButton.setButtonText ("Save");

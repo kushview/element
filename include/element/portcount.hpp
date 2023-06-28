@@ -7,9 +7,6 @@
 
 namespace element {
 
-// FIXME:
-using namespace juce;
-
 struct PortCount {
     PortCount()
     {
@@ -89,18 +86,18 @@ struct PortCount {
             const auto namePrefix = pt.getName();
 
             for (int j = 0; j < inputs[i]; ++j) {
-                String symbol = symPrefix;
-                symbol << "_in_" << String (j + 1);
-                String name = namePrefix;
+                juce::String symbol = symPrefix;
+                symbol << "_in_" << juce::String (j + 1);
+                juce::String name = namePrefix;
                 name << " In " << int (j + 1);
 
                 ports.add (i, index++, j, symbol, name, true);
             }
 
             for (int j = 0; j < outputs[i]; ++j) {
-                String symbol = symPrefix;
-                symbol << "_out_" << String (j + 1);
-                String name = namePrefix;
+                juce::String symbol = symPrefix;
+                symbol << "_out_" << juce::String (j + 1);
+                juce::String name = namePrefix;
                 name << " Out " << int (j + 1);
 
                 ports.add (i, index++, j, symbol, name, false);

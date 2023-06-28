@@ -321,7 +321,7 @@ public:
             arrow.addTriangle (-arrowL, arrowW, -arrowL, -arrowW, arrowL, 0.0f);
 
             arrow.applyTransform (AffineTransform()
-                                      .rotated (float_Pi * 0.5f - (float) atan2 (x2 - x1, y2 - y1))
+                                      .rotated (MathConstants<float>::pi * 0.5f - (float) atan2 (x2 - x1, y2 - y1))
                                       .translated ((x1 + x2) * 0.5f,
                                                    (y1 + y2) * 0.5f));
 
@@ -932,7 +932,7 @@ AudioProcessorEditor* GraphEditorComponent::createEditorForNode (ProcessorPtr no
     }
 
     if (useGenericEditor)
-        ui.reset (new GenericAudioProcessorEditor (node->getAudioProcessor()));
+        ui.reset (new GenericAudioProcessorEditor (*node->getAudioProcessor()));
 
     return (nullptr != ui) ? ui.release() : nullptr;
 }
@@ -1005,7 +1005,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
 
         if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString (a->getUnchecked (1).toString()))
         {
-            ScopedPointer<AddPluginMessage> message = new AddPluginMessage (graph, *t);
+            std::unique_ptr<AddPluginMessage> message (new AddPluginMessage (graph, *t));
             auto& builder (message->builder);
 
             if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
@@ -1027,22 +1027,6 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
             }
 
             postMessage (message.release());
-        }
-    }
-    else if (details.description.toString() == "ccNavConcertinaPanel")
-    {
-        auto* nav = ViewHelpers::getNavigationConcertinaPanel (this);
-        if (auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : nullptr)
-        {
-            File file = panel->getSelectedFile();
-            if (file.hasFileExtension ("els"))
-            {
-                postMessage (new OpenSessionMessage (file));
-            }
-            else if (file.hasFileExtension ("elg") || file.hasFileExtension ("elpreset"))
-            {
-                filesDropped (StringArray (file.getFullPathName()), lastDropX, lastDropY);
-            }
         }
     }
 }

@@ -49,7 +49,7 @@ public:
     /** Set true if pressing escape should close the view */
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
 
-    // FIXME: this shouldn't exist here.
+    // FIXME: nodeMoved signal shouldn't exist here.
     Signal<void()> nodeMoved;
 
     /** @internal */
@@ -127,11 +127,11 @@ private:
 
     class Toolbar;
     friend class Toolbar;
-    juce::ScopedPointer<Toolbar> toolBar;
+    std::unique_ptr<Toolbar> toolBar;
 
     class StatusBar;
     friend class StatusBar;
-    juce::ScopedPointer<StatusBar> statusBar;
+    std::unique_ptr<StatusBar> statusBar;
 
     bool statusBarVisible { true };
     int statusBarSize;

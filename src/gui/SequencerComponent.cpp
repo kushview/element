@@ -273,7 +273,7 @@ void SequencerComponent::valueTreeRedirected (ValueTree &tree)
     for (SequencerClipItem* c : clipList)
         recycleSequencerClip (c);
 
-    ScopedPointer<Session::Track> track = new Session::Track (session->getTrack (0));
+    std::unique_ptr<Session::Track> track = new Session::Track (session->getTrack (0));
     while (track && track->isValid())
     {
         ValueTree state = track->state();

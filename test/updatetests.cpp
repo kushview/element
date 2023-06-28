@@ -74,8 +74,7 @@ BOOST_AUTO_TEST_CASE (XML)
     if (xml == nullptr || doc.getLastParseError().isNotEmpty())
         return;
 
-    forEachXmlChildElementWithTagName (*xml, pkg, "PackageUpdate")
-    {
+    for (auto pkg : xml->getChildWithTagNameIterator ("PackageUpdate")) {
         BOOST_REQUIRE_NE (pkg->getChildByName ("Name"), nullptr);
         BOOST_REQUIRE_NE (pkg->getChildByName ("Version"), nullptr);
     }
@@ -83,8 +82,10 @@ BOOST_AUTO_TEST_CASE (XML)
 
 BOOST_AUTO_TEST_CASE (findExe)
 {
+#if ! defined(__linux__)
     ui::Updater updater;
     BOOST_REQUIRE (updater.exeFile().empty() == false);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE (GettersSetters)

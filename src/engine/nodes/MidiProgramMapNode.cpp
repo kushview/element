@@ -19,6 +19,7 @@
 
 #include "ElementApp.h"
 #include "engine/nodes/MidiProgramMapNode.h"
+#include "engine/trace.hpp"
 
 namespace element {
 
@@ -68,31 +69,29 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     ScopedLock sl (lock);
     MidiMessage msg;
-    int frame = 0;
 
     if (! toSendMidi.isEmpty())
     {
-        MidiBuffer::Iterator iter1 (toSendMidi);
-        while (iter1.getNextEvent (msg, frame))
-            midiIn->addEvent (msg, frame);
+        for (auto m : toSendMidi)
+            midiIn->addEvent (m.data, m.numBytes, m.samplePosition);
         toSendMidi.clear();
     }
 
-    MidiBuffer::Iterator iter2 (*midiIn);
     int program = -1;
 
-    while (iter2.getNextEvent (msg, frame))
+    for (auto m : *midiIn)
     {
+        msg = m.getMessage();
         if (msg.isProgramChange() && programMap[msg.getProgramChangeNumber()] >= 0)
         {
             program = msg.getProgramChangeNumber();
             tempMidi.addEvent (MidiMessage::programChange (
                                    msg.getChannel(), programMap[msg.getProgramChangeNumber()]),
-                               frame);
+                               m.samplePosition);
         }
         else
         {
-            tempMidi.addEvent (msg, frame);
+            tempMidi.addEvent (msg, m.samplePosition);
         }
     }
 
@@ -103,7 +102,7 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     }
 
     midiIn->swapWith (tempMidi);
-    traceMidi (*midiIn);
+    // traceMidi (*midiIn);
     tempMidi.clear();
 }
 

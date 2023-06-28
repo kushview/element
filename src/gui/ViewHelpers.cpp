@@ -179,13 +179,6 @@ void presentPluginWindow (const Node& node)
     jassertfalse;
 }
 
-NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c)
-{
-    // FIXME:
-    // if (auto* cc = findContentComponent (c))
-    //     return cc->getNavigationConcertinaPanel();
-    return nullptr;
-}
 } // namespace ViewHelpers
 
 void ViewHelperMixin::connectPorts (const Port& src, const Port& dst)

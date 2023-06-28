@@ -768,7 +768,7 @@ public:
         midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
         midiInputHeader.setFont (Font (12, Font::bold));
 
-        midiInputs = new MidiInputs (*this);
+        midiInputs = std::make_unique<MidiInputs> (*this);
         midiInputView.setViewedComponent (midiInputs.get(), false);
         addAndMakeVisible (midiInputView);
 
@@ -788,7 +788,7 @@ public:
 
     void timerCallback() override
     {
-        if ((midiInputs && midiInputs->getNumDevices() != MidiInput::getDevices().size()) || midiOutput.getNumItems() - 1 != MidiOutput::getDevices().size())
+        if ((midiInputs && midiInputs->getNumDevices() != MidiInput::getAvailableDevices().size()) || midiOutput.getNumItems() - 1 != MidiOutput::getAvailableDevices().size())
         {
             updateDevices();
         }
@@ -861,7 +861,7 @@ private:
     Label sendClockToInputLabel;
     SettingButton sendClockToInput;
     Label midiInputHeader;
-    StringArray outputs;
+    Array<MidiDeviceInfo> outputs;
 
     class MidiInputs : public Component,
                        public Button::Listener
@@ -876,17 +876,17 @@ private:
         {
             midiInputLabels.clearQuick (true);
             midiInputs.clearQuick (true);
-            inputs = MidiInput::getDevices();
+            inputs = MidiInput::getAvailableDevices();
 
-            for (const auto& name : inputs)
+            for (const auto& d : inputs)
             {
                 auto* label = midiInputLabels.add (new Label());
                 label->setFont (Font (12));
-                label->setText (name, dontSendNotification);
+                label->setText (d.name, dontSendNotification);
                 addAndMakeVisible (label);
 
                 auto* btn = midiInputs.add (new SettingButton());
-                btn->setName (name);
+                btn->setName (d.name);
                 btn->setClickingTogglesState (true);
                 btn->setYesNoText ("On", "Off");
                 btn->addListener (this);
@@ -947,42 +947,47 @@ private:
 
         void buttonClicked (Button* btn) override
         {
-            if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
+            auto sb = dynamic_cast<SettingButton*> (btn);
+            if (midiInputs.contains (sb))
             {
-                owner.midi.setMidiInputEnabled (btn->getName(), btn->getToggleState());
+                owner.midi.setMidiInputEnabled (inputs[midiInputs.indexOf (sb)],
+                                                btn->getToggleState());
             }
         }
 
         void updateSelection()
         {
             for (auto* input : midiInputs)
-                input->setToggleState (owner.midi.isMidiInputEnabled (input->getName()), dontSendNotification);
+            {
+                int idx = midiInputs.indexOf (input);
+                input->setToggleState (owner.midi.isMidiInputEnabled (inputs[idx]), dontSendNotification);
+            }
         }
 
     private:
         friend class MidiSettingsPage;
         MidiSettingsPage& owner;
-        StringArray inputs;
+        Array<MidiDeviceInfo> inputs;
         OwnedArray<Label> midiInputLabels;
         OwnedArray<SettingButton> midiInputs;
     };
 
     friend class MidiInputs;
-    ScopedPointer<MidiInputs> midiInputs;
+    std::unique_ptr<MidiInputs> midiInputs;
     Viewport midiInputView;
 
     void updateDevices()
     {
-        outputs = MidiOutput::getDevices();
+        outputs = MidiOutput::getAvailableDevices();
         midiOutput.clear (dontSendNotification);
         midiOutput.setTextWhenNoChoicesAvailable ("<none>");
 
         int i = 0;
         midiOutput.addItem ("<< none >>", 1);
         midiOutput.addSeparator();
-        for (const auto& name : outputs)
+        for (const auto& d : outputs)
         {
-            midiOutput.addItem (name, 10 + i);
+            midiOutput.addItem (d.name, 10 + i);
             ++i;
         }
 
@@ -997,7 +1002,7 @@ private:
     void updateOutputSelection()
     {
         if (auto* out = midi.getDefaultMidiOutput())
-            midiOutput.setSelectedId (10 + outputs.indexOf (out->getName()));
+            midiOutput.setSelectedId (10 + outputs.indexOf (out->getDeviceInfo()));
         else
             midiOutput.setSelectedId (1);
     }
@@ -1018,15 +1023,18 @@ PreferencesComponent::PreferencesComponent (Context& g, GuiService& _gui)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (pageList = new PageList (*this));
+    pageList = std::make_unique<PageList> (*this);
+    addAndMakeVisible (pageList.get());
     pageList->setName ("Page List");
 
-    addAndMakeVisible (groupComponent = new GroupComponent ("new group",
-                                                            TRANS ("group")));
+    groupComponent = std::make_unique<GroupComponent> ("new group",
+                                                       TRANS ("group"));
+    addAndMakeVisible (groupComponent.get());
     groupComponent->setColour (GroupComponent::outlineColourId, Colour (0xff888888));
     groupComponent->setColour (GroupComponent::textColourId, Colours::white);
 
-    addAndMakeVisible (pageComponent = new Component());
+    pageComponent.reset (new Component());
+    addAndMakeVisible (pageComponent.get());
     pageComponent->setName ("new component");
 
     //[UserPreSize]
@@ -1121,20 +1129,20 @@ void PreferencesComponent::setPage (const String& name)
 
     if (pageComponent)
     {
-        removeChildComponent (pageComponent);
+        removeChildComponent (pageComponent.get());
     }
 
-    pageComponent = createPageForName (name);
+    pageComponent.reset (createPageForName (name));
 
     if (pageComponent)
     {
         pageComponent->setName (name);
-        addAndMakeVisible (pageComponent);
+        addAndMakeVisible (pageComponent.get());
         pageList->selectRow (pageList->indexOfPage (name));
     }
     else
     {
-        pageComponent = new Component (name);
+        pageComponent = std::make_unique<Component> (name);
     }
     resized();
 }
@@ -1142,8 +1150,6 @@ void PreferencesComponent::setPage (const String& name)
 void PreferencesComponent::updateSize()
 {
     setSize (600, 500);
-    // setSize (roundDoubleToInt (600.0 * Desktop::getInstance().getGlobalScaleFactor()),
-    //          roundDoubleToInt (500.0 * Desktop::getInstance().getGlobalScaleFactor()));
 }
 
 } /* namespace element */

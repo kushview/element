@@ -56,17 +56,15 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         return;
 
     auto* const midiIn = midi.getWriteBuffer (0);
-    MidiBuffer::Iterator iter (*midiIn);
-    MidiMessage msg;
-    int frame;
 
-    ScopedLock sl (lock);
-    while (iter.getNextEvent (msg, frame))
+    for (auto m : *midiIn)
     {
-        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)));
+        auto msg = m.getMessage();
+        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (m.samplePosition) / currentSampleRate)));
         inputMessages.addMessageToQueue (msg);
     }
 
+    ScopedLock sl (lock);
     numSamples += nframes;
 }
 
@@ -97,14 +95,11 @@ void MidiMonitorNode::timerCallback()
     if (midiTemp.getNumEvents() <= 0)
         return;
 
-    MidiBuffer::Iterator iter (midiTemp);
-    MidiMessage msg;
-    int frame = 0;
-
     int numLogged = 0;
     String text;
-    while (iter.getNextEvent (msg, frame))
+    for (auto m : midiTemp)
     {
+        auto msg = m.getMessage();
         if (msg.isMidiClock())
         {
             text.clear();

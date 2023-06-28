@@ -40,4 +40,3 @@
 #include <element/context.hpp>
 #include <element/settings.hpp>
 #include "utils.hpp"
-#include "version.hpp"

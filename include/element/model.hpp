@@ -7,7 +7,7 @@
 #include <element/juce/data_structures.hpp>
 
 #define EL_MODEL_GETTER(a, b) \
-    inline const var& a() const noexcept { return objectData.getProperty (b); }
+    inline const juce::var& a() const noexcept { return objectData.getProperty (b); }
 #define EL_MODEL_GETTER_WITH_TYPE(a, b, r) \
     inline r a() const noexcept { return (r) objectData.getProperty (b); }
 #define EL_MODEL_SETTER(a, b) \

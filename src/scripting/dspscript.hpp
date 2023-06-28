@@ -21,9 +21,9 @@
 
 #include "sol/sol.hpp"
 #include <element/parameter.hpp>
+#include <element/juce/core.hpp>
+
 #include "scripting/scriptinstance.hpp"
-#include <element/juce.hpp>
-using namespace juce; // FIXME:
 
 namespace element {
 
@@ -41,7 +41,7 @@ public:
             f();
     }
 
-    static Result validate (const String& script);
+    static juce::Result validate (const juce::String& script);
 
     /** Returns true if the script loaded ok */
     bool isValid() const { return loaded; }
@@ -60,10 +60,10 @@ public:
     }
 
     //==========================================================================
-    void process (AudioSampleBuffer& a, MidiPipe& m);
+    void process (juce::AudioSampleBuffer& a, element::MidiPipe& m);
 
     //==========================================================================
-    void save (MemoryBlock& block);
+    void save (juce::MemoryBlock& block);
     void restore (const void* data, size_t size);
 
     //==========================================================================
@@ -76,7 +76,7 @@ public:
     void copyParameterValues (const DSPScript&);
 
     //==========================================================================
-    String getUI() const;
+    juce::String getUI() const;
 
 private:
     sol::table DSP;
@@ -99,11 +99,11 @@ private:
 
     class Parameter;
     friend class Parameter;
-    ReferenceCountedArray<Parameter> inParams, outParams;
+    juce::ReferenceCountedArray<Parameter> inParams, outParams;
 
     void deref();
-    void getParameterData (MemoryBlock&);
-    void setParameterData (MemoryBlock&);
+    void getParameterData (juce::MemoryBlock&);
+    void setParameterData (juce::MemoryBlock&);
     void addAudioMidiPorts();
     void addParameterPorts();
     void unlinkParams();

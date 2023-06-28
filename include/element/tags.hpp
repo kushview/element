@@ -15,6 +15,8 @@ EL_TAG (Anonymous)
 
 EL_TAG (Control)
 EL_TAG (Controller)
+EL_TAG (ControllerMap)
+
 EL_TAG (Graph)
 EL_TAG (Node)
 EL_TAG (Port)
@@ -31,8 +33,8 @@ EL_TAG (flow)
 EL_TAG (input)
 EL_TAG (midi)
 
-static const juce::Identifier asset = "asset";
-static const juce::Identifier assetId = "assetId";
+EL_TAG (asset);
+EL_TAG (assetId);
 static const juce::Identifier bpm = "bpm";
 static const juce::Identifier category = "category";
 static const juce::Identifier channel = "channel";

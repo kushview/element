@@ -339,7 +339,7 @@ public:
     void setHeaderComponent (Component* newHeaderComponent);
 
     /** Returns whatever header component was set with setHeaderComponent(). */
-    Component* getHeaderComponent() const noexcept { return headerComponent; }
+    Component* getHeaderComponent() const noexcept { return headerComponent.get(); }
 
     /** Changes the width of the rows in the list.
      
@@ -415,9 +415,9 @@ private:
     friend class ListViewport;
     friend class TableListBox;
     ListBoxModel* model;
-    ScopedPointer<ListViewport> viewport;
-    ScopedPointer<Component> headerComponent;
-    ScopedPointer<MouseListener> mouseMoveSelector;
+    std::unique_ptr<ListViewport> viewport;
+    std::unique_ptr<Component> headerComponent;
+    std::unique_ptr<MouseListener> mouseMoveSelector;
     int totalItems, rowHeight, minimumRowWidth;
     int outlineThickness;
     int lastRowSelected;

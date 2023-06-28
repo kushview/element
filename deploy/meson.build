@@ -1,5 +1,8 @@
 
-if not meson.is_subproject()
+archivegen = find_program ('archivegen', required : get_option ('deploy'))
+binarycreator = find_program ('binarycreator', required : get_option ('deploy'))
+macdeployqt = find_program ('macdeployqt', 
+    required : host_machine.system() == 'darwin' and get_option ('deploy'))
 
 element_deploy_targetdir = ''
 element_release_url = ''
@@ -9,12 +12,13 @@ element_repo_url = 'https://cd.kushview.net/element'
 if host_machine.system() == 'darwin'
     element_release_url = element_repo_url + '/release/osx'
     element_deploy_targetdir = '@HomeDir@/Library/Application Support/Kushview/Element'
-    subdir ('osx')
 elif host_machine.system() == 'windows'
     element_release_url = element_repo_url + '/release/windows'
     element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element'
-    subdir ('windows')
 endif
+
+if get_option ('deploy')
+if not meson.is_subproject()
 
 foreach f : [ 'config.xml', 'control.js' ]
     configure_file (input : f , output : f,
@@ -27,7 +31,7 @@ foreach f : [ 'config.xml', 'control.js' ]
         })
 endforeach
 
-endif
+endif # not subproject
 
 foreach pkg : 'element lv2'.split()
     subdir (pkg)
@@ -53,8 +57,6 @@ if host_machine.system() == 'darwin'
                 basename + '.dmg')
     endif
 
-    archivegen = find_program ('archivegen', required : true)
-    binarycreator = find_program ('binarycreator', required : true)
     configure_file (input : 'installer.sh', output : 'installer.sh',
         install : true, install_dir : installerdir,
         configuration: {
@@ -75,8 +77,7 @@ elif host_machine.system() == 'windows'
        # sign exe
     endif
 
-    archivegen = find_program ('archivegen', required : true)
-    binarycreator = find_program ('binarycreator', required : true)
+
     configure_file (input : 'installer.bat', output : 'installer.bat',
         install : true, install_dir : installerdir,
         configuration: {
@@ -88,8 +89,16 @@ elif host_machine.system() == 'windows'
         })
 endif
 
+endif # not subproject
+endif # not deploy
+
 summary ('Version', version_with_build, section : 'Application')
+summary ('Deploy', get_option('deploy'), section : 'Application')
 
+if not meson.is_subproject()
+if host_machine.system() == 'darwin'
+    subdir ('osx')
+elif host_machine.system() == 'windows'
+    subdir ('windows')
 endif
-
-# summary ('Hash', version_with_build, section : 'Version')
+endif

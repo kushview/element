@@ -39,7 +39,7 @@ struct Artist
         {
             g.setOrigin (r.getX(), r.getY());
             g.addTransform (AffineTransform().rotated (
-                float_Pi / 2.0f, 0.0f, 0.0f));
+                MathConstants<float>::pi / 2.0f, 0.0f, 0.0f));
             g.drawText (text,
                         0,
                         -r.getWidth(),
@@ -52,7 +52,7 @@ struct Artist
         {
             g.setOrigin (r.getX(), r.getY());
             g.addTransform (AffineTransform().rotated (
-                float_Pi / 2.0f, 0.0f, 0.0f));
+                MathConstants<float>::pi / 2.0f, 0.0f, 0.0f));
             g.drawText (text,
                         0,
                         -r.getWidth(),
@@ -65,7 +65,7 @@ struct Artist
         {
             g.setOrigin (r.getX(), r.getY());
             g.addTransform (AffineTransform().rotated (
-                -float_Pi / 2.0f, 0.0f, (float) r.getHeight()));
+                -MathConstants<float>::pi / 2.0f, 0.0f, (float) r.getHeight()));
             g.drawText (text,
                         0,
                         r.getHeight(),

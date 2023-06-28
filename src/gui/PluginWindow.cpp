@@ -50,10 +50,11 @@ public:
     {
         nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) && nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
 
-        addAndMakeVisible (toolbar = new PluginWindowToolbar());
+        toolbar.reset (new PluginWindowToolbar());
+        addAndMakeVisible (toolbar.get());
         toolbar->setBounds (0, 0, getWidth(), 24);
 
-        addAndMakeVisible (editor);
+        addAndMakeVisible (editor.get());
         editor->addComponentListener (this);
 
         addAndMakeVisible (nodeButton);
@@ -180,7 +181,7 @@ public:
 
     void componentMovedOrResized (Component& c, bool wasMoved, bool wasResized) override
     {
-        if (editor && editor != &c)
+        if (editor != nullptr && editor.get() != &c)
             return;
         if (wasResized)
             updateSize();
@@ -204,14 +205,14 @@ public:
 
 private:
     JUCE_DECLARE_WEAK_REFERENCEABLE (PluginWindowContent);
-    ScopedPointer<PluginWindowToolbar> toolbar;
+    std::unique_ptr<PluginWindowToolbar> toolbar;
     SettingButton nodeButton;
     PowerButton powerButton;
     SettingButton onTopButton;
     SettingButton muteButton;
     Value bypassValue;
     bool nativeEditor = false;
-    ScopedPointer<Component> editor, leftPanel, rightPanel;
+    std::unique_ptr<Component> editor, leftPanel, rightPanel;
     ProcessorPtr object;
     Node node;
 

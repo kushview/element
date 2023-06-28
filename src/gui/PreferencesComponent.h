@@ -58,9 +58,9 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<PageList> pageList;
-    ScopedPointer<GroupComponent> groupComponent;
-    ScopedPointer<Component> pageComponent;
+    std::unique_ptr<PageList> pageList;
+    std::unique_ptr<GroupComponent> groupComponent;
+    std::unique_ptr<Component> pageComponent;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)

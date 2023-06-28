@@ -98,7 +98,6 @@ private:
     bool showIns = true;
     bool showOuts = true;
     Viewport view;
-    
 
     struct Content : public Component,
                      public Button::Listener
@@ -117,11 +116,12 @@ private:
                     auto index = midiOutputs.getSelectedItemIndex();
                     if (index == 0)
                     {
-                        owner.midi.setDefaultMidiOutput (String());
+                        owner.midi.setDefaultMidiOutput ({});
                     }
                     else if (index > 0)
                     {
-                        owner.midi.setDefaultMidiOutput (midiOutputs.getItemText (index));
+                        auto avail = juce::MidiOutput::getAvailableDevices();
+                        owner.midi.setDefaultMidiOutput (avail[index - 1]);
                     }
                 };
             }
@@ -173,10 +173,10 @@ private:
             for (auto* btn : midiInputs)
                 btn->removeListener (this);
             midiInputs.clearQuick (true);
-            for (const auto& name : MidiInput::getDevices())
+            for (const auto& d : MidiInput::getAvailableDevices())
             {
-                auto* toggle = midiInputs.add (new ToggleButton (name));
-                toggle->setToggleState (owner.midi.isMidiInputEnabled (name), dontSendNotification);
+                auto* toggle = midiInputs.add (new ToggleButton (d.name));
+                toggle->setToggleState (owner.midi.isMidiInputEnabled (d), dontSendNotification);
                 toggle->addListener (this);
                 addAndMakeVisible (toggle);
             }
@@ -187,9 +187,9 @@ private:
             midiOutputs.clear (dontSendNotification);
             int itemId = 1;
             midiOutputs.addItem ("<< none >>", itemId++);
-            for (const auto& name : MidiOutput::getDevices())
+            for (const auto& d : MidiOutput::getAvailableDevices())
             {
-                midiOutputs.addItem (name, itemId++);
+                midiOutputs.addItem (d.name, itemId++);
             }
 
             auto outName = owner.midi.getDefaultMidiOutputName();
@@ -211,7 +211,9 @@ private:
 
         void buttonClicked (Button* button) override
         {
-            owner.midi.setMidiInputEnabled (button->getButtonText(), button->getToggleState());
+            auto idx = midiInputs.indexOf ((ToggleButton*) button);
+            auto avail = MidiInput::getAvailableDevices();
+            owner.midi.setMidiInputEnabled (avail[idx], button->getToggleState());
         }
 
         void resized() override
@@ -242,7 +244,7 @@ private:
         Label midiInputLabel;
         OwnedArray<ToggleButton> midiInputs;
     };
-    
+
     friend struct Content;
     std::unique_ptr<Content> content;
 
@@ -251,12 +253,12 @@ private:
         if (! content)
             return;
         bool didAnything = false;
-        if (showIns && content->midiInputs.size() != MidiInput::getDevices().size())
+        if (showIns && content->midiInputs.size() != MidiInput::getAvailableDevices().size())
         {
             content->updateInputs();
             didAnything = true;
         }
-        if (showOuts && content->midiOutputs.getNumItems() - 1 != MidiOutput::getDevices().size())
+        if (showOuts && content->midiOutputs.getNumItems() - 1 != MidiOutput::getAvailableDevices().size())
         {
             content->updateOutputs();
             didAnything = true;

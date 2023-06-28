@@ -6,7 +6,7 @@ option ('vst2sdk', type : 'string', value : 'auto', description : 'Path to VST2 
 option ('vst3sdk', type : 'string', value : 'auto', description : 'Path to VST3 SDK')
 option ('asiosdk', type : 'string', value : 'auto', description : 'Path to ASIO SDK')
 
-option ('deploy', type : 'boolean', value : true,  description : 'Make Installers')
+option ('deploy', type : 'boolean', value : false,  description : 'Make Installers')
 option ('sign', type : 'boolean', value : false,  description : 'Code Sign Binaries')
 option ('codesign-identity', type : 'string', value : '', description : 'Identity to use for code signing on Mac')
 option ('notarize', type : 'boolean', value : false, description : 'Whether to notarize or not.')

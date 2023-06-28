@@ -8,18 +8,17 @@
 #include <element/model.hpp>
 #include <element/tags.hpp>
 
-#define EL_CONTROL_VERSION    1
-#define EL_CONTROLLER_VERSION 1
+#define EL_CONTROL_VERSION        1
+#define EL_CONTROLLER_VERSION     1
+#define EL_CONTROLLER_MAP_VERSION 1
 
 namespace element {
 
-// FIXME:
-using namespace juce;
 class Controller;
 
 class Control : public Model {
 public:
-    explicit Control (const ValueTree& data = ValueTree())
+    explicit Control (const juce::ValueTree& data = juce::ValueTree())
         : Model (data)
     {
         if (data.isValid())
@@ -31,7 +30,7 @@ public:
         toggleEquals
     };
 
-    Control (const String& name)
+    Control (const juce::String& name)
         : Model (types::Control, EL_CONTROL_VERSION)
     {
         setName (name);
@@ -70,11 +69,11 @@ public:
     int getEventId() const { return (int) getProperty ("eventId", 0); }
 
     bool isMomentary() const { return (bool) getProperty ("momentary", false); }
-    Value getMomentaryValue() { return getPropertyAsValue ("momentary"); }
+    juce::Value getMomentaryValue() { return getPropertyAsValue ("momentary"); }
     int getToggleValue() const { return (int) getProperty ("toggleValue", 0); }
-    Value getToggleValueObject() { return getPropertyAsValue ("toggleValue"); }
+    juce::Value getToggleValueObject() { return getPropertyAsValue ("toggleValue"); }
     bool inverseToggle() const { return (bool) getProperty ("inverseToggle", false); }
-    Value getInverseToggleObject() { return getPropertyAsValue ("inverseToggle"); }
+    juce::Value getInverseToggleObject() { return getPropertyAsValue ("inverseToggle"); }
 
     static ToggleMode toggleMode (const String& str)
     {
@@ -90,16 +89,16 @@ public:
         return toggleMode (getProperty ("toggleMode").toString());
     }
 
-    Value toggleModeObject() { return getPropertyAsValue ("toggleMode"); }
+    juce::Value toggleModeObject() { return getPropertyAsValue ("toggleMode"); }
 
     Controller controller() const;
 
-    String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }
+    juce::String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }
 
 private:
     juce::MidiMessage getMappingDataLegacy() const
     {
-        const var& data (objectData.getProperty (tags::mappingData));
+        const juce::var& data (objectData.getProperty (tags::mappingData));
         if (const auto* block = data.getBinaryData())
             if (block->getSize() > 0)
                 return juce::MidiMessage (block->getData(), (int) block->getSize());
@@ -109,7 +108,7 @@ private:
     void setMissingProperties()
     {
         stabilizePropertyString (tags::name, "Control");
-        stabilizePropertyString (tags::uuid, Uuid().toString());
+        stabilizePropertyString (tags::uuid, juce::Uuid().toString());
 
         if (hasProperty (tags::mappingData)) {
             const auto midi = getMappingDataLegacy();
@@ -135,8 +134,8 @@ private:
 
 class Controller : public Model {
 public:
-    explicit Controller (const ValueTree& data = ValueTree());
-    Controller (const String& name);
+    explicit Controller (const juce::ValueTree& data = juce::ValueTree());
+    Controller (const juce::String& name);
     virtual ~Controller() {}
 
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (types::Controller); }
@@ -144,7 +143,8 @@ public:
     EL_MODEL_GETTER (getName, tags::name)
     EL_MODEL_SETTER (Name, tags::name)
     EL_MODEL_GETTER (getInputDevice, tags::inputDevice)
-    inline String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }
+
+    inline juce::String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }
 
     inline int getNumControls() const { return data().getNumChildren(); }
     inline Control getControl (const int index) const
@@ -154,12 +154,12 @@ public:
     }
 
     inline int indexOf (const Model& model) const { return objectData.indexOf (model.data()); }
-    inline int indexOf (const Identifier& childType, const Model& model) const
+    inline int indexOf (const juce::Identifier& childType, const Model& model) const
     {
         return objectData.getChildWithName (childType).indexOf (model.data());
     }
 
-    inline Control findControlById (const Uuid& uuid) const
+    inline Control findControlById (const juce::Uuid& uuid) const
     {
         const Control control (objectData.getChildWithProperty (tags::uuid, uuid.toString()));
         return control;
@@ -171,9 +171,10 @@ private:
 
 class ControllerMap : public Model {
 public:
-    explicit ControllerMap (const ValueTree& data = ValueTree()) : Model (data) {}
+    explicit ControllerMap (const juce::ValueTree& data = juce::ValueTree())
+        : Model (data) {}
     ~ControllerMap() noexcept {}
-    inline bool isValid() const { return objectData.isValid() && objectData.hasType (tags::map); }
+    inline bool isValid() const { return objectData.isValid() && objectData.hasType (types::ControllerMap); }
     inline int getParameterIndex() const { return (int) objectData.getProperty (tags::parameter, -1); }
 };
 

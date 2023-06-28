@@ -109,7 +109,7 @@ Settings::Settings()
 #endif
 
 #if JUCE_LINUX
-    opts.folderName = ".config/@0@".replace ("@0@", EL_APP_DATA_SUBDIR);
+    opts.folderName = String (".config/@0@").replace ("@0@", EL_APP_DATA_SUBDIR);
 #else
     opts.folderName = EL_APP_DATA_SUBDIR;
 #endif
@@ -428,14 +428,14 @@ void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
 
     int index = 0;
     sub.clear();
-    for (const auto& device : MidiInput::getDevices())
-        sub.addItem (MidiInputDevice + index++, device, true, midi.isMidiInputEnabled (device));
+    for (const auto& device : MidiInput::getAvailableDevices())
+        sub.addItem (MidiInputDevice + index++, device.name, true, midi.isMidiInputEnabled (device));
     menu.addSubMenu ("MIDI Input Devices", sub);
 
     index = 0;
     sub.clear();
-    for (const auto& device : MidiOutput::getDevices())
-        sub.addItem (MidiOutputDevice + index++, device, true, device == midi.getDefaultMidiOutputName());
+    for (const auto& device : MidiOutput::getAvailableDevices())
+        sub.addItem (MidiOutputDevice + index++, device.name, true, device.identifier == midi.getDefaultMidiOutputID());
     menu.addSubMenu ("MIDI Output Device", sub);
 
     if (auto* type = devices.getCurrentDeviceTypeObject())
@@ -522,17 +522,17 @@ bool Settings::performMenuResult (Context& world, const int result)
     if (settingResultIsFor (result, MidiInputDevice))
     {
         // MIDI input device
-        const auto device = MidiInput::getDevices()[result - MidiInputDevice];
-        if (device.isNotEmpty())
+        const auto device = MidiInput::getAvailableDevices()[result - MidiInputDevice];
+        if (device.identifier.isNotEmpty())
             midi.setMidiInputEnabled (device, ! midi.isMidiInputEnabled (device));
     }
     else if (settingResultIsFor (result, MidiOutputDevice))
     {
         // MIDI Output device
-        const auto device = MidiOutput::getDevices()[result - MidiOutputDevice];
-        if (device.isNotEmpty() && device == midi.getDefaultMidiOutputName())
+        const auto device = MidiOutput::getAvailableDevices()[result - MidiOutputDevice];
+        if (device.identifier.isNotEmpty() && device.identifier == midi.getDefaultMidiOutputID())
             midi.setDefaultMidiOutput ({});
-        else if (device.isNotEmpty())
+        else if (device.identifier.isNotEmpty())
             midi.setDefaultMidiOutput (device);
     }
     else if (settingResultIsFor (result, AudioInputDevice))

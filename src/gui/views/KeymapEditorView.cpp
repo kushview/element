@@ -62,7 +62,7 @@ private:
 
 KeymapEditorView::KeymapEditorView()
 {
-    setName ("KeymapEditorView");
+    setName (EL_VIEW_KEYMAP_EDITOR);
     addAndMakeVisible (closeButton);
     closeButton.setButtonText (TRANS ("Close"));
     closeButton.setSize (24, 24);
@@ -81,9 +81,11 @@ void KeymapEditorView::stabilizeContent()
     editor = nullptr;
     if (auto* const cc = ViewHelpers::findContentComponent (this))
     {
-        // FIXME: KeyMappings
-        // auto* const mapping = cc->context().getCommandManager().getKeyMappings();
-        // addAndMakeVisible (editor = new KeymapEditor (*mapping));
+        if (auto* const mapping = cc->services().find<UI>()->commands().getKeyMappings())
+        {
+            editor = std::make_unique<KeymapEditor> (*mapping);
+            addAndMakeVisible (editor.get());
+        }
     }
     resized();
 }
@@ -103,12 +105,11 @@ void KeymapEditorView::resized()
 
 void KeymapEditorView::saveMappings()
 {
-    // FIXME: KeyMappings
-    // if (auto* const cc = ViewHelpers::findContentComponent (this))
-    //     if (auto* const mapping = cc->context().getCommandManager().getKeyMappings())
-    //         if (auto xml = mapping->createXml (false))
-    //             cc->context().settings().getUserSettings()->setValue (
-    //                 "keymappings", xml.get());
+    if (auto* const cc = ViewHelpers::findContentComponent (this))
+        if (auto* const mapping = cc->services().find<UI>()->commands().getKeyMappings())
+            if (auto xml = mapping->createXml (false))
+                cc->context().settings().getUserSettings()->setValue (
+                    "keymappings", xml.get());
 }
 
 } // namespace element

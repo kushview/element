@@ -62,17 +62,15 @@ public:
         if (0 == offset.get())
             return;
 
-        MidiBuffer::Iterator iter (midi);
         MidiMessage msg;
-        int frame = 0;
-
-        while (iter.getNextEvent (msg, frame))
+        for (auto m : midi)
         {
-            if (frame >= numSamples)
+            if (m.samplePosition >= numSamples)
                 break;
+            msg = m.getMessage();
             if (msg.isNoteOnOrOff())
                 msg.setNoteNumber (offset.get() + msg.getNoteNumber());
-            output.addEvent (msg, frame);
+            output.addEvent (msg, m.samplePosition);
         }
 
         midi.swapWith (output);

@@ -109,7 +109,7 @@ protected:
 private:
     class ItemSelectionTimer;
     friend class ItemSelectionTimer;
-    ScopedPointer<Timer> delayedSelectionTimer;
+    std::unique_ptr<Timer> delayedSelectionTimer;
     WeakReference<TreeItemBase>::Master masterReference;
     friend class WeakReference<TreeItemBase>;
 
@@ -168,7 +168,7 @@ public:
     }
 
     TreeView tree;
-    ScopedPointer<TreeItemBase> rootItem;
+    std::unique_ptr<TreeItemBase> rootItem;
 
 private:
     String opennessStateKey;

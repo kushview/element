@@ -17,8 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/version.hpp>
+
 #include "gui/AboutComponent.h"
-#include "version.hpp"
 #include "BinaryData.h"
 #include "appinfo.hpp"
 

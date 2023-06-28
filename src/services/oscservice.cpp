@@ -48,9 +48,7 @@ struct CommandOSCListener final : juce::OSCReceiver::ListenerWithOSCAddress<>
         const auto command = Commands::fromString (msg.getString());
         if (command != Commands::invalid)
         {
-            // FIXME: Commands
-            // world.getCommandManager().invokeDirectly (
-            //     Commands::quit, true);
+            // noop
         }
     }
 

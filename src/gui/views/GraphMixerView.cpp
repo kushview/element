@@ -74,7 +74,8 @@ public:
             dragging = true;
             auto* dnd = findParentComponentOfClass<DragAndDropContainer>();
             Image image (Image::ARGB, 1, 1, true);
-            dnd->startDragging (var ("graphMixerStrip"), this, image);
+            ScaledImage si (image);
+            dnd->startDragging (var ("graphMixerStrip"), this, si);
         }
     }
 

@@ -248,42 +248,42 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
                                                                   double sampleRate,
                                                                   int blockSize)
 {
-    ScopedPointer<AudioPluginInstance> base;
+    std::unique_ptr<AudioPluginInstance> base;
 
     if (desc.fileOrIdentifier == "element.comb.mono")
-        base = new CombFilterProcessor (false);
+        base = std::make_unique<CombFilterProcessor> (false);
     else if (desc.fileOrIdentifier == "element.comb.stereo")
-        base = new CombFilterProcessor (true);
+        base = std::make_unique<CombFilterProcessor> (true);
     else if (desc.fileOrIdentifier == "element.allPass.mono")
-        base = new AllPassFilterProcessor (false);
+        base = std::make_unique<AllPassFilterProcessor> (false);
     else if (desc.fileOrIdentifier == "element.allPass.stereo")
-        base = new AllPassFilterProcessor (true);
+        base = std::make_unique<AllPassFilterProcessor> (true);
     else if (desc.fileOrIdentifier == "element.volume.mono")
-        base = new VolumeProcessor (-30.0, 12.0, false);
+        base = std::make_unique<VolumeProcessor> (-30.0, 12.0, false);
     else if (desc.fileOrIdentifier == "element.volume.stereo")
-        base = new VolumeProcessor (-30.0, 12.0, true);
+        base = std::make_unique<VolumeProcessor> (-30.0, 12.0, true);
     else if (desc.fileOrIdentifier == EL_NODE_ID_WET_DRY)
-        base = new WetDryProcessor();
+        base = std::make_unique<WetDryProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_REVERB)
-        base = new ReverbProcessor();
+        base = std::make_unique<ReverbProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_EQ_FILTER)
-        base = new EQFilterProcessor();
+        base = std::make_unique<EQFilterProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_FREQ_SPLITTER)
-        base = new FreqSplitterProcessor();
+        base = std::make_unique<FreqSplitterProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_COMPRESSOR)
-        base = new CompressorProcessor();
+        base = std::make_unique<CompressorProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_AUDIO_MIXER)
-        base = new AudioMixerProcessor (4, sampleRate, blockSize);
+        base = std::make_unique<AudioMixerProcessor> (4, sampleRate, blockSize);
     else if (desc.fileOrIdentifier == EL_NODE_ID_CHANNELIZE)
-        base = new ChannelizeProcessor();
+        base = std::make_unique<ChannelizeProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_CHANNEL_MAP)
-        base = new MidiChannelMapProcessor();
+        base = std::make_unique<MidiChannelMapProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_AUDIO_FILE_PLAYER)
-        base = new AudioFilePlayerNode();
+        base = std::make_unique<AudioFilePlayerNode>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_MEDIA_PLAYER)
-        base = new MediaPlayerProcessor();
+        base = std::make_unique<MediaPlayerProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_PLACEHOLDER)
-        base = new PlaceholderProcessor();
+        base = std::make_unique<PlaceholderProcessor>();
 
     return base != nullptr ? base.release() : nullptr;
 }

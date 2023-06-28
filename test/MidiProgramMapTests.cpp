@@ -52,10 +52,9 @@ static void testMidiStream (ProcessorPtr node, const String& name = "Renders map
     midi->addEvent (MidiMessage::noteOff (1, 12), 300);
     node->render (audio, pipe);
 
-    MidiBuffer::Iterator iter (*midi);
-    MidiMessage msg;
-    int frame = 0, index = 0;
-    while (iter.getNextEvent (msg, frame)) {
+    int index = 0;
+    for (auto m : *midi) {
+        auto msg = m.getMessage();
         switch (index) {
             case 0:
                 BOOST_REQUIRE (msg.isProgramChange() && msg.getProgramChangeNumber() == 6);

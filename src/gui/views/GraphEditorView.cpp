@@ -94,7 +94,7 @@ GraphEditorView::GraphEditorView()
     addAndMakeVisible (view);
     view.setViewedComponent (&graph, false);
     view.setScrollBarsShown (true, true, false, false);
-    view.setScrollOnDragEnabled (false);
+    view.setScrollOnDragMode (juce::Viewport::ScrollOnDragMode::never);
     view.setBounds (graph.getLocalBounds());
 
     addAndMakeVisible (nodeProps);
