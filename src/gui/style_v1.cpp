@@ -1,21 +1,5 @@
-/*
-    This file is part of the Kushview Modules for JUCE
-    Copyright (c) 2014-2019  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include <element/ui/style.hpp>
 #include <element/ui/simplemeter.hpp>
@@ -511,13 +495,23 @@ void LookAndFeel_E1::changeToggleButtonWidthToFitText (ToggleButton& button)
 }
 
 // MARK: Property Panel
+inline static auto getPanelSpacing() { return 1.4f; }
 
 void LookAndFeel_E1::drawPropertyPanelSectionHeader (Graphics& g, const String& name, bool isOpen, int width, int height)
 {
-    String text = isOpen ? " - " : " + ";
-    text << name;
-    g.setColour (isOpen ? Colors::textBoldColor : Colors::textColor);
-    g.drawText (text, 0, 0, width, height, Justification::centredLeft);
+    Rectangle<float> lb (0.f, 0.f, (float)width, (float)height);
+    g.setColour (Colors::widgetBackgroundColor.brighter());
+    g.fillRect (lb.withHeight (lb.getHeight() - getPanelSpacing()));
+
+    auto buttonSize = height * 0.75f;
+    auto buttonIndent = (height - buttonSize) * 0.5f;
+
+    drawTreeviewPlusMinusBox (g, Rectangle<float> (buttonIndent, buttonIndent, buttonSize, buttonSize), 
+                                Colours::white, isOpen, false);
+
+    g.setColour (Colors::textColor);
+    g.drawText (name, 0, 0, width, height, 
+                Justification::centred);
 }
 
 void LookAndFeel_E1::drawPropertyComponentBackground (Graphics& g, int width, int height, PropertyComponent& pc)
@@ -537,6 +531,23 @@ static int getPropertyComponentIndent2 (PropertyComponent& component)
 
 void LookAndFeel_E1::drawPropertyComponentLabel (Graphics& g, int width, int height, PropertyComponent& component)
 {
+#if 1
+    g.setColour (component.findColour (PropertyComponent::labelTextColourId)
+                    .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
+
+    // g.setFont (jmin (height, 24) * 0.55f);
+    g.setFont (12.f);
+
+    auto r = getPropertyComponentContentPosition (component);
+
+    g.drawFittedText (component.getName(),
+                        3, 
+                        r.getY(), 
+                        r.getX() - 5, 
+                        r.getHeight(),
+                        Justification::centredLeft, 
+                        2);
+#else
     ignoreUnused (width);
 
     const auto indent = getPropertyComponentIndent2 (component);
@@ -556,6 +567,7 @@ void LookAndFeel_E1::drawPropertyComponentLabel (Graphics& g, int width, int hei
                       r.getHeight(),
                       Justification::centredLeft,
                       2);
+#endif
 }
 
 Rectangle<int> LookAndFeel_E1::getPropertyComponentContentPosition (PropertyComponent& component)
@@ -994,6 +1006,60 @@ void LookAndFeel_E1::drawKeymapChangeButton (Graphics& g, int width, int height,
         g.setColour (textColour.withAlpha (0.4f));
         g.drawRect (0, 0, width, height);
     }
+}
+
+    // AlertWindow
+juce::AlertWindow* LookAndFeel_E1::createAlertWindow (const juce::String& title, 
+                                                      const juce::String& message,
+                                                      const juce::String& button1,
+                                                      const juce::String& button2,
+                                                      const juce::String& button3,
+                                                      juce::MessageBoxIconType iconType,
+                                                      int numButtons,
+                                                      juce::Component* associatedComponent)
+{
+    return LookAndFeel_V3::createAlertWindow (title, message, 
+                                              button1, button2, button3, 
+                                              iconType, numButtons, 
+                                              associatedComponent);
+}
+
+void LookAndFeel_E1::drawAlertBox (juce::Graphics& g, 
+                                   juce::AlertWindow& w, 
+                                   const juce::Rectangle<int>& r, 
+                                   juce::TextLayout& l)
+{
+    LookAndFeel_V3::drawAlertBox (g, w, r, l);
+}
+
+int LookAndFeel_E1::getAlertBoxWindowFlags()
+{
+    return LookAndFeel_V3::getAlertBoxWindowFlags();
+}
+
+juce::Array<int> LookAndFeel_E1::getWidthsForTextButtons (juce::AlertWindow& aw, const juce::Array<juce::TextButton*>& ab)
+{
+    return LookAndFeel_V3::getWidthsForTextButtons (aw, ab);
+}
+
+int LookAndFeel_E1::getAlertWindowButtonHeight()
+{
+    return LookAndFeel_V3::getAlertWindowButtonHeight();
+}
+
+juce::Font LookAndFeel_E1::getAlertWindowTitleFont()
+{
+    return LookAndFeel_V3::getAlertWindowTitleFont();
+}
+
+juce::Font LookAndFeel_E1::getAlertWindowMessageFont()
+{
+    return LookAndFeel_V3::getAlertWindowMessageFont();
+}
+
+juce::Font LookAndFeel_E1::getAlertWindowFont()
+{
+    return LookAndFeel_V3::getAlertWindowFont();
 }
 
 } // namespace element

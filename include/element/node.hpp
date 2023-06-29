@@ -448,7 +448,7 @@ public:
     ValueTree getParentArcsNode() const;
     ValueTree getPortsValueTree() const { return objectData.getChildWithName (tags::ports); }
     ValueTree getUIValueTree() const { return objectData.getChildWithName (tags::ui); }
-    ValueTree getBlockValueTree() const noexcept { return getUIValueTree().getChildWithName (tags::block); }
+    ValueTree getBlockValueTree() const noexcept { return getUIValueTree().getChildWithName (types::Block); }
     ValueTree getScriptsValueTree() const noexcept { return objectData.getChildWithName (tags::scripts); }
 
     //=========================================================================
@@ -608,7 +608,7 @@ struct ConnectionBuilder {
             dstOffset = 0;
 
         for (int i = 0; i < 2; ++i) {
-            ValueTree connection (tags::arc);
+            ValueTree connection (types::Arc);
             connection.setProperty (tags::sourceNode, (int64) src.getNodeId(), 0)
                 .setProperty (tags::destNode, (int64) dst.getNodeId(), 0)
                 .setProperty (tags::sourceChannel, i + srcOffset, 0)

@@ -221,14 +221,16 @@ private:
             }
             else
             {
-                AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                                  "Updates",
-                                                  "You're up to date with the latest Element");
+                if (showAlertWhenNoUpdatesReady)
+                    AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                                      "Updates",
+                                                      "You're up to date with the latest Element");
             }
         });
     }
 
     bool launchUpdaterOnExit { false };
+    bool showAlertWhenNoUpdatesReady = false;
     ui::Updater updater;
     boost::signals2::connection _conn;
 };

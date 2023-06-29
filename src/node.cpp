@@ -62,7 +62,7 @@ static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescripti
 
 static ValueTree getBlockValueTree (const Node& node)
 {
-    return node.getUIValueTree().getOrCreateChildWithName (tags::block, nullptr);
+    return node.getUIValueTree().getOrCreateChildWithName (types::Block, nullptr);
 }
 
 static StringArray getHiddenPortsProperty (const Node& node)
@@ -312,11 +312,23 @@ ValueTree Node::parse (const File& file)
     else
     {
         nodeData = data.getChildWithName (types::Node);
-        // Rename the node appropriately
-        if (data.hasProperty (tags::name))
-            nodeData.setProperty (tags::name, data.getProperty (tags::name), 0);
-        else
-            nodeData.setProperty (tags::name, file.getFileNameWithoutExtension(), 0);
+        if (! nodeData.isValid()) {
+            nodeData = data.getChildWithName (tags::node);
+            if (nodeData.isValid()) {
+                // TODO: Data Migrations.
+                std::clog << "[element] node migration needed loading preset." << std::endl;
+                nodeData = ValueTree();
+            }
+        }
+
+        // copy properties from preset if needed.
+        if (nodeData.isValid()) {
+            // Rename the node appropriately
+            if (data.hasProperty (tags::name))
+                nodeData.setProperty (tags::name, data.getProperty (tags::name), 0);
+            else
+                nodeData.setProperty (tags::name, file.getFileNameWithoutExtension(), 0);
+        }
     }
 
     if (nodeData.isValid() && nodeData.hasType (types::Node))
@@ -420,7 +432,7 @@ Node Node::createGraph (const String& name)
 
 ValueTree Node::makeArc (const Arc& arc)
 {
-    ValueTree model (tags::arc);
+    ValueTree model (types::Arc);
     model.setProperty (tags::sourceNode, (int) arc.sourceNode, nullptr);
     model.setProperty (tags::sourcePort, (int) arc.sourcePort, nullptr);
     model.setProperty (tags::destNode, (int) arc.destNode, nullptr);
@@ -483,7 +495,7 @@ void Node::setMissingProperties()
     objectData.getOrCreateChildWithName (tags::ports, nullptr);
     objectData.getOrCreateChildWithName (tags::scripts, nullptr);
     auto ui = objectData.getOrCreateChildWithName (tags::ui, nullptr);
-    ui.getOrCreateChildWithName (tags::block, nullptr);
+    ui.getOrCreateChildWithName (types::Block, nullptr);
 }
 
 Processor* Node::getObject() const

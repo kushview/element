@@ -89,7 +89,7 @@ libelement_sources = '''
     gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
-    gui/LookAndFeel_E1.cpp
+    gui/style_v1.cpp
     gui/LuaTokeniser.cpp
     gui/MainMenu.cpp
     gui/MainWindow.cpp

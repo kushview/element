@@ -1,21 +1,5 @@
-/*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
@@ -123,16 +107,10 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         URL (EL_URL_MANUAL_HOME).launchInDefaultBrowser();
     }
-    else if (index == 6500 && menu == Help)
+    else if (index == 6001 && menu == Help)
     {
 #ifdef EL_URL_API_LUA_EL
         URL (EL_URL_API_LUA_EL).launchInDefaultBrowser();
-#endif
-    }
-    else if (index == 6501 && menu == Help)
-    {
-#ifdef EL_URL_API_LUA_KV
-        URL (EL_URL_API_LUA_KV).launchInDefaultBrowser();
 #endif
     }
     else if (index == 7000 && menu == Help)
@@ -310,8 +288,9 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
     menu.addItem (6000, TRANS ("User's Manual"));
+    menu.addItem (6001, TRANS ("Lua API"));
     menu.addSeparator();
-    menu.addItem (7000, TRANS ("Report a Bug..."));
+    menu.addItem (7000, TRANS ("Issue tracking..."));
     menu.addItem (7001, TRANS ("Donate..."));
 #if ! JUCE_MAC
     menu.addCommandItem (&cmd, Commands::showAbout, TRANS ("About Element"));

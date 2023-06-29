@@ -1101,7 +1101,7 @@ GraphEditorComponent* BlockComponent::getGraphPanel() const noexcept
 void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
 {
     PopupMenu dMenu;
-    const auto block = node.getUIValueTree().getOrCreateChildWithName (tags::block, nullptr);
+    const auto block = node.getUIValueTree().getOrCreateChildWithName (types::Block, nullptr);
     const auto mode = BlockComponent::getDisplayModeFromString (
         block.getProperty (tags::displayMode).toString());
     for (int i = 0; i <= BlockComponent::Embed; ++i)
@@ -1113,7 +1113,7 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
             forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
-                auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (tags::block, nullptr);
+                auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (types::Block, nullptr);
                 sb.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             });
 

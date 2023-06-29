@@ -1,7 +1,10 @@
 project ('element', ['c', 'cpp' ],
     version : '1.0.0',
     meson_version : '>= 0.58.0',
-    default_options : [ 'c_std=c11', 'cpp_std=c++17' ])
+    default_options : [ 
+        'c_std=c11', 
+        'cpp_std=c++17', 
+        'buildtype=release' ])
 
 date_py = files ('util/date.py')
 element_release_date = run_command ('python', date_py).stdout().strip()

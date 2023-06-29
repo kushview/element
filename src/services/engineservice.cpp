@@ -779,31 +779,6 @@ void EngineService::changeListenerCallback (ChangeBroadcaster* cb)
     auto& devices (context().devices());
     if (cb != &devices)
         return;
-
-    for (auto* const root : graphs->getGraphs())
-    {
-        auto* manager = root->getController();
-        auto* processor = root->getRootGraph();
-        if (! processor || ! manager)
-            continue;
-#if 0
-        manager->syncArcsModel();
-#else
-        const bool wasSuspended = processor->isSuspended();
-        processor->suspendProcessing (true);
-        processor->setPlayConfigFor (devices);
-
-        for (int i = processor->getNumNodes(); --i >= 0;)
-        {
-            auto node = processor->getNode (i);
-            if (node->isAudioIONode() || node->isMidiIONode())
-                node->refreshPorts();
-        }
-
-        manager->syncArcsModel();
-        processor->suspendProcessing (wasSuspended);
-#endif
-    }
 }
 
 void EngineService::syncModels()

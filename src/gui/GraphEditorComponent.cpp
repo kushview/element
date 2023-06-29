@@ -1087,7 +1087,7 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
         addAndMakeVisible (comp, 20000);
         comp->update();
     }
-    else if (child.hasType (tags::arc) || child.hasType (tags::nodes) || child.hasType (tags::arcs))
+    else if (child.hasType (types::Arc) || child.hasType (tags::nodes) || child.hasType (tags::arcs))
     {
         updateComponents();
     }

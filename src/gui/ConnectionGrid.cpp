@@ -494,7 +494,7 @@ private:
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenAdded.hasType (tags::arcs) || childWhichHasBeenAdded.hasType (tags::arc))
+        else if (childWhichHasBeenAdded.hasType (tags::arcs) || childWhichHasBeenAdded.hasType (types::Arc))
         {
             buildNodeArray();
         }
@@ -515,7 +515,7 @@ private:
         {
             buildNodeArray();
         }
-        else if (childWhichHasBeenRemoved.hasType (tags::arcs) || childWhichHasBeenRemoved.hasType (tags::arc))
+        else if (childWhichHasBeenRemoved.hasType (tags::arcs) || childWhichHasBeenRemoved.hasType (types::Arc))
         {
             buildNodeArray();
         }

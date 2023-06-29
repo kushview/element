@@ -92,8 +92,6 @@ endif
 endif # not subproject
 endif # not deploy
 
-summary ('Version', version_with_build, section : 'Application')
-summary ('Deploy', get_option('deploy'), section : 'Application')
 
 if not meson.is_subproject()
 if host_machine.system() == 'darwin'
@@ -102,3 +100,6 @@ elif host_machine.system() == 'windows'
     # subdir ('windows')
 endif
 endif
+
+summary ('Version', version_with_build, section : 'Application')
+summary ('Deploy', get_option('deploy'), section : 'Application')

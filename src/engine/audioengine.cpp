@@ -115,8 +115,8 @@ struct RootGraphRender : public AsyncUpdater
 
         if (shouldProcess)
         {
-            audioOut.setSize (buffer.getNumChannels(), buffer.getNumSamples(), false, false, true);
-            audioTemp.setSize (buffer.getNumChannels(), buffer.getNumSamples(), false, false, true);
+            audioOut.setSize (numChans, numSamples, false, false, true);
+            audioTemp.setSize (numChans, numSamples, false, false, true);
 
             // clear the mixing area
             for (int i = numChans; --i >= 0;)
@@ -131,7 +131,7 @@ struct RootGraphRender : public AsyncUpdater
                 for (int i = numInputChans; i < numChans; ++i)
                     audioTemp.clear (i, 0, numSamples);
 
-                // clear so messages: avoids feedback loop when IO node ins are
+                // avoids feedback loop when IO node ins are
                 // connected to IO node outs
                 midiTemp.clear (0, numSamples);
 

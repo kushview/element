@@ -140,7 +140,8 @@ private:
 };
 
 class Application : public JUCEApplication,
-                    public ActionListener
+                    public ActionListener,
+                    private Timer
 {
 public:
     Application() {}
@@ -288,7 +289,7 @@ public:
         world->services().run();
 
         if (world->settings().checkForUpdates())
-            world->services().find<UI>()->checkUpdates();
+            startTimer (5000);
 
         const auto path = getCommandLineParameters();
         const File sessionFile = File::isAbsolutePath (path) ? File (path)
@@ -364,6 +365,13 @@ private:
 #else
         setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
 #endif
+    }
+
+    void timerCallback() override
+    {
+        std::clog << "[element] checking updates..." << std::endl;
+        world->services().find<UI>()->checkUpdates();
+        stopTimer();
     }
 };
 

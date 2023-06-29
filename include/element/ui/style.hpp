@@ -68,10 +68,13 @@ public:
 
     juce::Font getComboBoxFont (juce::ComboBox& box) override;
     juce::Font getLabelFont (juce::Label&) override;
+    
+    // Property Panel
     void drawPropertyPanelSectionHeader (juce::Graphics&, const juce::String& name, bool isOpen, int width, int height) override;
     void drawPropertyComponentBackground (juce::Graphics&, int width, int height, juce::PropertyComponent&) override;
     void drawPropertyComponentLabel (juce::Graphics&, int width, int height, juce::PropertyComponent&) override;
     juce::Rectangle<int> getPropertyComponentContentPosition (juce::PropertyComponent&) override;
+    
     juce::Path getTickShape (float height) override;
     juce::Path getCrossShape (float height) override;
     void drawToggleButton (juce::Graphics&, juce::ToggleButton&, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
@@ -139,6 +142,26 @@ public:
         l->setFont (juce::Font (13.f));
         return l;
     }
+
+    // AlertWindow
+    virtual juce::AlertWindow* createAlertWindow (const juce::String& title, const juce::String& message,
+                                            const juce::String& button1,
+                                            const juce::String& button2,
+                                            const juce::String& button3,
+                                            juce::MessageBoxIconType iconType,
+                                            int numButtons,
+                                            juce::Component* associatedComponent) override;
+
+    virtual void drawAlertBox (juce::Graphics&, juce::AlertWindow&, const juce::Rectangle<int>& textArea, juce::TextLayout&) override;
+
+    virtual int getAlertBoxWindowFlags() override;
+
+    virtual juce::Array<int> getWidthsForTextButtons (juce::AlertWindow&, const juce::Array<juce::TextButton*>&) override;
+    virtual int getAlertWindowButtonHeight() override;
+
+    virtual juce::Font getAlertWindowTitleFont() override;
+    virtual juce::Font getAlertWindowMessageFont() override;
+    virtual juce::Font getAlertWindowFont() override;
 
 private:
     juce::Image backgroundTexture;

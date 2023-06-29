@@ -13,6 +13,8 @@ EL_TAG (View)
 EL_TAG (GraphView)
 EL_TAG (Anonymous)
 
+EL_TAG (Arc)
+EL_TAG (Block)
 EL_TAG (Control)
 EL_TAG (Controller)
 EL_TAG (ControllerMap)
