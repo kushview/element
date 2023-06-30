@@ -250,12 +250,12 @@ std::string Updater::findExe (const std::string& basename)
     String fileName = basename;
 #if JUCE_WINDOWS
     fileName << ".exe";
-    fileName = String ("AppData/Roaming/Kushview/Element/") + fileName;
+    fileName = String ("AppData/Roaming/Kushview/Element/installer/") + fileName;
     juce::File updaterExe = File::getSpecialLocation (File::userHomeDirectory)
                                 .getChildFile (fileName);
 #elif JUCE_MAC
     fileName << ".app";
-    fileName = String ("Library/Application Support/Kushview/Element/") + fileName;
+    fileName = String ("Library/Application Support/Kushview/Element/installer/") + fileName;
     fileName << "/Contents/MacOS/" << basename;
     juce::File updaterExe = File::getSpecialLocation (File::userHomeDirectory)
                                 .getChildFile (fileName);
