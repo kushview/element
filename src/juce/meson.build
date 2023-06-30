@@ -148,7 +148,7 @@ elif host_machine.system() == 'darwin'
         'discrecording', 'iokit', 'quartzcore', 'metal' ])
     juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)
     juce_au_includes += juce_proj.get_variable ('juce_au_includes')
-elif
+elif host_machine.system() == 'windows'
    juce_conf_data.set10 ('JUCE_USE_DIRECTWRITE', true)
 endif
 
