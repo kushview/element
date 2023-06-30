@@ -7,7 +7,7 @@
 
 #include <element/element.h>
 #include "sol_helpers.hpp"
-#define LKV_TYPE_NAME_RANGE "Range"
+#define EL_TYPE_NAME_RANGE "Range"
 
 using namespace juce;
 namespace lua = element::lua;
@@ -19,22 +19,22 @@ int luaopen_el_Range (lua_State* L)
     using RT = Range<double>;
     auto M = lua.create_table();
     M.new_usertype<RT> (
-        LKV_TYPE_NAME_RANGE, sol::no_constructor, "new", sol::factories (
-                                                             /// Create an empty range.
-                                                             // @function Range.new
-                                                             // @treturn kv.Range
-                                                             []() { return RT(); },
+        EL_TYPE_NAME_RANGE, sol::no_constructor, "new", sol::factories (
+                                                            /// Create an empty range.
+                                                            // @function Range.new
+                                                            // @treturn kv.Range
+                                                            []() { return RT(); },
 
-                                                             /// Create a new range.
-                                                             // @function Range.new
-                                                             // @number start Start value
-                                                             // @number end End value
-                                                             // @treturn kv.Range
-                                                             [] (lua_Number x, lua_Number y) { return RT (x, y); }),
+                                                            /// Create a new range.
+                                                            // @function Range.new
+                                                            // @number start Start value
+                                                            // @number end End value
+                                                            // @treturn kv.Range
+                                                            [] (lua_Number x, lua_Number y) { return RT (x, y); }),
 
         sol::meta_method::to_string,
         [] (RT& self) {
-            return lua::to_string (self, LKV_TYPE_NAME_RANGE);
+            return lua::to_string (self, EL_TYPE_NAME_RANGE);
         },
 
         /// Max value.
@@ -73,6 +73,6 @@ int luaopen_el_Range (lua_State* L)
         "setlength",
         &RT::setLength);
 
-    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_RANGE));
+    sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_RANGE));
     return 1;
 }

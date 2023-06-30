@@ -6,15 +6,17 @@ macdeployqt = find_program ('macdeployqt',
 
 element_deploy_targetdir = ''
 element_release_url = ''
-
 element_repo_url = 'https://cd.kushview.net/element'
+element_runprogram = '/usr/bin/element'
 
 if host_machine.system() == 'darwin'
     element_release_url = element_repo_url + '/release/osx'
-    element_deploy_targetdir = '@HomeDir@/Library/Application Support/Kushview/Element'
+    element_deploy_targetdir = '@HomeDir@/Library/Application Support/Kushview/Element/installer'
+    element_runprogram = '@ApplicationsDir@/Element.app/Contents/MacOS/Element'
 elif host_machine.system() == 'windows'
     element_release_url = element_repo_url + '/release/windows'
-    element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element'
+    element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element/installer'
+    element_runprogram = '@ProgramFilesX64@/Kushview/Element/element.exe'
 endif
 
 if get_option ('deploy')
@@ -27,7 +29,8 @@ foreach f : [ 'config.xml', 'control.js' ]
         configuration: {
             'VERSION': meson.project_version(),
             'TARGETDIR': element_deploy_targetdir,
-            'RELEASEREPO': element_release_url
+            'RELEASEREPO': element_release_url,
+            'RUNPROGRAM': element_runprogram
         })
 endforeach
 
@@ -77,7 +80,6 @@ elif host_machine.system() == 'windows'
        # sign exe
     endif
 
-
     configure_file (input : 'installer.bat', output : 'installer.bat',
         install : true, install_dir : installerdir,
         configuration: {
@@ -91,7 +93,6 @@ endif
 
 endif # not subproject
 endif # not deploy
-
 
 if not meson.is_subproject()
 if host_machine.system() == 'darwin'

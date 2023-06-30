@@ -9,7 +9,7 @@
 #include <element/element.h>
 #include "sol_helpers.hpp"
 
-#define LKV_TYPE_NAME_MOUSE_EVENT "MouseEvent"
+#define EL_TYPE_NAME_MOUSE_EVENT "MouseEvent"
 
 using namespace juce;
 
@@ -18,7 +18,7 @@ int luaopen_el_MouseEvent (lua_State* L)
 {
     sol::state_view lua (L);
     auto M = lua.create_table();
-    M.new_usertype<MouseEvent> (LKV_TYPE_NAME_MOUSE_EVENT, sol::no_constructor,
+    M.new_usertype<MouseEvent> (EL_TYPE_NAME_MOUSE_EVENT, sol::no_constructor,
                                 /// Attributes.
                                 // @section attributes
 
@@ -64,6 +64,6 @@ int luaopen_el_MouseEvent (lua_State* L)
                                 "tilty",
                                 &MouseEvent::tiltY);
 
-    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_MOUSE_EVENT));
+    sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_MOUSE_EVENT));
     return 1;
 }

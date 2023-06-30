@@ -11,7 +11,7 @@
 
 #include "sol_helpers.hpp"
 
-#define LKV_TYPE_NAME_DESKTOP "Desktop"
+#define EL_TYPE_NAME_DESKTOP "Desktop"
 
 using namespace juce;
 
@@ -20,7 +20,7 @@ int luaopen_el_Desktop (lua_State* L)
 {
     sol::state_view lua (L);
     auto M = lua.create_table();
-    M.new_usertype<Desktop> (LKV_TYPE_NAME_DESKTOP, sol::no_constructor,
+    M.new_usertype<Desktop> (EL_TYPE_NAME_DESKTOP, sol::no_constructor,
                              /// Desktop single instance.
                              // @function Desktop.instance
                              // @within Class Methods
@@ -35,6 +35,6 @@ int luaopen_el_Desktop (lua_State* L)
                              "scale",
                              sol::property (&Desktop::getGlobalScaleFactor, &Desktop::setGlobalScaleFactor));
 
-    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_DESKTOP));
+    sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_DESKTOP));
     return 1;
 }

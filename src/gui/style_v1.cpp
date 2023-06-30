@@ -524,14 +524,8 @@ void LookAndFeel_E1::drawPropertyComponentBackground (Graphics& g, int width, in
     g.fillRect (r.getX(), 0, width - r.getX(), height - 1);
 }
 
-static int getPropertyComponentIndent2 (PropertyComponent& component)
-{
-    return jmin (10, component.getWidth() / 10);
-}
-
 void LookAndFeel_E1::drawPropertyComponentLabel (Graphics& g, int width, int height, PropertyComponent& component)
 {
-#if 1
     g.setColour (component.findColour (PropertyComponent::labelTextColourId)
                     .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
 
@@ -547,27 +541,6 @@ void LookAndFeel_E1::drawPropertyComponentLabel (Graphics& g, int width, int hei
                         r.getHeight(),
                         Justification::centredLeft, 
                         2);
-#else
-    ignoreUnused (width);
-
-    const auto indent = getPropertyComponentIndent2 (component);
-
-    g.setColour (component.findColour (PropertyComponent::labelTextColourId)
-                     .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
-
-    // g.setFont (jmin (height, 24) * 0.65f);
-    g.setFont (12.5f);
-
-    auto r = getPropertyComponentContentPosition (component);
-
-    g.drawFittedText (component.getName(),
-                      indent,
-                      r.getY(),
-                      r.getX() - 5,
-                      r.getHeight(),
-                      Justification::centredLeft,
-                      2);
-#endif
 }
 
 Rectangle<int> LookAndFeel_E1::getPropertyComponentContentPosition (PropertyComponent& component)

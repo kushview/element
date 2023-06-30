@@ -9,17 +9,18 @@
 
 #include <element/element.hpp>
 #include "rectangle.hpp"
-#define LKV_TYPE_NAME_BOUNDS "Bounds"
+#define EL_TYPE_NAME_BOUNDS "Bounds"
 
 using namespace juce;
 
+// clang-format off
 EL_PLUGIN_EXPORT
 int luaopen_el_Bounds (lua_State* L)
 {
     using B = Rectangle<int>;
 
-    auto M = element::lua::new_rectangle<int> (L, LKV_TYPE_NAME_BOUNDS, sol::meta_method::to_string, [] (B& self) {
-        return element::lua::to_string (self, LKV_TYPE_NAME_BOUNDS);
+    auto M = element::lua::defineRectangle<int> (L, EL_TYPE_NAME_BOUNDS, sol::meta_method::to_string, [] (B& self) {
+        return element::lua::to_string (self, EL_TYPE_NAME_BOUNDS);
     });
 
     sol::stack::push (L, M);

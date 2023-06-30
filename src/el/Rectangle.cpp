@@ -8,7 +8,7 @@
 
 #include <element/element.h>
 #include "rectangle.hpp"
-#define LKV_TYPE_NAME_RECTANGLE "Rectangle"
+#define EL_TYPE_NAME_RECTANGLE "Rectangle"
 
 namespace lua = element::lua;
 
@@ -17,8 +17,8 @@ int luaopen_el_Rectangle (lua_State* L)
 {
     using R = juce::Rectangle<float>;
 
-    auto M = lua::new_rectangle<float> (L, LKV_TYPE_NAME_RECTANGLE, sol::meta_method::to_string, [] (R& self) {
-        return lua::to_string (self, LKV_TYPE_NAME_RECTANGLE);
+    auto M = lua::defineRectangle<float> (L, EL_TYPE_NAME_RECTANGLE, sol::meta_method::to_string, [] (R& self) {
+        return lua::to_string (self, EL_TYPE_NAME_RECTANGLE);
     });
 
     sol::stack::push (L, M);

@@ -9,6 +9,8 @@
     <ControlScript>control.js</ControlScript>
     <MaintenanceToolName>updater</MaintenanceToolName>
 
+    <RunProgram>@RUNPROGRAM@</RunProgram>
+
     <WizardDefaultWidth>782</WizardDefaultWidth>
     <WizardDefaultHeight>512</WizardDefaultHeight>
 

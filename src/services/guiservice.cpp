@@ -181,6 +181,7 @@ public:
     void check() { updater.check (true); }
 
 private:
+    friend class GuiService;
     void setupUpdater()
     {
         juce::String ver (EL_VERSION_STRING);
@@ -986,6 +987,7 @@ bool GuiService::perform (const InvocationInfo& info)
         }
         //======================================================================
         case Commands::checkNewerVersion:
+            updates->showAlertWhenNoUpdatesReady = true;
             checkUpdates();
             break;
         //======================================================================

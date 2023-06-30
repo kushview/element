@@ -11,7 +11,7 @@
 #include "widget.hpp"
 #include "sol_helpers.hpp"
 
-#define LKV_TYPE_NAME_WINDOW "DocumentWindow"
+#define EL_TYPE_NAME_WINDOW "DocumentWindow"
 
 using namespace juce;
 
@@ -109,9 +109,9 @@ int luaopen_el_DocumentWindow (lua_State* L)
     namespace lua = element::lua;
 
     auto T = lua::defineWidget<DocumentWindow> (
-        L, LKV_TYPE_NAME_WINDOW, sol::meta_method::to_string, 
+        L, EL_TYPE_NAME_WINDOW, sol::meta_method::to_string, 
             [] (DocumentWindow& self) {
-                return lua::to_string (self, LKV_TYPE_NAME_WINDOW); 
+                return lua::to_string (self, EL_TYPE_NAME_WINDOW); 
             },
 
         /// Attributes.

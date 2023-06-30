@@ -9,7 +9,7 @@
 #include <element/juce/graphics.hpp>
 
 #include "sol_helpers.hpp"
-#define LKV_TYPE_NAME_POINT "Point"
+#define EL_TYPE_NAME_POINT "Point"
 
 using namespace juce;
 
@@ -20,18 +20,18 @@ int luaopen_el_Point (lua_State* L)
     using PTF = Point<lua_Number>;
     auto M = lua.create_table();
     M.new_usertype<PTF> (
-        LKV_TYPE_NAME_POINT, sol::no_constructor, "new", sol::factories (
-                                                             /// Create a new point with x and y = 0.
-                                                             // @function Point.new
-                                                             // @treturn el.Point
-                                                             []() { return PTF(); },
+        EL_TYPE_NAME_POINT, sol::no_constructor, "new", sol::factories (
+                                                            /// Create a new point with x and y = 0.
+                                                            // @function Point.new
+                                                            // @treturn el.Point
+                                                            []() { return PTF(); },
 
-                                                             /// Create a new point.
-                                                             // @function Point.new
-                                                             // @number x X coordinate
-                                                             // @number y Y coordinate
-                                                             // @treturn el.Point
-                                                             [] (lua_Number x, lua_Number y) { return PTF (x, y); }),
+                                                            /// Create a new point.
+                                                            // @function Point.new
+                                                            // @number x X coordinate
+                                                            // @number y Y coordinate
+                                                            // @treturn el.Point
+                                                            [] (lua_Number x, lua_Number y) { return PTF (x, y); }),
         sol::meta_method::to_string,
         [] (PTF& self) {
             return self.toString().toStdString();
@@ -131,6 +131,6 @@ int luaopen_el_Point (lua_State* L)
         "toint",
         &PTF::toInt);
 
-    sol::stack::push (L, element::lua::removeAndClear (M, LKV_TYPE_NAME_POINT));
+    sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_POINT));
     return 1;
 }

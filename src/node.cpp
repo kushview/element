@@ -312,9 +312,11 @@ ValueTree Node::parse (const File& file)
     else
     {
         nodeData = data.getChildWithName (types::Node);
-        if (! nodeData.isValid()) {
+        if (! nodeData.isValid())
+        {
             nodeData = data.getChildWithName (tags::node);
-            if (nodeData.isValid()) {
+            if (nodeData.isValid())
+            {
                 // TODO: Data Migrations.
                 std::clog << "[element] node migration needed loading preset." << std::endl;
                 nodeData = ValueTree();
@@ -322,7 +324,8 @@ ValueTree Node::parse (const File& file)
         }
 
         // copy properties from preset if needed.
-        if (nodeData.isValid()) {
+        if (nodeData.isValid())
+        {
             // Rename the node appropriately
             if (data.hasProperty (tags::name))
                 nodeData.setProperty (tags::name, data.getProperty (tags::name), 0);

@@ -8,7 +8,7 @@
 
 #include "object.hpp"
 #include "widget.hpp"
-#define LKV_TYPE_NAME_TEXT_BUTTON "TextButton"
+#define EL_TYPE_NAME_TEXT_BUTTON "TextButton"
 
 using namespace juce;
 
@@ -75,8 +75,8 @@ int luaopen_el_TextButton (lua_State* L)
     using lua::TextButton;
 
     auto T = lua::defineWidget<TextButton> (
-        L, LKV_TYPE_NAME_TEXT_BUTTON, sol::meta_method::to_string, [] (TextButton& self) {
-            return lua::to_string (self, LKV_TYPE_NAME_TEXT_BUTTON);
+        L, EL_TYPE_NAME_TEXT_BUTTON, sol::meta_method::to_string, [] (TextButton& self) {
+            return lua::to_string (self, EL_TYPE_NAME_TEXT_BUTTON);
         },
 
         /// Attributes.

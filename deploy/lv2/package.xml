@@ -3,13 +3,14 @@
     <DisplayName>LV2</DisplayName>
     <Description>LV2 Ecosystem </Description>
     <Version>1.18.10-0</Version>
-    <ReleaseDate>@RELEASEDATE@</ReleaseDate>
+    <ReleaseDate>2022-09-09</ReleaseDate>
 
     <!-- <Default>true</Default> -->
     <Essential>false</Essential>
     <Virtual>true</Virtual>
     <ForcedInstallation>true</ForcedInstallation>
-    <RequiresAdminRights>false</RequiresAdminRights>
+    <RequiresAdminRights>true</RequiresAdminRights>
+    <Script>component.js</Script>
 
     <Licenses>
         <License name="LV2" file="LICENSE" />

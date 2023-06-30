@@ -11,7 +11,7 @@
 #include "object.hpp"
 #include "widget.hpp"
 
-#define LKV_TYPE_NAME_VIEW "View"
+#define EL_TYPE_NAME_VIEW "View"
 
 namespace element {
 namespace lua {
@@ -69,8 +69,8 @@ int luaopen_el_View (lua_State* L)
     namespace lua = element::lua;
 
     auto T = lua::defineWidget<View> (
-        L, LKV_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (View& self) { 
-            return lua::to_string (self, LKV_TYPE_NAME_VIEW); 
+        L, EL_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (View& self) { 
+            return lua::to_string (self, EL_TYPE_NAME_VIEW); 
         },
         "add", sol::overload (&View::add, &View::addWithZ),
         sol::base_classes, sol::bases<juce::Component>()

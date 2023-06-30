@@ -11,7 +11,7 @@
 #include "object.hpp"
 #include "widget.hpp"
 
-#define LKV_TYPE_NAME_VIEW "GraphEditor"
+#define EL_TYPE_NAME_VIEW "GraphEditor"
 
 namespace element {
 namespace lua {
@@ -59,8 +59,8 @@ int luaopen_el_GraphEditor (lua_State* L)
     namespace lua = element::lua;
 
     auto T = lua::defineWidget<GraphEditor> (
-        L, LKV_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (GraphEditor& self) { 
-            return lua::to_string (self, LKV_TYPE_NAME_VIEW); 
+        L, EL_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (GraphEditor& self) { 
+            return lua::to_string (self, EL_TYPE_NAME_VIEW); 
         },
         "graph", sol::property (&GraphEditor::getGraph, &GraphEditor::setNode),
         sol::base_classes, sol::bases<juce::Component>()

@@ -29,10 +29,12 @@ install_data (sources : [
 )
 
 if get_option ('deploy')
-    configure_file (input: 'package.xml', output: 'package.xml',
-        install: true, install_dir: packagedir_element + '.lua' / 'meta',
-        configuration: { 'VERSION': version_with_build, 
-                         'RELEASEDATE': element_release_date})
+    foreach f : 'package.xml component.js'.split()
+        configure_file (input: f, output: f,
+            install: true, install_dir: packagedir_element + '.lua' / 'meta',
+            configuration: { 'VERSION': version_with_build, 
+                            'RELEASEDATE': element_release_date})
+    endforeach
 endif
 
 endif

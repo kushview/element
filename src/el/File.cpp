@@ -7,7 +7,7 @@
 
 #include <element/element.h>
 #include "sol_helpers.hpp"
-#define LKV_TYPE_NAME_FILE "File"
+#define EL_TYPE_NAME_FILE "File"
 
 using namespace juce;
 
@@ -17,7 +17,7 @@ int luaopen_el_File (lua_State* L)
 {
     sol::state_view lua (L);
     auto t = lua.create_table();
-    t.new_usertype<File> (LKV_TYPE_NAME_FILE,
+    t.new_usertype<File> (EL_TYPE_NAME_FILE,
         sol::no_constructor, sol::call_constructor,
         sol::factories (
             /// Non-existent file
@@ -47,7 +47,7 @@ int luaopen_el_File (lua_State* L)
         "path", [] (File& self) { }
     );
 
-    auto M = t.get<sol::table> (LKV_TYPE_NAME_FILE);
+    auto M = t.get<sol::table> (EL_TYPE_NAME_FILE);
     t.clear();
     sol::stack::push (L, M);
     return 1;

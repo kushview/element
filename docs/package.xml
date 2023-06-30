@@ -7,7 +7,9 @@
 
     <!-- <Default>true</Default> -->
     <Essential>false</Essential>
-    <Virtual>false</Virtual>
-    <ForcedInstallation>false</ForcedInstallation>
-    <RequiresAdminRights>false</RequiresAdminRights>
+    <Virtual>true</Virtual>
+    <ForcedInstallation>true</ForcedInstallation>
+    <RequiresAdminRights>true</RequiresAdminRights>
+
+    <Script>component.js</Script>
 </Package>

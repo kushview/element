@@ -10,7 +10,7 @@
 #include "object.hpp"
 #include "widget.hpp"
 
-#define LKV_TYPE_NAME_SLIDER "Slider"
+#define EL_TYPE_NAME_SLIDER "Slider"
 
 namespace element {
 namespace lua {
@@ -90,9 +90,9 @@ int luaopen_el_Slider (lua_State* L)
     using element::lua::Slider;
     namespace lua = element::lua;
 
-    auto T = lua::defineWidget<Slider> ( L, LKV_TYPE_NAME_SLIDER, 
+    auto T = lua::defineWidget<Slider> ( L, EL_TYPE_NAME_SLIDER, 
         sol::meta_method::to_string, [] (Slider& self) { 
-            return lua::to_string (self, LKV_TYPE_NAME_SLIDER); 
+            return lua::to_string (self, EL_TYPE_NAME_SLIDER); 
         },
 
         /// Attributes.

@@ -16,7 +16,7 @@ namespace lua {
 
 template <typename T, typename... Args>
 inline static sol::table
-    new_rectangle (lua_State* L, const char* name, Args&&... args)
+    defineRectangle (lua_State* L, const char* name, Args&&... args)
 {
     using R = juce::Rectangle<T>;
     sol::state_view lua (L);

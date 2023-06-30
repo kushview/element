@@ -3,13 +3,16 @@ install_data ('component.js', install_dir : packagedir_element / 'meta')
 element_operations = ''
 if host_machine.system() == 'windows'
     element_operations = '''<Operations>
+        <Operation name="Extract">
+            <Argument>@ApplicationDirX64@/Kushview/Element</Argument>
+        </Operation>
         <Operation name="CreateShortcut">
-            <Argument>@TargetDir@/bin/element.exe</Argument>
+            <Argument>@ApplicationDirX64@/Kushview/Element/bin/element.exe</Argument>
             <Argument>@DesktopDir@/Element.lnk</Argument>
             <Argument>workingDirectory=@TargetDir@</Argument>
         </Operation>
         <Operation name="CreateShortcut">
-            <Argument>@TargetDir@/bin/element.exe</Argument>
+            <Argument>@ApplicationDirX64@/Kushview/Element/bin/element.exe</Argument>
             <Argument>@StartMenuDir@/Element/Element.lnk</Argument>
             <Argument>workingDirectory=@TargetDir@</Argument>
         </Operation>
@@ -22,7 +25,7 @@ if host_machine.system() == 'windows'
 elif host_machine.system() == 'darwin'
     element_operations = '''<Operations>
         <Operation name="Extract">
-            <Argument>/Applications</Argument>
+            <Argument>@ApplicationsDir@</Argument>
         </Operation>
     </Operations>'''
 endif
