@@ -132,5 +132,5 @@
     "jenkins.pipeline.linter.connector.url": "https://ci.lvtk.org/pipeline-model-converter/validate",
     "mesonbuild.configureOnOpen": false,
     
-    "C_Cpp.default.compileCommands": "${default}"
+    "C_Cpp.default.compileCommands": "build/vscode_compile_commands.json"
 }
