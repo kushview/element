@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>VST Plugins</DisplayName>
+    <Description>Element VST2 plugins. Instrument and Effect</Description>
+
+    <Version>@VERSION@</Version>
+    <ReleaseDate>@RELEASEDATE@</ReleaseDate>
+
+    <Default>false</Default>
+    <Essential>false</Essential>
+    <ForcedInstallation>false</ForcedInstallation>
+    <RequiresAdminRights>true</RequiresAdminRights>
+    <Script>component.js</Script>
+
+</Package>

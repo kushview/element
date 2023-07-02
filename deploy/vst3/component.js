@@ -1,9 +1,9 @@
 function extractDir() {
     var dir = "";
     if (systemInfo.kernelType === "darwin") {
-        dir = "/Library/Application Support/Kushview/Element";
+        dir = "/Library/Audio/Plug-Ins/VST3";
     } else if (systemInfo.kernelType === "winnt") {
-        dir = installer.value ("ApplicationsDirX64") + "/Kushview/Element";
+        dir =installer.value ("ApplicationsDirX64") + "/Common Files/VST3";
     }
     return dir;
 }

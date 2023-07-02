@@ -36,7 +36,6 @@ node_modules
 /delete.txt
 /tools/deploy/
 /tools/installers/
-/plugins
 /pro/
 
 /*.gz

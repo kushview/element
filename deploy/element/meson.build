@@ -4,15 +4,15 @@ element_operations = ''
 if host_machine.system() == 'windows'
     element_operations = '''<Operations>
         <Operation name="Extract">
-            <Argument>@ApplicationDirX64@/Kushview/Element</Argument>
+            <Argument>@ApplicationsDirX64@/Kushview/Element</Argument>
         </Operation>
         <Operation name="CreateShortcut">
-            <Argument>@ApplicationDirX64@/Kushview/Element/bin/element.exe</Argument>
+            <Argument>@ApplicationsDirX64@/Kushview/Element/bin/element.exe</Argument>
             <Argument>@DesktopDir@/Element.lnk</Argument>
             <Argument>workingDirectory=@TargetDir@</Argument>
         </Operation>
         <Operation name="CreateShortcut">
-            <Argument>@ApplicationDirX64@/Kushview/Element/bin/element.exe</Argument>
+            <Argument>@ApplicationsDirX64@/Kushview/Element/bin/element.exe</Argument>
             <Argument>@StartMenuDir@/Element/Element.lnk</Argument>
             <Argument>workingDirectory=@TargetDir@</Argument>
         </Operation>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>VST3 Plugins</DisplayName>
+    <Description>Element VST3 plugins. Instrument and Effect</Description>
+
+    <Version>@VERSION@</Version>
+    <ReleaseDate>@RELEASEDATE@</ReleaseDate>
+
+    <Default>false</Default>
+    <Essential>false</Essential>
+    <ForcedInstallation>false</ForcedInstallation>
+    <RequiresAdminRights>true</RequiresAdminRights>
+    <Script>component.js</Script>
+
+</Package>

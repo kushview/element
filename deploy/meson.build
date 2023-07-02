@@ -16,7 +16,7 @@ if host_machine.system() == 'darwin'
 elif host_machine.system() == 'windows'
     element_release_url = element_repo_url + '/release/windows'
     element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element/installer'
-    element_runprogram = '@ProgramFilesX64@/Kushview/Element/element.exe'
+    element_runprogram = '@ApplicationsDirX64@/Kushview/Element/bin/element.exe'
 endif
 
 if get_option ('deploy')
@@ -36,7 +36,15 @@ endforeach
 
 endif # not subproject
 
-foreach pkg : 'element lv2'.split()
+element_packages = 'element lv2'.split()
+if not get_option ('element-plugins').disabled()
+    element_packages += 'vst vst3'.split()
+    if host_machine.system() == 'darwin'
+        element_packages += ['au']
+    endif
+endif
+
+foreach pkg : element_packages
     subdir (pkg)
 endforeach
 

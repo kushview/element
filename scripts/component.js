@@ -3,7 +3,7 @@ function extractDir() {
     if (systemInfo.kernelType === "darwin") {
         dir = "/Library/Application Support/Kushview/Element";
     } else if (systemInfo.kernelType === "winnt") {
-        dir = "@ApplicationsDirX64@/Kushview/Element";
+        dir = installer.value ("ApplicationsDirX64") + "/Kushview/Element";
     }
     return dir;
 }

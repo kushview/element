@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-    <DisplayName>Element</DisplayName>
+    <DisplayName>Element Application</DisplayName>
     <Description>Element modular streaming engine, plugin, host, and Audio Interface controller.</Description>
 
     <Version>@VERSION@</Version>
@@ -16,4 +16,6 @@
     <Licenses>
         <License name="License Agreement" file="GPL3.txt" />
     </Licenses>
+    <TreeName>net.kushview.element.app</TreeName>
+    <SortingPriority>100</SortingPriority>
 </Package>

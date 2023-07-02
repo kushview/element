@@ -6,6 +6,8 @@ project ('element', ['c', 'cpp' ],
         'cpp_std=c++17', 
         'buildtype=release' ])
 
+bundle_py = find_program ('util/bundle.py')
+
 date_py = files ('util/date.py')
 element_release_date = run_command ('python', date_py).stdout().strip()
 version_py = files ('util/version.py')
@@ -25,6 +27,8 @@ GPL3_txt = configure_file (copy: true,
     input : files ('LICENSES/GPL3.txt'),
     output: 'GPL3.txt', install : get_option ('deploy'),
     install_dir : packagedir_element / 'meta')
+
+element_bundles = []
 
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
@@ -79,9 +83,11 @@ element_app_deps = [ deps, juce_dep ]
 element_app_sources = [ 'src/main.cpp' ]
 element_exe_install = true
 element_exe_install_dir = get_option ('bindir')
+element_exe_name = 'element'
 
 if host_machine.system() == 'darwin'
     element_exe_install = false
+    element_exe_name = 'Element'
 elif host_machine.system() == 'windows'
     element_exe_install_dir = packagedir_element / 'data' / 'bin'
     windows = import ('windows')
@@ -101,8 +107,8 @@ endif
 
 subdir ('test')
 
-if not get_option ('apps').disabled()
-element_app = executable ('element', element_app_sources,
+if not get_option ('element-apps').disabled()
+element_app = executable (element_exe_name, element_app_sources,
     install : element_exe_install,
     install_dir : element_exe_install_dir,
     win_subsystem : 'windows',
@@ -113,9 +119,32 @@ element_app = executable ('element', element_app_sources,
     link_with : [ libelement ])
 endif
 
+subdir ('plugins')
 subdir ('deploy')
+
+
+
+if get_option('sign')
+if host_machine.system() == 'darwin'
+    macdeployqt = find_program ('macdeployqt', required : true)
+    identity = get_option ('codesign-identity')
+
+    foreach bundle : element_bundles
+        command = [ macdeployqt, bundle.full_path(), 
+            '-no-plugins', '-always-overwrite',
+            '-verbose=1', '-codesign='+identity, '-hardened-runtime', 
+            '-sign-for-notarization='+identity, '-timestamp' ]
+        signed_name = fs.name(bundle.full_path())+'_signed'
+        custom_target (signed_name,
+            command : command, input: bundle, output: signed_name,
+            build_by_default: true, install: false)
+    endforeach
+endif # end darwin
+endif # end code signing.
 
 summary ('Prefix', get_option('prefix'), section : 'Paths')
 summary ('Programs', get_option('prefix') / get_option('bindir'), section : 'Paths')
 summary ('Headers', get_option('prefix') / get_option('includedir'), section : 'Paths')
 summary ('Libraries', get_option('prefix') / get_option('libdir'), section : 'Paths')
+
+summary ('Plugins', get_option ('element-plugins'))
