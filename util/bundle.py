@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # encoding: utf-8
 # Michael Fisher, 2023
 
@@ -38,7 +38,8 @@ if opts.type == 'macapp' or opts.type == 'bundle':
 
     contents = join (opts.output, 'Contents')
     for dir in 'MacOS Resources'.split():
-        os.makedirs (join (contents, dir), exist_ok=True)
+        if not os.path.exists (join (contents, dir)):
+            os.makedirs (join (contents, dir))
     if os.path.exists (opts.binary):
         shutil.copy (opts.binary, join (contents, 'MacOS', basename (opts.binary)))
     if os.path.exists (opts.plist):
@@ -62,7 +63,8 @@ elif opts.type == 'vst3':
     
     contents = join (opts.output, 'Contents')
     for dir in [ opts.bindir, 'Resources' ]:
-        os.makedirs (join (contents, dir), exist_ok=True)
+        if not os.path.exists (join (contents, dir)):
+            os.makedirs (join (contents, dir))
     if os.path.exists (opts.binary):
         shutil.copy (opts.binary, join (contents, opts.bindir, basename (opts.binary)))
     if opts.resource != None and len(opts.resource) > 0 and os.path.exists (opts.resource):
