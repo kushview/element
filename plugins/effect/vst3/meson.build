@@ -35,7 +35,7 @@ element_fx_vst3 = shared_module ('KV-Element-FX',
     link_args : element_app_link_args,
     link_with : [ libelement ])
 
-element_fx_vst3_bundle_py =  [ 'python', bundle_py, 
+element_fx_vst3_bundle_py =  [ bundle_py, 
     '--binary', '@INPUT@', '--output', '@OUTPUT@',
     '--type', host_machine.system() == 'darwin' ? 'bundle' : 'vst3',
     '--bindir', element_vst3_bindir ]
