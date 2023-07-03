@@ -7,7 +7,7 @@ from subprocess import call, Popen, PIPE
 import os
 
 VERSION="1.0.0"
-LAST_VERSION="0.46.4"
+LAST_VERSION="853bdc30cb6e9839e0585037f35e42f0b02bc080"
 
 def options():
     parser = OptionParser()
