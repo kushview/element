@@ -3,11 +3,12 @@
 
 #pragma once
 
+#include <element/context.hpp>
 #include <element/services.hpp>
 #include <element/audioengine.hpp>
 #include <element/parameter.hpp>
+
 #include "ElementApp.h"
-#include <element/context.hpp>
 
 namespace element {
 
@@ -364,7 +365,7 @@ public:
     void numBusesChanged() override;
     void processorLayoutsChanged() override;
 
-    Services* getServices() const { return controller.get(); }
+    Services* getServices() const { return context != nullptr ? &context->services() : nullptr; }
 
     void setEditorBounds (const Rectangle<int>& bounds) { editorBounds = bounds; }
     const Rectangle<int>& getEditorBounds() const { return editorBounds; }
@@ -393,8 +394,7 @@ private:
     const Variant variant;
 
     OwnedArray<PerfParamMenuItem> menuMap;
-    std::unique_ptr<Context> world;
-    std::unique_ptr<Services> controller;
+    std::unique_ptr<Context> context;
     AudioEnginePtr engine;
 
     bool initialized = false;

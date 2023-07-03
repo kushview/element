@@ -29,7 +29,7 @@
 namespace element {
 
 class VideoMonitorNode : public Processor,
-                     public ChangeBroadcaster
+                         public ChangeBroadcaster
 {
 public:
     VideoMonitorNode()

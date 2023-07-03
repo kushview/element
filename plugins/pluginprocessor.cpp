@@ -24,20 +24,20 @@ using namespace juce;
 //=============================================================================
 static void setPluginMissingNodeProperties (const ValueTree& tree)
 {
-    if (tree.hasType (tags::node)) {
+    if (tree.hasType (types::Node)) {
         const Node node (tree, true);
         ignoreUnused (node);
-    } else if (tree.hasType (tags::controller) || tree.hasType (tags::control)) {
+    } else if (tree.hasType (types::Controller) || tree.hasType (types::Control)) {
         PLUGIN_DBG ("[element] set missing for: " << tree.getProperty (tags::name).toString());
     }
 }
 
 //=============================================================================
-#define enginectl  controller->find<EngineService>()
-#define guictl     controller->find<GuiService>()
-#define sessionctl controller->find<SessionService>()
-#define mapsctl    controller->find<MappingService>()
-#define devsctl    controller->find<DeviceService>()
+#define enginectl  context->services().find<EngineService>()
+#define guictl     context->services().find<GuiService>()
+#define sessionctl context->services().find<SessionService>()
+#define mapsctl    context->services().find<MappingService>()
+#define devsctl    context->services().find<DeviceService>()
 
 //=============================================================================
 PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
@@ -57,10 +57,6 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     prepared = controllerActive = false;
     shouldProcess.set (false);
     asyncPrepare.reset (new AsyncPrepare (*this));
-    if (! juce::MessageManager::getInstance()->isThisTheMessageThread())
-        triggerAsyncUpdate();
-    else
-        initialize();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -72,17 +68,16 @@ PluginProcessor::~PluginProcessor()
     perfparams.clear();
 
     if (controllerActive)
-        controller->deactivate();
+        context->services().deactivate();
 
     engine->releaseExternalResources();
 
-    if (auto session = world->session())
+    if (auto session = context->session())
         session->clear();
 
-    world->setEngine (nullptr);
+    context->setEngine (nullptr);
     engine = nullptr;
-    controller = nullptr;
-    world = nullptr;
+    context = nullptr;
 }
 
 const String PluginProcessor::getName() const
@@ -129,6 +124,9 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
         return;
     }
 
+    if (! controllerActive)
+        initialize();
+
     PLUGIN_DBG ("[element] prepare to play: prepared=" << (int) prepared << " sampleRate: " << sampleRate << " buff: " << bufferSize << " numIns: " << numIns << " numOuts: " << numOuts);
 
     const bool channelCountsChanged = numIns != getTotalNumInputChannels()
@@ -143,7 +141,7 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
     if (! prepared || detailsChanged) {
         prepared = true;
 
-        auto& plugins (world->plugins());
+        auto& plugins (context->plugins());
         plugins.setPlayConfig (sampleRate, bufferSize);
 
         if (detailsChanged) {
@@ -185,7 +183,7 @@ void PluginProcessor::reloadEngine()
     const bool wasSuspended = isSuspended();
     suspendProcessing (true);
 
-    auto session = world->session();
+    auto session = context->session();
     session->saveGraphState();
     engine->releaseExternalResources();
     engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
@@ -254,7 +252,7 @@ bool PluginProcessor::hasEditor() const { return true; }
 
 AudioProcessorEditor* PluginProcessor::createEditor()
 {
-    if (auto* gui = controller->find<GuiService>())
+    if (auto* gui = context->services().find<GuiService>())
         gui->stabilizeContent();
     return new PluginEditor (*this);
 }
@@ -263,14 +261,14 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
     if (! controllerActive)
         return;
-    if (auto session = world->session()) {
+    if (auto session = context->session()) {
         session->saveGraphState();
         session->getValueTree()
             .setProperty ("pluginEditorBounds", editorBounds.toString(), nullptr)
             .setProperty ("editorKeyboardFocus", editorWantsKeyboard, nullptr)
             .setProperty ("forceZeroLatency", isForcingZeroLatency(), nullptr);
 
-        if (auto engine = world->audio())
+        if (auto engine = context->audio())
             if (auto mon = engine->getTransportMonitor())
                 session->getValueTree().setProperty (
                     "pluginTransportPlaying", mon->playing.get(), nullptr);
@@ -297,8 +295,8 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
     PLUGIN_DBG ("[element] restore state: prepared: " << (int) prepared);
     if (! controllerActive)
         return;
-    auto session = world->session();
-    auto engine = world->audio();
+    auto session = context->session();
+    auto engine = context->audio();
     if (! session || ! shouldProcess.get())
         return;
 
@@ -358,18 +356,20 @@ void PluginProcessor::initialize()
 {
     if (controllerActive || ! MessageManager::getInstance()->isThisTheMessageThread())
         return;
+    bool wasProc = shouldProcess.get();
+    shouldProcess.set (false);
 
-    world.reset (new Context());
-    world->setEngine (new AudioEngine (*world, RunMode::Plugin));
-    engine = world->audio();
-    SessionPtr session = world->session();
-    Settings& settings (world->settings());
-    PluginManager& plugins (world->plugins());
+    context.reset (new Context());
+    context->setEngine (new AudioEngine (*context, RunMode::Plugin));
+    engine = context->audio();
+    SessionPtr session = context->session();
+    Settings& settings (context->settings());
+    PluginManager& plugins (context->plugins());
     engine->applySettings (settings);
 
     plugins.addDefaultFormats();
-    plugins.addFormat (new InternalFormat (*world));
-    plugins.addFormat (new ElementAudioPluginFormat (*world));
+    plugins.addFormat (new InternalFormat (*context));
+    plugins.addFormat (new ElementAudioPluginFormat (*context));
     plugins.restoreUserPlugins (settings);
 
     // The hosts WILL release and prepare the plugin frequently at any given
@@ -377,22 +377,18 @@ void PluginProcessor::initialize()
     // our engine running at all times to reduce massive plugin unloads and
     // re-loads back to back.
     engine->prepareExternalPlayback (sampleRate, bufferSize, getTotalNumInputChannels(), getTotalNumOutputChannels());
-    session->clear();
-    if (MessageManager::getInstance()->isThisTheMessageThread()) {
+    if (session->getNumGraphs() <= 0)
         session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
-        PLUGIN_DBG ("[element] default graph created");
-    } else {
-        PLUGIN_DBG ("[element] couldn't create default graph");
-    }
 
-    controller.reset (new Services (*world, RunMode::Plugin));
-    controller->activate();
+    auto& services (context->services());
+    services.activate();
     controllerActive = true;
 
     enginectl->sessionReloaded();
     mapsctl->learn (false);
     devsctl->refresh();
-    shouldProcess.set (true);
+
+    shouldProcess.set (wasProc);
 }
 
 void PluginProcessor::handleAsyncUpdate()
@@ -401,7 +397,7 @@ void PluginProcessor::handleAsyncUpdate()
     initialize();
     reloadEngine();
 
-    auto session = world->session();
+    auto session = context->session();
     const auto ppData = session->getValueTree().getChildWithName ("perfParams");
 
     for (int i = 0; i < ppData.getNumChildren(); ++i) {
@@ -438,7 +434,7 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
     if (nullptr == paramObj)
         return PopupMenu();
 
-    auto session = world->session();
+    auto session = context->session();
     PopupMenu menu;
     int menuIdx = 0;
     menuMap.clearQuick (true);

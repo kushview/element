@@ -99,6 +99,10 @@ struct RootGraphHolder
                 controller->setNodeModel (model);
                 resetIONodePorts();
             }
+            else
+            {
+                std::clog << "[element] failed to set root graph\n";
+            }
         }
 
         return attached();
