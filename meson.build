@@ -8,15 +8,12 @@ project ('element', ['c', 'cpp' ],
 
 bundle_py   = find_program ('util/bundle.py')
 date_py     = find_program ('util/date.py')
+version_py  = find_program ('util/version.py')
 element_release_date = run_command (date_py).stdout().strip()
-version_py = files ('util/version.py')
-version_with_build = run_command ('python',
-    [version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
-
-build_number = run_command ('python',
-    [version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
-git_hash = run_command ('python', [version_py] + '--hash --cwd=.'.split()).stdout().strip()
-git_short_hash = run_command ('python', [version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
+version_with_build = run_command ([version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
+build_number = run_command ([version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
+git_hash = run_command ([version_py] + '--hash --cwd=.'.split()).stdout().strip()
+git_short_hash = run_command ([version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
 
 net_kushview      = 'net.kushview'
 installerdir      = get_option('prefix')
