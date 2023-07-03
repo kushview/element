@@ -6,10 +6,9 @@ project ('element', ['c', 'cpp' ],
         'cpp_std=c++17', 
         'buildtype=release' ])
 
-bundle_py = find_program ('util/bundle.py')
-
-date_py = files ('util/date.py')
-element_release_date = run_command ('python', date_py).stdout().strip()
+bundle_py   = find_program ('util/bundle.py')
+date_py     = find_program ('util/date.py')
+element_release_date = run_command (date_py).stdout().strip()
 version_py = files ('util/version.py')
 version_with_build = run_command ('python',
     [version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
