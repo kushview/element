@@ -57,4 +57,36 @@ Value Model::getPropertyAsValue (const Identifier& property, bool updateSynchron
     return objectData.getPropertyAsValue (property, nullptr, updateSynchronously);
 }
 
+void Model::removeFromParent (const juce::ValueTree& data, juce::UndoManager* undo)
+{
+    auto parent = data.getParent();
+    if (! parent.isValid())
+        return;
+    parent.removeChild (data, undo);
+}
+
+void Model::removeFromParent (const Model& model, juce::UndoManager* undo)
+{
+    removeFromParent (model.data(), undo);
+}
+
+ValueTree Model::copyWithType (const ValueTree& tree, const Identifier& newType) noexcept
+{
+    juce::ValueTree ntree (newType);
+    ntree.copyPropertiesAndChildrenFrom (tree, nullptr);
+    return ntree;
+}
+
+void Model::copyChildrenWithType (const ValueTree& src, ValueTree& dst, const Identifier& newType) noexcept
+{
+    for (const auto& op : src)
+    {
+        auto np = Model::copyWithType (op, newType);
+        if (np.isValid())
+        {
+            dst.addChild (np, -1, 0);
+        }
+    }
+}
+
 } // namespace element

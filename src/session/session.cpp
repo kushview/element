@@ -331,4 +331,76 @@ ValueTree Session::readFromFile (const File& file)
 
     return data;
 }
+
+ValueTree Session::migrate (const ValueTree& oldData, String& error)
+{
+    error.clear();
+    const Model model (oldData);
+    if (model.version() == EL_SESSION_VERSION)
+        return oldData.createCopy();
+    if (model.version() > EL_SESSION_VERSION)
+    {
+        error = "Migrating from newer to older Session not supported.";
+        return {};
+    }
+
+    std::clog << "[element] session migration from v" << model.version() << std::endl;
+
+    ValueTree newData;
+    if (model.version() == 0)
+    {
+        newData = Model::copyWithType (oldData, types::Session);
+        std::clog << "type: " << newData.getType().toString().toStdString() << std::endl;
+        {
+            auto oldGraphs = oldData.getChildWithName (tags::graphs);
+            auto newGraphs = newData.getOrCreateChildWithName (tags::graphs, 0);
+            newGraphs.removeAllChildren (0);
+            for (const auto& g : oldGraphs)
+            {
+                String error;
+                auto mg = Node::migrate (g, error);
+                if (error.isEmpty() && mg.isValid())
+                {
+                    newGraphs.addChild (mg, -1, 0);
+                }
+                else
+                {
+                    return {};
+                }
+            }
+        }
+        {
+            auto oldCtl = oldData.getChildWithName (tags::controllers);
+            auto newCtl = newData.getOrCreateChildWithName (tags::controllers, 0);
+            newCtl.removeAllChildren (0);
+            Model::copyChildrenWithType (oldCtl, newCtl, types::Controller);
+            for (const auto& ctl : oldCtl)
+            {
+                if (! ctl.hasType (tags::control))
+                    continue; // warn? error?
+                auto nctl = Model::copyWithType (ctl, types::Control);
+                if (nctl.isValid())
+                {
+                    newCtl.addChild (nctl, -1, 0);
+                }
+            }
+        }
+        {
+            auto oldMaps = oldData.getChildWithName (tags::maps);
+            auto newMaps = newData.getOrCreateChildWithName (tags::maps, 0);
+            newMaps.removeAllChildren (0);
+            Model::copyChildrenWithType (oldMaps, newMaps, types::ControllerMap);
+        }
+    }
+    else
+    {
+        newData = {};
+        error = "Unknown session version to migrate: v";
+        error << model.version();
+        std::clog << "ERROR: " << error.toStdString() << std::endl;
+    }
+
+    return newData;
+}
+
 } // namespace element

@@ -988,7 +988,8 @@ void StandardContent::getAllCommands (Array<CommandID>& commands)
         Commands::toggleMeterBridge,
         Commands::toggleChannelStrip,
         Commands::showLastContentView,
-        Commands::rotateContentView
+        Commands::rotateContentView,
+        Commands::selectAll
     });
     // clang-format on
 }
@@ -1099,6 +1100,12 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
             result.setInfo ("Next View", "Shows the next View", "UI", 0);
             break;
         }
+        case Commands::selectAll: {
+            int flags = 0;
+            result.setInfo ("Select all", "Select all nodes", "UI", flags);
+            result.addDefaultKeypress ('a', ModifierKeys::commandModifier);
+            break;
+        }
     }
 }
 
@@ -1171,6 +1178,11 @@ bool StandardContent::perform (const InvocationInfo& info)
         case Commands::rotateContentView:
             nextMainView();
             break;
+        case Commands::selectAll: {
+            if (auto view = dynamic_cast<GraphEditorView*> (container->primary.get()))
+                view->selectAllNodes();
+            break;
+        }
         default:
             result = false;
             break;

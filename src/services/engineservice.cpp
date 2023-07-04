@@ -34,17 +34,6 @@
 
 namespace element {
 
-namespace detail {
-static void alertOldNode (const Node& g)
-{
-    String msg = "@0@ was created with an older version of Element and cannot yet be opened";
-    msg = msg.replace ("@0@", g.getDisplayName());
-    juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::InfoIcon,
-                                            "Old File",
-                                            msg);
-}
-} // namespace detail
-
 struct RootGraphHolder
 {
     RootGraphHolder (const Node& n, Context& world)
@@ -511,20 +500,23 @@ void EngineService::removeConnection (const uint32 s, const uint32 sp, const uin
 
 Node EngineService::addNode (const Node& node, const Node& target, const ConnectionBuilder& builder)
 {
+    auto ref = node;
     if (EL_NODE_VERSION > node.version())
     {
-        detail::alertOldNode (node);
-        return {};
+        String error;
+        const auto data = Node::migrate (node.data(), error);
+        if (error.isEmpty() && data.isValid())
+            ref = Node (data, true);
     }
 
     if (auto* controller = graphs->findGraphManagerFor (target))
     {
-        const uint32 nodeId = controller->addNode (node);
-        Node referencedNode (controller->getNodeModelForId (nodeId));
-        if (referencedNode.isValid())
+        const uint32 nodeId = controller->addNode (ref);
+        ref = controller->getNodeModelForId (nodeId);
+        if (ref.isValid())
         {
             builder.addConnections (*controller, nodeId);
-            return referencedNode;
+            return ref;
         }
     }
 
@@ -539,12 +531,22 @@ Node EngineService::addNode (const String& ID, const String& format)
     return addPlugin (desc, true, .5f, .5f, true);
 }
 
-void EngineService::addNode (const Node& node)
+void EngineService::addNode (const Node& _node)
 {
-    if (EL_NODE_VERSION > node.version())
+    auto node = _node;
+    if (EL_NODE_VERSION != node.version())
     {
-        detail::alertOldNode (node);
-        return;
+        String error;
+        auto data = Node::migrate (_node.data(), error);
+        if (data.isValid() && error.isEmpty())
+        {
+            node = Node (data, false);
+        }
+        else
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Error adding node", error);
+            return;
+        }
     }
 
     auto* root = graphs->findActiveRootGraphManager();

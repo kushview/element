@@ -929,7 +929,7 @@ void PluginManager::scanInternalPlugins()
         }
 
         OwnedArray<PluginDescription> ds;
-        for (const auto& nodeTypeId : nodes.getKnownIDs())
+        for (const auto& nodeTypeId : nodes.knownIDs())
             nodes.getPluginDescriptions (ds, nodeTypeId);
         for (const auto* const d : ds)
         {

@@ -518,11 +518,14 @@ public:
     static ValueTree makeArc (const Arc& arc);
 
     /** Create an Arc from a ValueTree */
-    static Arc arcFromValueTree (const ValueTree& data);
+    static Arc arcFromValueTree (const juce::ValueTree& data);
+
+    /** Migrate an old data format to the current one. */
+    static ValueTree migrate (const juce::ValueTree& data, juce::String& error) noexcept;
 
 private:
     void setMissingProperties();
-    void forEach (const ValueTree tree, std::function<void (const ValueTree& tree)>) const;
+    void forEach (const juce::ValueTree tree, std::function<void (const juce::ValueTree& tree)>) const;
 };
 
 class NodeObjectSync final : private ValueTree::Listener {

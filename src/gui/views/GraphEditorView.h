@@ -35,6 +35,8 @@ public:
     GraphEditorView();
     ~GraphEditorView();
 
+    void selectAllNodes();
+
     void didBecomeActive() override;
     void stabilizeContent() override;
     void willBeRemoved() override;

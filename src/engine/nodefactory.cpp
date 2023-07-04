@@ -36,33 +36,77 @@
 
 namespace element {
 
+template <class NT>
+struct SingleNodeProvider : public NodeProvider
+{
+    const String ID;
+    const String UI;
+
+    SingleNodeProvider() = delete;
+    SingleNodeProvider (const String& inID)
+        : ID (inID) {}
+    ~SingleNodeProvider() = default;
+
+    StringArray findTypes() override
+    {
+        return StringArray (ID);
+    }
+
+    Processor* create (const String& nodeId) override
+    {
+        return (this->ID == nodeId) ? new NT() : nullptr;
+    }
+};
+
+class NodeFactory::Impl
+{
+public:
+    Impl (NodeFactory& f) : factory (f)
+    {
+    }
+
+    ~Impl()
+    {
+        providers.clearQuick (true);
+        knownIDs.clearQuick();
+    }
+
+private:
+    friend class NodeFactory;
+    OwnedArray<NodeProvider> providers;
+    NodeFactory& factory;
+    StringArray knownIDs;
+    StringArray denyIDs;
+};
+
 NodeFactory::NodeFactory()
 {
-    add<AudioRouterNode> (EL_NODE_ID_AUDIO_ROUTER);
-    add<MidiChannelSplitterNode> (EL_NODE_ID_MIDI_CHANNEL_SPLITTER);
-    add<MidiMonitorNode> (EL_NODE_ID_MIDI_MONITOR);
-    add<MidiProgramMapNode> (EL_NODE_ID_MIDI_PROGRAM_MAP);
-    add<MidiRouterNode> (EL_NODE_ID_MIDI_ROUTER);
-    add<OSCSenderNode> (EL_NODE_ID_OSC_SENDER);
-    add<OSCReceiverNode> (EL_NODE_ID_OSC_RECEIVER);
-    add<ScriptNode> (EL_NODE_ID_SCRIPT);
-    add<GraphNode> (EL_NODE_ID_GRAPH);
-    add<MackieControlUniversal> ("el.MCU");
+    impl = std::make_unique<Impl> (*this);
+    add (new SingleNodeProvider<AudioRouterNode> (EL_NODE_ID_AUDIO_ROUTER));
+    add (new SingleNodeProvider<MidiChannelSplitterNode> (EL_NODE_ID_MIDI_CHANNEL_SPLITTER));
+    add (new SingleNodeProvider<MidiMonitorNode> (EL_NODE_ID_MIDI_MONITOR));
+    add (new SingleNodeProvider<MidiProgramMapNode> (EL_NODE_ID_MIDI_PROGRAM_MAP));
+    add (new SingleNodeProvider<MidiRouterNode> (EL_NODE_ID_MIDI_ROUTER));
+    add (new SingleNodeProvider<OSCSenderNode> (EL_NODE_ID_OSC_SENDER));
+    add (new SingleNodeProvider<OSCReceiverNode> (EL_NODE_ID_OSC_RECEIVER));
+    add (new SingleNodeProvider<ScriptNode> (EL_NODE_ID_SCRIPT));
+    add (new SingleNodeProvider<GraphNode> (EL_NODE_ID_GRAPH));
+    add (new SingleNodeProvider<MackieControlUniversal> ("el.MCU"));
 }
 
 NodeFactory::~NodeFactory()
 {
-    knownIDs.clearQuick();
-    providers.clearQuick (true);
+    impl.reset();
 }
 
 //==============================================================================
 void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, const String& ID, bool includeHidden)
 {
+    auto& denyIDs (impl->denyIDs);
     if (! includeHidden && denyIDs.contains (ID))
         return;
 
-    for (auto* f : providers)
+    for (auto* f : impl->providers)
     {
         if (ProcessorPtr ptr = f->create (ID))
         {
@@ -73,19 +117,74 @@ void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, con
     }
 }
 
+const StringArray& NodeFactory::knownIDs() const noexcept { return impl->knownIDs; }
+
 //==============================================================================
 NodeFactory& NodeFactory::add (NodeProvider* f)
 {
+    auto& providers (impl->providers);
     providers.add (f);
 
+    auto& denyIDs (impl->denyIDs);
     denyIDs.addArray (f->getHiddenTypes());
     denyIDs.removeDuplicates (true);
     denyIDs.removeEmptyStrings();
 
+    auto& knownIDs (impl->knownIDs);
     knownIDs.addArray (f->findTypes());
     knownIDs.removeDuplicates (true);
     knownIDs.removeEmptyStrings();
     return *this;
+}
+
+//==============================================================================
+void NodeFactory::hideType (const String& tp)
+{
+    auto& denyIDs (impl->denyIDs);
+    denyIDs.addIfNotAlreadyThere (tp);
+}
+
+void NodeFactory::hideAllTypes()
+{
+    auto& denyIDs (impl->denyIDs);
+    for (const auto& tp : impl->knownIDs)
+        denyIDs.add (tp);
+
+    // TODO: Nodes backed by juce::AudioProcessor
+    denyIDs.add (EL_NODE_ID_ALLPASS_FILTER);
+    denyIDs.add (EL_NODE_ID_AUDIO_FILE_PLAYER);
+    denyIDs.add (EL_NODE_ID_AUDIO_MIXER);
+    denyIDs.add (EL_NODE_ID_CHANNELIZE);
+    denyIDs.add (EL_NODE_ID_COMB_FILTER);
+    denyIDs.add (EL_NODE_ID_COMPRESSOR);
+    denyIDs.add (EL_NODE_ID_EQ_FILTER);
+    denyIDs.add (EL_NODE_ID_FREQ_SPLITTER);
+    denyIDs.add (EL_NODE_ID_MEDIA_PLAYER);
+    denyIDs.add (EL_NODE_ID_MIDI_CHANNEL_MAP);
+    denyIDs.add (EL_NODE_ID_MIDI_INPUT_DEVICE);
+    denyIDs.add (EL_NODE_ID_MIDI_OUTPUT_DEVICE);
+    denyIDs.add (EL_NODE_ID_PLACEHOLDER);
+    denyIDs.add (EL_NODE_ID_REVERB);
+    denyIDs.add (EL_NODE_ID_WET_DRY);
+    denyIDs.add (EL_NODE_ID_VOLUME);
+    // end audio procesor nodes
+
+    denyIDs.removeDuplicates (false);
+    denyIDs.removeEmptyStrings();
+}
+
+bool NodeFactory::isTypeHidden (const String& tp) const noexcept
+{
+    auto& denyIDs (impl->denyIDs);
+    return denyIDs.contains (tp);
+}
+
+void NodeFactory::removeHiddenType (const String& tp)
+{
+    auto& denyIDs (impl->denyIDs);
+    auto idx = denyIDs.indexOf (tp);
+    if (idx >= 0)
+        denyIDs.remove (idx);
 }
 
 //==============================================================================
@@ -96,6 +195,7 @@ Processor* NodeFactory::instantiate (const PluginDescription& desc)
 
 Processor* NodeFactory::instantiate (const String& identifier)
 {
+    auto& providers (impl->providers);
     Processor* node = nullptr;
     for (const auto& f : providers)
         if (auto* const n = f->create (identifier))
@@ -124,5 +224,7 @@ Processor* NodeFactory::wrap (AudioProcessor* processor)
 
     return node.release();
 }
+
+const OwnedArray<NodeProvider>& NodeFactory::providers() const noexcept { return impl->providers; }
 
 } // namespace element

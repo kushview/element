@@ -63,13 +63,19 @@ Result SessionDocument::loadDocument (const File& file)
     if (auto e = XmlDocument::parse (file))
     {
         ValueTree newData (ValueTree::fromXml (*e));
+        if (newData.isValid() && (int) newData.getProperty (tags::version, -1) != EL_SESSION_VERSION)
+        {
+            std::clog << "[element] migrate session...\n";
+            newData = Session::migrate (newData, error);
+        }
 
-        if (! newData.isValid() && newData.hasType (types::Session))
-            error = "Not a valid session file";
+        if (error.isEmpty() && (! newData.isValid() || ! newData.hasType (types::Session)))
+        {
+            error = "Not a valid session file or type";
+            if (newData.isValid())
+                error << ": el." << newData.getType().toString();
+        }
 
-        int loadedVersion = (int) newData.getProperty (tags::version, -1);
-        if (error.isEmpty() && EL_SESSION_VERSION > loadedVersion)
-            error = "Session was created with an old verison of Element. Loading not possible yet.";
         if (error.isEmpty() && ! session->loadData (newData))
             error = "Could not load session data";
     }

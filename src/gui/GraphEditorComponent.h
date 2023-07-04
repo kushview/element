@@ -55,6 +55,7 @@ public:
 
     /** Selects the given node */
     void selectNode (const Node& n);
+    void selectAllNodes();
 
     /** Removes the selected nodes */
     void deleteSelectedNodes();

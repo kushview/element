@@ -72,18 +72,15 @@ public:
     /** Count the number of children with a type */
     int countChildrenOfType (const juce::Identifier& slug) const;
 
-    inline static void removeFromParent (const juce::ValueTree& data, juce::UndoManager* undo = nullptr)
-    {
-        auto parent = data.getParent();
-        if (! parent.isValid())
-            return;
-        parent.removeChild (data, undo);
-    }
+    /** Remove a value tree from its parent. */
+    static void removeFromParent (const juce::ValueTree& data, juce::UndoManager* undo = nullptr);
+    /** Remove a model from it's parent. */
+    static void removeFromParent (const Model& model, juce::UndoManager* undo = nullptr);
 
-    inline static void removeFromParent (const Model& model, juce::UndoManager* undo = nullptr)
-    {
-        removeFromParent (model.data(), undo);
-    }
+    /** Copy a juce::ValueTree verbatib with a different type. */
+    static juce::ValueTree copyWithType (const juce::ValueTree& tree, const juce::Identifier& newType) noexcept;
+    /** Copy the childeren of a value tree to a new one assiging a new type. */
+    static void copyChildrenWithType (const juce::ValueTree& src, juce::ValueTree& dst, const juce::Identifier& newType) noexcept;
 
 protected:
     juce::ValueTree objectData;

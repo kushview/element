@@ -11,7 +11,7 @@
 #define EL_TEMPO_MIN 20
 #define EL_TEMPO_MAX 999
 
-#define EL_SESSION_VERSION 0
+#define EL_SESSION_VERSION 1
 
 namespace element {
 class Session;
@@ -108,6 +108,8 @@ public:
     {
         return getGraphsValueTree().getPropertyAsValue (tags::active, nullptr, syncUpdate);
     }
+
+    static ValueTree migrate (const ValueTree&, String& error);
 
 protected:
     void forEach (const ValueTree tree, ValueTreeFunction handler) const;

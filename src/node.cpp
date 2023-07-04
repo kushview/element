@@ -264,9 +264,10 @@ bool Node::isProbablyGraphNode (const ValueTree& data)
 {
     // clang-format off
     const var& tp = data.getProperty (tags::type);
-    return data.hasType (types::Node) && 
+    return (data.hasType (types::Node) || data.hasType (tags::node)) && 
         (tags::graph.toString() == tp.toString() || 
-         types::Graph.toString() == tp.toString());
+         types::Graph.toString() == tp.toString() ||
+         String ("default") == tp.toString());
     // clang-format on
 }
 
@@ -318,8 +319,13 @@ ValueTree Node::parse (const File& file)
             if (nodeData.isValid())
             {
                 // TODO: Data Migrations.
-                std::clog << "[element] node migration needed loading preset." << std::endl;
-                nodeData = ValueTree();
+                std::clog << "[element] node migration..." << std::endl;
+                String error;
+                nodeData = Node::migrate (nodeData, error);
+                if (error.isNotEmpty())
+                {
+                    std::clog << "[element] error: " << error.toStdString() << std::endl;
+                }
             }
         }
 
@@ -944,6 +950,125 @@ void Node::savePluginState()
 
     for (int i = 0; i < getNumNodes(); ++i)
         getNode (i).savePluginState();
+}
+
+namespace detail {
+
+static ValueTree migrateNode (const ValueTree& data, String& error)
+{
+    const Model model (data);
+    if (! model.hasType (types::Node) && ! model.hasType (tags::node))
+    {
+        error = "data is not a node: el.";
+        error << model.getType().toString();
+        return {};
+    }
+
+    if (model.version() > EL_NODE_VERSION)
+    {
+        error = "Node rollback from newer to older version not supported";
+        return {};
+    }
+
+    if (model.version() == EL_NODE_VERSION)
+        return data.createCopy();
+
+    ValueTree newData;
+    if (model.version() == 0)
+    {
+        std::clog << "[element] migrating node v0\n";
+        Identifier newType = types::Node;
+        if (model.getProperty (tags::type).toString() == tags::graph.toString())
+            newType = types::Graph;
+
+        newData = ValueTree (types::Node);
+        newData.copyPropertiesFrom (data, nullptr);
+        newData.setProperty (tags::type, newType.toString(), nullptr);
+        Node (newData, true);
+
+        {
+            auto o = data.getChildWithName (tags::arcs);
+            auto n = newData.getOrCreateChildWithName (tags::arcs, 0);
+            Model::copyChildrenWithType (o, n, types::Arc);
+        }
+        {
+            auto o = data.getChildWithName (tags::ports);
+            auto n = newData.getOrCreateChildWithName (tags::ports, 0);
+            Model::copyChildrenWithType (o, n, types::Port);
+        }
+        {
+            auto o = data.getChildWithName (tags::ui);
+            auto n = newData.getOrCreateChildWithName (tags::ui, 0);
+            n.copyPropertiesAndChildrenFrom (o, nullptr);
+
+            const auto ob = o.getChildWithName (tags::block);
+            if (ob.isValid())
+            {
+                auto newBlock = n.getChildWithName (tags::block);
+                if (newBlock.isValid())
+                    n.removeChild (newBlock, 0);
+                newBlock = n.getChildWithName (types::Block);
+                if (newBlock.isValid())
+                    n.removeChild (newBlock, 0);
+
+                newBlock = Model::copyWithType (ob, types::Block);
+                if (newBlock.isValid())
+                {
+                    n.addChild (newBlock, -1, 0);
+                }
+            }
+        }
+        {
+            auto o = data.getChildWithName (tags::scripts);
+            auto n = newData.getOrCreateChildWithName (tags::scripts, 0);
+            Model::copyChildrenWithType (o, n, types::Script);
+        }
+
+        auto oldNodes = data.getChildWithName (tags::nodes);
+        auto newNodes = newData.getOrCreateChildWithName (tags::nodes, nullptr);
+        for (const auto& child : oldNodes)
+        {
+            auto cm = detail::migrateNode (child, error);
+            if (cm.hasType (types::Node) && error.isEmpty())
+            {
+                newNodes.addChild (cm.createCopy(), -1, nullptr);
+            }
+            else
+            {
+                if (error.isEmpty())
+                    error = "Unexpected node child error.";
+                return {};
+            }
+        }
+    }
+    else
+    {
+        newData = {};
+        error = "Node migrations not implemented for data version: ";
+        error << model.version();
+    }
+
+    return newData;
+}
+
+} // namespace detail
+
+ValueTree Node::migrate (const ValueTree& data, String& error) noexcept
+{
+    error.clear();
+    Model model (data);
+    if (model.hasType (types::Node) && model.version() == EL_NODE_VERSION)
+        return data.createCopy();
+    auto newData = detail::migrateNode (data, error);
+    newData = error.isEmpty() ? newData : ValueTree();
+    if (! newData.isValid() && error.isEmpty())
+        error = "Unexpected node migration problem.";
+
+    if (error.isNotEmpty())
+    {
+        std::clog << newData.toXmlString().toStdString() << std::endl;
+    }
+    return newData;
 }
 
 void Node::setMuted (bool shouldBeMuted)

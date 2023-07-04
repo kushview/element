@@ -1139,6 +1139,27 @@ void GraphEditorComponent::selectNode (const Node& nodeToSelect)
     }
 }
 
+void GraphEditorComponent::selectAllNodes()
+{
+    if (ignoreNodeSelected)
+        return;
+
+    Node lastSelected;
+    for (int i = 0; i < graph.getNumNodes(); ++i)
+    {
+        auto node = lastSelected = graph.getNode (i);
+        selectedNodes.addToSelection (node.getNodeId());
+    }
+
+    updateSelection();
+    if (auto* cc = ViewHelpers::findContentComponent (this))
+    {
+        auto* gui = cc->services().find<GuiService>();
+        if (gui->getSelectedNode() != lastSelected)
+            gui->selectNode (lastSelected);
+    }
+}
+
 void GraphEditorComponent::deleteSelectedNodes()
 {
     NodeArray toRemove;

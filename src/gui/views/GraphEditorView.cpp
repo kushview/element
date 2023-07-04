@@ -320,4 +320,6 @@ void GraphEditorView::saveSettings()
     s.setProperty ("nodePropsVisible", nodeProps.isVisible(), nullptr);
 }
 
+void GraphEditorView::selectAllNodes() { graph.selectAllNodes(); }
+
 } /* namespace element */

@@ -32,16 +32,6 @@
 #include <element/settings.hpp>
 
 namespace element {
-namespace detail {
-static void alertOldFile (const File& file)
-{
-    String msg = "@0@ file was created with an older version of Element and cannot yet be opened";
-    msg = msg.replace ("@0@", file.getFileName());
-    juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::InfoIcon,
-                                            "Old File",
-                                            msg);
-}
-} // namespace detail
 
 class SessionService::ChangeResetter : public AsyncUpdater
 {
@@ -106,23 +96,38 @@ void SessionService::openFile (const File& file)
 
     if (file.hasFileExtension ("elg"))
     {
-        const ValueTree node (Node::parse (file));
-        if (Node::isProbablyGraphNode (node))
-        {
-            const Node model (node, true);
-            if (model.version() < EL_GRAPH_VERSION)
-            {
-                return detail::alertOldFile (file);
-            }
+        ValueTree data (Node::parse (file));
+        String error;
 
-            model.forEach ([] (const ValueTree& tree) {
-                if (! tree.hasType (types::Node))
-                    return;
-                auto nodeRef = tree;
-                nodeRef.setProperty (tags::uuid, Uuid().toString(), nullptr);
-            });
-            if (auto* ec = sibling<EngineService>())
-                ec->addGraph (model);
+        if (Node::isProbablyGraphNode (data))
+        {
+            Model model (data);
+
+            if (model.version() != EL_GRAPH_VERSION)
+                data = Node::migrate (model.data(), error);
+
+            if (data.isValid() && error.isEmpty())
+            {
+                Node node (data, true);
+                node.forEach ([] (const ValueTree& tree) {
+                    if (! tree.hasType (types::Node))
+                        return;
+                    auto ref = tree;
+                    ref.setProperty (tags::uuid, Uuid().toString(), nullptr);
+                });
+
+                if (auto* ec = sibling<EngineService>())
+                    ec->addGraph (node);
+            }
+        }
+        else
+        {
+            error = "File does not seem to be an Element graph.";
+        }
+
+        if (error.isNotEmpty())
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Invalid graph", error);
         }
     }
     else if (file.hasFileExtension ("els"))

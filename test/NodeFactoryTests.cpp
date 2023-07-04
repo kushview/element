@@ -25,12 +25,12 @@ BOOST_AUTO_TEST_CASE (Internals)
 
     OwnedArray<PluginDescription> types;
     for (const auto& ID : expectedIDs) {
-        BOOST_REQUIRE (nodes.getKnownIDs().contains (ID));
+        BOOST_REQUIRE (nodes.knownIDs().contains (ID));
         BOOST_REQUIRE (nullptr != std::unique_ptr<Processor> (nodes.instantiate (ID)));
         nodes.getPluginDescriptions (types, ID);
     }
 
-    BOOST_REQUIRE (nodes.getKnownIDs().size() == expectedIDs.size());
+    BOOST_REQUIRE (nodes.knownIDs().size() == expectedIDs.size());
     BOOST_REQUIRE (types.size() == expectedIDs.size());
     for (const auto* tp : types) {
         BOOST_REQUIRE (tp->name.isNotEmpty());
