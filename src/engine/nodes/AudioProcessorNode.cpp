@@ -257,6 +257,12 @@ void AudioProcessorNode::refreshPorts()
     setPorts (newPorts);
 }
 
+void AudioProcessorNode::getPluginDescription (PluginDescription& desc) const
+{
+    if (auto pi = dynamic_cast<AudioPluginInstance*> (proc.get()))
+        pi->fillInPluginDescription (desc);
+}
+
 ParameterPtr AudioProcessorNode::getParameter (const PortDescription& port)
 {
     jassert (isPositiveAndBelow (port.channel, params.size()));

@@ -61,8 +61,9 @@ public:
     Processor* instantiate (const PluginDescription&);
     /** Instantiate a node processor. */
     Processor* instantiate (const String& identifier);
+
     /** Wrap an audio plugin instance as a node processor. */
-    Processor* wrap (AudioProcessor*);
+    static Processor* wrap (AudioProcessor*);
 
     //==========================================================================
     /** Return the list of providers registered with this factory. */

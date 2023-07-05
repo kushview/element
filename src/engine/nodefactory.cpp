@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/context.hpp>
 #include <element/nodefactory.hpp>
 
 #include "engine/nodes/BaseProcessor.h"
@@ -32,10 +33,49 @@
 #include "engine/nodes/ScriptNode.h"
 #include "engine/graphnode.hpp"
 
+#include "engine/audioprocessorfactory.hpp"
+#include "engine/internalformat.hpp"
+
 #include "../nodes/mcu.hpp"
 
 namespace element {
 
+class AudioProcessorFactory::Format : public ElementAudioPluginFormat
+{
+public:
+    Format (Context& ctx) : ElementAudioPluginFormat (ctx) {}
+};
+
+AudioProcessorFactory::AudioProcessorFactory (Context& c)
+{
+    _format = std::make_unique<Format> (c);
+}
+
+AudioProcessorFactory::~AudioProcessorFactory() {}
+
+/** Create the instance by ID string. */
+Processor* AudioProcessorFactory::create (const String& ID)
+{
+    double sampleRate = 44100.0;
+    int bufferSize = 1024;
+    juce::PluginDescription desc;
+    desc.pluginFormatName = EL_NODE_FORMAT_NAME;
+    desc.fileOrIdentifier = ID;
+    if (auto ap = _format->createInstanceFromDescription (desc, sampleRate, bufferSize))
+    {
+        ap->enableAllBuses(); // TODO pluginmanager does this as well.
+        return NodeFactory::wrap (ap.release());
+    }
+    return nullptr;
+}
+
+/** return a list of types contained in this provider. */
+StringArray AudioProcessorFactory::findTypes()
+{
+    return _format->searchPathsForPlugins ({}, true, true);
+}
+
+//==============================================================================
 template <class NT>
 struct SingleNodeProvider : public NodeProvider
 {
@@ -219,7 +259,8 @@ Processor* NodeFactory::wrap (AudioProcessor* processor)
 
     if (node)
     {
-        // init
+        std::clog << "[element] wrapped: " << node->getName().toStdString() << std::endl;
+        // node->refreshPorts();
     }
 
     return node.release();

@@ -128,6 +128,7 @@ public:
         tracks.ensureStorageAllocated (16);
         while (--numTracks >= 0)
             addStereoTrack();
+
         setRateAndBufferSizeDetails (sampleRate, bufferSize);
         addLegacyParameter (masterMute = new AudioParameterBool ("masterMute", "Master Mute", false));
         addLegacyParameter (masterVolume = new AudioParameterFloat ("masterVolume", "Master Volume", -120.0f, 12.0f, 0.f));

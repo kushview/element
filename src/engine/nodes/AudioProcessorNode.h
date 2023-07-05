@@ -48,6 +48,8 @@ public:
     void releaseResources() override;
     void refreshPorts() override;
 
+    void getPluginDescription (PluginDescription& desc) const override;
+
 protected:
     ParameterPtr getParameter (const PortDescription& port) override;
 

@@ -16,7 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "engine/internalformat.hpp"
 #include <element/devices.hpp>
 #include <element/session.hpp>
 #include <element/settings.hpp>
@@ -24,9 +23,12 @@
 #include <element/services.hpp>
 #include <element/context.hpp>
 
+#include "engine/audioprocessorfactory.hpp"
+#include "engine/internalformat.hpp"
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
 #include "session/presetmanager.hpp"
+
 #include "appinfo.hpp"
 #include "log.hpp"
 #include "module.hpp"
@@ -81,7 +83,9 @@ private:
 
         plugins.reset (new PluginManager());
         plugins->addFormat (new InternalFormat (owner));
-        plugins->addFormat (new ElementAudioPluginFormat (owner));
+        // plugins->addFormat (new ElementAudioPluginFormat (owner));
+        auto& nf = plugins->getNodeFactory();
+        nf.add (new AudioProcessorFactory (owner));
         plugins->addDefaultFormats();
     }
 

@@ -692,11 +692,6 @@ void PluginManager::addDefaultFormats()
         else if (fmt == "LADSPA")
             audioPlugs.addFormat (new LADSPAPluginFormat());
 #endif
-
-#if JUCE_PLUGINHOST_LV2
-        else if (fmt == "LV2")
-            audioPlugs.addFormat (new LV2PluginFormat());
-#endif
     }
 }
 
@@ -771,7 +766,7 @@ Processor* PluginManager::createGraphNode (const PluginDescription& desc, String
     if (auto* const plugin = createAudioPlugin (desc, errorMsg))
     {
         plugin->enableAllBuses();
-        return nodes.wrap (plugin);
+        return NodeFactory::wrap (plugin);
     }
 
     if (desc.pluginFormatName == "Internal")
@@ -905,41 +900,27 @@ String PluginManager::getCurrentlyScannedPluginName() const
 void PluginManager::scanInternalPlugins()
 {
     auto& nodes = priv->nodes;
-    auto& manager = getAudioPluginFormats();
-    for (int i = 0; i < manager.getNumFormats(); ++i)
+
+    auto& known = getKnownPlugins();
+    const auto types = known.getTypes();
+    for (const auto& t : types)
     {
-        auto* format = manager.getFormat (i);
-        if (format->getName() != "Element")
+        if (t.pluginFormatName != EL_NODE_FORMAT_NAME)
             continue;
+        known.removeType (t);
+        known.removeFromBlacklist (t.fileOrIdentifier);
+        known.removeFromBlacklist (t.createIdentifierString());
+    }
 
-        auto& known = getKnownPlugins();
-        const auto types = known.getTypesForFormat (*format);
-        for (const auto& t : types)
-        {
-            known.removeType (t);
-            known.removeFromBlacklist (t.fileOrIdentifier);
-            known.removeFromBlacklist (t.createIdentifierString());
-        }
-
-        PluginDirectoryScanner scanner (getKnownPlugins(), *format, format->getDefaultLocationsToSearch(), true, priv->deadAudioPlugins, false);
-
-        String name;
-        while (scanner.scanNextFile (true, name))
-        {
-        }
-
-        OwnedArray<PluginDescription> ds;
-        for (const auto& nodeTypeId : nodes.knownIDs())
-            nodes.getPluginDescriptions (ds, nodeTypeId);
-        for (const auto* const d : ds)
-        {
-            known.removeType (*d);
-            known.removeFromBlacklist (d->fileOrIdentifier);
-            known.removeFromBlacklist (d->createIdentifierString());
-            known.addType (*d);
-        }
-
-        break;
+    OwnedArray<PluginDescription> ds;
+    for (const auto& nodeTypeId : nodes.knownIDs())
+        nodes.getPluginDescriptions (ds, nodeTypeId);
+    for (const auto* const d : ds)
+    {
+        known.removeType (*d);
+        known.removeFromBlacklist (d->fileOrIdentifier);
+        known.removeFromBlacklist (d->createIdentifierString());
+        known.addType (*d);
     }
 }
 
