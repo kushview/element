@@ -80,15 +80,11 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/libs/lua/*",
-                "${workspaceFolder}/libs/JUCE/modules/*",
-                "${workspaceFolder}/libs/kv/modules/*",
-                "${workspaceFolder}/libs/compat/*",
-                "${workspaceFolder}/libs/lua/src/*",
+                "${workspaceFolder}/subprojects/juce/modules/*",
+                "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*",
-                "${workspaceFolder}/build/libs/compat/*"
+                "${workspaceFolder}/test/*"
             ],
             "defines": [
                 "_DEBUG",

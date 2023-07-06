@@ -74,6 +74,10 @@ public:
 
     void setMainView (ContentView* v);
 
+    //==========================================================================
+    void setExtraView (juce::Component*);
+    Component* extraView() { return _extra.get(); }
+
 private:
     std::unique_ptr<NavigationConcertinaPanel> nav;
     friend class ContentContainer;
@@ -93,6 +97,8 @@ private:
     int nodeStripSize = 80;
 
     juce::String lastMainView;
+
+    std::unique_ptr<juce::Component> _extra;
 
     void resizerMouseDown();
     void resizerMouseUp();

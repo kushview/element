@@ -74,7 +74,7 @@ public:
 
     void resized() override
     {
-        const int padding = 5;
+        const int padding = 2;
         const int buttonSize = getHeight() - (padding * 2);
         addButton.setBounds (getWidth() - padding - buttonSize,
                              padding,

@@ -23,11 +23,7 @@ if host_machine.system() == 'windows'
         </Operation>
     </Operations>'''
 elif host_machine.system() == 'darwin'
-    element_operations = '''<Operations>
-        <Operation name="Extract">
-            <Argument>@ApplicationsDir@</Argument>
-        </Operation>
-    </Operations>'''
+    element_operations = '<Script>component.js</Script>'
 endif
 
 configure_file (input : 'package.xml',

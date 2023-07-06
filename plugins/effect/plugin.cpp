@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include "./pluginconfig.h"
-#include "../pluginprocessor.cpp"
-#include "../plugineditor.cpp"
+#include "pluginprocessor.hpp"
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

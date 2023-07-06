@@ -14,7 +14,7 @@ if get_option ('deploy')
     endforeach
 endif
 
-if ldoc.found()
+if ldoc.found() and not meson.is_subproject()
     custom_target (
         'Lua API Docs',
         build_by_default: true,

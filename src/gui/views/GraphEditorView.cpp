@@ -147,7 +147,7 @@ bool GraphEditorView::keyPressed (const KeyPress& key)
 
 void GraphEditorView::stabilizeContent()
 {
-    if (! nodeSelectedConnection.connected() || ! nodeRemovedConnection.connected())
+    if (! (nodeSelectedConnection.connected() && nodeRemovedConnection.connected()))
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
         {

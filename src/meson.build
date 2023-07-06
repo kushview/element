@@ -24,6 +24,9 @@ libelement_sources = '''
     timescale.cpp
     utils.cpp
 
+    plugineditor.cpp
+    pluginprocessor.cpp
+
     services/deviceservice.cpp
     services/engineservice.cpp
     services/guiservice.cpp

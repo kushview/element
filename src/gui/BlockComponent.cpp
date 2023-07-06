@@ -1031,6 +1031,7 @@ void BlockComponent::updatePosition()
 
     if (! node.hasPosition() && nullptr != parent)
     {
+        DBG ("converting relative position");
         node.getRelativePosition (x, y);
         x = x * (parent->getWidth()) - (getWidth() / 2);
         y = y * (parent->getHeight()) - (getHeight() / 2);
@@ -1038,6 +1039,7 @@ void BlockComponent::updatePosition()
     }
     else
     {
+        DBG ("getting regular pos");
         node.getPosition (x, y);
     }
 

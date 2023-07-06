@@ -41,16 +41,26 @@
     "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\r\n"
 
 namespace element {
-namespace About {
 
-static StringArray getDevelopers()
+namespace detail {
+
+static String licenseText()
+{
+    auto year = Time::getCurrentTime().getYear();
+    return String (EL_LICENSE_TEXT).replace ("@0@", String (year));
+}
+
+static StringArray developers()
 {
     const auto str = String (BinaryData::developers_txt, BinaryData::developers_txtSize);
     StringArray devs;
     devs.addTokens (str, "\n", {});
+    devs.removeDuplicates (false);
+    devs.removeEmptyStrings();
     return devs;
 }
-} // namespace About
+
+} // namespace detail
 
 class AboutCreditsPanel : public Component
 {
@@ -147,8 +157,8 @@ public:
         text.setCaretVisible (false);
         text.setMultiLine (true, false);
         text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
-        text.setText (String (EL_LICENSE_TEXT).replace ("%YEAR%", String (Time::getCurrentTime().getYear())));
         text.setReadOnly (true);
+        setLicenseText (detail::licenseText());
     }
 
     void setLicenseText (const String& newText)
@@ -232,7 +242,7 @@ AboutComponent::AboutComponent()
 
     auto* authors = new AboutCreditsComponent();
     authors->getPanel().addSection ("Lead Developer", { "Michael Fisher (mfisher31)" });
-    authors->getPanel().addSection ("Developers", About::getDevelopers());
+    authors->getPanel().addSection ("Developers", detail::developers());
     tabs.addTab ("Authors", tabc, authors, true);
 
     auto* donors = new AboutCreditsComponent();
@@ -253,7 +263,6 @@ AboutComponent::AboutComponent()
 
     AboutInfo i;
     i.title = EL_APP_NAME;
-    i.licenseText = EL_LICENSE_TEXT;
     i.copyright << "Copyright " << String (CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
     i.copyright = i.copyright.replace ("XXX", String (buildDate.getYear()));
     i.version = ("Version: ") + Version::withGitHash();

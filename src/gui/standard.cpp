@@ -675,6 +675,12 @@ void StandardContent::resizeContent (const Rectangle<int>& area)
 {
     Rectangle<int> r (area);
 
+    if (_extra && _extra->isVisible())
+    {
+        _extra->setBounds (r.removeFromBottom (44));
+        r.removeFromBottom (1);
+    }
+
     if (nodeStrip && nodeStrip->isVisible())
         nodeStrip->setBounds (r.removeFromRight (nodeStripSize));
 
@@ -1307,6 +1313,16 @@ void StandardContent::setMainView (ContentView* view)
 {
     jassert (view != nullptr);
     setContentView (view, false);
+}
+
+void StandardContent::setExtraView (Component* extra)
+{
+    _extra.reset (extra);
+    if (_extra)
+    {
+        addAndMakeVisible (_extra.get());
+    }
+    resized();
 }
 
 void StandardContent::setMeterBridgeVisible (bool vis)

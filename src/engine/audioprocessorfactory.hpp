@@ -16,6 +16,7 @@ public:
     Processor* create (const String&) override;
     /** return a list of types contained in this provider. */
     StringArray findTypes() override;
+
 private:
     class Format;
     std::unique_ptr<Format> _format;
