@@ -37,10 +37,12 @@ public:
     {
         param = parameter;
         control = dynamic_cast<RangedParameter*> (param.get());
+        observeParameter (param);
     }
 
     virtual ~ControlPort()
     {
+        observeParameter (nullptr);
         param = nullptr;
         control = nullptr;
     }
@@ -72,6 +74,7 @@ private:
     RangedParameterPtr control;
     void handleNewParameterValue() override
     {
+        std::clog << "handle new param value\n";
         if (onValueChange)
             onValueChange();
     }
@@ -232,7 +235,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
         "set",
         [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
 
-        "valuechanged",
+        "changed",
         sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction));
     env["ScriptNodeEditor.ControlPort"] = M;
 

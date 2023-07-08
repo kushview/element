@@ -1,6 +1,11 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+/// The Session Model.
+// Representation of a session.
+// @classmod el.Session
+// @pragma nostrip
+
 #include <element/element.h>
 #include <element/node.hpp>
 #include <element/session.hpp>
@@ -23,15 +28,31 @@ EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L)
                        : std::shared_ptr<Node>();
         },
 
-        "name", [](Session& self) { return self.getName().toStdString(); },
+        /// The sessions name.
+        // @tfield string Session.name
+        // @within Attributes
+        "name", sol::property (
+            [](Session& self) { return self.getName().toStdString(); },
+            [](Session& self, const char* name) { self.setName (name); }
+        ),
 
+        /// Convert to an XML string.
+        // @function Session:toXmlString
+        // @treturn string XML string of the session data.
         "toXmlString", [] (Session& self) -> std::string {
             auto tree = self.data().createCopy();
             Node::sanitizeRuntimeProperties (tree, true);
             return tree.toXmlString().toStdString();
         },
 
+        /// Save plugin states.
+        // Call to save the state of all nodes in a session.
+        // @function Session:saveState
         "saveState",    &Session::saveGraphState,
+
+        /// Restore state in plugins.
+        // Call to restore the state of all nodes in a session.
+        // @function Session:restoreState
         "restoreState", &Session::restoreGraphState
     );
 

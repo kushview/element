@@ -1,71 +1,49 @@
-/*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.2.1
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
-
-  ==============================================================================
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
-#include "ElementApp.h"
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 class GuiService;
-//[/Headers]
+class SettingsPage;
 
 //==============================================================================
-/**
-                                                                    //[Comments]
-                                                                    //[/Comments]
-*/
-class PreferencesComponent : public Component
+class PreferencesComponent : public juce::Component
 {
 public:
     //==============================================================================
-    PreferencesComponent (Context& g, GuiService& _gui);
+    PreferencesComponent (GuiService& ui);
     ~PreferencesComponent();
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
-    void setPage (const String& name);
-    void addPage (const String& name);
-    Component* createPageForName (const String& name);
-    void updateSize();
-    //[/UserMethods]
+    void setPage (const juce::String& name);
+    void addPage (const juce::String& name);
 
-    void paint (Graphics& g) override;
+    void updateSize();
+
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
+    bool keyPressed (const KeyPress& key) override;
+
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-    class PageList;
-    Context& world;
-    GuiService& gui;
-    OwnedArray<Component> pages;
-    //[/UserVariables]
+    Context& _context;
+    GuiService& _ui;
 
     //==============================================================================
+    class PageList;
     std::unique_ptr<PageList> pageList;
-    std::unique_ptr<GroupComponent> groupComponent;
     std::unique_ptr<Component> pageComponent;
+    juce::OwnedArray<juce::Component> pages;
+
+    //==============================================================================
+    Component* createPageForName (const String& name);
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
 };
 
-//[EndFile] You can add extra defines here...
+using Preferences = PreferencesComponent;
+
 } // namespace element
-//[/EndFile]

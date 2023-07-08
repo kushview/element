@@ -217,7 +217,7 @@ static int midibuffer_addbuffer (lua_State* L)
 static int midibuffer_insertbytes (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
-    auto* b = (kv_bytes_t*) lua_touserdata (L, 2);
+    auto* b = (EL_Bytes*) lua_touserdata (L, 2);
     auto n = static_cast<int> (lua_tointeger (L, 3));
     auto f = static_cast<int> (lua_tointeger (L, 4)) - 1;
     impl->buffer.addEvent (b->data, n, f);
@@ -269,7 +269,7 @@ static const luaL_Reg buffer_methods[] = {
     // This is a quick operation, because no memory allocating or copying is done, it
     // just swaps the internal state of the two buffers.
     // @function MidiBuffer:swap
-    // @tparam kv.MidiBuffer other Buffer to swap with
+    // @tparam el.MidiBuffer other Buffer to swap with
     { "swap", midibuffer_swap },
 
     /// Insert some MIDI in the buffer.
@@ -279,13 +279,13 @@ static const luaL_Reg buffer_methods[] = {
     { "insert", midibuffer_insert },
 
     /// Insert some bytes into the buffer.
-    // The kv.ByteArray passed in should contain a complete MIDI message
+    // The el.ByteArray passed in should contain a complete MIDI message
     // of any type.
-    // @function MidiBuffer:addbytes
-    // @tparam kv.ByteArray bytes The bytes to add
+    // @function MidiBuffer:addBytes
+    // @tparam el.ByteArray bytes The bytes to add
     // @int size Max number of bytes to add
     // @int frame Sample index to insert at
-    { "addbytes", midibuffer_insertbytes },
+    { "addBytes", midibuffer_insertbytes },
 
     /// Iterate over MIDI data.
     // Iterate over midi data in this buffer
@@ -301,18 +301,18 @@ static const luaL_Reg buffer_methods[] = {
     { "events", midibuffer_events },
 
     /// Add a raw MIDI Event.
-    // @function MidiBuffer:addevent
+    // @function MidiBuffer:addEvent
     // @param data Raw event data to add
     // @int size Size of data in bytes
     // @int frame Insert index
-    { "addevent", midibuffer_addevent },
+    { "addEvent", midibuffer_addevent },
 
     /// Iterate over MIDI Messages.
-    // Iterate over messages (kv.MidiMessage) in the buffer
+    // Iterate over messages (el.MidiMessage) in the buffer
     // @function MidiBuffer:messages
     // @return message iterator
     // @usage
-    // -- @msg     A kv.MidiMessage
+    // -- @msg     A el.MidiMessage
     // -- @frame   Audio frame index in buffer
     // for msg, frame in buffer:messages() do
     //     -- do something with midi data
@@ -320,15 +320,15 @@ static const luaL_Reg buffer_methods[] = {
     { "messages", midibuffer_messages },
 
     /// Add a message to the buffer.
-    // @function MidiBuffer:addmessage
-    // @tparam kv.MidiMessage msg Message to add
+    // @function MidiBuffer:addMessage
+    // @tparam el.MidiMessage msg Message to add
     // @int frame Insert index
-    { "addmessage", midibuffer_addmessage },
+    { "addMessage", midibuffer_addmessage },
 
     /// Add messages from another buffer.
-    // @function MidiBuffer:addbuffer
-    // @tparam kv.MidiBuffer buf Buffer to copy from
-    { "addbuffer", midibuffer_addbuffer },
+    // @function MidiBuffer:addBuffer
+    // @tparam el.MidiBuffer buf Buffer to copy from
+    { "addBuffer", midibuffer_addbuffer },
 
     { NULL, NULL }
 };

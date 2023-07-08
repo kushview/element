@@ -1,30 +1,30 @@
-/// An audio sample buffer
-// @classmod el.AudioBuffer
-
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#if LKV_AUDIO_BUFFER_COMPILE
+/// An audio sample buffer
+// @classmod el.AudioBuffer
+
+#if EL_LUA_AUDIO_BUFFER_COMPILE
 
 #include <element/element.h>
 #include <element/juce/audio_basics.hpp>
 
 #include "sol_helpers.hpp"
 
-#ifndef LKV_AUDIO_BUFFER_32
-#define LKV_AUDIO_BUFFER_32 0
+#ifndef EL_LUA_AUDIO_BUFFER_32
+#define EL_LUA_AUDIO_BUFFER_32 0
 #endif
 
-#if LKV_AUDIO_BUFFER_32
+#if EL_LUA_AUDIO_BUFFER_32
 #define EL_MT_AUDIO_BUFFER_TYPE "el.AudioBuffer32Class"
 #define EL_MT_AUDIO_BUFFER_IMPL EL_MT_AUDIO_BUFFER_32
-#define LKV_AUDIO_BUFFER_OPEN luaopen_el_AudioBuffer32
+#define EL_LUA_AUDIO_BUFFER_OPEN luaopen_el_AudioBuffer32
 using SampleType = float;
 
 #else
 #define EL_MT_AUDIO_BUFFER_TYPE "el.AudioBuffer64Class"
 #define EL_MT_AUDIO_BUFFER_IMPL EL_MT_AUDIO_BUFFER_64
-#define LKV_AUDIO_BUFFER_OPEN luaopen_el_AudioBuffer
+#define EL_LUA_AUDIO_BUFFER_OPEN luaopen_el_AudioBuffer
 using SampleType = lua_Number;
 #endif
 
@@ -34,7 +34,7 @@ using Buffer = juce::AudioBuffer<SampleType>;
 
 static int audio_isfloat (lua_State* L)
 {
-#if LKV_AUDIO_BUFFER_32
+#if EL_LUA_AUDIO_BUFFER_32
     lua_pushboolean (L, true);
 #else
     lua_pushboolean (L, false);
@@ -44,7 +44,7 @@ static int audio_isfloat (lua_State* L)
 
 static int audio_isdouble (lua_State* L)
 {
-#if LKV_AUDIO_BUFFER_32
+#if EL_LUA_AUDIO_BUFFER_32
     lua_pushboolean (L, false);
 #else
     lua_pushboolean (L, true);
@@ -52,9 +52,6 @@ static int audio_isdouble (lua_State* L)
     return 1;
 }
 
-/// Channel count
-// @function AudioBuffer:channels
-// @return the number of channels held in the buffer
 static int audio_channels (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -62,23 +59,6 @@ static int audio_channels (lua_State* L)
     return 1;
 }
 
-/// Clears the entire audio buffer.
-// @function AudioBuffer:clear
-
-/// Clears one channel in the audio buffer.
-// @int channel The channel to clear
-// @function AudioBuffer:clear
-
-/// Clears a range of samples on all channels.
-// @int start Sample index to start on
-// @int count Number of samples to clear
-// @function AudioBuffer:clear
-
-/// Clears a range of samples on one channel
-// @int channel The channel to clear
-// @int start Sample index to start on
-// @int count Number of samples to clear
-// @function AudioBuffer:clear
 static int audio_clear (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -112,9 +92,6 @@ static int audio_clear (lua_State* L)
     return 0;
 }
 
-/// Returns true if the buffer has been cleared
-// @function AudioBuffer:cleared
-// @return true if already cleared
 static int audio_cleared (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -122,9 +99,6 @@ static int audio_cleared (lua_State* L)
     return 1;
 }
 
-/// returns the number of samples in the buffer
-// @function AudioBuffer:length
-// @return size of the buffer in samples
 static int audio_length (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -132,11 +106,6 @@ static int audio_length (lua_State* L)
     return 1;
 }
 
-/// Get a single value from the buffer
-// @param channel The channel to get from
-// @param frame The sample index to get
-// @function AudioBuffer:get
-// @return the number of channels held in the buffer
 static int audio_get (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -151,11 +120,6 @@ static int audio_get (lua_State* L)
     return 1;
 }
 
-/// Set a single sample in the buffer
-// @param channel The channel to set on
-// @param frame The frame index to set
-// @param value The value to set
-// @function AudioBuffer:set
 static int audio_set (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -174,29 +138,6 @@ static int audio_set (lua_State* L)
     return 0;
 }
 
-/// Apply gain to all channels and samples
-// @number gain Gain to apply to all channels
-// @function AudioBuffer:applygain
-
-/// Apply gain to a single channel
-// @int channel Channel to apply gain to
-// @number gain Gain to apply to a channel
-// @function AudioBuffer:applygain
-
-/// Applies a gain multiple to a region of all the channels.
-// For speed, this doesn't check whether the sample numbers
-// are in-range, so be careful!
-// @int start Sample index to start at
-// @int count Number of samples to process
-// @number gain Amount of gain to apply
-// @function AudioBuffer:applygain
-
-/// Apply gain to a single channel with range
-// @int channel Channel to apply gain to
-// @int start Sample index to start at
-// @int count Number of samples to process
-// @number gain Amount of gain to apply
-// @function AudioBuffer:applygain
 static int audio_applygain (lua_State* L)
 {
     Buffer* buf = toclassref (L, 1);
@@ -235,18 +176,6 @@ static int audio_applygain (lua_State* L)
     return 0;
 }
 
-/// Fade the buffer from starting gain to ending gain
-// @number startgain Starting gain
-// @number endgain End gain
-// @function AudioBuffer:fade
-
-/// Fade the buffer from starting gain to ending gain
-// @int channel Channel to apply to
-// @int start Sample to start at
-// @int count Number of samples to process
-// @number gain1 Starting gain
-// @number gain2 End gain
-// @function AudioBuffer:fade
 static int audio_fade (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
@@ -272,11 +201,6 @@ static int audio_fade (lua_State* L)
     return 0;
 }
 
-/// Free used memory.
-// Invoke this to free the buffer when it is no longer needed.  Once called,
-// the buffer is no longer valid and WILL crash the interpreter if used after
-// the fact.
-// @function AudioBuffer:free
 static int audio_free (lua_State* L)
 {
     auto** buf = (Buffer**) lua_touserdata (L, 1);
@@ -334,22 +258,115 @@ static int audio_new (lua_State* L)
 static const luaL_Reg buffer_methods[] = {
     { "__gc", audio_free },
     { "__tostring", audio_tostring },
+
+    /// Free used memory.
+    // Invoke this to free the buffer when it is no longer needed.  Once called,
+    // the buffer is no longer valid and WILL crash the interpreter if used after
+    // the fact.
+    // @function AudioBuffer:free
     { "free", audio_free },
-    { "isfloat", audio_isfloat },
-    { "isdouble", audio_isdouble },
+
+    /// Returns true if audio data is 32bit float.
+    // Call this to find out audio data precision.
+    // @function AudioBuffer:isFloat
+    { "isFloat", audio_isfloat },
+
+    /// Returns true if audio data is 64bit float.
+    // Call this to find out audio data precision.
+    // @function AudioBuffer:isDouble
+    { "isDouble", audio_isdouble },
+
+    /// Channel count
+    // @function AudioBuffer:channels
+    // @return the number of channels held in the buffer
     { "channels", audio_channels },
+
+    /// returns the number of samples in the buffer
+    // @function AudioBuffer:length
+    // @return size of the buffer in samples
     { "length", audio_length },
+
+    /// Clears the entire audio buffer.
+    // @function AudioBuffer:clear
+
+    /// Clears one channel in the audio buffer.
+    // @int channel The channel to clear
+    // @function AudioBuffer:clear
+
+    /// Clears a range of samples on all channels.
+    // @int start Sample index to start on
+    // @int count Number of samples to clear
+    // @function AudioBuffer:clear
+
+    /// Clears a range of samples on one channel
+    // @int channel The channel to clear
+    // @int start Sample index to start on
+    // @int count Number of samples to clear
+    // @function AudioBuffer:clear
     { "clear", audio_clear },
+
+    /// Returns true if the buffer has been cleared
+    // @function AudioBuffer:cleared
+    // @return true if already cleared
     { "cleared", audio_cleared },
+
+    /// Get a single value from the buffer
+    // @param channel The channel to get from
+    // @param frame The sample index to get
+    // @function AudioBuffer:get
+    // @return the number of channels held in the buffer
     { "get", audio_get },
+
+    /// Set a single sample in the buffer
+    // @param channel The channel to set on
+    // @param frame The frame index to set
+    // @param value The value to set
+    // @function AudioBuffer:set
     { "set", audio_set },
-    { "applygain", audio_applygain },
+
+    /// Apply gain to all channels and samples
+    // @number gain Gain to apply to all channels
+    // @function AudioBuffer:applyGain
+
+    /// Apply gain to a single channel
+    // @int channel Channel to apply gain to
+    // @number gain Gain to apply to a channel
+    // @function AudioBuffer:applyGain
+
+    /// Applies a gain multiple to a region of all the channels.
+    // For speed, this doesn't check whether the sample numbers
+    // are in-range, so be careful!
+    // @int start Sample index to start at
+    // @int count Number of samples to process
+    // @number gain Amount of gain to apply
+    // @function AudioBuffer:applyGain
+
+    /// Apply gain to a single channel with range
+    // @int channel Channel to apply gain to
+    // @int start Sample index to start at
+    // @int count Number of samples to process
+    // @number gain Amount of gain to apply
+    // @function AudioBuffer:applyGain
+    { "applyGain", audio_applygain },
+
+    /// Fade the buffer from starting gain to ending gain
+    // @number startgain Starting gain
+    // @number endgain End gain
+    // @function AudioBuffer:fade
+
+    /// Fade the buffer from starting gain to ending gain
+    // @int channel Channel to apply to
+    // @int start Sample to start at
+    // @int count Number of samples to process
+    // @number gain1 Starting gain
+    // @number gain2 End gain
+    // @function AudioBuffer:fade
     { "fade", audio_fade },
     { NULL, NULL }
 };
 
 //==============================================================================
-#if LKV_AUDIO_BUFFER_32
+#if EL_LUA_AUDIO_BUFFER_32
 EL_PLUGIN_EXPORT
 int luaopen_el_AudioBuffer32 (lua_State* L)
 {

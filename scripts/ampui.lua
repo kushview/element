@@ -20,29 +20,29 @@ function Editor:init (ctx)
     local volume = ctx.params [1]
 
     self.knob = self:add (object.new (Slider))
-    self.knob.style = Slider.ROTARY
-    self.knob:settextboxstyle (Slider.TEXT_BOX_BELOW, true, 52, 26)
-    self.knob:setrange (-90, 24, 0.01)
-    self.knob:setvalue (volume:get(), false)
+    self.knob.style = Slider.Rotary
+    self.knob:setTextBoxStyle (Slider.TextBoxBelow, true, 52, 26)
+    self.knob:setRange (-90, 24, 0.01)
+    self.knob:setValue (volume:get(), false)
     self.knob.dragging  = false
-    self.knob.dragstart = function() self.knob.dragging = true end
-    self.knob.dragend   = function() self.knob.dragging = false end
-    self.knob.valuechanged   = function()
+    self.knob.dragStart = function() self.knob.dragging = true end
+    self.knob.dragEnd   = function() self.knob.dragging = false end
+    self.knob.changed   = function()
         if not self.knob.dragging then return end
         volume:set (self.knob:value(), false)
     end
 
-    volume.valuechanged = function()
-        self.knob:setvalue (volume:get(), false)
+    volume.changed = function()
+        self.knob:setValue (volume:get(), false)
     end
 
     self:resize (180, 170)
 end
 
 function Editor:paint (g)
-    g:fillall (bgcolor)
-    g:setcolor (fgcolor)
-    g:drawtext ("AMP", 0, 0, self.width, 30)
+    g:fillAll (bgcolor)
+    g:setColor (fgcolor)
+    g:drawText ("AMP", 0, 0, self.width, 30)
 end
 
 function Editor:resized()

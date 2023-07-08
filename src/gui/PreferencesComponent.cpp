@@ -1,21 +1,5 @@
-/*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.2.0
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
-
-  ==============================================================================
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 //[Headers] You can add your own extra header files here...
 #include <element/devices.hpp>
@@ -36,6 +20,8 @@
 #define EL_MIDI_SETTINGS_NAME "MIDI"
 #define EL_OSC_SETTINGS_NAME "OSC"
 #define EL_PLUGINS_PREFERENCE_NAME "Plugins"
+#define EL_REPOSITORY_PREFERENCE_NAME "Update Mirrors"
+
 //[/Headers]
 
 #include "PreferencesComponent.h"
@@ -68,6 +54,7 @@ public:
     {
         g.fillAll (Colors::widgetBackgroundColor.darker (0.45f));
     }
+
     virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected)
     {
         if (! isPositiveAndBelow (rowNumber, pageNames.size()))
@@ -99,7 +86,7 @@ public:
 private:
     friend class PreferencesComponent;
 
-    void addItem (const String& name, const String& identifier)
+    void addItem (const String& name)
     {
         pageNames.addIfNotAlreadyThere (name);
         updateContent();
@@ -111,6 +98,7 @@ private:
     String page;
 };
 
+//==============================================================================
 class SettingsPage : public Component
 {
 public:
@@ -133,6 +121,7 @@ protected:
     }
 };
 
+//==============================================================================
 class OSCSettingsPage : public SettingsPage,
                         private AsyncUpdater
 {
@@ -216,8 +205,7 @@ private:
     }
 };
 
-// MARK: Plugin Settings (included in general)
-
+//==============================================================================
 class PluginSettingsComponent : public SettingsPage,
                                 public Button::Listener
 {
@@ -328,8 +316,7 @@ private:
     }
 };
 
-// MARK: General Settings
-
+//==============================================================================
 class GeneralSettingsPage : public SettingsPage,
                             public Value::Listener,
                             public FilenameComponentListener,
@@ -676,8 +663,7 @@ private:
     GuiService& gui;
 };
 
-// MARK: Audio Settings
-
+//==============================================================================
 class AudioSettingsComponent : public SettingsPage
 {
 public:
@@ -697,12 +683,12 @@ public:
     void resized() override { devs.setBounds (getLocalBounds()); }
 
 private:
-    element::AudioDeviceSelectorComponent devs;
+    // element::AudioDeviceSelectorComponent devs;
+    juce::AudioDeviceSelectorComponent devs;
     DeviceManager& devices;
 };
 
-// MARK: MIDI Settings
-
+//==============================================================================
 class MidiSettingsPage : public SettingsPage,
                          public ComboBox::Listener,
                          public Button::Listener,
@@ -1014,109 +1000,458 @@ private:
     }
 };
 
-//[/MiscUserDefs]
+//==============================================================================
+class MirrorsSettingsPage : public SettingsPage,
+                            public TableListBoxModel,
+                            private AsyncUpdater
+{
+    GuiService& _ui;
+
+public:
+    MirrorsSettingsPage (GuiService& ui)
+        : _ui (ui)
+    {
+        addAndMakeVisible (_table);
+        auto& header = _table.getHeader();
+
+        header.addColumn ("Enabled", 1, 50, 50, 50, TableHeaderComponent::notResizable);
+        header.addColumn ("Host", 2, 150, 75, -1, TableHeaderComponent::notSortable);
+        header.addColumn ("Username", 3, 75, 60, -1, TableHeaderComponent::notSortable);
+        header.addColumn ("Password", 4, 100, 60, -1, TableHeaderComponent::notSortable);
+        _table.setHeaderHeight (22);
+        _table.setRowHeight (20);
+        _table.setModel (this);
+        updateRepo();
+
+        addAndMakeVisible (checkButton);
+        checkButton.onClick = [this]() {
+            _ui.checkUpdates();
+        };
+
+        addAndMakeVisible (addButton);
+        addButton.onClick = [this]() {
+            _repos.push_back ({});
+            _table.updateContent();
+            _table.selectRow (getNumRows() - 1);
+            _table.repaint();
+            saveRepos();
+        };
+
+        addAndMakeVisible (removeButton);
+        removeButton.onClick = [this]() {
+            auto selected = (size_t) _table.getSelectedRow();
+            if (selected >= 0 && selected < _repos.size())
+            {
+                _repos.erase (_repos.begin() + selected);
+                _table.updateContent();
+                _table.repaint();
+                saveRepos();
+            }
+        };
+
+        setSize (30 + 360 + 220 + 220, 500);
+    }
+
+    ~MirrorsSettingsPage()
+    {
+        _table.setModel (nullptr);
+    }
+
+    void resized() override
+    {
+        auto r = getLocalBounds();
+        auto rb = r.removeFromBottom (24);
+        rb.removeFromLeft (2);
+        checkButton.setBounds (rb.removeFromLeft (90));
+        rb.removeFromRight (2);
+        removeButton.setBounds (rb.removeFromRight (90));
+        rb.removeFromRight (3);
+        addButton.setBounds (rb.removeFromRight (90));
+
+        r.removeFromBottom (4);
+        _table.setBounds (r);
+    }
+
+    int getNumRows() override { return (int) _repos.size(); }
+
+    void paintRowBackground (Graphics& g, int r, int w, int h, bool selected) override
+    {
+        ViewHelpers::drawBasicTextRow ({}, g, w, h, selected);
+    }
+
+    void paintCell (Graphics& g, int r, int cID, int w, int h, bool selected) override
+    {
+        if (r >= (int) _repos.size())
+            return;
+
+        String text = "";
+        const auto& repo = _repos.at (r);
+        switch (cID)
+        {
+            case 1:
+                text.clear();
+                getLookAndFeel().drawTickBox (g, *this, (w / 2) - (h / 2) + 1, 1, h - 2, h - 2, repo.enabled, true, selected, false);
+                break;
+            case 2:
+                text = _repos.at (r).host;
+                break;
+            case 3:
+                text = _repos.at (r).username;
+                break;
+            case 4: {
+                for (int i = (int) _repos.at (r).password.length(); --i >= 0;)
+                    text << (juce_wchar) 0x2022;
+                break;
+            }
+        }
+
+        if (text.isNotEmpty())
+        {
+            g.setColour (Colors::textColor);
+            g.drawText (text, 0, 0, w, h, Justification::centred, true);
+        }
+        else
+        {
+        }
+    }
+
+    void cellClicked (int rowNumber, int columnId, const MouseEvent&) override
+    {
+        bool needsSaved = false;
+        if (columnId == 1)
+        {
+            _repos.at (rowNumber).enabled = ! _repos.at (rowNumber).enabled;
+            needsSaved = true;
+        }
+        _table.selectRow (rowNumber);
+        _table.repaintRow (rowNumber);
+
+        if (needsSaved)
+            saveRepos();
+    }
+
+    String getCellTooltip (int rowNumber, int columnId) override
+    {
+        if (columnId == 2)
+        {
+            return String (_repos.at (rowNumber).host);
+        }
+        return TableListBoxModel::getCellTooltip (rowNumber, columnId);
+    }
+    Component* refreshComponentForCell (int row, int column, bool selected, Component* existing) override
+    {
+        if (column == 1)
+            return nullptr;
+        ValueLabel* vlab = dynamic_cast<ValueLabel*> (existing);
+        if (vlab == nullptr)
+            vlab = new ValueLabel (*this);
+        vlab->update (row, column);
+        return vlab;
+    }
+
+#if 0
+    virtual Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
+                                                Component* existingComponentToUpdate);
+   
+    virtual void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&);
+    virtual void backgroundClicked (const MouseEvent&);
+    virtual void sortOrderChanged (int newSortColumnId, bool isForwards);
+    virtual int getColumnAutoSizeWidth (int columnId);
+    
+    virtual void selectedRowsChanged (int lastRowSelected);
+    virtual void deleteKeyPressed (int lastRowSelected);
+    virtual void returnKeyPressed (int lastRowSelected);
+    virtual void listWasScrolled();
+    virtual var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
+#endif
+private:
+    juce::TableListBox _table;
+    juce::TextButton addButton { "Add" },
+        removeButton { "Remove" },
+        checkButton { "Check..." };
+
+    struct Repo
+    {
+        std::string host;
+        std::string username;
+        std::string password;
+        bool enabled { false };
+    };
+    std::vector<Repo> _repos;
+
+    friend class ValueLabel;
+    class ValueLabel : public juce::TextEditor
+    {
+        MirrorsSettingsPage& owner;
+
+    public:
+        ValueLabel() = delete;
+        ValueLabel (MirrorsSettingsPage& o)
+            : owner (o)
+        {
+            setColour (TextEditor::backgroundColourId, Colours::transparentBlack);
+            setColour (TextEditor::outlineColourId, Colours::transparentBlack);
+        }
+
+        virtual ~ValueLabel()
+        {
+            onTextChange = nullptr;
+        }
+
+        void update (int r, int c)
+        {
+            column = c;
+            row = r;
+
+            if (row >= (int) owner._repos.size())
+                return;
+
+            auto repo = owner._repos.at (row);
+
+            setText ("", dontSendNotification);
+            setCaretPosition (0);
+            switch (column)
+            {
+                case 2:
+                    insertTextAtCaret (repo.host);
+                    break;
+                case 3:
+                    insertTextAtCaret (repo.username);
+                    break;
+                case 4:
+                    setPasswordCharacter ((juce_wchar) 0x2022);
+                    insertTextAtCaret (repo.password);
+                    break;
+            }
+
+            onTextChange = std::bind (&ValueLabel::textWasChanged, this);
+        }
+
+        void mouseDown (const MouseEvent& ev) override
+        {
+            owner._table.selectRow (row);
+            TextEditor::mouseDown (ev);
+        }
+
+    private:
+        void textWasChanged()
+        {
+            if (row >= (int) owner._repos.size())
+                return;
+
+            auto& repos = owner._repos;
+
+            switch (column)
+            {
+                case 2:
+                    repos.at (row).host = getText().trim().toStdString();
+                    break;
+                case 3:
+                    repos.at (row).username = getText().trim().toStdString();
+                    break;
+                case 4:
+                    repos.at (row).password = getText().trim().toStdString();
+                    break;
+            }
+
+            owner.triggerAsyncUpdate();
+        }
+
+        int column { 0 };
+        int row { 0 };
+    };
+
+    void handleAsyncUpdate() override { saveRepos(); }
+
+    static std::unique_ptr<XmlElement> readNetworkFile()
+    {
+        auto file = networkFile();
+        if (! file.existsAsFile())
+            return nullptr;
+        return XmlDocument::parse (file);
+    }
+
+    void saveRepos()
+    {
+        auto xml = readNetworkFile();
+        if (xml == nullptr)
+            return;
+
+        if (auto repos = xml->getChildByName ("Repositories"))
+        {
+            xml->removeChildElement (repos, true);
+            repos = xml->createNewChildElement ("Repositories");
+
+            for (const auto& repo : _repos)
+            {
+                auto r = repos->createNewChildElement ("Repository");
+                if (auto c = r->createNewChildElement ("Host"))
+                    c->addTextElement (repo.host);
+                if (auto c = r->createNewChildElement ("Username"))
+                    c->addTextElement (repo.username);
+                if (auto c = r->createNewChildElement ("Password"))
+                    c->addTextElement (repo.password);
+                if (auto c = r->createNewChildElement ("Enabled"))
+                    c->addTextElement (repo.enabled ? "1" : "0");
+            }
+        }
+
+        XmlElement::TextFormat format;
+        format.addDefaultHeader = true;
+        format.customEncoding = "UTF-8";
+        if (! xml->writeTo (networkFile(), format))
+        {
+            const auto fn = networkFile().getFileName().toStdString();
+            std::clog << "[element] failed to write " << fn << std::endl;
+        }
+    }
+
+    void updateRepo()
+    {
+        if (auto xml = readNetworkFile())
+        {
+            setEnabled (true);
+            _repos.clear();
+
+            if (auto xml2 = xml->getChildByName ("Repositories"))
+            {
+                for (const auto* const e : xml2->getChildIterator())
+                {
+                    Repo repo;
+
+                    if (auto c = e->getChildByName ("Host"))
+                        repo.host = c->getAllSubText().toStdString();
+                    if (auto c = e->getChildByName ("Username"))
+                        repo.username = c->getAllSubText().toStdString();
+                    if (auto c = e->getChildByName ("Password"))
+                        repo.password = c->getAllSubText().toStdString();
+
+                    if (auto c = e->getChildByName ("Enabled"))
+                    {
+                        auto st = c->getAllSubText();
+                        repo.enabled = st.getIntValue() != 0;
+                    }
+
+                    if (! repo.host.empty())
+                    {
+                        std::clog << "[element] found repo: " << repo.host << std::endl;
+                        _repos.push_back (repo);
+                    }
+                }
+            }
+        }
+        else
+        {
+            setEnabled (false);
+        }
+
+        _table.updateContent();
+        repaint();
+        resized();
+    }
+
+    static File networkFile() noexcept
+    {
+        return DataPath::applicationDataDir().getChildFile ("installer/network.xml");
+    }
+};
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent (Context& g, GuiService& _gui)
-    : world (g), gui (_gui)
+PreferencesComponent::PreferencesComponent (GuiService& ui)
+    : _context (ui.context()), _ui (ui)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
     pageList = std::make_unique<PageList> (*this);
     addAndMakeVisible (pageList.get());
     pageList->setName ("Page List");
 
-    groupComponent = std::make_unique<GroupComponent> ("new group",
-                                                       TRANS ("group"));
-    addAndMakeVisible (groupComponent.get());
-    groupComponent->setColour (GroupComponent::outlineColourId, Colour (0xff888888));
-    groupComponent->setColour (GroupComponent::textColourId, Colours::white);
-
-    pageComponent.reset (new Component());
+    pageComponent = std::make_unique<Component>();
     addAndMakeVisible (pageComponent.get());
     pageComponent->setName ("new component");
 
-    //[UserPreSize]
-    groupComponent->setVisible (false);
-    //[/UserPreSize]
-
     updateSize();
 
-    //[Constructor] You can add your own custom stuff here..
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
     addPage (EL_OSC_SETTINGS_NAME);
+
     setPage (EL_GENERAL_SETTINGS_NAME);
-    //[/Constructor]
 }
 
 PreferencesComponent::~PreferencesComponent()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
-    //[/Destructor_pre]
-
     pageList = nullptr;
-    groupComponent = nullptr;
     pageComponent = nullptr;
-
-    //[Destructor]. You can add your own custom destruction code here..
-    gui.refreshMainMenu();
-    //[/Destructor]
+    pages.clear();
+    _ui.refreshMainMenu();
 }
 
 //==============================================================================
 void PreferencesComponent::paint (Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
     g.fillAll (Colors::widgetBackgroundColor);
-    //[/UserPrePaint]
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
 }
 
 void PreferencesComponent::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
-
     pageList->setBounds (8, 8, 184, 480);
-    groupComponent->setBounds (200, 8, 392, 480);
     pageComponent->setBounds (208, 32, 376, 448);
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
 
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+bool PreferencesComponent::keyPressed (const KeyPress& key)
+{
+    if (key.getModifiers().isCommandDown() && key.getModifiers().isShiftDown() && key.getModifiers().isAltDown() && (key.getKeyCode() == 'm' || key.getKeyCode() == 'M'))
+    {
+        bool haveMirrors = false;
+        for (auto child : pageList->getChildren())
+        {
+            if (nullptr != dynamic_cast<MirrorsSettingsPage*> (child))
+            {
+                haveMirrors = true;
+                break;
+            }
+        }
+
+        if (! haveMirrors)
+        {
+            addPage (EL_REPOSITORY_PREFERENCE_NAME);
+            return true;
+        }
+    }
+    return false;
+}
+
 void PreferencesComponent::addPage (const String& name)
 {
     if (! pageList->pageNames.contains (name))
-        pageList->addItem (name, name);
+        pageList->addItem (name);
 }
 
 Component* PreferencesComponent::createPageForName (const String& name)
 {
     if (name == EL_GENERAL_SETTINGS_NAME)
     {
-        return new GeneralSettingsPage (world, gui);
+        return new GeneralSettingsPage (_context, _ui);
     }
     else if (name == EL_AUDIO_SETTINGS_NAME)
     {
-        return new AudioSettingsComponent (world.devices());
+        return new AudioSettingsComponent (_context.devices());
     }
     else if (name == EL_PLUGINS_PREFERENCE_NAME)
     {
-        return new PluginSettingsComponent (world);
+        return new PluginSettingsComponent (_context);
     }
     else if (name == EL_MIDI_SETTINGS_NAME)
     {
-        return new MidiSettingsPage (world);
+        return new MidiSettingsPage (_context);
     }
     else if (name == EL_OSC_SETTINGS_NAME)
     {
-        return new OSCSettingsPage (world, gui);
+        return new OSCSettingsPage (_context, _ui);
+    }
+    else if (name == EL_REPOSITORY_PREFERENCE_NAME)
+    {
+        return new MirrorsSettingsPage (_ui);
     }
 
     return nullptr;
@@ -1153,37 +1488,3 @@ void PreferencesComponent::updateSize()
 }
 
 } /* namespace element */
-//[/MiscUserCode]
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Context&amp; g, GuiService&amp; _gui"
-                 variableInitialisers="world (g), gui(_gui)" snapPixels="4" snapActive="1"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
-                 initialHeight="500">
-  <BACKGROUND backgroundColour="3b3b3b"/>
-  <GENERICCOMPONENT name="Page List" id="c2205f1e30617b7c" memberName="pageList"
-                    virtualName="" explicitFocusOrder="0" pos="8 8 184 480" class="PageList"
-                    params="*this"/>
-  <GROUPCOMPONENT name="new group" id="8e138086820b2998" memberName="groupComponent"
-                  virtualName="" explicitFocusOrder="0" pos="200 8 392 480" outlinecol="ff888888"
-                  textcol="ffffffff" title="group"/>
-  <GENERICCOMPONENT name="new component" id="8b11ff6707734770" memberName="pageComponent"
-                    virtualName="" explicitFocusOrder="0" pos="208 32 376 448" class="Component"
-                    params=""/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

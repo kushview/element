@@ -2,8 +2,8 @@
 -- @classmod el.AudioBuffer
 -- @pragma nostrip
 
-AudioBuffer32 = require ('el.AudioBuffer32')
-AudioBuffer64 = require ('el.AudioBuffer64')
+local AudioBuffer32 = require ('el.AudioBuffer32')
+local AudioBuffer64 = require ('el.AudioBuffer64')
 
 local M = {}
 

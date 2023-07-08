@@ -12,11 +12,11 @@
 /// Value changed handler.
 // Implement this to handle when the value changes. If you call Parameter:set
 // from inside this callback, be careful to not create an infinte callback loop.
-// @function Parameter:valuechanged
+// @function Parameter:changed
 // @within Handlers
 // @usage
 // -- The first argument, `self`, will be the Parameter object
-// param.valuechanged = function (self)
+// param.changed = function (self)
 //     local value = self:get()
 //     print (value)
 // end

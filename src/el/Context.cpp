@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 /// The main context in which Element is running.
-// A collection of global objects.
+// The main Element context.  A collection of "global" objects.
 // @classmod el.Context
 // @pragma nostrip
 
@@ -37,18 +37,27 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
     auto M = lua.create_table();
     
     M.new_usertype<Context> ("Context", sol::no_constructor,
-                             "instance", el_Context_userdata,
-                             "audio",    &Context::audio,
-                             "devices",  &Context::devices,
-                             "mapping",  &Context::mapping,
-                             "midi",     &Context::midi,
-                             "plugins",  &Context::plugins,
-                             "presets",  &Context::presets,
-                             "session",  &Context::session,
-                             "settings", &Context::settings);
+        /// Returns the single instance.
+        // @function Context.instance
+        // @treturn el.Context
+        // @within Class Methods
+        "instance", el_Context_userdata,
+
+        /// Returns the active el.Session.
+        // @function Context:session
+        // @treturn el.Session
+        // @within Instance Methods
+        "session",  &Context::session,
+
+        "audio",    &Context::audio,
+        "devices",  &Context::devices,
+        "mapping",  &Context::mapping,
+        "midi",     &Context::midi,
+        "plugins",  &Context::plugins,
+        "presets",  &Context::presets,
+        "settings", &Context::settings);
 
     lua.script (R"(
-        require ('el.Commands')
         require ('el.Node')
         require ('el.Session')
     )");

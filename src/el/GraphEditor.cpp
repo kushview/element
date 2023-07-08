@@ -1,9 +1,9 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-/// Slider widget.
+/// The base graph editor widget.
 // Is a @{el.Widget}
-// @classmod el.View
+// @classmod el.GraphEditor
 // @pragma nostrip
 
 #include <element/element.h>
@@ -62,6 +62,10 @@ int luaopen_el_GraphEditor (lua_State* L)
         L, EL_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (GraphEditor& self) { 
             return lua::to_string (self, EL_TYPE_NAME_VIEW); 
         },
+
+        /// The el.Graph used by this editor.
+        // @field GraphEditor.graph
+        // @within Attributes
         "graph", sol::property (&GraphEditor::getGraph, &GraphEditor::setNode),
         sol::base_classes, sol::bases<juce::Component>()
     );

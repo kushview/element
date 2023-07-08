@@ -191,7 +191,7 @@ private:
 //==============================================================================
 struct AudioDeviceSetupDetails
 {
-    AudioDeviceManager* manager;
+    AudioDeviceManager* manager { nullptr };
     int minNumInputChannels, maxNumInputChannels;
     int minNumOutputChannels, maxNumOutputChannels;
     bool useStereoPairs;

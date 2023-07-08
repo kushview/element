@@ -25,27 +25,27 @@ int luaopen_el_Graphics (lua_State* L)
         // @section methods
 
         /// Save the current state.
-        // @function Graphics:savestate
+        // @function Graphics:save
         "save",     &Graphics::saveState,
 
         /// Restore the last saved state.
-        // @function Graphics:restorestate
+        // @function Graphics:restore
         "restore",  &Graphics::restoreState,
 
         /// Change the color.
-        // @function Graphics:setcolor
+        // @function Graphics:setColor
         // @int color New ARGB color as integer. e.g.`0xAARRGGBB`
         "setColor", [] (Graphics& g, lua_Integer color) { 
             g.setColour (Colour (color)); 
         },
 
         /// Draw some text.
-        // @function Graphics:drawtext
+        // @function Graphics:drawText
         // @string text Text to draw
         // @tparam el.Rectangle r
 
         /// Draw some text.
-        // @function Graphics:drawtext
+        // @function Graphics:drawText
         // @string text Text to draw
         // @int x Horizontal position
         // @int y Vertical position

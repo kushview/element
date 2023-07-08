@@ -1,4 +1,6 @@
 --- Session.
+-- High level session dealings in Lua.  This module wraps el.Session class
+-- in an simplified API.
 -- @module el.session
 
 local Context = require ('el.Context')
@@ -9,8 +11,7 @@ local Graph   = require ('el.Graph')
 local M = {}
 local session = Context.instance():session()
 
-function M.get()         return session end
 function M.toxmlstring() return session:toXmlString() end
-function M.name()        return session:name() end
+function M.name()        return session.name end
 
 return M

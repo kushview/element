@@ -1,14 +1,15 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// Bounding box
 // The value type for this is a 32bit integer and Backed by a juce::Rectangle.
 // API is identical to @{el.Rectangle}.
 // @classmod el.Bounds
 // @pragma nostrip
 
-// Copyright 2023 Kushview, LLC <info@kushview.net>
-// SPDX-License-Identifier: GPL3-or-later
-
 #include <element/element.hpp>
 #include "rectangle.hpp"
+
 #define EL_TYPE_NAME_BOUNDS "Bounds"
 
 using namespace juce;

@@ -56,8 +56,6 @@ extern int luaopen_el_Bounds (lua_State*);
 extern int luaopen_el_TextButton (lua_State*);
 extern int luaopen_el_Widget (lua_State*);
 extern int luaopen_el_Desktop (lua_State*);
-extern int luaopen_el_DocumentWindow (lua_State*);
-extern int luaopen_el_File (lua_State*);
 extern int luaopen_el_Graphics (lua_State*);
 extern int luaopen_el_MidiBuffer (lua_State*);
 extern int luaopen_el_MidiMessage (lua_State*);
@@ -75,6 +73,11 @@ extern int luaopen_el_View (lua_State*);
 extern int luaopen_el_Graph (lua_State*);
 extern int luaopen_el_GraphEditor (lua_State*);
 extern int luaopen_el_Content (lua_State*);
+
+#if EL_EXPERIMENTAL
+extern int luaopen_el_DocumentWindow (lua_State*);
+extern int luaopen_el_File (lua_State*);
+#endif
 }
 
 using namespace sol;
@@ -372,17 +375,9 @@ static int searchInternalModules (lua_State* L)
     {
         sol::stack::push (L, luaopen_el_Desktop);
     }
-    else if (mod == "el.DocumentWindow" || mod == "kv.DocumentWindow")
-    {
-        sol::stack::push (L, luaopen_el_DocumentWindow);
-    }
     else if (mod == "el.MouseEvent" || mod == "kv.MouseEvent")
     {
         sol::stack::push (L, luaopen_el_MouseEvent);
-    }
-    else if (mod == "el.File" || mod == "kv.File")
-    {
-        sol::stack::push (L, luaopen_el_File);
     }
     else if (mod == "el.Slider" || mod == "kv.Slider")
     {
@@ -404,6 +399,16 @@ static int searchInternalModules (lua_State* L)
     {
         sol::stack::push (L, luaopen_el_Content);
     }
+#if EL_EXPERIMENTAL
+    else if (mod == "el.DocumentWindow" || mod == "kv.DocumentWindow")
+    {
+        sol::stack::push (L, luaopen_el_DocumentWindow);
+    }
+    else if (mod == "el.File" || mod == "kv.File")
+    {
+        sol::stack::push (L, luaopen_el_File);
+    }
+#endif
     else
     {
         std::stringstream msg;

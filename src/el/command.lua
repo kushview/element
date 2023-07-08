@@ -1,13 +1,13 @@
---- Commands.
+--- UI Commands.
+-- Support library for working with Element UI commands.
 -- @module el.command
 
-local Commands    = require ('el.Commands')
-local Context     = require ('el.Context')
+local Commands = require ('el.Commands')
+local Context  = require ('el.Context')
 
 local M = {}
 
---- Returns the global el.Commands
-function M.manager()
+local function instance()
     local g = Context.instance()
     return g and g:commands() or nil
 end
@@ -23,7 +23,7 @@ function M.invoke (cmd, async)
     end
 
     if cmd > 0 then
-        local m = M.manager()
+        local m = instance()
         assert (m ~= nil, "nil el.Commands")
         return m:invokeDirectly (cmd, async or false)
     end

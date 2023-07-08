@@ -17,7 +17,7 @@ endif
 if ldoc.found() and not meson.is_subproject()
     custom_target (
         'Lua API Docs',
-        build_by_default: true,
+        build_always_stale: true,
         command: [ ldoc, '-f', 'markdown', '-q',
             '-c', '@INPUT@', 
             '-d', meson.current_build_dir() / '..' / '@OUTPUT@',

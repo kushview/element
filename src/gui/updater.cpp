@@ -3,6 +3,7 @@
 #include <element/ui/updater.hpp>
 #include <element/juce/core.hpp>
 #include <element/juce/events.hpp>
+#include <element/datapath.hpp>
 #include <element/version.hpp>
 
 #ifndef EL_TRACE_UPDATER
@@ -25,6 +26,101 @@ using namespace juce;
 namespace element {
 namespace ui {
 
+//==============================================================================
+struct UpdateRepo
+{
+    std::string host;
+    std::string username;
+    std::string password;
+    bool enabled { false };
+};
+
+static File networkFile() noexcept
+{
+    return DataPath::applicationDataDir().getChildFile ("installer/network.xml");
+}
+
+static std::unique_ptr<XmlElement> readNetworkFile()
+{
+    auto file = networkFile();
+    if (! file.existsAsFile())
+        return nullptr;
+    return XmlDocument::parse (file);
+}
+
+#if 0
+static void saveRepos (const std::vector<UpdateRepo>& _repos)
+{
+    auto xml = readNetworkFile();
+    if (xml == nullptr)
+        return;
+
+    if (auto repos = xml->getChildByName ("Repositories"))
+    {
+        for (auto e : repos->getChildIterator())
+            repos->removeChildElement (e, true);
+
+        for (const auto& repo : _repos)
+        {
+            auto xml = repos->createNewChildElement ("Repository");
+            if (auto c = xml->createNewChildElement ("Host"))
+                c->addTextElement (repo.host);
+            if (auto c = xml->createNewChildElement ("Username"))
+                c->addTextElement (repo.username);
+            if (auto c = xml->createNewChildElement ("Password"))
+                c->addTextElement (repo.password);
+            if (auto c = xml->createNewChildElement ("Enabled"))
+                c->addTextElement (repo.enabled ? "1" : "0");
+        }
+    }
+
+    XmlElement::TextFormat format;
+    format.addDefaultHeader = true;
+    format.customEncoding = "UTF-8";
+    if (! xml->writeTo (networkFile(), format))
+    {
+        const auto fn = networkFile().getFileName().toStdString();
+        std::clog << "[element] failed to write " << fn << std::endl;
+    }
+}
+#endif
+
+static std::vector<UpdateRepo> updateRepos()
+{
+    std::vector<UpdateRepo> _repos;
+    if (auto xml = readNetworkFile())
+    {
+        if (auto xml2 = xml->getChildByName ("Repositories"))
+        {
+            for (const auto* const e : xml2->getChildIterator())
+            {
+                UpdateRepo repo;
+
+                if (auto c = e->getChildByName ("Host"))
+                    repo.host = c->getAllSubText().toStdString();
+                if (auto c = e->getChildByName ("Username"))
+                    repo.username = c->getAllSubText().toStdString();
+                if (auto c = e->getChildByName ("Password"))
+                    repo.password = c->getAllSubText().toStdString();
+
+                if (auto c = e->getChildByName ("Enabled"))
+                {
+                    auto st = c->getAllSubText();
+                    repo.enabled = st.getIntValue() != 0;
+                }
+
+                if (! repo.host.empty())
+                {
+                    std::clog << "[element] found repo: " << repo.host << std::endl;
+                    _repos.push_back (repo);
+                }
+            }
+        }
+    }
+    return _repos;
+}
+
+//==============================================================================
 class Updater::Updates : public juce::Thread,
                          public juce::AsyncUpdater
 {
@@ -68,25 +164,40 @@ public:
         return {};
     }
 
-    std::vector<UpdatePackage> checkNow (std::string& xmlOut, const std::string& repoToCheck)
+    std::vector<UpdatePackage> checkNow (std::string& xmlOut, const UpdateRepo& repoToCheck)
     {
         std::vector<UpdatePackage> packages;
+        juce::URL url (repoToCheck.host);
+        String urlStr = url.toString (true);
 
-        juce::URL url (repoToCheck);
+        if (! repoToCheck.username.empty() && ! repoToCheck.password.empty())
+        {
+            String creds = repoToCheck.username;
+            creds << ":" << repoToCheck.password << "@";
+            urlStr = urlStr.replace ("://", String ("://") + creds);
+        }
+
+        url = URL (urlStr);
         url = url.getChildURL ("Updates.xml");
-        int status = 599;
+
+        int status = -1;
 #if EL_TRACE_UPDATER
-        std::clog << "[element] repo: " << url.toString (false).toStdString() << std::endl;
+        std::clog << "[element] repo: " << urlStr.toStdString() << std::endl;
 #endif
         auto options = juce::URL::InputStreamOptions (URL::ParameterHandling::inAddress)
                            .withHttpRequestCmd ("GET")
                            .withStatusCode (&status)
                            .withConnectionTimeoutMs (2000);
+
         if (auto strm = url.createInputStream (options))
         {
             xmlOut = strm->readEntireStreamAsString().toStdString();
             packages = toPackages (xmlOut);
         }
+
+#if EL_TRACE_UPDATER
+        std::clog << "[element] response code: " << status << std::endl;
+#endif
 
         return packages;
     }
@@ -101,16 +212,39 @@ public:
         return isThreadRunning();
     }
 
+    UpdateRepo defaultRepo()
+    {
+        UpdateRepo repo;
+        repo.enabled = true;
+        repo.host = safeRepo();
+        return repo;
+    }
+
     void run() override
     {
+        std::vector<UpdatePackage> pkgs;
+        std::vector<UpdateRepo> repos (updateRepos());
+        repos.push_back (defaultRepo());
+
         std::string out;
         clearCached();
-        auto pkgs = checkNow (out, safeRepo());
+
+        for (const auto& repo : repos)
+        {
+            if (! repo.enabled)
+                continue;
+            out.clear();
+            pkgs = checkNow (out, repo);
+            if (! pkgs.empty())
+                break;
+        }
+
         {
             juce::ScopedLock sl (lock);
             cachedXml = out;
             cachedPackages = pkgs;
         }
+
         triggerAsyncUpdate();
     }
 
@@ -216,20 +350,18 @@ void Updater::check (bool async)
 {
     if (async)
     {
-        updates->clearCached();
         updates->checkAsync();
         return;
     }
 
-    const bool haveXml = ! updates->safeXml().empty();
-    if (haveXml)
+    if (! updates->safeXml().empty())
     {
         updates->updateCached();
         return;
     }
 
-    std::string xmlOut;
-    updates->checkNow (xmlOut, updates->safeRepo());
+    if (! updates->isThreadRunning())
+        updates->run();
 }
 
 void Updater::setInfo (const std::string& package, const std::string& version, const std::string& repo)

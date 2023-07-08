@@ -4,7 +4,7 @@
 #pragma once
 
 #include "sol_helpers.hpp"
-#include LKV_JUCE_HEADER
+#include EL_LUA_JUCE_HEADER
 
 namespace element {
 namespace lua {

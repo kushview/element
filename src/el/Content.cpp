@@ -1,6 +1,10 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+/// Base class for UI main Content.
+// @classmod el.Content
+// @pragma nostrip
+
 #include <element/element.h>
 
 #include <element/ui/content.hpp>
@@ -67,24 +71,49 @@ int luaopen_el_Content (lua_State* L)
             return lua::to_string (self, EL_TYPE_NAME_CONTENT);
         },
         
+#if 0
         "context",          &Content::context,
+
         "services",         &Content::services,
         "session",          &Content::session,
 
         "post",             &Content::post,
+#endif
 
+        /// Shows or hides the Toolbar.
+        // @function Content:showToolbar
+        // @bool show True to show or false to hide.
         "showToolbar",      &Content::setToolbarVisible,
+
+        /// Refreshes the toolbar.
+        // @function Content:refreshToolbar
         "refreshToolbar",   &Content::refreshToolbar,
 
+        /// Shows or hides the Status bar.
+        // @function Content:showStatusBar
+        // @bool show True to show or false to hide.
         "showStatusBar",    &Content::setStatusBarVisible,
+
+        /// Refreshes the status bar.
+        // @function Content:refreshStatusBar
         "refreshStatusBar", &Content::refreshStatusBar,
 
+        /// Display a view.
+        // Override this to show a view requested from the UI.
+        // @string name The name of the View requested.
+ 
+        /// Display a view.
+        // Override this to show a view requested from the UI.
+        // @function Content:presentView
+        // @tparam el.View view A view object to display.
         "presentView",      sol::overload (&Content::presentViewObject),
 
         sol::base_classes, sol::bases<juce::Component, element::Content>());
 
     lua::Object<Content>::addMethods (T, 
-        "content", "services", "post",
+#if 0
+        "content", "services", "session", "post",
+#endif
         "showToolbar", "refreshToolbar",
         "showStatusBar", "refreshStatusBar",
         "presentView");

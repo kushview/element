@@ -11,11 +11,12 @@
 
 #include <lauxlib.h>
 #include <lualib.h>
-#include "element/element.h"
+
+#include <element/element.h>
 #include "bytes.h"
 #include "packed.h"
 
-void kv_bytes_init (kv_bytes_t* b, size_t size)
+void element_bytes_init (EL_Bytes* b, size_t size)
 {
     b->data = NULL;
     b->size = size;
@@ -27,7 +28,7 @@ void kv_bytes_init (kv_bytes_t* b, size_t size)
     }
 }
 
-void kv_bytes_free (kv_bytes_t* b)
+void element_bytes_free (EL_Bytes* b)
 {
     b->size = 0;
     if (b->data != NULL)
@@ -37,12 +38,12 @@ void kv_bytes_free (kv_bytes_t* b)
     }
 }
 
-uint8_t kv_bytes_get (kv_bytes_t* b, lua_Integer index)
+uint8_t element_bytes_get (EL_Bytes* b, lua_Integer index)
 {
     return b->data[index];
 }
 
-void kv_bytes_set (kv_bytes_t* b, lua_Integer index, uint8_t value)
+void element_bytes_set (EL_Bytes* b, lua_Integer index, uint8_t value)
 {
     b->data[index] = value;
 }
@@ -53,10 +54,10 @@ void kv_bytes_set (kv_bytes_t* b, lua_Integer index, uint8_t value)
 // @treturn kv.ByteArray The new byte array.
 static int f_new (lua_State* L)
 {
-    kv_bytes_t* b = (kv_bytes_t*) lua_newuserdata (L, sizeof (kv_bytes_t));
+    EL_Bytes* b = (EL_Bytes*) lua_newuserdata (L, sizeof (EL_Bytes));
     luaL_setmetatable (L, EL_MT_BYTE_ARRAY);
     size_t size = lua_isnumber (L, 1) ? (size_t) lua_tonumber (L, 1) : 0;
-    kv_bytes_init (b, size);
+    element_bytes_init (b, size);
     return 1;
 }
 
@@ -65,8 +66,8 @@ static int f_new (lua_State* L)
 // @param bytes The array to free
 static int f_free (lua_State* L)
 {
-    kv_bytes_t* b = (kv_bytes_t*) lua_touserdata (L, 1);
-    kv_bytes_free (b);
+    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
+    element_bytes_free (b);
     return 0;
 }
 
@@ -76,11 +77,11 @@ static int f_free (lua_State* L)
 // @int index Index in the array
 static int f_get (lua_State* L)
 {
-    kv_bytes_t* b = (kv_bytes_t*) lua_touserdata (L, 1);
+    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
     lua_Integer index = luaL_checkinteger (L, 2);
     luaL_argcheck (L, b != NULL, 1, "`bytes' expected");
     luaL_argcheck (L, index >= 1 && index <= b->size, 2, "index out of range");
-    lua_pushinteger (L, (lua_Integer) kv_bytes_get (b, index - 1));
+    lua_pushinteger (L, (lua_Integer) element_bytes_get (b, index - 1));
     return 1;
 }
 
@@ -91,12 +92,12 @@ static int f_get (lua_State* L)
 // @int value Value to set in the range 0x00 to 0xFF inclusive
 static int f_set (lua_State* L)
 {
-    kv_bytes_t* b = (kv_bytes_t*) lua_touserdata (L, 1);
+    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
     lua_Integer index = luaL_checkinteger (L, 2);
     lua_Integer value = luaL_checkinteger (L, 3);
     luaL_argcheck (L, b != NULL, 1, "`bytes' expected");
     luaL_argcheck (L, index >= 1 && index <= b->size, 2, "index out of range");
-    kv_bytes_set (b, index - 1, (uint8_t) value);
+    element_bytes_set (b, index - 1, (uint8_t) value);
     return 1;
 }
 
@@ -106,7 +107,7 @@ static int f_set (lua_State* L)
 // @treturn int The size in bytes.
 static int f_size (lua_State* L)
 {
-    kv_bytes_t* b = (kv_bytes_t*) lua_touserdata (L, 1);
+    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
     luaL_argcheck (L, b != NULL, 1, "`bytes' expected");
     lua_pushinteger (L, (lua_Integer) b->size);
     return 1;
@@ -119,7 +120,7 @@ static int f_size (lua_State* L)
 // @int b2 Second byte
 // @int b3 Third byte
 // @int b4 Fourth byte
-// @treturn int Packed integer
+// @treturn int Packed lua_Integer
 static int f_pack (lua_State* L)
 {
     kv_packed_t msg = { .packed = 0x0 };

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 /// A rectangle.
-// Easy to use Rectangle object backed by JUCE Rectangle.
+// Easy to use Rectangle object backed.
 // @classmod el.Rectangle
 
 #pragma once
@@ -14,6 +14,7 @@
 namespace element {
 namespace lua {
 
+// clang-format off
 template <typename T, typename... Args>
 inline static sol::table
     defineRectangle (lua_State* L, const char* name, Args&&... args)
@@ -70,36 +71,28 @@ inline static sol::table
         // @section attributes
 
         /// @field Rectangle.x
-        "x",
-        sol::property (&R::getX, &R::setX),
+        "x", sol::property (&R::getX, &R::setX),
 
         /// @field Rectangle.y
-        "y",
-        sol::property (&R::getY, &R::setY),
+        "y", sol::property (&R::getY, &R::setY),
 
         /// @field Rectangle.width
-        "width",
-        sol::property (&R::getWidth, &R::setWidth),
+        "width", sol::property (&R::getWidth, &R::setWidth),
 
         /// @field Rectangle.height
-        "height",
-        sol::property (&R::getHeight, &R::setHeight),
+        "height",  sol::property (&R::getHeight, &R::setHeight),
 
         /// @field Rectangle.left
-        "left",
-        sol::property (&R::getX, &R::setLeft),
+        "left", sol::property (&R::getX, &R::setLeft),
 
         /// @field Rectangle.right
-        "right",
-        sol::property (&R::getRight, &R::setRight),
+        "right",  sol::property (&R::getRight, &R::setRight),
 
         /// @field Rectangle.top
-        "top",
-        sol::property (&R::getY, &R::setTop),
+        "top", sol::property (&R::getY, &R::setTop),
 
         /// @field Rectangle.bottom
-        "bottom",
-        sol::property (&R::getBottom, &R::setBottom),
+        "bottom", sol::property (&R::getBottom, &R::setBottom),
 
         /// Methods.
         // @section methods
@@ -107,26 +100,22 @@ inline static sol::table
         /// Returns the center point of this rect.
         // @function Rectangle:center
         // @treturn el.Point
-        "center",
-        [] (R& self) {
+        "center", [] (R& self) {
             juce::Point<lua_Number> pt ((lua_Number) self.getCentreX(),
                                         (lua_Number) self.getCentreY());
             return pt;
         },
 
-        /// @function Rectangle:centerx
-        "centerx",
-        &R::getCentreX,
+        /// @function Rectangle:centerX
+        "centerX", &R::getCentreX,
 
-        /// @function Rectangle:centery
-        "centery",
-        &R::getCentreY,
+        /// @function Rectangle:centerY
+        "centerY", &R::getCentreY,
 
         /// Is empty.
-        // @function Rectangle:isempty
+        // @function Rectangle:empty
         // @return True if a 0,0,0,0 rectangle
-        "isempty",
-        &R::isEmpty,
+        "empty", &R::isEmpty,
 
         /// Is finite.
         // @function Rectangle:isfinite
@@ -146,18 +135,15 @@ inline static sol::table
         // @param dx
         // @param dy
         // @return A translated rectangle
-        "translated",
-        &R::translated,
+        "translated",  &R::translated,
 
         /// Expand the rectangle in size.
         // @function Rectangle:expand
         // @param dx
         // @param dy
-        "expand",
-        &R::expand,
+        "expand",  &R::expand,
 
-        "expanded",
-        sol::overload (
+        "expanded", sol::overload (
             /// Returns expanded rectangle.
             // @function Rectangle:expanded
             // @param dx
@@ -173,11 +159,9 @@ inline static sol::table
         // @function Rectangle:reduce
         // @param dx
         // @param dy
-        "reduce",
-        &R::reduce,
+        "reduce", &R::reduce,
 
-        "reduced",
-        sol::overload (
+        "reduced", sol::overload (
             /// Returns reduced rectangle.
             // @function Rectangle:reduced
             // @param dx
@@ -193,47 +177,40 @@ inline static sol::table
         // Remomve and return a portion of this rectangle.
         // @function Rectangle:sliceTop
         // @param amt Amount to remove
-        "sliceTop",
-        &R::removeFromTop,
+        "sliceTop",  &R::removeFromTop,
 
         /// Slice left.
         // Remomve and return a portion of this rectangle.
         // @function Rectangle:sliceLeft
         // @param amt Amount to remove
-        "sliceLeft",
-        &R::removeFromLeft,
+        "sliceLeft", &R::removeFromLeft,
 
         /// Slice right.
         // Remomve and return a portion of this rectangle.
         // @function Rectangle:sliceRight
         // @param amt Amount to remove
-        "sliceRight",
-        &R::removeFromRight,
+        "sliceRight",  &R::removeFromRight,
 
         /// Slice bottom.
         // Remomve and return a portion of this rectangle.
         // @function Rectangle:sliceBottom
         // @param amt Amount to remove
-        "sliceBottom",
-        &R::removeFromBottom,
+        "sliceBottom", &R::removeFromBottom,
 
         /// Convert to integer.
-        // @function Rectangle:tointeger
-        // @return Converted rectangle
-        "tointeger",
-        &R::toNearestInt,
+        // @function Rectangle:toInt
+        // @treturn el.Bounds Converted rectangle
+        "toInt", &R::toNearestInt,
 
         /// Convert to rounded integer.
-        // @function Rectangle:toedges
-        // @return Converted rectangle
-        "toedges",
-        &R::toNearestIntEdges,
+        // @function Rectangle:toEdges
+        // @treturn el.Bounds Converted rectangle
+        "toEdges", &R::toNearestIntEdges,
 
         /// Convert to number.
-        // @function Rectangle:tointeger
+        // @function Rectangle:toNumber
         // @return Converted rectangle
-        "tonumber",
-        &R::toDouble,
+        "toNumber", &R::toDouble,
         std::forward<Args> (args)...
 #if 0        
         "getAspectRatio", sol::overload (
@@ -305,6 +282,7 @@ inline static sol::table
 
     return element::lua::removeAndClear (M, name);
 }
+// clang-format on
 
 } // namespace lua
 } // namespace element

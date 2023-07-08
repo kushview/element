@@ -141,9 +141,13 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
 
     M.new_usertype<Widget> (name, sol::no_constructor,
         /// Initialize the widget.
-        // Override this to customize your widget.
+        // Override this to customize your widget. Required as an @{el.object}
         // @function Widget.init
+        // @within Class Methods
         "init",         Widget::init,
+
+        /// Attributes.
+        // @section attributes
 
         /// Widget name (string).
         // @field Widget.name
@@ -184,7 +188,7 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
 
         /// Change the bounding box.
         // The coords returned is relative to the top/left of the widget's parent.
-        // @function Widget:setbounds
+        // @function Widget:setBounds
         // @int x X pos
         // @int y Y pos
         // @int w Width
@@ -192,11 +196,11 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
 
         /// Change the bounding box.
         // The coords returned is relative to the top/left of the widget's parent.
-        // @function Widget:setbounds
-        // @tparam mixed New bounds as a kv.Bounds or table
+        // @function Widget:setBounds
+        // @tparam mixed bounds New bounds as a el.Bounds or table
         // @usage
         // -- Can also set a table. e.g.
-        // widget:setbounds ({
+        // widget:setBounds ({
         //     x      = 0,
         //     y      = 0,
         //     width  = 100,
@@ -210,7 +214,7 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
 
         /// Local bounding box.
         // Same as bounds with zero x and y coords
-        // @function Widget:localbounds
+        // @function Widget:localBounds
         "localBounds",      &Widget::getLocalBounds,
 
         /// Widget right edge.
@@ -222,11 +226,11 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
         "bottom",           &Widget::getBottom,
 
         /// Widget Screen X position (int).
-        // @function Widget:screenx
+        // @function Widget:screenX
         "screenX",          &Widget::getScreenX,
 
         /// Widget Screen Y position (int).
-        // @function Widget:screeny
+        // @function Widget:screenY
         "screenY",          &Widget::getScreenY,
 
         "repaint", sol::overload (
@@ -236,7 +240,7 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
 
             /// Repaint a section.
             // @function Widget:repaint
-            // @tparam kv.Bounds b Area to repaint
+            // @tparam el.Bounds b Area to repaint
             [] (Widget& self, const juce::Rectangle<int>& r) {
                 self.repaint (r);
             },
@@ -262,12 +266,12 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
         "resize",       &Widget::setSize,
 
         /// Bring to front.
-        // @function Widget:tofront
+        // @function Widget:toFront
         // @bool focus If true, will also try to focus this widget.
         "toFront",      &Widget::toFront,
 
         /// To Back.
-        // @function Widget:toback
+        // @function Widget:toBack
         "toBack",       &Widget::toBack,
 
         std::forward<Args> (args)...

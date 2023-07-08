@@ -1,6 +1,11 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+/// The Node Model.
+// Representation of a Node.
+// @classmod el.Node
+// @pragma nostrip
+
 #pragma once
 
 #include "sol_helpers.hpp"
@@ -24,28 +29,95 @@ inline static sol::table new_nodetype (lua_State* L, const char* name, Args&&...
                                     : std::shared_ptr<Node>(); 
         },
 
-        "name",        [] (Node* self) { return self->getName().toStdString(); }, 
-        "setName",     [] (Node* self, const char* name) { self->setProperty (tags::name, String::fromUTF8 (name)); },
+        /// Attributes.
+        // @section attritubes
+
+        /// The node's name (@{string}).
+        // @field Node.name
+        "name", sol::property (
+            [] (Node& self) { return self.getName().toStdString(); },
+            [] (Node& self, const char* name) { self.setName (name); }
+        ),
+        
+        /// Validity flag (bool).
+        // False if this node isn't valid.
+        // @field Node.valid
+        "valid",    sol::readonly_property (&Node::isValid),
+
+        /// Methods.
+        // @section methods
+
+        /// Returns the display name of this node.
+        // @function Node:displayName
+        // @within Methods
+        // @treturn string The name to use for display.
         "displayName", [] (Node* self) { return self->getDisplayName().toStdString(); },
+        
+        /// Returns the original plugin name of this node.
+        // @function Node:pluginName
+        // @within Methods
+        // @treturn string The plugin name.
         "pluginName",  [] (Node* self) { return self->getPluginName().toStdString(); },
+
+        /// Returns true if the node has been renamed.
+        // @function Node:hasModifiedName
+        // @within Methods
+        // @return bool True if modified.
         "hasModifiedName", &Node::hasModifiedName,
+        
+        /// Returns a session-wide unique ID.
+        // @function Node:uuidString
+        // @treturn string
         "uuidString",  [](Node& self) { return self.getUuidString().toStdString(); },
+        
+        /// Returns a graph-wide unique ID.
+        // @function Node:nodeId
+        // @treturn int
         "nodeId",      [](Node& self) { return static_cast<lua_Integer> (self.getNodeId()); },
+
+        /// Returns the type of this node.
+        // Usage of this method is only used to determine if the node is a
+        // graph or not.  Subject to change and add more types.
+        // @function Node:nodeType
+        // @treturn string
         "nodeType",    [](Node& self) { return self.getNodeType().toString(); },
 
-        "missing",     &Node::isMissing,
-        "valid",       &Node::isValid,
-        "enabled",     &Node::isEnabled,
-        "bypassed",    &Node::isBypassed,
-        "muted",       &Node::isMuted,
+        /// Returns true if this is a graph.
+        // @function Node:isGraph
+        // @treturn bool
         "isGraph",     &Node::isGraph,
+
+        /// Returns true if this is a root graph.
+        // These exists as top level graphs in the @{el.Session}
+        // @function Node:isRoot
+        // @treturn bool
         "isRoot",      &Node::isRootGraph,
 
+        /// Convert to XML string.
+        // @function Node::toXmlString
+        // @treturn string
         "toXmlString", [] (Node* self) -> std::string {
             auto copy = self->data().createCopy();
             element::Node::sanitizeRuntimeProperties (copy, true);
             return copy.toXmlString().toStdString();
         },
+
+        /// Save state.
+        // @function Node:saveState
+        "saveState",    &Node::savePluginState,
+
+        /// Restore state.
+        // @function Node:restoreState
+        "restoreState", &Node::restorePluginState,
+
+        "missing",     &Node::isMissing,
+        
+        
+        
+        "enabled",     &Node::isEnabled,
+        "bypassed",    &Node::isBypassed,
+        "muted",       &Node::isMuted,
+
         "writeFile", [] (const Node& node, const char* filepath) -> bool {
             if (! File::isAbsolutePath (filepath))
                 return false;
@@ -54,8 +126,6 @@ inline static sol::table new_nodetype (lua_State* L, const char* name, Args&&...
 
         "resetPorts",   &Node::resetPorts,
 
-        "saveState",    &Node::savePluginState,
-        "restoreState", &Node::restorePluginState,
         std::forward<Args> (args)...
     );
     return removeAndClear (M, name);

@@ -1,8 +1,8 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#ifndef LKV_UTIL_H
-#define LKV_UTIL_H
+#ifndef EL_LUA_UTIL_H
+#define EL_LUA_UTIL_H
 
 #ifdef MIN
 #undef MIN

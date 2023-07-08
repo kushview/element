@@ -29,7 +29,11 @@ namespace element {
 namespace DataPathHelpers {
 StringArray getSubDirs()
 {
-    auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts", "Sessions" });
+    auto dirs = StringArray ({ "Controllers",
+                               "Graphs",
+                               "Presets",
+                               "Scripts",
+                               "Sessions" });
     return dirs;
 }
 
@@ -133,18 +137,6 @@ void DataPath::findPresetFiles (StringArray& results) const
 const File DataPath::installDir()
 {
     File dir;
-
-#if EL_INSTALL_DIR_AWARE
-#if JUCE_WINDOWS
-    const auto installDir = WindowsRegistry::getValue (
-                                "HKEY_LOCAL_MACHINE\\Software\\Kushview\\Element\\InstallDir", "")
-                                .unquoted();
-    if (File::isAbsolutePath (installDir))
-        dir = File (installDir);
-#elif JUCE_MAC
-    dir = File ("/Applications");
-#endif
-#endif
     return dir;
 }
 } // namespace element

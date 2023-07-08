@@ -9,21 +9,27 @@ project ('element', ['c', 'cpp' ],
 bundle_py   = find_program ('util/bundle.py')
 date_py     = find_program ('util/date.py')
 version_py  = find_program ('util/version.py')
-element_release_date = run_command (date_py).stdout().strip()
-version_with_build = run_command ([version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
-build_number = run_command ([version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
-git_hash = run_command ([version_py] + '--hash --cwd=.'.split()).stdout().strip()
-git_short_hash = run_command ([version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
 
+## Build & version information
+element_release_date = run_command (date_py).stdout().strip()
+version_with_build   = run_command ([version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
+build_number         = run_command ([version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
+git_hash             = run_command ([version_py] + '--hash --cwd=.'.split()).stdout().strip()
+git_short_hash       = run_command ([version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
+
+## Installer Metadata
 net_kushview      = 'net.kushview'
 installerdir      = get_option('prefix')
 packagesdir       = installerdir / 'packages'
 packagedir_element = packagesdir / net_kushview + '.element'
 GPL3_txt = configure_file (copy: true, 
     input : files ('LICENSES/GPL3.txt'),
-    output: 'GPL3.txt', install : get_option ('deploy'),
+    output: 'GPL3.txt', 
+    install : get_option ('deploy'),
     install_dir : packagedir_element / 'meta')
 
+## This collects app and plugin bundles needing code signing
+#  on Mac OS
 element_bundles = []
 
 fs = import ('fs')

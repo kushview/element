@@ -177,8 +177,6 @@ libelement_sources = '''
     el/Commands.cpp
     el/Content.cpp
     el/Desktop.cpp
-    el/DocumentWindow.cpp
-    el/File.cpp
     el/Context.cpp
     el/Graph.cpp
     el/GraphEditor.cpp

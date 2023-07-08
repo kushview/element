@@ -72,6 +72,8 @@ int luaopen_el_View (lua_State* L)
         L, EL_TYPE_NAME_VIEW, sol::meta_method::to_string, [] (View& self) { 
             return lua::to_string (self, EL_TYPE_NAME_VIEW); 
         },
+
+        /// Add a child widget to this view.
         "add", sol::overload (&View::add, &View::addWithZ),
         sol::base_classes, sol::bases<juce::Component>()
     );

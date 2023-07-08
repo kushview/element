@@ -445,16 +445,17 @@ void GuiService::runDialog (const String& uri)
         }
 
         DialogOptions opts;
-        opts.content.set (new PreferencesComponent (world, *this), true);
+        opts.content.set (new PreferencesComponent (*this), true);
         opts.useNativeTitleBar = true;
-        opts.dialogTitle = "Preferences";
+        opts.dialogTitle = TRANS ("Preferences");
         opts.componentToCentreAround = (Component*) mainWindow.get();
 
         if (DialogWindow* dw = opts.create())
         {
-            dw->setName ("Preferences");
+            dw->setName (TRANS ("Preferences"));
             dw->setComponentID ("PreferencesDialog");
             windowManager->push (dw, true);
+            dw->getContentComponent()->grabKeyboardFocus();
         }
     }
 }

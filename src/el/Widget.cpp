@@ -1,5 +1,7 @@
 /// A GUI Widget.
-// Is defined with @{el.object} and can be inherrited. Backed by a JUCE Component.
+//
+// Is defined with @{el.object} and can be inherrited.  Objects must be
+// instantiateed using @{object.new}
 // @classmod el.Widget
 // @pragma nostrip
 
@@ -88,6 +90,9 @@ int luaopen_el_Widget (lua_State* L)
         // @within Methods
         "add", sol::overload (&Widget::add, &Widget::addWithZ),
 
+        /// Elevate this widget to toplevel status.
+        // @function Widget:elevate
+        // @within Methods
         "elevate", sol::overload (
             [] (Widget& self, int flags) { 
                 self.addToDesktop (flags, nullptr);

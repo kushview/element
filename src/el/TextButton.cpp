@@ -46,7 +46,7 @@ public:
     /// On clicked handler.
     // Executed when the button is clicked by the user.
     // @function TextButton:clicked
-    // @tparam kv.TextButton self The reference to the clicked button
+    // @tparam el.TextButton self The reference to the clicked button
     void buttonClicked (Button*) override
     {
         try
@@ -68,6 +68,7 @@ private:
 } // namespace lua
 } // namespace element
 
+// clang-format off
 EL_PLUGIN_EXPORT
 int luaopen_el_TextButton (lua_State* L)
 {
@@ -82,34 +83,34 @@ int luaopen_el_TextButton (lua_State* L)
         /// Attributes.
         // @section attributes
 
-        /// The button's toggle state.
+        /// The button's toggle state (bool)
         // Setting this property **will notify** listeners. If you need to change
-        // the toggle state and NOT notify, use the @{settogglestate}
+        // the toggle state and NOT notify, use the @{setToggleState}
         // method instead.
         // @tfield bool TextButton.togglestate
-        "togglestate",
-        sol::property ([] (TextButton& self, bool state) { self.setToggleState (state, sendNotificationSync); }, [] (TextButton& self) { return self.getToggleState(); }),
+        "toggleState", sol::property (
+            [] (TextButton& self, bool state) { self.setToggleState (state, sendNotificationAsync); }, 
+            [] (TextButton& self) { return self.getToggleState(); }
+        ),
 
-        /// Displayed text.
+        /// Displayed text (string)
         // @tfield string TextButton.text
-        "text",
-        sol::property ([] (TextButton& self, const char* text) { self.setButtonText (String::fromUTF8 (text)); }, [] (TextButton& self) { return self.getButtonText().toStdString(); }),
+        "text", sol::property ([] (TextButton& self, const char* text) { self.setButtonText (String::fromUTF8 (text)); }, [] (TextButton& self) { return self.getButtonText().toStdString(); }),
 
         /// Methods.
         // @section methods
 
-        "settogglestate",
-        sol::overload (
+        "setToggleState", sol::overload (
             /// Change the button's toggle state.
             // Note this variation **will send** notifications to listeners.
-            // @function TextButton:settogglestate
+            // @function TextButton:setToggleState
             // @bool state  The new toggle state on or off
             [] (TextButton& self, bool toggled) {
                 self.setToggleState (toggled, sendNotification);
             },
 
             /// Change the button's toggle state.
-            // @function TextButton:settogglestate
+            // @function TextButton:setToggleState
             // @bool state  The new toggle state on or off
             // @bool notify If true sends notification to listeners
             [] (TextButton& self, bool toggled, bool notify) {
@@ -122,15 +123,12 @@ int luaopen_el_TextButton (lua_State* L)
     auto T_mt = T[sol::metatable_key];
     sol::table __props = T_mt["__props"];
 
-    /// Attributes.
-    // @section attributes
     __props.add (
-
         "text",
-        "togglestate");
+        "toggleState");
 
     T_mt["__methods"].get_or_create<sol::table>().add (
-        "settogglestate");
+        "setToggleState");
 
     sol::stack::push (L, T);
     return 1;

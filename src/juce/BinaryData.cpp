@@ -2752,7 +2752,7 @@ static const unsigned char temp_binary_data_11[] =
 "    local volume = ctx.params [1]\n"
 "\n"
 "    self.knob = self:add (object.new (Slider))\n"
-"    self.knob.style = Slider.ROTARY\n"
+"    self.knob.style = Slider.Rotary\n"
 "    self.knob:settextboxstyle (Slider.TEXT_BOX_BELOW, true, 52, 26)\n"
 "    self.knob:setrange (-90, 24, 0.01)\n"
 "    self.knob:setvalue (volume:get(), false)\n"
