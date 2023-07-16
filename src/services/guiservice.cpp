@@ -429,6 +429,12 @@ Commands& GuiService::commands() { return impl->commands; }
 
 void GuiService::checkUpdates() { updates->check(); }
 
+void GuiService::launchUpdater()
+{
+    updates->launchUpdaterOnExit = true;
+    JUCEApplication::getInstance()->systemRequestedQuit();
+}
+
 void GuiService::runDialog (const String& uri)
 {
     if (uri == "preferences")

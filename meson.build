@@ -48,8 +48,12 @@ subdir ('meson/juce')
 
 # Boost
 boost_dep = dependency ('boost', required : true)
-lvtk_proj = subproject ('lvtk')
+lvtk_proj = subproject ('lvtk', 
+    default_options: [
+        'default_library=static'
+    ])
 lvtk_host_dep = lvtk_proj.get_variable ('lvtk_host_dep')
+add_project_arguments (['-DLVTK_STATIC=1'], language: ['c', 'cpp', 'objc', 'objcpp'])
 
 deps = [ boost_dep ]
 
@@ -124,8 +128,6 @@ endif
 subdir ('plugins')
 subdir ('deploy')
 
-
-
 if get_option('sign')
 if host_machine.system() == 'darwin'
     macdeployqt = find_program ('macdeployqt', required : true)
@@ -141,7 +143,16 @@ if host_machine.system() == 'darwin'
             command : command, input: bundle, output: signed_name,
             build_by_default: true, install: false)
     endforeach
-endif # end darwin
+elif host_machine.system() == 'windows'
+    custom_target ('element.exe_signed',
+        command: [ 'SignTool', 'sign', '/as', '/v', '/sha1', get_option ('signtool-sha1'),
+            '/fd', 'SHA256', '/tr', 'http://tsa.safecreative.org', '@INPUT@' 
+        ],
+        input: element_app,
+        output: 'element.exe_signed',
+        build_by_default: true, 
+        install: false)
+endif 
 endif # end code signing.
 
 summary ('Prefix', get_option('prefix'), section : 'Paths')

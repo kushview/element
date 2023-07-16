@@ -148,7 +148,36 @@ void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, con
 
     for (auto* f : impl->providers)
     {
+        if (f->format() != EL_NODE_FORMAT_NAME)
+            continue;
+
         if (ProcessorPtr ptr = f->create (ID))
+        {
+            auto* desc = out.add (new PluginDescription());
+            ptr->getPluginDescription (*desc);
+            break;
+        }
+    }
+}
+
+/** Fill a list of plugin descriptions. public */
+void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out,
+                                         const String& format,
+                                         const String& identifier,
+                                         bool includeHidden)
+{
+    if (format == EL_NODE_FORMAT_NAME)
+    {
+        getPluginDescriptions (out, identifier, includeHidden);
+        return;
+    }
+
+    for (auto* f : impl->providers)
+    {
+        if (f->format() != format)
+            continue;
+
+        if (ProcessorPtr ptr = f->create (identifier))
         {
             auto* desc = out.add (new PluginDescription());
             ptr->getPluginDescription (*desc);
@@ -259,8 +288,7 @@ Processor* NodeFactory::wrap (AudioProcessor* processor)
 
     if (node)
     {
-        std::clog << "[element] wrapped: " << node->getName().toStdString() << std::endl;
-        // node->refreshPorts();
+        // noop.
     }
 
     return node.release();

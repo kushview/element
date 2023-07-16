@@ -440,7 +440,7 @@ void initializeState (sol::state_view& view)
     newSearchers.add (package["searchers"][1]);
     newSearchers.add (searchInternalModules);
     sol::table packageSearchers = package["searchers"];
-    for (int i = 2; i <= packageSearchers.size(); ++i)
+    for (size_t i = 2; i <= packageSearchers.size(); ++i)
         newSearchers.add (package["searchers"][i]);
     package["searchers"] = newSearchers;
 

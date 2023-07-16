@@ -426,10 +426,11 @@ void Updater::launch()
     cmd.add (String (updates->exeFile).quoted());
 #endif
     cmd.add ("--su");
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_LINUX
     cmd.add ("&");
 #endif
-    std::system (cmd.joinIntoString (" ").toRawUTF8());
+    auto _ = std::system (cmd.joinIntoString (" ").toRawUTF8());
+    (void) _; // some systems define with 'warn_unused_result'
 }
 
 //==============================================================================

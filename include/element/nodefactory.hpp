@@ -34,8 +34,14 @@ public:
     NodeFactory();
     ~NodeFactory();
 
+    /** Fill a list of Element type plugin descriptions. public */
+    void getPluginDescriptions (OwnedArray<PluginDescription>& out,
+                                const String& identifier,
+                                bool includeHidden = false);
+
     /** Fill a list of plugin descriptions. public */
     void getPluginDescriptions (OwnedArray<PluginDescription>& out,
+                                const String& format,
                                 const String& identifier,
                                 bool includeHidden = false);
 

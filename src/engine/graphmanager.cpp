@@ -420,12 +420,21 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
         jassert (node.getFormat().toString().isNotEmpty());
         jassert (node.getIdentifier().toString().isNotEmpty());
         node.resetPorts();
-        PortArray cins;
-        node.getPorts (cins, PortType::Control, true);
-        for (auto& c : cins)
+
+        PortArray pins, pouts;
+        std::vector<PortType> toHide = {
+            PortType::Control, PortType::CV, PortType::Atom, PortType::Video, PortType::Event
+        };
+
+        for (const auto& pt : toHide)
         {
-            c.setHiddenOnBlock (true);
+            node.getPorts (pins, pouts, pt);
         }
+
+        for (auto& c : pins)
+            c.setHiddenOnBlock (true);
+        for (auto& c : pouts)
+            c.setHiddenOnBlock (true);
 
         if (object->isSubGraph())
         {

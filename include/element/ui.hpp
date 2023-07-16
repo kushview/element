@@ -41,6 +41,7 @@ public:
     Commands& commands();
 
     void checkUpdates();
+    void launchUpdater();
 
     Services& services() const { return controller; }
     KeyListener* getKeyListener() const;

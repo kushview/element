@@ -239,7 +239,7 @@ private:
                     auto ptr = charptr;
                     auto newTempo = CharacterFunctions::readDoubleValue (ptr);
 
-                    if (ptr - charptr == txt.getNumBytesAsUTF8())
+                    if ((size_t) (ptr - charptr) == txt.getNumBytesAsUTF8())
                     {
                         if (newTempo < 20.0)
                             newTempo = 20.0;

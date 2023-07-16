@@ -95,6 +95,14 @@ public:
         return ed;
     }
 
+    static std::unique_ptr<Component> createEditor (const Node& node)
+    {
+        if (auto obj = node.getObject())
+            if (obj->hasEditor())
+                return std::unique_ptr<Component> (obj->createEditor());
+        return std::make_unique<GenericNodeEditor> (node);
+    }
+
     /** Returns the editor sources used by this factory */
     const OwnedArray<NodeEditorSource>& getSources() const { return sources; }
 

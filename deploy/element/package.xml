@@ -11,7 +11,7 @@
     <ForcedInstallation>true</ForcedInstallation>
     <RequiresAdminRights>true</RequiresAdminRights>
     
-    @OPERATIONS@
+    <Script>component.js</Script>
 
     <Licenses>
         <License name="License Agreement" file="GPL3.txt" />

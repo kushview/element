@@ -42,6 +42,12 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/subprojects/juce/modules/*",
+                "${workspaceFolder}/subprojects/lvtk/include/*",
+                "${workspaceFolder}/build/include/*",
+                "${workspaceFolder}/include/*",
+                "${workspaceFolder}/src/*",
+                "${workspaceFolder}/test/*",
                 "/usr/local/include/*",
                 "/usr/include/*",
                 "/usr/include/lilv-0/*",
@@ -49,15 +55,10 @@
                 "/usr/include/serd-0/*",
                 "/usr/include/sord-0/*",
                 "/usr/include/sratom-0/*",
-                "${workspaceFolder}/build/libs/compat/*",
-                "${workspaceFolder}/libs/lua/src/*",
-                "${workspaceFolder}/libs/sol/*",
-                "${workspaceFolder}/libs/JUCE/modules/*",
-                "${workspaceFolder}/libs/kv/modules/*",
-                "${workspaceFolder}/libs/compat/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*"
+                "${workspaceFolder}/test/*",
+                "${default}"
             ],
             "defines": [
                 "LUA_USE_READLINE=1",

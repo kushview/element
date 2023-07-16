@@ -15,7 +15,7 @@
 #endif
 
 #ifndef EL_INVALID_PORT
-    #define EL_INVALID_PORT (uint32_t) - 1
+    #define EL_INVALID_PORT ((uint32_t) -1)
 #endif
 
 #ifndef EL_INVALID_NODE
@@ -419,7 +419,7 @@ public:
     inline int getPortForChannel (int type, int channel, bool input) const
     {
         if (auto* const desc = findByChannelInternal (type, channel, input)) {
-            jassert (desc->index != EL_INVALID_PORT);
+            jassert (desc->index != static_cast<int> (EL_INVALID_PORT));
             return desc->index;
         }
         return static_cast<int> (EL_INVALID_PORT);
@@ -457,7 +457,7 @@ public:
         return ports.begin();
     }
 
-    inline PortDescription* const* begin() const noexcept
+    inline const PortDescription* const* begin() const noexcept
     {
         return ports.begin();
     }
@@ -467,7 +467,7 @@ public:
         return ports.end();
     }
 
-    inline PortDescription* const* end() const noexcept
+    inline const PortDescription* const* end() const noexcept
     {
         return ports.end();
     }

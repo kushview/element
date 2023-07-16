@@ -13,7 +13,7 @@ class ChildProcessSlave;
 class Processor;
 class Node;
 class NodeFactory;
-class PluginScannerMaster;
+class PluginScannerCoordinator;
 class PluginScanner;
 
 class PluginManager : public juce::ChangeBroadcaster {
@@ -61,7 +61,7 @@ public:
     NodeFactory& getNodeFactory();
 
     /** creates a child process slave used in start up */
-    element::ChildProcessSlave* createAudioPluginScannerSlave();
+    juce::ChildProcessWorker* createAudioPluginScannerWorker();
 
     /** creates a new plugin scanner for use by a third party, e.g. plugin manager UI */
     PluginScanner* createAudioPluginScanner();
@@ -125,7 +125,7 @@ private:
     class Private;
     std::unique_ptr<Private> priv;
 
-    friend class PluginScannerMaster;
+    friend class PluginScannerCoordinator;
     void scanFinished();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager)
@@ -170,9 +170,9 @@ public:
     const juce::StringArray& getFailedFiles() const { return failedIdentifiers; }
 
 private:
-    friend class PluginScannerMaster;
+    friend class PluginScannerCoordinator;
     friend class juce::Timer;
-    std::unique_ptr<PluginScannerMaster> master;
+    std::unique_ptr<PluginScannerCoordinator> master;
     juce::ListenerList<Listener> listeners;
     juce::StringArray failedIdentifiers;
     juce::KnownPluginList& list;

@@ -1,20 +1,5 @@
-/*
-    This file is part of Element
-    Copyright (C) 2016-2021  Kushview, LLC.  All rights reserved.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include "ElementApp.h"
 #include <element/services.hpp>
@@ -36,7 +21,6 @@
 #include "log.hpp"
 #include "messages.hpp"
 #include "utils.hpp"
-#include "slaveprocess.hpp"
 
 namespace element {
 
@@ -303,7 +287,7 @@ private:
     String launchCommandLine;
     std::unique_ptr<Context> world;
     std::unique_ptr<Startup> startup;
-    OwnedArray<element::ChildProcessSlave> slaves;
+    OwnedArray<juce::ChildProcessWorker> slaves;
 
     void printCopyNotice()
     {
@@ -317,18 +301,18 @@ private:
     bool maybeLaunchSlave (const String& commandLine)
     {
         slaves.clearQuick (true);
-        slaves.add (world->plugins().createAudioPluginScannerSlave());
+        slaves.add (world->plugins().createAudioPluginScannerWorker());
         StringArray processIds = { EL_PLUGIN_SCANNER_PROCESS_ID };
         for (auto* slave : slaves)
         {
             for (const auto& pid : processIds)
             {
-                if (slave->initialiseFromCommandLine (commandLine, pid))
+                if (slave->initialiseFromCommandLine (commandLine, pid, 20 * 1000))
                 {
 #if JUCE_MAC
                     Process::setDockIconVisible (false);
-#endif
                     juce::shutdownJuce_GUI();
+#endif
                     return true;
                 }
             }

@@ -90,7 +90,7 @@ private:
         auto new_searchers = view.create_table();
         new_searchers.add (orig_searchers[1]); // first searcher is the preloader
         new_searchers.add (resolve_internal_package); // insert ours
-        for (int i = 2; i <= orig_searchers.size(); ++i) // add everything after (file searchers)
+        for (size_t i = 2; i <= orig_searchers.size(); ++i) // add everything after (file searchers)
             new_searchers.add (package[skey][i]); // ..
         package[skey] = new_searchers; // replace them
 #endif

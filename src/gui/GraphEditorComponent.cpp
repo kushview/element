@@ -700,8 +700,8 @@ ConnectorComponent* GraphEditorComponent::getComponentForConnection (const Arc& 
         if (ConnectorComponent* const c = dynamic_cast<ConnectorComponent*> (getChildComponent (i)))
             if (c->sourceFilterID == arc.sourceNode
                 && c->destFilterID == arc.destNode
-                && c->sourceFilterChannel == arc.sourcePort
-                && c->destFilterChannel == arc.destPort)
+                && (uint32_t) c->sourceFilterChannel == arc.sourcePort
+                && (uint32_t) c->destFilterChannel == arc.destPort)
                 return c;
     }
 

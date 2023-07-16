@@ -18,7 +18,6 @@ libelement_sources = '''
     semaphore.cpp
     settings.cpp
     services.cpp
-    slaveprocess.cpp
     strings.cpp
     script.cpp
     timescale.cpp
@@ -69,8 +68,16 @@ libelement_sources = '''
     engine/midiclock.cpp
     engine/nodefactory.cpp
     engine/audioengine.cpp
+    engine/portbuffer.cpp
     engine/rootgraph.cpp
     engine/shuttle.cpp
+
+    lv2/logfeature.cpp
+    lv2/module.cpp
+    lv2/workthread.cpp
+    lv2/workerfeature.cpp
+    lv2/world.cpp
+    lv2/native.cpp
     
     gui/designer.cpp
     gui/grapheditor.cpp

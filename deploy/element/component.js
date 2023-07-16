@@ -1,9 +1,11 @@
+function isWindows() { return systemInfo.kernelType === "winnt"; }
+
 function extractDir() {
     var dir = "";
     if (systemInfo.kernelType === "darwin") {
         dir = "/Applications";
     } else if (systemInfo.kernelType === "winnt") {
-        dir = installer.value ("@ApplicationsDirX64@") + "/Kushview/Element";
+        dir = installer.value ("ApplicationsDirX64") + "/Kushview/Element";
     }
     return dir;
 }
@@ -19,5 +21,20 @@ Component.prototype.createOperations = function () {
         if (target.length <= 0)
             continue;
         component.addElevatedOperation ("Extract", a, target)
+    }
+
+    if (isWindows()) {
+        component.addOperation ('CreateShortcut',
+            '@ApplicationsDirX64@/Kushview/Element/bin/element.exe',
+            '@DesktopDir@/Element.lnk',
+            'workingDirectory=@TargetDir@');
+        component.addOperation ('CreateShortcut',
+            '@ApplicationsDirX64@/Kushview/Element/bin/element.exe',
+            '@StartMenuDir@/Element/Element.lnk',
+            'workingDirectory=@TargetDir@');
+        component.addOperation ('CreateShortcut',
+            '@TargetDir@/updater.exe',
+            '@StartMenuDir@/Element/Updater.lnk',
+            'workingDirectory=@TargetDir@');
     }
 };

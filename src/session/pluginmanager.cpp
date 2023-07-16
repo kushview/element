@@ -1,31 +1,15 @@
-/*
-    This file is part of Element
-    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include <element/nodefactory.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
 #include <element/settings.hpp>
+#include <element/lv2.hpp>
 
 #include "engine/nodes/NodeTypes.h"
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
-#include "slaveprocess.hpp"
 #include "utils.hpp"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME "DeadAudioPlugins.txt"
@@ -46,12 +30,13 @@ static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
 static void pluginScannerSlaveCrashHandler (void*) {}
 
-class PluginScannerMaster : public element::ChildProcessMaster,
-                            public AsyncUpdater
+//==============================================================================
+class PluginScannerCoordinator : public juce::ChildProcessCoordinator,
+                                 public AsyncUpdater
 {
 public:
-    explicit PluginScannerMaster (PluginScanner& o) : owner (o) {}
-    ~PluginScannerMaster() {}
+    explicit PluginScannerCoordinator (PluginScanner& o) : owner (o) {}
+    ~PluginScannerCoordinator() {}
 
     bool startScanning (const StringArray& names = StringArray())
     {
@@ -60,7 +45,7 @@ public:
 
         {
             ScopedLock sl (lock);
-            slaveState = "waiting";
+            slaveState = EL_PLUGIN_SCANNER_WAITING_STATE;
             running = false;
             formatNames = names;
         }
@@ -72,6 +57,7 @@ public:
             running = res;
         }
 
+        std::clog << "[element] scanner launched: " << (isRunning() ? "yes" : "no") << std::endl;
         return res;
     }
 
@@ -111,6 +97,7 @@ public:
     {
         // this probably will happen when a plugin crashes.
         {
+            std::clog << "[element] scanner connection lost...\n";
             ScopedLock sl (lock);
             running = false;
         }
@@ -123,10 +110,11 @@ public:
         const auto state = getSlaveState();
         if (state == "ready" && isRunning())
         {
+            std::clog << "ready!\n";
             String msg = "scan:";
             msg << formatNames.joinIntoString (",");
             MemoryBlock mb (msg.toRawUTF8(), msg.length());
-            sendMessageToSlave (mb);
+            sendMessageToWorker (mb);
         }
         else if (state == "scanning")
         {
@@ -150,7 +138,7 @@ public:
             }
             owner.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
         }
-        else if (state == "waiting")
+        else if (state == EL_PLUGIN_SCANNER_WAITING_STATE)
         {
             if (! isRunning())
             {
@@ -189,7 +177,7 @@ public:
     bool sendQuitMessage()
     {
         if (isRunning())
-            return sendMessageToSlave (MemoryBlock ("quit", 4));
+            return sendMessageToWorker (MemoryBlock ("quit", 4));
         return false;
     }
 
@@ -222,34 +210,47 @@ private:
         progress = -1.f;
     }
 
-    bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
+    bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 3)
     {
         resetScannerVariables();
         auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
-        return launchSlaveProcess (scannerExe,
-                                   EL_PLUGIN_SCANNER_PROCESS_ID,
-                                   timeout,
-                                   flags);
+        return launchWorkerProcess (scannerExe,
+                                    EL_PLUGIN_SCANNER_PROCESS_ID,
+                                    timeout,
+                                    flags);
     }
 };
 
-class PluginScannerSlave : public element::ChildProcessSlave,
-                           public AsyncUpdater
+//==============================================================================
+class PluginScannerWorker : public juce::ChildProcessWorker,
+                            public AsyncUpdater
 {
 public:
-    PluginScannerSlave()
+    PluginScannerWorker()
     {
         scanFile = PluginScanner::getSlavePluginListFile();
         SystemStats::setApplicationCrashHandler (pluginScannerSlaveCrashHandler);
+        auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
+        logfile.create();
+        logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
+        logger->logMessage ("[element] launched scanner");
     }
 
-    ~PluginScannerSlave() {}
+    ~PluginScannerWorker()
+    {
+        if (logger)
+            logger->logMessage ("[element] scanner destroyed.");
+    }
 
-    void handleMessageFromMaster (const MemoryBlock& mb) override
+    void handleMessageFromCoordinator (const MemoryBlock& mb) override
     {
         const auto data (mb.toString());
         const auto type (data.upToFirstOccurrenceOf (":", false, false));
         const auto message (data.fromFirstOccurrenceOf (":", false, false));
+
+        String msg = "message: ";
+        msg << type;
+        logger->logMessage (msg);
 
         if (type == "quit")
         {
@@ -308,8 +309,10 @@ public:
 
     void handleConnectionMade() override
     {
+        logger->logMessage ("[element] connection to scanner coordinator established");
         settings = std::make_unique<Settings>();
         plugins = std::make_unique<PluginManager>();
+        logger->logMessage ("[element] scanner created objects");
 
         if (! scanFile.existsAsFile())
             scanFile.create();
@@ -317,19 +320,28 @@ public:
         if (auto xml = XmlDocument::parse (scanFile))
             pluginList.recreateFromXml (*xml);
 
+        logger->logMessage ("[element] scanner processing blacklist");
         // This must happen before user settings, PluginManager will delete the deadman file
         // when restoring user plugins
         PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
             pluginList, plugins->getDeadAudioPluginsFile());
 
+        logger->logMessage ("[element] scanner setting up formats");
         plugins->addDefaultFormats();
-        plugins->restoreUserPlugins (*settings);
+        logger->logMessage ("[element] scanner restoring plugin list");
+        {
+            juce::MessageManagerLock mml;
+            plugins->restoreUserPlugins (*settings);
+        }
 
-        sendState (EL_PLUGIN_SCANNER_READY_ID);
+        logger->logMessage ("[element] scanner notify read!");
+        if (! sendState (EL_PLUGIN_SCANNER_READY_ID))
+            logger->logMessage ("[element] plugin scanner failed to send 'ready' message");
     }
 
     void handleConnectionLost() override
     {
+        logger.reset();
         settings = nullptr;
         plugins = nullptr;
         scanner = nullptr;
@@ -345,6 +357,8 @@ private:
     StringArray filesToSkip;
     File scanFile;
     StringArray formatsToScan;
+
+    std::unique_ptr<juce::FileLogger> logger;
 
     void applyDeadPlugins()
     {
@@ -372,7 +386,7 @@ private:
         String data = type;
         data << ":" << message.trim();
         MemoryBlock mb (data.toRawUTF8(), data.getNumBytesAsUTF8());
-        return sendMessageToMaster (mb);
+        return sendMessageToCoordinator (mb);
     }
 
     bool doNextScan()
@@ -395,8 +409,48 @@ private:
     {
         if (plugins == nullptr || settings == nullptr)
             return;
-        if (auto* format = plugins->getAudioPluginFormat (formatName))
+
+        if (formatName == "LV2")
+            scanLV2();
+        else if (auto* format = plugins->getAudioPluginFormat (formatName))
             scanFor (*format);
+    }
+
+    void scanLV2()
+    {
+        if (plugins == nullptr || settings == nullptr)
+            return;
+        auto& nodes = plugins->getNodeFactory();
+
+        for (auto* p : nodes.providers())
+        {
+            if (p->format() != "LV2")
+                continue;
+            const auto types = p->findTypes();
+            float step = 1.f;
+            for (const auto& tp : types)
+            {
+                if (! pluginList.getBlacklistedFiles().contains (tp) && pluginList.getTypeForFile (tp) == nullptr)
+                {
+                    sendString ("name", tp.trim());
+                    OwnedArray<PluginDescription> dc;
+                    pluginList.addToBlacklist (tp);
+                    writePluginListNow();
+
+                    if (auto inst = p->create (tp))
+                    {
+                        pluginList.removeFromBlacklist (tp);
+                        PluginDescription desc;
+                        inst->getPluginDescription (desc);
+                        pluginList.addType (desc);
+                        writePluginListNow();
+                    }
+                }
+
+                sendString ("progress", String (step / (float) types.size()));
+                step += 1.f;
+            }
+        }
     }
 
     void scanFor (AudioPluginFormat& format)
@@ -418,8 +472,7 @@ private:
     }
 };
 
-// MARK: Plugin Scanner
-
+//==============================================================================
 PluginScanner::PluginScanner (KnownPluginList& listToManage) : list (listToManage) {}
 PluginScanner::~PluginScanner()
 {
@@ -449,7 +502,7 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
     cancel();
     getSlavePluginListFile().deleteFile();
     if (master == nullptr)
-        master.reset (new PluginScannerMaster (*this));
+        master.reset (new PluginScannerCoordinator (*this));
     if (master->isRunning())
         return;
     master->startScanning (formats);
@@ -606,13 +659,22 @@ private:
             scanner->removeListener (this);
             scanner->cancel();
             scanner = nullptr;
+            std::clog << "[element] cancel already running scanner.\n";
         }
 
         StringArray formatsToScan = names;
         if (formatsToScan.isEmpty())
+        {
             for (int i = 0; i < formats.getNumFormats(); ++i)
                 if (formats.getFormat (i)->getName() != "Element" && formats.getFormat (i)->canScanForPlugins())
                     formatsToScan.add (formats.getFormat (i)->getName());
+            formatsToScan.add ("LV2");
+        }
+
+        std::clog << "[element] preparing to scan: ";
+        for (const auto& fmt : formatsToScan)
+            std::clog << fmt.toStdString() << " ";
+        std::clog << std::endl;
 
         scanner = std::make_unique<PluginScanner> (allPlugins);
         scanner->addListener (this);
@@ -667,6 +729,7 @@ PluginManager::~PluginManager()
 
 void PluginManager::addDefaultFormats()
 {
+    priv->nodes.add (new LV2NodeProvider());
     auto& audioPlugs = getAudioPluginFormats();
     for (const auto& fmt : Util::getSupportedAudioPluginFormats())
     {
@@ -721,9 +784,9 @@ void PluginManager::searchUnverifiedPlugins()
     priv->searchUnverifiedPlugins (this->props);
 }
 
-element::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
+juce::ChildProcessWorker* PluginManager::createAudioPluginScannerWorker()
 {
-    return new PluginScannerSlave();
+    return new PluginScannerWorker();
 }
 
 PluginScanner* PluginManager::createAudioPluginScanner()
@@ -819,6 +882,10 @@ bool PluginManager::isAudioPluginFormatSupported (const String& name) const
     for (int i = 0; i < fmts.getNumFormats(); ++i)
         if (fmts.getFormat (i)->getName() == name)
             return true;
+    auto& nodes = priv->nodes;
+    for (const auto* provider : nodes.providers())
+        if (provider->format() == name)
+            return true;
     return false;
 }
 
@@ -886,6 +953,7 @@ void PluginManager::scanAudioPlugins (const StringArray& names)
         return;
 
     scanInternalPlugins();
+
     if (isScanningAudioPlugins())
         return;
 

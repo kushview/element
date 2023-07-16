@@ -8,10 +8,7 @@
 
 namespace element {
 
-class LV2Node : public Processor {
-public:
-};
-
+//==============================================================================
 class LV2NodeProvider : public NodeProvider {
 public:
     LV2NodeProvider();

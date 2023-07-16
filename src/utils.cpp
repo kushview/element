@@ -42,10 +42,8 @@ StringArray getSupportedAudioPluginFormats()
 #if JUCE_PLUGINHOST_LADSPA
     fmts.add ("LADSPA");
 #endif
-#if JUCE_PLUGINHOST_LV2
-    fmts.add ("LV2");
-#endif
 
+    fmts.add ("LV2");
     return fmts;
 }
 

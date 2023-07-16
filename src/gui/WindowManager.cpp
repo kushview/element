@@ -89,8 +89,16 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& n, Component* e)
 PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
 {
     NodeEditorFactory factory (gui);
+
+    /** Try internal formats and custom GUIs. */
     if (auto e = factory.instantiate (node, NodeEditorPlacement::PluginWindow))
         return createPluginWindowFor (node, e.release());
+
+    /** Try non AudioProcessor plugin formats. */
+    if (auto comp = NodeEditorFactory::createEditor (node))
+        return createPluginWindowFor (node, comp.release());
+
+    /** JUCE audio processor editor */
     auto editor = NodeEditorFactory::createAudioProcessorEditor (node);
     return (editor != nullptr) ? createPluginWindowFor (node, editor.release()) : nullptr;
 }

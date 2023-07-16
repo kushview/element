@@ -368,6 +368,10 @@ public:
     int getDelayCompensationSamples() const;
 
     //=========================================================================
+    virtual bool hasEditor() { return false; }
+    virtual Component* createEditor() { return nullptr; }
+
+    //=========================================================================
     /** Triggered when the enabled state changes */
     Signal<void (Processor*)> enablementChanged;
 
@@ -419,6 +423,8 @@ protected:
 
     //==========================================================================
     void triggerPortReset();
+
+    PortList portList() const noexcept { return ports; }
 
 private:
     friend class EngineService;

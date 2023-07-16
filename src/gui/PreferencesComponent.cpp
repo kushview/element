@@ -1025,7 +1025,20 @@ public:
 
         addAndMakeVisible (checkButton);
         checkButton.onClick = [this]() {
-            _ui.checkUpdates();
+            _ui.commands().invokeDirectly (Commands::checkNewerVersion, true);
+        };
+
+        addAndMakeVisible (launchButton);
+        launchButton.onClick = [this]() {
+            // clang-format off
+            if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon,
+                "Launch Updater?", 
+                "Element must quit to launch the updater program. Continue?",
+                "Quit and launch..", "Cancel"))
+            {
+                _ui.launchUpdater();
+            }
+            // clang-format on
         };
 
         addAndMakeVisible (addButton);
@@ -1063,6 +1076,9 @@ public:
         auto rb = r.removeFromBottom (24);
         rb.removeFromLeft (2);
         checkButton.setBounds (rb.removeFromLeft (90));
+        rb.removeFromLeft (3);
+        launchButton.setBounds (rb.removeFromLeft (120));
+
         rb.removeFromRight (2);
         removeButton.setBounds (rb.removeFromRight (90));
         rb.removeFromRight (3);
@@ -1168,7 +1184,8 @@ private:
     juce::TableListBox _table;
     juce::TextButton addButton { "Add" },
         removeButton { "Remove" },
-        checkButton { "Check..." };
+        checkButton { "Check..." },
+        launchButton { "Launch Updater" };
 
     struct Repo
     {
