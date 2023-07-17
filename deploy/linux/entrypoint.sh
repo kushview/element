@@ -1,8 +1,6 @@
 #!/bin/sh
 # Builds a Linux AppImage
 
-
-
 export CC=clang
 export CFLAGS="-DEL_APPIMAGE=1"
 export CXX=clang++
@@ -11,7 +9,7 @@ export LD_LIBRARY_PATH="/depends/x86_64-pc-linux-gnu/lib"
 
 export BOOST_ROOT="/depends/x86_64-pc-linux-gnu/include"
 
-nativefiles="--native-file=tools/machine/linux.ini"
+nativefiles="--native-file=meson/subs.ini --native-file=meson/linux.ini --native-file=meson/appimage.ini"
 builddir="build-docker"
 
 rm -rf build-docker
@@ -22,4 +20,4 @@ set -e
 meson setup -Dbuildtype=release $nativefiles $builddir
 meson compile -C $builddir
 meson test -C $builddir
-sh tools/lindeploy/appimage.sh "$builddir"
+sh deploy/linux/appimage.sh "$builddir"

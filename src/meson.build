@@ -232,6 +232,8 @@ endif
 
 if host_machine.system() == 'windows'
     libelement_sources += [ 'dlfcn-win32.c' ]
+elif host_machine.system() == 'darwin'
+    libelement_sources += [ 'gui/nsviewwithparent.mm']
 endif
 
 luael_gen = generator (bin2c,

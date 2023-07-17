@@ -1,5 +1,6 @@
 option ('element-apps', type : 'feature', value : 'auto',  description : 'Build applications')
 option ('element-plugins', type : 'feature', value : 'disabled',  description : 'Build the plugins')
+option ('ldoc', type : 'feature', value : 'disabled', description : 'Build Lua docs with LDoc')
 
 option ('lv2dir', type : 'string',  value : '', description: 'LV2 install path')
 

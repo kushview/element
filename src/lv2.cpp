@@ -26,6 +26,10 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
 #include <element/juce/gui_basics.hpp>
 #include <element/juce/gui_extra.hpp>
 
+#if JUCE_MAC
+#include "gui/nsviewwithparent.hpp"
+#endif
+
 // Change this to enable logging of various LV2 activities
 #ifndef EL_LV2_LOGGING
 #define EL_LV2_LOGGING 0
@@ -685,6 +689,7 @@ private:
         ViewSizeListener listener;
     };
 #elif JUCE_MAC
+
     struct ViewComponent : public NSViewComponentWithParent
     {
         explicit ViewComponent (PhysicalResizeListener&)

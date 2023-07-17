@@ -100,14 +100,16 @@ elif host_machine.system() == 'windows'
 endif
 
 endif # not subproject
-endif # not deploy
+endif # is deploy
 
 if not meson.is_subproject()
-if host_machine.system() == 'darwin'
-    subdir ('osx')
-elif host_machine.system() == 'windows'
-    # subdir ('windows')
-endif
+    if host_machine.system() == 'darwin'
+        subdir ('osx')
+    elif host_machine.system() == 'windows'
+        # subdir ('windows')
+    elif host_machine.system() == 'linux'
+        subdir ('linux')
+    endif
 endif
 
 summary ('Version', version_with_build, section : 'Application')

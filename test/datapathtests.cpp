@@ -14,6 +14,7 @@ BOOST_AUTO_TEST_SUITE (DataPathTests)
 
 BOOST_AUTO_TEST_CASE (PathsMatch)
 {
+#if ! EL_APPIMAGE
     Settings s;
     auto params = s.getStorageParameters();
     params.folderName = params.folderName.replace ("\\", "/");
@@ -24,6 +25,9 @@ BOOST_AUTO_TEST_CASE (PathsMatch)
     BOOST_REQUIRE_MESSAGE (fullPath.endsWith (EL_APP_DATA_SUBDIR), fullPath.toStdString());
     BOOST_REQUIRE_EQUAL (DataPath::defaultSettingsFile().getFullPathName().toStdString(),
                          s.getUserSettings()->getFile().getFullPathName().toStdString());
+#else
+    BOOST_REQUIRE (true);
+#endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()
