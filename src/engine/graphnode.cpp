@@ -407,8 +407,6 @@ void GraphNode::buildRenderingSequence()
             for (int i = 0; i < nodes.size(); ++i)
             {
                 Processor* const node = nodes.getUnchecked (i);
-                // TODO: necessary?
-                node->prepare (getSampleRate(), getBlockSize(), this);
 
                 int j = 0;
                 for (; j < orderedNodes.size(); ++j)

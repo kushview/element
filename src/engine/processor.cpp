@@ -332,7 +332,9 @@ void Processor::prepare (const double newSampleRate,
         oversampler->prepare (jmax (getNumPorts (PortType::Audio, true),
                                     getNumPorts (PortType::Audio, false)),
                               blockSize);
+
         const int osFactor = jmax (1, getOversamplingFactor());
+        std::clog << "[element] prepare " << getName().toStdString() << " with osFactor: " << osFactor << std::endl;
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
         inRMS.clearQuick (true);
@@ -357,6 +359,7 @@ void Processor::unprepare()
 {
     if (isPrepared)
     {
+        std::clog << "[element] unprepare " << getName().toStdString() << std::endl;
         isPrepared = false;
         releaseResources();
         oversampler->reset();
@@ -708,6 +711,7 @@ void Processor::setMuted (bool muted)
         muteChanged (this);
 }
 
+//==============================================================================
 dsp::Oversampling<float>* Processor::getOversamplingProcessor()
 {
     return oversampler->getProcessor (osPow - 1);
@@ -715,24 +719,35 @@ dsp::Oversampling<float>* Processor::getOversamplingProcessor()
 
 void Processor::setOversamplingFactor (int osFactor)
 {
+    std::clog << "[element] set osFactor: " << osFactor << std::endl;
+
     const auto newOsPow = (int) log2f ((float) osFactor);
 
     {
         ScopedLock sl (getPropertyLock());
         if (newOsPow == osPow)
             return;
+    }
+
+    {
+        const auto wasEnabled = isEnabled();
+        setEnabled (false);
 
         if (osFactor > 1)
         {
             osPow = (int) log2f ((float) osFactor);
             if (auto* const osProc = getOversamplingProcessor())
+            {
                 osLatency = osProc->getLatencyInSamples();
+            }
         }
         else
         {
             osPow = 0;
             osLatency = 0.0;
         }
+
+        setEnabled (wasEnabled);
     }
 
     if (auto* g = getParentGraph())
@@ -750,7 +765,7 @@ int Processor::getOversamplingFactor()
     return 1;
 }
 
-//=========================================================================
+//==============================================================================
 void Processor::setDelayCompensation (double delayMs)
 {
     if (delayCompMillis == delayMs)
