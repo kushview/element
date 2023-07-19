@@ -34,6 +34,7 @@ element_fx_vst2 = shared_module ('KV-Element-FX',
     objcpp_args : [ element_fx_vst2_juce_args ],
     link_args : element_app_link_args,
     link_with : [ libelement ])
+element_binaries += element_fx_vst2
 
 if host_machine.system() == 'darwin'
     element_fx_vst2_plist = configure_file (

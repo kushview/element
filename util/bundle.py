@@ -16,6 +16,7 @@ def options():
     parser.add_option ("--plist", type='string', dest='plist')
     parser.add_option ("--resource", type='string', dest='resource')
     parser.add_option ("--bindir", type='string', dest='bindir')
+    parser.add_option ("--signtool-sha1", type="string", default='', dest='signtool_sha1')
     (opts, _) = parser.parse_args()
     return opts
 
@@ -24,7 +25,6 @@ opts = options()
 if len (opts.output) <= 0:
     print ("no output specified")
     exit (1)
-
 
 basename = os.path.basename
 join = os.path.join
@@ -66,7 +66,14 @@ elif opts.type == 'vst3':
         if not os.path.exists (join (contents, dir)):
             os.makedirs (join (contents, dir))
     if os.path.exists (opts.binary):
-        shutil.copy (opts.binary, join (contents, opts.bindir, basename (opts.binary)))
+        binary_target = join (contents, opts.bindir, basename (opts.binary))
+        shutil.copy (opts.binary, binary_target)
+        if len(opts.signtool_sha1) > 0:
+            call (['SignTool', 'sign', '/as', '/v', '/sha1', opts.signtool_sha1,
+                   '/fd', 'SHA256', 
+                   '/tr', 'http://sha256timestamp.ws.symantec.com/sha256/timestamp', 
+                   binary_target ])
+
     if opts.resource != None and len(opts.resource) > 0 and os.path.exists (opts.resource):
         shutil.copy (opts.resource, join (contents, 'Resources', basename (opts.resource)))
 

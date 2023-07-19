@@ -83,9 +83,11 @@ if host_machine.system() == 'darwin'
 elif host_machine.system() == 'windows'
     basename = 'element-windows-@0@'.format (version_with_build)
 
-    extra_args = ''
+    signtool_script = ''
     if get_option ('sign')
-       # sign exe
+        signtool_script='''
+SignTool  sign /as /v /sha1 @0@ /fd SHA256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp @1@
+'''.format (get_option('signtool-sha1'), basename + '.exe')
     endif
 
     configure_file (input : 'installer.bat', output : 'installer.bat',
@@ -95,7 +97,8 @@ elif host_machine.system() == 'windows'
             'CONFIGFILE': 'config\config.xml',
             'PACKAGES': 'packages',
             'INSTALLERBASE': basename,
-            'ARCHIVEGEN': archivegen.full_path()
+            'ARCHIVEGEN': archivegen.full_path(),
+            'SIGNTOOL': signtool_script
         })
 endif
 

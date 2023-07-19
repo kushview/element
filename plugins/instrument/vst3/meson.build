@@ -35,7 +35,7 @@ element_vst3 = shared_module ('KV-Element',
     link_args : element_app_link_args,
     link_with : [ libelement ])
 
-element_vst3_bundle_py =  [ bundle_py, 
+element_vst3_bundle_py = [ bundle_py,
     '--binary', '@INPUT@', '--output', '@OUTPUT@',
     '--type', host_machine.system() == 'darwin' ? 'bundle' : 'vst3',
     '--bindir', element_vst3_bindir ]
@@ -55,7 +55,8 @@ if host_machine.system() == 'darwin'
     )
 
     element_vst3_bundle_py += [ '--plist', element_vst3_plist ]
+elif host_machine.system() == 'windows' and get_option ('sign')
+    element_vst3_bundle_py += [ '--signtool-sha1', get_option ('signtool-sha1') ]
 endif
 
 subdir ('bundle')
-

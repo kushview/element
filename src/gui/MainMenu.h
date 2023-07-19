@@ -28,8 +28,7 @@ class Content;
 class Context;
 class MainWindow;
 
-class MainMenu : public MenuBarModel,
-                 public ApplicationCommandTarget
+class MainMenu : public MenuBarModel
 {
 public:
     enum RootNames
@@ -62,12 +61,6 @@ public:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int index, const String& name) override;
     void menuItemSelected (int index, int menu) override;
-
-    // Command Target
-    ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; }
-    void getAllCommands (Array<CommandID>&) override {}
-    void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
-    bool perform (const InvocationInfo& info) override { return false; }
 
 private:
     MainWindow& owner;

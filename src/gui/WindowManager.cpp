@@ -94,13 +94,15 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
     if (auto e = factory.instantiate (node, NodeEditorPlacement::PluginWindow))
         return createPluginWindowFor (node, e.release());
 
-    /** Try non AudioProcessor plugin formats. */
+    /** JUCE audio processor editor */
+    if (auto editor = NodeEditorFactory::createAudioProcessorEditor (node))
+        return createPluginWindowFor (node, editor.release());
+
+    /** Try non-AudioProcessor plugin formats. */
     if (auto comp = NodeEditorFactory::createEditor (node))
         return createPluginWindowFor (node, comp.release());
 
-    /** JUCE audio processor editor */
-    auto editor = NodeEditorFactory::createAudioProcessorEditor (node);
-    return (editor != nullptr) ? createPluginWindowFor (node, editor.release()) : nullptr;
+    return nullptr;
 }
 
 } // namespace element

@@ -28,9 +28,11 @@ GPL3_txt = configure_file (copy: true,
     install : get_option ('deploy'),
     install_dir : packagedir_element / 'meta')
 
-## This collects app and plugin bundles needing code signing
-#  on Mac OS
+## This collects app and plugin bundles needing code signing on Mac OS
 element_bundles = []
+
+## This collects app and plugin bundles needing code signing on Windows
+element_binaries = []
 
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
@@ -114,45 +116,51 @@ endif
 subdir ('test')
 
 if not get_option ('element-apps').disabled()
-element_app = executable (element_exe_name, element_app_sources,
-    install : element_exe_install,
-    install_dir : element_exe_install_dir,
-    win_subsystem : 'windows',
-    gnu_symbol_visibility : 'hidden',
-    dependencies : element_app_deps,
-    include_directories : [ 'src', libelement_includes ],
-    link_args : element_app_link_args,
-    link_with : [ libelement ])
+    element_app = executable (element_exe_name, element_app_sources,
+        install : element_exe_install,
+        install_dir : element_exe_install_dir,
+        win_subsystem : 'windows',
+        gnu_symbol_visibility : 'hidden',
+        dependencies : element_app_deps,
+        include_directories : [ 'src', libelement_includes ],
+        link_args : element_app_link_args,
+        link_with : [ libelement ])
+    element_binaries += element_app
 endif
+
+
 
 subdir ('plugins')
 subdir ('deploy')
 
 if get_option('sign')
-if host_machine.system() == 'darwin'
-    macdeployqt = find_program ('macdeployqt', required : true)
-    identity = get_option ('codesign-identity')
+    if host_machine.system() == 'darwin'
+        macdeployqt = find_program ('macdeployqt', required : true)
+        identity = get_option ('codesign-identity')
 
-    foreach bundle : element_bundles
-        command = [ macdeployqt, bundle.full_path(), 
-            '-no-plugins', '-always-overwrite',
-            '-verbose=1', '-codesign='+identity, '-hardened-runtime', 
-            '-sign-for-notarization='+identity, '-timestamp' ]
-        signed_name = fs.name(bundle.full_path())+'_signed'
-        custom_target (signed_name,
-            command : command, input: bundle, output: signed_name,
-            build_by_default: true, install: false)
-    endforeach
-elif host_machine.system() == 'windows'
-    custom_target ('element.exe_signed',
-        command: [ 'SignTool', 'sign', '/as', '/v', '/sha1', get_option ('signtool-sha1'),
-            '/fd', 'SHA256', '/tr', 'http://tsa.safecreative.org', '@INPUT@' 
-        ],
-        input: element_app,
-        output: 'element.exe_signed',
-        build_by_default: true, 
-        install: false)
-endif 
+        foreach bundle : element_bundles
+            command = [ macdeployqt, bundle.full_path(), 
+                '-no-plugins', '-always-overwrite',
+                '-verbose=1', '-codesign='+identity, '-hardened-runtime', 
+                '-sign-for-notarization='+identity, '-timestamp' ]
+            signed_name = fs.name(bundle.full_path())+'_signed'
+            custom_target (signed_name,
+                command : command, input: bundle, output: signed_name,
+                build_by_default: true, install: false)
+        endforeach
+    elif host_machine.system() == 'windows'
+        foreach binary : element_binaries
+            signed_name = fs.name(binary.full_path())+'_signed'
+            custom_target (signed_name,
+                command: [ 'SignTool', 'sign', '/as', '/v', '/sha1', get_option ('signtool-sha1'),
+                    '/fd', 'SHA256', '/tr', 'http://sha256timestamp.ws.symantec.com/sha256/timestamp', '@INPUT@' 
+                ],
+                input: binary,
+                output: signed_name,
+                build_by_default: true,
+                install: false)
+        endforeach
+    endif 
 endif # end code signing.
 
 summary ('Prefix', get_option('prefix'), section : 'Paths')

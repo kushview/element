@@ -55,6 +55,8 @@ if host_machine.system() == 'darwin'
     )
 
     element_fx_vst3_bundle_py += [ '--plist', element_fx_vst3_plist ]
+elif host_machine.system() == 'windows' and get_option ('sign')
+    element_fx_vst3_bundle_py += [ '--signtool-sha1', get_option ('signtool-sha1') ]
 endif
 
 subdir ('bundle')

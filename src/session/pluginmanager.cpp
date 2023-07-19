@@ -651,6 +651,7 @@ private:
     double sampleRate = 44100.0;
     int blockSize = 512;
     std::unique_ptr<PluginScanner> scanner;
+    bool hasAddedFormats = false;
 
     void scanAudioPlugins (const StringArray& names)
     {
@@ -729,6 +730,9 @@ PluginManager::~PluginManager()
 
 void PluginManager::addDefaultFormats()
 {
+    if (priv->hasAddedFormats)
+        return;
+    
     priv->nodes.add (new LV2NodeProvider());
     auto& audioPlugs = getAudioPluginFormats();
     for (const auto& fmt : Util::getSupportedAudioPluginFormats())
@@ -756,6 +760,8 @@ void PluginManager::addDefaultFormats()
             audioPlugs.addFormat (new LADSPAPluginFormat());
 #endif
     }
+
+    priv->hasAddedFormats = true;
 }
 
 void PluginManager::addFormat (AudioPluginFormat* fmt)

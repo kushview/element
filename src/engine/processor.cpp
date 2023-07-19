@@ -334,7 +334,6 @@ void Processor::prepare (const double newSampleRate,
                               blockSize);
 
         const int osFactor = jmax (1, getOversamplingFactor());
-        std::clog << "[element] prepare " << getName().toStdString() << " with osFactor: " << osFactor << std::endl;
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
         inRMS.clearQuick (true);
@@ -359,7 +358,6 @@ void Processor::unprepare()
 {
     if (isPrepared)
     {
-        std::clog << "[element] unprepare " << getName().toStdString() << std::endl;
         isPrepared = false;
         releaseResources();
         oversampler->reset();
@@ -719,8 +717,6 @@ dsp::Oversampling<float>* Processor::getOversamplingProcessor()
 
 void Processor::setOversamplingFactor (int osFactor)
 {
-    std::clog << "[element] set osFactor: " << osFactor << std::endl;
-
     const auto newOsPow = (int) log2f ((float) osFactor);
 
     {
