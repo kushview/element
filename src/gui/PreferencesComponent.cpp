@@ -446,7 +446,7 @@ public:
         defaultSessionClearButton.setButtonText ("X");
         defaultSessionClearButton.addListener (this);
 
-        const int source = String ("internal") == settings.getUserSettings()->getValue ("clockSource")
+        const int source = String ("internal") == settings.getClockSource()
                                ? ClockSourceInternal
                                : ClockSourceMidiClock;
         clockSourceBox.setSelectedId (source, dontSendNotification);
@@ -556,7 +556,7 @@ public:
         else if (value.refersToSameSourceAs (clockSource))
         {
             const var val = ClockSourceInternal == (int) clockSource.getValue() ? "internal" : "midiClock";
-            settings.getUserSettings()->setValue ("clockSource", val);
+            settings.setClockSource (val);
             engine->applySettings (settings);
             if (auto* cc = ViewHelpers::findContentComponent())
                 cc->refreshToolbar();

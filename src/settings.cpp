@@ -49,6 +49,7 @@ const char* Settings::mainContentTypeKey = "mainContentType";
 const char* Settings::pluginListHeaderKey = "pluginListHeader";
 const char* Settings::devicesKey = "devices";
 const char* Settings::keymappingsKey = "keymappings";
+const char* Settings::clockSourceKey = "clockSource";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -399,6 +400,26 @@ String Settings::getMainContentType() const
 void Settings::setMainContentType (const String& tp)
 {
     ignoreUnused (tp);
+}
+
+//=============================================================================
+juce::String Settings::getClockSource() const
+{
+    if (auto* p = getProps())
+        return p->getValue (clockSourceKey, "internal");
+    return "internal";
+}
+
+void Settings::setClockSource (const juce::String& src)
+{
+    if (src != "internal" && src != "midiClock")
+    {
+        jassertfalse;
+        return;
+    }
+
+    if (auto p = getProps())
+        p->setValue (clockSourceKey, src);
 }
 
 //=============================================================================

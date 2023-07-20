@@ -128,9 +128,16 @@ if not get_option ('element-apps').disabled()
     element_binaries += element_app
 endif
 
-
-
 subdir ('plugins')
+
+app_logo_png = files ('data/ElementIcon.png')
+app_icon = app_logo_png
+if host_machine.system() == 'windows'
+    app_icon = files ('data/ElementIcon.ico')
+elif host_machine.system() == 'darwin'
+    app_icon = files ('deploy/osx/Icon.icns')
+endif
+
 subdir ('deploy')
 
 if get_option('sign')
@@ -149,10 +156,11 @@ if get_option('sign')
                 build_by_default: true, install: false)
         endforeach
     elif host_machine.system() == 'windows'
+        signtool = find_program ('SignTool', required : true)
         foreach binary : element_binaries
             signed_name = fs.name(binary.full_path())+'_signed'
             custom_target (signed_name,
-                command: [ 'SignTool', 'sign', '/as', '/v', '/sha1', get_option ('signtool-sha1'),
+                command: [ signtool, 'sign', '/as', '/v', '/sha1', get_option ('signtool-sha1'),
                     '/fd', 'SHA256', '/tr', 'http://sha256timestamp.ws.symantec.com/sha256/timestamp', '@INPUT@' 
                 ],
                 input: binary,

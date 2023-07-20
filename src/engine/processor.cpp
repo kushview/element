@@ -538,9 +538,10 @@ void Processor::MidiProgramLoader::handleAsyncUpdate()
         }
     }
 
-    node.midiProgramChanged(); // always notify the program # changed even if not loaded.
-        // do this because there may not be data for the program but
-        // the property is still relavent.
+    // always notify the program # changed even if not loaded.
+    // do this because there may not be data for the program but
+    // the property is still relavent.
+    node.midiProgramChanged();
 }
 
 void Processor::setMidiProgram (const int program)
@@ -676,7 +677,7 @@ ValueTree Processor::createPortsData() const
     {
         ValueTree port = ports.createValueTree (i);
         port.setProperty (tags::flow, ports.isInput (i) ? "input" : "output", nullptr);
-        port.removeProperty (tags::input, nullptr); // added by KV modules, not needed yet
+        port.removeProperty (tags::input, nullptr);
         portList.addChild (port, -1, 0);
         jassert (isPositiveAndBelow ((int) port.getProperty (tags::index), ports.size()));
     }

@@ -827,7 +827,7 @@ bool AudioEngine::addGraph (RootGraph* graph)
 
 void AudioEngine::applySettings (Settings& settings)
 {
-    const bool useMidiClock = settings.getUserSettings()->getValue ("clockSource") == "midiClock";
+    const bool useMidiClock = settings.getClockSource() == "midiClock";
     if (useMidiClock)
         priv->resetMidiClock();
     priv->processMidiClock.set (useMidiClock ? 1 : 0);

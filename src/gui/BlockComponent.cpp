@@ -436,6 +436,12 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     if (getParentComponent() != nullptr)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
 
+    bool hasMoved = false;
+
+    double ox, oy, nx, ny;
+    node.getPosition (ox, oy);
+    nx = ox;
+    ny = oy;
     moveBlockTo (pos.getX(), pos.getY());
 
     if (auto* const panel = getGraphPanel())
@@ -443,21 +449,29 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
         if (panel->onBlockMoved)
             panel->onBlockMoved (*this);
 
+        // onBlockMoved may have reverted position
+        node.getPosition (nx, ny);
+        hasMoved = nx != ox || ny != oy;
+
         int dx = deltaX - lastDragDeltaX;
         int dy = deltaY - lastDragDeltaY;
 
-        for (int i = 0; i < panel->getNumChildComponents(); ++i)
+        if (hasMoved)
         {
-            auto* block = dynamic_cast<BlockComponent*> (panel->getChildComponent (i));
-            if (block == nullptr || block == this || ! block->isSelected())
-                continue;
+            for (int i = 0; i < panel->getNumChildComponents(); ++i)
+            {
+                auto* block = dynamic_cast<BlockComponent*> (panel->getChildComponent (i));
+                if (block == nullptr || block == this || ! block->isSelected())
+                    continue;
 
-            auto bp = block->getNodePosition();
-            if (! vertical)
-                std::swap (bp.x, bp.y);
+                auto bp = block->getNodePosition();
+                if (! vertical)
+                    std::swap (bp.x, bp.y);
 
-            block->moveBlockTo (roundToIntAccurate (bp.x + dx),
-                                roundToIntAccurate (bp.y + dy));
+                block->moveBlockTo (roundToIntAccurate (bp.x + dx),
+                                    roundToIntAccurate (bp.y + dy));
+                panel->onBlockMoved (*block);
+            }
         }
 
         panel->updateConnectorComponents();

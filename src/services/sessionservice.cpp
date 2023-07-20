@@ -17,19 +17,18 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <element/services.hpp>
-#include <element/engine.hpp>
-#include "services/deviceservice.hpp"
-#include "services/mappingservice.hpp"
-#include <element/ui.hpp>
-#include "services/presetservice.hpp"
-#include "services/sessionservice.hpp"
-
-#include <element/ui/content.hpp>
-
 #include <element/node.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
+#include <element/services.hpp>
+#include <element/engine.hpp>
+#include <element/ui.hpp>
+#include <element/ui/content.hpp>
+
+#include "services/deviceservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/presetservice.hpp"
+#include "services/sessionservice.hpp"
 
 namespace element {
 
@@ -253,7 +252,12 @@ void SessionService::newSession()
     // - 2 if the middle button was pressed ('no')
     int res = 2;
     if (document->hasChangedSinceSaved())
-        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon, "Save Session?", "The current session has changes. Would you like to save it?", "Save Session", "Don't Save", "Cancel");
+        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon,
+                                               "Save Session?",
+                                               "The current session has changes. Would you like to save it?",
+                                               "Save Session",
+                                               "Don't Save",
+                                               "Cancel");
     if (res == 1)
         document->save (true, true);
 

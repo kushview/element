@@ -42,6 +42,7 @@ public:
     static const char* pluginListHeaderKey;
     static const char* devicesKey;
     static const char* keymappingsKey;
+    static const char* clockSourceKey;
 
     std::unique_ptr<juce::XmlElement> getLastGraph() const;
     void setLastGraph (const juce::ValueTree& data);
@@ -111,6 +112,9 @@ public:
 
     juce::String getMainContentType() const;
     void setMainContentType (const juce::String&);
+
+    juce::String getClockSource() const;
+    void setClockSource (const juce::String&);
 
 private:
     juce::PropertiesFile* getProps() const;

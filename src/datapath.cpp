@@ -75,7 +75,7 @@ const File DataPath::defaultLocation() { return defaultUserDataPath(); }
 
 const File DataPath::defaultGlobalMidiProgramsDir()
 {
-    return defaultUserDataPath().getChildFile ("Cache/MIDI/Programs");
+    return applicationDataDir().getChildFile ("cache/midi/programs");
 }
 
 const File DataPath::defaultScriptsDir() { return defaultUserDataPath().getChildFile ("Scripts"); }

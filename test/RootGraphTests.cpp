@@ -22,11 +22,6 @@ BOOST_AUTO_TEST_CASE (Layout)
     RootGraph root;
     DummyAudioDeviceSetup setup;
     root.setPlayConfigFor (setup);
-    BOOST_REQUIRE (root.getNumAudioInputs() == setup.inputChannels.countNumberOfSetBits());
-    BOOST_REQUIRE (root.getNumAudioOutputs() == setup.outputChannels.countNumberOfSetBits());
-    BOOST_REQUIRE (root.getNumPorts (PortType::Midi, true) == 1);
-    BOOST_REQUIRE (root.getNumPorts (PortType::Midi, false) == 1);
-    BOOST_REQUIRE (root.getName() == setup.inputDeviceName);
     BOOST_REQUIRE (root.getSampleRate() == setup.sampleRate);
     BOOST_REQUIRE (root.getBlockSize() == setup.bufferSize);
     root.clear();

@@ -11,7 +11,7 @@ option ('asiosdk', type : 'string', value : 'auto', description : 'Path to ASIO 
 option ('deploy', type : 'boolean', value : false,  description : 'Make Installers')
 option ('sign', type : 'boolean', value : false,  description : 'Code Sign Binaries')
 option ('codesign-identity', type : 'string', value : '', description : 'Identity to use for code signing on Mac')
-option ('signtool-sha1', type : 'string', value : '', description : 'Certificate thumbprint')
+option ('signtool-sha1', type : 'string', value : '', description : 'Certificate thumbprint for SignTool.exe')
 
 option ('notarize', type : 'boolean', value : false, description : 'Whether to notarize or not.')
 option ('app-password', type : 'string', value : '',  description : 'App Password for notoary')

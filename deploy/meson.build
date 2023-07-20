@@ -22,6 +22,9 @@ endif
 if get_option ('deploy')
 if not meson.is_subproject()
 
+install_data (app_logo_png, install_dir: installerdir / 'config', rename: 'logo.png')
+install_data (app_icon, install_dir: installerdir / 'config')
+
 foreach f : [ 'config.xml', 'control.js' ]
     configure_file (input : f , output : f,
         install : true, 
@@ -30,7 +33,8 @@ foreach f : [ 'config.xml', 'control.js' ]
             'VERSION': meson.project_version(),
             'TARGETDIR': element_deploy_targetdir,
             'RELEASEREPO': element_release_url,
-            'RUNPROGRAM': element_runprogram
+            'RUNPROGRAM': element_runprogram,
+            'APPICON': fs.stem ('@0@'.format (app_icon.get (0)))
         })
 endforeach
 

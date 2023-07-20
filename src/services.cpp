@@ -61,15 +61,15 @@ public:
         {
             lastExportedGraph = DataPath::defaultGraphDir();
             initialized = true;
-        }
 
-        // migrate global node midi programs.
-        auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
-        auto olddir = DataPath::applicationDataDir().getChildFile ("NodeMidiPrograms");
-        if (! progsdir.exists() && olddir.exists())
-        {
-            progsdir.getParentDirectory().createDirectory();
-            olddir.copyDirectoryTo (progsdir);
+            // migrate global node midi programs.
+            auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
+            auto olddir = DataPath::applicationDataDir().getChildFile ("NodeMidiPrograms");
+            if (! progsdir.exists() && olddir.exists())
+            {
+                progsdir.getParentDirectory().createDirectory();
+                olddir.copyDirectoryTo (progsdir);
+            }
         }
 
         for (auto* s : services)

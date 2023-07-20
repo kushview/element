@@ -4,10 +4,16 @@
     <Name>Element</Name>
     <Version>@VERSION@</Version>
     <Publisher>Kushview, LLC</Publisher>
+    <ProductUrl>https://kushview.net/element/</ProductUrl>
+
     <StartMenuDir>Kushview</StartMenuDir>
     <TargetDir>@TARGETDIR@</TargetDir>
     <ControlScript>control.js</ControlScript>
     <MaintenanceToolName>updater</MaintenanceToolName>
+
+    <InstallerApplicationIcon>@APPICON@</InstallerApplicationIcon>
+    <!-- <InstallerWindowIcon>logo.png</InstallerWindowIcon> -->
+    <Logo>logo.png</Logo>
 
     <RunProgram>@RUNPROGRAM@</RunProgram>
 
