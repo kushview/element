@@ -10,11 +10,11 @@ element_fx_vst3_juce_args = [
     '-DJucePlugin_Build_VST3=1', 
     '-DJucePlugin_Version=@0@'.format (meson.project_version()),
     '-DJucePlugin_VersionString="@0@"'.format(meson.project_version()),
-    '-DJucePlugin_VersionCode=@0@'.format (run_command (
+    '-DJucePlugin_VersionCode=@0@'.format (run_command (python3, 
         getcode_py, '--version', meson.project_version()).stdout().strip()),
-    '-DJucePlugin_ManufacturerCode=@0@'.format (run_command (
+    '-DJucePlugin_ManufacturerCode=@0@'.format (run_command (python3, 
         getcode_py, '--code', element_manu_code).stdout().strip()),
-    '-DJucePlugin_PluginCode=@0@'.format (run_command (
+    '-DJucePlugin_PluginCode=@0@'.format (run_command (python3, 
         getcode_py, '--code', element_fx_code).stdout().strip())
 ]
 
@@ -35,7 +35,7 @@ element_fx_vst3 = shared_module ('KV-Element-FX',
     link_args : element_app_link_args,
     link_with : [ libelement ])
 
-element_fx_vst3_bundle_py =  [ bundle_py, 
+element_fx_vst3_bundle_py =  [ python3, bundle_py, 
     '--binary', '@INPUT@', '--output', '@OUTPUT@',
     '--type', host_machine.system() == 'darwin' ? 'bundle' : 'vst3',
     '--bindir', element_vst3_bindir ]

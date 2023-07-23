@@ -2,7 +2,7 @@
 element_bundles += custom_target (
     'Element.app',
     build_by_default: true,
-    command: [ bundle_py, '--binary', '@INPUT@',
+    command: [ python3, bundle_py, '--binary', '@INPUT@',
                 '--output', '@OUTPUT@',
                 '--plist', files ('Info.plist'),
                 '--resource', files ('Icon.icns') ],

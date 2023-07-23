@@ -7,6 +7,7 @@ from subprocess import call, Popen, PIPE
 import os
 
 VERSION="1.0.0"
+CURRENT_REVISION="origin/develop"
 LAST_VERSION="853bdc30cb6e9839e0585037f35e42f0b02bc080"
 
 def options():
@@ -14,6 +15,8 @@ def options():
     
     parser.add_option ("--current-version", type="string", dest="current_version", 
                         default=VERSION, help="The current version string to display")
+    parser.add_option ("--current-revision", type="string", dest="current_revision", 
+                        default=CURRENT_REVISION, help="The ending revision to count commits to.")
     parser.add_option ("--last-version", type="string", dest="last_version", 
                         default=LAST_VERSION, help="The last version, hash, tag, etc in git to count commits from")
     parser.add_option ("--before", type="string", dest="before", default='', help="Prefix string")
@@ -51,7 +54,7 @@ def exists():
     return os.path.exists ('.git')
 
 def ncommits (revision):
-    args = 'rev-list %s..HEAD' % revision
+    args = 'rev-list %s..%s' % (revision, CURRENT_REVISION)
     (n, err) = call_git (None, args.split())
     if None == err:
         return len (n.split())

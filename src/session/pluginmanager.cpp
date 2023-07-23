@@ -12,8 +12,8 @@
 #include "datapath.hpp"
 #include "utils.hpp"
 
-#define EL_DEAD_AUDIO_PLUGINS_FILENAME "DeadAudioPlugins.txt"
-#define EL_PLUGIN_SCANNER_SLAVE_LIST_PATH "Temp/SlavePluginList.xml"
+#define EL_DEAD_AUDIO_PLUGINS_FILENAME "scanner/crashed.txt"
+#define EL_PLUGIN_SCANNER_SLAVE_LIST_PATH "scanner/list.xml"
 #define EL_PLUGIN_SCANNER_WAITING_STATE "waiting"
 #define EL_PLUGIN_SCANNER_READY_STATE "ready"
 
@@ -393,6 +393,8 @@ private:
     {
         const auto nextFile = scanner->getNextPluginFileThatWillBeScanned();
         sendString ("name", nextFile);
+        logger->logMessage (String ("scan: ") + nextFile);
+
         for (const auto& file : scanner->getFailedFiles())
             pluginList.addToBlacklist (file);
 
@@ -433,6 +435,7 @@ private:
                 if (! pluginList.getBlacklistedFiles().contains (tp) && pluginList.getTypeForFile (tp) == nullptr)
                 {
                     sendString ("name", tp.trim());
+                    logger->logMessage (String ("scan: ") + tp);
                     OwnedArray<PluginDescription> dc;
                     pluginList.addToBlacklist (tp);
                     writePluginListNow();
@@ -732,7 +735,7 @@ void PluginManager::addDefaultFormats()
 {
     if (priv->hasAddedFormats)
         return;
-    
+
     priv->nodes.add (new LV2NodeProvider());
     auto& audioPlugs = getAudioPluginFormats();
     for (const auto& fmt : Util::getSupportedAudioPluginFormats())

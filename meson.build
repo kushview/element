@@ -6,16 +6,18 @@ project ('element', ['c', 'cpp' ],
         'cpp_std=c++17', 
         'buildtype=release' ])
 
+pymod       = import ('python')
+python3     = pymod.find_installation ('python3', required : true)
 bundle_py   = find_program ('util/bundle.py')
 date_py     = find_program ('util/date.py')
 version_py  = find_program ('util/version.py')
 
 ## Build & version information
-element_release_date = run_command (date_py).stdout().strip()
-version_with_build   = run_command ([version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
-build_number         = run_command ([version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
-git_hash             = run_command ([version_py] + '--hash --cwd=.'.split()).stdout().strip()
-git_short_hash       = run_command ([version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
+element_release_date = run_command (python3, date_py).stdout().strip()
+version_with_build   = run_command ([python3, version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
+build_number         = run_command ([python3, version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
+git_hash             = run_command ([python3, version_py] + '--hash --cwd=.'.split()).stdout().strip()
+git_short_hash       = run_command ([python3, version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
 
 ## Installer Metadata
 net_kushview      = 'net.kushview'
@@ -142,18 +144,23 @@ subdir ('deploy')
 
 if get_option('sign')
     if host_machine.system() == 'darwin'
-        macdeployqt = find_program ('macdeployqt', required : true)
         identity = get_option ('codesign-identity')
+        entitlements = files ('deploy/osx/app.entitlements').get(0)
 
         foreach bundle : element_bundles
-            command = [ macdeployqt, bundle.full_path(), 
-                '-no-plugins', '-always-overwrite',
-                '-verbose=1', '-codesign='+identity, '-hardened-runtime', 
-                '-sign-for-notarization='+identity, '-timestamp' ]
             signed_name = fs.name(bundle.full_path())+'_signed'
+            codesign_command = [ find_program ('codesign', required : true),
+                    '--verbose=2', '--timestamp', 
+                    '--sign', get_option ('codesign-identity'),
+                    '--options', 'runtime', '--deep', '--force',
+                    '--entitlements', entitlements,
+                    '@INPUT@' ]
             custom_target (signed_name,
-                command : command, input: bundle, output: signed_name,
-                build_by_default: true, install: false)
+                        command: codesign_command,
+                        input: bundle,
+                        output: signed_name,
+                        build_by_default: true,
+                        install: false)
         endforeach
     elif host_machine.system() == 'windows'
         signtool = find_program ('SignTool', required : true)

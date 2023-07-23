@@ -9,11 +9,11 @@ element_vst2_juce_args = [
     '-DJucePlugin_Build_VST=1', 
     '-DJucePlugin_Version=@0@'.format (meson.project_version()),
     '-DJucePlugin_VersionString="@0@"'.format(meson.project_version()),
-    '-DJucePlugin_VersionCode=@0@'.format (run_command (
+    '-DJucePlugin_VersionCode=@0@'.format (run_command (python3,
         getcode_py, '--version', meson.project_version()).stdout().strip()),
-    '-DJucePlugin_ManufacturerCode=@0@'.format (run_command (
+    '-DJucePlugin_ManufacturerCode=@0@'.format (run_command (python3,
         getcode_py, '--code', element_manu_code).stdout().strip()),
-    '-DJucePlugin_PluginCode=@0@'.format (run_command (
+    '-DJucePlugin_PluginCode=@0@'.format (run_command (python3,
         getcode_py, '--code', element_code).stdout().strip())
 ]
 
@@ -57,7 +57,7 @@ if host_machine.system() == 'darwin'
     element_bundles += custom_target (
         'KV-Element.vst',
         build_by_default: true,
-        command: [ bundle_py, '--binary', '@INPUT@',
+        command: [ python3, bundle_py, '--binary', '@INPUT@',
                     '--output', '@OUTPUT@',
                     '--plist', element_vst2_plist,
                     '--type', 'bundle' ],

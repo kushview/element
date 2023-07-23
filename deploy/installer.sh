@@ -19,9 +19,7 @@ rm -rf archives && mkdir archives
 cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
     ../archives/element-osx.tar.gz \
         net.kushview.element \
-        net.kushview.element.lv2 \
         net.kushview.element.lua \
-        net.kushview.element.doc \
         net.kushview.element.au \
         net.kushview.element.vst \
         net.kushview.element.vst3

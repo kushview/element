@@ -581,4 +581,47 @@ void GraphNode::setPlayHead (AudioPlayHead* newPlayHead)
         node->setPlayHead (playhead);
 }
 
+void GraphNode::refreshPorts()
+{
+    if (! customPortsSet)
+    {
+        auto count = PortCount().with (PortType::Audio, 2, 2).with (PortType::Midi, 1, 1);
+        setPorts (count.toPortList());
+    }
+    else
+    {
+        setPorts (userPorts);
+    }
+
+    for (auto* node : nodes)
+    {
+        if (auto io = dynamic_cast<IONode*> (node))
+            io->refreshPorts();
+    }
+}
+
+void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
+{
+    if (type != PortType::Audio && type != PortType::Midi)
+        return;
+
+    count = std::max ((int) 0, count);
+    PortCount newCount;
+    for (int ti = 0; ti < PortType::Unknown; ++ti)
+    {
+        auto tp = PortType (ti);
+        newCount.set (tp, (inputs && type == tp) ? count : getNumPorts (tp, true), (! inputs && type == tp) ? count : getNumPorts (tp, false));
+    }
+
+    userPorts = newCount.toPortList();
+    customPortsSet = true;
+
+    std::clog << "[element] graph changing port counts.\n";
+
+    if (async)
+        triggerPortReset();
+    else
+        resetPorts();
+}
+
 } // namespace element

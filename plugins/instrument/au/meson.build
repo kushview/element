@@ -6,7 +6,7 @@ element_au_juce_args = [
     '-DJucePlugin_VersionString="@0@"'.format(meson.project_version()),
     '-DJucePlugin_VersionCode=@0@'.format (element_plugin_hex_verson_str),
     '-DJucePlugin_ManufacturerCode=@0@'.format (element_manu_hex_code_str),
-    '-DJucePlugin_PluginCode=@0@'.format (run_command (
+    '-DJucePlugin_PluginCode=@0@'.format (run_command (python3,
         getcode_py, '--code', element_code).stdout().strip())
 ]
 
@@ -54,7 +54,7 @@ element_au_plist = configure_file (
 element_bundles += custom_target (
     'KV-Element.component',
     build_by_default: true,
-    command: [ bundle_py, '--binary', '@INPUT@',
+    command: [ python3, bundle_py, '--binary', '@INPUT@',
                 '--output', '@OUTPUT@',
                 '--plist', element_au_plist,
                 '--type', 'bundle' ],

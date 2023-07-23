@@ -188,13 +188,10 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override;
 
-    void refreshPorts() override
-    {
-        auto count = PortCount().with (PortType::Audio, 2, 2).with (PortType::Midi, 1, 1);
-        setPorts (count.toPortList());
-    }
-
+    void refreshPorts() override;
     void setPlayHead (AudioPlayHead*) override;
+
+    void setNumPorts (PortType type, int count, bool inputs, bool async = true);
 
 protected:
     //==========================================================================
@@ -232,6 +229,9 @@ private:
     MidiBuffer filteredMidi;
 
     std::atomic<AudioPlayHead*> playhead { nullptr };
+
+    bool customPortsSet = false;
+    PortList userPorts;
 
     CriticalSection seqLock;
     void handleAsyncUpdate() override;

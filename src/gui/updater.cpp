@@ -379,22 +379,15 @@ void Updater::setInfo (const std::string& package, const std::string& version)
 //==============================================================================
 std::string Updater::findExe (const std::string& basename)
 {
-    String fileName = basename;
+    String fileName (boost::trim_copy (basename));
 #if JUCE_WINDOWS
     fileName << ".exe";
-    fileName = String ("AppData/Roaming/Kushview/Element/installer/") + fileName;
-    juce::File updaterExe = File::getSpecialLocation (File::userHomeDirectory)
-                                .getChildFile (fileName);
 #elif JUCE_MAC
-    fileName << ".app";
-    fileName = String ("Library/Application Support/Kushview/Element/installer/") + fileName;
-    fileName << "/Contents/MacOS/" << basename;
-    juce::File updaterExe = File::getSpecialLocation (File::userHomeDirectory)
-                                .getChildFile (fileName);
-#else
-    juce::File updaterExe;
+    fileName << ".app/Contents/MacOS/" << boost::trim_copy (basename);
 #endif
-
+    const auto updaterExe = DataPath::applicationDataDir()
+                                .getChildFile ("installer")
+                                .getChildFile (fileName);
     return updaterExe.getFullPathName().toStdString();
 }
 
@@ -406,6 +399,7 @@ bool Updater::exists() const noexcept
 
 void Updater::launch()
 {
+    std::clog << "[element] launching updater.\n";
     StringArray cmd;
     if (updates->exeFile.empty())
         updates->exeFile = findExe ("updater");
@@ -420,11 +414,10 @@ void Updater::launch()
     }
 #if JUCE_WINDOWS
     cmd.add (String (updates->exeFile).quoted());
-
 #elif JUCE_MAC
-    // cmd.add ("open");
     cmd.add (String (updates->exeFile).quoted());
 #endif
+
     cmd.add ("--su");
 #if JUCE_MAC || JUCE_LINUX
     cmd.add ("&");

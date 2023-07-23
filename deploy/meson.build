@@ -40,7 +40,7 @@ endforeach
 
 endif # not subproject
 
-element_packages = 'element lv2'.split()
+element_packages = 'element'.split()
 if not get_option ('element-plugins').disabled()
     element_packages += 'vst vst3'.split()
     if host_machine.system() == 'darwin'

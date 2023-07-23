@@ -48,6 +48,7 @@ void IONode::refreshPorts()
 
     if (auto* const graph = getParentGraph())
     {
+        std::clog << "[element] IO node changing port size\n";
         count.set (getPortType(),
                    graph->getNumPorts (getPortType(), isInput()),
                    ! isInput());

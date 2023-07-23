@@ -737,6 +737,7 @@ bool LV2Module::hasEditor() const
     SortSupportedUIs sorter;
     suplist.sort (sorter, true);
 
+#if JUCE_DEBUG
     for (const auto* const sui : supportedUIs)
     {
         DBG ("[jlv2] supported ui: " << sui->URI);
@@ -744,6 +745,7 @@ bool LV2Module::hasEditor() const
         DBG ("[jlv2]       widget: " << sui->widget);
         DBG ("[jlv2]         show: " << (int) sui->useShowInterface);
     }
+#endif
 
     return ! supportedUIs.isEmpty();
 }

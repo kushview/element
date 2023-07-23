@@ -353,6 +353,96 @@ private:
     }
 };
 
+class GraphChannelCountPropertyComponent : public SliderPropertyComponent
+{
+public:
+    GraphChannelCountPropertyComponent (const Node& node, PortType pt, bool input)
+        : SliderPropertyComponent (defaultName (pt, input), 0.0, maxPorts (pt), 1.0),
+          _node (node),
+          _proc (dynamic_cast<GraphNode*> (node.getObject())),
+          _type (pt),
+          _input (input)
+    {
+        jassert (_proc != nullptr);
+        initSlider();
+    }
+
+    ~GraphChannelCountPropertyComponent()
+    {
+    }
+
+    double getValue() const override
+    {
+        if (auto obj = _proc)
+            return obj->getNumPorts (_type, _input);
+        return 0.0;
+    }
+
+    void setValue (double dval) override
+    {
+        if (_proc == nullptr)
+            return;
+
+        const int count = std::max ((int) 0, (int) dval);
+        if (count == _proc->getNumPorts (_type, _input))
+            return;
+
+        _proc->setNumPorts (_type, count, _input, false);
+        _node.resetPorts();
+
+        // TODO: this should be concealed in the Model
+        for (int i = _node.getNumNodes(); --i >= 0;)
+        {
+            auto c = _node.getNode (i);
+            if (c.isIONode())
+                c.resetPorts();
+        }
+
+        refresh();
+    }
+
+private:
+    Node _node;
+    using Proc = juce::ReferenceCountedObjectPtr<GraphNode>;
+    Proc _proc;
+
+    PortType _type { PortType::Audio };
+    bool _input { true };
+
+    static String defaultName (PortType tp, bool input)
+    {
+        auto str = tp.getName();
+        str << (input ? " Ins" : " Outs");
+        return str;
+    }
+
+    static double maxPorts (PortType pt)
+    {
+        double ret = 0.0;
+        switch (pt.id())
+        {
+            case PortType::Audio:
+                ret = 32.0;
+                break;
+            case PortType::Midi:
+                ret = 1.0;
+                break;
+            default:
+                ret = 0.0;
+                break;
+        }
+
+        return ret;
+    }
+
+    void initSlider()
+    {
+        slider.setSliderStyle (Slider::IncDecButtons);
+        slider.setScrollWheelEnabled (false);
+        slider.setTextBoxIsEditable (true);
+    }
+};
+
 class GraphPropertyPanel : public PropertyPanel
 {
 public:
@@ -401,6 +491,9 @@ private:
         props.add (new RootGraphMidiChannels (g, getWidth() - 100));
         props.add (new MidiProgramPropertyComponent (g));
         props.add (new KeyMapPropertyComponent (g));
+        props.add (new GraphChannelCountPropertyComponent (g, PortType::Audio, true));
+        props.add (new GraphChannelCountPropertyComponent (g, PortType::Audio, false));
+
         // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (tags::persistent),
         //                                          TRANS("Persistent"),
         //                                          TRANS("Don't unload when deactivated")));

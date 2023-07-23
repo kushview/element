@@ -58,7 +58,7 @@ element_mfx_au_plist = configure_file (
 element_bundles += custom_target (
     'KV-Element-MFX.component',
     build_by_default: true,
-    command: [ bundle_py, '--binary', '@INPUT@',
+    command: [ python3, bundle_py, '--binary', '@INPUT@',
                 '--output', '@OUTPUT@',
                 '--plist', element_mfx_au_plist,
                 '--type', 'bundle' ],

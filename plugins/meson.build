@@ -1,15 +1,15 @@
 
 if get_option('element-plugins').enabled()
 
-getcode_py = find_program ('../util/getcode.py')
+getcode_py = files('../util/getcode.py')
 
-element_plugin_hex_verson_str = run_command (
+element_plugin_hex_verson_str = run_command (python3,
     getcode_py, '--version', meson.project_version()).stdout().strip()
-element_plugin_int_version = run_command (
+element_plugin_int_version = run_command (python3,
     getcode_py, '--version', meson.project_version(), '--integer').stdout().strip().to_int()
 
 element_manu_code = 'KshV'
-element_manu_hex_code_str = run_command (
+element_manu_hex_code_str = run_command (python3,
     getcode_py, '--code', element_manu_code).stdout().strip()
 
 element_code = 'Elmt'
