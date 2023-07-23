@@ -8,7 +8,7 @@ project ('element', ['c', 'cpp' ],
 
 pymod       = import ('python')
 python3     = pymod.find_installation ('python3', required : true)
-bundle_py   = find_program ('util/bundle.py')
+bundle_py   = files ('util/bundle.py').get(0)
 date_py     = find_program ('util/date.py')
 version_py  = find_program ('util/version.py')
 
