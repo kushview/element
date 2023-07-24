@@ -85,7 +85,14 @@ struct RootGraphHolder
             {
                 controller = std::make_unique<RootGraphManager> (*root, plugins);
                 model.setProperty (tags::object, node.get());
+
+                // TODO: Uniform method for saving/restoring nodes with custom ports.
+                PortArray ins, outs;
+                model.getPorts (ins, outs, PortType::Audio);
+                root->setNumPorts (PortType::Audio, ins.size(), true, false);
+                root->setNumPorts (PortType::Audio, outs.size(), false, false);
                 controller->setNodeModel (model);
+
                 resetIONodePorts();
             }
             else

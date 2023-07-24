@@ -76,12 +76,12 @@ private:
     void addMissingIONodes()
     {
         auto& graph (manager.getGraph());
-        const Node model (manager.getGraphModel());
+        Node model (manager.getGraphModel());
 
-        const bool wantsAudioIn = graph.getNumPorts (PortType::Audio, true) > 0 && model.hasAudioInputNode();
-        const bool wantsAudioOut = graph.getNumPorts (PortType::Audio, false) > 0 && model.hasAudioOutputNode();
-        const bool wantsMidiIn = graph.getNumPorts (PortType::Midi, true) > 0 && model.hasMidiInputNode();
-        const bool wantsMidiOut = graph.getNumPorts (PortType::Midi, false) > 0 && model.hasMidiOutputNode();
+        const bool wantsAudioIn = graph.getNumPorts (PortType::Audio, true) > 0;
+        const bool wantsAudioOut = graph.getNumPorts (PortType::Audio, false) > 0;
+        const bool wantsMidiIn = graph.getNumPorts (PortType::Midi, true) > 0;
+        const bool wantsMidiOut = graph.getNumPorts (PortType::Midi, false) > 0;
 
         ProcessorPtr ioNodes[IONode::numDeviceTypes];
         for (int i = 0; i < manager.getNumNodes(); ++i)
@@ -154,6 +154,8 @@ private:
 
         for (const auto& nodeId : nodesToRemove)
             manager.removeNode (nodeId);
+
+        model.resetPorts();
     }
 };
 

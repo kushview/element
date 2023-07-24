@@ -13,7 +13,8 @@
 #include "sol_helpers.hpp"
 
 // clang-format off
-EL_PLUGIN_EXPORT int luaopen_el_Session (lua_State* L)
+EL_PLUGIN_EXPORT 
+int luaopen_el_Session (lua_State* L)
 {
     using namespace element;
 

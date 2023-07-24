@@ -616,8 +616,6 @@ void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
     userPorts = newCount.toPortList();
     customPortsSet = true;
 
-    std::clog << "[element] graph changing port counts.\n";
-
     if (async)
         triggerPortReset();
     else

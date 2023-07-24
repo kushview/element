@@ -453,7 +453,6 @@ public:
             {
                 if (ev->body.type == midiEvent)
                 {
-                    std::clog << "added midi\n";
                     midi.getWriteBuffer (0)->addEvent (
                         LV2_ATOM_BODY_CONST (&ev->body),
                         ev->body.size,

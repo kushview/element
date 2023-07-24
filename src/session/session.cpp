@@ -19,7 +19,6 @@
 
 #include "engine/internalformat.hpp"
 #include <element/transport.hpp>
-
 #include <element/node.hpp>
 #include <element/session.hpp>
 
@@ -306,7 +305,7 @@ bool Session::writeToFile (const File& file) const
     Node::sanitizeProperties (saveData, true);
     TemporaryFile tempFile (file);
 
-    if (auto fos = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
+    if (auto fos = tempFile.getFile().createOutputStream())
     {
         {
             GZIPCompressorOutputStream gzip (*fos, 9);

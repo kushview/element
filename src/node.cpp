@@ -192,9 +192,17 @@ Node Node::createDefaultGraph (const String& name)
 {
     Node graph (types::Graph);
     graph.setProperty (tags::name, name);
+    ValueTree gports = graph.getPortsValueTree();
+
+    int portIdx = 0;
+    gports.addChild (Port ("Audio In 1", tags::audio, tags::input, portIdx++).data(), -1, 0);
+    gports.addChild (Port ("Audio In 2", tags::audio, tags::input, portIdx++).data(), -1, 0);
+    gports.addChild (Port ("MIDI In", tags::midi, tags::input, portIdx++).data(), -1, 0);
+    gports.addChild (Port ("Audio Out 1", tags::audio, tags::output, portIdx++).data(), -1, 0);
+    gports.addChild (Port ("Audio Out 2", tags::audio, tags::output, portIdx++).data(), -1, 0);
+    gports.addChild (Port ("MIDI Out", tags::midi, tags::output, portIdx++).data(), -1, 0);
 
     ValueTree nodes = graph.getNodesValueTree();
-
     const auto types = StringArray ({ "audio.input", "audio.output", "midi.input", "midi.output" });
     const auto names = StringArray ({ "Audio In", "Audio Out", "MIDI In", "MIDI Out" });
     uint32 nodeId = 1;
@@ -203,7 +211,7 @@ Node Node::createDefaultGraph (const String& name)
     {
         ValueTree ioNode (types::Node);
         ValueTree ports = ioNode.getOrCreateChildWithName (tags::ports, 0);
-        int portIdx = 0;
+        portIdx = 0;
 
         ioNode.setProperty (tags::id, static_cast<int64> (nodeId++), 0)
             .setProperty (tags::type, "plugin", 0)
