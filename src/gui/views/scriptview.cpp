@@ -14,7 +14,10 @@ class ScriptView::Impl : public juce::Value::Listener
 {
 public:
     Impl (ScriptView& v, Context& c)
-        : view (v), context (c), scripting (c.scripting()), env (scripting.getLuaState(), sol::create)
+        : view (v),
+          context (c),
+          scripting (c.scripting()),
+          env (scripting.getLuaState(), sol::create)
     {
     }
 
@@ -29,6 +32,10 @@ public:
     {
         codeValue.addListener (this);
         sol::state_view state (env.lua_state());
+        state.script (R"(
+            require ('el.Node')
+            require ('el.Graph')
+        )");
     }
 
     View* proxyView() const noexcept
@@ -143,7 +150,14 @@ private:
         if (! descriptor.valid())
             return;
         if (sol::safe_function f = descriptor["graph_changed"])
-            f (proxy, Node (graph.data(), false));
+        {
+            sol::safe_function_result res = f (proxy, Node (graph.data(), false));
+            if (! res.valid())
+            {
+                sol::error e = res;
+                scripting.logError (e.what());
+            }
+        }
     }
 
     void notifyNodeChanged()
@@ -151,7 +165,14 @@ private:
         if (! descriptor.valid())
             return;
         if (sol::safe_function f = descriptor["node_changed"])
-            f (proxy, node);
+        {
+            sol::safe_function_result res = f (proxy, node);
+            if (! res.valid())
+            {
+                sol::error e = res;
+                scripting.logError (e.what());
+            }
+        }
     }
 
     void valueChanged (juce::Value& val) override
@@ -166,6 +187,7 @@ ScriptView::ScriptView (Context& ctx, const Script& src)
     setComponentID ("el.ScriptView");
     impl = std::make_unique<Impl> (*this, ctx);
     setSize (100, 100);
+    impl->init();
     impl->setScript (src);
 }
 

@@ -52,11 +52,30 @@ the build system, or the command line options of your compiler.
 #include <limits>
 
 #define SOL_IN_DEBUG_DETECTED                0
-#define SOL_SAFE_USERTYPE                    0
+#define SOL_SAFE_USERTYPE                    1
 #define SOL_SAFE_REFERENCES                  0
 #define SOL_SAFE_FUNCTION_CALLS              0
 #define SOL_USING_CXX_LUA                    0
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION      0
+
+#if 0
+
+// #define SOL_IN_DEBUG_DETECTED                0
+
+// #define SOL_ALL_SAFETIES_ON             1
+#define SOL_SAFE_USERTYPE                    0
+#define SOL_SAFE_REFERENCES                  0
+#define SOL_SAFE_FUNCTION_CALLS              0
+#define SOL_SAFE_FUNCTION                    0
+#define SOL_SAFE_NUMERICS                    1
+#define SOL_SAFE_GETTER                      0
+
+// Keep this off
+#define SOL_DEFAULT_PASS_ON_ERROR            0
+
+#define SOL_USING_CXX_LUA                    0
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION      0
+#endif
 
 // end of sol/config.hpp
 

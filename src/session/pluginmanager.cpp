@@ -28,7 +28,7 @@ using namespace juce;
 
 static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
-static void pluginScannerSlaveCrashHandler (void*) {}
+static void pluginScannerWorkerCrashHandler (void*) {}
 
 //==============================================================================
 class PluginScannerCoordinator : public juce::ChildProcessCoordinator,
@@ -61,7 +61,7 @@ public:
         return res;
     }
 
-    void handleMessageFromSlave (const MemoryBlock& mb) override
+    void handleMessageFromWorker (const MemoryBlock& mb) override
     {
         const auto data (mb.toString());
         const auto type (data.upToFirstOccurrenceOf (":", false, false));
@@ -107,7 +107,7 @@ public:
 
     void handleAsyncUpdate() override
     {
-        const auto state = getSlaveState();
+        const auto state = getWorkerState();
         if (state == "ready" && isRunning())
         {
             std::clog << "ready!\n";
@@ -121,7 +121,7 @@ public:
             if (! isRunning())
             {
                 DBG ("[element] a plugin crashed or timed out during scan");
-                updateListAndLaunchSlave();
+                updateListAndLaunchWorker();
             }
             else
             {
@@ -143,7 +143,7 @@ public:
             if (! isRunning())
             {
                 DBG ("[element] waiting for plugin scanner");
-                updateListAndLaunchSlave();
+                updateListAndLaunchWorker();
             }
         }
         else if (slaveState == "quitting")
@@ -156,7 +156,7 @@ public:
         }
     }
 
-    const String getSlaveState() const
+    const String getWorkerState() const
     {
         ScopedLock sl (lock);
         return slaveState;
@@ -193,9 +193,9 @@ private:
 
     String pluginBeingScanned;
 
-    void updateListAndLaunchSlave()
+    void updateListAndLaunchWorker()
     {
-        if (auto xml = XmlDocument::parse (PluginScanner::getSlavePluginListFile()))
+        if (auto xml = XmlDocument::parse (PluginScanner::getWorkerPluginListFile()))
             owner.list.recreateFromXml (*xml);
 
         const bool res = launchScanner();
@@ -228,8 +228,8 @@ class PluginScannerWorker : public juce::ChildProcessWorker,
 public:
     PluginScannerWorker()
     {
-        scanFile = PluginScanner::getSlavePluginListFile();
-        SystemStats::setApplicationCrashHandler (pluginScannerSlaveCrashHandler);
+        scanFile = PluginScanner::getWorkerPluginListFile();
+        SystemStats::setApplicationCrashHandler (pluginScannerWorkerCrashHandler);
         auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
         logfile.create();
         logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
@@ -503,7 +503,7 @@ void PluginScanner::scanForAudioPlugins (const juce::String& formatName)
 void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 {
     cancel();
-    getSlavePluginListFile().deleteFile();
+    getWorkerPluginListFile().deleteFile();
     if (master == nullptr)
         master.reset (new PluginScannerCoordinator (*this));
     if (master->isRunning())
@@ -1010,7 +1010,7 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
 
 void PluginManager::scanFinished()
 {
-    restoreAudioPlugins (PluginScanner::getSlavePluginListFile());
+    restoreAudioPlugins (PluginScanner::getWorkerPluginListFile());
     if (auto* scanner = getBackgroundAudioPluginScanner())
         scanner->cancel();
     jassert (! isScanningAudioPlugins());
@@ -1023,7 +1023,7 @@ void PluginManager::restoreAudioPlugins (const File& file)
         restoreUserPlugins (*xml);
 }
 
-const File& PluginScanner::getSlavePluginListFile()
+const File& PluginScanner::getWorkerPluginListFile()
 {
     static File _listTempFile;
 #if 0

@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 #include <element/ui/meterbridge.hpp>
 #include <element/services.hpp>
 #include <element/context.hpp>

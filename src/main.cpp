@@ -138,7 +138,7 @@ public:
     void initialise (const String& commandLine) override
     {
         world = std::make_unique<Context> (commandLine);
-        if (maybeLaunchSlave (commandLine))
+        if (maybeLaunchScannerWorker (commandLine))
             return;
 
         if (sendCommandLineToPreexistingInstance())
@@ -163,7 +163,7 @@ public:
         if (! world)
             return;
 
-        slaves.clearQuick (true);
+        workers.clearQuick (true);
 
         auto engine (world->audio());
         auto& plugins (world->plugins());
@@ -233,15 +233,15 @@ public:
         }
     }
 
-    void anotherInstanceStarted (const String& commandLine) override
+    void maybeOpenCommandLineFile (const String& commandLine)
     {
-        if (! world)
-            return;
-
         if (auto* sc = world->services().find<SessionService>())
         {
             const auto path = commandLine.unquoted().trim();
-            if (File::isAbsolutePath (path))
+            const File sessionFile = File::isAbsolutePath (path) 
+                ? File (path)
+                : File::getCurrentWorkingDirectory().getChildFile (path);
+            if (sessionFile.existsAsFile())
             {
                 const File file (path);
                 if (file.hasFileExtension ("els"))
@@ -250,6 +250,14 @@ public:
                     sc->importGraph (file);
             }
         }
+    }
+
+    void anotherInstanceStarted (const String& commandLine) override
+    {
+        if (! world)
+            return;
+
+        maybeOpenCommandLineFile (commandLine);
     }
 
     void suspended() override {}
@@ -275,19 +283,14 @@ public:
         if (world->settings().checkForUpdates())
             startTimer (5000);
 
-        const auto path = getCommandLineParameters();
-        const File sessionFile = File::isAbsolutePath (path) ? File (path)
-                                                             : File::getCurrentWorkingDirectory().getChildFile (path);
-        if (sessionFile.hasFileExtension ("els"))
-            if (auto* sc = world->services().find<SessionService>())
-                sc->openFile (sessionFile);
+        maybeOpenCommandLineFile (getCommandLineParameters());
     }
 
 private:
     String launchCommandLine;
     std::unique_ptr<Context> world;
     std::unique_ptr<Startup> startup;
-    OwnedArray<juce::ChildProcessWorker> slaves;
+    OwnedArray<juce::ChildProcessWorker> workers;
 
     void printCopyNotice()
     {
@@ -298,16 +301,16 @@ private:
                                 .replace ("%YEAR%", String (Time::getCurrentTime().getYear())));
     }
 
-    bool maybeLaunchSlave (const String& commandLine)
+    bool maybeLaunchScannerWorker (const String& commandLine)
     {
-        slaves.clearQuick (true);
-        slaves.add (world->plugins().createAudioPluginScannerWorker());
+        workers.clearQuick (true);
+        workers.add (world->plugins().createAudioPluginScannerWorker());
         StringArray processIds = { EL_PLUGIN_SCANNER_PROCESS_ID };
-        for (auto* slave : slaves)
+        for (auto* worker : workers)
         {
             for (const auto& pid : processIds)
             {
-                if (slave->initialiseFromCommandLine (commandLine, pid, 20 * 1000))
+                if (worker->initialiseFromCommandLine (commandLine, pid, 20 * 1000))
                 {
 #if JUCE_MAC
                     Process::setDockIconVisible (false);

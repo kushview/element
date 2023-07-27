@@ -146,7 +146,7 @@ public:
         virtual void audioPluginScanStarted (const juce::String& name) {}
     };
 
-    static const juce::File& getSlavePluginListFile();
+    static const juce::File& getWorkerPluginListFile();
 
     /** scan for plugins of type */
     void scanForAudioPlugins (const juce::String& formatName);

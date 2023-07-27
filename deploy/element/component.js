@@ -36,5 +36,9 @@ Component.prototype.createOperations = function () {
             '@TargetDir@/updater.exe',
             '@StartMenuDir@/Element/Updater.lnk',
             'workingDirectory=@TargetDir@');
+
+        exePat = installer.value ("ApplicationsDirX64") + "\\Kushview\\Element\\bin\\element.exe"
+        component.addOperation ('RegisterFileType', 'els', exePat + " '%1'", 'Element Session');
+        component.addOperation ('RegisterFileType', 'elg', exePat + " '%1'", 'Element Graph');
     }
 };

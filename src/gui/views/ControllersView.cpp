@@ -565,12 +565,12 @@ public:
 
         addAndMakeVisible (saveControllerButton);
         saveControllerButton.setTooltip ("Save a controller to disk");
-        saveControllerButton.setPath (getIcons().fasSave, 4.2);
+        saveControllerButton.setPath (getIcons().fasSave, 4.2f);
         saveControllerButton.addListener (this);
 
         addAndMakeVisible (openControllerButton);
         openControllerButton.setTooltip ("Open a controller from disk");
-        openControllerButton.setPath (getIcons().fasFolderOpen, 3.0);
+        openControllerButton.setPath (getIcons().fasFolderOpen, 3.0f);
         openControllerButton.addListener (this);
 
         addAndMakeVisible (maps);

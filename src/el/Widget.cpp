@@ -1,3 +1,6 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
+
 /// A GUI Widget.
 //
 // Is defined with @{el.object} and can be inherrited.  Objects must be

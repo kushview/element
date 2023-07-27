@@ -37,7 +37,7 @@ struct ScriptInfo final {
     static ScriptInfo parse (const juce::String& buffer);
     static ScriptInfo parse (juce::File file);
 
-    bool valid() const noexcept { return name.isNotEmpty(); }
+    bool valid() const noexcept { return type.isNotEmpty(); }
 };
 
 #define EL_SCRIPT_VERSION 0

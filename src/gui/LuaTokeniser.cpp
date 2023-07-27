@@ -1,25 +1,5 @@
-/*
-    This file is part of Element, modified from JUCE source
-
-    Copyright (c) 2017 - ROLI Ltd.
-    Copyright (C) 2019  Kushview, LLC.
-      - Multiline comment support
-      - Control statements via preprocessor token
-    
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include "gui/LuaTokeniser.h"
 using namespace juce;
@@ -130,7 +110,7 @@ struct LuaTokeniserFunctions
     static int parseIdentifier (Iterator& source) noexcept
     {
         int tokenLength = 0;
-        String::CharPointerType::CharType possibleIdentifier[100];
+        String::CharPointerType::CharType possibleIdentifier[100]= {0 };
         String::CharPointerType possible (possibleIdentifier);
 
         while (CppTokeniserFunctions::isIdentifierBody (source.peekNextChar()))
