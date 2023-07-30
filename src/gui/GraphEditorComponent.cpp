@@ -376,7 +376,6 @@ GraphEditorComponent::~GraphEditorComponent()
     graph = Node();
     data = ValueTree();
     draggingConnector = nullptr;
-    resizePositionsFrozen = false;
     deleteAllChildren();
 
     factory.reset();
@@ -394,7 +393,6 @@ void GraphEditorComponent::setNode (const Node& n)
     data = graph.data();
 
     verticalLayout = graph.getProperty (tags::vertical, true);
-    resizePositionsFrozen = (bool) graph.getProperty (tags::staticPos, false);
 
     if (draggingConnector)
         removeChildComponent (draggingConnector.get());
@@ -709,7 +707,7 @@ PortComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 
 void GraphEditorComponent::resized()
 {
-    updateBlockComponents (! areResizePositionsFrozen());
+    updateBlockComponents (false);
     updateConnectorComponents();
 }
 
@@ -1027,6 +1025,10 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
 {
     lastDropX = x;
     lastDropY = y;
+
+    if (onFilesDropped && onFilesDropped (files, x, y))
+        return;
+
     for (const auto& path : files)
     {
         const auto file = File (path);

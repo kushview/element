@@ -550,7 +550,7 @@ public:
             paths.clear();
         }
 
-        startThread (4);
+        startThread (Thread::Priority::background);
     }
 
     void getPlugins (OwnedArray<PluginDescription>& plugs,

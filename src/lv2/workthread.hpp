@@ -19,7 +19,8 @@ class WorkerBase;
 class WorkThread : public juce::Thread
 {
 public:
-    WorkThread (const juce::String& name, uint32_t bufsize, int32 priority = 5);
+    using Priority = juce::Thread::Priority;
+    WorkThread (const juce::String& name, uint32_t bufsize, Priority priority = Priority::normal);
     ~WorkThread();
 
     inline static uint32_t getRequiredSpace (uint32_t msgSize) { return msgSize + (2 * sizeof (uint32_t)); }

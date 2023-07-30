@@ -845,12 +845,6 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     {
         updatePosition();
     }
-    else if (nullptr != getParentComponent())
-    {
-        // position is relative and parent might be resizing
-        const auto b = getBoundsInParent();
-        setNodePosition (b.getX(), b.getY());
-    }
 
     if (node.getUIValueTree().hasProperty ("color"))
     {

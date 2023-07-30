@@ -60,42 +60,6 @@
 namespace element {
 
 //=============================================================================
-#if 0
-class GraphEditorViewSE : public GraphEditorView
-{
-public:
-    GraphEditorViewSE()
-    {
-        logo1 = ImageCache::getFromMemory (BinaryData::kushviewlogotext_220_png,
-                                           BinaryData::kushviewlogotext_220_pngSize);
-        logo2 = ImageCache::getFromMemory (BinaryData::digitalelementslogo_220_png,
-                                           BinaryData::digitalelementslogo_220_pngSize);
-    }
-
-    ~GraphEditorViewSE() = default;
-
-    void paintOverChildren (Graphics& g) override
-    {
-        const int pad = 10;
-        auto dw = logo1.getWidth() * 0.38;
-        auto dh = logo1.getHeight() * 0.38;
-        g.drawImageWithin (logo1, -40, getHeight() - dh - pad, dw, dh, RectanglePlacement::centred);
-        dw = logo2.getWidth() * 0.4;
-        dh = logo2.getHeight() * 0.4;
-        g.drawImageWithin (logo2, getWidth() - dw - pad, getHeight() - dh - pad, dw, dh, RectanglePlacement::xRight | RectanglePlacement::yBottom);
-    }
-
-private:
-    Image logo1, logo2;
-};
-#endif
-
-static GraphEditorView* createGraphEditorView()
-{
-    return new GraphEditorView();
-}
-
-//=============================================================================
 class SmartLayoutManager : public StretchableLayoutManager
 {
 public:
@@ -457,7 +421,7 @@ static ContentView* createLastContentView (Settings& settings)
     else if (lastContentView == "PatchBay")
         view = std::make_unique<ConnectionGrid>();
     else if (lastContentView == EL_VIEW_GRAPH_EDITOR)
-        view.reset (createGraphEditorView());
+        view.reset (new GraphEditorView());
     else if (lastContentView == EL_VIEW_CONTROLLERS)
         view = std::make_unique<ControllersView>();
     else
@@ -529,7 +493,7 @@ StandardContent::StandardContent (Context& ctl_)
 
     setSize (640, 360);
 
-    container->setMainView (new GraphEditorView());
+    setMainView (EL_VIEW_GRAPH_EDITOR);
 
     nav->setSize (304, getHeight());
     resizerMouseUp();
@@ -571,13 +535,20 @@ int StandardContent::getNavSize()
 
 void StandardContent::setMainView (const String& name)
 {
+    if (auto v = createContentView (name))
+    {
+        v->setName (name);
+        setContentView (v, false);
+        return;
+    }
+
     if (name == "PatchBay")
     {
         setContentView (new ConnectionGrid());
     }
     else if (name == EL_VIEW_GRAPH_EDITOR)
     {
-        setContentView (createGraphEditorView());
+        setContentView (new GraphEditorView());
     }
     else if (name == EL_VIEW_PLUGIN_MANAGER)
     {
@@ -604,7 +575,7 @@ void StandardContent::setMainView (const String& name)
         if (auto s = context().session())
         {
             if (s->getNumGraphs() > 0)
-                setContentView (createGraphEditorView());
+                setContentView (new GraphEditorView());
             else
                 setContentView (new EmptyContentView());
         }
@@ -645,6 +616,13 @@ void StandardContent::setContentView (ContentView* view, const bool accessory)
 
 void StandardContent::setSecondaryView (const String& name)
 {
+    if (auto v = createContentView (name))
+    {
+        v->setName (name);
+        setContentView (v, true);
+        return;
+    }
+
     if (name == EL_VIEW_GRAPH_MIXER)
     {
         setContentView (new GraphMixerView(), true);

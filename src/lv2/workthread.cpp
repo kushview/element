@@ -17,7 +17,7 @@ using namespace juce;
 
 namespace element {
 
-WorkThread::WorkThread (const String& name, uint32_t bufsize, int32 priority)
+WorkThread::WorkThread (const String& name, uint32_t bufsize, Thread::Priority priority)
     : Thread (name)
 {
     nextWorkId = 0;

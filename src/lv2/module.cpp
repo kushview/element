@@ -10,9 +10,6 @@
 #include "lv2/module.hpp"
 #include "lv2/workerfeature.hpp"
 
-#define JLV2_MODULE_EVENT_BUFFER_SIZE 8192
-#define JLV2_MODULE_RING_BUFFER_SIZE  8192
-
 namespace element {
 
 enum UIQuality
@@ -197,13 +194,13 @@ void LV2Module::activatePorts()
 
 void LV2Module::init()
 {
-    events.reset (new RingBuffer (JLV2_MODULE_RING_BUFFER_SIZE));
-    evbufsize = jmax (evbufsize, static_cast<uint32> (JLV2_MODULE_RING_BUFFER_SIZE));
+    events.reset (new RingBuffer (EL_LV2_RING_BUFFER_SIZE));
+    evbufsize = jmax (evbufsize, static_cast<uint32> (EL_LV2_RING_BUFFER_SIZE));
     evbuf.realloc (evbufsize);
     evbuf.clear (evbufsize);
 
-    notifications.reset (new RingBuffer (JLV2_MODULE_RING_BUFFER_SIZE));
-    ntbufsize = jmax (ntbufsize, static_cast<uint32> (JLV2_MODULE_RING_BUFFER_SIZE));
+    notifications.reset (new RingBuffer (EL_LV2_RING_BUFFER_SIZE));
+    ntbufsize = jmax (ntbufsize, static_cast<uint32> (EL_LV2_RING_BUFFER_SIZE));
     ntbuf.realloc (ntbufsize);
     ntbuf.clear (ntbufsize);
 
@@ -255,7 +252,7 @@ void LV2Module::init()
                 dataType = map (LV2_ATOM__Float);
                 break;
             case PortType::Atom:
-                capacity = JLV2_MODULE_EVENT_BUFFER_SIZE;
+                capacity = EL_LV2_EVENT_BUFFER_SIZE;
                 dataType = map (LV2_ATOM__Sequence);
                 break;
             case PortType::Midi:
@@ -263,7 +260,7 @@ void LV2Module::init()
                 dataType = map (LV2_MIDI__MidiEvent);
                 break;
             case PortType::Event:
-                capacity = JLV2_MODULE_EVENT_BUFFER_SIZE;
+                capacity = EL_LV2_EVENT_BUFFER_SIZE;
                 dataType = map (LV2_EVENT__Event);
                 break;
             case PortType::CV:

@@ -103,6 +103,7 @@ void Port::setHiddenOnBlock (bool hidden)
     }
 
     setHiddenPortsProperty (node, symbols);
+    setProperty ("hiddenOnBlock", hidden);
 }
 
 bool Port::isHiddenOnBlock() const
@@ -113,8 +114,15 @@ bool Port::isHiddenOnBlock() const
         return true;
     }
 
-    const auto symbols = getHiddenPortsProperty (parent);
-    return symbols.contains (symbol().toRawUTF8());
+    // TODO: hiddenOnBlock property can't be a 'once' object
+    if (! objectData.hasProperty ("hiddenOnBlock")) {
+        const auto symbols = getHiddenPortsProperty (parent);
+        ValueTree(objectData).setProperty ("hiddenOnBlock", 
+                                symbols.contains (symbol().toRawUTF8()),
+                                nullptr);
+    }
+
+    return (bool) getProperty ("hiddenOnBlock");
 }
 
 //==============================================================================

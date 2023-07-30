@@ -164,8 +164,7 @@ World::World()
     numThreads = JLV2_NUM_WORKERS;
     for (int i = 0; i < numThreads; ++i)
     {
-        threads.add (new WorkThread ("lv2_worker_" + String (i + 1), 2048));
-        threads.getLast()->setPriority (5);
+        threads.add (new WorkThread ("lv2_worker_" + String (i + 1), EL_LV2_RING_BUFFER_SIZE));
     }
 
     addFeature (new GenericFeature (*symbolMap.map_feature()), false);
@@ -288,8 +287,7 @@ WorkThread& World::getWorkThread()
 {
     while (threads.size() < numThreads)
     {
-        threads.add (new WorkThread ("LV2 Worker " + String (threads.size()), 2048));
-        threads.getLast()->setPriority (5);
+        threads.add (new WorkThread ("LV2 Worker " + String (threads.size()), EL_LV2_RING_BUFFER_SIZE));
     }
 
     const int threadIndex = currentThread;

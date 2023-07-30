@@ -65,17 +65,6 @@ public:
     void updateComponents (const bool doNodePositions = true);
 
     //=========================================================================
-    bool areResizePositionsFrozen() const { return resizePositionsFrozen; }
-    inline void setResizePositionsFrozen (const bool shouldBeFrozen)
-    {
-        if (resizePositionsFrozen == shouldBeFrozen)
-            return;
-        resizePositionsFrozen = shouldBeFrozen;
-        if (graph.isValid())
-            graph.setProperty (tags::staticPos, resizePositionsFrozen);
-    }
-
-    //=========================================================================
     void changeListenerCallback (ChangeBroadcaster*) override;
 
     void paint (Graphics& g) override;
@@ -92,6 +81,7 @@ public:
     void filesDropped (const StringArray& files, int x, int y) override;
 
     //=========================================================================
+    std::function<bool (const StringArray&, int, int)> onFilesDropped;
     std::function<void (BlockComponent&)> onBlockMoved;
     std::function<void()> onZoomChanged;
 
@@ -106,7 +96,6 @@ private:
 
     Node graph;
     ValueTree data;
-    bool resizePositionsFrozen = false;
 
     float lastDropX = 0.5f;
     float lastDropY = 0.5f;

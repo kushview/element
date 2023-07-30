@@ -210,7 +210,7 @@ public:
         {
             return true;
         }
-        startThread (4);
+        startThread (Thread::Priority::background);
         return isThreadRunning();
     }
 

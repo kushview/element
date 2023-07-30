@@ -78,6 +78,9 @@ public:
     void setExtraView (juce::Component*);
     Component* extraView() { return _extra.get(); }
 
+protected:
+    virtual ContentView* createContentView (const juce::String&) { return nullptr; }
+
 private:
     std::unique_ptr<NavigationConcertinaPanel> nav;
     friend class ContentContainer;
