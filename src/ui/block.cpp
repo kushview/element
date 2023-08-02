@@ -846,6 +846,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
 
     updatePins (forcePins);
+    updateSize();
     setName (node.getDisplayName());
 
     if (doPosition)
