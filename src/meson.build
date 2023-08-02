@@ -34,8 +34,6 @@ libelement_sources = '''
     services/presetservice.cpp
     services/sessionservice.cpp
     
-    gui/sessiondocument.cpp
-
     engine/ionode.cpp
     engine/oversampler.cpp
     engine/graphmanager.cpp
@@ -78,32 +76,24 @@ libelement_sources = '''
     lv2/workerfeature.cpp
     lv2/world.cpp
     lv2/native.cpp
-    
-    gui/designer.cpp
-    gui/grapheditor.cpp
-    gui/meterbridge.cpp
-    gui/navigation.cpp
-    gui/nodeeditor.cpp
+
 
     gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp
-    gui/BlockComponent.cpp
+    
     gui/Buttons.cpp
-    gui/capslock.cpp
     gui/ChannelStripComponent.cpp
     gui/ConnectionGrid.cpp
-    gui/content.cpp
+    
+
     gui/ContextMenus.cpp
-    gui/decibelscale.cpp
-    gui/simplemeter.cpp
+
     gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
-    gui/style_v1.cpp
     gui/LuaTokeniser.cpp
     gui/MainMenu.cpp
     gui/MainWindow.cpp
-    
     gui/NodeEditorFactory.cpp
     gui/NodeIOConfiguration.cpp
     gui/PatchMatrixComponent.cpp
@@ -130,7 +120,7 @@ libelement_sources = '''
     gui/SequencerComponent.cpp
     gui/SessionImportWizard.cpp
     gui/SessionTreePanel.cpp
-    gui/standard.cpp
+    
     gui/SystemTray.cpp
     gui/TransportBar.cpp
     gui/TreeviewBase.cpp
@@ -164,8 +154,7 @@ libelement_sources = '''
     gui/widgets/SessionGraphsListBox.cpp
     gui/Window.cpp
     gui/WindowManager.cpp
-    gui/updater.cpp
-    
+   
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp
     scripting/bindings.cpp
@@ -175,6 +164,21 @@ libelement_sources = '''
     session/devicemanager.cpp
     session/pluginmanager.cpp
     session/session.cpp
+
+    ui/block.cpp
+    ui/content.cpp
+    ui/capslock.cpp
+    ui/decibelscale.cpp
+    ui/designer.cpp
+    ui/grapheditor.cpp
+    ui/meterbridge.cpp
+    ui/navigation.cpp
+    ui/nodeeditor.cpp
+    ui/sessiondocument.cpp
+    ui/simplemeter.cpp
+    ui/standard.cpp
+    ui/style_v1.cpp
+    ui/updater.cpp
 
     el/audio.c
     el/AudioBuffer32.cpp
@@ -233,7 +237,7 @@ endif
 if host_machine.system() == 'windows'
     libelement_sources += [ 'dlfcn-win32.c' ]
 elif host_machine.system() == 'darwin'
-    libelement_sources += [ 'gui/nsviewwithparent.mm']
+    libelement_sources += [ 'ui/nsviewwithparent.mm']
 endif
 
 luael_gen = generator (bin2c,

@@ -57,7 +57,7 @@ public:
             running = res;
         }
 
-        std::clog << "[element] scanner launched: " << (isRunning() ? "yes" : "no") << std::endl;
+        DBG("[element] scanner launched: " << (isRunning() ? "yes" : "no"));
         return res;
     }
 
@@ -110,7 +110,6 @@ public:
         const auto state = getWorkerState();
         if (state == "ready" && isRunning())
         {
-            std::clog << "ready!\n";
             String msg = "scan:";
             msg << formatNames.joinIntoString (",");
             MemoryBlock mb (msg.toRawUTF8(), msg.length());
@@ -233,13 +232,10 @@ public:
         auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
         logfile.create();
         logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
-        logger->logMessage ("[element] launched scanner");
     }
 
     ~PluginScannerWorker()
     {
-        if (logger)
-            logger->logMessage ("[element] scanner destroyed.");
     }
 
     void handleMessageFromCoordinator (const MemoryBlock& mb) override
@@ -248,7 +244,7 @@ public:
         const auto type (data.upToFirstOccurrenceOf (":", false, false));
         const auto message (data.fromFirstOccurrenceOf (":", false, false));
 
-        String msg = "message: ";
+        String msg = "[scanner] received message: ";
         msg << type;
         logger->logMessage (msg);
 
@@ -309,10 +305,10 @@ public:
 
     void handleConnectionMade() override
     {
-        logger->logMessage ("[element] connection to scanner coordinator established");
+        logger->logMessage ("[scanner] connection to coordinator established");
         settings = std::make_unique<Settings>();
         plugins = std::make_unique<PluginManager>();
-        logger->logMessage ("[element] scanner created objects");
+        logger->logMessage ("[scanner] created global objects");
 
         if (! scanFile.existsAsFile())
             scanFile.create();
@@ -320,23 +316,23 @@ public:
         if (auto xml = XmlDocument::parse (scanFile))
             pluginList.recreateFromXml (*xml);
 
-        logger->logMessage ("[element] scanner processing blacklist");
+        logger->logMessage ("[scanner] processing blacklist");
         // This must happen before user settings, PluginManager will delete the deadman file
         // when restoring user plugins
         PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
             pluginList, plugins->getDeadAudioPluginsFile());
 
-        logger->logMessage ("[element] scanner setting up formats");
+        logger->logMessage ("[scanner] setting up formats");
         plugins->addDefaultFormats();
-        logger->logMessage ("[element] scanner restoring plugin list");
+        logger->logMessage ("[scanner] restoring plugin list");
         {
             juce::MessageManagerLock mml;
             plugins->restoreUserPlugins (*settings);
         }
 
-        logger->logMessage ("[element] scanner notify read!");
+        logger->logMessage ("[scanner] scanner notify read!");
         if (! sendState (EL_PLUGIN_SCANNER_READY_ID))
-            logger->logMessage ("[element] plugin scanner failed to send 'ready' message");
+            logger->logMessage ("[scanner] plugin scanner failed to send 'ready' message");
     }
 
     void handleConnectionLost() override
@@ -393,7 +389,7 @@ private:
     {
         const auto nextFile = scanner->getNextPluginFileThatWillBeScanned();
         sendString ("name", nextFile);
-        logger->logMessage (String ("scan: ") + nextFile);
+        logger->logMessage (String ("[scanner] scan: ") + nextFile);
 
         for (const auto& file : scanner->getFailedFiles())
             pluginList.addToBlacklist (file);
@@ -435,7 +431,7 @@ private:
                 if (! pluginList.getBlacklistedFiles().contains (tp) && pluginList.getTypeForFile (tp) == nullptr)
                 {
                     sendString ("name", tp.trim());
-                    logger->logMessage (String ("scan: ") + tp);
+                    logger->logMessage (String ("[scanner] scan: ") + tp);
                     OwnedArray<PluginDescription> dc;
                     pluginList.addToBlacklist (tp);
                     writePluginListNow();

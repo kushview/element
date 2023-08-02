@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/ui/popups.hpp>
-#include "gui/datapathbrowser.hpp"
+#include "ui/datapathbrowser.hpp"
 
 #include "ElementApp.h"
 #include "engine/graphmanager.hpp"
 
 #include "gui/GuiCommon.h"
-#include "gui/BlockComponent.h"
+#include "ui/block.hpp"
 #include <element/ui/content.hpp>
 #include "gui/ContextMenus.h"
 #include "gui/Icons.h"
@@ -761,10 +761,12 @@ void GraphEditorComponent::updateConnectorComponents (bool async)
 void GraphEditorComponent::updateBlockComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
+    {
         if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
         {
             block->update (doPosition);
         }
+    }
 }
 
 void GraphEditorComponent::stabilizeNodes()

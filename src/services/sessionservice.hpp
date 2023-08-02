@@ -7,7 +7,7 @@
 #include <element/session.hpp>
 #include <element/signals.hpp>
 
-#include "gui/sessiondocument.hpp"
+#include "ui/sessiondocument.hpp"
 
 namespace element {
 class SessionService : public Service

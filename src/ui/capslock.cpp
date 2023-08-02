@@ -9,7 +9,7 @@
 #warning "Caps lock detection not yet implemented on Linux"
 #endif
 
-#include "gui/capslock.hpp"
+#include "ui/capslock.hpp"
 
 namespace element {
 

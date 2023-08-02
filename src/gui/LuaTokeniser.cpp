@@ -110,7 +110,7 @@ struct LuaTokeniserFunctions
     static int parseIdentifier (Iterator& source) noexcept
     {
         int tokenLength = 0;
-        String::CharPointerType::CharType possibleIdentifier[100]= {0 };
+        String::CharPointerType::CharType possibleIdentifier[100] = { 0 };
         String::CharPointerType possible (possibleIdentifier);
 
         while (CppTokeniserFunctions::isIdentifierBody (source.peekNextChar()))

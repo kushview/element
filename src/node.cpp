@@ -115,11 +115,10 @@ bool Port::isHiddenOnBlock() const
     }
 
     // TODO: hiddenOnBlock property can't be a 'once' object
-    if (! objectData.hasProperty ("hiddenOnBlock")) {
+    if (! objectData.hasProperty ("hiddenOnBlock"))
+    {
         const auto symbols = getHiddenPortsProperty (parent);
-        ValueTree(objectData).setProperty ("hiddenOnBlock", 
-                                symbols.contains (symbol().toRawUTF8()),
-                                nullptr);
+        ValueTree (objectData).setProperty ("hiddenOnBlock", symbols.contains (symbol().toRawUTF8()), nullptr);
     }
 
     return (bool) getProperty ("hiddenOnBlock");

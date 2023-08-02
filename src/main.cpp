@@ -104,7 +104,6 @@ private:
     {
         auto& settings (world.settings());
         auto& plugins (world.plugins());
-        auto engine (world.audio());
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();
@@ -238,9 +237,9 @@ public:
         if (auto* sc = world->services().find<SessionService>())
         {
             const auto path = commandLine.unquoted().trim();
-            const File sessionFile = File::isAbsolutePath (path) 
-                ? File (path)
-                : File::getCurrentWorkingDirectory().getChildFile (path);
+            const File sessionFile = File::isAbsolutePath (path)
+                                         ? File (path)
+                                         : File::getCurrentWorkingDirectory().getChildFile (path);
             if (sessionFile.existsAsFile())
             {
                 const File file (path);

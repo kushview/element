@@ -18,7 +18,7 @@
 */
 
 #include "gui/GuiCommon.h"
-#include "gui/BlockComponent.h"
+#include "ui/block.hpp"
 #include "gui/views/GraphEditorView.h"
 #include "common.hpp"
 #include "scopedcallback.hpp"

@@ -10,21 +10,22 @@
 #include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/ui/updater.hpp>
+#include <element/ui/commands.hpp>
+#include <element/ui/standard.hpp>
+#include <element/ui/style.hpp>
 
 #include "services/sessionservice.hpp"
 #include "gui/views/VirtualKeyboardView.h"
 #include "gui/AboutComponent.h"
 #include "gui/GuiCommon.h"
-#include <element/ui/style.hpp>
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/PreferencesComponent.h"
 #include "gui/SystemTray.h"
 #include "gui/WindowManager.h"
-#include <element/ui/standard.hpp>
-#include "gui/capslock.hpp"
 
-#include <element/ui/commands.hpp>
+#include "ui/capslock.hpp"
+
 
 namespace element {
 
@@ -82,15 +83,15 @@ struct GuiService::KeyPressManager : public KeyListener
 private:
     bool isVirtualKeyboardVisible() const
     {
-        // if (auto* cc = owner.content())
-        //     return cc->isVirtualKeyboardVisible();
+        if (auto* cc = dynamic_cast<StandardContent*> (owner.content()))
+            return cc->isVirtualKeyboardVisible();
         return false;
     }
 
     VirtualKeyboardView* getVirtualKeyboardView() const
     {
-        // if (auto* cc = owner.content())
-        //     return cc->getVirtualKeyboardView();
+        if (auto* cc = dynamic_cast<StandardContent*> (owner.content()))
+            return cc->getVirtualKeyboardView();
         return nullptr;
     }
 

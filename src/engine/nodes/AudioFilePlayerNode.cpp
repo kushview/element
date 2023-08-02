@@ -6,7 +6,7 @@
 #include "engine/nodes/AudioFilePlayerNode.h"
 
 #include "gui/Buttons.h"
-#include "gui/datapathbrowser.hpp"
+#include "ui/datapathbrowser.hpp"
 #include <element/ui/style.hpp>
 #include "gui/ViewHelpers.h"
 

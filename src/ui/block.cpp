@@ -5,7 +5,7 @@
 #include <element/ui.hpp>
 #include "gui/views/NodePortsTable.h"
 #include "gui/Artist.h"
-#include "gui/BlockComponent.h"
+#include "ui/block.hpp"
 #include "gui/Buttons.h"
 #include <element/ui/content.hpp>
 #include "gui/ContextMenus.h"
@@ -536,6 +536,8 @@ bool BlockComponent::hitTest (int x, int y)
     return getBoxRectangle().contains (x, y);
 }
 
+
+
 Rectangle<int> BlockComponent::getBoxRectangle() const
 {
     return getLocalBounds().reduced (pinSize / 2);
@@ -717,6 +719,10 @@ void BlockComponent::resized()
         er.removeFromTop (vertical ? 20 : 18);
         er.removeFromBottom (18);
         embedded->setBounds (er.reduced (1));
+        embedded->setBounds (er.getX(),
+                             er.getY(),
+                             embedded->getWidth(),
+                             embedded->getHeight());
     }
 
     if (vertical)
@@ -827,8 +833,10 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
                 // else
                 //     embedded = NodeEditorFactory::createAudioProcessorEditor (node).release();
             }
-            if (embedded != nullptr)
+            if (embedded != nullptr) {
                 addAndMakeVisible (embedded.get());
+                updateSize();
+            }
         }
     }
     else
@@ -838,7 +846,6 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
 
     updatePins (forcePins);
-    updateSize();
     setName (node.getDisplayName());
 
     if (doPosition)
@@ -935,14 +942,16 @@ void BlockComponent::updateSize()
             setSize (minW, minH);
             break;
         }
+
         case Embed: {
             if (embedded != nullptr)
             {
                 setSize (embedded->getWidth() + pinSize,
-                         embedded->getHeight() + 18 + 18);
+                         embedded->getHeight() + pinSize + (vertical ? 20 : 18) + 18);
             }
             break;
         }
+
         case Normal: {
             setSize (customWidth > 0 ? customWidth : minW,
                      customHeight > 0 ? customHeight : minH);

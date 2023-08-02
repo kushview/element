@@ -33,6 +33,7 @@ public:
     void updateGraphNode (Processor* newNode, Component* newEditor);
     Node getNode() const { return node; }
     void restoreAlwaysOnTopState();
+    
     void moved() override;
     void closeButtonPressed() override;
     void resized() override;
@@ -41,7 +42,8 @@ public:
 
     int getDesktopWindowStyleFlags() const override
     {
-        return DocumentWindow::getDesktopWindowStyleFlags() | ComponentPeer::windowHasCloseButton | ComponentPeer::windowHasTitleBar | ComponentPeer::windowHasDropShadow;
+        return DocumentWindow::getDesktopWindowStyleFlags(); 
+        // | ComponentPeer::windowHasCloseButton | ComponentPeer::windowHasTitleBar | ComponentPeer::windowHasDropShadow;
     }
 
 protected:

@@ -84,7 +84,10 @@ public:
             auto* const buffer = buffers.getUnchecked (port->index);
 
             if (ui)
+            {
                 ui->portEvent ((uint32_t) port->index, sizeof (float), 0, buffer->getPortData());
+            }
+
             if (owner.onPortNotify)
                 owner.onPortNotify ((uint32_t) port->index, sizeof (float), 0, buffer->getPortData());
         }
@@ -776,7 +779,6 @@ LV2ModuleUI* LV2Module::createEditor()
     if (instance != nullptr)
     {
         jassert (instance == priv->ui.get());
-        priv->sendControlValues();
     }
 
     return instance;
@@ -857,9 +859,10 @@ void LV2Module::run (uint32 nframes)
             if (ev.protocol == 0)
             {
                 auto* buffer = priv->buffers.getUnchecked (ev.index);
-                if (buffer->getValue() != *((float*) evbuf.getData()))
+                const float value = *((float*) evbuf.getData());
+                if (buffer->getValue() != value)
                 {
-                    buffer->setValue (*((float*) evbuf.getData()));
+                    buffer->setValue (value);
                     if (notifications->canWrite (pesize + ev.size))
                     {
                         notifications->write (ev);

@@ -6,6 +6,14 @@
 
 namespace element {
 
+Editor::Editor() {}
+Editor::~Editor() {}
+
+void Editor::setResizable (bool canResize)
+{
+    _resizable = canResize;
+}
+
 NodeEditor::NodeEditor (const Node& _node) noexcept
     : node (_node) {}
 NodeEditor::~NodeEditor() {}

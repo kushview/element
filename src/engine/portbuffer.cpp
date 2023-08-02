@@ -64,7 +64,7 @@ void PortBuffer::setValue (float newValue)
 {
     jassert (type == PortType::Control);
     jassert (buffer.control != nullptr);
-    *buffer.control = newValue;
+    (*buffer.control) = newValue;
 }
 
 bool PortBuffer::addEvent (int64 frames, uint32 size, uint32 bodyType, const uint8* data)

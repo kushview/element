@@ -32,7 +32,8 @@ public:
     PluginWindowContent (Component* const _editor, const Node& _node)
         : editor (_editor), object (_node.getObject()), node (_node)
     {
-        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) && nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
+        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) && 
+            nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
 
         toolbar.reset (new PluginWindowToolbar());
         addAndMakeVisible (toolbar.get());
@@ -90,7 +91,6 @@ public:
     {
         const int height = jmax (editor->getHeight(), 100) + toolbar->getHeight();
         setSize (editor->getWidth(), height + 4);
-        resized();
     }
 
     void resized() override
@@ -117,15 +117,7 @@ public:
             r3.removeFromRight (4);
         }
 
-        if (nativeEditor)
-        {
-            editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
-        }
-        else
-        {
-            editor->setBounds (0, r.getY(), getWidth(), getHeight() - r.getY());
-        }
-
+        editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
         editor->addComponentListener (this);
     }
 
@@ -242,8 +234,13 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
       node (n),
       delayedNodeFocus (*this)
 {
-    setLookAndFeel (&g.getLookAndFeel());
+#if JUCE_LINUX || JUCE_BSD
+    setUsingNativeTitleBar (false);
+#else
     setUsingNativeTitleBar (true);
+#endif
+
+    setLookAndFeel (&g.getLookAndFeel());    
     setSize (400, 300);
 
     name = node.getPropertyAsValue (tags::name);
@@ -260,9 +257,15 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     bool windowResize = false;
     bool useResizeHandle = false;
 
-    if (nullptr != dynamic_cast<GenericAudioProcessorEditor*> (ui))
+    if (auto eed = dynamic_cast<Editor*> (ui))
     {
-        setResizable (false, false);
+        windowResize = eed->resizable();
+        useResizeHandle = windowResize;
+    }
+    else if (nullptr != dynamic_cast<GenericAudioProcessorEditor*> (ui))
+    {
+        windowResize = false;
+        useResizeHandle = false;
     }
     else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
@@ -280,13 +283,12 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
         useResizeHandle = false;
     }
 
-    setResizable (windowResize, useResizeHandle);
-
     const bool defaultOnTop = g.context().settings().pluginWindowsOnTop();
     setAlwaysOnTop ((bool) node.getProperty (tags::windowOnTop, defaultOnTop));
 
     auto* const content = new PluginWindowContent (ui, node);
     setContentOwned (content, true);
+    setResizable (windowResize, useResizeHandle);
 
     addToDesktop();
     content->stabilizeComponents();

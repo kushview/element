@@ -59,6 +59,11 @@ lvtk_proj = subproject ('lvtk',
 lvtk_host_dep = lvtk_proj.get_variable ('lvtk_host_dep')
 add_project_arguments (['-DLVTK_STATIC=1'], language: ['c', 'cpp', 'objc', 'objcpp'])
 
+if cpp.get_argument_syntax() == 'gcc'
+    # silence warnings from sol3
+    add_project_arguments (['-Wno-array-bounds'], language : ['cpp'])
+endif
+
 deps = [ boost_dep ]
 
 # Filesystem

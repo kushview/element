@@ -116,6 +116,9 @@ NodeFactory::NodeFactory()
     add (new SingleNodeProvider<ScriptNode> (EL_NODE_ID_SCRIPT));
     add (new SingleNodeProvider<GraphNode> (EL_NODE_ID_GRAPH));
     add (new SingleNodeProvider<MackieControlUniversal> ("el.MCU"));
+#if ! JUCE_DEBUG
+    hideType ("el.MCU");
+#endif
 }
 
 NodeFactory::~NodeFactory()

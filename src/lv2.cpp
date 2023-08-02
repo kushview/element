@@ -21,13 +21,14 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
 #include "lv2/workerfeature.hpp"
 #include "lv2/native.hpp"
 
+#include <element/ui/nodeeditor.hpp>
 #include <element/nodefactory.hpp>
 #include "engine/portbuffer.hpp"
 #include <element/juce/gui_basics.hpp>
 #include <element/juce/gui_extra.hpp>
 
 #if JUCE_MAC
-#include "gui/nsviewwithparent.hpp"
+ #include "ui/nsviewwithparent.hpp"
 #endif
 
 // Change this to enable logging of various LV2 activities
@@ -287,7 +288,7 @@ public:
         totalAudioIn = channels.getNumAtomInputs();
         totalAudioOut = channels.getNumAudioOutputs();
 
-        if (! module->hasEditor())
+        // if (! module->hasEditor())
         {
             jassert (module->onPortNotify == nullptr);
             namespace ph = std::placeholders;
@@ -463,7 +464,7 @@ public:
     }
 
     bool hasEditor() override { return module->hasEditor(); }
-    Component* createEditor() override;
+    Editor* createEditor() override;
 
     //==============================================================================
     int getNumPrograms() const override { return 1; }
@@ -557,13 +558,13 @@ struct ViewSizeListener : private ComponentMovementWatcher
     PhysicalResizeListener& listener;
 };
 
-class LV2NativeEditor : public juce::Component,
+class LV2NativeEditor : public Editor,
                         public juce::Timer,
                         public PhysicalResizeListener
 {
 public:
     LV2NativeEditor (LV2Processor* p, LV2ModuleUI::Ptr _ui)
-        : juce::Component(),
+        : Editor(),
           plugin (*p),
           ui (_ui)
     {
@@ -574,6 +575,8 @@ public:
         addAndMakeVisible (view.get());
         ui->setParent ((intptr_t) view->getWidget());
         ui->instantiate();
+        p->getModule().sendPortEvents();
+
         nativeViewSetup = ui->loaded();
 
         setSize (ui->getClientWidth() > 0 ? ui->getClientWidth() : 240,
@@ -582,10 +585,10 @@ public:
         startTimerHz (60);
 
         // FIXME?
-        // setResizable (ui->haveClientResize(), false);
+        setResizable (ui->haveClientResize());
 
-        ui->onClientResize = [this]() -> int {
-            // EL_LV2_LOG ("UI resized itself: " << ui->getClientWidth() << "x" << ui->getClientHeight());
+        ui->onClientResize = []() -> int {
+            EL_LV2_LOG ("UI resized itself: " << ui->getClientWidth() << "x" << ui->getClientHeight());
             // native->setSize (ui->getClientWidth(), ui->getClientHeight());
             // setSize (native->getWidth(), native->getHeight());
             // return 0;
@@ -652,6 +655,11 @@ private:
                 setOpaque (true);
                 addToDesktop (0);
             }
+
+            void paint (Graphics& g) override
+            {
+                g.fillAll (Colours::black);
+            }
         };
 
         Inner inner;
@@ -684,6 +692,11 @@ private:
 
         void forceViewToSize() {}
         void fitToView() {}
+
+        void paint (Graphics& g) override
+        {
+            g.fillAll (Colours::black);
+        }
 
         ViewSizeListener listener;
     };
@@ -743,7 +756,7 @@ private:
 };
 
 //==============================================================================
-Component* LV2Processor::createEditor()
+Editor* LV2Processor::createEditor()
 {
     jassert (module->hasEditor());
     LV2ModuleUI::Ptr ui = module->hasEditor() ? module->createEditor() : nullptr;
@@ -751,7 +764,7 @@ Component* LV2Processor::createEditor()
         return nullptr;
     return ui->requiresShowInterface()
                ? nullptr
-               : (AudioProcessorEditor*) new LV2NativeEditor (this, ui);
+               : new LV2NativeEditor (this, ui);
 }
 
 //==============================================================================

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/session.hpp>
-#include "gui/sessiondocument.hpp"
+#include "ui/sessiondocument.hpp"
 
 namespace element {
 

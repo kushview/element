@@ -3,7 +3,7 @@
 
 #include <element/script.hpp>
 #include <element/graph.hpp>
-#include "gui/datapathbrowser.hpp"
+#include "ui/datapathbrowser.hpp"
 
 #include "gui/views/GraphEditorView.h"
 #include "gui/views/scriptview.hpp"

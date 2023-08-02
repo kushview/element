@@ -9,7 +9,7 @@
 #include "engine/graphnode.hpp"
 #include "gui/GuiCommon.h"
 #include "session/presetmanager.hpp"
-#include "gui/BlockComponent.h"
+#include "ui/block.hpp"
 #include "./utils.hpp"
 
 namespace element {

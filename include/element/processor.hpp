@@ -23,6 +23,7 @@ namespace GraphRender {
 class ProcessBufferOp;
 }
 
+class Editor;
 class GraphNode;
 class ProcessBufferOp;
 
@@ -369,7 +370,7 @@ public:
 
     //=========================================================================
     virtual bool hasEditor() { return false; }
-    virtual Component* createEditor() { return nullptr; }
+    virtual Editor* createEditor() { return nullptr; }
 
     //=========================================================================
     /** Triggered when the enabled state changes */

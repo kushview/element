@@ -36,7 +36,7 @@ public:
     ~GraphEditorView();
 
     GraphEditorComponent& editor() { return graph; }
-    
+
     void selectAllNodes();
 
     void didBecomeActive() override;

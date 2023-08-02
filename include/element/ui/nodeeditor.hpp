@@ -11,7 +11,22 @@
 
 namespace element {
 
-class NodeEditor : public Component {
+//==============================================================================
+class Editor : public Component {
+public:
+    Editor();
+    virtual ~Editor();
+    bool resizable() const noexcept { return _resizable; }
+
+protected:
+    void setResizable (bool canResize);
+
+private:
+    bool _resizable { false };
+};
+
+//==============================================================================
+class NodeEditor : public Editor {
 protected:
     NodeEditor (const Node&) noexcept;
 

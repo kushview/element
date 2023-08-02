@@ -21,7 +21,7 @@
 #include "lv2/world.hpp"
 
 #define EL_LV2_EVENT_BUFFER_SIZE 8192
-#define EL_LV2_RING_BUFFER_SIZE  8192
+#define EL_LV2_RING_BUFFER_SIZE 8192
 
 namespace element {
 
