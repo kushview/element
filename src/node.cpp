@@ -431,10 +431,10 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
 Node Node::createGraph (const String& name)
 {
     Node node (types::Graph);
-    ValueTree root = node.data();
-    root.setProperty (tags::name, name, nullptr);
-    root.getOrCreateChildWithName (tags::nodes, nullptr);
-    root.getOrCreateChildWithName (tags::arcs, nullptr);
+    ValueTree data = node.data();
+    data.setProperty (tags::name, name, nullptr);
+    data.getOrCreateChildWithName (tags::nodes, nullptr);
+    data.getOrCreateChildWithName (tags::arcs, nullptr);
     return node;
 }
 

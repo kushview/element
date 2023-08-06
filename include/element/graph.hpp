@@ -34,6 +34,16 @@ public:
     }
 
     inline bool hasViewScript() const noexcept { return findViewScript().valid(); }
+
+    /** Create a graph with X amount of audio ins, outs, and/or MIDI ports.
+        
+        @param name The name of the graph.
+        @param numAudioIns Total number of audio in ports.
+        @param numAudioOuts Total number of audio out ports.
+        @param midiIn  If true, add a MIDI input.
+        @param midiOut If true, add a MIDI output.
+    */
+    static Graph create (const juce::String& name, int numAudioIns, int numAudioOuts, bool midiIn, bool midiOut);
 };
 
 } // namespace element

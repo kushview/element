@@ -408,7 +408,7 @@ void PluginProcessor::initialize()
 
     plugins.restoreUserPlugins (settings);
     plugins.setPropertiesFile (settings.getUserSettings());
-    
+
     // The hosts WILL release and prepare the plugin frequently at any given
     // time. plugins are handled different by each one, so it's best to keep
     // our engine running at all times to reduce massive plugin unloads and

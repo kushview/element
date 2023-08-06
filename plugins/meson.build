@@ -4,13 +4,13 @@ if get_option('element-plugins').enabled()
 getcode_py = files('../util/getcode.py')
 
 element_plugin_hex_verson_str = run_command (python3,
-    getcode_py, '--version', meson.project_version()).stdout().strip()
+    getcode_py, '--version', meson.project_version(), check: true).stdout().strip()
 element_plugin_int_version = run_command (python3,
-    getcode_py, '--version', meson.project_version(), '--integer').stdout().strip().to_int()
+    getcode_py, '--version', meson.project_version(), '--integer', check: true).stdout().strip().to_int()
 
 element_manu_code = 'KshV'
 element_manu_hex_code_str = run_command (python3,
-    getcode_py, '--code', element_manu_code).stdout().strip()
+    getcode_py, '--code', element_manu_code, check: true).stdout().strip()
 
 element_code = 'Elmt'
 element_fx_code = 'ElFX'

@@ -820,6 +820,13 @@ void Processor::PortResetter::handleAsyncUpdate()
 
     // notify others
     node.portsChanged();
+    if (auto gn = dynamic_cast<GraphNode*> (&node))
+    {
+        // GraphNode's will likely have IONodes which need to notify as well.
+        for (int i = 0; i < gn->getNumNodes(); ++i)
+            if (auto io = dynamic_cast<IONode*> (gn->getNode (i)))
+                io->portsChanged();
+    }
 }
 
 void Processor::triggerPortReset()

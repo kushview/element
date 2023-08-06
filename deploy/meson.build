@@ -120,4 +120,4 @@ if not meson.is_subproject()
 endif
 
 summary ('Version', version_with_build, section : 'Application')
-summary ('Deploy', get_option('deploy'), section : 'Application')
+summary ('Deploy', get_option('deploy'), section : 'Application', bool_yn: true)

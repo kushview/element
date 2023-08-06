@@ -5,10 +5,10 @@
 
 namespace element {
 
-class GraphEditor : public NodeEditor {
+class GraphNodeEditor : public NodeEditor {
 public:
-    GraphEditor (const Node& graph);
-    ~GraphEditor();
+    GraphNodeEditor (const Node& graph);
+    ~GraphNodeEditor();
     void resized() override;
     void paint (juce::Graphics& g) override;
 

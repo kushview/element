@@ -35,6 +35,8 @@ public:
 
 private:
     friend class SessionNodeTreeItem;
+    friend class SessionRootGraphTreeItem;
+    
     class Panel;
     std::unique_ptr<Panel> panel;
 

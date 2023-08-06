@@ -47,6 +47,8 @@ juce_conf_data.set10 ('JUCE_DISPLAY_SPLASH_SCREEN', false)
 juce_conf_data.set10 ('JUCE_MODAL_LOOPS_PERMITTED', true)
 juce_conf_data.set10 ('JUCE_DISABLE_JUCE_VERSION_PRINTING', true)
 juce_conf_data.set10 ('JUCE_WEB_BROWSER', false)
+juce_conf_data.set10 ('JUCE_USE_LAME_AUDIO_FORMAT', false)
+juce_conf_data.set10 ('JUCE_USE_MP3AUDIOFORMAT', true)
 
 juce_asio_includes = []
 juce_conf_data.set10 ('JUCE_ASIO', false)

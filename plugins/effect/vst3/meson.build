@@ -11,11 +11,11 @@ element_fx_vst3_juce_args = [
     '-DJucePlugin_Version=@0@'.format (meson.project_version()),
     '-DJucePlugin_VersionString="@0@"'.format(meson.project_version()),
     '-DJucePlugin_VersionCode=@0@'.format (run_command (python3, 
-        getcode_py, '--version', meson.project_version()).stdout().strip()),
+        getcode_py, '--version', meson.project_version(), check: true).stdout().strip()),
     '-DJucePlugin_ManufacturerCode=@0@'.format (run_command (python3, 
-        getcode_py, '--code', element_manu_code).stdout().strip()),
+        getcode_py, '--code', element_manu_code, check: true).stdout().strip()),
     '-DJucePlugin_PluginCode=@0@'.format (run_command (python3, 
-        getcode_py, '--code', element_fx_code).stdout().strip())
+        getcode_py, '--code', element_fx_code, check: true).stdout().strip())
 ]
 
 if host_machine.system() == 'darwin'

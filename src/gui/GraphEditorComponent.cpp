@@ -1084,9 +1084,16 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
         const Node node (parent, false);
         for (int i = 0; i < getNumChildComponents(); ++i)
             if (auto* const filter = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-                filter->update();
+                filter->update (false, false);
         updateConnectorComponents();
     }
+}
+
+void GraphEditorComponent::valueTreeChildRemoved (ValueTree& parent,
+                                                  ValueTree& child,
+                                                  int index)
+{
+    juce::ignoreUnused (parent, child, index);
 }
 
 void GraphEditorComponent::findLassoItemsInArea (Array<uint32>& itemsFound,

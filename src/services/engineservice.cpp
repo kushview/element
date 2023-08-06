@@ -5,6 +5,7 @@
 
 #include <element/context.hpp>
 #include <element/devices.hpp>
+#include <element/graph.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
 #include <element/services.hpp>
@@ -282,7 +283,12 @@ void EngineService::addGraph()
     auto engine = world.audio();
     auto session = world.session();
 
-    Node node (Node::createDefaultGraph ("Graph " + String (session->getNumGraphs() + 1)));
+    Node node (Graph::create ("Graph " + String (session->getNumGraphs() + 1),
+                              engine->getNumChannels (true),
+                              engine->getNumChannels (false),
+                              true,
+                              true));
+
     addGraph (node);
 
     sibling<GuiService>()->stabilizeContent();

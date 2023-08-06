@@ -1,14 +1,14 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <element/plugins.hpp>
+#include <element/ui/style.hpp>
+
 #include "gui/GuiCommon.h"
 #include "gui/widgets/BreadCrumbComponent.h"
 #include "gui/ContextMenus.h"
 #include "gui/widgets/HorizontalListBox.h"
 #include "gui/ConnectionGrid.h"
-#include "gui/Artist.h"
-
-#include <element/plugins.hpp>
 #include "session/presetmanager.hpp"
 
 #include "matrixstate.hpp"
@@ -285,9 +285,7 @@ private:
         else
         {
             Rectangle<int> r2 = { padding, 0, height - 1 - padding, width };
-            Artist::drawVerticalText (g, text, r.withY (padding), Justification::centredRight);
-            // g.addTransform (AffineTransform().rotated (1.57079633f, 0, 0).translated(width, 0));
-            // g.drawFittedText (text, padding, 0, height - 1 - padding, width, Justification::centredLeft, 1);
+            Style::drawVerticalText (g, text, r.withY (padding), Justification::centredRight);
         }
     }
 

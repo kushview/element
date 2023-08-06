@@ -14,17 +14,17 @@ extern "C" {
 #include <dlfcn.h>
 #endif
 
-static void* element_openlib (const char* path)
+inline static void* element_openlib (const char* path)
 {
     return dlopen (path, RTLD_LOCAL | RTLD_LAZY);
 }
 
-static void element_closelib (void* handle)
+inline static void element_closelib (void* handle)
 {
     dlclose (handle);
 }
 
-static void* element_getsym (void* handle, const char* f)
+inline static void* element_getsym (void* handle, const char* f)
 {
     return dlsym (handle, f);
 }

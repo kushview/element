@@ -45,6 +45,5 @@ Welcome to the Element user/developer manual.
    :caption: Developers
 
    Building <building>
-   Projucer <building-projucer>
    C++ Code Style <code-style>
    Lua Code Style <lua-style>

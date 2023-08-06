@@ -57,7 +57,7 @@ public:
             running = res;
         }
 
-        DBG("[element] scanner launched: " << (isRunning() ? "yes" : "no"));
+        DBG ("[element] scanner launched: " << (isRunning() ? "yes" : "no"));
         return res;
     }
 

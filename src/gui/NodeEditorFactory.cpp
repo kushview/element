@@ -45,7 +45,7 @@ public:
         const auto NID = node.getIdentifier().toString();
         if (NID == EL_NODE_ID_GRAPH)
         {
-            return new GraphEditor (node);
+            return new GraphNodeEditor (node);
         }
         else if (NID == "el.MCU")
         {

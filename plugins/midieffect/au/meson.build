@@ -8,8 +8,8 @@ element_mfx_au_juce_args = [
     '-DJucePlugin_VersionString="@0@"'.format(meson.project_version()),
     '-DJucePlugin_VersionCode=@0@'.format (element_plugin_hex_verson_str),
     '-DJucePlugin_ManufacturerCode=@0@'.format (element_manu_hex_code_str),
-    '-DJucePlugin_PluginCode=@0@'.format (run_command (
-        getcode_py, '--code', element_mfx_au_code).stdout().strip())
+    '-DJucePlugin_PluginCode=@0@'.format (run_command (python3,
+        getcode_py, '--code', element_mfx_au_code, check: true).stdout().strip())
 ]
 
 fs = import ('fs')

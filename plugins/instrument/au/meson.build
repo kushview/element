@@ -7,7 +7,7 @@ element_au_juce_args = [
     '-DJucePlugin_VersionCode=@0@'.format (element_plugin_hex_verson_str),
     '-DJucePlugin_ManufacturerCode=@0@'.format (element_manu_hex_code_str),
     '-DJucePlugin_PluginCode=@0@'.format (run_command (python3,
-        getcode_py, '--code', element_code).stdout().strip())
+        getcode_py, '--code', element_code, check: true).stdout().strip())
 ]
 
 fs = import ('fs')

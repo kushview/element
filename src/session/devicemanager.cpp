@@ -18,6 +18,7 @@
 */
 
 #include <element/devices.hpp>
+#include "engine/jack.hpp"
 
 namespace element {
 
@@ -28,12 +29,13 @@ const int DeviceManager::maxAudioChannels = 128;
 class DeviceManager::Private
 {
 public:
-    Private() {}
+    Private (DeviceManager& o) : owner (o) {}
     ~Private() {}
 
-    AudioEnginePtr activeEngine;
-#if KV_JACK_AUDIO
-    kv::JackClient jackClient { "Element", 2, "main_in_", 2, "main_out_" };
+    DeviceManager& owner;
+    AudioEnginePtr engine;
+#if EL_USE_JACK
+    JackClient jack { "Element", 2, "main_in_", 2, "main_out_" };
 #endif
 
     juce::ReferenceCountedArray<DeviceManager::LevelMeter> levelsIn, levelsOut;
@@ -41,7 +43,7 @@ public:
 
 DeviceManager::DeviceManager()
 {
-    impl = std::make_unique<Private>();
+    impl = std::make_unique<Private> (*this);
 }
 
 DeviceManager::~DeviceManager()
@@ -52,10 +54,10 @@ DeviceManager::~DeviceManager()
 
 void DeviceManager::attach (AudioEnginePtr engine)
 {
-    if (impl->activeEngine == engine)
+    if (impl->engine == engine)
         return;
 
-    auto old = impl->activeEngine;
+    auto old = impl->engine;
 
     if (old != nullptr)
     {
@@ -71,7 +73,7 @@ void DeviceManager::attach (AudioEnginePtr engine)
         closeAudioDevice();
     }
 
-    impl->activeEngine = engine;
+    impl->engine = engine;
 }
 
 static void addIfNotNull (OwnedArray<AudioIODeviceType>& list, AudioIODeviceType* const device)
@@ -85,8 +87,8 @@ void DeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list)
 #if JUCE_ALSA
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
 #endif
-#if KV_JACK_AUDIO
-    addIfNotNull (list, Jack::createAudioIODeviceType (&impl->jackClient));
+#if EL_USE_JACK
+    addIfNotNull (list, Jack::createAudioIODeviceType (impl->jack));
 #endif
 
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
@@ -117,7 +119,7 @@ void DeviceManager::selectAudioDriver (const String& name)
 #if KV_JACK_AUDIO
 kv::JackClient& DeviceManager::getJackClient()
 {
-    return impl->jackClient;
+    return impl->jack;
 }
 #endif
 

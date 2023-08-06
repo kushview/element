@@ -3,19 +3,21 @@
 
 #include <element/services.hpp>
 #include <element/ui.hpp>
-#include "gui/views/NodePortsTable.h"
-#include "gui/Artist.h"
-#include "ui/block.hpp"
-#include "gui/Buttons.h"
 #include <element/ui/content.hpp>
+#include <element/node.hpp>
+#include <element/context.hpp>
+
+#include "engine/midiengine.hpp"
+
+#include "gui/views/NodePortsTable.h"
+#include "gui/Buttons.h"
 #include "gui/ContextMenus.h"
 #include "gui/GraphEditorComponent.h"
 #include "gui/NodeIOConfiguration.h"
 #include "gui/NodeEditorFactory.h"
 #include "gui/ViewHelpers.h"
-#include "engine/midiengine.hpp"
-#include <element/node.hpp>
-#include <element/context.hpp>
+#include "ui/block.hpp"
+
 #include "scopedflag.hpp"
 
 namespace element {
@@ -536,8 +538,6 @@ bool BlockComponent::hitTest (int x, int y)
     return getBoxRectangle().contains (x, y);
 }
 
-
-
 Rectangle<int> BlockComponent::getBoxRectangle() const
 {
     return getLocalBounds().reduced (pinSize / 2);
@@ -686,7 +686,7 @@ void BlockComponent::paint (Graphics& g)
                 break;
             }
             case Compact: {
-                Artist::drawVerticalText (g, displayName, getLocalBounds(), Justification::centred);
+                Style::drawVerticalText (g, displayName, getLocalBounds(), Justification::centred);
                 break;
             }
         }
@@ -833,7 +833,8 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
                 // else
                 //     embedded = NodeEditorFactory::createAudioProcessorEditor (node).release();
             }
-            if (embedded != nullptr) {
+            if (embedded != nullptr)
+            {
                 addAndMakeVisible (embedded.get());
                 updateSize();
             }
@@ -846,7 +847,10 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
 
     updatePins (forcePins);
-    updateSize();
+
+    if (displayMode != Embed)
+        updateSize();
+
     setName (node.getDisplayName());
 
     if (doPosition)

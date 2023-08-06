@@ -6,6 +6,7 @@ libelement_sources = '''
     context.cpp
     controller.cpp
     datapath.cpp
+    graph.cpp
     gzip.cpp
     lv2.cpp
     matrixstate.cpp
@@ -77,17 +78,11 @@ libelement_sources = '''
     lv2/world.cpp
     lv2/native.cpp
 
-
-    gui/AboutComponent.cpp
     gui/AudioIOPanelView.cpp
-    
     gui/Buttons.cpp
     gui/ChannelStripComponent.cpp
     gui/ConnectionGrid.cpp
-    
-
     gui/ContextMenus.cpp
-
     gui/FileComboBox.cpp
     gui/GraphEditorComponent.cpp
     gui/Icons.cpp
@@ -165,6 +160,7 @@ libelement_sources = '''
     session/pluginmanager.cpp
     session/session.cpp
 
+    ui/aboutscreen.cpp
     ui/block.cpp
     ui/content.cpp
     ui/capslock.cpp
@@ -210,7 +206,7 @@ libelement_sources = '''
     juce/BinaryData.cpp
 '''.split()
 
-libelement_includes =  [ 
+libelement_includes =  [
     include_directories (
         'lua/sol',
         '../scripts',
@@ -222,8 +218,15 @@ libelement_includes =  [
     juce_includes, 
     juce_vst3_includes, 
     juce_vst2_includes, 
-    juce_lv2_includes 
+    juce_lv2_includes,
+    jack_includes 
 ]
+
+if jack_enabled
+    libelement_sources += files ('''
+        engine/jack.cpp
+    '''.split())
+endif
 
 host_cpp_args = []
 if host_machine.system() == 'linux'
@@ -232,9 +235,7 @@ if host_machine.system() == 'linux'
         '-DEL_LUADIR="@0@"'.format (absdatadir / 'element' / 'lua'),
         '-DEL_SCRIPTSDIR="@0@"'.format (absdatadir / 'element' / 'scripts')
     ]
-endif
-
-if host_machine.system() == 'windows'
+elif host_machine.system() == 'windows'
     libelement_sources += [ 'dlfcn-win32.c' ]
 elif host_machine.system() == 'darwin'
     libelement_sources += [ 'ui/nsviewwithparent.mm']

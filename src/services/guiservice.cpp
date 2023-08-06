@@ -16,7 +16,7 @@
 
 #include "services/sessionservice.hpp"
 #include "gui/views/VirtualKeyboardView.h"
-#include "gui/AboutComponent.h"
+#include "ui/aboutscreen.hpp"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
@@ -25,7 +25,6 @@
 #include "gui/WindowManager.h"
 
 #include "ui/capslock.hpp"
-
 
 namespace element {
 
@@ -1052,7 +1051,7 @@ void GuiService::toggleAboutScreen()
         about.reset (new AboutDialog (*this));
         if (appInfo.title.isNotEmpty())
         {
-            if (auto c = dynamic_cast<AboutComponent*> (about->getContentComponent()))
+            if (auto c = dynamic_cast<AboutScreen*> (about->getContentComponent()))
             {
                 c->setAboutInfo (appInfo);
                 about->setName (TRANS ("About ") + appInfo.title);

@@ -1,30 +1,12 @@
-/*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
-
-#include <element/services.hpp>
+// Copyright 2019-2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include <element/engine.hpp>
+#include <element/services.hpp>
 #include <element/ui/commands.hpp>
 
 #include "engine/rootgraph.hpp"
 #include "engine/velocitycurve.hpp"
-
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"
@@ -364,11 +346,15 @@ public:
           _input (input)
     {
         jassert (_proc != nullptr);
+        pcc = _proc->portsChanged.connect ([&]() {
+            refresh();
+        });
         initSlider();
     }
 
     ~GraphChannelCountPropertyComponent()
     {
+        pcc.disconnect();
     }
 
     double getValue() const override
@@ -387,16 +373,8 @@ public:
         if (count == _proc->getNumPorts (_type, _input))
             return;
 
-        _proc->setNumPorts (_type, count, _input, false);
-        _node.resetPorts();
+        _proc->setNumPorts (_type, count, _input, true);
 
-        // TODO: this should be concealed in the Model
-        for (int i = _node.getNumNodes(); --i >= 0;)
-        {
-            auto c = _node.getNode (i);
-            if (c.isIONode())
-                c.resetPorts();
-        }
 
         refresh();
     }
@@ -408,6 +386,8 @@ private:
 
     PortType _type { PortType::Audio };
     bool _input { true };
+
+    boost::signals2::connection pcc;
 
     static String defaultName (PortType tp, bool input)
     {

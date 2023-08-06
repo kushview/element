@@ -6,16 +6,16 @@
 
 namespace element {
 
-class GraphEditor::Graph : public GraphEditorComponent
+class GraphNodeEditor::Graph : public GraphEditorComponent
 {
 public:
-    Graph (GraphEditor& ge) : editor (ge) {}
+    Graph (GraphNodeEditor& ge) : editor (ge) {}
     ~Graph() {}
 
-    GraphEditor& editor;
+    GraphNodeEditor& editor;
 };
 
-GraphEditor::GraphEditor (const Node& n)
+GraphNodeEditor::GraphNodeEditor (const Node& n)
     : NodeEditor (n)
 {
     setOpaque (true);
@@ -25,17 +25,17 @@ GraphEditor::GraphEditor (const Node& n)
     graph->setNode (getNode());
 }
 
-GraphEditor::~GraphEditor()
+GraphNodeEditor::~GraphNodeEditor()
 {
     graph.reset();
 }
 
-void GraphEditor::resized()
+void GraphNodeEditor::resized()
 {
     graph->setBounds (getLocalBounds().reduced (1));
 }
 
-void GraphEditor::paint (juce::Graphics& g)
+void GraphNodeEditor::paint (juce::Graphics& g)
 {
     g.fillAll (juce::Colours::black);
 }

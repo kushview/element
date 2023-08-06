@@ -32,8 +32,7 @@ public:
     PluginWindowContent (Component* const _editor, const Node& _node)
         : editor (_editor), object (_node.getObject()), node (_node)
     {
-        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) && 
-            nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
+        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) && nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
 
         toolbar.reset (new PluginWindowToolbar());
         addAndMakeVisible (toolbar.get());
@@ -240,7 +239,7 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     setUsingNativeTitleBar (true);
 #endif
 
-    setLookAndFeel (&g.getLookAndFeel());    
+    setLookAndFeel (&g.getLookAndFeel());
     setSize (400, 300);
 
     name = node.getPropertyAsValue (tags::name);

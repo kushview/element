@@ -3,8 +3,9 @@
 
 #include <element/script.hpp>
 #include <element/graph.hpp>
-#include "ui/datapathbrowser.hpp"
+#include <element/ui/standard.hpp>
 
+#include "ui/datapathbrowser.hpp"
 #include "gui/views/GraphEditorView.h"
 #include "gui/views/scriptview.hpp"
 #include "services/sessionservice.hpp"
@@ -26,6 +27,28 @@
 
 namespace element {
 
+namespace detail {
+    inline static Node findRoot (const Node& node) {
+        auto root = node;
+        while (! root.isRootGraph())
+            root = root.getParentGraph();
+        return root;
+    }
+
+    inline static void showGraphEditor (Component* c, const Node& node)
+    {
+        auto graph = findRoot (node);
+        if (! graph.isValid())
+            return;
+
+        if (auto* cc = dynamic_cast<StandardContent*> (ViewHelpers::findContentComponent (c)))
+        {
+            auto view = std::make_unique<GraphEditorView> ();
+            view->setNode (node);
+            cc->setMainView (view.release());
+        }
+    }
+}
 //=============================================================================
 class SessionBaseTreeItem : public TreeItemBase
 {
@@ -45,6 +68,13 @@ public:
     {
         if (auto view = getOwnerView())
             return dynamic_cast<SessionTreePanel*> (view->findParentComponentOfClass<SessionTreePanel>());
+        return nullptr;
+    }
+
+    SessionPtr session()
+    {
+        if (auto panel = getSessionTreePanel())
+            return panel->session();
         return nullptr;
     }
 
@@ -179,33 +209,11 @@ public:
 
         jassert (session != nullptr && cc != nullptr && gui != nullptr);
 
-        auto root = node;
-        while (! root.isRootGraph() && root.isValid())
-            root = root.getParentGraph();
-
-        if (root.isRootGraph() && root != session->getCurrentGraph())
-        {
-            ScopedFlag scopedFlag (tree->ignoreActiveRootGraphSelectionHandler, true);
-
-            gui->closeAllPluginWindows (true);
-            auto graphs = session->data().getChildWithName (tags::graphs);
-            graphs.setProperty (tags::active, graphs.indexOf (root.data()), 0);
-            auto& app (ViewHelpers::findContentComponent (getOwnerView())->services());
-            app.find<EngineService>()->setRootNode (root);
-            gui->showPluginWindowsFor (root, true, false, false);
-        }
-
-        if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
-        {
-            auto graph = (node.isGraph()) ? node : node.getParentGraph();
-            c->presentView (EL_VIEW_GRAPH_EDITOR);
-        }
+        detail::showGraphEditor (cc, node);
 
         if (! node.isRootGraph())
             gui->selectNode (node);
-        else if (node.isRootGraph() && node.hasAudioOutputNode())
-            gui->selectNode (node.getNodeByFormat ("Internal", "audio.output"));
-
+        
         gui->refreshMainMenu();
         gui->stabilizeViews();
 
@@ -530,6 +538,35 @@ public:
         ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->removeGraph (index);
     }
 
+    void itemDoubleClicked (const MouseEvent& ev) override
+    {
+        if (! node.isRootGraph() || session() == nullptr || content() == nullptr)
+        {
+            jassertfalse;
+            return;
+        }
+
+        if (node == session()->getCurrentGraph()) {
+            return;
+        }
+
+        if (auto tree = getSessionTreePanel())
+        {
+            auto gui = content()->services().find<UI>();
+            auto engine = content()->services().find<EngineService>();
+            ScopedFlag scopedFlag (tree->ignoreActiveRootGraphSelectionHandler, true);
+
+            // TODO: this needs moved down to the services level
+            gui->closeAllPluginWindows (true);
+            auto graphs = session()->data().getChildWithName (tags::graphs);
+            graphs.setProperty (tags::active, graphs.indexOf (node.data()), 0);
+            engine->setRootNode (node);
+            gui->showPluginWindowsFor (node, true, false, false);
+        }
+
+        treeHasChanged();
+    }
+
     void showDocument() override
     {
         Graph graph (getNode());
@@ -545,18 +582,7 @@ public:
         }
         else
         {
-            if (auto* cc = content())
-            {
-                auto s = cc->session();
-                for (int i = 0; i < s->getNumGraphs(); ++i)
-                {
-                    if (s->getGraph (i) == graph)
-                    {
-                        cc->session()->setActiveGraph (i);
-                        cc->presentView (EL_VIEW_GRAPH_EDITOR);
-                    }
-                }
-            }
+            detail::showGraphEditor (content(), graph);
         }
     }
 
@@ -573,6 +599,20 @@ public:
     void duplicateItem() override
     {
         ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->duplicateGraph (node);
+    }
+
+    void paintItem (Graphics& g, int width, int height) override
+    {
+        if (auto s = session())
+        {
+            if (node == s->getActiveGraph())
+            {
+                g.fillAll (Colors::toggleGreen.withAlpha (0.44f));
+                return;
+            }
+        }
+
+        TreeItemBase::paintItem (g, width, height);
     }
 
     void paintContent (Graphics& g, const Rectangle<int>& area) override
@@ -724,8 +764,6 @@ public:
 
     void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
     {
-        std::clog << "[element] SessionRootTreeItem::itemDropped()" << std::endl;
-
         // TODO: need to not directly bind index of graph in model from the actual
         // index used in the engine.  After this, it will be less complicated to
         // insert graphs anywhere from a visual standpoint.
@@ -912,11 +950,12 @@ void SessionTreePanel::selectActiveRootGraph()
 
 void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (tree.hasType (tags::graphs) && property == tags::active)
-    {
-        selectActiveRootGraph();
+    if (property == tags::active) {
+        if (auto root = panel->rootItem.get())
+            root->treeHasChanged();
     }
-    else if (tree.hasType (types::Node))
+
+    if (tree.hasType (types::Node))
     {
         const Node graph (tree, false);
         if (property == tags::name || (graph.isRootGraph() && property == tags::midiProgram))

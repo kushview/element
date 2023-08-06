@@ -13,11 +13,11 @@ date_py     = find_program ('util/date.py')
 version_py  = find_program ('util/version.py')
 
 ## Build & version information
-element_release_date = run_command (python3, date_py).stdout().strip()
-version_with_build   = run_command ([python3, version_py] + '--build --ignore-dirty --cwd=.'.split()).stdout().strip()
-build_number         = run_command ([python3, version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split()).stdout().strip()
-git_hash             = run_command ([python3, version_py] + '--hash --cwd=.'.split()).stdout().strip()
-git_short_hash       = run_command ([python3, version_py] + '--short-hash --cwd=.'.split()).stdout().strip()
+element_release_date = run_command (python3, date_py, check: true).stdout().strip()
+version_with_build   = run_command ([python3, version_py] + '--build --ignore-dirty --cwd=.'.split(), check: true).stdout().strip()
+build_number         = run_command ([python3, version_py] + '--build --build-style=onlybuild --ignore-dirty --cwd=.'.split(), check: true).stdout().strip()
+git_hash             = run_command ([python3, version_py] + '--hash --cwd=.'.split(), check: true).stdout().strip()
+git_short_hash       = run_command ([python3, version_py] + '--short-hash --cwd=.'.split(), check: true).stdout().strip()
 
 ## Installer Metadata
 net_kushview      = 'net.kushview'
@@ -52,13 +52,30 @@ subdir ('meson/juce')
 
 # Boost
 boost_dep = dependency ('boost', required : true)
+
+# LVTK / LV2
 lvtk_proj = subproject ('lvtk', 
     default_options: [
         'default_library=static'
     ])
 lvtk_host_dep = lvtk_proj.get_variable ('lvtk_host_dep')
-add_project_arguments (['-DLVTK_STATIC=1'], language: ['c', 'cpp', 'objc', 'objcpp'])
+add_project_arguments (['-DLVTK_STATIC=1', '-DPUGL_STATIC=1'], 
+    language: ['c', 'cpp', 'objc', 'objcpp'])
 
+# JACK
+jack_enabled = false
+jack_includes = include_directories()
+
+if not get_option('jack').disabled()
+    jack_enabled = cpp.check_header ('jack/jack.h', 
+        required : get_option('jack').enabled(),
+        include_directories : jack_includes)
+endif
+if jack_enabled
+    add_project_arguments ('-DEL_USE_JACK=1', language : [ 'c', 'objc', 'cpp', 'objcpp' ])
+endif
+
+# Sol3
 if cpp.get_argument_syntax() == 'gcc'
     # silence warnings from sol3
     add_project_arguments (['-Wno-array-bounds'], language : ['cpp'])
@@ -183,9 +200,12 @@ if get_option('sign')
     endif 
 endif # end code signing.
 
+summary ('JACK', jack_enabled, bool_yn: true, section: 'Application')
+
 summary ('Prefix', get_option('prefix'), section : 'Paths')
 summary ('Programs', get_option('prefix') / get_option('bindir'), section : 'Paths')
 summary ('Headers', get_option('prefix') / get_option('includedir'), section : 'Paths')
 summary ('Libraries', get_option('prefix') / get_option('libdir'), section : 'Paths')
 
-summary ('Plugins', get_option ('element-plugins'))
+summary ('Plugins', not get_option ('element-plugins').disabled(), 
+    bool_yn: true, section: 'Application')

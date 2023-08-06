@@ -150,8 +150,10 @@ public:
     NodeModelUpdater (GraphManager& m, const ValueTree& d, Processor* o)
         : manager (m), data (d), object (o)
     {
-        portsChangedConnection = object->portsChanged.connect (
-            std::bind (&NodeModelUpdater::onPortsChanged, this));
+        jassert (object != nullptr);
+        if (object)
+            portsChangedConnection = object->portsChanged.connect (
+                std::bind (&NodeModelUpdater::onPortsChanged, this));
     }
 
     ~NodeModelUpdater()
@@ -183,7 +185,7 @@ private:
         manager.syncArcsModel();
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeModelUpdater);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeModelUpdater)
 };
 
 //==============================================================================
@@ -591,6 +593,14 @@ void GraphManager::setNodeModel (const Node& node)
     graph = node.data();
     arcs = node.getArcsValueTree();
     nodes = node.getNodesValueTree();
+
+    if (graph.hasProperty (tags::updater))
+    {
+        graph.setProperty (tags::updater, (NodeModelUpdater*) nullptr, nullptr);
+        graph.removeProperty (tags::updater, nullptr);
+    }
+
+    graph.setProperty (tags::updater, new NodeModelUpdater (*this, graph, &processor), nullptr);
 
     Array<ValueTree> failed;
     for (int i = 0; i < nodes.getNumChildren(); ++i)

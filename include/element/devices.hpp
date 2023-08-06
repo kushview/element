@@ -24,7 +24,7 @@ public:
     kv::JackClient& getJackClient();
 #endif
 
-    virtual void createAudioDeviceTypes (juce::OwnedArray<juce::AudioIODeviceType>& list) override;
+    void createAudioDeviceTypes (juce::OwnedArray<juce::AudioIODeviceType>& list) override;
 
 private:
     friend class World;

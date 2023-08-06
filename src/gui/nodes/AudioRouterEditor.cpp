@@ -17,11 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <element/ui/style.hpp>
+
 #include "engine/nodes/AudioRouterNode.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/PatchMatrixComponent.h"
-#include <element/ui/style.hpp>
-#include "gui/Artist.h"
 #include "common.hpp"
 
 namespace element {
@@ -228,7 +228,7 @@ public:
         {
             auto r = box.removeFromLeft (colThickness);
             g.setColour (Colors::textColor);
-            Artist::drawVerticalText (g, String ("Ch. ") + String (col + 1), r, Justification::centredRight);
+            Style::drawVerticalText (g, String ("Ch. ") + String (col + 1), r, Justification::centredRight);
         }
     }
 
