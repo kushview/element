@@ -833,7 +833,10 @@ void StandardContent::restoreState (PropertiesFile* props)
     bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.meterSize()));
     bo.setVisibility ((uint32) props->getIntValue ("meterBridgeVisibility", bo.visibility()));
     setMeterBridgeVisible (props->getBoolValue ("meterBridge", isMeterBridgeVisible()));
+
     resized();
+    container->bottom->resized();
+    container->resized();
 }
 
 void StandardContent::setCurrentNode (const Node& node)
@@ -898,6 +901,8 @@ void StandardContent::setNodeChannelStripVisible (const bool isVisible)
     }
 
     resized();
+    container->bottom->resized();
+    container->resized();
 }
 bool StandardContent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
 
@@ -1298,8 +1303,8 @@ void StandardContent::setMeterBridgeVisible (bool vis)
     if (isMeterBridgeVisible() == vis)
         return;
     container->bottom->bridge->setVisible (vis);
+    container->bottom->resized();
     container->resized();
-    resized();
 }
 
 bool StandardContent::isMeterBridgeVisible() const
