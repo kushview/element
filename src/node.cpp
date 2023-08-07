@@ -87,9 +87,6 @@ Node Port::getNode() const
 
 void Port::setHiddenOnBlock (bool hidden)
 {
-    // if (hidden == isHiddenOnBlock())
-    //     return;
-
     const auto node (getNode());
     auto symbols = getHiddenPortsProperty (node);
 
@@ -317,8 +314,6 @@ ValueTree Node::parse (const File& file)
             nodeData = data.getChildWithName (tags::node);
             if (nodeData.isValid())
             {
-                // TODO: Data Migrations.
-                std::clog << "[element] node migration..." << std::endl;
                 String error;
                 nodeData = Node::migrate (nodeData, error);
                 if (error.isNotEmpty())
@@ -1021,6 +1016,16 @@ static ValueTree migrateNode (const ValueTree& data, String& error)
             auto o = data.getChildWithName (tags::scripts);
             auto n = newData.getOrCreateChildWithName (tags::scripts, 0);
             Model::copyChildrenWithType (o, n, types::Script);
+        }
+
+        Node newNode (newData, false);
+        // version 0 nodes did not show control ports therefore
+        // need to be set to the default block visibility = hidden
+        for (int i = 0; i < newNode.getNumPorts(); ++i) {
+            auto port = newNode.getPort (i);
+            if (port.getType() == PortType::Audio || port.getType() == PortType::Midi)
+                continue;
+            port.setHiddenOnBlock (true);
         }
 
         auto oldNodes = data.getChildWithName (tags::nodes);
