@@ -44,12 +44,3 @@ Please report bugs and feature requests on Gitlab. [Element issue tracker](https
 
 ### Sponsors & Support
 This project has been made possible by our Pro license holders & Patrons. Element never would have made it this far without you!  If you'd like to support the project, you can do so by subscribing or purchasing a pre-built binary on [kushview.net](https://kushview.net/element/)
-
-### Donations
-Support Kushview with crypto!  If you're building from source, or installing by normal means on Linux, this is the best way to donate.
-
-| Coin     | Address                                    |
-| -------- |:------------------------------------------:|
-| Bitcoin  | 3CmHtp5eUe4VHdcrUMb82vDBqRmX3AQ7U5         |
-| Litecoin | MCkYJxaeWN18AgJrZHbsKduTdjZsmjNk7V         |
-| Ethereum | 0xc2D1fC4197580B61ad76B66906eC5abe71C7f912 |
