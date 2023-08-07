@@ -323,10 +323,10 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 
     mapsctl->learn (false);
 
-    if (auto xml = getXmlFromBinary (data, sizeInBytes))
+    String error;
+    if (auto e = getXmlFromBinary (data, sizeInBytes))
     {
-        String error;
-        ValueTree newData = ValueTree::fromXml (*xml);
+        ValueTree newData (ValueTree::fromXml (*e));
         if (newData.isValid() && (int) newData.getProperty (tags::version, -1) != EL_SESSION_VERSION)
         {
             std::clog << "[element] migrate session...\n";
@@ -335,43 +335,54 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 
         if (error.isEmpty() && (! newData.isValid() || ! newData.hasType (types::Session)))
         {
-            error = "Not a valid session state or type";
+            error = "Not a valid session file or type";
             if (newData.isValid())
                 error << ": el." << newData.getType().toString();
         }
 
         if (error.isEmpty() && ! session->loadData (newData))
-            error = "Could not load session data.";
+            error = "Could not load session data";
+    }
+    else
+    {
+        error = "Not a valid session file";
+    }
 
-        if (error.isNotEmpty())
-        {
-            PLUGIN_DBG ("[element] plugin failed restoring state: " << error);
-        }
-        else
-        {
-            typedef Rectangle<int> RI;
-            editorBounds = RI::fromString (session->getProperty (
-                                                      "pluginEditorBounds", RI().toString())
-                                               .toString());
-            editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
-            setForceZeroLatency ((bool) session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
-            if (engine && ! engine->isUsingExternalClock())
-                engine->setPlaying ((bool) session->getProperty ("pluginTransportPlaying", false));
-            session->forEach (setPluginMissingNodeProperties);
-            for (auto* const param : perfparams)
-                param->clearNode();
-        }
+    if (error.isNotEmpty())
+    {
+        PLUGIN_DBG ("[element] plugin failed restoring state: " << error);
+    }
+    else
+    {
+        session->forEach ([&](const ValueTree& d) {
+            if (! d.hasType (types::Node))
+                return;
+            const Node node (d, true);
+            juce::ignoreUnused (node);
+        });
 
-        triggerAsyncUpdate();
+        typedef Rectangle<int> RI;
+        editorBounds = RI::fromString (session->getProperty (
+                                                  "pluginEditorBounds", RI().toString())
+                                           .toString());
+        editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
+        setForceZeroLatency ((bool) session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
+        if (engine && ! engine->isUsingExternalClock())
+            engine->setPlaying ((bool) session->getProperty ("pluginTransportPlaying", false));
+        session->forEach (setPluginMissingNodeProperties);
+        for (auto* const param : perfparams)
+            param->clearNode();
+    }
 
-        if (prepared)
-        {
-            PLUGIN_DBG ("[element] plugin restored state while already prepared");
-        }
-        else
-        {
-            PLUGIN_DBG ("[element] plugin tried to restore state when not prepared");
-        }
+    triggerAsyncUpdate();
+
+    if (prepared)
+    {
+        PLUGIN_DBG ("[element] plugin restored state while already prepared");
+    }
+    else
+    {
+        PLUGIN_DBG ("[element] plugin tried to restore state when not prepared");
     }
 }
 

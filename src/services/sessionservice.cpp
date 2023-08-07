@@ -1,6 +1,7 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <element/graph.hpp>
 #include <element/node.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
@@ -272,9 +273,14 @@ void SessionService::loadNewSessionData()
 
     if (! wasLoaded)
     {
+        auto engine = context().audio();
+        int fallbackCount = 2;
+        int numIn = engine != nullptr ? engine->getNumChannels (true) : fallbackCount;
+        int numOut = engine != nullptr ? engine->getNumChannels (false) : fallbackCount;
         currentSession->clear();
         currentSession->addGraph (
-            Node::createDefaultGraph ("Graph"), true);
+            Graph::create ("Graph", numIn, numOut, true, true),
+            true);
     }
 }
 

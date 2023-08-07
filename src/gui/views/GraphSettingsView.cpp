@@ -375,7 +375,6 @@ public:
 
         _proc->setNumPorts (_type, count, _input, true);
 
-
         refresh();
     }
 

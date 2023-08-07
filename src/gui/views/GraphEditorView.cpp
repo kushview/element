@@ -12,6 +12,16 @@ namespace element {
 
 GraphEditorView::GraphEditorView()
 {
+    init();
+}
+
+GraphEditorView::GraphEditorView (const Node& g) {
+    init();
+    setNode (g);
+}
+
+void GraphEditorView::init()
+{
     setName (EL_VIEW_GRAPH_EDITOR);
 
     graph.onBlockMoved = [this] (BlockComponent& block) {

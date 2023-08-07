@@ -6,19 +6,6 @@
 
 namespace element {
 
-static void setMissingNodeProperties (const ValueTree& tree)
-{
-    if (tree.hasType (types::Node))
-    {
-        const Node node (tree, true);
-        ignoreUnused (node);
-    }
-    else if (tree.hasType (types::Controller) || tree.hasType (types::Control))
-    {
-        // noop
-    }
-}
-
 SessionDocument::SessionDocument (SessionPtr s)
     : FileBasedDocument (".els", "*.els", "Open Session", "Save Session"),
       session (s)
@@ -70,7 +57,12 @@ Result SessionDocument::loadDocument (const File& file)
 
     if (error.isEmpty())
     {
-        session->forEach (setMissingNodeProperties);
+        session->forEach ([&](const ValueTree& d) {
+            if (! d.hasType (types::Node))
+                return;
+            const Node node (d, true);
+            juce::ignoreUnused (node);
+        });
     }
 
     return (error.isNotEmpty()) ? Result::fail (error) : Result::ok();

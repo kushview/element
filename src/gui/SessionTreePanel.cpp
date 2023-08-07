@@ -28,27 +28,28 @@
 namespace element {
 
 namespace detail {
-    inline static Node findRoot (const Node& node) {
-        auto root = node;
-        while (! root.isRootGraph())
-            root = root.getParentGraph();
-        return root;
-    }
+inline static Node findRoot (const Node& node)
+{
+    auto root = node;
+    while (! root.isRootGraph())
+        root = root.getParentGraph();
+    return root;
+}
 
-    inline static void showGraphEditor (Component* c, const Node& node)
+inline static void showGraphEditor (Component* c, const Node& node)
+{
+    auto graph = findRoot (node);
+    if (! graph.isValid())
+        return;
+
+    if (auto* cc = dynamic_cast<StandardContent*> (ViewHelpers::findContentComponent (c)))
     {
-        auto graph = findRoot (node);
-        if (! graph.isValid())
-            return;
-
-        if (auto* cc = dynamic_cast<StandardContent*> (ViewHelpers::findContentComponent (c)))
-        {
-            auto view = std::make_unique<GraphEditorView> ();
-            view->setNode (node);
-            cc->setMainView (view.release());
-        }
+        auto view = std::make_unique<GraphEditorView>();
+        view->setNode (node);
+        cc->setMainView (view.release());
     }
 }
+} // namespace detail
 //=============================================================================
 class SessionBaseTreeItem : public TreeItemBase
 {
@@ -213,7 +214,7 @@ public:
 
         if (! node.isRootGraph())
             gui->selectNode (node);
-        
+
         gui->refreshMainMenu();
         gui->stabilizeViews();
 
@@ -546,7 +547,8 @@ public:
             return;
         }
 
-        if (node == session()->getCurrentGraph()) {
+        if (node == session()->getCurrentGraph())
+        {
             return;
         }
 
@@ -822,8 +824,11 @@ void SessionTreePanel::refresh()
     if (auto* const gui = ViewHelpers::getGuiController (this))
     {
         if (! nodeSelectedConnection.connected())
+        {
             nodeSelectedConnection = gui->nodeSelected.connect (
                 std::bind (&SessionTreePanel::onNodeSelected, this));
+            onNodeSelected();
+        }
     }
 
     if (panel->rootItem)
@@ -854,6 +859,7 @@ void SessionTreePanel::setSession (SessionPtr s)
     }
 
     refresh();
+    panel->updateContent();
 }
 
 void SessionTreePanel::showNode (const Node& newNode)
@@ -950,7 +956,8 @@ void SessionTreePanel::selectActiveRootGraph()
 
 void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (property == tags::active) {
+    if (property == tags::active)
+    {
         if (auto root = panel->rootItem.get())
             root->treeHasChanged();
     }

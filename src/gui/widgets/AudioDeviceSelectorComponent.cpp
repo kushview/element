@@ -1243,7 +1243,8 @@ void AudioDeviceSelectorComponent::updateAllControls()
             details.maxNumOutputChannels = maxOutputChannels;
             details.useStereoPairs = showChannelsAsStereoPairs;
 
-            if (type->getTypeName() != "JACK")
+            // if (type->getTypeName() != "JACK")
+            if (true)
             {
                 auto* sp = new AudioDeviceSettingsPanel (*type, details, hideAdvancedOptionsWithButton);
                 audioDeviceSettingsComp.reset (sp);

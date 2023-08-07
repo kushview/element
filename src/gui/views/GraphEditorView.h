@@ -16,6 +16,7 @@ class GraphEditorView : public GraphDisplayView,
                         public ChangeListener
 {
 public:
+    GraphEditorView (const Node&);
     GraphEditorView();
     ~GraphEditorView();
 
@@ -69,6 +70,7 @@ private:
     void onNodeSelected();
     void onNodeRemoved (const Node&);
     void updateSizeInternal (const bool force = true);
+    void init();
 };
 
 } // namespace element

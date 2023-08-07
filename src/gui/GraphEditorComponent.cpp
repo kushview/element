@@ -368,6 +368,7 @@ GraphEditorComponent::GraphEditorComponent()
     factory.reset (new DefaultBlockFactory (*this));
     setOpaque (true);
     data.addListener (this);
+    setSize (640, 360);
 }
 
 GraphEditorComponent::~GraphEditorComponent()

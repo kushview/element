@@ -838,10 +838,16 @@ void StandardContent::restoreState (PropertiesFile* props)
 
 void StandardContent::setCurrentNode (const Node& node)
 {
-    if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || getMainViewName() == EL_VIEW_SESSION_SETTINGS || getMainViewName() == EL_VIEW_PLUGIN_MANAGER || getMainViewName() == EL_VIEW_CONTROLLERS) && session()->getNumGraphs() > 0)
+    // clang-format off
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || 
+        getMainViewName() == EL_VIEW_SESSION_SETTINGS || 
+        getMainViewName() == EL_VIEW_PLUGIN_MANAGER || 
+        getMainViewName() == EL_VIEW_CONTROLLERS) && 
+        session()->getNumGraphs() > 0)
     {
         setMainView (EL_VIEW_GRAPH_EDITOR);
     }
+    // clang-format on
 
     container->setNode (node);
 }
@@ -895,7 +901,7 @@ void StandardContent::setNodeChannelStripVisible (const bool isVisible)
 }
 bool StandardContent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
 
-//=====
+//==============================================================================
 bool StandardContent::isVirtualKeyboardVisible() const
 {
     if (auto vc = getVirtualKeyboardView())
@@ -1111,7 +1117,7 @@ bool StandardContent::perform (const InvocationInfo& info)
         case Commands::showGraphMixer: {
             if (showAccessoryView() && getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
             {
-                setShowAccessoryView (false);
+                container->setSecondaryView (nullptr);
             }
             else
             {
@@ -1122,7 +1128,7 @@ bool StandardContent::perform (const InvocationInfo& info)
         case Commands::showConsole: {
             if (showAccessoryView() && getAccessoryViewName() == EL_VIEW_CONSOLE)
             {
-                setShowAccessoryView (false);
+                container->setSecondaryView (nullptr);
             }
             else
             {

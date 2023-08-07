@@ -7,6 +7,8 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
+#include "gui/views/GraphEditorView.h"
+
 #include "plugineditor.hpp"
 #include "pluginprocessor.hpp"
 #include "ElementApp.h"
@@ -303,6 +305,7 @@ protected:
 PluginEditor::PluginEditor (PluginProcessor& plugin)
     : AudioProcessorEditor (&plugin), processor (plugin)
 {
+    Logger::writeToLog ("PluginEditor::PluginEditor");
     setOpaque (true);
     paramTable.reset (new ParamTable());
     addAndMakeVisible (paramTable.get());
@@ -444,14 +447,12 @@ void PluginEditor::handleAsyncUpdate()
         return;
 
     asyncInitDone = true;
-
     auto* const app = processor.getServices();
     auto* const gui = app->find<GuiService>();
 
     content = gui->content();
     jassert (content);
 
-    // FIXME
     if (auto* cc = dynamic_cast<StandardContent*> (content.getComponent()))
         cc->setExtraView (new PerfSliders (processor));
 
@@ -487,8 +488,10 @@ void PluginEditor::handleAsyncUpdate()
             for (int w = 0; w < gui->getNumPluginWindows(); ++w)
                 if (auto* window = gui->getPluginWindow (w))
                     window->toFront (false);
-            if (auto standard = dynamic_cast<StandardContent*> (content.getComponent()))
-                standard->setCurrentNode (graph);
+            // if (auto standard = dynamic_cast<StandardContent*> (content.getComponent()))
+            //     standard->setCurrentNode (graph);
+            if (auto* cc = dynamic_cast<StandardContent*> (content.getComponent()))
+                cc->setMainView (new GraphEditorView (graph));
         }
     }
 }

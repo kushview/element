@@ -110,6 +110,12 @@ public:
     void setRoot (TreeItemBase* root);
     virtual void saveOpenness();
 
+    /** Call this if and when the displayed content has changed. */
+    void updateContent() {
+        if (rootItem)
+            rootItem->treeHasChanged();
+    }
+
     void deleteSelectedItems()
     {
         if (rootItem != nullptr)
