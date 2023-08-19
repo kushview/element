@@ -31,9 +31,9 @@
 #include "gui/TempoAndMeterBar.h"
 #include "gui/TransportBar.h"
 #include <element/ui/navigation.hpp>
-#include "gui/views/NodeEditorContentView.h"
+#include "ui/nodeeditorview.hpp"
 #include "gui/views/GraphSettingsView.h"
-#include "gui/views/NodeMidiContentView.h"
+#include "ui/nodepropertiesview.hpp"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
@@ -763,9 +763,9 @@ void StandardContent::stabilize (const bool refreshDataPathTrees)
 
     if (auto* ss = nav->findPanel<SessionTreePanel>())
         ss->setSession (session);
-    if (auto* mcv = nav->findPanel<NodeMidiContentView>())
+    if (auto* mcv = nav->findPanel<NodePropertiesView>())
         mcv->stabilizeContent();
-    if (auto* ncv = nav->findPanel<NodeEditorContentView>())
+    if (auto* ncv = nav->findPanel<NodeEditorView>())
         ncv->stabilizeContent();
     if (auto* gcv = nav->findPanel<GraphSettingsView>())
         gcv->stabilizeContent();
@@ -1189,13 +1189,13 @@ void StandardContent::getSessionState (String& state)
 {
     ValueTree data ("state");
 
-    if (auto* const ned = nav->findPanel<NodeEditorContentView>())
+    if (auto* const ned = nav->findPanel<NodeEditorView>())
     {
         String nedState;
         ned->getState (nedState);
         if (nedState.isNotEmpty())
         {
-            data.setProperty ("NodeEditorContentView", nedState, nullptr);
+            data.setProperty ("NodeEditorView", nedState, nullptr);
         }
     }
 
@@ -1218,9 +1218,9 @@ void StandardContent::applySessionState (const String& state)
     if (! data.isValid())
         return;
 
-    if (auto* const ned = nav->findPanel<NodeEditorContentView>())
+    if (auto* const ned = nav->findPanel<NodeEditorView>())
     {
-        String nedState = data.getProperty ("NodeEditorContentView").toString();
+        String nedState = data.getProperty ("NodeEditorView").toString();
         ned->setState (nedState);
     }
 }

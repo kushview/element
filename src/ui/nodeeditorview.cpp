@@ -1,44 +1,30 @@
-/*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+#include <element/context.hpp>
+#include <element/devices.hpp>
+#include <element/services.hpp>
+#include <element/ui/style.hpp>
+#include <element/ui.hpp>
 
 #include "ElementApp.h"
 
-#include <element/services.hpp>
-#include <element/ui.hpp>
-#include "services/sessionservice.hpp"
 #include "engine/graphnode.hpp"
 #include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"
 #include "gui/nodes/MidiIONodeEditor.h"
-#include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "gui/ViewHelpers.h"
-#include <element/ui/style.hpp>
 #include "gui/ContextMenus.h"
 #include "gui/NodeEditorFactory.h"
-#include <element/devices.hpp>
-#include <element/context.hpp>
+#include "services/sessionservice.hpp"
+
+#include "ui/nodeeditorview.hpp"
 
 namespace element {
 
-class NodeEditorContentView::NodeWatcher : private ValueTree::Listener
+class NodeEditorView::NodeWatcher : private ValueTree::Listener
 {
 public:
     NodeWatcher()
@@ -121,9 +107,9 @@ private:
     void valueTreeRedirected (ValueTree&) override {}
 };
 
-NodeEditorContentView::NodeEditorContentView()
+NodeEditorView::NodeEditorView()
 {
-    setName ("NodeEditorContentView");
+    setName ("NodeEditorView");
     addAndMakeVisible (nodesCombo);
     nodesCombo.addListener (this);
 
@@ -154,7 +140,7 @@ NodeEditorContentView::NodeEditorContentView()
     };
 }
 
-NodeEditorContentView::~NodeEditorContentView()
+NodeEditorView::~NodeEditorView()
 {
     watcher.reset();
     menuButton.onClick = nullptr;
@@ -164,7 +150,7 @@ NodeEditorContentView::~NodeEditorContentView()
     sessionLoadedConnection.disconnect();
 }
 
-void NodeEditorContentView::getState (String& state)
+void NodeEditorView::getState (String& state)
 {
     ValueTree tree ("state");
     // DBG("[element] ned saving node: " << node.getUuidString());
@@ -180,7 +166,7 @@ void NodeEditorContentView::getState (String& state)
     state = mo.getMemoryBlock().toBase64Encoding();
 }
 
-void NodeEditorContentView::setState (const String& state)
+void NodeEditorView::setState (const String& state)
 {
     MemoryBlock mb;
     mb.fromBase64Encoding (state);
@@ -217,7 +203,7 @@ void NodeEditorContentView::setState (const String& state)
     }
 }
 
-void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView* view)
+void NodeEditorView::nodeMenuCallback (int result, NodeEditorView* view)
 {
     if (result == 1)
     {
@@ -225,12 +211,12 @@ void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView*
     }
 }
 
-void NodeEditorContentView::paint (Graphics& g)
+void NodeEditorView::paint (Graphics& g)
 {
     g.fillAll (element::Colors::backgroundColor);
 }
 
-void NodeEditorContentView::comboBoxChanged (ComboBox*)
+void NodeEditorView::comboBoxChanged (ComboBox*)
 {
     const auto selectedNode = graph.getNode (nodesCombo.getSelectedItemIndex());
     if (selectedNode.isValid())
@@ -241,7 +227,7 @@ void NodeEditorContentView::comboBoxChanged (ComboBox*)
     }
 }
 
-void NodeEditorContentView::resized()
+void NodeEditorView::resized()
 {
     auto r1 = getLocalBounds().reduced (2);
     if (r1.getHeight() < 44)
@@ -259,7 +245,7 @@ void NodeEditorContentView::resized()
     }
 }
 
-void NodeEditorContentView::setSticky (bool shouldBeSticky)
+void NodeEditorView::setSticky (bool shouldBeSticky)
 {
     if (sticky == shouldBeSticky)
         return;
@@ -267,18 +253,18 @@ void NodeEditorContentView::setSticky (bool shouldBeSticky)
     resized();
 }
 
-void NodeEditorContentView::onGraphChanged()
+void NodeEditorView::onGraphChanged()
 {
-    std::clog << "NodeEditorContentView::onGraphChanged()\n";
+    std::clog << "NodeEditorView::onGraphChanged()\n";
 }
 
-void NodeEditorContentView::onSessionLoaded()
+void NodeEditorView::onSessionLoaded()
 {
     if (auto session = ViewHelpers::getSession (this))
         setNode (session->getActiveGraph().getNode (0));
 }
 
-void NodeEditorContentView::stabilizeContent()
+void NodeEditorView::stabilizeContent()
 {
     auto* cc = ViewHelpers::findContentComponent (this);
     auto session = ViewHelpers::getSession (this);
@@ -288,10 +274,10 @@ void NodeEditorContentView::stabilizeContent()
 
     if (! selectedNodeConnection.connected())
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
-            &NodeEditorContentView::stabilizeContent, this));
+            &NodeEditorView::stabilizeContent, this));
     if (! sessionLoadedConnection.connected())
         sessionLoadedConnection = sessions.sessionLoaded.connect (std::bind (
-            &NodeEditorContentView::onSessionLoaded, this));
+            &NodeEditorView::onSessionLoaded, this));
 
     if (! sticky || ! node.isValid())
     {
@@ -304,7 +290,7 @@ void NodeEditorContentView::stabilizeContent()
     }
 }
 
-void NodeEditorContentView::setNode (const Node& newNode)
+void NodeEditorView::setNode (const Node& newNode)
 {
     auto newGraph = newNode.getParentGraph();
     bool graphChanged = false;
@@ -336,7 +322,7 @@ void NodeEditorContentView::setNode (const Node& newNode)
     nodesCombo.selectNode (node, dontSendNotification);
 }
 
-void NodeEditorContentView::valueChanged (Value& value)
+void NodeEditorView::valueChanged (Value& value)
 {
     if (! nodeObjectValue.refersToSameSourceAs (value))
         return;
@@ -348,7 +334,7 @@ void NodeEditorContentView::valueChanged (Value& value)
     }
 }
 
-void NodeEditorContentView::clearEditor()
+void NodeEditorView::clearEditor()
 {
     if (editor == nullptr)
         return;
@@ -364,7 +350,7 @@ void NodeEditorContentView::clearEditor()
     editor.reset (nullptr);
 }
 
-Component* NodeEditorContentView::createEmbededEditor()
+Component* NodeEditorView::createEmbededEditor()
 {
     auto* const world = ViewHelpers::getGlobals (this);
     jassert (world);

@@ -5,9 +5,9 @@
 
 #include <element/context.hpp>
 
-#include "gui/views/NodeEditorContentView.h"
+#include "ui/nodeeditorview.hpp"
 #include "gui/views/GraphSettingsView.h"
-#include "gui/views/NodeMidiContentView.h"
+#include "ui/nodepropertiesview.hpp"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
@@ -188,7 +188,7 @@ void NavigationConcertinaPanel::saveState (PropertiesFile* props)
             .setProperty ("name", panel->getName(), 0)
             .setProperty ("h", panel->getHeight(), 0);
 
-        if (auto* ned = dynamic_cast<NodeEditorContentView*> (panel))
+        if (auto* ned = dynamic_cast<NodeEditorView*> (panel))
             item.setProperty ("sticky", ned->isSticky(), nullptr);
 
         state.addChild (item, -1, 0);
@@ -209,7 +209,7 @@ void NavigationConcertinaPanel::restoreState (PropertiesFile* props)
             if (auto* c = findPanelByName (item["name"].toString().trim()))
             {
                 setPanelSize (c, jmax (10, (int) item["h"]), false);
-                if (auto* ned = dynamic_cast<NodeEditorContentView*> (c))
+                if (auto* ned = dynamic_cast<NodeEditorView*> (c))
                     ned->setSticky ((bool) item.getProperty ("sticky", ned->isSticky()));
             }
         }
@@ -281,18 +281,18 @@ void NavigationConcertinaPanel::updateContent()
 
     if (! namesHidden.contains ("Node"))
     {
-        auto* nv = new NodeEditorContentView();
-        nv->setName ("Node");
-        nv->setComponentID ("Node");
-        addPanelInternal (-1, nv, "Node", nullptr);
+        auto* mv = new NodePropertiesView();
+        mv->setName ("Node");
+        mv->setComponentID ("Node");
+        addPanelInternal (-1, mv, "Node", nullptr);
     }
 
-    if (! namesHidden.contains ("MIDI"))
+    if (! namesHidden.contains ("Editor"))
     {
-        auto* mv = new NodeMidiContentView();
-        mv->setName ("MIDI");
-        mv->setComponentID ("MIDI");
-        addPanelInternal (-1, mv, "MIDI", nullptr);
+        auto* nv = new NodeEditorView();
+        nv->setName ("Editor");
+        nv->setComponentID ("Editor");
+        addPanelInternal (-1, nv, "Editor", nullptr);
     }
 
     if (! namesHidden.contains ("Plugins"))

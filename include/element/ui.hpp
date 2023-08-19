@@ -51,6 +51,8 @@ public:
     MainWindow* getMainWindow() const { return mainWindow.get(); }
     void refreshMainMenu();
 
+    void showPreferencesDialog (const String& section = {});
+
     void runDialog (const String& uri);
     void runDialog (Component* c, const String& title = String());
 

@@ -57,7 +57,7 @@ Result SessionDocument::loadDocument (const File& file)
 
     if (error.isEmpty())
     {
-        session->forEach ([&](const ValueTree& d) {
+        session->forEach ([&] (const ValueTree& d) {
             if (! d.hasType (types::Node))
                 return;
             const Node node (d, true);

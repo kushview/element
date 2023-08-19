@@ -691,7 +691,6 @@ void PluginListComponent::optionsMenuCallback (int result)
             break;
 
         case 9: {
-            std::clog << "[element] scanning LV2..." << std::endl;
             if (auto* world = ViewHelpers::getGlobals (this))
                 plugins.saveUserPlugins (world->settings());
 
@@ -851,6 +850,7 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
     }
     else
     {
+        // std::clog << "[element] scanning for " << format.getName().toStdString() << std::endl;
         if (auto* world = ViewHelpers::getGlobals (this))
             plugins.saveUserPlugins (world->settings());
         // clang-format off

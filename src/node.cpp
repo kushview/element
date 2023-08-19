@@ -1021,7 +1021,8 @@ static ValueTree migrateNode (const ValueTree& data, String& error)
         Node newNode (newData, false);
         // version 0 nodes did not show control ports therefore
         // need to be set to the default block visibility = hidden
-        for (int i = 0; i < newNode.getNumPorts(); ++i) {
+        for (int i = 0; i < newNode.getNumPorts(); ++i)
+        {
             auto port = newNode.getPort (i);
             if (port.getType() == PortType::Audio || port.getType() == PortType::Midi)
                 continue;

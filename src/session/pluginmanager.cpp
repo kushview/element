@@ -129,7 +129,7 @@ public:
         }
         else if (state == "finished")
         {
-            DBG ("[element] slave finished scanning");
+            DBG ("[element] worker finished scanning");
             {
                 ScopedLock sl (lock);
                 running = false;
@@ -151,7 +151,7 @@ public:
         }
         else
         {
-            DBG ("[element] invalid slave state: " << state);
+            DBG ("[element] invalid worker state: " << state);
         }
     }
 
@@ -1024,7 +1024,7 @@ const File& PluginScanner::getWorkerPluginListFile()
     static File _listTempFile;
 #if 0
     if (_listTempFile == File())
-        _listTempFile = File::createTempFile ("el-pm-slave");
+        _listTempFile = File::createTempFile ("el-pm-worker");
 #else
     if (_listTempFile == File())
         _listTempFile = DataPath::applicationDataDir().getChildFile (EL_PLUGIN_SCANNER_SLAVE_LIST_PATH);

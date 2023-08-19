@@ -246,7 +246,22 @@ void NodeFactory::removeHiddenType (const String& tp)
 //==============================================================================
 Processor* NodeFactory::instantiate (const PluginDescription& desc)
 {
-    return instantiate (desc.fileOrIdentifier);
+    const auto ID = desc.fileOrIdentifier;
+    if (desc.pluginFormatName == EL_NODE_FORMAT_NAME)
+        return instantiate (ID);
+
+    auto& providers (impl->providers);
+    Processor* node = nullptr;
+    for (const auto& f : providers)
+    {
+        if (auto* const n = f->create (ID))
+        {
+            node = n;
+            break;
+        }
+    }
+
+    return node;
 }
 
 Processor* NodeFactory::instantiate (const String& identifier)
@@ -254,11 +269,16 @@ Processor* NodeFactory::instantiate (const String& identifier)
     auto& providers (impl->providers);
     Processor* node = nullptr;
     for (const auto& f : providers)
+    {
+        if (f->format() != EL_NODE_FORMAT_NAME)
+            continue;
+
         if (auto* const n = f->create (identifier))
         {
             node = n;
             break;
         }
+    }
 
     if (node)
     {

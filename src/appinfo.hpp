@@ -4,7 +4,7 @@
 #pragma once
 
 /** Settings in this file can only be configured with the CPP preprocessor.
-    Modify them to chenge things like app name.
+    Modify them to change things like app name.
  */
 
 // clang-format off

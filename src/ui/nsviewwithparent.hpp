@@ -1,4 +1,4 @@
-// Copyright 2023 Kushview, LLC <info@kushview.net>
+// Copyright: Copied from JUCE framework.
 // SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
@@ -13,13 +13,13 @@ namespace element {
 #if JUCE_MAC
 //==============================================================================
 /*  This is an NSViewComponent which holds a long-lived NSView which acts
-        as the parent view for plugin editors.
+    as the parent view for plugin editors.
 
-        Note that this component does not auto-resize depending on the bounds
-        of the owned view. VST2 and VST3 plugins have dedicated interfaces to
-        request that the editor bounds are updated. We can call `setSize` on this
-        component from inside those dedicated callbacks.
-    */
+    Note that this component does not auto-resize depending on the bounds
+    of the owned view. VST2 and VST3 plugins have dedicated interfaces to
+    request that the editor bounds are updated. We can call `setSize` on this
+    component from inside those dedicated callbacks.
+*/
 struct NSViewComponentWithParent : public juce::NSViewComponent,
                                    private juce::AsyncUpdater
 {

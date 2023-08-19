@@ -1,4 +1,4 @@
-// Copyright 2023 Kushview, LLC <info@kushview.net>
+// Copyright: Copied from JUCE framework.
 // SPDX-License-Identifier: GPL3-or-later
 
 #define JUCE_CORE_INCLUDE_NATIVE_HEADERS 1

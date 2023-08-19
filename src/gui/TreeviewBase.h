@@ -111,7 +111,8 @@ public:
     virtual void saveOpenness();
 
     /** Call this if and when the displayed content has changed. */
-    void updateContent() {
+    void updateContent()
+    {
         if (rootItem)
             rootItem->treeHasChanged();
     }

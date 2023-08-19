@@ -45,25 +45,6 @@ private:
     Node node;
     GraphEditorComponent graph;
     Viewport view;
-    NodePropertyPanel nodeProps;
-    int nodePropsWidth = 220;
-
-    class NodePropsToggle : public Label
-    {
-    public:
-        NodePropsToggle() = default;
-        ~NodePropsToggle() override = default;
-        std::function<void()> onClick;
-
-    protected:
-        void mouseUp (const MouseEvent& ev) override
-        {
-            if (onClick)
-                onClick();
-        }
-    };
-
-    NodePropsToggle nodePropsToggle;
 
     SignalConnection nodeSelectedConnection,
         nodeRemovedConnection;

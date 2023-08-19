@@ -131,8 +131,6 @@ libelement_sources = '''
     gui/views/LuaConsoleView.cpp
     gui/views/NavigationView.cpp
     gui/views/NodeChannelStripView.cpp
-    gui/views/NodeEditorContentView.cpp
-    gui/views/NodeMidiContentView.cpp
     gui/views/NodePortsTable.cpp
     gui/views/PluginsPanelView.cpp
     gui/views/ScriptEditorView.cpp
@@ -170,6 +168,8 @@ libelement_sources = '''
     ui/meterbridge.cpp
     ui/navigation.cpp
     ui/nodeeditor.cpp
+    ui/nodeeditorview.cpp
+    ui/nodepropertiesview.cpp
     ui/sessiondocument.cpp
     ui/simplemeter.cpp
     ui/standard.cpp

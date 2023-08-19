@@ -419,34 +419,44 @@ void GuiService::launchUpdater()
     JUCEApplication::getInstance()->systemRequestedQuit();
 }
 
+void GuiService::showPreferencesDialog (const String& section)
+{
+    if (auto* const dialog = windowManager->findDialogByName ("Preferences"))
+    {
+        if (! dialog->isOnDesktop() || ! dialog->isVisible())
+        {
+            dialog->setVisible (true);
+            dialog->addToDesktop();
+        }
+        dialog->toFront (true);
+        if (section.isNotEmpty())
+            (dynamic_cast<PreferencesComponent*> (dialog->getContentComponent()))->setPage (section);
+        return;
+    }
+
+    DialogOptions opts;
+    auto* const prefs = new PreferencesComponent (*this);
+    opts.content.set (prefs, true);
+    opts.useNativeTitleBar = true;
+    opts.dialogTitle = TRANS ("Preferences");
+    opts.componentToCentreAround = (Component*) mainWindow.get();
+
+    if (DialogWindow* dw = opts.create())
+    {
+        dw->setName (TRANS ("Preferences"));
+        dw->setComponentID ("PreferencesDialog");
+        windowManager->push (dw, true);
+        if (section.isNotEmpty())
+            prefs->setPage (section);
+        dw->getContentComponent()->grabKeyboardFocus();
+    }
+}
+
 void GuiService::runDialog (const String& uri)
 {
     if (uri == "preferences")
     {
-        if (auto* const dialog = windowManager->findDialogByName ("Preferences"))
-        {
-            if (! dialog->isOnDesktop() || ! dialog->isVisible())
-            {
-                dialog->setVisible (true);
-                dialog->addToDesktop();
-            }
-            dialog->toFront (true);
-            return;
-        }
-
-        DialogOptions opts;
-        opts.content.set (new PreferencesComponent (*this), true);
-        opts.useNativeTitleBar = true;
-        opts.dialogTitle = TRANS ("Preferences");
-        opts.componentToCentreAround = (Component*) mainWindow.get();
-
-        if (DialogWindow* dw = opts.create())
-        {
-            dw->setName (TRANS ("Preferences"));
-            dw->setComponentID ("PreferencesDialog");
-            windowManager->push (dw, true);
-            dw->getContentComponent()->grabKeyboardFocus();
-        }
+        showPreferencesDialog();
     }
 }
 

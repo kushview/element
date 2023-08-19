@@ -80,13 +80,13 @@ def get_hash (what='HEAD'):
     if not exists(): return ''
     args = 'rev-parse %s' % what
     (r, e) = call_git (None, args.strip().split())
-    return r.strip()
+    return r.strip().decode('utf-8')
 
 def get_hash_short (what='HEAD'):
     if not exists(): return ''
     args = 'rev-parse --short %s' % what
     (r, e) = call_git (None, args.strip().split())
-    return r.strip()
+    return r.strip().decode('utf-8')
 
 def version():
     here = os.getcwd()

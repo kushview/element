@@ -354,7 +354,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
     }
     else
     {
-        session->forEach ([&](const ValueTree& d) {
+        session->forEach ([&] (const ValueTree& d) {
             if (! d.hasType (types::Node))
                 return;
             const Node node (d, true);

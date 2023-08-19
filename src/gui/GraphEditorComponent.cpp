@@ -14,9 +14,9 @@
 #include "gui/Icons.h"
 #include "gui/PluginWindow.h"
 
-#include "gui/views/NodeEditorContentView.h"
+#include "ui/nodeeditorview.hpp"
 #include "gui/views/GraphSettingsView.h"
-#include "gui/views/NodeMidiContentView.h"
+#include "ui/nodepropertiesview.hpp"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
