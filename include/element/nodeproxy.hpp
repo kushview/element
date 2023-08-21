@@ -3,17 +3,17 @@
 
 #pragma once
 
-#include <element/juce/core.hpp>
+#include <element/element.hpp>
 
 namespace element {
 
-class NodeProxy : public juce::ReferenceCountedObject {
+class NodeProxy {
 public:
     NodeProxy() = delete;
     virtual ~NodeProxy() = default;
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeProxy)
+    EL_DISABLE_COPY (NodeProxy)
 };
 
 } // namespace element

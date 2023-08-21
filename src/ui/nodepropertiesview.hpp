@@ -5,9 +5,9 @@
 
 #include <element/ui/content.hpp>
 
-#include "gui/widgets/MidiChannelSelectComponent.h"
-#include "gui/widgets/NodeMidiProgramComponent.h"
-#include "gui/widgets/NodeListComboBox.h"
+#include "ui/midichannelselectcomponent.hpp"
+#include "ui/nodemidiprogramcomponent.hpp"
+#include "ui/nodelistcombobox.hpp"
 
 namespace element {
 

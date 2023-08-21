@@ -4,7 +4,7 @@
 #pragma once
 
 #include <element/node.hpp>
-#include "gui/Buttons.h"
+#include "ui/buttons.hpp"
 
 namespace element {
 

@@ -4,8 +4,8 @@
 #pragma once
 
 #include <element/ui/content.hpp>
-#include "gui/widgets/NodeListComboBox.h"
-#include "gui/Buttons.h"
+#include "ui/nodelistcombobox.hpp"
+#include "ui/buttons.hpp"
 
 namespace element {
 

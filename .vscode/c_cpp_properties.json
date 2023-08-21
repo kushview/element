@@ -81,6 +81,7 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\SDKs\\boost_1_71_0\\*",
                 "${workspaceFolder}/subprojects/juce/modules/*",
                 "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/include/*",

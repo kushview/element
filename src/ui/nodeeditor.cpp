@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/ui/nodeeditor.hpp>
-#include "gui/PluginWindow.h"
+#include "ui/pluginwindow.hpp"
 
 namespace element {
 

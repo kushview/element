@@ -10,16 +10,16 @@
 #include "ElementApp.h"
 
 #include "engine/graphnode.hpp"
-#include "gui/nodes/AudioIONodeEditor.h"
-#include "gui/nodes/AudioRouterEditor.h"
-#include "gui/nodes/GenericNodeEditor.h"
-#include "gui/nodes/MidiIONodeEditor.h"
-#include "gui/widgets/AudioDeviceSelectorComponent.h"
-#include "gui/ViewHelpers.h"
-#include "gui/ContextMenus.h"
-#include "gui/NodeEditorFactory.h"
-#include "services/sessionservice.hpp"
+#include "nodes/ionodeeditor.hpp"
+#include "nodes/audioroutereditor.hpp"
+#include "nodes/genericeditor.hpp"
+#include "nodes/midideviceeditor.hpp"
 
+#include "services/sessionservice.hpp"
+#include "ui/audiodeviceselector.hpp"
+#include "ui/viewhelpers.hpp"
+#include "ui/contextmenus.hpp"
+#include "ui/nodeeditorfactory.hpp"
 #include "ui/nodeeditorview.hpp"
 
 namespace element {

@@ -1,21 +1,19 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#include "ui/datapathbrowser.hpp"
-
 #include <element/context.hpp>
-
-#include "ui/nodeeditorview.hpp"
-#include "gui/views/GraphSettingsView.h"
-#include "ui/nodepropertiesview.hpp"
-#include "gui/views/PluginsPanelView.h"
-#include "gui/AudioIOPanelView.h"
-#include "gui/SessionTreePanel.h"
-#include "gui/ViewHelpers.h"
 #include <element/ui/style.hpp>
 #include <element/ui/commands.hpp>
-
 #include <element/ui/navigation.hpp>
+
+#include "ui/datapathbrowser.hpp"
+#include "ui/nodeeditorview.hpp"
+#include "ui/graphsettingsview.hpp"
+#include "ui/nodepropertiesview.hpp"
+#include "ui/pluginspanelview.hpp"
+#include "ui/audioiopanelview.hpp"
+#include "ui/sessiontreepanel.hpp"
+#include "ui/viewhelpers.hpp"
 
 namespace element {
 

@@ -15,14 +15,14 @@
 #include <element/ui/style.hpp>
 
 #include "services/sessionservice.hpp"
-#include "gui/views/VirtualKeyboardView.h"
+#include "ui/virtualkeyboardview.hpp"
 #include "ui/aboutscreen.hpp"
-#include "gui/GuiCommon.h"
-#include "gui/MainWindow.h"
-#include "gui/PluginWindow.h"
-#include "gui/PreferencesComponent.h"
-#include "gui/SystemTray.h"
-#include "gui/WindowManager.h"
+#include "ui/guicommon.hpp"
+#include "ui/mainwindow.hpp"
+#include "ui/pluginwindow.hpp"
+#include "ui/preferences.hpp"
+#include "ui/systemtray.hpp"
+#include "ui/windowmanager.hpp"
 
 #include "ui/capslock.hpp"
 

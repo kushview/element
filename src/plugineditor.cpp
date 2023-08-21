@@ -5,9 +5,9 @@
 #include <element/ui/style.hpp>
 #include <element/ui/commands.hpp>
 
-#include "gui/GuiCommon.h"
-#include "gui/PluginWindow.h"
-#include "gui/views/GraphEditorView.h"
+#include "ui/guicommon.hpp"
+#include "ui/pluginwindow.hpp"
+#include "ui/grapheditorview.hpp"
 
 #include "plugineditor.hpp"
 #include "pluginprocessor.hpp"

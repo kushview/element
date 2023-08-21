@@ -12,10 +12,10 @@
 #include <element/session.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
-
-#include "gui/SystemTray.h"
-#include "scripting/scriptmanager.hpp"
 #include <element/ui/commands.hpp>
+
+#include "ui/systemtray.hpp"
+#include "scripting/scriptmanager.hpp"
 #include "session/presetmanager.hpp"
 #include "datapath.hpp"
 #include "sol/sol.hpp"

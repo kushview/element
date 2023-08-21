@@ -7,7 +7,7 @@
 #include <element/settings.hpp>
 #include <element/lv2.hpp>
 
-#include "engine/nodes/NodeTypes.h"
+#include "nodes/nodetypes.hpp"
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
 #include "utils.hpp"

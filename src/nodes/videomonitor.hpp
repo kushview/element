@@ -8,7 +8,7 @@
 #include <element/processor.hpp>
 #include <element/porttype.hpp>
 
-#include "engine/nodes/NodeTypes.h"
+#include "nodes/nodetypes.hpp"
 
 namespace element {
 

@@ -18,8 +18,6 @@
 
 namespace element {
 
-// using namespace juce; // FIXME:
-
 class DataPath;
 class GraphManager;
 class NodeArray;

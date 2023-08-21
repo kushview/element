@@ -1,15 +1,17 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#include "engine/graphmanager.hpp"
-#include "engine/nodes/AudioProcessorNode.h"
-#include "engine/nodes/AudioRouterNode.h"
-#include "engine/nodes/MidiChannelSplitterNode.h"
-#include "engine/nodes/MidiProgramMapNode.h"
-#include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/rootgraph.hpp"
-#include <element/plugins.hpp>
 #include <element/context.hpp>
+#include <element/plugins.hpp>
+
+#include "engine/graphmanager.hpp"
+#include "nodes/audioprocessor.hpp"
+#include "nodes/audiorouter.hpp"
+#include "nodes/midichannelsplitter.hpp"
+#include "nodes/midiprogrammap.hpp"
+#include "nodes/placeholder.hpp"
+#include "engine/rootgraph.hpp"
+
 #include "utils.hpp"
 
 namespace element {

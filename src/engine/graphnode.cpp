@@ -1,16 +1,16 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#include "engine/graphbuilder.hpp"
-#include "engine/ionode.hpp"
-#include "engine/nodes/AudioProcessorNode.h"
 #include <element/audioengine.hpp>
 #include <element/midipipe.hpp>
-#include "engine/miditranspose.hpp"
-#include "engine/nodes/NodeTypes.h"
 #include <element/node.hpp>
 #include <element/portcount.hpp>
 
+#include "engine/graphbuilder.hpp"
+#include "engine/ionode.hpp"
+#include "nodes/audioprocessor.hpp"
+#include "engine/miditranspose.hpp"
+#include "nodes/nodetypes.hpp"
 #include "engine/graphnode.hpp"
 
 namespace element {

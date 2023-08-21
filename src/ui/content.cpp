@@ -7,20 +7,18 @@
 #include <element/devices.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
+#include <element/ui/commands.hpp>
+#include <element/ui/content.hpp>
+#include <element/ui/style.hpp>
 
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
-#include "gui/widgets/MidiBlinker.h"
-
-#include <element/ui/style.hpp>
-#include "gui/MainWindow.h"
-#include "gui/MainMenu.h"
-#include "gui/TempoAndMeterBar.h"
-#include "gui/TransportBar.h"
-#include "gui/ViewHelpers.h"
-#include <element/ui/commands.hpp>
-
-#include <element/ui/content.hpp>
+#include "ui/midiblinker.hpp"
+#include "ui/mainwindow.hpp"
+#include "ui/mainmenu.hpp"
+#include "ui/tempoandmeterbar.hpp"
+#include "ui/transportbar.hpp"
+#include "ui/viewhelpers.hpp"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0

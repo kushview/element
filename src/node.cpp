@@ -1,7 +1,7 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#include "engine/nodes/BaseProcessor.h" // for internal id macros
+#include "nodes/baseprocessor.hpp" // for internal id macros
 #include <element/node.hpp>
 #include <element/session.hpp>
 #include <element/script.hpp>

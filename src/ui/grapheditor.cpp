@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/ui/grapheditor.hpp>
-#include "gui/GraphEditorComponent.h"
+#include "ui/grapheditorcomponent.hpp"
 
 namespace element {
 

@@ -12,7 +12,7 @@
 #include <element/settings.hpp>
 
 #include "engine/graphmanager.hpp"
-#include "engine/nodes/MidiDeviceProcessor.h"
+#include "nodes/mididevice.hpp"
 #include "engine/rootgraph.hpp"
 #include <element/engine.hpp>
 #include <element/ui.hpp>
@@ -479,10 +479,6 @@ void EngineService::connect (PortType type, const Node& src, int sc, const Node&
     }
 }
 
-void EngineService::testReconfigureRootGraphs()
-{
-    changeListenerCallback (&context().devices());
-}
 void EngineService::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
     if (auto* root = graphs->findActiveRootGraphManager())
@@ -660,27 +656,24 @@ void EngineService::activate()
     Service::activate();
 
     auto& globals (context());
-    auto& devices (globals.devices());
     auto engine (globals.audio());
     auto session (globals.session());
     engine->setSession (session);
     engine->activate();
 
     sessionReloaded();
-    devices.addChangeListener (this);
 }
 
 void EngineService::deactivate()
 {
     Service::deactivate();
     auto& globals (context());
-    auto& devices (globals.devices());
     auto engine (globals.audio());
     auto session (globals.session());
 
-    if (auto* gui = sibling<GuiService>())
+    if (auto* const gui = sibling<UI>())
     {
-        // gui might not deactivate before the engine, so
+        // UI might not deactivate before the engine, so
         // close the windows here
         gui->closeAllPluginWindows();
     }
@@ -690,7 +683,6 @@ void EngineService::deactivate()
 
     engine->deactivate();
     engine->setSession (nullptr);
-    devices.removeChangeListener (this);
 }
 
 void EngineService::clear()
@@ -775,13 +767,6 @@ void EngineService::setRootNode (const Node& newRootNode)
     }
 
     engine->refreshSession();
-}
-
-void EngineService::changeListenerCallback (ChangeBroadcaster* cb)
-{
-    auto& devices (context().devices());
-    if (cb != &devices)
-        return;
 }
 
 void EngineService::syncModels()

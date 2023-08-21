@@ -6,8 +6,8 @@
 #include <element/juce/gui_basics.hpp>
 #include <element/ui/content.hpp>
 
-#include "gui/widgets/FileTreeView.h"
-#include "gui/ViewHelpers.h"
+#include "ui/filetreeview.hpp"
+#include "ui/viewhelpers.hpp"
 #include "datapath.hpp"
 #include "messages.hpp"
 

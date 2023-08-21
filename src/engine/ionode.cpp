@@ -3,7 +3,7 @@
 
 #include "engine/ionode.hpp"
 #include "engine/graphnode.hpp"
-#include "engine/nodes/NodeTypes.h"
+#include "nodes/nodetypes.hpp"
 
 namespace element {
 

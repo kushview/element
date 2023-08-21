@@ -198,6 +198,8 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
         ui.setProperty ("content", state, nullptr);
     }
 
+    sigWillSave();
+
     if (saveAs)
     {
         result = document->saveAsInteractive (true);

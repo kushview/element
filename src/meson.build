@@ -43,23 +43,36 @@ libelement_sources = '''
     engine/mappingengine.cpp
     engine/processor.cpp
     engine/midipipe.cpp
-    engine/nodes/ScriptNode.cpp
-    engine/nodes/MidiProgramMapNode.cpp
-    engine/nodes/AudioRouterNode.cpp
-    engine/nodes/MidiRouterNode.cpp
-    engine/nodes/MediaPlayerProcessor.cpp
-    engine/nodes/OSCReceiverNode.cpp
-    engine/nodes/MidiMonitorNode.cpp
-    engine/nodes/MidiFilterNode.cpp
-    engine/nodes/MidiChannelSplitterNode.cpp
-    engine/nodes/CompressorProcessor.cpp
-    engine/nodes/MidiDeviceProcessor.cpp
-    engine/nodes/AudioMixerProcessor.cpp
-    engine/nodes/EQFilterProcessor.cpp
-    engine/nodes/AudioFilePlayerNode.cpp
-    engine/nodes/OSCSenderNode.cpp
-    engine/nodes/AudioProcessorNode.cpp
-    
+
+    nodes/audiofileplayer.cpp
+    nodes/audiomixer.cpp
+    nodes/audioprocessornode.cpp
+    nodes/audiorouter.cpp
+    nodes/audioroutereditor.cpp
+    nodes/compressor.cpp
+    nodes/compressoreditor.cpp
+    nodes/eqfilter.cpp
+    nodes/eqfiltereditor.cpp
+    nodes/genericeditor.cpp
+    nodes/knobs.cpp
+    nodes/mediaplayer.cpp
+    nodes/midichannelsplitter.cpp
+    nodes/mididevice.cpp
+    nodes/midifilter.cpp
+    nodes/midimonitor.cpp
+    nodes/midimonitoreditor.cpp
+    nodes/midiprogrammap.cpp
+    nodes/midiprogrammapeditor.cpp
+    nodes/midirouter.cpp
+    nodes/midiroutereditor.cpp
+    nodes/oscreceiver.cpp
+    nodes/oscreceivereditor.cpp
+    nodes/oscsender.cpp
+    nodes/oscsendereditor.cpp
+    nodes/scriptnode.cpp
+    nodes/scriptnodeeditor.cpp
+    nodes/volumeeditor.cpp
+
     engine/graphnode.cpp
     engine/transport.cpp
     engine/graphbuilder.cpp
@@ -78,103 +91,84 @@ libelement_sources = '''
     lv2/world.cpp
     lv2/native.cpp
 
-    gui/AudioIOPanelView.cpp
-    gui/Buttons.cpp
-    gui/ChannelStripComponent.cpp
-    gui/ConnectionGrid.cpp
-    gui/ContextMenus.cpp
-    gui/FileComboBox.cpp
-    gui/GraphEditorComponent.cpp
-    gui/Icons.cpp
-    gui/LuaTokeniser.cpp
-    gui/MainMenu.cpp
-    gui/MainWindow.cpp
-    gui/NodeEditorFactory.cpp
-    gui/NodeIOConfiguration.cpp
-    gui/PatchMatrixComponent.cpp
-    gui/nodes/AudioRouterEditor.cpp
-    gui/nodes/CompressorNodeEditor.cpp
-    gui/nodes/EQFilterNodeEditor.cpp
-    gui/nodes/GenericNodeEditor.cpp
-    gui/nodes/KnobsComponent.cpp
-    gui/nodes/MidiMonitorNodeEditor.cpp
-    gui/nodes/MidiProgramMapEditor.cpp
-    gui/nodes/MidiRouterEditor.cpp
-    
-    gui/nodes/OSCReceiverNodeEditor.cpp
-    gui/nodes/OSCSenderNodeEditor.cpp
-    gui/nodes/ScriptNodeEditor.cpp
-    gui/nodes/VolumeNodeEditor.cpp
-    gui/PluginManagerComponent.cpp
-    gui/PluginWindow.cpp
-    gui/PreferencesComponent.cpp
-    gui/properties/NodeProperties.cpp
-    gui/properties/NodePropertyPanel.cpp
-    gui/RackContentView.cpp
-    gui/SequencerClipItem.cpp
-    gui/SequencerComponent.cpp
-    gui/SessionImportWizard.cpp
-    gui/SessionTreePanel.cpp
-    
-    gui/SystemTray.cpp
-    gui/TransportBar.cpp
-    gui/TreeviewBase.cpp
-    gui/ViewHelpers.cpp
-    gui/views/scriptview.cpp
-    gui/views/ContentView.cpp
-    gui/views/ControllersView.cpp
-    gui/views/ControllerMapsView.cpp
-    gui/views/GraphEditorView.cpp
-    gui/views/GraphMixerView.cpp
-    gui/views/GraphSettingsView.cpp
-    gui/views/KeymapEditorView.cpp
-    gui/views/LuaConsoleView.cpp
-    gui/views/NavigationView.cpp
-    gui/views/NodeChannelStripView.cpp
-    gui/views/NodePortsTable.cpp
-    gui/views/PluginsPanelView.cpp
-    gui/views/ScriptEditorView.cpp
-    gui/views/SessionSettingsView.cpp
-    gui/views/SessionTreeContentView.cpp
-    gui/views/VirtualKeyboardView.cpp
-    gui/widgets/AudioDeviceSelectorComponent.cpp
-    gui/widgets/Console.cpp
-    gui/widgets/FileTreeView.cpp
-    gui/widgets/HorizontalListBox.cpp
-    gui/widgets/LuaConsole.cpp
-    gui/widgets/MidiBlinker.cpp
-    gui/widgets/NodeMidiProgramComponent.cpp
-    gui/widgets/SessionGraphsListBox.cpp
-    gui/Window.cpp
-    gui/WindowManager.cpp
-   
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp
     scripting/bindings.cpp
     scripting/scriptloader.cpp
     scripting/scriptmanager.cpp
-
+    
     session/devicemanager.cpp
     session/pluginmanager.cpp
     session/session.cpp
 
     ui/aboutscreen.cpp
+    ui/audiodeviceselector.cpp
+    ui/audioiopanelview.cpp
     ui/block.cpp
-    ui/content.cpp
+    ui/buttons.cpp
     ui/capslock.cpp
+    ui/channelstrip.cpp
+    ui/connectiongrid.cpp
+    ui/console.cpp
+    ui/content.cpp
+    ui/contextmenus.cpp
+    ui/controllermapsview.cpp
+    ui/controllersview.cpp
     ui/decibelscale.cpp
     ui/designer.cpp
+    ui/filecombobox.cpp
+    ui/filetreeview.cpp
     ui/grapheditor.cpp
+    ui/grapheditorcomponent.cpp
+    ui/grapheditorview.cpp
+    ui/graphmixerview.cpp
+    ui/graphsettingsview.cpp
+    ui/horizontallistbox.cpp
+    ui/icons.cpp
+    ui/keymapeditorview.cpp
+    ui/luaconsole.cpp
+    ui/luaconsoleview.cpp
+    ui/luatokenizer.cpp
+    ui/mainmenu.cpp
+    ui/mainwindow.cpp
     ui/meterbridge.cpp
+    ui/midiblinker.cpp
     ui/navigation.cpp
+    ui/navigationview.cpp
+    ui/nodechannelstripview.cpp
     ui/nodeeditor.cpp
+    ui/nodeeditorfactory.cpp
     ui/nodeeditorview.cpp
+    ui/nodeioconfiguration.cpp
+    ui/nodemidiprogramcomponent.cpp
+    ui/nodeportstable.cpp
+    ui/nodeproperties.cpp
     ui/nodepropertiesview.cpp
+    ui/nodepropertypanel.cpp
+    ui/patchmatrix.cpp
+    ui/pluginmanagercomponent.cpp
+    ui/pluginspanelview.cpp
+    ui/pluginwindow.cpp
+    ui/preferences.cpp
+    ui/rackview.cpp
+    ui/scripteditorview.cpp
+    ui/scriptview.cpp
     ui/sessiondocument.cpp
+    ui/sessionimportwizard.cpp
+    ui/sessionsettingsview.cpp
+    ui/sessiontreepanel.cpp
+    ui/sessiontreeview.cpp
     ui/simplemeter.cpp
     ui/standard.cpp
     ui/style_v1.cpp
+    ui/systemtray.cpp
+    ui/transportbar.cpp
+    ui/treeviewbase.cpp
     ui/updater.cpp
+    ui/viewhelpers.cpp
+    ui/virtualkeyboardview.cpp
+    ui/window.cpp
+    ui/windowmanager.cpp
 
     el/audio.c
     el/AudioBuffer32.cpp

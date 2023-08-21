@@ -5,10 +5,10 @@
 #include <element/ui.hpp>
 #include <element/ui/style.hpp>
 
-#include "gui/properties/NodeProperties.h"
-#include "gui/ViewHelpers.h"
 #include "services/sessionservice.hpp"
+#include "ui/nodeproperties.hpp"
 #include "ui/nodepropertiesview.hpp"
+#include "ui/viewhelpers.hpp"
 
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
 

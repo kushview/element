@@ -1,9 +1,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "engine/nodes/MidiProgramMapNode.h"
-#include "engine/graphnode.hpp"
 #include <element/processor.hpp>
+
+#include "nodes/midiprogrammap.hpp"
+#include "engine/graphnode.hpp"
 
 using namespace element;
 using namespace juce;

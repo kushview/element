@@ -9,13 +9,13 @@
 
 #include "engine/midiengine.hpp"
 
-#include "gui/views/NodePortsTable.h"
-#include "gui/Buttons.h"
-#include "gui/ContextMenus.h"
-#include "gui/GraphEditorComponent.h"
-#include "gui/NodeIOConfiguration.h"
-#include "gui/NodeEditorFactory.h"
-#include "gui/ViewHelpers.h"
+#include "ui/nodeportstable.hpp"
+#include "ui/buttons.hpp"
+#include "ui/contextmenus.hpp"
+#include "ui/grapheditorcomponent.hpp"
+#include "ui/nodeioconfiguration.hpp"
+#include "ui/nodeeditorfactory.hpp"
+#include "ui/viewhelpers.hpp"
 #include "ui/block.hpp"
 
 #include "scopedflag.hpp"

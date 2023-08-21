@@ -35,6 +35,7 @@ public:
     void importGraph (const File& file);
 
     Signal<void()> sessionLoaded;
+    Signal<void()> sigWillSave;
 
 private:
     SessionPtr currentSession;

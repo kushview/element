@@ -1,6 +1,6 @@
 
 #include <boost/test/unit_test.hpp>
-#include "engine/nodes/NodeTypes.h"
+#include "nodes/nodetypes.hpp"
 #include <element/nodefactory.hpp>
 
 using namespace element;

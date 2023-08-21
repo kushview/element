@@ -130,7 +130,7 @@ public:
     {
         auto* priv = (Private*) user_data;
         auto& plugin = priv->owner;
-        lvtk::ignore_unused (plugin);
+        lvtk::ignore (plugin);
         if (type != priv->owner.map (LV2_ATOM__Float))
             return;
 
@@ -361,7 +361,7 @@ void LV2Module::setStateString (const String& stateStr)
         return;
     auto* const map = (LV2_URID_Map*) world.getFeatures().getFeature (LV2_URID__map)->getFeature()->data;
     auto* const unmap = (LV2_URID_Unmap*) world.getFeatures().getFeature (LV2_URID__unmap)->getFeature()->data;
-    lvtk::ignore_unused (unmap);
+    lvtk::ignore (unmap);
     if (auto* state = lilv_state_new_from_string (world.getWorld(), map, stateStr.toRawUTF8()))
     {
         const LV2_Feature* const features[] = { nullptr };
@@ -713,7 +713,7 @@ bool LV2Module::hasEditor() const
 
         if (hasIdle)
         {
-            lvtk::ignore_unused (hasIdle);
+            lvtk::ignore (hasIdle);
         }
     }
 

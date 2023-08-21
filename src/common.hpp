@@ -15,7 +15,7 @@
 #include "services/sessionservice.hpp"
 #include "services/presetservice.hpp"
 
-#include "engine/nodes/NodeTypes.h"
+#include "nodes/nodetypes.hpp"
 
 #include <element/node.hpp>
 #include <element/session.hpp>

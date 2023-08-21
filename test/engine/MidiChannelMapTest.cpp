@@ -2,10 +2,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "engine/graphnode.hpp"
-#include "engine/nodes/AudioProcessorNode.h"
+#include "nodes/audioprocessor.hpp"
 #include "engine/ionode.hpp"
 #include "engine/midichannelmap.hpp"
-#include "engine/nodes/MidiChannelMapProcessor.h"
+#include "nodes/midichannelmap.hpp"
 
 using namespace element;
 

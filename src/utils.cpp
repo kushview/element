@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include "utils.hpp"
-#include "engine/nodes/BaseProcessor.h"
+#include "nodes/baseprocessor.hpp"
 
 #if JUCE_WINDOWS
 #include <windows.h>

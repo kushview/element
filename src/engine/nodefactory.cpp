@@ -4,17 +4,17 @@
 #include <element/context.hpp>
 #include <element/nodefactory.hpp>
 
-#include "engine/nodes/BaseProcessor.h"
-#include "engine/nodes/AudioProcessorNode.h"
-#include "engine/nodes/AudioRouterNode.h"
-#include "engine/nodes/MidiChannelSplitterNode.h"
-#include "engine/nodes/MidiMonitorNode.h"
-#include "engine/nodes/MidiProgramMapNode.h"
-#include "engine/nodes/MidiRouterNode.h"
-// #include "engine/nodes/MidiSequencerNode.h"
-#include "engine/nodes/OSCReceiverNode.h"
-#include "engine/nodes/OSCSenderNode.h"
-#include "engine/nodes/ScriptNode.h"
+#include "nodes/baseprocessor.hpp"
+#include "nodes/audioprocessor.hpp"
+#include "nodes/audiorouter.hpp"
+#include "nodes/midichannelsplitter.hpp"
+#include "nodes/midimonitor.hpp"
+#include "nodes/midiprogrammap.hpp"
+#include "nodes/midirouter.hpp"
+// #include "nodes/MidiSequencerNode.h"
+#include "nodes/oscreceiver.hpp"
+#include "nodes/oscsender.hpp"
+#include "nodes/scriptnode.hpp"
 #include "engine/graphnode.hpp"
 
 #include "engine/audioprocessorfactory.hpp"

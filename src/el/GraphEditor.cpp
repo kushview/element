@@ -7,7 +7,7 @@
 // @pragma nostrip
 
 #include <element/element.h>
-#include "gui/GraphEditorComponent.h"
+#include "ui/grapheditorcomponent.hpp"
 #include "object.hpp"
 #include "widget.hpp"
 

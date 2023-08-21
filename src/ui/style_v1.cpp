@@ -4,8 +4,8 @@
 #include <element/ui/style.hpp>
 #include <element/ui/simplemeter.hpp>
 
-#include "gui/Buttons.h"
-#include "gui/widgets/MidiBlinker.h"
+#include "ui/buttons.hpp"
+#include "ui/midiblinker.hpp"
 #include "BinaryData.h"
 
 // clang-format off

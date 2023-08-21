@@ -2,16 +2,18 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <iomanip>
-#include "ElementApp.h"
 
-#include "engine/nodes/AudioProcessorNode.h"
-#include "engine/nodes/MidiDeviceProcessor.h"
-#include "engine/nodes/PlaceholderProcessor.h"
 #include <element/audioengine.hpp>
 #include <element/midipipe.hpp>
 #include <element/processor.hpp>
-#include "engine/rootgraph.hpp"
 #include <element/node.hpp>
+
+#include "ElementApp.h"
+
+#include "nodes/audioprocessor.hpp"
+#include "nodes/mididevice.hpp"
+#include "nodes/placeholder.hpp"
+#include "engine/rootgraph.hpp"
 
 namespace element {
 

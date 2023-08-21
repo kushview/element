@@ -13,8 +13,7 @@ struct ConnectionBuilder;
 class GraphManager;
 class RootGraphManager;
 
-class EngineService : public Service,
-                      private ChangeListener {
+class EngineService : public Service {
 public:
     EngineService();
     ~EngineService();
@@ -105,8 +104,6 @@ public:
             connectChannels (src.getParentGraph(), src, sc++, dst, dc++);
     }
 
-    void testReconfigureRootGraphs();
-
     /** Remove a connection on the active root graph */
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
 
@@ -139,7 +136,6 @@ private:
     std::unique_ptr<RootGraphs> graphs;
 
     friend class ChangeBroadcaster;
-    void changeListenerCallback (ChangeBroadcaster*) override;
     Node addPlugin (GraphManager& controller, const PluginDescription& desc);
 };
 
