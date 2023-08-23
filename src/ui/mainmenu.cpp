@@ -42,7 +42,9 @@ void MainMenu::setupMenu()
 #if JUCE_MAC
     macMenu.reset (new PopupMenu());
     macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About "));
+#if EL_UPDATER
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
+#endif
     macMenu->addSeparator();
     macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
     MenuBarModel::setMacMainMenu (this, macMenu.get());
@@ -240,7 +242,9 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
 
 #if ! JUCE_MAC
     menu.addSeparator();
+#if EL_UPDATER
     menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");
+#endif
     menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
     menu.addSeparator();
     menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);

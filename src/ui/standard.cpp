@@ -1198,6 +1198,16 @@ void StandardContent::getSessionState (String& state)
         }
     }
 
+    if (auto* const npv = nav->findPanel<NodePropertiesView>())
+    {
+        String npvState;
+        npv->getState (npvState);
+        if (npvState.isNotEmpty())
+        {
+            data.setProperty ("NodePropertiesView", npvState, nullptr);
+        }
+    }
+
     MemoryOutputStream mo;
     {
         GZIPCompressorOutputStream gzip (mo, 9);
@@ -1221,6 +1231,12 @@ void StandardContent::applySessionState (const String& state)
     {
         String nedState = data.getProperty ("NodeEditorView").toString();
         ned->setState (nedState);
+    }
+
+    if (auto* const npv = nav->findPanel<NodePropertiesView>())
+    {
+        String npvState = data.getProperty ("NodePropertiesView").toString();
+        npv->setState (npvState);
     }
 }
 

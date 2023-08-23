@@ -234,6 +234,60 @@ void NodePropertiesView::stabilizeContent()
     }
 }
 
+//==============================================================================
+void NodePropertiesView::getState (String& state)
+{
+    ValueTree tree ("state");
+    tree.setProperty (tags::node, _node.getUuidString(), nullptr)
+        .setProperty ("sticky", sticky, nullptr);
+
+    MemoryOutputStream mo;
+    {
+        GZIPCompressorOutputStream gzipStream (mo, 9);
+        tree.writeToStream (gzipStream);
+    }
+
+    state = mo.getMemoryBlock().toBase64Encoding();
+}
+
+void NodePropertiesView::setState (const String& state)
+{
+    MemoryBlock mb;
+    mb.fromBase64Encoding (state);
+    const ValueTree tree = (mb.getSize() > 0)
+                               ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+                               : ValueTree();
+    if (! tree.isValid())
+        return;
+
+    setSticky ((bool) tree.getProperty ("sticky", sticky));
+
+    auto session = ViewHelpers::getSession (this);
+    if (session == nullptr)
+    {
+        jassertfalse;
+        return;
+    }
+
+    const auto nodeStr = tree[tags::node].toString();
+    Node newNode;
+    if (nodeStr.isNotEmpty())
+    {
+        const Uuid gid (nodeStr);
+        newNode = session->findNodeById (gid);
+    }
+
+    if (newNode.isValid())
+    {
+        setNode (newNode);
+    }
+    else
+    {
+        DBG ("[element] couldn't find node to to select in node properties view");
+    }
+}
+
+//==============================================================================
 void NodePropertiesView::onSessionLoaded()
 {
     if (auto session = ViewHelpers::getSession (this))

@@ -40,7 +40,10 @@ public:
     void run();
     Commands& commands();
 
+    /** Check for a newer version and show alert, if available. */
     void checkUpdates();
+
+    /** Launch the updater tool, if available and enabled. */
     void launchUpdater();
 
     Services& services() const { return controller; }

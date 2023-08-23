@@ -28,6 +28,9 @@ public:
     void resized() override;
     void paint (Graphics& g) override;
 
+    void getState (String& state) override;
+    void setState (const String& state) override;
+
 private:
     Node _node, _graph;
     boost::signals2::connection selectedNodeConnection,

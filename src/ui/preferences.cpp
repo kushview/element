@@ -1417,6 +1417,7 @@ void PreferencesComponent::resized()
 
 bool PreferencesComponent::keyPressed (const KeyPress& key)
 {
+#if EL_UPDATER
     if (key.getModifiers().isCommandDown() && key.getModifiers().isShiftDown() && key.getModifiers().isAltDown() && (key.getKeyCode() == 'm' || key.getKeyCode() == 'M'))
     {
         bool haveMirrors = false;
@@ -1435,6 +1436,7 @@ bool PreferencesComponent::keyPressed (const KeyPress& key)
             return true;
         }
     }
+#endif
     return false;
 }
 

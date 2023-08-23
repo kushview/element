@@ -19,6 +19,11 @@ build_number         = run_command ([python3, version_py] + '--build --build-sty
 git_hash             = run_command ([python3, version_py] + '--hash --cwd=.'.split(), check: true).stdout().strip()
 git_short_hash       = run_command ([python3, version_py] + '--short-hash --cwd=.'.split(), check: true).stdout().strip()
 
+## Updater integration
+if get_option('updater')
+    add_project_arguments ('-DEL_UPDATER=1', language: ['cpp', 'objcpp'])
+endif
+
 ## Installer Metadata
 net_kushview      = 'net.kushview'
 installerdir      = get_option('prefix')
