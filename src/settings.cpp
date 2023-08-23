@@ -87,11 +87,10 @@ Settings::Settings()
     opts.applicationName = EL_APP_NAME;
     opts.filenameSuffix = "conf";
     opts.osxLibrarySubFolder = "Application Support";
-    opts.storageFormat = PropertiesFile::storeAsCompressedBinary;
+    opts.storageFormat = PropertiesFile::storeAsXML;
 
 #if JUCE_DEBUG
     opts.applicationName << "_Debug";
-    opts.storageFormat = PropertiesFile::storeAsXML;
 #endif
 
 #if JUCE_LINUX

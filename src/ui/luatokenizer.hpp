@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <element/juce.hpp>
-using namespace juce; // FIXME
+#include <element/element.h>
+#include <element/juce/gui_extra.hpp>
 
 namespace element {
 
@@ -13,7 +13,7 @@ namespace element {
 
     @tags{GUI}
 */
-class JUCE_API LuaTokeniser : public CodeTokeniser
+class EL_API LuaTokeniser : public juce::CodeTokeniser
 {
 public:
     //==============================================================================
@@ -21,8 +21,8 @@ public:
     ~LuaTokeniser() override;
 
     //==============================================================================
-    int readNextToken (CodeDocument::Iterator&) override;
-    CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
+    int readNextToken (juce::CodeDocument::Iterator&) override;
+    juce::CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
 
     /** The token values returned by this tokeniser. */
     enum TokenType

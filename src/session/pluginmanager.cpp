@@ -26,9 +26,12 @@
 namespace element {
 using namespace juce;
 
+namespace detail {
 static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
-static void pluginScannerWorkerCrashHandler (void*) {}
+static void pluginScannerCrashHandler (void*) {}
+static File pluginsXmlFile() { return DataPath::applicationDataDir().getChildFile ("plugins.xml"); }
+} // namespace detail
 
 //==============================================================================
 class PluginScannerCoordinator : public juce::ChildProcessCoordinator,
@@ -228,7 +231,7 @@ public:
     PluginScannerWorker()
     {
         scanFile = PluginScanner::getWorkerPluginListFile();
-        SystemStats::setApplicationCrashHandler (pluginScannerWorkerCrashHandler);
+        SystemStats::setApplicationCrashHandler (detail::pluginScannerCrashHandler);
         auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
         logfile.create();
         logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
@@ -511,10 +514,9 @@ void PluginScanner::timerCallback()
 {
 }
 
-// MARK: Unverified Plugins
-
-typedef HashMap<String, StringArray> UnverifiedPluginMap;
-typedef HashMap<String, FileSearchPath> UnverifiedPluginPaths;
+//==============================================================================
+using UnverifiedPluginMap = HashMap<String, StringArray>;
+using UnverifiedPluginPaths = HashMap<String, FileSearchPath>;
 
 class UnverifiedPlugins : private Thread
 {
@@ -600,8 +602,7 @@ private:
     }
 };
 
-// MARK: Plugin Manager
-
+//==============================================================================
 class PluginManager::Private : public PluginScanner::Listener
 {
 public:
@@ -915,10 +916,7 @@ void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
     setPropertiesFile (settings.getUserSettings());
     if (auto elm = priv->allPlugins.createXml())
-    {
-        props->setValue (pluginListKey(), elm.get());
-        props->saveIfNeeded();
-    }
+        elm->writeTo (detail::pluginsXmlFile());
 }
 
 void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
@@ -926,7 +924,15 @@ void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
     setPropertiesFile (settings.getUserSettings());
     if (props == nullptr)
         return;
-    if (auto xml = props->getXmlValue (pluginListKey()))
+    
+    // transfer old plugins to new.
+    if (auto xml = props->getXmlValue (detail::pluginListKey()))
+    {
+        xml->writeTo (detail::pluginsXmlFile());
+        props->removeValue (detail::pluginListKey());
+    }
+
+    if (auto xml = XmlDocument::parse (detail::pluginsXmlFile()))
         restoreUserPlugins (*xml);
     settings.saveIfNeeded();
 }
@@ -939,11 +945,11 @@ void PluginManager::restoreUserPlugins (const XmlElement& xml)
     if (props == nullptr)
         return;
 
-    if (auto e = priv->allPlugins.createXml())
-    {
-        props->setValue (pluginListKey(), e.get());
-        props->saveIfNeeded();
-    }
+    // if (auto e = priv->allPlugins.createXml())
+    // {
+    //     props->setValue (pluginListKey(), e.get());
+    //     props->saveIfNeeded();
+    // }
 }
 
 void PluginManager::setPlayConfig (double sampleRate, int blockSize)

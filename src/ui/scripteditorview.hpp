@@ -8,6 +8,7 @@
 #include <element/script.hpp>
 
 #include "scripting/scriptsource.hpp"
+#include "ui/luatokenizer.hpp"
 
 namespace element {
 
@@ -27,7 +28,7 @@ public:
     {
         setTabSize (4, true);
         setFont (getFont().withHeight (getDefaultFontHeight()));
-        setColourScheme (LuaTokeniser().getDefaultColourScheme());
+        setColourScheme (element::LuaTokeniser().getDefaultColourScheme());
     }
 
     virtual ~ScriptEditorComponent() = default;
@@ -103,8 +104,8 @@ protected:
 
 private:
     std::unique_ptr<ScriptEditorComponent> editor;
-    LuaTokeniser tokens;
-    CodeDocument code;
+    element::LuaTokeniser tokens;
+    juce::CodeDocument code;
 };
 
 //==============================================================================
