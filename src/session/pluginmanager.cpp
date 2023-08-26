@@ -924,7 +924,7 @@ void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
     setPropertiesFile (settings.getUserSettings());
     if (props == nullptr)
         return;
-    
+
     // transfer old plugins to new.
     if (auto xml = props->getXmlValue (detail::pluginListKey()))
     {

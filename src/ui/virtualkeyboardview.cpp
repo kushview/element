@@ -1,21 +1,5 @@
-/*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #include <element/audioengine.hpp>
 #include "ui/guicommon.hpp"
@@ -101,7 +85,7 @@ VirtualKeyboardView::VirtualKeyboardView()
         internalState, MidiKeyboardComponent::horizontalKeyboard);
     addAndMakeVisible (keyboard.get());
     setupKeyboard (*keyboard);
-#if 1
+    setWantsKeyboardFocus (true);
 
     addAndMakeVisible (midiChannelLabel);
     midiChannelLabel.setFont (Font (12.f));
@@ -111,6 +95,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     midiChannel.setSliderStyle (Slider::IncDecButtons);
     midiChannel.setRange (1.0, 16.0, 1.0);
     midiChannel.setTextBoxStyle (Slider::TextBoxLeft, false, 30, midiChannel.getTextBoxHeight());
+    midiChannel.setWantsKeyboardFocus (false);
     midiChannel.onValueChange = [this]() {
         keyboard->setMidiChannel (roundToInt (midiChannel.getValue()));
     };
@@ -123,6 +108,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     midiProgram.setSliderStyle (Slider::IncDecButtons);
     midiProgram.setRange (1.0, 128, 1.0);
     midiProgram.setTextBoxStyle (Slider::TextBoxLeft, false, 34, midiProgram.getTextBoxHeight());
+    midiProgram.setWantsKeyboardFocus (false);
     midiProgram.onValueChange = [this]() {
         auto* const world = ViewHelpers::getGlobals (this);
         AudioEnginePtr engine = world != nullptr ? world->audio() : nullptr;
@@ -183,7 +169,6 @@ VirtualKeyboardView::VirtualKeyboardView()
         keyWidth = jlimit (14, 24, keyWidth + 1);
         stabilizeWidthControls();
     };
-#endif
 }
 
 void VirtualKeyboardView::stabilizeWidthControls()
@@ -223,6 +208,7 @@ void VirtualKeyboardView::restoreState (PropertiesFile* props)
 void VirtualKeyboardView::setupKeyboard (VirtualKeyboardComponent& kb)
 {
     kb.setKeyWidth (keyWidth);
+    kb.setWantsKeyboardFocus (false);
 }
 
 VirtualKeyboardView::~VirtualKeyboardView()
@@ -238,7 +224,7 @@ void VirtualKeyboardView::paint (Graphics& g)
 void VirtualKeyboardView::resized()
 {
     auto r = getLocalBounds();
-#if 1
+
     r.removeFromTop (2);
     auto r2 = r.removeFromTop (18);
     r2.removeFromLeft (4);
@@ -262,7 +248,7 @@ void VirtualKeyboardView::resized()
     hold.setBounds (sustain.getRight(), r2.getY(), sustain.getWidth(), r2.getHeight());
 
     r.removeFromTop (2);
-#endif
+
     if (keyboard)
         keyboard->setBounds (r);
 }
@@ -292,42 +278,30 @@ bool VirtualKeyboardView::keyPressed (const KeyPress& key)
     const auto isCtrlDown = key.getModifiers().isCommandDown();
     const auto isAltDown = key.getModifiers().isAltDown();
 
-    if (! isShiftDown && isCtrlDown && ! isAltDown && (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    if (key == KeyPress::leftKey || key == KeyPress::rightKey)
     {
-        // ctrl + minus
-        midiChannel.setValue (midiChannel.getValue() - 1);
-        return true;
-    }
-    else if (! isShiftDown && isCtrlDown && ! isAltDown && (key.isKeyCode ('=') || key.isKeyCode ('+')))
-    {
-        // ctrl + plus
-        midiChannel.setValue (midiChannel.getValue() + 1);
+        const double channelValue = key == KeyPress::leftKey ? -1.0 : 1.0;
+        midiChannel.setValue (midiChannel.getValue() + channelValue);
         return true;
     }
 
-    else if (! isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    else if (key == KeyPress::upKey || key == KeyPress::downKey)
     {
-        // ctrl + alt + minus
-        midiProgram.setValue (midiProgram.getValue() - 1);
-        return true;
-    }
-    else if (! isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('=') || key.isKeyCode ('+')))
-    {
-        // ctrl + alt + plus
-        midiProgram.setValue (midiProgram.getValue() + 1);
+        double programValue = key == KeyPress::downKey ? -1.0 : 1.0;
+        if (isAltDown)
+            programValue *= 10.0;
+        midiProgram.setValue (midiProgram.getValue() + programValue);
         return true;
     }
 
-    else if (isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    else if (key.isKeyCode ('-'))
     {
-        // shift + ctrl + alt + minus
         if (widthDown.onClick)
             widthDown.onClick();
         return true;
     }
-    else if (isShiftDown && isCtrlDown && isAltDown && (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    else if (key.isKeyCode ('+'))
     {
-        // shift + ctrl + alt + plus
         if (widthUp.onClick)
             widthUp.onClick();
         return true;

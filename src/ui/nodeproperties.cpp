@@ -118,6 +118,13 @@ private:
 
     void updateMidiProgram()
     {
+        if (node.isGraph())
+        {
+            setEnabled (false);
+            return;
+        }
+
+        setEnabled (true);
         const bool enabled = node.areMidiProgramsEnabled();
         String programName;
         if (ProcessorPtr object = node.getObject())

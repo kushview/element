@@ -226,7 +226,7 @@ public:
     {
         PopupMenu presets;
         getPresetsMenu (collection, presets);
-        addSubMenu (subMenuName, presets);
+        addSubMenu (subMenuName, presets, ! node.isGraph() && ! node.isIONode());
     }
 
     inline void getPresetsMenu (PresetManager& collection, PopupMenu& menu)

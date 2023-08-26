@@ -224,7 +224,8 @@ private:
 void GuiService::ForegroundCheck::timerCallback()
 {
     static bool sIsForeground = true;
-    if (ui.services().getRunMode() == RunMode::Plugin) {
+    if (ui.services().getRunMode() == RunMode::Plugin)
+    {
         stopTimer();
         return;
     }
@@ -232,7 +233,7 @@ void GuiService::ForegroundCheck::timerCallback()
     auto foreground = Process::isForegroundProcess();
     if (sIsForeground == foreground)
         return;
-    
+
     if (! ui.settings().hidePluginWindowsWhenFocusLost())
         return;
 
@@ -416,9 +417,10 @@ void GuiService::closeAllWindows()
 
 Commands& GuiService::commands() { return impl->commands; }
 
-void GuiService::checkUpdates() { 
+void GuiService::checkUpdates()
+{
 #if EL_UPDATER
-    updates->check(); 
+    updates->check();
 #endif
 }
 
