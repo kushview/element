@@ -24,85 +24,15 @@ GraphEditorView::GraphEditorView (const Node& g)
 void GraphEditorView::init()
 {
     setName (EL_VIEW_GRAPH_EDITOR);
-
-    graph.onBlockMoved = [this] (BlockComponent& block) {
-        const int resizeBy = 12;
-        const int edgeSpeed = 6;
-        const int maxSpeed = 10;
-
-        // restrict top/left out of bounds scroll
-        auto pos = block.getBounds().getTopLeft();
-        if (block.getX() < 0)
-            pos.setX (0);
-        if (block.getY() < 0)
-            pos.setY (0);
-
-        // save top left
-        const auto revertTopLeftPos = pos;
-        const bool revertTopLeft = pos.getX() != block.getX() || pos.getY() != block.getY();
-        ScopedCallback defer ([&block, &revertTopLeftPos, &revertTopLeft]() {
-            if (revertTopLeft)
-            {
-                block.setNodePosition (revertTopLeftPos);
-                block.updatePosition();
-            }
-        });
-
-        // no action if mouse within viewable area
-        const auto mp = view.getLocalPoint (nullptr, Desktop::getInstance().getMousePosition());
-        if (mp.getX() > 0 && mp.getX() < view.getViewWidth() && mp.getY() > 0 && mp.getY() < view.getViewHeight())
-        {
-            return;
-        }
-
-        // expand and scroll bottom/right
-        pos = block.getBounds().getBottomRight();
-        auto gb = graph.getBounds();
-        bool sizeShouldChange = false;
-        if (pos.x > gb.getWidth())
-        {
-            gb.setWidth (pos.x + resizeBy);
-            sizeShouldChange = true;
-        }
-        if (pos.y > gb.getHeight())
-        {
-            gb.setHeight (pos.y + resizeBy);
-            sizeShouldChange = true;
-        }
-        if (sizeShouldChange)
-        {
-            graph.setBounds (gb);
-        }
-
-        pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
-        view.autoScroll (pos.x, pos.y, edgeSpeed, maxSpeed);
-    };
-
-    graph.onZoomChanged = [this]() {
-        auto s = settings();
-        if (s.isValid())
-        {
-            s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);
-        }
-    };
-
-    addAndMakeVisible (view);
-    view.setViewedComponent (&graph, false);
-    view.setScrollBarsShown (true, true, false, false);
-    view.setScrollOnDragMode (juce::Viewport::ScrollOnDragMode::never);
-    view.setBounds (graph.getLocalBounds());
-
+    addAndMakeVisible (_editor);
     setSize (640, 360);
     setWantsKeyboardFocus (true);
 }
 
 GraphEditorView::~GraphEditorView()
 {
-    graph.onZoomChanged = nullptr;
-    graph.onBlockMoved = nullptr;
     nodeSelectedConnection.disconnect();
     nodeRemovedConnection.disconnect();
-    view.setViewedComponent (nullptr, false);
 }
 
 void GraphEditorView::willBeRemoved()
@@ -112,14 +42,14 @@ void GraphEditorView::willBeRemoved()
     if (world)
         world->midi().removeChangeListener (this);
     saveSettings();
-    graph.setNode (Node());
+    _editor.setNode (Node());
 }
 
 bool GraphEditorView::keyPressed (const KeyPress& key)
 {
     if (key.getKeyCode() == KeyPress::backspaceKey || key.getKeyCode() == KeyPress::deleteKey)
     {
-        graph.deleteSelectedNodes();
+        _editor.deleteSelectedNodes();
         return true;
     }
 
@@ -148,7 +78,7 @@ void GraphEditorView::stabilizeContent()
     }
 
     const auto g = getGraph();
-    graph.setNode (g);
+    _editor.setNode (g);
     onNodeSelected();
 }
 
@@ -159,12 +89,12 @@ void GraphEditorView::didBecomeActive()
     world->midi().addChangeListener (this);
     stabilizeContent();
     restoreSettings();
-    graph.updateComponents();
+    _editor.updateComponents();
 }
 
 void GraphEditorView::changeListenerCallback (ChangeBroadcaster*)
 {
-    graph.stabilizeNodes();
+    _editor.stabilizeNodes();
 }
 
 void GraphEditorView::paint (Graphics& g)
@@ -175,16 +105,13 @@ void GraphEditorView::paint (Graphics& g)
 void GraphEditorView::graphDisplayResized (const Rectangle<int>& area)
 {
     auto r = area;
-
-    view.setBounds (r);
-    if (graph.getWidth() < view.getWidth() || graph.getHeight() < view.getHeight())
-        graph.setBounds (view.getBounds());
+    _editor.setBounds (r);
 
     auto s = settings();
     if (s.isValid())
     {
-        s.setProperty (tags::width, graph.getWidth(), nullptr)
-            .setProperty (tags::height, graph.getHeight(), nullptr);
+        s.setProperty (tags::width, _editor.getWidth(), nullptr)
+            .setProperty (tags::height, _editor.getHeight(), nullptr);
     }
 }
 
@@ -212,7 +139,7 @@ void GraphEditorView::onNodeSelected()
             // prevent minor gui changes from marking session as dirty.
             // This is a hack and need a better solution;
             Session::ScopedFrozenLock freeze (*session);
-            graph.selectNode (selected);
+            _editor.selectNode (selected);
         }
     }
 }
@@ -230,14 +157,16 @@ void GraphEditorView::onNodeRemoved (const Node& node)
 
 void GraphEditorView::updateSizeInternal (const bool force)
 {
-    auto r = graph.getRequiredSpace();
+#if 0
+    auto r = _editor.getRequiredSpace();
     const auto rc = r;
     if (r.getWidth() <= view.getWidth())
         r.setWidth (view.getWidth());
     if (r.getHeight() <= view.getHeight())
         r.setHeight (view.getHeight());
     if (force || r != rc)
-        graph.setBounds (r);
+        _editor.setBounds (r);
+#endif
 }
 
 ValueTree GraphEditorView::settings() const
@@ -256,11 +185,12 @@ void GraphEditorView::restoreSettings()
         return;
     }
 
-    graph.setSize (s.getProperty (tags::width, getWidth()),
-                   s.getProperty (tags::height, getHeight()));
-    graph.setZoomScale (s.getProperty ("zoomScale", 1.0f));
-    view.getHorizontalScrollBar().setCurrentRangeStart (s.getProperty ("horizontalRangeStart", 0.0));
-    view.getVerticalScrollBar().setCurrentRangeStart (s.getProperty ("verticalRangeStart", 0.0));
+#if 0
+    _editor.setSize (s.getProperty (tags::width, getWidth()),
+                     s.getProperty (tags::height, getHeight()));
+   
+    _editor.setZoomScale (s.getProperty ("zoomScale", 1.0f));
+#endif
 
     resized();
 }
@@ -271,13 +201,13 @@ void GraphEditorView::saveSettings()
     if (! s.isValid())
         return;
 
-    s.setProperty (tags::width, graph.getWidth(), nullptr);
-    s.setProperty (tags::height, graph.getHeight(), nullptr);
-    s.setProperty ("horizontalRangeStart", view.getHorizontalScrollBar().getCurrentRangeStart(), nullptr);
-    s.setProperty ("verticalRangeStart", view.getVerticalScrollBar().getCurrentRangeStart(), nullptr);
-    s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);
+    s.setProperty (tags::width, _editor.getWidth(), nullptr);
+    s.setProperty (tags::height, _editor.getHeight(), nullptr);
+    // s.setProperty ("horizontalRangeStart", view.getHorizontalScrollBar().getCurrentRangeStart(), nullptr);
+    // s.setProperty ("verticalRangeStart", view.getVerticalScrollBar().getCurrentRangeStart(), nullptr);
+    // s.setProperty ("zoomScale", _editor.getZoomScale(), nullptr);
 }
 
-void GraphEditorView::selectAllNodes() { graph.selectAllNodes(); }
+void GraphEditorView::selectAllNodes() { _editor.selectAllNodes(); }
 
 } /* namespace element */

@@ -21,7 +21,7 @@ public:
     GraphEditorView();
     ~GraphEditorView();
 
-    GraphEditorComponent& editor() { return graph; }
+    GraphEditor& editor() { return _editor; }
 
     void selectAllNodes();
 
@@ -44,8 +44,7 @@ protected:
 
 private:
     Node node;
-    GraphEditorComponent graph;
-    Viewport view;
+    GraphEditor _editor;
 
     SignalConnection nodeSelectedConnection,
         nodeRemovedConnection;

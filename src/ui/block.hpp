@@ -196,6 +196,7 @@ protected:
 private:
     friend class GraphEditorComponent;
     friend class GraphEditorView;
+    friend class GraphEditor;
     friend class juce::ChangeBroadcaster;
 
     const uint32 filterID;
