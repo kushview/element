@@ -32,70 +32,15 @@
 
 namespace element {
 
-InternalFormat::InternalFormat (Context& ctx)
-    : context (ctx)
-{
-    {
-        PlaceholderProcessor p;
-        p.fillInPluginDescription (placeholderDesc);
-    }
-    {
-        MidiDeviceProcessor in (true, context.midi());
-        in.fillInPluginDescription (midiInputDeviceDesc);
-        MidiDeviceProcessor out (false, context.midi());
-        out.fillInPluginDescription (midiOutputDeviceDesc);
-    }
-}
+using namespace juce;
 
-AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
-{
-    if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_INPUT_DEVICE)
-    {
-        return new MidiDeviceProcessor (true, context.midi());
-    }
-    else if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
-    {
-        return new MidiDeviceProcessor (false, context.midi());
-    }
-    else if (desc.fileOrIdentifier == EL_NODE_ID_PLACEHOLDER)
-    {
-        return new PlaceholderProcessor();
-    }
-
-    return nullptr;
-}
-
-void InternalFormat::getAllTypes (OwnedArray<PluginDescription>& results)
-{
-    results.add (new PluginDescription (placeholderDesc));
-    results.add (new PluginDescription (midiInputDeviceDesc));
-    results.add (new PluginDescription (midiOutputDeviceDesc));
-}
-
-void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate, int initialBufferSize, PluginCreationCallback callback)
-{
-    if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
-    {
-        callback (std::unique_ptr<AudioPluginInstance> (i), String());
-    }
-    else
-    {
-        callback (nullptr, String ("Could not instantiate ") + d.name);
-    }
-}
-
-bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
-{
-    return false;
-}
-
-// MARK: Element Format
-ElementAudioPluginFormat::ElementAudioPluginFormat (Context& g)
-    : world (g) {}
+//==============================================================================
+ElementAudioPluginFormat::ElementAudioPluginFormat (Context& c)
+    : _context (c) {}
 
 void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription>& ds, const String& fileOrId)
 {
-    auto& factory = world.plugins().getNodeFactory();
+    auto& factory = _context.plugins().getNodeFactory();
     if (factory.isTypeHidden (fileOrId))
         return;
 
@@ -206,6 +151,16 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
         auto* const desc = ds.add (new PluginDescription());
         PlaceholderProcessor().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_NODE_ID_MIDI_INPUT_DEVICE)
+    {
+        auto* const desc = ds.add (new PluginDescription());
+        MidiDeviceProcessor (true, _context.midi()).fillInPluginDescription (*desc);
+    }
+    else if (fileOrId == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
+    {
+        auto* const desc = ds.add (new PluginDescription());
+        MidiDeviceProcessor (false, _context.midi()).fillInPluginDescription (*desc);
+    }
 }
 
 StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -225,6 +180,8 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_NODE_ID_MIDI_CHANNEL_MAP);
     results.add (EL_NODE_ID_AUDIO_FILE_PLAYER);
     results.add (EL_NODE_ID_PLACEHOLDER);
+    results.add (EL_NODE_ID_MIDI_INPUT_DEVICE);
+    results.add (EL_NODE_ID_MIDI_OUTPUT_DEVICE);
     return results;
 }
 
@@ -268,6 +225,10 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = std::make_unique<MediaPlayerProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_PLACEHOLDER)
         base = std::make_unique<PlaceholderProcessor>();
+    else if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_INPUT_DEVICE)
+        base = std::make_unique<MidiDeviceProcessor> (true, _context.midi());
+    else if (desc.fileOrIdentifier == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
+        base = std::make_unique<MidiDeviceProcessor> (false, _context.midi());
 
     return base != nullptr ? base.release() : nullptr;
 }

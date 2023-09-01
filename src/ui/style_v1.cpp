@@ -666,7 +666,7 @@ void LookAndFeel_E1::drawProgressBar (Graphics& g, ProgressBar& progressBar, int
     drawLinearProgressBar (g, progressBar, width, height, progress, textToShow);
 }
 
-static void drawButtonShape (Graphics& g, const Path& outline, Colour baseColour, float height)
+void Style::drawButtonShape (Graphics& g, const Path& outline, Colour baseColour, float height)
 {
     const float mainBrightness = baseColour.getBrightness();
     const float mainAlpha = baseColour.getFloatAlpha();
@@ -701,7 +701,7 @@ void LookAndFeel_E1::drawButtonBackground (Graphics& g, Button& button, const Co
     Path outline;
     outline.addRoundedRectangle (0.5f, 0.5f, width, height, cornerSize, cornerSize, ! (flatOnLeft || flatOnTop), ! (flatOnRight || flatOnTop), ! (flatOnLeft || flatOnBottom), ! (flatOnRight || flatOnBottom));
 
-    drawButtonShape (g, outline, baseColour, height);
+    Style::drawButtonShape (g, outline, baseColour, height);
 }
 
 void LookAndFeel_E1::drawTableHeaderBackground (Graphics& g, TableHeaderComponent& header)
@@ -879,7 +879,7 @@ void LookAndFeel_E1::drawComboBox (Graphics& g, int width, int height, const boo
                               buttonW - outlineThickness * 2.0f,
                               buttonH - outlineThickness * 2.0f);
 
-    drawButtonShape (g,
+    Style::drawButtonShape (g,
                      buttonShape,
                      buttonColour.withMultipliedSaturation (box.hasKeyboardFocus (true) ? 1.3f : 0.9f).withMultipliedAlpha (box.isEnabled() ? 0.9f : 0.5f),
                      (float) height);

@@ -17,6 +17,7 @@
 #include "ui/nodeeditorfactory.hpp"
 #include "ui/viewhelpers.hpp"
 #include "ui/block.hpp"
+#include "ui/blockutils.hpp"
 
 #include "scopedflag.hpp"
 
@@ -81,26 +82,34 @@ Colour PortComponent::getColor() const noexcept
 
 void PortComponent::paint (Graphics& g)
 {
-    Path path;
-
-    float start = 0.0, end = 0.0;
-    if (vertical)
+    if (true)
     {
-        start = input ? -90.f : 270.f;
-        end = input ? 90.f : 90.f;
+        g.setColour (getColor());
+        g.fillRoundedRectangle (0.f, 0.f, (float)getWidth(), (float)getHeight(), 2.f);
     }
     else
     {
-        start = input ? 180.f : 0.f;
-        end = input ? 360.f : 180.f;
-    }
+        Path path;
 
-    path.addPieSegment (getLocalBounds().toFloat(),
-                        degreesToRadians (start),
-                        degreesToRadians (end),
-                        0);
-    g.setColour (getColor());
-    g.fillPath (path);
+        float start = 0.0, end = 0.0;
+        if (vertical)
+        {
+            start = input ? -90.f : 270.f;
+            end = input ? 90.f : 90.f;
+        }
+        else
+        {
+            start = input ? 180.f : 0.f;
+            end = input ? 360.f : 180.f;
+        }
+
+        path.addPieSegment (getLocalBounds().toFloat(),
+                            degreesToRadians (start),
+                            degreesToRadians (end),
+                            0);
+        g.setColour (getColor());
+        g.fillPath (path);
+    }
 }
 
 void PortComponent::mouseDown (const MouseEvent& e)
@@ -816,12 +825,10 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
     }
     else
     {
-        setMuteButtonVisible (true);
-        setConfigButtonVisible (true);
-        setPowerButtonVisible (true);
+        detail::updateNormalBlockButtons (*this, this->node);
     }
 
-    if (displayMode == Embed)
+    if (displayMode == Embed && detail::supportsEmbed (this->node))
     {
         if (embedded == nullptr)
         {
@@ -830,8 +837,8 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
                 NodeEditorFactory factory (*ui);
                 if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
                     embedded.reset (e.release());
-                // else
-                //     embedded = NodeEditorFactory::createAudioProcessorEditor (node).release();
+                else
+                    embedded = NodeEditorFactory::createAudioProcessorEditor (node);
             }
             if (embedded != nullptr)
             {
@@ -1107,19 +1114,21 @@ GraphEditorComponent* BlockComponent::getGraphPanel() const noexcept
 void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
 {
     PopupMenu dMenu;
-    const auto block = node.getUIValueTree().getOrCreateChildWithName (types::Block, nullptr);
+    const auto block = node.getBlockValueTree();
     const auto mode = BlockComponent::getDisplayModeFromString (
-        block.getProperty (tags::displayMode).toString());
+        block.getProperty(tags::displayMode).toString());
+    
     for (int i = 0; i <= BlockComponent::Embed; ++i)
     {
-        auto m = static_cast<BlockComponent::DisplayMode> (i);
-        dMenu.addItem (BlockComponent::getDisplayModeName (m), true, mode == m, [this, block, m]() {
+        const auto m = static_cast<BlockComponent::DisplayMode> (i);
+        const bool enabled = m == BlockComponent::Embed ? detail::supportsEmbed(node) : true;
+        dMenu.addItem (BlockComponent::getDisplayModeName (m), enabled, mode == m, [this, block, m]() {
             auto b = block;
             b.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
-                auto sb = sibling.node.getUIValueTree().getOrCreateChildWithName (types::Block, nullptr);
+                auto sb = sibling.node.getBlockValueTree();
                 sb.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             });
 
@@ -1127,6 +1136,7 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
                 gp->updateConnectorComponents (true);
         });
     }
+
     menuToAddTo.addSubMenu (TRANS ("Display"), dMenu);
 }
 

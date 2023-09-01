@@ -67,8 +67,6 @@ private:
         services = std::make_unique<Services> (owner, RunMode::Standalone);
 
         plugins.reset (new PluginManager());
-        plugins->addFormat (new InternalFormat (owner));
-        // plugins->addFormat (new ElementAudioPluginFormat (owner));
         auto& nf = plugins->getNodeFactory();
         nf.add (new AudioProcessorFactory (owner));
         plugins->addDefaultFormats();
@@ -76,7 +74,7 @@ private:
 
     void freeAll()
     {
-        services.reset();
+        services = nullptr;
         plugins = nullptr;
         settings = nullptr;
         engine = nullptr;

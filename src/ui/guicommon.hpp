@@ -7,6 +7,7 @@
 #include <element/ui.hpp>
 #include <element/ui/commands.hpp>
 #include <element/ui/content.hpp>
+#include <element/ui/style.hpp>
 #include <element/session.hpp>
 #include <element/node.hpp>
 #include <element/context.hpp>
@@ -14,6 +15,5 @@
 
 #include "ElementApp.h"
 #include "ui/buttons.hpp"
-#include <element/ui/style.hpp>
 #include "ui/viewhelpers.hpp"
 #include "messages.hpp"

@@ -118,7 +118,7 @@ libelement_sources = '''
     ui/designer.cpp
     ui/filecombobox.cpp
     ui/filetreeview.cpp
-    ui/grapheditor.cpp
+    ui/graphnodeeditor.cpp
     ui/grapheditorcomponent.cpp
     ui/grapheditorview.cpp
     ui/graphmixerview.cpp

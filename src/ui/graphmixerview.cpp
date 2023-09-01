@@ -211,19 +211,32 @@ public:
         box.updateContent();
     }
 
+    void setNode (const Node& node)
+    {
+        if (node == _node)
+            return;
+        _node = node.isGraph() ? node : node.getParentGraph();
+        refreshNodes();
+    }
+
     void refreshNodes()
     {
         nodes.clearQuick();
-        const auto graph = gui.context().session()->getActiveGraph();
+        const auto graph = _node.isGraph() ? _node
+                                           : gui.context().session()->getActiveGraph();
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
-            const auto node = graph.getNode (i);
-            if (node.isMidiIONode() || node.getIdentifier() == EL_NODE_ID_MIDI_INPUT_DEVICE || node.getIdentifier() == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
+            const auto n = graph.getNode (i);
+            // clang-format off
+            if (n.isMidiIONode() || 
+                n.getIdentifier() == EL_NODE_ID_MIDI_INPUT_DEVICE || 
+                n.getIdentifier() == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
             {
                 continue;
             }
+            // clang-format on
 
-            nodes.add (node);
+            nodes.add (n);
         }
     }
 #if 0
@@ -241,15 +254,17 @@ public:
 private:
     GuiService& gui;
     HorizontalListBox& box;
+    Node _node;
     NodeArray nodes;
     bool dragging = false;
 };
 
-class GraphMixerView::Content : public Component, public DragAndDropContainer
+class GraphMixerView::Content : public Component,
+                                public DragAndDropContainer
 {
 public:
     Content (GraphMixerView& v, GuiService& gui, Session* sess)
-        : session (sess), view (v)
+        : ui (gui), session (sess), view (v)
     {
         setOpaque (true);
         addAndMakeVisible (box);
@@ -258,7 +273,7 @@ public:
         box.setModel (model.get());
         box.updateContent();
 
-        nodeSelectedConnection = gui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this));
+        nodeSelectedConnection = ui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this));
     }
 
     ~Content()
@@ -270,6 +285,7 @@ public:
 
     void onNodeSelected()
     {
+        model->setNode (ui.getSelectedNode());
         box.updateContent();
     }
 
@@ -301,6 +317,7 @@ public:
     }
 
 private:
+    UI& ui;
     SessionPtr session;
     GraphMixerView& view;
     std::unique_ptr<GraphMixerListBoxModel> model;

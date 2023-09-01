@@ -9,10 +9,14 @@
 
 #include "ElementApp.h"
 
-#include "ui/datapathbrowser.hpp"
 #include "engine/graphmanager.hpp"
+#include "nodes/baseprocessor.hpp"
+#include "nodes/audioprocessor.hpp"
+#include "session/presetmanager.hpp"
+#include "ui/datapathbrowser.hpp"
 #include "ui/guicommon.hpp"
 #include "ui/block.hpp"
+#include "ui/blockutils.hpp"
 #include "ui/contextmenus.hpp"
 #include "ui/icons.hpp"
 #include "ui/pluginwindow.hpp"
@@ -23,60 +27,27 @@
 #include "ui/sessiontreepanel.hpp"
 #include "ui/audioiopanelview.hpp"
 #include "ui/nodeioconfiguration.hpp"
-#include "nodes/baseprocessor.hpp"
-#include "session/presetmanager.hpp"
 #include "ui/grapheditorcomponent.hpp"
 
 #include "scopedflag.hpp"
 
 namespace element {
 
-static bool elNodeIsAudioMixer (const Node& node)
-{
-    return node.getFormat().toString() == "Element"
-           && node.getIdentifier().toString() == "element.audioMixer";
-}
-
-static bool elNodeIsMidiDevice (const Node& node)
-{
-    return node.getFormat().toString() == "Internal"
-           && (node.getIdentifier().toString() == "element.midiInputDevice" || node.getIdentifier().toString() == "element.midiOutputDevice");
-}
-
-static bool elNodeCanChangeIO (const Node& node)
-{
-    return ! node.isIONode()
-           && ! node.isGraph()
-           && ! elNodeIsAudioMixer (node)
-           && ! elNodeIsMidiDevice (node);
-}
-
 class DefaultBlockFactory : public BlockFactory
 {
 public:
-    DefaultBlockFactory (GraphEditorComponent& e)
-        : editor (e) {}
+    DefaultBlockFactory (Context& c, GraphEditorComponent& e)
+        : context (c), editor (e) {}
 
-    BlockComponent* createBlockComponent (Services& app, const Node& node) override
+    BlockComponent* createBlockComponent (const Node& node) override
     {
-        ignoreUnused (app);
         auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
-
-        if (node.isIONode() || node.isRootGraph())
-        {
-            block->setMuteButtonVisible (false);
-            block->setPowerButtonVisible (false);
-        }
-
-        if (! elNodeCanChangeIO (node))
-        {
-            block->setConfigButtonVisible (false);
-        }
-
+        detail::updateNormalBlockButtons (*block, node);
         return block;
     }
 
 private:
+    Context& context;
     GraphEditorComponent& editor;
 };
 
@@ -359,7 +330,6 @@ GraphEditorComponent::GraphEditorComponent()
     : ViewHelperMixin (this),
       selectedNodes (*this)
 {
-    factory.reset (new DefaultBlockFactory (*this));
     setOpaque (true);
     data.addListener (this);
     setSize (640, 360);
@@ -1206,10 +1176,17 @@ void GraphEditorComponent::updateSelection()
 
 BlockComponent* GraphEditorComponent::createBlock (const Node& node)
 {
-    if (auto* cc = ViewHelpers::findContentComponent (this))
-        return factory->createBlockComponent (cc->services(), node);
-    jassertfalse;
-    return nullptr;
+    if (factory == nullptr)
+        if (auto* cc = ViewHelpers::findContentComponent (this))
+            factory = std::make_unique<DefaultBlockFactory> (cc->context(), *this);
+
+    if (factory == nullptr)
+    {
+        jassertfalse;
+        return nullptr;
+    }
+
+    return factory->createBlockComponent (node);
 }
 
 } // namespace element

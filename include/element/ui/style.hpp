@@ -92,6 +92,11 @@ struct Style {
             jassertfalse; // mode not supported
         }
     }
+
+    static void drawButtonShape (juce::Graphics& g,
+                                const juce::Path& outline, 
+                                juce::Colour baseColour,
+                                float height);
 };
 
 // clang-format off

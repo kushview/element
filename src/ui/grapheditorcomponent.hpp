@@ -121,12 +121,10 @@ private:
 
     float zoomScale = 1.0;
 
-    void selectNode (const Node& node, ModifierKeys mods);
     void setSelectedNodesCompact (bool selected);
 
     Component* createContainerForNode (ProcessorPtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (ProcessorPtr node, bool useGenericEditor);
-    PluginWindow* getOrCreateWindowForNode (ProcessorPtr f, bool useGeneric);
 
     void updateBlockComponents (const bool doPosition = true);
     void updateConnectorComponents (bool async = false);

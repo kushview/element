@@ -51,7 +51,7 @@ private:
         AudioProcessorNode& node;
     } enablement;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioProcessorNode);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioProcessorNode)
 };
 
 } // namespace element

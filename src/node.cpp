@@ -549,12 +549,12 @@ void Node::getAudioOutputs (PortArray& ports) const
 //==============================================================================
 bool Node::isMidiInputDevice() const
 {
-    return objectData.getProperty (tags::format) == "Element" && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_INPUT_DEVICE;
+    return objectData.getProperty (tags::format) == EL_NODE_FORMAT_NAME && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_INPUT_DEVICE;
 }
 
 bool Node::isMidiOutputDevice() const
 {
-    return objectData.getProperty (tags::format) == "Element" && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_OUTPUT_DEVICE;
+    return objectData.getProperty (tags::format) == EL_NODE_FORMAT_NAME && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_OUTPUT_DEVICE;
 }
 
 //==============================================================================

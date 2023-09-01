@@ -852,6 +852,7 @@ Processor* PluginManager::createGraphNode (const PluginDescription& desc, String
         else
         {
             errorMsg = "Could not create internal node";
+            errorMsg << ": " << desc.fileOrIdentifier;
             return nullptr;
         }
     }

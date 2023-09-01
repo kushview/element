@@ -4,7 +4,7 @@
 #pragma once
 
 #include <element/node.hpp>
-#include "ui/buttons.hpp"
+#include "./buttons.hpp"
 
 namespace element {
 
@@ -332,7 +332,7 @@ private:
 
     void addDisplaySubmenu (PopupMenu& menuToAddTo);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent)
 };
 
 //=============================================================================
@@ -340,7 +340,7 @@ class BlockFactory
 {
 public:
     virtual ~BlockFactory() = default;
-    virtual BlockComponent* createBlockComponent (Services& app, const Node& node) = 0;
+    virtual BlockComponent* createBlockComponent (const Node& node) = 0;
 
 protected:
     BlockFactory() = default;

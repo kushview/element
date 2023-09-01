@@ -903,8 +903,9 @@ Node EngineService::addMidiDeviceNode (const MidiDeviceInfo& device, const bool 
     if (auto* const root = graphs->findActiveRootGraphManager())
     {
         PluginDescription desc;
-        desc.pluginFormatName = "Internal";
-        desc.fileOrIdentifier = isInput ? "element.midiInputDevice" : "element.midiOutputDevice";
+        desc.pluginFormatName = EL_NODE_FORMAT_NAME;
+        desc.fileOrIdentifier = isInput ? EL_NODE_ID_MIDI_INPUT_DEVICE
+                                        : EL_NODE_ID_MIDI_OUTPUT_DEVICE;
         ptr = root->getNodeForId (root->addNode (&desc, 0.5, 0.5));
     }
 
