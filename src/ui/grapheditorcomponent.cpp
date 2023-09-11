@@ -628,12 +628,17 @@ void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x
     DBG ("[element] GraphEditorComponent::createNewPlugin(...)");
 }
 
-BlockComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
+BlockComponent* GraphEditorComponent::getComponentForNode (const Node& node) const
+{
+    return getComponentForFilter (node.getNodeId());
+}
+
+BlockComponent* GraphEditorComponent::getComponentForFilter (const uint32 nodeID) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         if (BlockComponent* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-            if (block->filterID == filterID)
+            if (block->filterID == nodeID)
                 return block;
     }
 
@@ -1128,6 +1133,11 @@ void GraphEditorComponent::deleteSelectedNodes()
         const auto node = graph.getNodeById (nodeId);
         toRemove.add (node);
     }
+
+    for (const auto& sl : toRemove)
+        if (auto x = getComponentForNode (sl))
+            if (x->displayMode == BlockComponent::Embed)
+                x->clearEmbedded();
 
     ViewHelpers::postMessageFor (this, new RemoveNodeMessage (toRemove));
     selectedNodes.deselectAll();

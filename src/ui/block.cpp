@@ -85,7 +85,7 @@ void PortComponent::paint (Graphics& g)
     if (true)
     {
         g.setColour (getColor());
-        g.fillRoundedRectangle (0.f, 0.f, (float)getWidth(), (float)getHeight(), 2.f);
+        g.fillRoundedRectangle (0.f, 0.f, (float) getWidth(), (float) getHeight(), 2.f);
     }
     else
     {
@@ -188,6 +188,7 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
 
 BlockComponent::~BlockComponent() noexcept
 {
+    clearEmbedded();
     nodeEnabled.removeListener (this);
     nodeName.removeListener (this);
     hiddenPorts.removeListener (this);
@@ -195,12 +196,83 @@ BlockComponent::~BlockComponent() noexcept
     deleteAllPins();
 }
 
+void BlockComponent::clearEmbedded()
+{
+    if (nullptr == embedded)
+        return;
+
+    if (auto jed = dynamic_cast<juce::AudioProcessorEditor*> (embedded.get()))
+        jed->processor.editorBeingDeleted (jed);
+
+    embedded.reset();
+}
+
 void BlockComponent::setDisplayMode (DisplayMode mode)
 {
     if (mode == displayMode)
         return;
+    auto oldMode = displayMode;
     displayMode = mode;
+    if (oldMode == Embed)
+        clearEmbedded();
     updateSize();
+
+    if (displayMode == Compact || displayMode == Small)
+    {
+        setMuteButtonVisible (false);
+        setConfigButtonVisible (false);
+        setPowerButtonVisible (false);
+    }
+    else
+    {
+        detail::updateNormalBlockButtons (*this, this->node);
+    }
+
+    if (displayMode == Embed)
+    {
+        if (detail::supportsEmbed (this->node))
+        {
+            struct EmbedBockAsync : MessageManager::MessageBase
+            {
+                using PtrType = std::unique_ptr<juce::Component>;
+                EmbedBockAsync (BlockComponent& b, const Node& n, UI& u, PtrType& p)
+                    : block (b), node (n), ui (u), embedded (p) {}
+
+                void messageCallback() override
+                {
+                    if (embedded == nullptr)
+                    {
+                        NodeEditorFactory factory (ui);
+                        if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
+                            embedded.reset (e.release());
+                        else
+                            embedded = NodeEditorFactory::createAudioProcessorEditor (node);
+                    }
+
+                    if (embedded != nullptr)
+                    {
+                        block.addAndMakeVisible (embedded.get());
+                        block.updateSize();
+                    }
+                }
+
+                BlockComponent& block;
+                Node node;
+                UI& ui;
+                PtrType& embedded;
+            };
+
+            if (auto* ui = ViewHelpers::getGuiController (this))
+                (new EmbedBockAsync (*this, node, *ui, this->embedded))->post();
+        }
+        else
+        {
+        }
+    }
+    else
+    {
+        clearEmbedded();
+    }
 }
 
 void BlockComponent::moveBlockTo (double x, double y)
@@ -535,6 +607,10 @@ void BlockComponent::makeEditorActive()
     }
     else if (node.isValid())
     {
+        if (displayMode == Embed)
+        {
+            setDisplayMode (Small);
+        }
         ViewHelpers::presentPluginWindow (this, node);
     }
 }
@@ -816,42 +892,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     vertical = ged->isLayoutVertical();
 
-    displayMode = getDisplayModeFromString (displayModeValue.getValue());
-    if (displayMode == Compact || displayMode == Small)
-    {
-        setMuteButtonVisible (false);
-        setConfigButtonVisible (false);
-        setPowerButtonVisible (false);
-    }
-    else
-    {
-        detail::updateNormalBlockButtons (*this, this->node);
-    }
-
-    if (displayMode == Embed && detail::supportsEmbed (this->node))
-    {
-        if (embedded == nullptr)
-        {
-            if (auto* ui = ViewHelpers::getGuiController (this))
-            {
-                NodeEditorFactory factory (*ui);
-                if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
-                    embedded.reset (e.release());
-                else
-                    embedded = NodeEditorFactory::createAudioProcessorEditor (node);
-            }
-            if (embedded != nullptr)
-            {
-                addAndMakeVisible (embedded.get());
-                updateSize();
-            }
-        }
-    }
-    else
-    {
-        if (embedded != nullptr)
-            embedded = nullptr;
-    }
+    setDisplayMode (getDisplayModeFromString (displayModeValue.getValue()));
 
     updatePins (forcePins);
 
@@ -1116,12 +1157,12 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
     PopupMenu dMenu;
     const auto block = node.getBlockValueTree();
     const auto mode = BlockComponent::getDisplayModeFromString (
-        block.getProperty(tags::displayMode).toString());
-    
+        block.getProperty (tags::displayMode).toString());
+
     for (int i = 0; i <= BlockComponent::Embed; ++i)
     {
         const auto m = static_cast<BlockComponent::DisplayMode> (i);
-        const bool enabled = m == BlockComponent::Embed ? detail::supportsEmbed(node) : true;
+        const bool enabled = m == BlockComponent::Embed ? detail::supportsEmbed (node) : true;
         dMenu.addItem (BlockComponent::getDisplayModeName (m), enabled, mode == m, [this, block, m]() {
             auto b = block;
             b.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);

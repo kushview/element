@@ -256,6 +256,31 @@ void SimpleMeter::paint (Graphics& g)
     g.fillAll();
 }
 
+void SimpleMeter::paintOverChildren (juce::Graphics& g)
+{
+    if (portCount < 2)
+        return;
+
+    g.setColour (Colour (0xFF202020).darker (0.2f));
+    const int size = (horizontal ? getHeight() : getWidth()) / portCount;
+    if (! horizontal)
+    {
+        for (int idx = 0; idx < portCount - 1; ++idx)
+        {
+            const auto x = float ((idx + 1) * size);
+            g.fillRect (x - 1.f, 0.f, 1.f, (float) getHeight());
+        }
+    }
+    else
+    {
+        for (int idx = 0; idx < portCount - 1; ++idx)
+        {
+            const auto y = float ((idx + 1) * size);
+            g.fillRect (0.f, y - 1.f, (float) getWidth(), 1.f);
+        }
+    }
+}
+
 SimpleMeterValue* SimpleMeter::createSimpleMeterValue()
 {
     return new SimpleMeterValue (this);

@@ -304,68 +304,12 @@ int LookAndFeel_E1::getSliderThumbRadius (Slider& slider)
         : static_cast<int> ((float) slider.getWidth() * 0.77f));
 }
 
-void LookAndFeel_E1::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
+void LookAndFeel_E1::drawRotarySlider (Graphics& g, int x, int y, int width, int height, 
+                                       float sliderPos, const float rotaryStartAngle, 
+                                       const float rotaryEndAngle, Slider& slider)
 {
-    const float radius = jmin (width / 2, height / 2) - 2.0f;
-    const float centreX = x + width * 0.5f;
-    const float centreY = y + height * 0.5f;
-    const float rx = centreX - radius;
-    const float ry = centreY - radius;
-    const float rw = radius * 2.0f;
-    const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    const bool isMouseOver = slider.isMouseOverOrDragging() && slider.isEnabled();
-
-    if (radius > 12.0f)
-    {
-        if (slider.isEnabled())
-            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.7f));
-        else
-            g.setColour (Colour (0x80808080));
-
-        const float thickness = 0.7f;
-
-        {
-            Path filledArc;
-            filledArc.addPieSegment (rx, ry, rw, rw, rotaryStartAngle, angle, thickness);
-            g.fillPath (filledArc);
-        }
-
-        {
-            const float innerRadius = radius * 0.2f;
-            Path p;
-            p.addTriangle (-innerRadius, 0.0f, 0.0f, -radius * thickness * 1.1f, innerRadius, 0.0f);
-
-            p.addEllipse (-innerRadius, -innerRadius, innerRadius * 2.0f, innerRadius * 2.0f);
-
-            g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
-        }
-
-        if (slider.isEnabled())
-            g.setColour (slider.findColour (Slider::rotarySliderOutlineColourId));
-        else
-            g.setColour (Colour (0x80808080));
-
-        Path outlineArc;
-        outlineArc.addPieSegment (rx, ry, rw, rw, rotaryStartAngle, rotaryEndAngle, thickness);
-        outlineArc.closeSubPath();
-
-        g.strokePath (outlineArc, PathStrokeType (slider.isEnabled() ? (isMouseOver ? 2.0f : 1.2f) : 0.3f));
-    }
-    else
-    {
-        if (slider.isEnabled())
-            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.7f));
-        else
-            g.setColour (Colour (0x80808080));
-
-        Path p;
-        p.addEllipse (-0.4f * rw, -0.4f * rw, rw * 0.8f, rw * 0.8f);
-        PathStrokeType (rw * 0.1f).createStrokedPath (p, p);
-
-        p.addLineSegment (Line<float> (0.0f, 0.0f, 0.0f, -radius), rw * 0.2f);
-
-        g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
-    }
+    Style::drawDial (g, x, y, width, height, sliderPos, 0.f, 
+                     rotaryStartAngle, rotaryEndAngle, slider);
 }
 
 void LookAndFeel_E1::drawLinearSlider (Graphics& g, int x, int y, int width, int height, float sliderPos, float minSliderPos, float maxSliderPos, const Slider::SliderStyle st, Slider& sl)
@@ -666,6 +610,54 @@ void LookAndFeel_E1::drawProgressBar (Graphics& g, ProgressBar& progressBar, int
     drawLinearProgressBar (g, progressBar, width, height, progress, textToShow);
 }
 
+void Style::drawVerticalText (juce::Graphics& g,
+                              const juce::String& text,
+                              const juce::Rectangle<int> area,
+                              juce::Justification justification)
+{
+    using namespace juce;
+
+    auto r = area;
+    Graphics::ScopedSaveState savestate (g);
+
+    if (justification == Justification::centred) {
+        g.setOrigin (r.getX(), r.getY());
+        g.addTransform (AffineTransform().rotated (
+            MathConstants<float>::pi / 2.0f, 0.0f, 0.0f));
+        g.drawText (text,
+                    0,
+                    -r.getWidth(),
+                    r.getHeight(),
+                    r.getWidth(),
+                    justification,
+                    false);
+    } else if (justification == Justification::left || justification == Justification::centredLeft || justification == Justification::topLeft || justification == Justification::bottomLeft) {
+        g.setOrigin (r.getX(), r.getY());
+        g.addTransform (AffineTransform().rotated (
+            MathConstants<float>::pi / 2.0f, 0.0f, 0.0f));
+        g.drawText (text,
+                    0,
+                    -r.getWidth(),
+                    r.getHeight(),
+                    r.getWidth(),
+                    justification,
+                    false);
+    } else if (justification == Justification::right || justification == Justification::centredRight || justification == Justification::topRight || justification == Justification::bottomRight) {
+        g.setOrigin (r.getX(), r.getY());
+        g.addTransform (AffineTransform().rotated (
+            -MathConstants<float>::pi / 2.0f, 0.0f, (float) r.getHeight()));
+        g.drawText (text,
+                    0,
+                    r.getHeight(),
+                    r.getHeight(),
+                    r.getWidth(),
+                    justification,
+                    false);
+    } else {
+        jassertfalse; // mode not supported
+    }
+}
+
 void Style::drawButtonShape (Graphics& g, const Path& outline, Colour baseColour, float height)
 {
     const float mainBrightness = baseColour.getBrightness();
@@ -679,6 +671,142 @@ void Style::drawButtonShape (Graphics& g, const Path& outline, Colour baseColour
 
     g.setColour (Colours::black.withAlpha (0.4f * mainAlpha));
     g.strokePath (outline, PathStrokeType (1.0f));
+}
+
+void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height, 
+                      float sliderPos, const float anchorPos, 
+                      const float rotaryStartAngle, const float rotaryEndAngle,
+                      juce::Slider& slider)
+{
+    const float radius = jmin (width / 2, height / 2) - 2.0f;
+    const float centreX = x + width * 0.5f;
+    const float centreY = y + height * 0.5f;
+    const float rx = centreX - radius;
+    const float ry = centreY - radius;
+    const float rw = radius * 2.0f;
+    
+    const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    const float anchor = rotaryStartAngle + anchorPos * (rotaryEndAngle - rotaryStartAngle);
+    const float a1 = angle < anchor ? angle : anchor;
+    const float a2 = angle < anchor ? anchor : angle;
+
+    const bool isMouseOver = slider.isMouseOverOrDragging() && slider.isEnabled();
+
+    if (radius > 12.0f)
+    {
+        if (slider.isEnabled())
+            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.7f));
+        else
+            g.setColour (Colour (0x80808080));
+
+        const float thickness = 0.7f;
+
+        {
+            Path filledArc;
+            filledArc.addPieSegment (rx, ry, rw, rw, a1, a2, thickness);
+            g.fillPath (filledArc);
+        }
+
+        {
+            const float innerRadius = radius * 0.2f;
+            Path p;
+            p.addTriangle (-innerRadius, 0.0f, 0.0f, -radius * thickness * 1.1f, innerRadius, 0.0f);
+
+            p.addEllipse (-innerRadius, -innerRadius, innerRadius * 2.0f, innerRadius * 2.0f);
+
+            g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
+        }
+
+        if (slider.isEnabled())
+            g.setColour (slider.findColour (Slider::rotarySliderOutlineColourId));
+        else
+            g.setColour (Colour (0x80808080));
+
+        Path outlineArc;
+        outlineArc.addPieSegment (rx, ry, rw, rw, rotaryStartAngle, rotaryEndAngle, thickness);
+        outlineArc.closeSubPath();
+
+        g.strokePath (outlineArc, PathStrokeType (slider.isEnabled() ? (isMouseOver ? 2.0f : 1.2f) : 0.3f));
+    }
+    else
+    {
+        if (slider.isEnabled())
+            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.7f));
+        else
+            g.setColour (Colour (0x80808080));
+
+        Path p;
+        p.addEllipse (-0.4f * rw, -0.4f * rw, rw * 0.8f, rw * 0.8f);
+        PathStrokeType (rw * 0.1f).createStrokedPath (p, p);
+
+        p.addLineSegment (Line<float> (0.0f, 0.0f, 0.0f, -radius), rw * 0.2f);
+
+        g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
+    }
+}
+
+static int getFaderThumbSize (juce::Slider& slider, bool length)
+{
+    auto size = std::min (13, slider.isHorizontal()
+        ? static_cast<int> ((float) slider.getHeight() * 0.90f) 
+        : static_cast<int> ((float) slider.getWidth() * 0.90f));
+
+    if (length)
+        size = std::min (24, size * 2);
+
+    return size;
+}
+
+void Style::drawFader (Graphics& g, int x, int y, int width, int height,
+                       float sliderPos,
+                       float minSliderPos,
+                       float maxSliderPos,
+                       const Slider::SliderStyle style,
+                       Slider& slider)
+{
+    auto trackWidth = jmin (4.0f, slider.isHorizontal() ? (float) height * 0.25f : (float) width * 0.25f);
+
+    Point<float> startPoint (slider.isHorizontal() ? (float) x : (float) x + (float) width * 0.5f,
+                                slider.isHorizontal() ? (float) y + (float) height * 0.5f : (float) (height + y));
+
+    Point<float> endPoint (slider.isHorizontal() ? (float) (width + x) : startPoint.x,
+                            slider.isHorizontal() ? startPoint.y : (float) y);
+
+    Path backgroundTrack;
+    backgroundTrack.startNewSubPath (startPoint);
+    backgroundTrack.lineTo (endPoint);
+    g.setColour (slider.findColour (Slider::backgroundColourId));
+    g.strokePath (backgroundTrack, { trackWidth, PathStrokeType::curved, PathStrokeType::rounded });
+
+    Path valueTrack;
+    Point<float> minPoint, maxPoint, thumbPoint;
+    element::ignore (thumbPoint);
+
+    auto kx = slider.isHorizontal() ? sliderPos : ((float) x + (float) width * 0.5f);
+    auto ky = slider.isHorizontal() ? ((float) y + (float) height * 0.5f) : sliderPos;
+
+    minPoint = startPoint;
+    maxPoint = { kx, ky };
+
+    auto thumbWidth = getFaderThumbSize (slider, false);
+    auto thumbLength = getFaderThumbSize (slider, true);
+
+    valueTrack.startNewSubPath (minPoint);
+    valueTrack.lineTo (maxPoint);
+    g.setColour (slider.findColour (Slider::trackColourId));
+    g.strokePath (valueTrack, { trackWidth, PathStrokeType::curved, PathStrokeType::rounded });
+
+    // draw the thumb
+    auto thumbColor= slider.findColour (Slider::thumbColourId);
+    g.setColour (thumbColor);
+    auto tr = Rectangle<float> (static_cast<float> (thumbWidth), static_cast<float> (thumbLength));
+    g.fillRoundedRectangle (tr.withCentre (maxPoint), 3.f);
+    g.setColour (thumbColor.brighter(0.3f));
+    g.drawRoundedRectangle (tr.withCentre (maxPoint), 3.f, 1.0f);
+    g.setColour (juce::Colours::whitesmoke.darker(0.2f));
+    tr = tr.withCentre (maxPoint);
+    g.drawLine (tr.getX() + 1.f, tr.getCentreY(), tr.getRight() - 1.f, tr.getCentreY(), 1.2);
+    // g.fillEllipse (Rectangle<float> (static_cast<float> (thumbWidth), static_cast<float> (thumbWidth)).withCentre (maxPoint));
 }
 
 void LookAndFeel_E1::drawButtonBackground (Graphics& g, Button& button, const Colour& backgroundColour, bool isMouseOverButton, bool isButtonDown)

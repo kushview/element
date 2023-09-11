@@ -96,9 +96,11 @@ public:
     };
 
     /** @internal */
-    void paint (juce::Graphics& g);
+    void paint (juce::Graphics& g) override;
     /** @internal */
-    void resized();
+    void paintOverChildren (juce::Graphics& g) override;
+    /** @internal */
+    void resized() override;
 
 protected:
     virtual SimpleMeterValue* createSimpleMeterValue();

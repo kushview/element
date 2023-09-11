@@ -137,6 +137,7 @@ private:
 
     BlockComponent* createBlock (const Node&);
 
+    BlockComponent* getComponentForNode (const Node&) const;
     BlockComponent* getComponentForFilter (const uint32 filterID) const;
     ConnectorComponent* getComponentForConnection (const Arc& conn) const;
     PortComponent* findPinAt (const int x, const int y) const;

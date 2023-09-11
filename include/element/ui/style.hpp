@@ -45,58 +45,30 @@ struct Style {
     static constexpr float fontSizeDefault = 12.0f;
 
     /** Draws text rotated by 90 or -90 degrees */
-    inline static void drawVerticalText (juce::Graphics& g,
-                                         const juce::String& text,
-                                         const juce::Rectangle<int> area,
-                                         juce::Justification justification = juce::Justification::centredLeft)
-    {
-        using namespace juce;
+    static void drawVerticalText (juce::Graphics& g,
+                                  const juce::String& text,
+                                  const juce::Rectangle<int> area,
+                                  juce::Justification justification = juce::Justification::centredLeft);
 
-        auto r = area;
-        Graphics::ScopedSaveState savestate (g);
-
-        if (justification == Justification::centred) {
-            g.setOrigin (r.getX(), r.getY());
-            g.addTransform (AffineTransform().rotated (
-                MathConstants<float>::pi / 2.0f, 0.0f, 0.0f));
-            g.drawText (text,
-                        0,
-                        -r.getWidth(),
-                        r.getHeight(),
-                        r.getWidth(),
-                        justification,
-                        false);
-        } else if (justification == Justification::left || justification == Justification::centredLeft || justification == Justification::topLeft || justification == Justification::bottomLeft) {
-            g.setOrigin (r.getX(), r.getY());
-            g.addTransform (AffineTransform().rotated (
-                MathConstants<float>::pi / 2.0f, 0.0f, 0.0f));
-            g.drawText (text,
-                        0,
-                        -r.getWidth(),
-                        r.getHeight(),
-                        r.getWidth(),
-                        justification,
-                        false);
-        } else if (justification == Justification::right || justification == Justification::centredRight || justification == Justification::topRight || justification == Justification::bottomRight) {
-            g.setOrigin (r.getX(), r.getY());
-            g.addTransform (AffineTransform().rotated (
-                -MathConstants<float>::pi / 2.0f, 0.0f, (float) r.getHeight()));
-            g.drawText (text,
-                        0,
-                        r.getHeight(),
-                        r.getHeight(),
-                        r.getWidth(),
-                        justification,
-                        false);
-        } else {
-            jassertfalse; // mode not supported
-        }
-    }
-
+    /** Draws the basic shape of a button. */
     static void drawButtonShape (juce::Graphics& g,
-                                const juce::Path& outline, 
-                                juce::Colour baseColour,
-                                float height);
+                                 const juce::Path& outline,
+                                 juce::Colour baseColour,
+                                 float height);
+
+    /** Draws the basic shape of a dial or knob. */
+    static void drawDial (juce::Graphics& g, int x, int y, int width, int height,
+                          float sliderPos, const float anchorPos,
+                          const float rotaryStartAngle, const float rotaryEndAngle,
+                          juce::Slider& slider);
+
+    /** Draws a simple fader cap outline. */
+    static void drawFader (juce::Graphics& g, int x, int y, int width, int height,
+                           float sliderPos,
+                           float minSliderPos,
+                           float maxSliderPos,
+                           const juce::Slider::SliderStyle style,
+                           juce::Slider& slider);
 };
 
 // clang-format off
@@ -155,16 +127,16 @@ public:
     virtual void drawKeymapChangeButton (juce::Graphics& g, int width, int height, juce::Button& button, const juce::String& keyDescription) override;
 
     // Sliders
-    int getSliderThumbRadius (juce::Slider&) override;
-    void drawLinearSliderBackground (juce::Graphics& g, int x, int y, int width, int height,
-                                     float sliderPos, float minSliderPos, float maxSliderPos, 
-                                     const juce::Slider::SliderStyle style, juce::Slider& slider) override;
-    void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, 
-                           float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, 
-                           juce::Slider& slider) override;
-    void drawLinearSlider (juce::Graphics&, int x, int y, int width, int height,
-                           float sliderPos, float minSliderPos, float maxSliderPos,
-                           const juce::Slider::SliderStyle, juce::Slider&) override;
+    virtual int getSliderThumbRadius (juce::Slider&) override;
+    virtual void drawLinearSliderBackground (juce::Graphics& g, int x, int y, int width, int height,
+                                             float sliderPos, float minSliderPos, float maxSliderPos, 
+                                             const juce::Slider::SliderStyle style, juce::Slider& slider) override;
+    virtual void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, 
+                                   float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, 
+                                   juce::Slider& slider) override;
+    virtual void drawLinearSlider (juce::Graphics&, int x, int y, int width, int height,
+                                   float sliderPos, float minSliderPos, float maxSliderPos,
+                                   const juce::Slider::SliderStyle, juce::Slider&) override;
 
     // Menus
     virtual juce::Font getPopupMenuFont() override;
