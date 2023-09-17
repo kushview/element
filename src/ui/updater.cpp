@@ -13,15 +13,6 @@
 #endif
 
 #define EL_PACKAGE_ID "net.kushview.element"
-#define EL_UPDATES_REPO_URL_BASE "https://cd.kushview.net/element/release"
-
-#if JUCE_MAC
-#define EL_UPDATES_REPO_URL EL_UPDATES_REPO_URL_BASE "/osx"
-#elif JUCE_WINDOWS
-#define EL_UPDATES_REPO_URL EL_UPDATES_REPO_URL_BASE "/windows"
-#else
-#define EL_UPDATES_REPO_URL EL_UPDATES_REPO_URL_BASE "/linux"
-#endif
 
 using namespace juce;
 
@@ -113,7 +104,9 @@ static std::vector<UpdateRepo> updateRepos()
 
                 if (! repo.host.empty())
                 {
+#if EL_TRACE_UPDATER
                     std::clog << "[element] found repo: " << repo.host << std::endl;
+#endif
                     _repos.push_back (repo);
                 }
             }
@@ -180,11 +173,12 @@ public:
         }
 
         url = URL (urlStr);
-        url = url.getChildURL ("Updates.xml");
+        url = url.getChildURL ("latest.xml");
+        urlStr = url.toString (true);
 
         int status = -1;
 #if EL_TRACE_UPDATER
-        std::clog << "[element] repo: " << urlStr.toStdString() << std::endl;
+        std::clog << "[element] checking: " << urlStr.toStdString() << std::endl;
 #endif
         auto options = juce::URL::InputStreamOptions (URL::ParameterHandling::inAddress)
                            .withHttpRequestCmd ("GET")
@@ -214,7 +208,7 @@ public:
         return isThreadRunning();
     }
 
-    UpdateRepo defaultRepo()
+    UpdateRepo fallbackRepo()
     {
         UpdateRepo repo;
         repo.enabled = true;
@@ -226,7 +220,8 @@ public:
     {
         std::vector<UpdatePackage> pkgs;
         std::vector<UpdateRepo> repos (updateRepos());
-        repos.push_back (defaultRepo());
+        if (repos.empty())
+            repos.push_back (fallbackRepo());
 
         std::string out;
         clearCached();
@@ -236,9 +231,8 @@ public:
             if (! repo.enabled)
                 continue;
             out.clear();
-            pkgs = checkNow (out, repo);
-            if (! pkgs.empty())
-                break;
+            for (const auto& p : checkNow (out, repo))
+                pkgs.push_back (p);
         }
 
         {
@@ -324,7 +318,7 @@ Updater::Updater()
 {
     updates = std::make_unique<Updates> (*this);
     setExeFile (Updater::findExe ("updater"));
-    setInfo (EL_PACKAGE_ID, EL_VERSION_STRING, EL_UPDATES_REPO_URL);
+    setInfo (EL_PACKAGE_ID, EL_VERSION_STRING, EL_UPDATE_REPOSITORY_URL);
 }
 
 Updater::Updater (const std::string& package, const std::string& version, const std::string& repo)

@@ -10,9 +10,32 @@ function extractDir() {
     return dir;
 }
 
-function Component() {}
+function Component() {
+    if (installer.isInstaller()) {
+        component.loaded.connect(this, Component.prototype.installerLoaded);
+    }
+}
 
-Component.prototype.createOperations = function () {
+Component.prototype.installerLoaded = function() {
+    // if (installer.addWizardPage (component, "UpdateKeyWidget", QInstaller.Introduction)) {
+    //     var widget = gui.pageWidgetByObjectName("DynamicUpdateKeyWidget");
+    //     widget.windowTitle = "Update Key";
+    //     widget.updateKeyType.currentIndexChanged.connect (this, Component.prototype.updateKeyTypeChanged)
+    // }
+}
+
+function updateRepositories() {
+    var widget = gui.pageWidgetByObjectName("DynamicUpdateKeyWidget");
+    let tp  = widget.updateKeyType.currentText
+    let key = widget.updateKey.text()
+    console.log (tp, key)
+}
+
+Component.prototype.updateKeyTypeChanged = function (index) {
+   // updateRepositories()
+}
+
+Component.prototype.createOperations = function() {
     for (var i = 0; i < component.archives.length; ++i) {
         let a = component.archives [i]
         if (! a.endsWith ('7z'))

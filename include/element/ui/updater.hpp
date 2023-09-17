@@ -8,6 +8,20 @@
 
 #include <element/signals.hpp>
 
+#ifndef EL_UPDATE_REPOSITORY_HOST
+    #define EL_UPDATE_REPOSITORY_HOST "https://repo.kushview.net"
+#endif
+
+#define EL_UPDATE_REPOSITORY_URL_BASE EL_UPDATE_REPOSITORY_HOST "/element/1/stable"
+
+#if JUCE_MAC
+    #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/osx"
+#elif JUCE_WINDOWS
+    #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/windows"
+#else
+    #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/linux"
+#endif
+
 namespace element {
 namespace ui {
 

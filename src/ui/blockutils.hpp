@@ -53,7 +53,7 @@ static inline bool supportsAudioBuses (const Node& node)
 // Update button status for normal blocks.
 static inline void updateNormalBlockButtons (BlockComponent& block, const Node& node)
 {
-    if (node.isIONode() || node.isRootGraph())
+    if (node.isIONode() || node.isRootGraph() || detail::isMidiDevice (node))
     {
         block.setMuteButtonVisible (false);
         block.setPowerButtonVisible (false);

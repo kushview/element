@@ -1,11 +1,14 @@
 
 @BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@ || exit
+
 rmdir archives /s /q
 mkdir archives
+
 cd packages
-@ARCHIVEGEN@ -c 9 -f tar.gz ../archives/element-windows-archives.tar.gz^
+@ARCHIVEGEN@ -c 9 -f tar.gz ../archives/element-win64.tar.gz^
   net.kushview.element^
-  net.kushview.element.lua^
+  net.kushview.element.lua || exit
+@ARCHIVEGEN@ -c 9 -f tar.gz ../archives/element-plugins-win64.tar.gz^
   net.kushview.element.vst^
   net.kushview.element.vst3 || exit
 cd ..

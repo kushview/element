@@ -2,7 +2,8 @@ option ('element-apps', type : 'feature', value : 'auto',  description : 'Build 
 option ('element-plugins', type : 'feature', value : 'disabled',  description : 'Build the plugins')
 option ('ldoc', type : 'feature', value : 'disabled', description : 'Build Lua docs with LDoc')
 
-option ('updater', type: 'boolean', value: false, description: 'Build updater launch and check integration')
+option ('updater', type: 'boolean', value: false, description: 'Build updater launch and check integration.')
+option ('updater-host', type: 'string', value: '', description: 'Use a custom host for update checks.')
 
 option ('lv2dir', type : 'string',  value : '', description: 'LV2 install path')
 

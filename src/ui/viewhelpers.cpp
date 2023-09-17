@@ -7,7 +7,7 @@
 #include <element/audioengine.hpp>
 #include <element/ui/content.hpp>
 #include <element/ui/style.hpp>
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/pluginwindow.hpp"
 #include "ui/viewhelpers.hpp"
 #include <element/node.hpp>

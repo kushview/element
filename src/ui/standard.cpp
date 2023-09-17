@@ -17,7 +17,7 @@
 #include "ui/keymapeditorview.hpp"
 #include "ui/luaconsoleview.hpp"
 #include "ui/nodechannelstripview.hpp"
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/mainmenu.hpp"
 #include "ui/midiblinker.hpp"
 #include "ui/navigationview.hpp"

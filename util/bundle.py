@@ -29,6 +29,12 @@ if len (opts.output) <= 0:
 basename = os.path.basename
 join = os.path.join
 
+if os.path.exists (opts.output):
+    if os.path.isdir(opts.output):
+        shutil.rmtree(opts.output, ignore_errors=True)
+    else:
+        os.remove(opts.output)
+
 if opts.type == 'macapp' or opts.type == 'bundle':
     # generic mac app or other bundle with "Contents/MacOS"
     # this is also used for vst3 and vst2 on OSX because of the plist

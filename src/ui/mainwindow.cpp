@@ -1,16 +1,17 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#include <element/ui/menumodels.hpp>
 #include <element/ui.hpp>
-#include "services/sessionservice.hpp"
+#include <element/ui/menumodels.hpp>
 #include <element/ui/content.hpp>
-#include "ui/mainmenu.hpp"
-#include "ui/mainwindow.hpp"
 #include <element/ui/commands.hpp>
 #include <element/ui/commands.hpp>
+#include <element/ui/mainwindow.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
+
+#include "services/sessionservice.hpp"
+#include "ui/mainmenu.hpp"
 #include "utils.hpp"
 
 namespace element {

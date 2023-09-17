@@ -20,11 +20,12 @@
     <WizardDefaultWidth>782</WizardDefaultWidth>
     <WizardDefaultHeight>512</WizardDefaultHeight>
 
+    <RepositorySettingsPageVisible>true</RepositorySettingsPageVisible>
     <RemoteRepositories>
-        <Repository>
+        <!-- <Repository>
             <Url>@RELEASEREPO@</Url>
             <Enabled>1</Enabled>
-            <DisplayName>Releases</DisplayName>
-        </Repository>
+            <DisplayName>Public</DisplayName>
+        </Repository> -->
     </RemoteRepositories>
 </Installer>

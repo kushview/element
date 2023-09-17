@@ -13,12 +13,12 @@
 #include <element/ui/commands.hpp>
 #include <element/ui/standard.hpp>
 #include <element/ui/style.hpp>
+#include <element/ui/mainwindow.hpp>
 
 #include "services/sessionservice.hpp"
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/aboutscreen.hpp"
 #include "ui/guicommon.hpp"
-#include "ui/mainwindow.hpp"
 #include "ui/pluginwindow.hpp"
 #include "ui/preferences.hpp"
 #include "ui/systemtray.hpp"
@@ -172,14 +172,8 @@ private:
         ver << "-" << EL_BUILD_NUMBER;
         // ver = "0.20.0.0";
         updater.setInfo ("net.kushview.element", ver.toStdString());
-        updater.setRepository ("https://cd.kushview.net/element/release");
-#if JUCE_MAC
-        updater.setRepository (updater.repository() + "/osx");
-#elif JUCE_WINDOWS
-        updater.setRepository (updater.repository() + "/windows");
-#else
-        updater.setRepository (updater.repository() + "/linux");
-#endif
+        updater.setRepository (EL_UPDATE_REPOSITORY_URL);
+
         _conn.disconnect();
         _conn = updater.sigUpdatesAvailable.connect ([this]() {
             if (updater.available().size() > 0)
@@ -610,7 +604,10 @@ void GuiService::run()
     auto& settings = context().settings();
     PropertiesFile* const pf = settings.getUserSettings();
 
-    mainWindow.reset (new MainWindow (world));
+    mainWindow = factory->createMainWindow();
+    if (mainWindow == nullptr)
+        mainWindow = std::make_unique<MainWindow> (world);
+
     mainWindow->windowTitleFunction = factory->getMainWindowTitler();
     if (auto menu = factory->createMainMenuBarModel())
     {
@@ -1060,6 +1057,8 @@ void GuiService::setMainWindowTitler (std::function<juce::String()> f)
         mainWindow->refreshName();
     }
 }
+
+MainWindow* GuiService::getMainWindow() const noexcept { return mainWindow.get(); }
 
 void GuiService::refreshMainMenu()
 {

@@ -15,7 +15,7 @@
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/mainmenu.hpp"
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/viewhelpers.hpp"
 #include "ui/pluginwindow.hpp"
 

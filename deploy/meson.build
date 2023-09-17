@@ -6,15 +6,16 @@ macdeployqt = find_program ('macdeployqt',
 
 element_deploy_targetdir = ''
 element_release_url = ''
-element_repo_url = 'https://cd.kushview.net/element'
+element_repo_url = 'https://repo.kushview.net/p/element/0'
+# element_repo_url = 'http://localhost:7777/element/v0'
 element_runprogram = '/usr/bin/element'
 
 if host_machine.system() == 'darwin'
-    element_release_url = element_repo_url + '/release/osx'
+    element_release_url = element_repo_url + '/stable/osx'
     element_deploy_targetdir = '@HomeDir@/Library/Application Support/Kushview/Element/installer'
     element_runprogram = '@ApplicationsDir@/Element.app/Contents/MacOS/Element'
 elif host_machine.system() == 'windows'
-    element_release_url = element_repo_url + '/release/windows'
+    element_release_url = element_repo_url + '/stable/windows'
     element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element/installer'
     element_runprogram = '@ApplicationsDirX64@/Kushview/Element/bin/element.exe'
 endif

@@ -11,6 +11,7 @@
 #include <element/juce/gui_basics.hpp>
 
 #include <element/ui/about.hpp>
+#include <element/ui/mainwindow.hpp>
 #include <element/ui/menumodels.hpp>
 #include <element/ui/view.hpp>
 
@@ -21,6 +22,7 @@ namespace element {
 
 class Services;
 class Context;
+class MainWindow;
 class Node;
 
 class ContentView : public juce::Component {
@@ -159,6 +161,9 @@ public:
         returns nullptr, Element will fallback to default titling.
      */
     virtual std::function<juce::String()> getMainWindowTitler() { return nullptr; }
+
+    /** Create a custom MainWindow to be used by the UI service. */
+    virtual std::unique_ptr<MainWindow> createMainWindow() { return nullptr; }
 
     /** The struct returned will be used when showing the About Dialog inside Element. */
     virtual AboutInfo aboutInfo() { return {}; }

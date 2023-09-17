@@ -43,6 +43,9 @@ public:
     static const char* devicesKey;
     static const char* keymappingsKey;
     static const char* clockSourceKey;
+    static const char* updateChannelKey;
+    static const char* updateKeyTypeKey;
+    static const char* updateKeyKey;
 
     std::unique_ptr<juce::XmlElement> getLastGraph() const;
     void setLastGraph (const juce::ValueTree& data);
@@ -115,6 +118,26 @@ public:
 
     juce::String getClockSource() const;
     void setClockSource (const juce::String&);
+
+    /** Returns the update Key type to use when checking. */
+    juce::String getUpdateKeyType() const;
+
+    /** Set the key type. Possible values are patreon, element-v1, or 
+        membership.
+     */
+    void setUpdateKeyType (const String& slug);
+
+    /** Returns the update Key to use when checking. */
+    juce::String getUpdateKey() const;
+
+    /** Set the user's update key text. */
+    void setUpdateKey (const String& key);
+
+    /** Returns the update channel. */
+    juce::String getUpdateChannel() const;
+
+    /** Change the update channgel. stable or nightly. */
+    void setUpdateChannel (const String& key);
 
 private:
     juce::PropertiesFile* getProps() const;

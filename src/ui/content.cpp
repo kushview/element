@@ -14,7 +14,7 @@
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/midiblinker.hpp"
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/mainmenu.hpp"
 #include "ui/tempoandmeterbar.hpp"
 #include "ui/transportbar.hpp"

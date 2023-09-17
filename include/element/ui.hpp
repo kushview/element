@@ -51,7 +51,7 @@ public:
 
     void closeAllWindows();
 
-    MainWindow* getMainWindow() const { return mainWindow.get(); }
+    MainWindow* getMainWindow() const noexcept;
     void refreshMainMenu();
 
     void showPreferencesDialog (const String& section = {});

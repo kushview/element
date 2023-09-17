@@ -22,6 +22,11 @@ git_short_hash       = run_command ([python3, version_py] + '--short-hash --cwd=
 ## Updater integration
 if get_option('updater')
     add_project_arguments ('-DEL_UPDATER=1', language: ['cpp', 'objcpp'])
+    updater_host = get_option('updater-host').strip()
+    if updater_host != ''
+        add_project_arguments ('-DEL_UPDATE_REPOSITORY_HOST="@0@"'.format(updater_host), 
+                                language: ['cpp', 'objcpp'])
+    endif
 endif
 
 ## Installer Metadata

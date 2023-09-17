@@ -8,7 +8,7 @@
 
 #include "engine/graphnode.hpp"
 #include "ui/nodeeditorfactory.hpp"
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/windowmanager.hpp"
 
 namespace element {

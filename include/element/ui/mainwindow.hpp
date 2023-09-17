@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <element/juce/gui_basics.hpp>
 #include <element/session.hpp>
 
 namespace element {
@@ -13,20 +13,19 @@ class Context;
 class MainMenu;
 class MainMenuBarModel;
 
-class MainWindow : public DocumentWindow,
-                   public ChangeListener
-{
+class MainWindow : public juce::DocumentWindow,
+                   public juce::ChangeListener {
 public:
     MainWindow (Context&);
     virtual ~MainWindow();
-    void closeButtonPressed() override;
+    virtual void closeButtonPressed() override;
     void minimiseButtonPressed() override;
 
     void refreshMenu();
     Context& context() { return world; }
     Services& services();
 
-    void changeListenerCallback (ChangeBroadcaster* source) override;
+    void changeListenerCallback (juce::ChangeBroadcaster* source) override;
     void activeWindowStatusChanged() override;
     void refreshName();
 

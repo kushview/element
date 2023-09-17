@@ -4,7 +4,7 @@
 #include "engine/graphnode.hpp"
 #include "ui/guicommon.hpp"
 #include "ui/nodeioconfiguration.hpp"
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 
 namespace element {
 

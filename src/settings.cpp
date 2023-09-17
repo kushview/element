@@ -35,6 +35,9 @@ const char* Settings::pluginListHeaderKey = "pluginListHeader";
 const char* Settings::devicesKey = "devices";
 const char* Settings::keymappingsKey = "keymappings";
 const char* Settings::clockSourceKey = "clockSource";
+const char* Settings::updateChannelKey = "updateChannel";
+const char* Settings::updateKeyTypeKey = "updateKeyType";
+const char* Settings::updateKeyKey = "updateKey";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -404,6 +407,51 @@ void Settings::setClockSource (const juce::String& src)
 
     if (auto p = getProps())
         p->setValue (clockSourceKey, src);
+}
+
+juce::String Settings::getUpdateKeyType() const
+{
+    if (auto* p = getProps())
+        return p->getValue (updateKeyTypeKey, "element-v1");
+    return "element-v1";
+}
+
+void Settings::setUpdateKeyType (const String& slug)
+{
+    if (slug != "patreon" && slug != "element-v1" && slug != "membership")
+    {
+        jassertfalse;
+        return;
+    }
+
+    if (auto p = getProps())
+        p->setValue (updateKeyTypeKey, slug);
+}
+
+juce::String Settings::getUpdateKey() const
+{
+    if (auto* p = getProps())
+        return p->getValue (updateKeyKey, "");
+    return "";
+}
+
+void Settings::setUpdateKey (const String& slug)
+{
+    if (auto p = getProps())
+        p->setValue (updateKeyKey, slug.trim());
+}
+
+juce::String Settings::getUpdateChannel() const
+{
+    if (auto* p = getProps())
+        return p->getValue (updateChannelKey, "");
+    return "";
+}
+
+void Settings::setUpdateChannel (const String& channel)
+{
+    if (auto p = getProps())
+        p->setValue (updateChannelKey, channel.trim());
 }
 
 //=============================================================================

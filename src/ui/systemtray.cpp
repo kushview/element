@@ -5,7 +5,7 @@
 #include <element/ui.hpp>
 #include <element/context.hpp>
 
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/systemtray.hpp"
 #include "utils.hpp"
 

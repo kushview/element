@@ -7,10 +7,12 @@
 #include <element/ui/content.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
+#include <element/ui/updater.hpp>
+#include <element/version.hpp>
 
 #include "ui/audiodeviceselector.hpp"
 #include "ui/guicommon.hpp"
-#include "ui/mainwindow.hpp"
+#include <element/ui/mainwindow.hpp>
 #include "ui/viewhelpers.hpp"
 #include "services/oscservice.hpp"
 #include "engine/midiengine.hpp"
@@ -20,7 +22,7 @@
 #define EL_MIDI_SETTINGS_NAME "MIDI"
 #define EL_OSC_SETTINGS_NAME "OSC"
 #define EL_PLUGINS_PREFERENCE_NAME "Plugins"
-#define EL_REPOSITORY_PREFERENCE_NAME "Update Mirrors"
+#define EL_REPOSITORY_PREFERENCE_NAME "Updates"
 
 //[/Headers]
 
@@ -106,18 +108,22 @@ public:
     virtual ~SettingsPage() {}
 
 protected:
-    virtual void layoutSetting (Rectangle<int>& r, Label& label, Component& setting, const int valueWidth = -1)
+    virtual void layoutSetting (Rectangle<int>& r, Label& label, Component& setting, 
+                                const int valueWidth = -1, const int keyWidth = -1)
     {
         const int spacingBetweenSections = 6;
         const int settingHeight = 22;
         const int toggleWidth = valueWidth > 0 ? valueWidth : 40;
         const int toggleHeight = 18;
+        const int labelWidth = keyWidth > 0 ? keyWidth : getWidth() / 2;
 
         r.removeFromTop (spacingBetweenSections);
         auto r2 = r.removeFromTop (settingHeight);
-        label.setBounds (r2.removeFromLeft (getWidth() / 2));
-        setting.setBounds (r2.removeFromLeft (toggleWidth)
-                               .withSizeKeepingCentre (toggleWidth, toggleHeight));
+        label.setBounds (r2.removeFromLeft (labelWidth));
+        r2 = r2.removeFromLeft (toggleWidth);
+        if (nullptr != dynamic_cast<SettingButton*> (&setting))
+            r2 = r2.withSizeKeepingCentre (toggleWidth, toggleHeight);
+        setting.setBounds (r2);
     }
 };
 
@@ -1001,16 +1007,61 @@ private:
 };
 
 //==============================================================================
-class MirrorsSettingsPage : public SettingsPage,
+class UpdatesSettingsPage : public SettingsPage,
                             public TableListBoxModel,
                             private AsyncUpdater
 {
-    GuiService& _ui;
-
 public:
-    MirrorsSettingsPage (GuiService& ui)
+    UpdatesSettingsPage (GuiService& ui)
         : _ui (ui)
     {
+        updateChannelLabel.setText ("Update channel", dontSendNotification);
+        addAndMakeVisible (updateChannelLabel);
+        updateChannel.addItem ("Stable", 1);
+        updateChannel.addItem ("Nightly", 2);
+        // updateChannel.addItem ("Beta", 3);
+        
+        updateChannel.setSelectedId (savedUpdateChannelId(), dontSendNotification);
+        updateChannel.onChange = [this]() {
+            String ch = updateChannelSlug();
+            _ui.settings().setUpdateChannel (ch);
+            _ui.settings().saveIfNeeded();
+            saveRepos();
+        };
+        addAndMakeVisible (updateChannel);
+
+        updateKeyTypeLabel.setText ("Update key type", dontSendNotification);
+        addAndMakeVisible (updateKeyTypeLabel);
+        updateKeyType.addItem ("Element v1", 2);
+        updateKeyType.addItem ("Patreon", 1);
+        
+        // updateKeyType.addItem ("Membership", 3);
+        updateKeyType.setSelectedId (savedUpdateKeyTypeId(), dontSendNotification);
+        updateKeyType.onChange = [this]() {
+            auto slug = updateKeyTypeSlug (updateKeyType.getSelectedId());
+            _ui.settings().setUpdateKeyType (slug);
+            _ui.settings().saveIfNeeded();
+            saveRepos();
+        };
+        addAndMakeVisible (updateKeyType);
+
+        updateKeyLabel.setText ("Update key", dontSendNotification);
+        addAndMakeVisible (updateKeyLabel);
+        updateKey.text.setText (_ui.settings().getUpdateKey(), dontSendNotification);
+        updateKey.text.onReturnKey = [this]() {
+            _ui.settings().setUpdateKey (updateKey.text.getText());
+            _ui.settings().saveIfNeeded();
+            saveRepos();
+        };
+        updateKey.text.onFocusLost = updateKey.text.onReturnKey;
+        updateKey.apply.setButtonText ("Apply");
+        updateKey.apply.onClick = updateKey.text.onReturnKey;
+        addAndMakeVisible (updateKey);
+
+        mirrorsHeading.setJustificationType (juce::Justification::centredLeft);
+        mirrorsHeading.setFont (Font (15.f));
+        addAndMakeVisible (mirrorsHeading);
+
         addAndMakeVisible (_table);
         auto& header = _table.getHeader();
 
@@ -1029,12 +1080,17 @@ public:
         };
 
         addAndMakeVisible (launchButton);
+        launchButton.setEnabled (networkFile().existsAsFile());
+        if (! launchButton.isEnabled()) {
+            launchButton.setTooltip (TRANS("The updater application doesn't appear to be installed on your system"));
+        }
         launchButton.onClick = [this]() {
             // clang-format off
             if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon,
-                "Launch Updater?", 
-                "Element must quit to launch the updater program. Continue?",
-                "Quit and launch..", "Cancel"))
+                TRANS("Launch Updater?"), 
+                TRANS("Element must quit to launch the updater program. Continue?"),
+                TRANS("Launch it..."), 
+                TRANS("Cancel")))
             {
                 _ui.launchUpdater();
             }
@@ -1062,28 +1118,49 @@ public:
             }
         };
 
+        // custom repos not ready yet.
+        mirrorsHeading.setVisible (false);
+        _table.setEnabled (false);
+        removeButton.setEnabled (_table.isEnabled());
+        addButton.setEnabled (_table.isEnabled());
+        _table.setVisible (_table.isEnabled());
+        removeButton.setVisible (_table.isEnabled());
+        addButton.setVisible (_table.isEnabled());
+
         setSize (30 + 360 + 220 + 220, 500);
     }
 
-    ~MirrorsSettingsPage()
+    ~UpdatesSettingsPage()
     {
+        saveRepos();
         _table.setModel (nullptr);
     }
 
     void resized() override
     {
         auto r = getLocalBounds();
+
+        layoutSetting (r, updateChannelLabel, updateChannel, r.getWidth() / 3, 160);
+        layoutSetting (r, updateKeyTypeLabel, updateKeyType, r.getWidth() / 3, 160);
+        layoutSetting (r, updateKeyLabel, updateKey, r.getWidth() * 0.66f, 160);
+
+        r.removeFromTop (8);
+        auto fh = 4 + (int) mirrorsHeading.getFont().getHeight();
+        mirrorsHeading.setBounds (r.removeFromTop (fh));
+        r.removeFromTop (4);
         auto rb = r.removeFromBottom (24);
         rb.removeFromLeft (2);
-        checkButton.setBounds (rb.removeFromLeft (90));
+        checkButton.setBounds (rb.removeFromRight (90));
         rb.removeFromLeft (3);
         launchButton.setBounds (rb.removeFromLeft (120));
 
-        rb.removeFromRight (2);
-        removeButton.setBounds (rb.removeFromRight (90));
-        rb.removeFromRight (3);
-        addButton.setBounds (rb.removeFromRight (90));
-
+        if (removeButton.isVisible())
+        {
+            rb.removeFromRight (2);
+            removeButton.setBounds (rb.removeFromRight (90));
+            rb.removeFromRight (3);
+            addButton.setBounds (rb.removeFromRight (90));
+        }
         r.removeFromBottom (4);
         _table.setBounds (r);
     }
@@ -1181,11 +1258,41 @@ public:
     virtual var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
 #endif
 private:
+    GuiService& _ui;
+
+    juce::Label updateChannelLabel;
+    juce::ComboBox updateChannel;
+
+    juce::Label updateKeyTypeLabel;
+    juce::ComboBox updateKeyType;
+
+    struct UpdateKey : public Component
+    {
+        juce::TextEditor text;
+        juce::TextButton apply;
+        UpdateKey()
+        {
+            addAndMakeVisible (text);
+            addAndMakeVisible (apply);
+        }
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            apply.setBounds (r.removeFromRight (50));
+            r.removeFromRight (1);
+            text.setBounds (r);
+        }
+    };
+
+    juce::Label updateKeyLabel;
+    UpdateKey updateKey;
+
+    juce::Label mirrorsHeading { "Custom Repositories", "Custom Repositories" };
     juce::TableListBox _table;
     juce::TextButton addButton { "Add" },
         removeButton { "Remove" },
         checkButton { "Check..." },
-        launchButton { "Launch Updater" };
+        launchButton { "Launch updater" };
 
     struct Repo
     {
@@ -1199,11 +1306,11 @@ private:
     friend class ValueLabel;
     class ValueLabel : public juce::TextEditor
     {
-        MirrorsSettingsPage& owner;
+        UpdatesSettingsPage& owner;
 
     public:
         ValueLabel() = delete;
-        ValueLabel (MirrorsSettingsPage& o)
+        ValueLabel (UpdatesSettingsPage& o)
             : owner (o)
         {
             setColour (TextEditor::backgroundColourId, Colours::transparentBlack);
@@ -1288,6 +1395,62 @@ private:
         return XmlDocument::parse (file);
     }
 
+    std::string makeRepoUrl (const std::string& pkg)
+    {
+        const auto major = Version::segments (EL_VERSION_STRING)[0];
+        std::stringstream host;
+        host << EL_UPDATE_REPOSITORY_HOST << "/" << pkg << "/" << major;
+        host << "/" << updateChannelSlug();
+
+#if JUCE_MAC
+        host << "/osx";
+#elif JUCE_WINDOWS
+        host << "/windows";
+#else
+        host << "/linux";
+#endif
+
+        return host.str();
+    }
+
+    /** Create repo(s) associated with the license key. */
+    std::vector<Repo> makeReposForUpdateKey()
+    {
+        std::vector<Repo> out;
+        const auto tp = updateKeyTypeSlug();
+        const auto key = updateKey.text.getText().trim();
+        if (key.isEmpty())
+            return out;
+
+        std::vector<std::string> packages = { "element" };
+        for (const auto& pkg : packages)
+        {
+            Repo r;
+            r.enabled = true;
+
+            if (tp == "patreon" || tp == "element-v1" || tp == "membership")
+                r.username = tp.toStdString();
+            r.password = key.toStdString();
+            r.host = makeRepoUrl (pkg);
+            out.push_back (r);
+        }
+
+        return out;
+    }
+
+    void addRepoToXml (const Repo& repo, XmlElement& repos)
+    {
+        auto r = repos.createNewChildElement ("Repository");
+        if (auto c = r->createNewChildElement ("Host"))
+            c->addTextElement (repo.host);
+        if (auto c = r->createNewChildElement ("Username"))
+            c->addTextElement (repo.username);
+        if (auto c = r->createNewChildElement ("Password"))
+            c->addTextElement (repo.password);
+        if (auto c = r->createNewChildElement ("Enabled"))
+            c->addTextElement (repo.enabled ? "1" : "0");
+    }
+
     void saveRepos()
     {
         auto xml = readNetworkFile();
@@ -1299,18 +1462,10 @@ private:
             xml->removeChildElement (repos, true);
             repos = xml->createNewChildElement ("Repositories");
 
-            for (const auto& repo : _repos)
-            {
-                auto r = repos->createNewChildElement ("Repository");
-                if (auto c = r->createNewChildElement ("Host"))
-                    c->addTextElement (repo.host);
-                if (auto c = r->createNewChildElement ("Username"))
-                    c->addTextElement (repo.username);
-                if (auto c = r->createNewChildElement ("Password"))
-                    c->addTextElement (repo.password);
-                if (auto c = r->createNewChildElement ("Enabled"))
-                    c->addTextElement (repo.enabled ? "1" : "0");
-            }
+            for (const auto& repo : makeReposForUpdateKey())
+                addRepoToXml (repo, *repos);
+            // for (const auto& repo : _repos)
+            //     addRepoToXml (repo, *repos);
         }
 
         XmlElement::TextFormat format;
@@ -1325,6 +1480,7 @@ private:
 
     void updateRepo()
     {
+#if 0
         if (auto xml = readNetworkFile())
         {
             setEnabled (true);
@@ -1361,7 +1517,7 @@ private:
         {
             setEnabled (false);
         }
-
+#endif
         _table.updateContent();
         repaint();
         resized();
@@ -1370,6 +1526,105 @@ private:
     static File networkFile() noexcept
     {
         return DataPath::applicationDataDir().getChildFile ("installer/network.xml");
+    }
+
+    String updateChannelSlug (int comboId = 0)
+    {
+        if (comboId < 1)
+            comboId = updateChannel.getSelectedId();
+
+        String ch = "";
+        if (comboId == 1)
+            ch = "stable";
+        else if (comboId == 2)
+            ch = "nightly";
+        if (ch.isEmpty())
+            ch = "stable";
+
+        return ch;
+    }
+
+    String updateKeyTypeName (int comboId = 0)
+    {
+        if (comboId <= 0)
+            comboId = updateKeyType.getSelectedId();
+
+        switch (comboId)
+        {
+            case 1:
+                return "Patreon";
+                break;
+            case 2:
+                return "Element (v1)";
+                break;
+            case 3:
+                return "Membership";
+                break;
+        }
+
+        return "";
+    }
+
+    String updateKeyTypeSlug (int comboId = 0)
+    {
+        if (comboId <= 0)
+            comboId = updateKeyType.getSelectedId();
+        switch (comboId)
+        {
+            case 1:
+                return "patreon";
+                break;
+            case 2:
+                return "element-v1";
+                break;
+            case 3:
+                return "membership";
+                break;
+        }
+
+        return "";
+    }
+
+    int updateKeyTypeId (const String& slug)
+    {
+        if (slug == "patreon")
+            return 1;
+        if (slug == "element-v1")
+            return 2;
+        if (slug == "membership")
+            return 3;
+
+        return 0;
+    }
+
+    int savedUpdateChannelId()
+    {
+        auto tp = _ui.settings().getUpdateChannel();
+        auto tpi = 0;
+
+        if (tp == "stable")
+            tpi = 1;
+        else if (tp == "nightly")
+            tpi = 2;
+
+        if (tpi < 1)
+            tpi = 1;
+        if (tpi > 2)
+            tpi = 2;
+
+        return tpi;
+    }
+
+    /** returns the update key type saved currently in settings. */
+    int savedUpdateKeyTypeId()
+    {
+        auto tp = _ui.settings().getUpdateKeyType();
+        auto tpi = updateKeyTypeId (tp);
+        if (tpi < 1)
+            tpi = 2;
+        if (tpi > 3)
+            tpi = 3;
+        return tpi;
     }
 };
 
@@ -1391,6 +1646,9 @@ PreferencesComponent::PreferencesComponent (GuiService& ui)
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
     addPage (EL_OSC_SETTINGS_NAME);
+#if EL_UPDATER
+    addPage (EL_REPOSITORY_PREFERENCE_NAME);
+#endif
 
     setPage (EL_GENERAL_SETTINGS_NAME);
 }
@@ -1411,32 +1669,13 @@ void PreferencesComponent::paint (Graphics& g)
 
 void PreferencesComponent::resized()
 {
-    pageList->setBounds (8, 8, 184, 480);
-    pageComponent->setBounds (208, 32, 376, 448);
+    auto r = getLocalBounds().reduced (8);
+    pageList->setBounds (r.removeFromLeft (110));
+    pageComponent->setBounds (r.reduced (8));
 }
 
 bool PreferencesComponent::keyPressed (const KeyPress& key)
 {
-#if EL_UPDATER
-    if (key.getModifiers().isCommandDown() && key.getModifiers().isShiftDown() && key.getModifiers().isAltDown() && (key.getKeyCode() == 'm' || key.getKeyCode() == 'M'))
-    {
-        bool haveMirrors = false;
-        for (auto child : pageList->getChildren())
-        {
-            if (nullptr != dynamic_cast<MirrorsSettingsPage*> (child))
-            {
-                haveMirrors = true;
-                break;
-            }
-        }
-
-        if (! haveMirrors)
-        {
-            addPage (EL_REPOSITORY_PREFERENCE_NAME);
-            return true;
-        }
-    }
-#endif
     return false;
 }
 
@@ -1470,7 +1709,7 @@ Component* PreferencesComponent::createPageForName (const String& name)
     }
     else if (name == EL_REPOSITORY_PREFERENCE_NAME)
     {
-        return new MirrorsSettingsPage (_ui);
+        return new UpdatesSettingsPage (_ui);
     }
 
     return nullptr;

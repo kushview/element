@@ -1,4 +1,5 @@
 install_data ('component.js', install_dir : packagedir_element / 'meta')
+install_data ('updatekey.ui', install_dir : packagedir_element / 'meta')
 
 element_operations = ''
 if host_machine.system() == 'windows'
