@@ -41,9 +41,17 @@ inline static void showGraphEditor (Component* c, const Node& node)
 
     if (auto* cc = dynamic_cast<StandardContent*> (ViewHelpers::findContentComponent (c)))
     {
-        auto view = std::make_unique<GraphEditorView>();
-        view->setNode (node);
-        cc->setMainView (view.release());
+        if (auto mvc = dynamic_cast<GraphEditorView*> (cc->getMainViewComponent()))
+        {
+            if (mvc->getGraph() != graph)
+                mvc->setNode (graph);
+        }
+        else
+        {
+            auto view = std::make_unique<GraphEditorView>();
+            view->setNode (graph);
+            cc->setMainView (view.release());
+        }
     }
 }
 } // namespace detail

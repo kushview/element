@@ -519,6 +519,13 @@ String StandardContent::getMainViewName() const
     return name;
 }
 
+Component* StandardContent::getMainViewComponent() const
+{
+    if (auto c1 = container->primary.get())
+        return c1;
+    return nullptr;
+}
+
 String StandardContent::getAccessoryViewName() const
 {
     String name;

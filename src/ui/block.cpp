@@ -177,8 +177,8 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
 
     displayModeValue = node.getBlockValueTree()
                            .getPropertyAsValue (tags::displayMode, nullptr);
-    displayMode = getDisplayModeFromString (displayModeValue.toString());
     displayModeValue.addListener (this);
+    setDisplayMode (getDisplayModeFromString (displayModeValue.getValue()));
 
     customWidth = node.getBlockValueTree().getProperty (tags::width, customWidth);
     customHeight = node.getBlockValueTree().getProperty (tags::height, customHeight);
@@ -212,7 +212,12 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
     if (mode == displayMode)
         return;
     auto oldMode = displayMode;
+
     displayMode = mode;
+    displayModeValue.removeListener (this);
+    displayModeValue.setValue (getDisplayModeKey (displayMode));
+    displayModeValue.addListener (this);
+
     if (oldMode == Embed)
         clearEmbedded();
     updateSize();
@@ -235,11 +240,13 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
             struct EmbedBockAsync : MessageManager::MessageBase
             {
                 using PtrType = std::unique_ptr<juce::Component>;
-                EmbedBockAsync (BlockComponent& b, const Node& n, UI& u, PtrType& p)
-                    : block (b), node (n), ui (u), embedded (p) {}
+                EmbedBockAsync (BlockComponent& b, const Node& n, UI& u, PtrType& p, DisplayMode om)
+                    : block (b), node (n), ui (u), embedded (p), oldMode (om) {}
 
                 void messageCallback() override
                 {
+                    ui.closePluginWindowsFor (node, false);
+
                     if (embedded == nullptr)
                     {
                         NodeEditorFactory factory (ui);
@@ -254,16 +261,22 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
                         block.addAndMakeVisible (embedded.get());
                         block.updateSize();
                     }
+                    else
+                    {
+                        if (oldMode != Embed)
+                            block.setDisplayMode (oldMode);
+                    }
                 }
 
                 BlockComponent& block;
                 Node node;
                 UI& ui;
                 PtrType& embedded;
+                DisplayMode oldMode;
             };
 
             if (auto* ui = ViewHelpers::getGuiController (this))
-                (new EmbedBockAsync (*this, node, *ui, this->embedded))->post();
+                (new EmbedBockAsync (*this, node, *ui, this->embedded, oldMode))->post();
         }
         else
         {
@@ -475,7 +488,9 @@ void BlockComponent::mouseDown (const MouseEvent& e)
 void BlockComponent::mouseMove (const MouseEvent& e)
 {
     Component::mouseMove (e);
-    if (getCornerResizeBox().toFloat().contains (e.position))
+    const bool canResize = getDisplayMode() == Embed && node.getFormat() == EL_NODE_FORMAT_NAME;
+
+    if (canResize && getCornerResizeBox().toFloat().contains (e.position))
     {
         if (! mouseInCornerResize)
         {
@@ -501,10 +516,14 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     if (e.mods.isPopupMenu() || blockDrag)
         return;
 
+    auto* const panel = getGraphPanel();
+
     if (mouseInCornerResize)
     {
         setCustomSize (originalBounds.getWidth() + e.getDistanceFromDragStartX(),
                        originalBounds.getHeight() + e.getDistanceFromDragStartY());
+        if (panel != nullptr)
+            panel->updateConnectorComponents();
         return;
     }
 
@@ -527,7 +546,7 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     ny = oy;
     moveBlockTo (pos.getX(), pos.getY());
 
-    if (auto* const panel = getGraphPanel())
+    if (panel != nullptr)
     {
         if (panel->onBlockMoved)
             panel->onBlockMoved (*this);
@@ -894,12 +913,11 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     setDisplayMode (getDisplayModeFromString (displayModeValue.getValue()));
 
-    updatePins (forcePins);
-
     if (displayMode != Embed)
         updateSize();
 
     setName (node.getDisplayName());
+    updatePins (forcePins);
 
     if (doPosition)
     {
@@ -988,8 +1006,12 @@ void BlockComponent::updateSize()
     int minW = 0, minH = 0;
     getMinimumSize (minW, minH);
     jassert (minW > 0 && minH > 0);
+
+    const auto r1 = getBoundsInParent();
+
     switch (displayMode)
     {
+        case Normal:
         case Compact:
         case Small: {
             setSize (minW, minH);
@@ -999,17 +1021,24 @@ void BlockComponent::updateSize()
         case Embed: {
             if (embedded != nullptr)
             {
-                setSize (embedded->getWidth() + pinSize,
-                         embedded->getHeight() + pinSize + (vertical ? 20 : 18) + 18);
+                // if (customWidth > 0 && customHeight > 0)
+                // {
+                //     setSize (customWidth, customHeight);
+                // }
+                // else
+                {
+                    setSize (embedded->getWidth() + pinSize,
+                             embedded->getHeight() + pinSize + (vertical ? 20 : 18) + 18);
+                }
             }
             break;
         }
+    }
 
-        case Normal: {
-            setSize (customWidth > 0 ? customWidth : minW,
-                     customHeight > 0 ? customHeight : minH);
-            break;
-        }
+    if (r1 != getBoundsInParent())
+    {
+        if (auto panel = getGraphPanel())
+            panel->updateConnectorComponents (true);
     }
 }
 
@@ -1032,10 +1061,10 @@ void BlockComponent::setCustomSize (int width, int height)
 
         if (displayMode == Small || displayMode == Compact)
         {
-            displayModeValue.removeListener (this);
-            displayModeValue.setValue (getDisplayModeKey (Normal));
-            displayModeValue.addListener (this);
             displayMode = Normal;
+            displayModeValue.removeListener (this);
+            displayModeValue.setValue (getDisplayModeKey (displayMode));
+            displayModeValue.addListener (this);
         }
 
         setSize (customWidth, customHeight);

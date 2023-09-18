@@ -31,6 +31,7 @@ public:
     void setMainView (const juce::String& name);
     void setSecondaryView (const juce::String& name);
     juce::String getMainViewName() const;
+    juce::Component* getMainViewComponent() const;
     juce::String getAccessoryViewName() const;
 
     void nextMainView();
@@ -53,6 +54,7 @@ public:
     bool isMeterBridgeVisible() const;
 
     void setCurrentNode (const Node& node) override;
+
     void stabilize (const bool refreshDataPathTrees = false) override;
     void stabilizeViews() override;
 

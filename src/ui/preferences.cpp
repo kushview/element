@@ -108,8 +108,7 @@ public:
     virtual ~SettingsPage() {}
 
 protected:
-    virtual void layoutSetting (Rectangle<int>& r, Label& label, Component& setting, 
-                                const int valueWidth = -1, const int keyWidth = -1)
+    virtual void layoutSetting (Rectangle<int>& r, Label& label, Component& setting, const int valueWidth = -1, const int keyWidth = -1)
     {
         const int spacingBetweenSections = 6;
         const int settingHeight = 22;
@@ -1020,7 +1019,7 @@ public:
         updateChannel.addItem ("Stable", 1);
         updateChannel.addItem ("Nightly", 2);
         // updateChannel.addItem ("Beta", 3);
-        
+
         updateChannel.setSelectedId (savedUpdateChannelId(), dontSendNotification);
         updateChannel.onChange = [this]() {
             String ch = updateChannelSlug();
@@ -1034,7 +1033,7 @@ public:
         addAndMakeVisible (updateKeyTypeLabel);
         updateKeyType.addItem ("Element v1", 2);
         updateKeyType.addItem ("Patreon", 1);
-        
+
         // updateKeyType.addItem ("Membership", 3);
         updateKeyType.setSelectedId (savedUpdateKeyTypeId(), dontSendNotification);
         updateKeyType.onChange = [this]() {
@@ -1081,8 +1080,9 @@ public:
 
         addAndMakeVisible (launchButton);
         launchButton.setEnabled (networkFile().existsAsFile());
-        if (! launchButton.isEnabled()) {
-            launchButton.setTooltip (TRANS("The updater application doesn't appear to be installed on your system"));
+        if (! launchButton.isEnabled())
+        {
+            launchButton.setTooltip (TRANS ("The updater application doesn't appear to be installed on your system"));
         }
         launchButton.onClick = [this]() {
             // clang-format off

@@ -131,7 +131,9 @@ void NodeFactory::getPluginDescriptions (OwnedArray<PluginDescription>& out, con
 {
     auto& denyIDs (impl->denyIDs);
     if (! includeHidden && denyIDs.contains (ID))
+    {
         return;
+    }
 
     for (auto* f : impl->providers)
     {

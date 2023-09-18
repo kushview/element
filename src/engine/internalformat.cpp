@@ -42,7 +42,9 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray<PluginDescription
 {
     auto& factory = _context.plugins().getNodeFactory();
     if (factory.isTypeHidden (fileOrId))
+    {
         return;
+    }
 
     if (fileOrId == "element.comb")
     {
@@ -191,18 +193,21 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
 {
     std::unique_ptr<AudioPluginInstance> base;
 
-    if (desc.fileOrIdentifier == "element.comb.mono")
+    if (desc.fileOrIdentifier == "element.comb.mono" || desc.fileOrIdentifier == EL_NODE_ID_COMB_FILTER)
         base = std::make_unique<CombFilterProcessor> (false);
     else if (desc.fileOrIdentifier == "element.comb.stereo")
         base = std::make_unique<CombFilterProcessor> (true);
-    else if (desc.fileOrIdentifier == "element.allPass.mono")
+
+    else if (desc.fileOrIdentifier == "element.allPass.mono" || desc.fileOrIdentifier == EL_NODE_ID_ALLPASS_FILTER)
         base = std::make_unique<AllPassFilterProcessor> (false);
     else if (desc.fileOrIdentifier == "element.allPass.stereo")
         base = std::make_unique<AllPassFilterProcessor> (true);
+
     else if (desc.fileOrIdentifier == "element.volume.mono")
         base = std::make_unique<VolumeProcessor> (-30.0, 12.0, false);
-    else if (desc.fileOrIdentifier == "element.volume.stereo")
+    else if (desc.fileOrIdentifier == "element.volume.stereo" || desc.fileOrIdentifier == EL_NODE_ID_VOLUME)
         base = std::make_unique<VolumeProcessor> (-30.0, 12.0, true);
+
     else if (desc.fileOrIdentifier == EL_NODE_ID_WET_DRY)
         base = std::make_unique<WetDryProcessor>();
     else if (desc.fileOrIdentifier == EL_NODE_ID_REVERB)

@@ -348,12 +348,14 @@ GraphEditorComponent::~GraphEditorComponent()
 
 void GraphEditorComponent::setNode (const Node& n)
 {
-    if (n == graph)
-        return;
     bool isGraph = n.isGraph();
     bool isValid = n.isValid();
-    graph = isValid && isGraph ? n : Node (types::Graph);
+    const auto ng = isValid && isGraph ? n : Node (types::Graph);
 
+    if (ng == graph)
+        return;
+
+    graph = ng;
     data.removeListener (this);
     data = graph.data();
 

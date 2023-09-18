@@ -86,7 +86,7 @@ if host_machine.system() == 'darwin'
             'ARCHIVEGEN': archivegen.full_path()
         })
 elif host_machine.system() == 'windows'
-    basename = 'element-windows-@0@'.format (version_with_build)
+    basename = 'element-win64-@0@'.format (version_with_build)
 
     signtool_script = ''
     if get_option ('sign')
