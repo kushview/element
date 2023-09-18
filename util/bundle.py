@@ -3,14 +3,18 @@
 # Michael Fisher, 2023
 
 from optparse import OptionParser
+import subprocess
 from subprocess import call, Popen, PIPE
 import os
 import shutil
+
+from sys import platform
 
 def options():
     parser = OptionParser()
     
     parser.add_option ("--binary", type="string", dest="binary")
+    parser.add_option ("--no-strip", action='store_true', dest='no_strip', default=False)
     parser.add_option ("--output", type="string", dest="output")
     parser.add_option ("--type", type="string", dest="type", default="macapp")
     parser.add_option ("--plist", type='string', dest='plist')
@@ -25,6 +29,8 @@ opts = options()
 if len (opts.output) <= 0:
     print ("no output specified")
     exit (1)
+
+should_strip = not opts.no_strip
 
 basename = os.path.basename
 join = os.path.join
@@ -46,10 +52,20 @@ if opts.type == 'macapp' or opts.type == 'bundle':
     for dir in 'MacOS Resources'.split():
         if not os.path.exists (join (contents, dir)):
             os.makedirs (join (contents, dir))
+    
     if os.path.exists (opts.binary):
-        shutil.copy (opts.binary, join (contents, 'MacOS', basename (opts.binary)))
+        tgt = join (contents, 'MacOS', basename (opts.binary))
+        shutil.copy (opts.binary, tgt)
+        if should_strip:
+            if platform == "linux" or platform == "linux2":
+                pass
+            elif platform == "darwin":
+                call (['/usr/bin/strip', '-x', '-arch', 'all', tgt],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
     if os.path.exists (opts.plist):
         shutil.copyfile (opts.plist, join (contents, 'Info.plist'))
+    
     if opts.resource != None and len(opts.resource) > 0 and os.path.exists (opts.resource):
         shutil.copy (opts.resource, join (contents, 'Resources', basename (opts.resource)))
 
@@ -72,6 +88,10 @@ elif opts.type == 'vst3':
         if not os.path.exists (join (contents, dir)):
             os.makedirs (join (contents, dir))
     if os.path.exists (opts.binary):
+        if should_strip:
+            if platform == "win32":
+                pass
+
         binary_target = join (contents, opts.bindir, basename (opts.binary))
         shutil.copy (opts.binary, binary_target)
         if len(opts.signtool_sha1) > 0:
