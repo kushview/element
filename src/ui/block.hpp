@@ -130,6 +130,9 @@ public:
     DisplayMode getDisplayMode() const noexcept { return displayMode; }
 
     //=========================================================================
+    Node getNode() const noexcept { return node; }
+
+    //=========================================================================
     void moveBlockTo (double x, double y);
 
     //=========================================================================
@@ -202,6 +205,8 @@ private:
     const uint32 filterID;
     Node graph;
     Node node;
+    ProcessorPtr obj;
+    boost::signals2::connection willRemoveConn;
 
     Value nodeEnabled,
         nodeName,

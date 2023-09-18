@@ -74,7 +74,7 @@ void CompressorNodeEditor::CompViz::timerCallback()
 
 void CompressorNodeEditor::CompViz::paint (Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (Style::contentBackgroundColorId));
+    g.fillAll (Colors::widgetBackgroundColor.darker(0.1f));
 
     // draw grid
     g.setColour (Colours::grey.withAlpha (0.75f));
@@ -107,8 +107,8 @@ CompressorNodeEditor::CompressorNodeEditor (CompressorProcessor& proc) : AudioPr
                                                                          knobs (proc, [this, &proc] { proc.updateParams(); compViz.updateCurve(); }),
                                                                          compViz (proc)
 {
+    setOpaque (true);
     setSize (610, 420);
-
     addAndMakeVisible (knobs);
     addAndMakeVisible (compViz);
 }
@@ -119,6 +119,7 @@ CompressorNodeEditor::~CompressorNodeEditor()
 
 void CompressorNodeEditor::paint (Graphics& g)
 {
+    g.fillAll (Colors::widgetBackgroundColor.darker (0.1f));
 }
 
 void CompressorNodeEditor::resized()

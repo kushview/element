@@ -23,6 +23,13 @@
 
 namespace element {
 
+namespace detail {
+    static bool canResize (BlockComponent& block) {
+        return block.getDisplayMode() == BlockComponent::Embed && 
+            block.getNode().getFormat() == EL_NODE_FORMAT_NAME;
+    }
+}
+
 //=============================================================================
 PortComponent::PortComponent (const Node& g, const Node& n, const uint32 nid, const uint32 i, const bool dir, const PortType t, const bool v)
     : graph (g), node (n), nodeID (nid), port (i), type (t), input (dir), vertical (v)
@@ -143,6 +150,9 @@ GraphEditorComponent* PortComponent::getGraphEditor() const noexcept
 BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const bool vertical_)
     : filterID (node_.getNodeId()), graph (graph_), node (node_), font (11.0f)
 {
+    obj = node.getObject();
+    jassert (obj != nullptr);
+
     setBufferedToImage (true);
     nodeEnabled = node.getPropertyAsValue (tags::enabled);
     nodeEnabled.addListener (this);
@@ -184,10 +194,16 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     customHeight = node.getBlockValueTree().getProperty (tags::height, customHeight);
     setSize (customWidth > 0 ? customWidth : 170,
              customHeight > 0 ? customHeight : 60);
+
+    if (obj != nullptr) {
+        willRemoveConn = obj->willBeRemoved.connect(
+            std::bind (&BlockComponent::clearEmbedded, this));
+    }
 }
 
 BlockComponent::~BlockComponent() noexcept
 {
+    willRemoveConn.disconnect();
     clearEmbedded();
     nodeEnabled.removeListener (this);
     nodeName.removeListener (this);
@@ -496,7 +512,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
 void BlockComponent::mouseMove (const MouseEvent& e)
 {
     Component::mouseMove (e);
-    const bool canResize = getDisplayMode() == Embed && node.getFormat() == EL_NODE_FORMAT_NAME;
+    const bool canResize = detail::canResize (*this);
 
     if (canResize && getCornerResizeBox().toFloat().contains (e.position))
     {
@@ -1029,11 +1045,12 @@ void BlockComponent::updateSize()
         case Embed: {
             if (embedded != nullptr)
             {
-                // if (customWidth > 0 && customHeight > 0)
-                // {
-                //     setSize (customWidth, customHeight);
-                // }
-                // else
+                if (detail::canResize (*this) && customWidth > 0 && customHeight > 0)
+                {
+                    setSize (customWidth, customHeight);
+                    resized();
+                }
+                else
                 {
                     setSize (embedded->getWidth() + pinSize,
                              embedded->getHeight() + pinSize + (vertical ? 20 : 18) + 18);
