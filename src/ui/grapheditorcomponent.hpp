@@ -136,6 +136,7 @@ private:
     void endDraggingConnector (const MouseEvent& e);
 
     BlockComponent* createBlock (const Node&);
+    BlockComponent* findBlock (const Node&) const noexcept;
 
     BlockComponent* getComponentForNode (const Node&) const;
     BlockComponent* getComponentForFilter (const uint32 filterID) const;

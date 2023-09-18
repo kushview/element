@@ -1201,4 +1201,12 @@ BlockComponent* GraphEditorComponent::createBlock (const Node& node)
     return factory->createBlockComponent (node);
 }
 
+BlockComponent* GraphEditorComponent::findBlock (const Node& node) const noexcept {
+    for (int i = 0; i < getNumChildComponents(); ++i)
+        if (auto block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
+            if (block->node == node)
+                return block;
+    return nullptr;
+}
+
 } // namespace element

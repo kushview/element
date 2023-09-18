@@ -443,7 +443,11 @@ void BlockComponent::mouseDown (const MouseEvent& e)
 
         if (auto* message = menu.createMessageForResultCode (result))
         {
+            const bool beingRemoved = nullptr != dynamic_cast<RemoveNodeMessage*> (message);
             ViewHelpers::postMessageFor (this, message);
+            if (beingRemoved)
+                clearEmbedded();
+
             for (const auto& nodeId : getGraphPanel()->selectedNodes)
             {
                 if (nodeId == node.getNodeId())
@@ -453,6 +457,10 @@ void BlockComponent::mouseDown (const MouseEvent& e)
                 {
                     if (nullptr != dynamic_cast<RemoveNodeMessage*> (message))
                     {
+                        if (auto panel = getGraphPanel())
+                            if (auto sb = panel->findBlock (selectedNode))
+                                sb->clearEmbedded();
+
                         ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
                     }
                 }
