@@ -3,6 +3,7 @@
 
 #include <element/plugins.hpp>
 #include <element/ui/style.hpp>
+#include <element/engine.hpp>
 
 #include "ui/guicommon.hpp"
 #include "ui/breadcrumb.hpp"
@@ -19,6 +20,7 @@ namespace element {
 // Spacing between each patch point
 static const int gridPadding = 1;
 
+// =============================================================================
 class ConnectionGrid::PatchMatrix : public PatchMatrixComponent,
                                     private ValueTree::Listener,
                                     ViewHelperMixin
@@ -220,6 +222,8 @@ public:
         handleNodeMenuResult (result, n);
     }
 
+    boost::signals2::signal<void()> sigSelectionChanged;
+
 private:
     friend class ConnectionGrid;
     friend class Sources;
@@ -269,7 +273,7 @@ private:
 
         const bool hover = (isSource) ? mouseIsOverRow (rowNumber)
                                       : mouseIsOverColumn (rowNumber);
-        g.setColour (hover ? Colors::elemental.withAlpha (0.4f) : Colors::widgetBackgroundColor);
+        g.setColour (rowIsSelected || hover ? Colors::elemental.withAlpha (0.4f) : Colors::widgetBackgroundColor);
 
         if (isSource)
             g.fillRect (0, 0, width - 1, height - 1);
@@ -371,6 +375,7 @@ private:
     {
         const Node node (getNode (row, isSource));
         const Port port (getPort (row, isSource));
+
         if (ev.mods.isPopupMenu())
             showMenuForNodeAndPort (node, port);
     }
@@ -526,8 +531,19 @@ private:
     }
 };
 
-// MARK: Sources
+namespace detail {
 
+// =============================================================================
+template <class Box>
+static void boxInit (Box& box)
+{
+    box.setMultipleSelectionEnabled (true);
+    // box.setRowSelectedOnMouseDown (true);
+    box.setClickingTogglesRowSelection (false);
+}
+} // namespace detail
+
+// =============================================================================
 class ConnectionGrid::Sources : public ListBox,
                                 public ListBoxModel
 {
@@ -538,6 +554,7 @@ public:
         jassert (m != nullptr);
         setRowHeight (matrix->getRowThickness());
         setModel (this);
+        detail::boxInit (*this);
     }
 
     ~Sources() {}
@@ -578,10 +595,16 @@ public:
         const Node node (matrix->getNode (lastRowSelected, true));
         ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
     }
+
+    void selectedRowsChanged (int lastRowSelected) override
+    {
+        matrix->sigSelectionChanged();
+    }
+
 #if 0
         virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                    Component* existingComponentToUpdate);
-        virtual void selectedRowsChanged (int lastRowSelected);
+        
         virtual void returnKeyPressed (int lastRowSelected);
         virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe);
         virtual String getTooltipForRow (int row);
@@ -593,24 +616,7 @@ private:
     friend class PatchMatrix;
 };
 
-// MARK: Controls
-
-class ConnectionGrid::Controls : public Component
-{
-public:
-    Controls (PatchMatrix* m) : matrix (m) {}
-    void mouseDown (const MouseEvent& ev) override
-    {
-        if (ev.mods.isPopupMenu())
-            matrix->emptyAreaClicked (ev);
-    }
-
-private:
-    PatchMatrix* matrix;
-};
-
-// MARK: Destinations
-
+// =============================================================================
 class ConnectionGrid::Destinations : public HorizontalListBox,
                                      public ListBoxModel
 {
@@ -621,9 +627,20 @@ public:
         jassert (m != nullptr);
         setRowHeight (matrix->getColumnThickness());
         setModel (this);
+        detail::boxInit (*this);
     }
 
     int getNumRows() override { return matrix->getNumColumns(); }
+
+    void mouseDown (const MouseEvent& ev) override
+    {
+        return;
+    }
+
+    void mouseUp (const MouseEvent& ev) override
+    {
+        return;
+    }
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
     {
@@ -660,13 +677,124 @@ public:
         ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
     }
 
+    void selectedRowsChanged (int lastRowSelected) override
+    {
+        matrix->sigSelectionChanged();
+    }
+
 private:
     PatchMatrix* matrix;
     friend class PatchMatrix;
 };
 
-// MARK: Quads
+// =============================================================================
+class ConnectionGrid::Controls : public Component
+{
+public:
+    Controls (PatchMatrix& m, Sources& s, Destinations& t)
+        : matrix (m), sources (s), targets (t)
+    {
+        addAndMakeVisible (routeButton);
+        routeButton.onClick = [this]() { applyRouting(); };
+        selectionConn = matrix.sigSelectionChanged.connect (
+            std::bind (&Controls::stabilize, this));
+        stabilize();
+    }
 
+    ~Controls()
+    {
+        selectionConn.disconnect();
+    }
+
+    void resized() override
+    {
+        auto r = getLocalBounds().reduced (32, 0);
+        r.removeFromTop (getHeight() / 2 - routeButtonHeight / 2);
+        routeButton.changeWidthToFitText (routeButtonHeight);
+        routeButton.setBounds (r.removeFromTop (routeButtonHeight));
+    }
+
+    void mouseDown (const MouseEvent& ev) override
+    {
+        if (ev.mods.isPopupMenu())
+            matrix.emptyAreaClicked (ev);
+    }
+
+private:
+    PatchMatrix& matrix;
+    Sources& sources;
+    Destinations& targets;
+
+    int routeButtonHeight = 26;
+    TextButton routeButton { "Route", "Apply routes to selection." };
+    boost::signals2::connection selectionConn;
+
+    bool canRoute() const
+    {
+        return sources.getNumSelectedRows() > 0 && targets.getNumSelectedRows() > 0;
+    }
+
+    void stabilize()
+    {
+        routeButton.setEnabled (canRoute());
+    }
+
+    void applyRouting()
+    {
+        if (! canRoute())
+            return;
+
+        if (auto ctx = ViewHelpers::getGlobals (this))
+        {
+            auto& e = *ctx->services().find<EngineService>();
+
+            Array<Port> srcPorts[PortType::Unknown];
+            Array<Port> dstPorts[PortType::Unknown];
+
+            for (int i = 0; i < sources.getNumSelectedRows(); ++i)
+            {
+                auto port = matrix.getPort (sources.getSelectedRow (i), true);
+                srcPorts[port.getType()].add (port);
+            }
+
+            for (int i = 0; i < targets.getNumSelectedRows(); ++i)
+            {
+                auto port = matrix.getPort (targets.getSelectedRow (i), false);
+                dstPorts[port.getType()].add (port);
+            }
+
+            for (auto pt : PortType::all())
+            {
+                auto& s = srcPorts[pt];
+                auto& t = dstPorts[pt];
+                if (s.size() <= 0 || t.size() <= 0)
+                    continue;
+
+                auto nc = std::max (s.size(), t.size());
+                int sidx = 0, tidx = 0;
+
+                while (--nc >= 0)
+                {
+                    // std::clog << "s=" << s[sidx] << " t=" << t[tidx] << std::endl;
+                    auto sp = s.getUnchecked (sidx);
+                    auto tp = t.getUnchecked (tidx);
+
+                    e.connect (sp.getType(), sp.getNode(), sp.channel(), tp.getNode(), tp.channel());
+
+                    if (++sidx >= s.size())
+                        sidx = 0;
+                    if (++tidx >= t.size())
+                        tidx = 0;
+                }
+            }
+        }
+
+        if (auto grid = findParentComponentOfClass<ConnectionGrid>())
+            grid->stabilizeContent();
+    }
+};
+
+// =============================================================================
 class ConnectionGrid::Quads : public QuadrantLayout
 {
 public:
@@ -711,8 +839,7 @@ private:
     }
 };
 
-// MARK: PatchMatrix IMPL
-
+// =============================================================================
 void ConnectionGrid::PatchMatrix::updateContent()
 {
     audioInIndexes.clearQuick();
@@ -775,8 +902,7 @@ void ConnectionGrid::PatchMatrix::updateContent()
     repaint();
 }
 
-// MARK: Connection Grid IMPL
-
+// =============================================================================
 ConnectionGrid::ConnectionGrid()
 {
     setName ("PatchBay"); // Don't change this
@@ -785,8 +911,8 @@ ConnectionGrid::ConnectionGrid()
     addAndMakeVisible (quads.get());
     quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix());
     quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
-    quads->setQuadrantComponent (Quads::Q3, controls = new Controls (matrix));
     quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
+    quads->setQuadrantComponent (Quads::Q3, controls = new Controls (*matrix, *sources, *destinations));
 
     breadcrumb = std::make_unique<BreadCrumbComponent>();
     addAndMakeVisible (breadcrumb.get());

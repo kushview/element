@@ -54,6 +54,12 @@ public:
         type = o.type;
     }
 
+    /** Returns all types*/
+    inline static std::vector<PortType> all() noexcept
+    {
+        return { Control, Audio, CV, Atom, Event, Midi, Video };
+    }
+
     /** Get a URI string for this port type */
     inline const juce::String& getURI() const { return typeURI (type); }
 

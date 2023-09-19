@@ -24,11 +24,11 @@
 namespace element {
 
 namespace detail {
-    static bool canResize (BlockComponent& block) {
-        return block.getDisplayMode() == BlockComponent::Embed && 
-            block.getNode().getFormat() == EL_NODE_FORMAT_NAME;
-    }
+static bool canResize (BlockComponent& block)
+{
+    return block.getDisplayMode() == BlockComponent::Embed && block.getNode().getFormat() == EL_NODE_FORMAT_NAME;
 }
+} // namespace detail
 
 //=============================================================================
 PortComponent::PortComponent (const Node& g, const Node& n, const uint32 nid, const uint32 i, const bool dir, const PortType t, const bool v)
@@ -195,8 +195,9 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     setSize (customWidth > 0 ? customWidth : 170,
              customHeight > 0 ? customHeight : 60);
 
-    if (obj != nullptr) {
-        willRemoveConn = obj->willBeRemoved.connect(
+    if (obj != nullptr)
+    {
+        willRemoveConn = obj->willBeRemoved.connect (
             std::bind (&BlockComponent::clearEmbedded, this));
     }
 }

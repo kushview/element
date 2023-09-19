@@ -74,7 +74,7 @@ void CompressorNodeEditor::CompViz::timerCallback()
 
 void CompressorNodeEditor::CompViz::paint (Graphics& g)
 {
-    g.fillAll (Colors::widgetBackgroundColor.darker(0.1f));
+    g.fillAll (Colors::widgetBackgroundColor.darker (0.1f));
 
     // draw grid
     g.setColour (Colours::grey.withAlpha (0.75f));
