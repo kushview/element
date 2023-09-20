@@ -224,6 +224,8 @@ public:
 
     boost::signals2::signal<void()> sigSelectionChanged;
 
+    const NodeArray& getNodes() const noexcept { return nodes; }
+
 private:
     friend class ConnectionGrid;
     friend class Sources;
@@ -698,6 +700,10 @@ public:
         routeButton.onClick = [this]() { applyRouting(); };
         selectionConn = matrix.sigSelectionChanged.connect (
             std::bind (&Controls::stabilize, this));
+
+        addAndMakeVisible (clearButton);
+        clearButton.onClick = [this]() { clearRoutes(); };
+
         stabilize();
     }
 
@@ -712,6 +718,8 @@ public:
         r.removeFromTop (getHeight() / 2 - routeButtonHeight / 2);
         routeButton.changeWidthToFitText (routeButtonHeight);
         routeButton.setBounds (r.removeFromTop (routeButtonHeight));
+        r.removeFromTop (2);
+        clearButton.setBounds (r.removeFromTop (routeButtonHeight));
     }
 
     void mouseDown (const MouseEvent& ev) override
@@ -726,7 +734,8 @@ private:
     Destinations& targets;
 
     int routeButtonHeight = 26;
-    TextButton routeButton { "Route", "Apply routes to selection." };
+    TextButton routeButton { "Route", "Apply routes to selection." },
+        clearButton { "Clear", "Clear all connections." };
     boost::signals2::connection selectionConn;
 
     bool canRoute() const
@@ -737,6 +746,16 @@ private:
     void stabilize()
     {
         routeButton.setEnabled (canRoute());
+    }
+
+    void clearRoutes()
+    {
+        if (auto ctx = ViewHelpers::getGlobals (this))
+            if (auto e = ctx->services().find<element::EngineService>())
+                for (const auto& node : matrix.getNodes())
+                    e->disconnectNode (node);
+        if (auto grid = findParentComponentOfClass<ConnectionGrid>())
+            grid->stabilizeContent();
     }
 
     void applyRouting()

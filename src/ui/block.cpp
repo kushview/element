@@ -938,11 +938,11 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
     setDisplayMode (getDisplayModeFromString (displayModeValue.getValue()));
 
-    if (displayMode != Embed)
-        updateSize();
-
     setName (node.getDisplayName());
     updatePins (forcePins);
+    // update size relies on port counts being updated.
+    if (displayMode != Embed)
+        updateSize();
 
     if (doPosition)
     {
@@ -979,7 +979,7 @@ void BlockComponent::getMinimumSize (int& width, int& height)
 
     if (vertical)
     {
-        w = jmax (w, int (maxPorts * pinSize) + int (maxPorts * pinSpacing));
+        w = std::max (w, int (maxPorts * pinSize) + int (maxPorts * pinSpacing));
         h = 60;
 
         if (displayMode == Compact)
@@ -987,7 +987,7 @@ void BlockComponent::getMinimumSize (int& width, int& height)
             h = (pinSize * 2) + 20;
         }
 
-        w = jmax (w, textWidth);
+        w = std::max (w, textWidth);
     }
     else
     {
