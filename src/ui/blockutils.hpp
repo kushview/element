@@ -51,21 +51,30 @@ static inline bool supportsAudioBuses (const Node& node)
 }
 
 // Update button status for normal blocks.
-static inline void updateNormalBlockButtons (BlockComponent& block, const Node& node)
+static inline void updateBlockButtonVisibility (BlockComponent& block, const Node& node)
 {
-    if (node.isIONode() || node.isRootGraph() || detail::isMidiDevice (node))
+    if (block.getDisplayMode() == BlockComponent::Compact || block.getDisplayMode() == BlockComponent::Small)
     {
         block.setMuteButtonVisible (false);
+        block.setConfigButtonVisible (false);
         block.setPowerButtonVisible (false);
     }
+    else 
+    {
+        if (node.isIONode() || node.isRootGraph() || detail::isMidiDevice (node))
+        {
+            block.setMuteButtonVisible (false);
+            block.setPowerButtonVisible (false);
+        }
 
-    if (detail::supportsAudioBuses (node))
-    {
-        block.setConfigButtonVisible (true);
-    }
-    else
-    {
-        block.setConfigButtonVisible (false);
+        if (detail::supportsAudioBuses (node))
+        {
+            block.setConfigButtonVisible (true);
+        }
+        else
+        {
+            block.setConfigButtonVisible (false);
+        }
     }
 }
 

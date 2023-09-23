@@ -42,7 +42,7 @@ public:
     BlockComponent* createBlockComponent (const Node& node) override
     {
         auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
-        detail::updateNormalBlockButtons (*block, node);
+        detail::updateBlockButtonVisibility (*block, node);
         return block;
     }
 

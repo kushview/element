@@ -239,17 +239,8 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
         clearEmbedded();
     updateSize();
 
-    if (displayMode == Compact || displayMode == Small)
-    {
-        setMuteButtonVisible (false);
-        setConfigButtonVisible (false);
-        setPowerButtonVisible (false);
-    }
-    else
-    {
-        detail::updateNormalBlockButtons (*this, this->node);
-    }
-
+    detail::updateBlockButtonVisibility (*this, this->node);
+    
     if (displayMode == Embed)
     {
         if (detail::supportsEmbed (this->node))
