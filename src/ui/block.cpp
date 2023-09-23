@@ -146,9 +146,28 @@ GraphEditorComponent* PortComponent::getGraphEditor() const noexcept
     return findParentComponentOfClass<GraphEditorComponent>();
 }
 
+void BlockComponent::AsyncEmbedInit::timerCallback()
+{
+    if (block.getDisplayMode() != BlockComponent::Embed)
+    {
+        stopTimer();
+        return;
+    }
+
+    if (ViewHelpers::findContentComponent (&block) == nullptr)
+        return;
+    initialized = true;
+    block.setDisplayModeInternal (Embed, true);
+    stopTimer();
+}
+
 //=============================================================================
 BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const bool vertical_)
-    : filterID (node_.getNodeId()), graph (graph_), node (node_), font (11.0f)
+    : filterID (node_.getNodeId()),
+      graph (graph_),
+      node (node_),
+      font (11.0f),
+      embedInit (*this)
 {
     obj = node.getObject();
     jassert (obj != nullptr);
@@ -188,7 +207,10 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     displayModeValue = node.getBlockValueTree()
                            .getPropertyAsValue (tags::displayMode, nullptr);
     displayModeValue.addListener (this);
-    setDisplayMode (getDisplayModeFromString (displayModeValue.getValue()));
+    const auto idm = getDisplayModeFromString (displayModeValue.getValue());
+    setDisplayModeInternal (idm, false);
+    if (idm == Embed)
+        embedInit.startTimer (14);
 
     customWidth = node.getBlockValueTree().getProperty (tags::width, customWidth);
     customHeight = node.getBlockValueTree().getProperty (tags::height, customHeight);
@@ -224,9 +246,9 @@ void BlockComponent::clearEmbedded()
     embedded.reset();
 }
 
-void BlockComponent::setDisplayMode (DisplayMode mode)
+void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
 {
-    if (mode == displayMode)
+    if (mode == displayMode && ! force)
         return;
     auto oldMode = displayMode;
 
@@ -240,7 +262,7 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
     updateSize();
 
     detail::updateBlockButtonVisibility (*this, this->node);
-    
+
     if (displayMode == Embed)
     {
         if (detail::supportsEmbed (this->node))
@@ -258,7 +280,7 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
                     if (embedded == nullptr)
                     {
                         NodeEditorFactory factory (ui);
-                        if (auto e = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
+                        if (auto e = factory.instantiate (node, NodeEditorPlacement::PluginWindow))
                             embedded.reset (e.release());
                         else
                             embedded = NodeEditorFactory::createAudioProcessorEditor (node);
@@ -294,6 +316,11 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
     {
         clearEmbedded();
     }
+}
+
+void BlockComponent::setDisplayMode (DisplayMode mode)
+{
+    setDisplayModeInternal (mode, false);
 }
 
 void BlockComponent::moveBlockTo (double x, double y)

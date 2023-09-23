@@ -59,7 +59,7 @@ static inline void updateBlockButtonVisibility (BlockComponent& block, const Nod
         block.setConfigButtonVisible (false);
         block.setPowerButtonVisible (false);
     }
-    else 
+    else
     {
         if (node.isIONode() || node.isRootGraph() || detail::isMidiDevice (node))
         {

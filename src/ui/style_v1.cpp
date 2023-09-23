@@ -805,7 +805,7 @@ void Style::drawFader (Graphics& g, int x, int y, int width, int height,
     g.drawRoundedRectangle (tr.withCentre (maxPoint), 3.f, 1.0f);
     g.setColour (juce::Colours::whitesmoke.darker(0.2f));
     tr = tr.withCentre (maxPoint);
-    g.drawLine (tr.getX() + 1.f, tr.getCentreY(), tr.getRight() - 1.f, tr.getCentreY(), 1.2);
+    g.drawLine (tr.getX() + 1.f, tr.getCentreY(), tr.getRight() - 1.f, tr.getCentreY(), 1.2f);
     // g.fillEllipse (Rectangle<float> (static_cast<float> (thumbWidth), static_cast<float> (thumbWidth)).withCentre (maxPoint));
 }
 

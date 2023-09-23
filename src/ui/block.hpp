@@ -338,7 +338,17 @@ private:
 
     void addDisplaySubmenu (PopupMenu& menuToAddTo);
 
+    void setDisplayModeInternal (DisplayMode, bool);
     void clearEmbedded();
+
+    // work around...
+    struct AsyncEmbedInit : public juce::Timer
+    {
+        AsyncEmbedInit (BlockComponent& b) : block (b) {}
+        bool initialized = false;
+        BlockComponent& block;
+        void timerCallback() override;
+    } embedInit;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent)
 };

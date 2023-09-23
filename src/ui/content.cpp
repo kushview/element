@@ -71,6 +71,14 @@ public:
         mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
         mapButton.addListener (this);
         addAndMakeVisible (mapButton);
+
+        pluginMenu.setIcon (Icon (getIcons().falBarsOutline,
+                              findColour (TextButton::textColourOffId)));
+        pluginMenu.setTriggeredOnMouseDown (true);
+        pluginMenu.onClick = [this]() { runPluginMenu(); };
+        if (owner.services().getRunMode() == RunMode::Plugin)
+            addAndMakeVisible (pluginMenu);
+
         addAndMakeVisible (midiBlinker);
     }
 
@@ -122,7 +130,14 @@ public:
 
         tempoBar.setBounds (10, 8, tempoBarWidth, tempoBarHeight);
 
-        r.removeFromRight (10);
+        r.removeFromRight (pluginMenu.isVisible() ? 4 : 10);
+
+        if (pluginMenu.isVisible())
+        {
+            int pms = tempoBarHeight + 3;
+            pluginMenu.setBounds (r.removeFromRight (tempoBarHeight).withSizeKeepingCentre (pms, pms));
+            r.removeFromRight (4);
+        }
 
         if (midiBlinker.isVisible())
         {
@@ -198,8 +213,16 @@ private:
     SettingButton mapButton;
     TempoAndMeterBar tempoBar;
     TransportBar transport;
+    IconButton pluginMenu;
     MidiBlinker midiBlinker;
     Array<SignalConnection> connections;
+
+    void runPluginMenu() {
+        auto& ui = *owner.services().find<UI>();
+        PopupMenu menu;
+        MainMenu::buildPluginMainMenu (ui.commands(), menu);
+        menu.show();
+    }
 };
 
 class Content::StatusBar : public Component,

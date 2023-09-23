@@ -14,14 +14,14 @@
 #define EL_SESSION_VERSION 1
 
 namespace element {
-class Session;
+
 class Context;
 
-/** Session, the main interface between the engine and model layers */
+/** Session, the main interface between the model and engine layers */
 class Session : public Model,
-                public ReferenceCountedObject,
-                public ChangeBroadcaster,
-                public ValueTree::Listener {
+                public juce::ReferenceCountedObject,
+                public juce::ChangeBroadcaster,
+                public juce::ValueTree::Listener {
 public:
     struct ScopedFrozenLock {
         ScopedFrozenLock (const Session& s) : session (s)
