@@ -256,10 +256,20 @@ private:
         }
     }
 
-    String decorateNodeName (const Node& node) {
+    String decorateNodeName (const Node& node)
+    {
         if (node.isIONode())
             return decorateNodeName (node.getParentGraph());
         return node.getDisplayName();
+    }
+
+    String decoratePortName (const Port& port)
+    {
+        if (! port.getNode().isIONode())
+            return port.getName();
+        String res = port.getType().getName();
+        res << " " << (1 + port.channel());
+        return res;
     }
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected, bool isSource)
@@ -271,7 +281,7 @@ private:
         String text = decorateNodeName (node);
 
         {
-            String portName = port.getName();
+            String portName = decoratePortName (port);
             if (portName.isEmpty())
                 portName << port.getType().getName() << " " << (1 + port.channel());
             if (text.isEmpty())
