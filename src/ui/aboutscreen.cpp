@@ -250,6 +250,7 @@ AboutScreen::AboutScreen()
     i.copyright << "Copyright " << String (CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
     i.copyright = i.copyright.replace ("XXX", String (buildDate.getYear()));
     i.version = ("Version: ") + Version::withGitHash();
+    i.version << " (build " << EL_BUILD_NUMBER << ")";
     setAboutInfo (i);
 }
 

@@ -256,19 +256,28 @@ private:
         }
     }
 
+    String decorateNodeName (const Node& node) {
+        if (node.isIONode())
+            return decorateNodeName (node.getParentGraph());
+        return node.getDisplayName();
+    }
+
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected, bool isSource)
     {
         const int padding = 18;
         const Node node (getNode (rowNumber, isSource));
         const Port port (getPort (rowNumber, isSource));
 
-        String text = node.getName();
+        String text = decorateNodeName (node);
 
         {
             String portName = port.getName();
             if (portName.isEmpty())
                 portName << port.getType().getName() << " " << (1 + port.channel());
-            text << " - " << portName;
+            if (text.isEmpty())
+                text = portName;
+            else
+                text << ": " << portName;
         }
 
         Rectangle<int> r (0, 0, width, height);
@@ -291,7 +300,7 @@ private:
         else
         {
             Rectangle<int> r2 = { padding, 0, height - 1 - padding, width };
-            Style::drawVerticalText (g, text, r.withY (padding), Justification::centredRight);
+            Style::drawVerticalText (g, text, r.withY (padding), Justification::centredLeft);
         }
     }
 
