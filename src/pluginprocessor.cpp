@@ -409,7 +409,7 @@ void PluginProcessor::initialize()
     bool wasProc = shouldProcess.get();
     shouldProcess.set (false);
 
-    context.reset (new Context());
+    context.reset (new Context (RunMode::Plugin));
     context->setEngine (new AudioEngine (*context, RunMode::Plugin));
     engine = context->audio();
     SessionPtr session = context->session();
