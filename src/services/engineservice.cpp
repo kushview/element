@@ -47,10 +47,16 @@ struct RootGraphHolder
     {
         jassert (engine);
         if (! engine)
+        {
+            DBG ("[element] root graph attach: engine is nil");
             return false;
+        }
 
         if (attached())
+        {
+            DBG ("[element] root graph attach: already attached");
             return true;
+        }
 
         node = new RootGraph();
 
@@ -849,7 +855,11 @@ void EngineService::sessionReloaded()
             Node rootGraph (session->getGraph (i));
             if (auto* holder = graphs->add (new RootGraphHolder (rootGraph, context())))
             {
-                holder->attach (engine);
+                if (! holder->attach (engine))
+                {
+                    std::clog << "[element] failed attaching root grapn: " << holder->model.getName() << std::endl;
+                }
+
                 if (auto* const controller = holder->getController())
                 {
                     // noop: saving this logical block
@@ -857,7 +867,17 @@ void EngineService::sessionReloaded()
             }
         }
 
-        setRootNode (session->getCurrentGraph());
+        const auto ag = session->getActiveGraph();
+        setRootNode (ag);
+    }
+
+    if (session->getNumGraphs() != graphs->getGraphs().size())
+    {
+        std::clog << "[element] model and engine graph counts do not match\n";
+    }
+    else
+    {
+        DBG ("[element] session reloaded: " << session->getName());
     }
 }
 

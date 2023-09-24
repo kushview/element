@@ -29,7 +29,9 @@ struct RootGraphRender : public AsyncUpdater
     void handleAsyncUpdate() override
     {
         if (onActiveGraphChanged)
+        {
             onActiveGraphChanged();
+        }
     }
 
     const int setCurrentGraph (const int index)
@@ -343,20 +345,26 @@ public:
 
     void onCurrentGraphChanged()
     {
-        int currentGraph = -1;
+        int renderingIndex = -1;
         {
             ScopedLock sl (lock);
-            currentGraph = graphs.getGraphIndex();
+            renderingIndex = graphs.getGraphIndex();
+        }
+
+        if (renderingIndex != currentGraph.get())
+        {
+            // a change is about to happen next audio cycle.
+            return;
         }
 
         auto session = engine.context().session();
-        if (currentGraph >= 0 && currentGraph != session->getActiveGraphIndex())
+        if (currentGraph.get() >= 0 && currentGraph.get() != session->getActiveGraphIndex())
         {
             // NOTE: this is a cheap way to refresh the GUI, in the future this
             // will need to be smarter by determining whether or not EC needs to
             // handle the change at the model layer.
             auto graphs = session->data().getChildWithName (tags::graphs);
-            graphs.setProperty (tags::active, currentGraph, nullptr);
+            graphs.setProperty (tags::active, currentGraph.get(), nullptr);
         }
     }
 

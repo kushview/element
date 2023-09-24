@@ -25,6 +25,15 @@
 namespace element {
 
 namespace detail {
+inline static void repaintItems (TreeViewItem* item)
+{
+    if (item == nullptr)
+        return;
+    for (int i = 0; i < item->getNumSubItems(); ++i)
+        if (auto si = item->getSubItem (i))
+            si->repaintItem();
+}
+
 inline static Node findRoot (const Node& node)
 {
     auto root = node;
@@ -438,7 +447,7 @@ private:
     };
 };
 
-//===
+//=============================================================================
 class GraphScriptTreeItem : public SessionBaseTreeItem
 {
 public:
@@ -626,7 +635,7 @@ public:
     {
         if (auto s = session())
         {
-            if (node == s->getActiveGraph())
+            if (node.isValid() && node == s->getActiveGraph())
             {
                 g.fillAll (Colors::toggleGreen.withAlpha (0.44f));
                 return;
@@ -851,7 +860,10 @@ void SessionTreePanel::refresh()
     }
 
     if (panel->rootItem)
+    {
         panel->rootItem->refreshSubItems();
+        detail::repaintItems (panel->rootItem.get());
+    }
 }
 
 void SessionTreePanel::paint (juce::Graphics& g)
@@ -877,8 +889,9 @@ void SessionTreePanel::setSession (SessionPtr s)
         data.addListener (this);
     }
 
-    refresh();
     panel->updateContent();
+    refresh();
+    selectActiveRootGraph();
 }
 
 void SessionTreePanel::showNode (const Node& newNode)
@@ -975,10 +988,12 @@ void SessionTreePanel::selectActiveRootGraph()
 
 void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (property == tags::active)
+    if (tree.hasType (tags::graphs) && property == tags::active)
     {
         if (auto root = panel->rootItem.get())
+        {
             root->treeHasChanged();
+        }
     }
 
     if (tree.hasType (types::Node))
@@ -1017,7 +1032,7 @@ void SessionTreePanel::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (couldBeSessionObjects (parent, child))
         refreshSubItems (panel->rootItem.get());
-    
+
     if (child.hasType (types::Node))
     {
         const Node node (child, false);
