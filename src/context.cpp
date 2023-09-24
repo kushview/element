@@ -24,12 +24,14 @@ namespace element {
 class Context::Impl
 {
 public:
-    Impl (Context& g)
-        : owner (g) {}
+    Impl (Context& g, RunMode m)
+        : owner (g),
+          mode (m) {}
 
     ~Impl() {}
 
     Context& owner;
+    RunMode mode;
 
     std::unique_ptr<Services> services;
 
@@ -63,8 +65,8 @@ private:
         lua.reset (new ScriptingEngine());
         lua->initialize (owner);
 
-        owner.setEngine (new AudioEngine (owner, RunMode::Standalone));
-        services = std::make_unique<Services> (owner, RunMode::Standalone);
+        owner.setEngine (new AudioEngine (owner, mode));
+        services = std::make_unique<Services> (owner, mode);
 
         plugins.reset (new PluginManager());
         auto& nf = plugins->getNodeFactory();
@@ -87,9 +89,9 @@ private:
     }
 };
 
-Context::Context (const String& _cli)
+Context::Context (RunMode mode, const String& _cli)
 {
-    impl.reset (new Impl (*this));
+    impl.reset (new Impl (*this, mode));
     impl->init();
 }
 

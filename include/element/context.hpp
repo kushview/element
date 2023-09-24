@@ -6,6 +6,7 @@
 #include <element/juce/core.hpp>
 #include <element/audioengine.hpp>
 #include <element/session.hpp>
+#include <element/runmode.hpp>
 
 namespace element {
 
@@ -22,7 +23,7 @@ class Settings;
 
 class Context {
 public:
-    explicit Context (const juce::String& commandLine = juce::String());
+    explicit Context (RunMode mode = RunMode::Standalone, const juce::String& commandLine = juce::String());
     virtual ~Context();
 
     Log& logger();

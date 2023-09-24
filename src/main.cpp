@@ -136,7 +136,7 @@ public:
 
     void initialise (const String& commandLine) override
     {
-        world = std::make_unique<Context> (commandLine);
+        world = std::make_unique<Context> (RunMode::Standalone, commandLine);
         if (maybeLaunchScannerWorker (commandLine))
             return;
 
