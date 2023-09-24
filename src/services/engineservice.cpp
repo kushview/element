@@ -289,12 +289,12 @@ void EngineService::addGraph()
                               true,
                               true));
 
-    addGraph (node);
+    addGraph (node, false);
 
     sibling<GuiService>()->stabilizeContent();
 }
 
-void EngineService::addGraph (const Node& newGraph)
+void EngineService::addGraph (const Node& newGraph, bool makeActive)
 {
     jassert (newGraph.isGraph());
 
@@ -315,7 +315,7 @@ void EngineService::addGraph (const Node& newGraph)
     {
         if (holder->attach (engine))
         {
-            session->addGraph (node, true);
+            session->addGraph (node, makeActive);
             setRootNode (node);
         }
         else
@@ -350,7 +350,7 @@ void EngineService::duplicateGraph (const Node& graph)
     });
 
     duplicate.setProperty (tags::name, duplicate.getName().replace ("(copy)", "").trim() + String (" (copy)"));
-    addGraph (duplicate);
+    addGraph (duplicate, true);
 }
 
 void EngineService::duplicateGraph()

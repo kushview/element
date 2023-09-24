@@ -70,7 +70,7 @@ public:
     void addGraph();
 
     /** adds a specific graph */
-    void addGraph (const Node& n);
+    void addGraph (const Node& n, bool makeActive);
 
     /** Remove a root graph by index */
     void removeGraph (int index = -1);

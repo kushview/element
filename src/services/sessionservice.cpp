@@ -101,7 +101,7 @@ void SessionService::openFile (const File& file)
                 });
 
                 if (auto* ec = sibling<EngineService>())
-                    ec->addGraph (node);
+                    ec->addGraph (node, false);
             }
         }
         else

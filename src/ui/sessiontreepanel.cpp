@@ -37,7 +37,9 @@ inline static void showGraphEditor (Component* c, const Node& node)
 {
     auto graph = findRoot (node);
     if (! graph.isValid())
+    {
         return;
+    }
 
     if (auto* cc = dynamic_cast<StandardContent*> (ViewHelpers::findContentComponent (c)))
     {
@@ -578,9 +580,15 @@ public:
     void showDocument() override
     {
         if (content() == nullptr)
+        {
             return;
+        }
 
         Graph graph (getNode());
+        if (! graph.isValid() || graph.getObject() == nullptr)
+        {
+            return;
+        }
         Script script = graph.findViewScript();
         if (script.valid())
         {
@@ -1009,6 +1017,25 @@ void SessionTreePanel::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (couldBeSessionObjects (parent, child))
         refreshSubItems (panel->rootItem.get());
+    if (child.hasType (types::Node))
+    {
+        const Node node (child, false);
+
+        if (node.isRootGraph())
+        {
+            for (int i = 0; i < panel->rootItem->getNumSubItems(); ++i)
+            {
+                if (auto* const item = dynamic_cast<SessionRootGraphTreeItem*> (panel->rootItem->getSubItem (i)))
+                {
+                    if (node == item->node)
+                    {
+                        item->setSelected (true, true, sendNotification);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void SessionTreePanel::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int indexRemovedAt)

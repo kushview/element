@@ -47,7 +47,7 @@ private:
 
     bool ignoreActiveRootGraphSelectionHandler = false;
     void selectActiveRootGraph();
-
+    
     TreeViewItem* findItemForNode (const Node& node) const;
 
     void onNodeSelected();
