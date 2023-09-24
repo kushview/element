@@ -290,8 +290,6 @@ void EngineService::addGraph()
                               true));
 
     addGraph (node, false);
-
-    sibling<GuiService>()->stabilizeContent();
 }
 
 void EngineService::addGraph (const Node& newGraph, bool makeActive)
@@ -332,8 +330,6 @@ void EngineService::addGraph (const Node& newGraph, bool makeActive)
     {
         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Audio Engine", err);
     }
-
-    sibling<GuiService>()->stabilizeContent();
 }
 
 void EngineService::duplicateGraph (const Node& graph)

@@ -1017,6 +1017,7 @@ void SessionTreePanel::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (couldBeSessionObjects (parent, child))
         refreshSubItems (panel->rootItem.get());
+    
     if (child.hasType (types::Node))
     {
         const Node node (child, false);
@@ -1030,6 +1031,7 @@ void SessionTreePanel::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
                     if (node == item->node)
                     {
                         item->setSelected (true, true, sendNotification);
+                        item->repaintItem();
                         break;
                     }
                 }

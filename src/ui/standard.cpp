@@ -757,15 +757,8 @@ void StandardContent::filesDropped (const StringArray& files, int x, int y)
 void StandardContent::stabilize (const bool refreshDataPathTrees)
 {
     auto session = context().session();
-    if (session->getNumGraphs() > 0)
-    {
-        const Node graph = session->getCurrentGraph();
-        setCurrentNode (graph);
-    }
-    else
-    {
+    if (session->getNumGraphs() <= 0)
         setContentView (new EmptyContentView());
-    }
 
     if (auto* ss = nav->findPanel<SessionTreePanel>())
         ss->setSession (session);
