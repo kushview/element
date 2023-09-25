@@ -22,7 +22,6 @@ public:
 
 private:
     std::unique_ptr<SessionPropertyPanel> props;
-    GraphButton graphButton;
 };
 
 typedef SessionContentView SessionSettingsView;

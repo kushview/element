@@ -111,6 +111,7 @@ NodeEditorView::NodeEditorView()
 {
     setName ("NodeEditorView");
     addAndMakeVisible (nodesCombo);
+    nodesCombo.setFilter (NodeListComboBox::rejectIONodes);
     nodesCombo.addListener (this);
 
     addAndMakeVisible (menuButton);
@@ -218,7 +219,7 @@ void NodeEditorView::paint (Graphics& g)
 
 void NodeEditorView::comboBoxChanged (ComboBox*)
 {
-    const auto selectedNode = graph.getNode (nodesCombo.getSelectedItemIndex());
+    const auto selectedNode = nodesCombo.selectedNode();
     if (selectedNode.isValid())
     {
         if (sticky)
@@ -255,7 +256,7 @@ void NodeEditorView::setSticky (bool shouldBeSticky)
 
 void NodeEditorView::onGraphChanged()
 {
-    std::clog << "NodeEditorView::onGraphChanged()\n";
+    // noop
 }
 
 void NodeEditorView::onSessionLoaded()
@@ -303,11 +304,15 @@ void NodeEditorView::setNode (const Node& newNode)
     if (graphChanged || nodesCombo.getNumItems() != graph.getNumNodes())
         nodesCombo.addNodes (graph, dontSendNotification);
 
-    if (newNode != node)
+    auto nextNode = newNode;
+    if (! nodesCombo.nodes().contains (nextNode) || nextNode.isIONode())
+        nextNode = nodesCombo.nodes().getFirst();
+
+    if (nextNode != node)
     {
         nodeObjectValue.removeListener (this);
         clearEditor();
-        watcher->setNodeToWatch (newNode);
+        watcher->setNodeToWatch (nextNode);
         node = watcher->getWatchedNode();
         nodeObjectValue = node.getPropertyAsValue (tags::object, true);
         editor.reset (createEmbededEditor());

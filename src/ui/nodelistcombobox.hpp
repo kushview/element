@@ -17,7 +17,14 @@ public:
         setTextWhenNothingSelected ("<select node>");
     }
 
+    using FilterFunction = std::function<bool (const Node&)>;
+    inline static bool rejectIONodes (const Node& node) { return ! node.isIONode(); }
     virtual ~NodeListComboBox() {}
+
+    void setFilter (FilterFunction fn)
+    {
+        _filter = fn;
+    }
 
     void addNodes (const Node& parent,
                    juce::NotificationType notification = juce::sendNotificationAsync)
@@ -27,11 +34,14 @@ public:
         clear (notification);
         _nodes.clear();
 
+        int idx = _offset;
         for (int i = 0; i < parent.getNumNodes(); ++i)
         {
             const auto node (parent.getNode (i));
+            if (! filterNode (node))
+                continue;
             _nodes.add (node);
-            addItem (node.getDisplayName(), i + _offset);
+            addItem (node.getDisplayName(), idx++);
         }
 
         if (isPositiveAndBelow (jmin (lastIndex, getNumItems() - _offset), getNumItems()))
@@ -56,8 +66,14 @@ public:
 
 private:
     juce::Array<Node> _nodes;
+    std::function<bool (const Node&)> _filter;
     const int _noneId = 1;
     int _offset = 2;
+
+    bool filterNode (const Node& node) const noexcept
+    {
+        return _filter != nullptr ? _filter (node) : true;
+    }
 };
 
 } // namespace element

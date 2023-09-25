@@ -84,7 +84,7 @@ public:
     {
         return getControllersValueTree().indexOf (device.data());
     }
-
+    
     inline int getNumControllerMaps() const { return getControllerMapsValueTree().getNumChildren(); }
     inline ControllerMap getControllerMap (const int index) const { return ControllerMap (getControllerMapsValueTree().getChild (index)); }
     inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.data()); }

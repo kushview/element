@@ -105,6 +105,7 @@ void NodePropertiesView::init()
     setMouseClickGrabsKeyboardFocus (false);
     setInterceptsMouseClicks (true, true);
     addAndMakeVisible (combo);
+    combo.setFilter (NodeListComboBox::rejectIONodes);
     combo.onChange = [this]() {
         setNode (combo.selectedNode());
     };
@@ -176,14 +177,19 @@ void NodePropertiesView::setNode (const Node& newNode)
     if (graphChanged || combo.getNumItems() != _graph.getNumNodes())
         combo.addNodes (_graph, dontSendNotification);
 
-    if (newNode != _node)
+    auto nextNode = newNode;
+    if (! combo.nodes().contains (nextNode) || nextNode.isIONode())
+        nextNode = combo.nodes().getFirst();
+
+    if (nextNode != _node)
     {
-        nodeSync.setNode (newNode);
+        nodeSync.setNode (nextNode);
         _node = nodeSync.getNode();
         resized();
     }
 
-    combo.selectNode (_node, dontSendNotification);
+    if (_node != combo.selectedNode())
+        combo.selectNode (_node, dontSendNotification);
 
     if (ProcessorPtr ptr = _node.getObject())
     {

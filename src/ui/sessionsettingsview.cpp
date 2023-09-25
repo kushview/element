@@ -56,17 +56,10 @@ SessionContentView::SessionContentView()
     props = std::make_unique<SessionPropertyPanel>();
     addAndMakeVisible (props.get());
     setEscapeTriggersClose (true);
-    addAndMakeVisible (graphButton);
-    graphButton.setTooltip ("Show graph editor");
-    graphButton.onClick = [this]() {
-        if (auto* g = ViewHelpers::getGlobals (this))
-            g->services().find<UI>()->commands().invokeDirectly (Commands::showGraphEditor, true);
-    };
 }
 
 SessionContentView::~SessionContentView()
 {
-    graphButton.onClick = nullptr;
 }
 
 void SessionContentView::didBecomeActive()
@@ -85,6 +78,5 @@ void SessionContentView::resized()
 {
     props->setBounds (getLocalBounds().reduced (2));
     const int configButtonSize = 14;
-    graphButton.setBounds (getWidth() - configButtonSize - 4, 4, configButtonSize, configButtonSize);
 }
 } // namespace element

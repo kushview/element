@@ -373,6 +373,15 @@ void EngineService::removeGraph (int index)
     if (index < 0)
         index = session->getActiveGraphIndex();
 
+    const auto toRemove = session->getGraph (index);
+    const auto active = session->getActiveGraph();
+    const bool removedIsActive = toRemove == active;
+    
+    if (! toRemove.isValid()) {
+        DBG("[element] cannot remove invalid graph");
+        return;
+    }
+
     if (auto* holder = graphs->findByEngineIndex (index))
     {
         bool removeIt = false;
@@ -392,23 +401,31 @@ void EngineService::removeGraph (int index)
             graphs->remove (holder);
             DBG ("[element] graph removed: index: " << index);
             ValueTree sgraphs = session->data().getChildWithName (tags::graphs);
-
-            if (index < 0 || index >= session->getNumGraphs())
-                index = session->getNumGraphs() - 1;
-
-            sgraphs.setProperty (tags::active, index, 0);
-            const Node nextGraph = session->getCurrentGraph();
-
-            if (nextGraph.isRootGraph())
+            if (removedIsActive)
             {
-                DBG ("[element] setting new graph: " << nextGraph.getName());
-                setRootNode (nextGraph);
+                if (index < 0 || index >= session->getNumGraphs())
+                    index = session->getNumGraphs() - 1;
+
+                sgraphs.setProperty (tags::active, index, 0);
+                const Node nextGraph = session->getCurrentGraph();
+
+                if (nextGraph.isRootGraph())
+                {
+                    DBG ("[element] setting new graph: " << nextGraph.getName());
+                    setRootNode (nextGraph);
+                }
+                else if (session->getNumGraphs() > 0)
+                {
+                    DBG ("[element] failed to find appropriate index.");
+                    sgraphs.setProperty (tags::active, 0, nullptr);
+                    setRootNode (session->getActiveGraph());
+                }
             }
-            else if (session->getNumGraphs() > 0)
+            else
             {
-                DBG ("[element] failed to find appropriate index.");
-                sgraphs.setProperty (tags::active, 0, 0);
-                setRootNode (session->getActiveGraph());
+                index = std::max (0, sgraphs.indexOf (active.data()));
+                sgraphs.setProperty (tags::active, index, nullptr);
+                setRootNode (active);
             }
         }
     }
