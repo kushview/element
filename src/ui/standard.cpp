@@ -503,10 +503,16 @@ StandardContent::StandardContent (Context& ctl_)
     setVirtualKeyboardVisible (true);
     setNodeChannelStripVisible (false);
     setMeterBridgeVisible (false);
+
+    auto& srv = *ctl_.services().find<SessionService>();
+    sessionLoadedConn = srv.sessionLoaded.connect ([this]() {
+        setCurrentNode (session()->getActiveGraph());
+    });
 }
 
 StandardContent::~StandardContent() noexcept
 {
+    sessionLoadedConn.disconnect();
     setContentView (nullptr, false);
     setContentView (nullptr, true);
 }

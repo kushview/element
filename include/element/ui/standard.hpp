@@ -105,6 +105,8 @@ private:
 
     std::unique_ptr<juce::Component> _extra;
 
+    boost::signals2::connection sessionLoadedConn;
+    
     void resizerMouseDown();
     void resizerMouseUp();
     void updateLayout();
