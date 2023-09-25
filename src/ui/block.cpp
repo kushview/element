@@ -228,6 +228,8 @@ BlockComponent::~BlockComponent() noexcept
 {
     willRemoveConn.disconnect();
     clearEmbedded();
+    obj = nullptr;
+    
     nodeEnabled.removeListener (this);
     nodeName.removeListener (this);
     hiddenPorts.removeListener (this);
