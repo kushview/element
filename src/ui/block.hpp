@@ -244,6 +244,8 @@ private:
     DropShadowEffect shadow;
     std::unique_ptr<Component> embedded;
 
+    Value nodeObject;
+    
     Colour color { 0x00000000 };
     class BlockColorSelector : public juce::ColourSelector
     {

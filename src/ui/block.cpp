@@ -169,8 +169,10 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
       font (11.0f),
       embedInit (*this)
 {
+    nodeObject = node.getPropertyAsValue (tags::object, true);
     obj = node.getObject();
     jassert (obj != nullptr);
+    nodeObject.addListener (this);
 
     setBufferedToImage (true);
     nodeEnabled = node.getPropertyAsValue (tags::enabled);
@@ -219,13 +221,15 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
 
     if (obj != nullptr)
     {
-        willRemoveConn = obj->willBeRemoved.connect (
-            std::bind (&BlockComponent::clearEmbedded, this));
+        willRemoveConn = obj->willBeRemoved.connect ([this]() {
+            valueChanged (nodeObject);
+        });
     }
 }
 
 BlockComponent::~BlockComponent() noexcept
 {
+    nodeObject.removeListener (this);
     willRemoveConn.disconnect();
     clearEmbedded();
     obj = nullptr;
@@ -359,6 +363,12 @@ void BlockComponent::valueChanged (Value& value)
     else if (displayModeValue.refersToSameSourceAs (value))
     {
         update (false, false);
+    }
+    else if (nodeObject.refersToSameSourceAs (nodeObject))
+    {
+        willRemoveConn.disconnect();
+        clearEmbedded();
+        obj = nullptr;
     }
 }
 
