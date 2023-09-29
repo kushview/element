@@ -140,7 +140,7 @@ public:
         addAndMakeVisible (text);
         text.setCaretVisible (false);
         text.setMultiLine (true, false);
-        text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
+        text.setFont (Font (Font::getDefaultMonospacedFontName(), 10.f, Font::plain));
         text.setReadOnly (true);
         setLicenseText (detail::licenseText());
     }
