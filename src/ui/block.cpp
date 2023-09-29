@@ -296,6 +296,7 @@ void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
                     {
                         block.addAndMakeVisible (embedded.get());
                         block.updateSize();
+                        block.resized();
                     }
                     else
                     {
