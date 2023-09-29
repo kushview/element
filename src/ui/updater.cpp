@@ -173,7 +173,7 @@ public:
         }
 
         url = URL (urlStr);
-        url = url.getChildURL ("latest.xml");
+        url = url.getChildURL (updatesFilename);
         urlStr = url.toString (true);
 
         int status = -1;
@@ -309,6 +309,7 @@ private:
     Updater& owner;
     UpdatePackage local;
     std::string exeFile;
+    std::string updatesFilename { "latest.xml" };
     std::string repo;
     std::string cachedXml;
     std::vector<UpdatePackage> cachedPackages;
@@ -425,6 +426,7 @@ void Updater::launch()
 //==============================================================================
 std::string Updater::exeFile() const noexcept { return updates->exeFile; }
 void Updater::setExeFile (const std::string& file) { updates->exeFile = file; }
+void Updater::setUpdatesFilename (const std::string& filename) { updates->updatesFilename = filename; }
 std::string Updater::repository() const noexcept { return updates->safeRepo(); }
 void Updater::setRepository (const std::string& url)
 {

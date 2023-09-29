@@ -77,6 +77,9 @@ public:
     /** Changes the EXE file of the updater program. */
     void setExeFile (const std::string& file);
 
+    /** Change the XML file to check. Default is 'Updates.xml' */
+    void setUpdatesFilename (const std::string& filename);
+    
     /** Launch the updater GUI if possible. */
     void launch();
 
