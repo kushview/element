@@ -3,6 +3,10 @@
 
 #pragma once
 
+#ifndef EL_REVERB_NODE_NAME
+    #define EL_REVERB_NODE_NAME "eVerb"
+#endif
+
 #include "nodes/baseprocessor.hpp"
 
 namespace element {
@@ -29,7 +33,7 @@ public:
 
     virtual ~ReverbProcessor() {}
 
-    const String getName() const override { return "eVerb"; }
+    const String getName() const override { return EL_REVERB_NODE_NAME; }
 
     void fillInPluginDescription (PluginDescription& desc) const override
     {
