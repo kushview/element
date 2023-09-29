@@ -11,8 +11,8 @@
 #endif
 
 namespace element {
-namespace DataPathHelpers {
-StringArray getSubDirs()
+namespace detail {
+inline static StringArray getSubDirs()
 {
     auto dirs = StringArray ({ "Controllers",
                                "Graphs",
@@ -22,7 +22,7 @@ StringArray getSubDirs()
     return dirs;
 }
 
-void initializeUserLibrary (const File& path)
+inline static void initializeUserLibrary (const File& path)
 {
     for (const auto& d : getSubDirs())
     {
@@ -32,15 +32,19 @@ void initializeUserLibrary (const File& path)
         subdir.createDirectory();
     }
 }
-} // namespace DataPathHelpers
+} // namespace detail
 
 DataPath::DataPath()
 {
     root = defaultUserDataPath();
-    DataPathHelpers::initializeUserLibrary (root);
 }
 
 DataPath::~DataPath() {}
+
+const void DataPath::initializeDefaultLocation()
+{
+    detail::initializeUserLibrary (defaultLocation());
+}
 
 const File DataPath::applicationDataDir()
 {

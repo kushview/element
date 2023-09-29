@@ -33,6 +33,8 @@ public:
 
     void launchApplication()
     {
+        DataPath::initializeDefaultLocation();
+        
         Settings& settings (world.settings());
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
 
