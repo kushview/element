@@ -19,7 +19,6 @@ inline static void addMidiDevicesToMenu (juce::PopupMenu& menu, const bool isInp
 
 inline static juce::MidiDeviceInfo getMidiDeviceForMenuResult (const int result, const bool isInput, const int offset = 80000)
 {
-    jassert (offset > 0 && result >= offset);
     const int index = result - offset;
     const auto devices = isInput ? juce::MidiInput::getAvailableDevices()
                                  : juce::MidiOutput::getAvailableDevices();

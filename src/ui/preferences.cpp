@@ -1,41 +1,29 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-//[Headers] You can add your own extra header files here...
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
-#include <element/ui/content.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
-#include <element/ui/updater.hpp>
 #include <element/version.hpp>
+#include <element/ui/content.hpp>
+#include <element/ui/mainwindow.hpp>
+#include <element/ui/updater.hpp>
+#include <element/ui/preferences.hpp>
 
 #include "ui/audiodeviceselector.hpp"
 #include "ui/guicommon.hpp"
-#include <element/ui/mainwindow.hpp>
 #include "ui/viewhelpers.hpp"
 #include "services/oscservice.hpp"
 #include "engine/midiengine.hpp"
 
-#define EL_GENERAL_SETTINGS_NAME "General"
-#define EL_AUDIO_SETTINGS_NAME "Audio"
-#define EL_MIDI_SETTINGS_NAME "MIDI"
-#define EL_OSC_SETTINGS_NAME "OSC"
-#define EL_PLUGINS_PREFERENCE_NAME "Plugins"
-#define EL_REPOSITORY_PREFERENCE_NAME "Updates"
-
-//[/Headers]
-
-#include "ui/preferences.hpp"
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace element {
 
-class PreferencesComponent::PageList : public ListBox,
-                                       public ListBoxModel
+class Preferences::PageList : public ListBox,
+                              public ListBoxModel
 {
 public:
-    PageList (PreferencesComponent& prefs)
+    PageList (Preferences& prefs)
         : owner (prefs)
     {
         font.setHeight (16);
@@ -86,7 +74,7 @@ public:
     }
 
 private:
-    friend class PreferencesComponent;
+    friend class Preferences;
 
     void addItem (const String& name)
     {
@@ -95,7 +83,7 @@ private:
     }
 
     Font font;
-    PreferencesComponent& owner;
+    Preferences& owner;
     StringArray pageNames;
     String page;
 };
@@ -436,7 +424,7 @@ public:
             if (settings.getDesktopScale() != Desktop::getInstance().getGlobalScaleFactor())
             {
                 Desktop::getInstance().setGlobalScaleFactor (settings.getDesktopScale());
-                if (auto* parent = findParentComponentOfClass<PreferencesComponent>())
+                if (auto* parent = findParentComponentOfClass<Preferences>())
                     parent->updateSize();
             }
         };
@@ -1629,31 +1617,21 @@ private:
 };
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent (GuiService& ui)
+Preferences::Preferences (GuiService& ui)
     : _context (ui.context()), _ui (ui)
 {
     pageList = std::make_unique<PageList> (*this);
     addAndMakeVisible (pageList.get());
-    pageList->setName ("Page List");
+    pageList->setName ("PageList");
 
     pageComponent = std::make_unique<Component>();
     addAndMakeVisible (pageComponent.get());
-    pageComponent->setName ("new component");
+    pageComponent->setName ("Page");
 
     updateSize();
-
-    addPage (EL_GENERAL_SETTINGS_NAME);
-    addPage (EL_AUDIO_SETTINGS_NAME);
-    addPage (EL_MIDI_SETTINGS_NAME);
-    addPage (EL_OSC_SETTINGS_NAME);
-#if EL_UPDATER
-    addPage (EL_REPOSITORY_PREFERENCE_NAME);
-#endif
-
-    setPage (EL_GENERAL_SETTINGS_NAME);
 }
 
-PreferencesComponent::~PreferencesComponent()
+Preferences::~Preferences()
 {
     pageList = nullptr;
     pageComponent = nullptr;
@@ -1662,30 +1640,31 @@ PreferencesComponent::~PreferencesComponent()
 }
 
 //==============================================================================
-void PreferencesComponent::paint (Graphics& g)
+void Preferences::paint (Graphics& g)
 {
     g.fillAll (Colors::widgetBackgroundColor);
 }
 
-void PreferencesComponent::resized()
+void Preferences::resized()
 {
     auto r = getLocalBounds().reduced (8);
     pageList->setBounds (r.removeFromLeft (110));
-    pageComponent->setBounds (r.reduced (8));
+    if (pageComponent)
+        pageComponent->setBounds (r.reduced (8));
 }
 
-bool PreferencesComponent::keyPressed (const KeyPress& key)
+bool Preferences::keyPressed (const KeyPress& key)
 {
     return false;
 }
 
-void PreferencesComponent::addPage (const String& name)
+void Preferences::addPage (const String& name)
 {
     if (! pageList->pageNames.contains (name))
         pageList->addItem (name);
 }
 
-Component* PreferencesComponent::createPageForName (const String& name)
+Component* Preferences::createPageForName (const String& name)
 {
     if (name == EL_GENERAL_SETTINGS_NAME)
     {
@@ -1715,7 +1694,22 @@ Component* PreferencesComponent::createPageForName (const String& name)
     return nullptr;
 }
 
-void PreferencesComponent::setPage (const String& name)
+void Preferences::addDefaultPages() {
+    if (pageList->getNumRows() > 0)
+        return;
+    
+    addPage (EL_GENERAL_SETTINGS_NAME);
+    addPage (EL_AUDIO_SETTINGS_NAME);
+    addPage (EL_MIDI_SETTINGS_NAME);
+    addPage (EL_OSC_SETTINGS_NAME);
+#if EL_UPDATER
+    addPage (EL_REPOSITORY_PREFERENCE_NAME);
+#endif
+
+    setPage (EL_GENERAL_SETTINGS_NAME);
+}
+
+void Preferences::setPage (const String& name)
 {
     if (nullptr != pageComponent && name == pageComponent->getName())
         return;
@@ -1740,7 +1734,7 @@ void PreferencesComponent::setPage (const String& name)
     resized();
 }
 
-void PreferencesComponent::updateSize()
+void Preferences::updateSize()
 {
     setSize (600, 500);
 }

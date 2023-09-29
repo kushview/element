@@ -66,7 +66,7 @@ void Processor::clearParameters()
 {
 #if JUCE_DEBUG
     for (const auto* param : parameters)
-        jassert (param->getReferenceCount() == 1);
+        jassert (param->getReferenceCount() >= 1);
 #endif
     parameters.clear();
 }

@@ -13,6 +13,7 @@
 #include <element/ui/about.hpp>
 #include <element/ui/mainwindow.hpp>
 #include <element/ui/menumodels.hpp>
+#include <element/ui/preferences.hpp>
 #include <element/ui/view.hpp>
 
 #include <element/session.hpp>
@@ -25,6 +26,7 @@ class Context;
 class MainWindow;
 class Node;
 
+//==============================================================================
 class ContentView : public juce::Component {
 public:
     ContentView();
@@ -164,6 +166,9 @@ public:
 
     /** Create a custom MainWindow to be used by the UI service. */
     virtual std::unique_ptr<MainWindow> createMainWindow() { return nullptr; }
+
+    /** Create a custom Preferences Widget to use by the UI service. */
+    virtual std::unique_ptr<Preferences> createPreferences() { return nullptr; }
 
     /** The struct returned will be used when showing the About Dialog inside Element. */
     virtual AboutInfo aboutInfo() { return {}; }

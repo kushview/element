@@ -7,6 +7,7 @@
 #include "ui/guicommon.hpp"
 #include "ui/pluginwindow.hpp"
 #include "ui/contextmenus.hpp"
+#include <element/ui/grapheditor.hpp>
 #include "nodes/volumeeditor.hpp"
 #include "session/presetmanager.hpp"
 
@@ -117,8 +118,21 @@ public:
             r3.removeFromRight (4);
         }
 
-        editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
+        if (! resizeInternalType (r))
+            editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
         editor->addComponentListener (this);
+    }
+
+    bool resizeInternalType (const Rectangle<int>& r)
+    {
+        auto ed = dynamic_cast<NodeEditor*> (editor.get());
+        if (nullptr != ed && ed->resizable())
+        {
+            ed->setBounds (r);
+            return true;
+        }
+
+        return false;
     }
 
     void buttonClicked (Button* button) override
@@ -257,12 +271,7 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     bool windowResize = false;
     bool useResizeHandle = false;
 
-    if (auto eed = dynamic_cast<Editor*> (ui))
-    {
-        windowResize = eed->resizable();
-        useResizeHandle = windowResize;
-    }
-    else if (nullptr != dynamic_cast<GenericAudioProcessorEditor*> (ui))
+    if (nullptr != dynamic_cast<GenericAudioProcessorEditor*> (ui))
     {
         windowResize = false;
         useResizeHandle = false;
@@ -276,6 +285,11 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     {
         windowResize = false;
         useResizeHandle = false;
+    }
+    else if (auto eed = dynamic_cast<Editor*> (ui))
+    {
+        windowResize = eed->resizable();
+        useResizeHandle = windowResize;
     }
     else
     {

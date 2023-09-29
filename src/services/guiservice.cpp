@@ -14,13 +14,13 @@
 #include <element/ui/standard.hpp>
 #include <element/ui/style.hpp>
 #include <element/ui/mainwindow.hpp>
+#include <element/ui/preferences.hpp>
 
 #include "services/sessionservice.hpp"
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/aboutscreen.hpp"
 #include "ui/guicommon.hpp"
 #include "ui/pluginwindow.hpp"
-#include "ui/preferences.hpp"
 #include "ui/systemtray.hpp"
 #include "ui/windowmanager.hpp"
 
@@ -39,6 +39,14 @@ public:
     std::unique_ptr<Content> createMainContent (const String& type) override
     {
         return std::make_unique<StandardContent> (context);
+    }
+
+    std::unique_ptr<Preferences> createPreferences() override
+    {
+        auto& ui = *context.services().find<UI>();
+        auto prefs = std::make_unique<Preferences> (ui);
+        prefs->addDefaultPages();
+        return prefs;
     }
 
 private:
@@ -437,13 +445,20 @@ void GuiService::showPreferencesDialog (const String& section)
         }
         dialog->toFront (true);
         if (section.isNotEmpty())
-            (dynamic_cast<PreferencesComponent*> (dialog->getContentComponent()))->setPage (section);
+            (dynamic_cast<Preferences*> (dialog->getContentComponent()))->setPage (section);
         return;
     }
 
     DialogOptions opts;
-    auto* const prefs = new PreferencesComponent (*this);
-    opts.content.set (prefs, true);
+    auto prefs = factory->createPreferences();
+    if (prefs == nullptr)
+    {
+        DBG ("[element] falling back to default preferences.");
+        prefs = std::make_unique<Preferences> (*this);
+        prefs->addDefaultPages();
+    }
+    
+    opts.content.set (prefs.release(), true);
     opts.useNativeTitleBar = true;
     opts.dialogTitle = TRANS ("Preferences");
     opts.componentToCentreAround = (Component*) mainWindow.get();
@@ -451,10 +466,10 @@ void GuiService::showPreferencesDialog (const String& section)
     if (DialogWindow* dw = opts.create())
     {
         dw->setName (TRANS ("Preferences"));
-        dw->setComponentID ("PreferencesDialog");
+        dw->setComponentID ("net.kushview.element.PreferencesDialog");
         windowManager->push (dw, true);
         if (section.isNotEmpty())
-            prefs->setPage (section);
+            (dynamic_cast<Preferences*> (dw->getContentComponent()))->setPage (section);
         dw->getContentComponent()->grabKeyboardFocus();
     }
 }

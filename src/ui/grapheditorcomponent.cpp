@@ -434,15 +434,12 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         zoomMenu.addItem (55, "150%", true, getZoomScale() == 1.50);
         zoomMenu.addItem (56, "175%", true, getZoomScale() == 1.75);
         zoomMenu.addItem (57, "200%", true, getZoomScale() == 2.00);
-        menu.addSubMenu ("Zoom", zoomMenu);
+        // menu.addSubMenu ("Zoom", zoomMenu);
 
         menu.addItem (5, "Change orientation...");
         menu.addItem (7, "Gather nodes...");
-#if JUCE_DEBUG
-        menu.addItem (100, "Misc testing item...");
-#endif
-        menu.addSeparator();
 
+        menu.addSeparator();
         menu.addSectionHeader ("Plugins");
         menu.addPluginItems();
         const int result = menu.show();

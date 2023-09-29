@@ -13,6 +13,10 @@
 #include "nodes/nodetypes.hpp"
 #include "engine/graphnode.hpp"
 
+#ifndef EL_GRAPH_NODE_NAME
+    #define EL_GRAPH_NODE_NAME "Graph"
+#endif
+
 namespace element {
 
 GraphNode::Connection::Connection (const uint32 sourceNode_, const uint32 sourcePort_, const uint32 destNode_, const uint32 destPort_) noexcept
@@ -31,7 +35,7 @@ GraphNode::GraphNode()
 {
     for (int i = 0; i < IONode::numDeviceTypes; ++i)
         ioNodes[i] = EL_INVALID_PORT;
-    setName ("Graph");
+    setName (EL_GRAPH_NODE_NAME);
 }
 
 GraphNode::~GraphNode()
@@ -43,9 +47,9 @@ GraphNode::~GraphNode()
 
 void GraphNode::clear()
 {
+    clearRenderingSequence();
     nodes.clear();
     connections.clear();
-    clearRenderingSequence();
 }
 
 Processor* GraphNode::getNodeForId (const uint32 nodeId) const
@@ -346,7 +350,7 @@ void GraphNode::clearRenderingSequence()
     Array<void*> oldOps;
 
     {
-        const ScopedLock sl (getPropertyLock());
+        const ScopedLock sl (seqLock);
         renderingOps.swapWith (oldOps);
     }
 
