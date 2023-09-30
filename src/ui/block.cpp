@@ -902,10 +902,20 @@ void BlockComponent::resized()
         auto er = box;
         er.removeFromTop (vertical ? 20 : 18);
         er.removeFromBottom (18);
-        embedded->setBounds (er.getX(),
-                             er.getY(),
-                             embedded->getWidth(),
-                             embedded->getHeight());
+        if (node.getFormat() != EL_NODE_FORMAT_NAME)
+        {
+            customWidth = customHeight = 0;
+            embedded->setBounds (er.getX(),
+                                er.getY(),
+                                embedded->getWidth(),
+                                embedded->getHeight());
+        }
+        else
+        {
+            customWidth = getWidth();
+            customHeight = getHeight();
+            embedded->setBounds (er);
+        }
     }
 
     if (vertical)
@@ -1102,7 +1112,6 @@ void BlockComponent::updateSize()
             {
                 if (detail::canResize (*this) && customWidth > 0 && customHeight > 0)
                 {
-                    std::clog << "wrong resized called\n";
                     setSize (customWidth, customHeight);
                     resized();
                 }
