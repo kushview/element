@@ -794,7 +794,7 @@ void BlockComponent::paint (Graphics& g)
     if (node.isMissing())
     {
         g.setColour (bgc.darker (0.6f));
-        g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.3);
+        g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.3f);
     }
 
     if (colorize)
