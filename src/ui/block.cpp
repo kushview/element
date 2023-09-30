@@ -233,7 +233,7 @@ BlockComponent::~BlockComponent() noexcept
     willRemoveConn.disconnect();
     clearEmbedded();
     obj = nullptr;
-    
+
     nodeEnabled.removeListener (this);
     nodeName.removeListener (this);
     hiddenPorts.removeListener (this);
@@ -241,10 +241,36 @@ BlockComponent::~BlockComponent() noexcept
     deleteAllPins();
 }
 
+void BlockComponent::componentMovedOrResized (Component& component,
+                                              bool wasMoved,
+                                              bool wasResized)
+{
+    if (embedded == nullptr || embedded.get() != &component)
+        return;
+
+    struct AsyncUpdateSize : public juce::MessageManager::MessageBase
+    {
+        AsyncUpdateSize (BlockComponent& b) : block (&b) {}
+        juce::Component::SafePointer<BlockComponent> block;
+        void messageCallback() override
+        {
+            if (auto bp = block.getComponent())
+                bp->updateSize();
+        }
+    };
+
+    if (wasResized)
+        (new AsyncUpdateSize (*this))->post();
+
+    juce::ignoreUnused (wasMoved);
+}
+
 void BlockComponent::clearEmbedded()
 {
     if (nullptr == embedded)
         return;
+
+    embedded->removeComponentListener (this);
 
     if (auto jed = dynamic_cast<juce::AudioProcessorEditor*> (embedded.get()))
         jed->processor.editorBeingDeleted (jed);
@@ -297,11 +323,12 @@ void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
                         block.addAndMakeVisible (embedded.get());
                         block.updateSize();
                         block.resized();
+                        embedded->addComponentListener (&block);
                     }
                     else
                     {
                         if (oldMode != Embed)
-                            block.setDisplayMode (oldMode);
+                            block.setDisplayModeInternal (oldMode, true);
                     }
                 }
 
@@ -720,7 +747,7 @@ void BlockComponent::paint (Graphics& g)
     const auto box (getBoxRectangle());
     const int colorBarHeight = vertical ? 20 : 18;
     bool colorize = color != Colour (0x00000000);
-    Colour bgc = isEnabled() && node.isEnabled() && !node.isMissing()
+    Colour bgc = isEnabled() && node.isEnabled() && ! node.isMissing()
                      ? Colors::widgetBackgroundColor.brighter (0.8f)
                      : Colors::widgetBackgroundColor.brighter (0.2f);
 
@@ -875,7 +902,6 @@ void BlockComponent::resized()
         auto er = box;
         er.removeFromTop (vertical ? 20 : 18);
         er.removeFromBottom (18);
-        embedded->setBounds (er.reduced (1));
         embedded->setBounds (er.getX(),
                              er.getY(),
                              embedded->getWidth(),
@@ -1076,6 +1102,7 @@ void BlockComponent::updateSize()
             {
                 if (detail::canResize (*this) && customWidth > 0 && customHeight > 0)
                 {
+                    std::clog << "wrong resized called\n";
                     setSize (customWidth, customHeight);
                     resized();
                 }

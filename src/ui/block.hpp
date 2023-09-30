@@ -52,6 +52,7 @@ private:
 
 //=============================================================================
 class BlockComponent : public Component,
+                       private ComponentListener,
                        public Button::Listener,
                        private AsyncUpdater,
                        private Value::Listener,
@@ -245,7 +246,7 @@ private:
     std::unique_ptr<Component> embedded;
 
     Value nodeObject;
-    
+
     Colour color { 0x00000000 };
     class BlockColorSelector : public juce::ColourSelector
     {
@@ -343,6 +344,9 @@ private:
     void setDisplayModeInternal (DisplayMode, bool);
     void clearEmbedded();
 
+    void componentMovedOrResized (Component& component,
+                                  bool wasMoved,
+                                  bool wasResized) override;
     // work around...
     struct AsyncEmbedInit : public juce::Timer
     {
