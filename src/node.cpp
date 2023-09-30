@@ -674,7 +674,7 @@ Node Node::getNodeByUuid (const Uuid& uuid, const bool recursive) const
 
 Port Node::getPort (const int index) const
 {
-    Port port (getPortsValueTree().getChildWithProperty (tags::index, index));
+    Port port (getPortsValueTree().getChild (index));
     return port;
 }
 
