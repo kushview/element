@@ -201,16 +201,28 @@ void NavigationConcertinaPanel::restoreState (PropertiesFile* props)
     if (auto xml = props->getXmlValue ("ccNavPanel"))
     {
         ValueTree state = ValueTree::fromXml (*xml);
+        std::vector<ValueTree> withSize;
         for (int i = 0; i < state.getNumChildren(); ++i)
         {
             auto item (state.getChild (i));
+            const auto h = std::max (0, (int) item["h"]);
             if (auto* c = findPanelByName (item["name"].toString().trim()))
             {
-                setPanelSize (c, jmax (10, (int) item["h"]), false);
                 if (auto* ned = dynamic_cast<NodeEditorView*> (c))
                     ned->setSticky ((bool) item.getProperty ("sticky", ned->isSticky()));
+
+                if (h > 0) {
+                    withSize.push_back (item);
+                    continue;
+                }
+
+                setPanelSize (c, 0, false);
             }
         }
+
+        for (const auto& item : withSize)
+            if (auto* c = findPanelByName (item["name"].toString().trim()))
+                setPanelSize (c, (int) item["h"], false);
     }
 }
 
@@ -301,13 +313,13 @@ void NavigationConcertinaPanel::updateContent()
         addPanelInternal (-1, pv, "Plugins", 0);
     }
 
-    if (! namesHidden.contains ("User Data Path"))
+    if (! namesHidden.contains ("Data Path"))
     {
         auto* dp = new DataPathTreeComponent();
         dp->setName ("UserDataPath");
         dp->setComponentID ("UserDataPath");
         dp->getFileTree().setDragAndDropDescription ("ccNavConcertinaPanel");
-        addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
+        addPanelInternal (-1, dp, "Data Path", new UserDataPathHeader (*this, *dp));
     }
 }
 

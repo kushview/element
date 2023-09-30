@@ -354,7 +354,11 @@ element::LookAndFeel_E1& GuiService::getLookAndFeel()
 void GuiService::saveProperties (PropertiesFile* props)
 {
     jassert (props);
-
+    
+    if (auto maps = commands().getKeyMappings())
+        if (auto xml = maps->createXml (false))
+            props->setValue (Settings::keymappingsKey, xml.get());
+    
     if (mainWindow)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
@@ -369,8 +373,12 @@ void GuiService::saveProperties (PropertiesFile* props)
 }
 
 void GuiService::activate()
-{
+{   
+    auto props = context().settings().getUserSettings();
     context().devices().addChangeListener (this);
+    if (auto maps = commands().getKeyMappings())
+        if (auto xml = props->getXmlValue (Settings::keymappingsKey))
+            maps->restoreFromXml (*xml);
     impl->restoreRecents();
 }
 

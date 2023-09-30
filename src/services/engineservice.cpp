@@ -306,7 +306,9 @@ void EngineService::addGraph (const Node& newGraph, bool makeActive)
         if (holder->attach (engine))
         {
             session->addGraph (node, makeActive);
-            setRootNode (node);
+            DBG ("[element] graph added: active: " << (int) makeActive);
+            if (makeActive)
+                setRootNode (node);
         }
         else
         {
@@ -362,9 +364,10 @@ void EngineService::removeGraph (int index)
     const auto toRemove = session->getGraph (index);
     const auto active = session->getActiveGraph();
     const bool removedIsActive = toRemove == active;
-    
-    if (! toRemove.isValid()) {
-        DBG("[element] cannot remove invalid graph");
+
+    if (! toRemove.isValid())
+    {
+        DBG ("[element] cannot remove invalid graph");
         return;
     }
 
