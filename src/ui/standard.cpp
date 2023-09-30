@@ -811,6 +811,8 @@ void StandardContent::saveState (PropertiesFile* props)
         props->setValue ("virtualKeyboard", isVirtualKeyboardVisible());
     }
 
+    props->setValue ("standardNavSize", getNavSize());
+
     props->setValue ("channelStrip", isNodeChannelStripVisible());
 
     auto& mo = container->bottom->bridge->meterBridge();
@@ -838,6 +840,13 @@ void StandardContent::restoreState (PropertiesFile* props)
     bo.setMeterSize (props->getIntValue ("meterBridgeSize", bo.meterSize()));
     bo.setVisibility ((uint32) props->getIntValue ("meterBridgeVisibility", bo.visibility()));
     setMeterBridgeVisible (props->getBoolValue ("meterBridge", isMeterBridgeVisible()));
+
+    {
+        auto ns = props->getIntValue ("standardNavSize", getNavSize());
+        if (nav)
+            nav->setSize (ns, nav->getHeight());
+        resizerMouseUp();
+    }
 
     resized();
     container->bottom->resized();
