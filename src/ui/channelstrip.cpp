@@ -1,9 +1,31 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <element/ui/style.hpp>
 #include "ui/channelstrip.hpp"
 
 namespace element {
+
+struct ChannelStripComponent::FaderStyle : public LookAndFeel_E1
+{
+    void drawLinearSlider (Graphics& g,
+                           int x,
+                           int y,
+                           int width,
+                           int height,
+                           float sliderPos,
+                           float minSliderPos,
+                           float maxSliderPos,
+                           const Slider::SliderStyle sliderStyle,
+                           Slider& slider) override
+    {
+        // clang-format off
+        Style::drawFader (g, x, y, width, height, 
+                                    sliderPos, minSliderPos, maxSliderPos,
+                                    sliderStyle, slider);
+        // clang-format on
+    }
+};
 
 ChannelStripComponent::VolumeLabel::VolumeLabel() {}
 ChannelStripComponent::VolumeLabel::~VolumeLabel() {}
@@ -17,6 +39,8 @@ void ChannelStripComponent::VolumeLabel::settingLabelDoubleClicked()
 ChannelStripComponent::ChannelStripComponent()
     : meter (2, false)
 {
+    _fstyle = std::make_unique<FaderStyle>();
+
     addAndMakeVisible (fader);
     fader.setSliderStyle (Slider::LinearVertical);
     fader.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
@@ -24,6 +48,9 @@ ChannelStripComponent::ChannelStripComponent()
     fader.setValue (0.f, dontSendNotification);
     fader.setSkewFactor (2);
     fader.addListener (this);
+    fader.setColour (Slider::trackColourId, Colours::black);
+    setColour (Slider::thumbColourId, Colours::black.brighter (0.2f));
+    fader.setLookAndFeel (_fstyle.get());
 
     addAndMakeVisible (meter, 100);
     addAndMakeVisible (scale, 101);
@@ -57,8 +84,10 @@ ChannelStripComponent::ChannelStripComponent()
 
 ChannelStripComponent::~ChannelStripComponent() noexcept
 {
+    fader.setLookAndFeel (nullptr);
     fader.removeListener (this);
     volume.getValueObject().removeListener (this);
+    _fstyle.reset();
 }
 
 void ChannelStripComponent::setMinMaxDecibels (double minDb, double maxDb)

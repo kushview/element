@@ -88,6 +88,9 @@ private:
     SimpleMeter meter;
     DecibelScale scale;
     Label name;
+    struct FaderStyle;
+    std::unique_ptr<FaderStyle> _fstyle;
+
     class VolumeLabel : public DragableIntLabel
     {
     public:
