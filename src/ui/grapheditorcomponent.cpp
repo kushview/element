@@ -337,6 +337,8 @@ GraphEditorComponent::GraphEditorComponent()
 
 GraphEditorComponent::~GraphEditorComponent()
 {
+    if (graph.isValid())
+        graph.setProperty (tags::vertical, verticalLayout);
     data.removeListener (this);
     graph = Node();
     data = ValueTree();
@@ -352,14 +354,16 @@ void GraphEditorComponent::setNode (const Node& n)
     bool isValid = n.isValid();
     const auto ng = isValid && isGraph ? n : Node (types::Graph);
 
-    if (ng == graph)
+    if (ng == graph) {
+        // properties might still need updating.
         return;
+    }
 
     graph = ng;
     data.removeListener (this);
     data = graph.data();
 
-    verticalLayout = graph.getProperty (tags::vertical, true);
+    verticalLayout = graph.getProperty (tags::vertical, false);
 
     if (draggingConnector)
         removeChildComponent (draggingConnector.get());
@@ -378,7 +382,7 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
     verticalLayout = isVertical;
 
     if (graph.isValid() && graph.isGraph())
-        graph.setProperty ("vertical", verticalLayout);
+        graph.setProperty (tags::vertical, verticalLayout);
 
     draggingConnector = nullptr;
     deleteAllChildren();
@@ -425,17 +429,6 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         }
 
         menu.addSeparator();
-        PopupMenu zoomMenu;
-        // zoomMenu.addItem (50, "25%",  true, getZoomScale() == 0.25);
-        // zoomMenu.addItem (51, "50%",  true, getZoomScale() == 0.50);
-        zoomMenu.addItem (52, "75%", true, getZoomScale() == 0.75);
-        zoomMenu.addItem (53, "100%", true, getZoomScale() == 1.00);
-        zoomMenu.addItem (54, "125%", true, getZoomScale() == 1.25);
-        zoomMenu.addItem (55, "150%", true, getZoomScale() == 1.50);
-        zoomMenu.addItem (56, "175%", true, getZoomScale() == 1.75);
-        zoomMenu.addItem (57, "200%", true, getZoomScale() == 2.00);
-        // menu.addSubMenu ("Zoom", zoomMenu);
-
         menu.addItem (5, "Change orientation...");
         menu.addItem (7, "Gather nodes...");
 

@@ -105,7 +105,7 @@ private:
     std::unique_ptr<ConnectorComponent> draggingConnector;
     std::unique_ptr<BlockFactory> factory;
 
-    bool verticalLayout = true;
+    bool verticalLayout = false;
 
     LassoComponent<uint32> lasso;
     friend class SelectedNodes;
@@ -228,14 +228,6 @@ public:
             pos = _viewport.getLocalPoint (&_editor, pos.toFloat()).toInt();
             _viewport.autoScroll (pos.x, pos.y, edgeSpeed, maxSpeed);
         };
-
-        // _editor.onZoomChanged = [this]() {
-        //     auto s = settings();
-        //     if (s.isValid())
-        //     {
-        //         s.setProperty ("zoomScale", _editor.getZoomScale(), nullptr);
-        //     }
-        // };
     }
 
     ~GraphEditor()

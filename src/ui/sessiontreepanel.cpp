@@ -332,7 +332,7 @@ public:
         PopupMenu menu;
         if (node.isGraph())
         {
-            menu.addItem (5, "Add Nested Graph");
+            menu.addItem (5, "Add graph...");
             menu.addSeparator();
         }
 
@@ -347,7 +347,7 @@ public:
         PopupMenu menu;
         if (node.isGraph())
         {
-            menu.addItem (5, "Add Nested Graph");
+            menu.addItem (5, "Add graph...");
             menu.addSeparator();
         }
 
@@ -360,6 +360,8 @@ public:
 
     bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
+        std::clog << "isInterestedInDragSource()\n";
+
         const auto& desc (details.description);
         if (! node.isGraph())
             return false;
@@ -370,6 +372,7 @@ public:
 
     void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
     {
+        std::clog << "dropped\n";
         ignoreUnused (index);
 
         auto* world = ViewHelpers::getGlobals (getOwnerView());
@@ -737,7 +740,7 @@ public:
         bool hasView = Graph (getNode()).hasViewScript();
 
         PopupMenu menu;
-        menu.addItem (5, "Add Nested Graph");
+        menu.addItem (5, "Add graph...");
         PopupMenu scripts;
         scripts.addItem (6, "Anonymous");
         scripts.addItem (7, "View", ! hasView, hasView);
@@ -787,6 +790,7 @@ public:
 
     bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
+        std::clog << "isInterestedInDragSource() session root\n";
         const auto& desc (details.description);
         return desc.toString() == "ccNavConcertinaPanel";
         // ||    (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");

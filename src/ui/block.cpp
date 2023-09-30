@@ -797,13 +797,6 @@ void BlockComponent::paint (Graphics& g)
         g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.3f);
     }
 
-    if (colorize)
-        g.setColour (Colours::white.overlaidWith (color).contrasting());
-    else
-        g.setColour (Colours::black);
-
-    g.setFont (Font (12.f));
-
     auto displayName = node.getDisplayName();
     auto subName = node.hasModifiedName() ? node.getPluginName() : String();
 
@@ -822,6 +815,13 @@ void BlockComponent::paint (Graphics& g)
         }
     }
 
+    auto normalTextColor = node.isMissing() ? Colors::toggleRed : Colours::black;
+    if (colorize && ! node.isMissing())
+        normalTextColor = Colours::white.overlaidWith (color).contrasting();
+
+    g.setColour (normalTextColor);
+    g.setFont (Font (12.f, node.isMissing() ? Font::bold : 0));
+    
     if (vertical)
     {
         switch (displayMode)

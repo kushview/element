@@ -210,7 +210,7 @@ public:
         PopupMenu menu;
         KnownPluginList::addToMenu (menu,
                                     plugins.getKnownPlugins().getTypes(),
-                                    KnownPluginList::sortByCategory,
+                                    KnownPluginList::sortByManufacturer,
                                     node.getFileOrIdentifier().toString());
         addSubMenu ("Replace", menu);
     }
