@@ -106,15 +106,6 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (TextEditor::outlineColourId, Colours::black);
     setColour (TextEditor::focusedOutlineColourId, Colors::toggleBlue.darker (0.002f).withAlpha (0.6f));
 
-    // Slider
-    setColour (Slider::thumbColourId, Colours::black);
-    setColour (Slider::textBoxTextColourId, Colors::textColor);
-    setColour (Slider::trackColourId, Colours::black);
-    setColour (Slider::textBoxBackgroundColourId, findColour (TextEditor::backgroundColourId));
-    setColour (Slider::textBoxHighlightColourId, findColour (TextEditor::highlightColourId));
-    setColour (Slider::textBoxOutlineColourId, findColour (TextEditor::outlineColourId));
-    setColour (Slider::textBoxTextColourId, findColour (TextEditor::textColourId));
-
     // Digital meter styling
     setColour (SimpleMeter::levelOverColourId, Colours::yellow.darker());
     setColour (SimpleMeter::level0dBColourId, Colours::yellowgreen);
@@ -208,20 +199,12 @@ LookAndFeel_E1::LookAndFeel_E1()
     // List Box
     setColour (ListBox::textColourId, Colors::textColor);
 
-    // // Slider
-    //                                                    and feel class how this is used. */
-    //     trackColourId               = 0x1001310,  /**< The colour to draw the groove that the thumb moves along. */
-    //     rotarySliderFillColourId    = 0x1001311,  /**< For rotary sliders, this colour fills the outer curve. */
-    //     rotarySliderOutlineColourId = 0x1001312,  /**< For rotary sliders, this colour is used to draw the outer curve's outline. */
-
-    //     textBoxOutlineColourId      = 0x1001700   /**< The colour to use for a border around the text-editor box. */
-
-    setColour (Slider::backgroundColourId,          Colours::black.brighter (0.15f));
-    setColour (Slider::thumbColourId,               Colours::black.brighter (0.12f));
-    setColour (Slider::trackColourId,               Colours::black.brighter (0.05f));
+    // Slider
     
+    setColour (Slider::thumbColourId,               Colours::black.brighter());
+    setColour (Slider::trackColourId,               Colors::toggleOrange.darker(0.7f));
+    setColour (Slider::backgroundColourId,          Colours::black.brighter (0.002f));
     setColour (Slider::rotarySliderFillColourId,    Colors::toggleBlue.darker (0.3f));
-
     setColour (Slider::textBoxTextColourId,         Colors::textColor);
     setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
     setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
