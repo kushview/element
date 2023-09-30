@@ -277,7 +277,7 @@ void NodeEditorView::stabilizeContent()
         selectedNodeConnection = gui.nodeSelected.connect (std::bind (
             &NodeEditorView::stabilizeContent, this));
     if (! sessionLoadedConnection.connected())
-        sessionLoadedConnection = sessions.sessionLoaded.connect (std::bind (
+        sessionLoadedConnection = sessions.sigSessionLoaded.connect (std::bind (
             &NodeEditorView::onSessionLoaded, this));
 
     if (! sticky || ! node.isValid())

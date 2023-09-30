@@ -34,7 +34,7 @@ public:
     void exportGraph (const Node& node, const File& targetFile);
     void importGraph (const File& file);
 
-    Signal<void()> sessionLoaded;
+    Signal<void()> sigSessionLoaded;
     Signal<void()> sigWillSave;
 
 private:

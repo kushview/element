@@ -292,7 +292,7 @@ void SessionService::refreshOtherControllers()
     sibling<DeviceService>()->refresh();
     sibling<MappingService>()->learn (false);
     sibling<PresetService>()->refresh();
-    sessionLoaded();
+    sigSessionLoaded();
 }
 
 } // namespace element

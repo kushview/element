@@ -226,7 +226,7 @@ void NodePropertiesView::stabilizeContent()
 
     auto& sessions = *cc->services().find<SessionService>();
     if (! sessionLoadedConnection.connected())
-        sessionLoadedConnection = sessions.sessionLoaded.connect (std::bind (
+        sessionLoadedConnection = sessions.sigSessionLoaded.connect (std::bind (
             &NodePropertiesView::onSessionLoaded, this));
 
     if (! sticky || ! _node.isValid())

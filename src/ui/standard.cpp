@@ -505,7 +505,7 @@ StandardContent::StandardContent (Context& ctl_)
     setMeterBridgeVisible (false);
 
     auto& srv = *ctl_.services().find<SessionService>();
-    sessionLoadedConn = srv.sessionLoaded.connect ([this]() {
+    sessionLoadedConn = srv.sigSessionLoaded.connect ([this]() {
         setCurrentNode (session()->getActiveGraph());
     });
 }

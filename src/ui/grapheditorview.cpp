@@ -70,7 +70,7 @@ void GraphEditorView::stabilizeContent()
             nodeRemovedConnection = eng.sigNodeRemoved.connect (
                 std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
             auto& s = *cc->services().find<SessionService>();
-            sessionLoadedConnection = s.sessionLoaded.connect (
+            sessionLoadedConnection = s.sigSessionLoaded.connect (
                 std::bind(&GraphEditorView::onSessionLoaded, this)
             );
         }
