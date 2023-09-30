@@ -127,7 +127,7 @@ public:
 
     void changeBusesLayout (const Node& node, const AudioProcessor::BusesLayout& layout);
 
-    Signal<void (const Node&)> nodeRemoved;
+    Signal<void (const Node&)> sigNodeRemoved;
 
 private:
     friend struct RootGraphHolder;

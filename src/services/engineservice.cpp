@@ -422,8 +422,11 @@ void EngineService::removeGraph (int index)
     {
         DBG ("[element] could not find root graph index: " << index);
     }
-
-    sibling<GuiService>()->stabilizeContent();
+    
+    if (toRemove.isValid())
+        sigNodeRemoved (toRemove);
+    // FIXME: dont notify the UI top-down
+    sibling<UI>()->stabilizeContent();
 }
 
 void EngineService::connectChannels (const Node& graph, const Node& src, const int sc, const Node& dst, const int dc)
@@ -624,7 +627,7 @@ void EngineService::removeNode (const Node& node)
         if (gui->getSelectedNode() == node)
             gui->selectNode (Node());
         manager->removeNode (node.getNodeId());
-        nodeRemoved (node);
+        sigNodeRemoved (node);
     }
 }
 

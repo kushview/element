@@ -66,8 +66,8 @@ void GraphEditorView::stabilizeContent()
             auto& gui = *cc->services().find<GuiService>();
             nodeSelectedConnection = gui.nodeSelected.connect (
                 std::bind (&GraphEditorView::onNodeSelected, this));
-            auto& eng = *cc->services().find<EngineService>();
-            nodeRemovedConnection = eng.nodeRemoved.connect (
+            auto& eng = *gui.sibling<EngineService>();
+            nodeRemovedConnection = eng.sigNodeRemoved.connect (
                 std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
             auto& s = *cc->services().find<SessionService>();
             sessionLoadedConnection = s.sessionLoaded.connect (
