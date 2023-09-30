@@ -677,12 +677,26 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
 
     if (radius > 12.0f)
     {
+        const float thickness = 0.82f;
+        const float iradius = radius * 0.7f;
+        {
+            const float csf =  rw - (rw * thickness);
+            Path filledCircle;
+            ColourGradient grad (Colours::whitesmoke.darker(0.f), rx, ry, 
+                                 Colours::whitesmoke.darker(2.f), rx + rw, ry + rw, 
+                                 true);
+            g.setFillType (grad);
+            filledCircle.addEllipse (Rectangle<float> (rx, ry, rw, rw).reduced (csf));
+            g.fillPath (filledCircle);
+            g.setColour (Colours::black.brighter(0.17f));
+           
+            g.strokePath (filledCircle, PathStrokeType(1.23));
+        }
+
         if (slider.isEnabled())
-            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.7f));
+            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.8f));
         else
             g.setColour (Colour (0x80808080));
-
-        const float thickness = 0.7f;
 
         {
             Path filledArc;
@@ -691,12 +705,13 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
         }
 
         {
-            const float innerRadius = radius * 0.2f;
             Path p;
-            p.addTriangle (-innerRadius, 0.0f, 0.0f, -radius * thickness * 1.1f, innerRadius, 0.0f);
-
-            p.addEllipse (-innerRadius, -innerRadius, innerRadius * 2.0f, innerRadius * 2.0f);
-
+            p.addLineSegment (Line<float> (
+                0.f,
+                -18.f,
+                0.f,
+                -radius + 18), 4.0f);
+            g.setColour (Colours::black);
             g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
         }
 
@@ -704,12 +719,6 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
             g.setColour (slider.findColour (Slider::rotarySliderOutlineColourId));
         else
             g.setColour (Colour (0x80808080));
-
-        Path outlineArc;
-        outlineArc.addPieSegment (rx, ry, rw, rw, rotaryStartAngle, rotaryEndAngle, thickness);
-        outlineArc.closeSubPath();
-
-        g.strokePath (outlineArc, PathStrokeType (slider.isEnabled() ? (isMouseOver ? 2.0f : 1.2f) : 0.3f));
     }
     else
     {
