@@ -204,7 +204,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (Slider::thumbColourId,               Colours::black.brighter());
     setColour (Slider::trackColourId,               Colors::toggleOrange.darker(0.7f));
     setColour (Slider::backgroundColourId,          Colours::black.brighter (0.002f));
-    setColour (Slider::rotarySliderFillColourId,    Colors::toggleBlue.darker (0.3f));
+    setColour (Slider::rotarySliderFillColourId,    Colors::toggleOrange.darker (0.72f));
     setColour (Slider::textBoxTextColourId,         Colors::textColor);
     setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
     setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
