@@ -34,7 +34,7 @@ public:
     void launchApplication()
     {
         DataPath::initializeDefaultLocation();
-        
+
         Settings& settings (world.settings());
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
 
@@ -57,28 +57,47 @@ private:
     {
         auto& settings = world.settings();
         DeviceManager& devices (world.devices());
-        String tp = devices.getCurrentAudioDeviceType();
+        for (const auto& tp : devices.getAvailableDeviceTypes())
+            tp->scanForDevices();
 
         AudioEnginePtr engine = world.audio();
         engine->applySettings (settings);
 
         auto* props = settings.getUserSettings();
 
+        String error = "No device found at startup";
         if (auto dxml = props->getXmlValue ("devices"))
         {
-            devices.initialise (DeviceManager::maxAudioChannels,
-                                DeviceManager::maxAudioChannels,
-                                dxml.get(),
-                                true,
-                                "default",
-                                nullptr);
-            auto setup = devices.getAudioDeviceSetup();
-            devices.setAudioDeviceSetup (setup, true);
+            DeviceManager::AudioDeviceSetup prefered;
+            prefered.inputChannels.setRange (0, 32, true);
+            prefered.outputChannels.setRange (0, 32, true);
+            prefered.sampleRate = 44100.0;
+            prefered.bufferSize = 1024;
+            error = devices.initialise (DeviceManager::maxAudioChannels,
+                                        DeviceManager::maxAudioChannels,
+                                        dxml.get(),
+                                        true,
+                                        "default",
+                                        &prefered);
+            if (error.isNotEmpty())
+            {
+                auto setup = devices.getAudioDeviceSetup();
+                error = devices.setAudioDeviceSetup (setup, true);
+            }
         }
-        else
+
+        if (error.isNotEmpty())
         {
-            devices.initialiseWithDefaultDevices (DeviceManager::maxAudioChannels,
-                                                  DeviceManager::maxAudioChannels);
+#if JUCE_WINDOWS
+            devices.setCurrentAudioDeviceType ("Windows Audio (Low Latency Mode)", true);
+#endif
+            error = devices.initialiseWithDefaultDevices (DeviceManager::maxAudioChannels,
+                                                          DeviceManager::maxAudioChannels);
+        }
+
+        if (error.isNotEmpty())
+        {
+            Logger::writeToLog (error);
         }
     }
 

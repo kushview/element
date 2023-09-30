@@ -177,6 +177,9 @@ public:
 
     void setNumPorts (PortType type, int count, bool inputs, bool async = true);
 
+    /** Returns true if the graph is prepared. */
+    bool prepared() const noexcept { return _prepared; }
+
 protected:
     //==========================================================================
     virtual void preRenderNodes() {}
@@ -202,6 +205,7 @@ private:
     AudioSampleBuffer renderingBuffers;
     OwnedArray<MidiBuffer> midiBuffers;
     Array<void*> renderingOps;
+    bool _prepared = false;
 
     AudioSampleBuffer* currentAudioInputBuffer;
     AudioSampleBuffer currentAudioOutputBuffer;

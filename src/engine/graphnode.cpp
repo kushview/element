@@ -101,7 +101,8 @@ Processor* GraphNode::addNode (Processor* newNode, uint32 nodeId)
     newNode->setPlayHead (playhead);
     newNode->setParentGraph (this);
     newNode->refreshPorts();
-    newNode->prepare (getSampleRate(), getBlockSize(), this);
+    if (prepared())
+        newNode->prepare (getSampleRate(), getBlockSize(), this);
     triggerAsyncUpdate();
     return nodes.add (newNode);
 }
@@ -456,12 +457,16 @@ void GraphNode::handleAsyncUpdate()
 
 void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock)
 {
+    if (prepared())
+        return;
+    
     currentAudioInputBuffer = nullptr;
     currentAudioOutputBuffer.setSize (jmax (1, getNumAudioOutputs()), estimatedSamplesPerBlock);
     currentMidiInputBuffer = nullptr;
     currentMidiOutputBuffer.clear();
     clearRenderingSequence();
 
+    _prepared = true;
     if (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock)
         setRenderDetails (sampleRate, estimatedSamplesPerBlock);
 
@@ -473,9 +478,14 @@ void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock
 
 void GraphNode::releaseResources()
 {
+    if (! prepared())
+        return;
+
     for (int i = 0; i < nodes.size(); ++i)
         nodes.getUnchecked (i)->unprepare();
 
+    _prepared = false;
+    
     renderingBuffers.setSize (1, 1);
     midiBuffers.clear();
 

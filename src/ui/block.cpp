@@ -720,7 +720,7 @@ void BlockComponent::paint (Graphics& g)
     const auto box (getBoxRectangle());
     const int colorBarHeight = vertical ? 20 : 18;
     bool colorize = color != Colour (0x00000000);
-    Colour bgc = isEnabled() && node.isEnabled()
+    Colour bgc = isEnabled() && node.isEnabled() && !node.isMissing()
                      ? Colors::widgetBackgroundColor.brighter (0.8f)
                      : Colors::widgetBackgroundColor.brighter (0.2f);
 
@@ -766,11 +766,8 @@ void BlockComponent::paint (Graphics& g)
 
     if (node.isMissing())
     {
-        g.setColour (Colour (0xff333333));
-        g.setFont (9.f);
-        auto pr = box;
-        pr.removeFromTop (6);
-        g.drawFittedText ("(placeholder)", pr, Justification::centred, 2);
+        g.setColour (bgc.darker (0.6f));
+        g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.3);
     }
 
     if (colorize)

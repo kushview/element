@@ -710,8 +710,8 @@ private:
     Atomic<float> nextTempo;
 
     CriticalSection lock;
-    double sampleRate = 0.0;
-    int blockSize = 0;
+    double sampleRate = 44100.0;
+    int blockSize = 1024;
     bool isPrepared = false;
     Atomic<int> currentGraph;
 

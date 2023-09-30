@@ -83,8 +83,6 @@ struct RootGraphHolder
                 root->setNumPorts (PortType::Audio, ins.size(), true, false);
                 root->setNumPorts (PortType::Audio, outs.size(), false, false);
                 controller->setNodeModel (model);
-
-                resetIONodePorts();
             }
             else
             {
@@ -120,18 +118,6 @@ struct RootGraphHolder
     RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node.get() : nullptr); }
 
     bool hasController() const { return nullptr != controller; }
-
-    void resetIONodePorts()
-    {
-        const ValueTree nodes = model.getNodesValueTree();
-        for (int i = nodes.getNumChildren(); --i >= 0;)
-        {
-            Node model (nodes.getChild (i), false);
-            ProcessorPtr node = model.getObject();
-            if (node && (node->isAudioIONode() || node->isMidiIONode()))
-                model.resetPorts();
-        }
-    }
 
 private:
     friend class EngineService;

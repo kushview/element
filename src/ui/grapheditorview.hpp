@@ -47,9 +47,11 @@ private:
     GraphEditor _editor;
 
     SignalConnection nodeSelectedConnection,
-        nodeRemovedConnection;
+        nodeRemovedConnection,
+        sessionLoadedConnection;
     void onNodeSelected();
     void onNodeRemoved (const Node&);
+    void onSessionLoaded();
     void updateSizeInternal (const bool force = true);
     void init();
 };

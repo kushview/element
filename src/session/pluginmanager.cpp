@@ -1062,6 +1062,11 @@ PluginDescription PluginManager::findDescriptionFor (const Node& node) const
     if (! wasFound)
     {
         // Manually load and search
+        desc.pluginFormatName = node.getProperty (tags::format).toString();
+        desc.fileOrIdentifier = node.getProperty (tags::identifier).toString();
+        
+        DBG("[element] manual load: " << desc.pluginFormatName << " : " << desc.fileOrIdentifier);
+
         OwnedArray<PluginDescription> types;
         if (auto* format = getAudioPluginFormat (desc.pluginFormatName))
             format->findAllTypesForFile (types, desc.fileOrIdentifier);

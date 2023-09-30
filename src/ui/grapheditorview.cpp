@@ -33,6 +33,7 @@ GraphEditorView::~GraphEditorView()
 {
     nodeSelectedConnection.disconnect();
     nodeRemovedConnection.disconnect();
+    sessionLoadedConnection.disconnect();
 }
 
 void GraphEditorView::willBeRemoved()
@@ -68,6 +69,10 @@ void GraphEditorView::stabilizeContent()
             auto& eng = *cc->services().find<EngineService>();
             nodeRemovedConnection = eng.nodeRemoved.connect (
                 std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
+            auto& s = *cc->services().find<SessionService>();
+            sessionLoadedConnection = s.sessionLoaded.connect (
+                std::bind(&GraphEditorView::onSessionLoaded, this)
+            );
         }
     }
 
@@ -125,6 +130,11 @@ void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
     stabilizeContent();
     restoreSettings();
     updateSizeInternal (false);
+}
+
+void GraphEditorView::onSessionLoaded() 
+{
+
 }
 
 void GraphEditorView::onNodeSelected()

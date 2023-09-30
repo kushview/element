@@ -242,7 +242,6 @@ public:
         addAndMakeVisible (streamingStatusLabel);
         addAndMakeVisible (statusLabel);
 
-        const Colour labelColor (0xffaaaaaa);
         const Font font (12.0f);
 
         for (int i = 0; i < getNumChildComponents(); ++i)
@@ -250,7 +249,7 @@ public:
             if (Label* label = dynamic_cast<Label*> (getChildComponent (i)))
             {
                 label->setFont (font);
-                label->setColour (Label::textColourId, labelColor);
+                label->setColour (Label::textColourId, Colors::textColor);
                 label->setJustificationType (Justification::centredLeft);
             }
         }
@@ -313,12 +312,14 @@ public:
             streamingStatusLabel.setText (text, dontSendNotification);
 
             statusLabel.setText (String ("Device: ") + dev->getName(), dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colors::textColor);
         }
         else
         {
-            sampleRateLabel.setText ("", dontSendNotification);
-            streamingStatusLabel.setText ("", dontSendNotification);
+            sampleRateLabel.setText ("N/A", dontSendNotification);
+            streamingStatusLabel.setText ("N/A", dontSendNotification);
             statusLabel.setText ("No Device", dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colors::toggleRed);
         }
 
         if (plugins.isScanningAudioPlugins())
