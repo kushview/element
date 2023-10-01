@@ -63,6 +63,8 @@ audio and MIDI processing in your Session.
     ===========     ================================
     **name**        (string) The parameter name
     **label**       (string) Value label. e.g. dB
+    **flow**        (string) Port direction, input or output. default=input
+    **type**        (string) Type of value. default=float
     **min**         (number) Minimum value
     **max**         (number) Maximum value
     **default**     (number) Default value
