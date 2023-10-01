@@ -51,6 +51,20 @@ public:
             param->setValueNotifyingHost (val);
     }
 
+    float getMin() const noexcept
+    {
+        if (control)
+            return control->getNormalisableRange().start;
+        return 0.f;
+    }
+
+    float getMax() const noexcept
+    {
+        if (control)
+            return control->getNormalisableRange().end;
+        return 1.f;
+    }
+
     std::function<void()> onValueChange;
 
 private:
@@ -58,7 +72,6 @@ private:
     RangedParameterPtr control;
     void handleNewParameterValue() override
     {
-        std::clog << "handle new param value\n";
         if (onValueChange)
             onValueChange();
     }
@@ -194,6 +207,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> (
+        // clang format-off
         "ControlPort", sol::no_constructor,
 #if 0
         "value",        sol::overload (
@@ -214,13 +228,13 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
             }
         ),
 #endif
-        "get",
-        [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
-        "set",
-        [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
-
-        "changed",
-        sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction));
+        "get", [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
+        "set", [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
+        "min", [] (ScriptNodeControlPort& self) -> double { return self.getMin(); },
+        "max", [] (ScriptNodeControlPort& self) -> double { return self.getMax(); },
+        "changed", sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction)
+        // clang-format on    
+    );
     env["ScriptNodeEditor.ControlPort"] = M;
 
     lua = getNodeObjectOfType<ScriptNode>();
