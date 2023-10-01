@@ -292,15 +292,19 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
 
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
-    menu.addItem (6000, TRANS ("User's Manual"));
-    menu.addItem (6001, TRANS ("Lua API"));
-    menu.addSeparator();
-    menu.addItem (7000, TRANS ("Issue tracking..."));
-    menu.addItem (7001, TRANS ("Donate..."));
 #if ! JUCE_MAC
     menu.addCommandItem (&cmd, Commands::showAbout, TRANS ("About Element"));
     menu.addSeparator();
 #endif
+    menu.addItem (6000, TRANS ("User's Manual"));
+    menu.addItem (6001, TRANS ("Lua API"));
+    menu.addSeparator();
+    menu.addItem (7000, TRANS ("Issue tracking..."));
+#if ! EL_UPDATER
+    menu.addSeparator();
+    menu.addItem (7001, TRANS ("Donate..."));
+#endif
+
 }
 
 void MainMenu::buildSessionMenu (Commands& cmd, PopupMenu& menu)
