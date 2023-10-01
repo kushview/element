@@ -20,6 +20,7 @@ public:
     ~ConnectionGrid();
 
     void setNode (const Node& node);
+    Node getGraph() const noexcept;
 
     void didBecomeActive() override;
 

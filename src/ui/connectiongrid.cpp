@@ -967,6 +967,13 @@ ConnectionGrid::~ConnectionGrid()
     quads = nullptr;
 }
 
+Node ConnectionGrid::getGraph() const noexcept
+{
+    if (matrix != nullptr)
+        return Node (matrix->graphModel, false);
+    return {};
+}
+
 void ConnectionGrid::setNode (const Node& newNode)
 {
     if (newNode.isGraph() && ! newNode.isRootGraph())

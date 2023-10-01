@@ -556,11 +556,22 @@ void StandardContent::setMainView (const String& name)
 
     if (name == "PatchBay")
     {
-        setContentView (new ConnectionGrid());
+        Node g;
+        auto grid = new ConnectionGrid();
+        if (auto gev = dynamic_cast<GraphEditorView*> (getMainViewComponent()))
+            g = gev->getGraph();
+        setContentView (grid, false);
+        if (g.isValid())
+            grid->setNode (g);
     }
     else if (name == EL_VIEW_GRAPH_EDITOR)
     {
-        setContentView (new GraphEditorView());
+        GraphEditorView* ged = nullptr;
+        if (auto gev = dynamic_cast<ConnectionGrid*> (getMainViewComponent()))
+            ged = new GraphEditorView (gev->getGraph());
+        else
+            ged = new GraphEditorView();
+        setContentView (ged);
     }
     else if (name == EL_VIEW_PLUGIN_MANAGER)
     {
@@ -854,7 +865,7 @@ void StandardContent::restoreState (PropertiesFile* props)
 }
 
 void StandardContent::setCurrentNode (const Node& node)
-{
+{    
     // clang-format off
     if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || 
         getMainViewName() == EL_VIEW_SESSION_SETTINGS || 
