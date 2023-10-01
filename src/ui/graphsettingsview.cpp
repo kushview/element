@@ -242,7 +242,7 @@ class KeyMapPropertyComponent : public PropertyComponent,
 {
 public:
     KeyMapPropertyComponent (const Node& n)
-        : PropertyComponent ("Key Map", 25),
+        : PropertyComponent ("Hotkey", 25),
           textWithButton (*this)
     {
         node = n;
