@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Session version="1" name="datadial" tempo="120.0" notes="" beatsPerBar="4"
+         beatDivisor="2">
+  <graphs active="0">
+    <Node version="1" type="Graph" uuid="aa172651ea824da684e598db2875569f"
+          name="Graph" bypass="0" persistent="1" renderMode="single" keyStart="0"
+          keyEnd="127" transpose="0" delayCompensation="0" tempo="120.0">
+      <nodes>
+        <Node id="1" format="Internal" identifier="audio.input" type="plugin"
+              name="" relativeX="0.3457142857142857" relativeY="0.1943907156673114"
+              pluginIdentifierString="Internal--da9d27b2-0" uuid="b391ca33964c4ce4be5b2de870fe781f"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="211.0"
+              y="141.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1"
+              enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="Audio Out 1" symbol="audio_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="Audio Out 2" symbol="audio_out_2"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="2" format="Internal" identifier="midi.input" type="plugin"
+              name="" relativeX="0.75" relativeY="0.25" pluginIdentifierString="Internal--6e34cabd-0"
+              uuid="5f1ede56162a4fc7bb8249ccb2761c36" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="601.5" y="167.75" midiProgram="0" globalMidiPrograms="0"
+              midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState=""
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="3" format="Internal" identifier="midi.output" type="plugin"
+              name="" relativeX="0.75" relativeY="0.75" pluginIdentifierString="Internal--6306046e-0"
+              uuid="808ad0d755994dc6b5c8179820cf9285" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="601.5" y="549.25" midiProgram="0" globalMidiPrograms="0"
+              midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState=""
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node format="Element" identifier="element.script" type="plugin" name="Data Dial"
+              pluginIdentifierString="Element-Script-9debc3fd-400" uuid="43b7c1102d1a47c9b08143f4204dfc45"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="285.0"
+              y="139.0" state="1202.3wYkV8uaaaCD1cccXM.Y6U3P+mHO3nZmstVD.CrjltBCzLDD2zggsgEZIJa1RSpIR4X2h7lrGv8Xri7n9gUbF1TPjk38wOd22c7nllTHxs+jNk26AOL0j+R2Se1u7nGc3gGBSs7BtFNYYtTjI3EfPAuojEu+dGdn6e3sK3PBNC7lxxDJdJHPv7kbk0.Lv3eCLDOrZdxkkyEpXXhER0bCnzVOe1hMfUClkZscAXQ1WokkK4PNqfsjiz.LUJtZkR7NqzvgOJxywgUZgg23X+fwGWf+BWWZP6lbNDtNa5EzfRQBWYnwe8EuAV8sz3rR6BcAA9bQxBFWB+nvrfWr+d6umTmvj.qLUnAXLTv+yRQAGhNfKi8idPeGLmJ9ZTXZB.i2IgqLnVkg7mwREp4vLt8FNWA35nliJBNEJzqVp4HKivUZT7v1CcT0PzZcI2VVnPk2xlgBuNibwmtTjJPNyKcoETA0kV2ywgrnvDRIfoLOWWfnB4Lg5oHV3FAlOTZ37ImMoZ4yJUIVgV4z2+Px1f3hvf1oWEja7I5MeNvqTigOACG.CgaGzXx6aUlFA2RVve3pzNwUiJRAX7N8kFT2u+z5Q2kBmP0yigm7Nuz+jAaCRxlg0.0fROsKfLo9lVrPhbWPKQUtAzv3gcsyV2x9niddG6o7LVoz1L+Fy2izoRc6a7I.Wt2o20Eg9MY4E5UhTrfbaPfd164IXs.tkDgjvMF.yxUaeosIdwFK3bsBLnwDNfaANwQzokYYtcKMvV1A143pbgHm2Fi+tws+rU5d244fOEwF.KGDlXHii7oz57ZkX6Jf1MBFCGfq0AAUlpiqrzTYGL2p.LXtYjJHAupggvH6uGlX5wSEVcA0l829Bea1W4Gx2M3ZD+09XmZfEuU2LzXonUqLD2USn1aUBzOKRmysMw1VMlHitNSD3oRgqzX2fIiMfohg6ALYrAb61u2ALYjZPRvmMOQKqZ15ppWmk8ruy8WcheGHnKpNGNiWHVwwBQE+FrckWE7hjSVcE4nLAj3W20HH7iqhsHRf7NVckFA5XgRf.RrqaJvlnVo+PXGDq.OxCRjLi4.viEKJVnSIvDuwDGFtLyuD95MuiDNkaLf7G6NKsPKMvuN52qf4lS7GT5YHF2yGyRSgHxsicQbDkt52uC9XicizwLYO9RskUroCniMb6a4qsmpWO0COvVbXvS4XisA3oyk7AvyNZ.bz22ccbTbo6nKHhBliw9bQ8G.UuwV6dCOpZWy7cLYYyLQoxgMiIM76DOoEr4ycmXhwjGwt.LECRqCPHIF0eWLL1GQfuCwc43UXWP3+.GdmXWjPGk2kjlt0hL228rKRwJJU0YV0D6tBBDpXTYDIfqbpWWEKz2qYV09yt8l+e4iVr6KGK3FwGwYL5ECguAOT5EXp94gG6W2Dt6dpb7CXvHYdfz4GmIjxSjRHJzPn1.5Suzu+OJq1x8PJ4JoUwFsAqnZei+0S0kpz5ONXqHmLAQNdRKSP4J5n98acfZc2ZVB9ylZs7teJhPYrLkUvr71MNB4016cIJG.Dn+0SrnSqtZR04UTGM23sVN5jlTlk06Ae8Wt9uLO9qt95q606yus2e26e.3SGFxM"
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" version="1" id="4" relativeX="0.5314285714285715"
+              relativeY="0.2040618955512573" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="" displayMode="embed" width="152" height="179"/>
+            <ScriptNodeEditor showParams="0"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="control" name="Volume" symbol="volume"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="5" format="Element" identifier="element.volume.stereo" type="plugin"
+              name="Volume" relativeX="0.4371428571428572" relativeY="0.3878143133462282"
+              pluginIdentifierString="Element-Volume-b98d75da-0" uuid="d2602c71304346e9b6d52650080dd9ba"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="153.0"
+              y="333.0" windowX="201" windowY="425" windowVisible="0" state="84.VMjLgrD....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOyQWXzUFH18Fa00VY8HRKw3hLy.CLvDCMzjSM3PSN1DiHu3C."
+              programState="84.VMjLgrD....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOyQWXzUFH18Fa00VY8HRKw3hLy.CLvDCMzjSM3PSN1DiHu3C."
+              program="1" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="" displayMode="embed"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="Main 1" symbol="audio_in_1"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="Main 2" symbol="audio_in_2"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="audio" name="Main 1" symbol="audio_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="3" channel="1" type="audio" name="Main 2" symbol="audio_out_2"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="4" channel="0" type="control" name="Volume" symbol="control_0"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="5" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node format="Element" identifier="element.volume.stereo" type="plugin"
+              name="Volume" pluginIdentifierString="Element-Volume-b98d75da-0"
+              uuid="43032be3cc534e0898e4c46ffa5cd122" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="155.0" y="486.0" state="84.VMjLgrD....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOyQWXzUFH18Fa00VY8HRKw3hLy.CLvDCMzjSM3PSN1DiHu3C."
+              programState="84.VMjLgrD....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOyQWXzUFH18Fa00VY8HRKw3hLy.CLvDCMzjSM3PSN1DiHu3C."
+              program="1" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" version="1" id="6" relativeX="0.44" relativeY="0.5357833655705996"
+              windowX="454" windowY="87" windowVisible="0" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="" displayMode="embed"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="Main 1" symbol="audio_in_1"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="Main 2" symbol="audio_in_2"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="audio" name="Main 1" symbol="audio_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="3" channel="1" type="audio" name="Main 2" symbol="audio_out_2"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="4" channel="0" type="control" name="Volume" symbol="control_0"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="5" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+      </nodes>
+      <scripts/>
+      <ui>
+        <Block/>
+        <GraphEditorView width="1034" height="700"/>
+      </ui>
+      <arcs>
+        <Arc sourceNode="4" sourcePort="1" destNode="5" destPort="4"/>
+        <Arc sourceNode="4" sourcePort="1" destNode="6" destPort="4"/>
+      </arcs>
+      <ports>
+        <Port index="0" channel="0" type="audio" name="Audio In 1" symbol="audio_in_1"
+              flow="input"/>
+        <Port index="1" channel="1" type="audio" name="Audio In 2" symbol="audio_in_2"
+              flow="input"/>
+        <Port index="2" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
+              flow="input"/>
+        <Port index="3" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+              flow="output"/>
+      </ports>
+    </Node>
+  </graphs>
+  <controllers/>
+  <maps/>
+  <ui content="183.3ociMGsSBCCE..sXheMjrHAA4cY2vstfavbr0DdXDZk01s6RowV+6Udj237Cbt5a8R1jm1Rmkom67jqpSFXSN97xkIyoUbud8G3WPsldK9YppjGFQnW+J1N7MTWxA6.Z6cFrQkBhKAp4RATuiSFGZi4AitI1b.eOKtYeVxOuLcgZF61VtiFkNem75iL1pBfobD5OEsBGRBUZknXzp+ewTIPgHR0CEP3tweyRxmymluiw9Cfm24zc"/>
+</Session>
