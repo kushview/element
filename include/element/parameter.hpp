@@ -379,7 +379,7 @@ class ParameterObserver : private PortObserver,
 public:
     ParameterObserver() = default;
     ParameterObserver (ParameterPtr param)
-        : parameter (param)
+        : parameter (nullptr)
     {
         observeParameter (param);
     }

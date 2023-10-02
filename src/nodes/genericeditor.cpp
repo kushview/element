@@ -28,7 +28,7 @@ public:
         button.setBounds (area.reduced (0, 10));
     }
 
-private:
+protected:
     void handleNewParameterValue() override
     {
         auto parameterState = getParameterState (getParameter()->getValue());
@@ -37,6 +37,7 @@ private:
             button.setToggleState (parameterState, dontSendNotification);
     }
 
+private:
     void buttonClicked()
     {
         if (getParameterState (getParameter()->getValue()) != button.getToggleState())
@@ -100,7 +101,7 @@ public:
             button->setBounds (area.removeFromLeft (80));
     }
 
-private:
+protected:
     void handleNewParameterValue() override
     {
         bool newState = getParameterState();
@@ -112,6 +113,7 @@ private:
         }
     }
 
+private:
     void rightButtonChanged()
     {
         auto buttonState = buttons[1]->getToggleState();
@@ -187,7 +189,7 @@ public:
         box.setBounds (area.reduced (0, 10));
     }
 
-private:
+protected:
     void handleNewParameterValue() override
     {
         auto index = parameterValues.indexOf (getParameter()->getCurrentValueAsText());
@@ -202,6 +204,7 @@ private:
         box.setSelectedItemIndex (index);
     }
 
+private:
     void boxChanged()
     {
         if (getParameter()->getCurrentValueAsText() != box.getText())
@@ -264,13 +267,7 @@ public:
         slider.setBounds (area);
     }
 
-private:
-    void updateTextDisplay()
-    {
-        jassert (MessageManager::getInstance()->isThisTheMessageThread());
-        valueLabel.setText (getParameter()->getCurrentValueAsText(), dontSendNotification);
-    }
-
+protected:
     void handleNewParameterValue() override
     {
         jassert (MessageManager::getInstance()->isThisTheMessageThread());
@@ -279,6 +276,13 @@ private:
             slider.setValue (getParameter()->getValue(), dontSendNotification);
             updateTextDisplay();
         }
+    }
+
+private:
+    void updateTextDisplay()
+    {
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
+        valueLabel.setText (getParameter()->getCurrentValueAsText(), dontSendNotification);
     }
 
     void sliderValueChanged()
@@ -368,7 +372,7 @@ public:
         auto area = getLocalBounds();
 
         parameterName.setBounds (area.removeFromLeft (80));
-        parameterLabel.setBounds (area.removeFromRight (30));
+        parameterLabel.setBounds (area.removeFromRight (54));
         parameterComp->setBounds (area);
     }
 

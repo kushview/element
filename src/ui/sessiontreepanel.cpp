@@ -42,9 +42,19 @@ inline static Node findRoot (const Node& node)
     return root;
 }
 
+inline static Node findGraph (const Node& node)
+{
+    if (node.isGraph() || ! node.isValid())
+        return node;
+    auto g = node.getParentGraph();
+    if (g.isValid())
+        return g;
+    return findRoot (node);
+}
+
 inline static void showGraphEditor (Component* c, const Node& node)
 {
-    auto graph = findRoot (node);
+    auto graph = findGraph (node);
     if (! graph.isValid())
     {
         return;
