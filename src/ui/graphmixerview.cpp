@@ -273,12 +273,20 @@ public:
         box.setModel (model.get());
         box.updateContent();
 
-        nodeSelectedConnection = ui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this));
+        _conns.push_back (ui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this)));
+        auto& ssrv = *gui.sibling<SessionService>();
+        _conns.push_back (ssrv.sigSessionLoaded.connect ([this]() {
+            model->refreshNodes();
+            model->setNode (session->getActiveGraph());
+        }));
     }
 
     ~Content()
     {
-        nodeSelectedConnection.disconnect();
+        for (auto& c : _conns)
+            c.disconnect();
+        _conns.clear();
+
         box.setModel (nullptr);
         model.reset();
     }
@@ -323,7 +331,7 @@ private:
     std::unique_ptr<GraphMixerListBoxModel> model;
     ChannelStripComponent channelStrip;
     HorizontalListBox box;
-    SignalConnection nodeSelectedConnection;
+    std::vector<SignalConnection> _conns;
 };
 
 GraphMixerView::GraphMixerView()

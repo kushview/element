@@ -20,10 +20,18 @@ public:
         : NodeChannelStripComponent (g)
     {
         bindSignals();
+        _conns.push_back (g.sibling<SessionService>()->sigSessionLoaded.connect ([this, &g]() {
+            auto graph = g.session()->getActiveGraph();
+            setNode (graph.getNode (0));
+            g.selectNode (graph.getNode(0));
+        }));
     }
 
     ~Content()
     {
+        for (auto& c : _conns)
+            c.disconnect();
+        _conns.clear();
         unbindSignals();
     }
 
@@ -33,6 +41,8 @@ public:
         g.setColour (Colors::contentBackgroundColor);
         g.drawLine (0.0, 0.0, 0.0, getHeight());
     }
+
+    std::vector<boost::signals2::connection> _conns;
 };
 
 NodeChannelStripView::NodeChannelStripView()

@@ -9,6 +9,7 @@
 
 #include "ElementApp.h"
 #include "ui/channelstrip.hpp"
+#include "services/sessionservice.hpp"
 
 namespace element {
 
@@ -71,10 +72,15 @@ public:
             std::bind (&NodeChannelStripComponent::muteChanged, this));
         volumeDoubleClickedConnection = channelStrip.volumeLabelDoubleClicked.connect (
             std::bind (&NodeChannelStripComponent::setUnityGain, this));
+
     }
 
     void unbindSignals()
     {
+        for (auto& c : _conns)
+            c.disconnect();
+        _conns.clear();
+
         displayName.removeListener (this);
         flowBox.removeListener (this);
         nodeSelectedConnection.disconnect();
@@ -257,6 +263,7 @@ private:
     SignalConnection powerChangedConnection;
     SignalConnection volumeDoubleClickedConnection;
     SignalConnection muteChangedConnection;
+    std::vector<boost::signals2::connection> _conns;
 
     inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
     inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 2; }
