@@ -512,7 +512,7 @@ void LookAndFeel_E1::drawScrollbar (Graphics& g, ScrollBar& scrollbar, int x, in
 
 void LookAndFeel_E1::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area, bool isMouseOver, bool isMouseDown, ConcertinaPanel& concertina, Component& panel)
 {
-    g.setColour (Colour (0xff292929));
+    g.setColour (Colour (0xff212121));
     Rectangle<int> r (area.withSizeKeepingCentre (area.getWidth(), area.getHeight() - 2));
     g.fillRect (r);
 
