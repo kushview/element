@@ -391,10 +391,15 @@ void ScriptNodeEditor::updatePreview()
                 sol::table editor;
                 const bool canResize = DSPUI.get_or ("resizable", false);
 
-                switch (DSPUI["editor"].get_type())
+                std::string factoryFn = "instantiate";
+                if (DSPUI[factoryFn].get_type() != sol::type::function) {
+                    factoryFn = "editor";
+                }
+
+                switch (DSPUI[factoryFn].get_type())
                 {
                     case sol::type::function: {
-                        sol::function instantiate = DSPUI["editor"];
+                        sol::function instantiate = DSPUI[factoryFn];
                         auto editorResult = instantiate (ctx);
                         if (! editorResult.valid())
                         {
