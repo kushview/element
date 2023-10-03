@@ -356,7 +356,7 @@ void GuiService::saveProperties (PropertiesFile* props)
     jassert (props);
     
     if (auto maps = commands().getKeyMappings())
-        if (auto xml = maps->createXml (false))
+        if (auto xml = maps->createXml (true))
             props->setValue (Settings::keymappingsKey, xml.get());
     
     if (mainWindow)
@@ -376,9 +376,6 @@ void GuiService::activate()
 {   
     auto props = context().settings().getUserSettings();
     context().devices().addChangeListener (this);
-    if (auto maps = commands().getKeyMappings())
-        if (auto xml = props->getXmlValue (Settings::keymappingsKey))
-            maps->restoreFromXml (*xml);
     impl->restoreRecents();
 }
 
@@ -540,6 +537,12 @@ Content* GuiService::content()
             if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (_content.get()))
                 commands().registerAllCommandsForTarget (tgt);
         }
+
+        // keymaps must load after content is available.
+        if (auto maps = commands().getKeyMappings())
+            if (auto xml = settings().getUserSettings()->getXmlValue (Settings::keymappingsKey))
+                maps->restoreFromXml (*xml);
+
         commands().commandStatusChanged();
     }
 
@@ -643,6 +646,7 @@ void GuiService::run()
     mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commands().getKeyMappings());
     _content->restoreState (pf);
+
     mainWindow->addToDesktop();
 
     Desktop::getInstance().setGlobalScaleFactor (

@@ -92,9 +92,9 @@ void KeymapEditorView::saveMappings()
 {
     if (auto* const cc = ViewHelpers::findContentComponent (this))
         if (auto* const mapping = cc->services().find<UI>()->commands().getKeyMappings())
-            if (auto xml = mapping->createXml (false))
+            if (auto xml = mapping->createXml (true))
                 cc->context().settings().getUserSettings()->setValue (
-                    "keymappings", xml.get());
+                    Settings::keymappingsKey, xml.get());
 }
 
 } // namespace element

@@ -202,9 +202,6 @@ public:
 
         if (auto el = world->devices().createStateXml())
             props->setValue (Settings::devicesKey, el.get());
-        auto& ui = *world->services().find<UI>();
-        if (auto keymappings = ui.commands().getKeyMappings()->createXml (true))
-            props->setValue (Settings::keymappingsKey, keymappings.get());
 
         engine = nullptr;
         Logger::setCurrentLogger (nullptr);
