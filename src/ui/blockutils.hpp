@@ -29,6 +29,8 @@ static inline bool isMidiDevice (const Node& node)
 // true if the node probably supports embedding outside a plugin window.
 static inline bool supportsEmbed (const Node& node)
 {
+    if (node.isIONode() || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER))
+        return false;
     // Allow embedding at first to expose problems.
     return true;
 }
