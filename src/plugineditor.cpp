@@ -345,21 +345,19 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
 PluginEditor::~PluginEditor()
 {
     auto* const app = processor.getServices();
-    if (auto* const cc = dynamic_cast<element::Content*> (content.getComponent()))
-        if (app != nullptr)
-            cc->saveState (app->context().settings().getUserSettings());
+    auto* const gui = app->find<UI>();
+
+    if (app != nullptr && gui != nullptr)
+        gui->saveSettings();
 
     perfParamChangedConnection.disconnect();
     removeChildComponent (content.getComponent());
     content = nullptr;
 
-    if (app != nullptr)
+    if (gui != nullptr)
     {
-        if (auto* gui = app->find<GuiService>())
-        {
-            gui->closeAllPluginWindows();
-            gui->clearContentComponent();
-        }
+        gui->closeAllPluginWindows();
+        gui->clearContentComponent();
     }
 }
 

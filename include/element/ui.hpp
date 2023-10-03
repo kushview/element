@@ -138,6 +138,8 @@ public:
     using RecentFiles = juce::RecentlyOpenedFilesList;
     RecentFiles& recentFiles();
 
+    void saveSettings() override;
+    
 private:
     class UpdateManager;
     std::unique_ptr<UpdateManager> updates;

@@ -1174,6 +1174,11 @@ void GuiService::shutdown()
         updates->launchDetached();
 }
 
+void GuiService::saveSettings() {
+    saveProperties (settings().getUserSettings());
+
+}
+
 void GuiService::changeListenerCallback (ChangeBroadcaster* broadcaster)
 {
     if (broadcaster == &context().devices())
@@ -1197,13 +1202,6 @@ void GuiService::clearContentComponent()
 
     if (_content)
     {
-        if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (_content.get()))
-        {
-            Array<CommandID> cmds;
-            tgt->getAllCommands (cmds);
-            for (const auto c : cmds)
-                commands().removeCommand (c);
-        }
         _content.reset();
     }
 
