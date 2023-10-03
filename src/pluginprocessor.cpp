@@ -464,6 +464,7 @@ void PluginProcessor::handleAsyncUpdate()
             param->bindToNode (node, parameter);
     }
 
+    sessionctl->sigSessionLoaded();
     onPerfParamsChanged();
 }
 
