@@ -26,6 +26,11 @@ public:
         data = nullptr;
     }
 
+    /// Handlers. 
+    // @section handlers
+
+    /// Called when the widget resizes.
+    // @function Widget:resized
     void resized()
     {
         if (sol::safe_function f = widget["resized"])
@@ -34,6 +39,9 @@ public:
         }
     }
 
+    /// Draw your widget here.
+    // @function Widget:paint
+    // @tparam el.Graphics g The graphics object to paint with
     void paint (Graphics& g)
     {
         if (sol::safe_function f = widget["paint"])
@@ -42,22 +50,87 @@ public:
         }
     }
 
+    /// Called when the mouse is moving.
+    // @function Widget:mouseMove
+    // @tparam el.MouseEvent ev The event to process
+    void mouseMove (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseMove"])
+            f (widget, ev);
+    }
+
+    /// Called when the mouse enters your widget.
+    // @function Widget:mouseEnter
+    // @tparam el.MouseEvent ev The event to process
+    void mouseEnter (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseEnter"])
+            f (widget, ev);
+    }
+    
+    /// Called when the mouse exits your widget.
+    // @function Widget:mouseExit
+    // @tparam el.MouseEvent ev The event to process
+    void mouseExit (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseExit"])
+            f (widget, ev);
+    }
+
+    /// Called when the mouse is dragging.
+    // @function Widget:mouseDrag
+    // @tparam el.MouseEvent ev The event to process
     void mouseDrag (const MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseDrag"])
             f (widget, ev);
     }
 
+    /// Called when the mouse is pressed down.
+    // @function Widget:mouseDown
+    // @tparam el.MouseEvent ev The event to process
     void mouseDown (const MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseDown"])
             f (widget, ev);
     }
 
+    /// Called when the mouse has been released.
+    // @function Widget:mouseUp
+    // @tparam el.MouseEvent ev The event to process
     void mouseUp (const MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseUp"])
             f (widget, ev);
+    }
+
+    /// Called when the mouse is double clicked.
+    // @function Widget:mouseDoubleClick
+    // @tparam el.MouseEvent ev The event to process
+    void mouseDoubleClick (const MouseEvent& ev)
+    {
+        if (sol::safe_function f = widget["mouseDoubleClick"])
+            f (widget, ev);
+    }
+
+    /// Called when the mouse is double clicked.
+    // @function Widget:mouseWheelMove
+    // @tparam el.MouseEvent ev The event to process
+    // @tparam mixed details Wheel info to process
+    void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& details)
+    {
+        if (sol::safe_function f = widget["mouseWheelMove"])
+            f (widget, ev, details);
+    }
+
+    /// Called when the mouse is double clicked.
+    // @function Widget:mouseWheelMove
+    // @tparam el.MouseEvent ev The event to process
+    // @param  scale The scale to magnify by, 1.0 being no scale
+    void mouseMagnify (const MouseEvent& ev, float scale)
+    {
+        if (sol::safe_function f = widget["mouseMagnify"])
+            f (widget, ev, static_cast<lua_Number> (scale));
     }
 
     sol::table addWithZ (const sol::object& child, int zorder)
@@ -340,7 +413,13 @@ protected: \
 public: \
     void paint (juce::Graphics& g) override { proxy.paint (g); } \
     void resized() override { proxy.resized(); } \
+    void mouseMove (const MouseEvent& ev) override { proxy.mouseMove (ev); } \
+    void mouseEnter (const MouseEvent& ev) override { proxy.mouseEnter (ev); } \
+    void mouseExit (const MouseEvent& ev) override { proxy.mouseExit (ev); } \
     void mouseDrag (const MouseEvent& ev) override { proxy.mouseDrag (ev); } \
     void mouseDown (const MouseEvent& ev) override { proxy.mouseDown (ev); } \
-    void mouseUp (const MouseEvent& ev) override { proxy.mouseUp (ev); }
+    void mouseUp (const MouseEvent& ev) override { proxy.mouseUp (ev); } \
+    void mouseDoubleClick (const MouseEvent& ev) override { proxy.mouseDoubleClick (ev); } \
+    void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& details) override { proxy.mouseWheelMove (ev, details); } \
+    void mouseMagnify (const MouseEvent& ev, float scale) override { proxy.mouseMagnify (ev, scale); }
 // clang-format on

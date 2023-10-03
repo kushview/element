@@ -64,11 +64,6 @@ public:
     }
 
     /** Proxy */
-    // void paint (juce::Graphics& g) override { proxy.paint (g); }
-    // void resized() override { proxy.resized(); }
-    // void mouseDrag (const MouseEvent& ev) override { proxy.mouseDrag (ev); }
-    // void mouseDown (const MouseEvent& ev) override { proxy.mouseDown (ev); }
-    // void mouseUp (const MouseEvent& ev) override { proxy.mouseUp (ev); }
     EL_LUA_IMPLEMENT_WIDGET_PROXY
 };
 
