@@ -887,7 +887,9 @@ void BlockComponent::paint (Graphics& g)
 void BlockComponent::resized()
 {
     const auto box (getBoxRectangle());
-    auto r = box.reduced (4, 2).removeFromBottom (14);
+
+    auto r = box.reduced (4, 2).removeFromBottom (18);
+    r.removeFromBottom (4);
     const int halfPinSize = pinSize / 2;
 
     {
@@ -901,7 +903,7 @@ void BlockComponent::resized()
     {
         auto er = box;
         er.removeFromTop (vertical ? 20 : 18);
-        er.removeFromBottom (18);
+        er.removeFromBottom (22);
         if (node.getFormat() != EL_NODE_FORMAT_NAME)
         {
             customWidth = customHeight = 0;
@@ -1047,7 +1049,7 @@ void BlockComponent::getMinimumSize (int& width, int& height)
 
         if (displayMode == Compact)
         {
-            h = (pinSize * 2) + 20;
+            h = (pinSize * 2) + 24;
         }
 
         w = std::max (w, textWidth);
