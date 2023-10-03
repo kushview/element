@@ -422,7 +422,7 @@ void EngineService::removeGraph (int index)
     {
         DBG ("[element] could not find root graph index: " << index);
     }
-    
+
     if (toRemove.isValid())
         sigNodeRemoved (toRemove);
     // FIXME: dont notify the UI top-down
@@ -618,6 +618,28 @@ void EngineService::removeNode (const Node& node)
     const Node graph (node.getParentGraph());
     if (! graph.isGraph())
         return;
+
+    if (auto gp = dynamic_cast<GraphNode*> (graph.getObject()))
+    {
+        // workaround: removal of a duplex node in reality has
+        // cleared the graph's ports
+        if (node.isAudioInputNode())
+        {
+            gp->setNumPorts (PortType::Audio, 0, true, true);
+        }
+        else if (node.isAudioOutputNode())
+        {
+            gp->setNumPorts (PortType::Audio, 0, false, true);
+        }
+        else if (node.isMidiInputNode())
+        {
+            gp->setNumPorts (PortType::Midi, 0, true, true);
+        }
+        else if (node.isMidiOutputNode())
+        {
+            gp->setNumPorts (PortType::Midi, 0, false, true);
+        }
+    }
 
     auto* const gui = sibling<GuiService>();
     if (auto* manager = graphs->findGraphManagerFor (graph))
