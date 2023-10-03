@@ -305,7 +305,6 @@ protected:
 PluginEditor::PluginEditor (PluginProcessor& plugin)
     : AudioProcessorEditor (&plugin), processor (plugin)
 {
-    Logger::writeToLog ("PluginEditor::PluginEditor");
     setOpaque (true);
     paramTable.reset (new ParamTable());
     addAndMakeVisible (paramTable.get());
@@ -345,10 +344,16 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
 
 PluginEditor::~PluginEditor()
 {
+    auto* const app = processor.getServices();
+    if (auto* const cc = dynamic_cast<element::Content*> (content.getComponent()))
+        if (app != nullptr)
+            cc->saveState (app->context().settings().getUserSettings());
+
     perfParamChangedConnection.disconnect();
     removeChildComponent (content.getComponent());
     content = nullptr;
-    if (auto* const app = processor.getServices())
+
+    if (app != nullptr)
     {
         if (auto* gui = app->find<GuiService>())
         {
@@ -494,6 +499,11 @@ void PluginEditor::handleAsyncUpdate()
                 cc->setMainView (new GraphEditorView (graph));
         }
     }
+
+    auto* const srvc = processor.getServices();
+    if (auto* const cc = dynamic_cast<element::Content*> (content.getComponent()))
+        if (srvc != nullptr)
+            cc->restoreState (srvc->context().settings().getUserSettings());
 }
 
 } // namespace element
