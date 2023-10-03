@@ -391,6 +391,7 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
         require ('el.Graphics')
         require ('el.Point')
         require ('el.Rectangle')
+        require ('el.MouseEvent')
     )");
 
     return T;
