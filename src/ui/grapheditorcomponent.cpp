@@ -354,7 +354,8 @@ void GraphEditorComponent::setNode (const Node& n)
     bool isValid = n.isValid();
     const auto ng = isValid && isGraph ? n : Node (types::Graph);
 
-    if (ng == graph) {
+    if (ng == graph)
+    {
         // properties might still need updating.
         return;
     }
@@ -369,6 +370,7 @@ void GraphEditorComponent::setNode (const Node& n)
         removeChildComponent (draggingConnector.get());
     deleteAllChildren();
     updateComponents();
+    ensureSize();
     if (draggingConnector)
         addAndMakeVisible (draggingConnector.get());
 
@@ -1174,6 +1176,61 @@ void GraphEditorComponent::updateSelection()
     for (int i = getNumChildComponents(); --i >= 0;)
         if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
             block->repaint();
+}
+
+void GraphEditorComponent::ensureSize()
+{
+    int width = getWidth();
+    int height = getHeight();
+    int numChanges = 0;
+    int numEditorChanges = 0;
+    for (int i = 0; i < getNumChildComponents(); ++i)
+    {
+        auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i));
+        if (nullptr == block)
+            continue;
+
+        auto r = block->getBounds();
+        // auto x = r.getX(), y = r.getY();
+        // if (! isLayoutVertical())
+        bool changed = false;
+        if (r.getX() < 0)
+        {
+            changed = true;
+            r = r.withX (0);
+        }
+        else if (r.getRight() > width)
+        {
+            numEditorChanges++;
+            width = r.getRight();
+        }
+
+        if (r.getY() < 0)
+        {
+            changed = true;
+            r = r.withY (0);
+        }
+        else if (r.getBottom() > height)
+        {
+            numEditorChanges++;
+            height = r.getBottom();
+        }
+
+        if (changed)
+        {
+            block->moveBlockTo (r.getX(), r.getY());
+            ++numChanges;
+        }
+    }
+
+    if (numChanges > 0)
+    {
+        updateBlockComponents (true);
+        updateConnectorComponents();
+    }
+
+    if (numEditorChanges > 0)
+        setSize (width, height);
 }
 
 BlockComponent* GraphEditorComponent::createBlock (const Node& node)

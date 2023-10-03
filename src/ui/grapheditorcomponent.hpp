@@ -144,6 +144,7 @@ private:
     PortComponent* findPinAt (const int x, const int y) const;
 
     void updateSelection();
+    void ensureSize();
 
     void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override {}
     void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
@@ -162,6 +163,7 @@ class GraphEditor : public juce::Component
 public:
     GraphEditor()
     {
+        setOpaque (true);
         addAndMakeVisible (_viewport);
 
         setSize (640, 360);
@@ -239,7 +241,10 @@ public:
     void setNode (const Node& node) { _editor.setNode (node); }
     void deleteSelectedNodes() { _editor.deleteSelectedNodes(); }
 
-    void paint (juce::Graphics& g) override { g.fillAll (juce::Colours::black); }
+    void paint (juce::Graphics& g) override
+    {
+        g.fillAll (findColour (Style::widgetBackgroundColorId).darker());
+    }
     void resized() override
     {
         auto r = getLocalBounds();
