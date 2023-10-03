@@ -821,7 +821,7 @@ void BlockComponent::paint (Graphics& g)
 
     g.setColour (normalTextColor);
     g.setFont (Font (12.f, node.isMissing() ? Font::bold : 0));
-    
+
     if (vertical)
     {
         switch (displayMode)
@@ -906,9 +906,9 @@ void BlockComponent::resized()
         {
             customWidth = customHeight = 0;
             embedded->setBounds (er.getX(),
-                                er.getY(),
-                                embedded->getWidth(),
-                                embedded->getHeight());
+                                 er.getY(),
+                                 embedded->getWidth(),
+                                 embedded->getHeight());
         }
         else
         {
@@ -1298,6 +1298,31 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
     }
 
     menuToAddTo.addSubMenu (TRANS ("Display"), dMenu);
+}
+
+bool BlockComponent::isInterestedInDragSource (const SourceDetails& details)
+{    
+    if (! node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER))
+        return false;
+    if (! details.description.isArray())
+        return false;
+    if (auto* a = details.description.getArray())
+    {
+        const var type (a->getFirst());
+        return type == var ("plugin");
+    }
+    return false;
+}
+
+void BlockComponent::itemDropped (const SourceDetails& details)
+{
+    if (const auto* a = details.description.getArray())
+    {
+        auto& plugs (ViewHelpers::getGlobals (this)->plugins());
+        if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString (a->getUnchecked (1).toString()))
+            if (auto panel = getGraphPanel())
+                panel->postMessage (new ReplaceNodeMessage  (node, *t));
+    }
 }
 
 } // namespace element

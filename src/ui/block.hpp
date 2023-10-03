@@ -56,7 +56,8 @@ class BlockComponent : public Component,
                        public Button::Listener,
                        private AsyncUpdater,
                        private Value::Listener,
-                       private ChangeListener
+                       private ChangeListener,
+                       public DragAndDropTarget
 {
 public:
     BlockComponent() = delete;
@@ -185,6 +186,8 @@ public:
     /** @internal */
     void resized() override;
 
+    bool isInterestedInDragSource (const SourceDetails& details) override;
+    void itemDropped (const SourceDetails& details) override;
 protected:
     inline void forEachSibling (std::function<void (BlockComponent&)> callback)
     {
@@ -355,6 +358,13 @@ private:
         BlockComponent& block;
         void timerCallback() override;
     } embedInit;
+
+#if 0
+void itemDragEnter (const SourceDetails& dragSourceDetails);
+void itemDragMove (const SourceDetails& dragSourceDetails);
+void itemDragExit (const SourceDetails& dragSourceDetails);
+bool shouldDrawDragImageWhenOver();
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlockComponent)
 };
