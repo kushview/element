@@ -33,8 +33,8 @@ struct Style {
         backgroundHighlightColorId,
 
         contentBackgroundColorId,
-
         widgetBackgroundColorId,
+        
         textColorId,
         textActiveColorId,
         textBoldColorId,

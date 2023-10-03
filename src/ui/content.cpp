@@ -36,7 +36,8 @@ ContentView::~ContentView()
 
 void ContentView::paint (Graphics& g)
 {
-    g.fillAll (Colors::backgroundColor);
+    auto c = findColour (Style::widgetBackgroundColorId).darker();
+    g.fillAll (c);
 }
 
 bool ContentView::keyPressed (const KeyPress& k)

@@ -227,7 +227,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     
 
     // Scrollbar
-    setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.25f));
+    setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.2f));
 
     // code editor. TODO
     setColour (CodeEditorComponent::backgroundColourId, findColour (Style::widgetBackgroundColorId).darker (0.6f));
@@ -276,7 +276,7 @@ Typeface::Ptr LookAndFeel_E1::getTypefaceForFont (const Font& font)
     return LookAndFeel_V2::getTypefaceForFont (font);
 }
 
-int LookAndFeel_E1::getDefaultScrollbarWidth() { return 12; }
+int LookAndFeel_E1::getDefaultScrollbarWidth() { return 14; }
 bool LookAndFeel_E1::areScrollbarButtonsVisible() { return false; }
 
 //=============================================================================
@@ -493,9 +493,9 @@ void LookAndFeel_E1::drawScrollbar (Graphics& g, ScrollBar& scrollbar, int x, in
         const float thumbIndentx2 = thumbIndent * 2.0f;
 
         if (isScrollbarVertical)
-            thumbPath.addRoundedRectangle (x + thumbIndent, thumbStartPosition + thumbIndent, width - thumbIndentx2, thumbSize - thumbIndentx2, (width - thumbIndentx2) * 0.5f);
+            thumbPath.addRoundedRectangle (x + thumbIndent, thumbStartPosition + thumbIndent, width - thumbIndentx2, thumbSize - thumbIndentx2, 1.f);
         else
-            thumbPath.addRoundedRectangle (thumbStartPosition + thumbIndent, y + thumbIndent, thumbSize - thumbIndentx2, height - thumbIndentx2, (height - thumbIndentx2) * 0.5f);
+            thumbPath.addRoundedRectangle (thumbStartPosition + thumbIndent, y + thumbIndent, thumbSize - thumbIndentx2, height - thumbIndentx2, 1.f);
     }
 
     Colour thumbCol (scrollbar.findColour (ScrollBar::thumbColourId, true));
