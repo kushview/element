@@ -619,6 +619,7 @@ void EngineService::removeNode (const Node& node)
     if (! graph.isGraph())
         return;
 
+#if 0
     if (auto gp = dynamic_cast<GraphNode*> (graph.getObject()))
     {
         // workaround: removal of a duplex node in reality has
@@ -640,6 +641,7 @@ void EngineService::removeNode (const Node& node)
             gp->setNumPorts (PortType::Midi, 0, false, true);
         }
     }
+#endif
 
     auto* const gui = sibling<GuiService>();
     if (auto* manager = graphs->findGraphManagerFor (graph))
