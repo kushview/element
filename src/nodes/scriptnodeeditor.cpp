@@ -389,6 +389,7 @@ void ScriptNodeEditor::updatePreview()
             {
                 sol::table DSPUI = instance;
                 sol::table editor;
+                const bool canResize = DSPUI.get_or ("resizable", false);
 
                 switch (DSPUI["editor"].get_type())
                 {
@@ -417,6 +418,7 @@ void ScriptNodeEditor::updatePreview()
                     widget = editor;
                     addAndMakeVisible (*comp);
                     comp->setAlwaysOnTop (true);
+                    setResizable (canResize);
                     updateSize();
                 }
                 else
@@ -471,8 +473,12 @@ void ScriptNodeEditor::resized()
 
     if (comp != nullptr)
     {
-        auto compY = showToolbar ? r2.getBottom() : 0;
-        comp->setBounds (0, compY, comp->getWidth(), comp->getHeight());
+        if (resizable()) {
+            comp->setBounds (getLocalBounds());
+        } else {
+            auto compY = showToolbar ? r2.getBottom() : 0;
+            comp->setBounds (0, compY, comp->getWidth(), comp->getHeight());
+        }
     }
 
     if (showToolbar && props.isVisible())
