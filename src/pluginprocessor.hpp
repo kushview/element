@@ -94,6 +94,11 @@ public:
             parameter->addListener (this);
     }
 
+    void setAndNotify (float value) {
+        if (parameter)
+            parameter->setValueNotifyingHost (value);
+    }
+
     void updateValue()
     {
         if (parameter)

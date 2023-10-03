@@ -143,7 +143,7 @@ private:
             if (! isDragging)
                 param.beginChangeGesture();
 
-            param.setValueNotifyingHost (newVal);
+            param.setAndNotify (newVal);
             updateTextDisplay();
 
             if (! isDragging)
