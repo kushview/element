@@ -590,6 +590,10 @@ void DSPScript::addParameterPorts()
             {
                 paramData[channel] = dfault;
             }
+            else
+            {
+                controlData[channel] = dfault;
+            }
 
             ports.addControl (index++, channel, sym, name, min, max, dfault, isInput);
         }
