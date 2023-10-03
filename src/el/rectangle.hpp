@@ -118,9 +118,9 @@ inline static sol::table
         "empty", &R::isEmpty,
 
         /// Is finite.
-        // @function Rectangle:isfinite
+        // @function Rectangle:isFinite
         // @return True if finite
-        "isfinite",
+        "isFinite",
         &R::isFinite,
 
         /// Translate the rectangle.

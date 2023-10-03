@@ -12,7 +12,7 @@
 #define EL_TYPE_NAME_MOUSE_EVENT "MouseEvent"
 
 using namespace juce;
-juce::ModifierKeys;
+
 // clang-format off
 EL_PLUGIN_EXPORT
 int luaopen_el_MouseEvent (lua_State* L)
@@ -56,6 +56,90 @@ int luaopen_el_MouseEvent (lua_State* L)
         /// Tilt Y (-1.0-1.0).
         // @tfield number MouseEvent.tiltY
         "tiltY", &MouseEvent::tiltY,
+
+        /// Get the mouse down x coord.
+        // @function MouseEvent.mouseDownX
+        "mouseDownX", &MouseEvent::getMouseDownX,
+
+        /// Get the mouse down x coord.
+        // @function MouseEvent.mouseDownY
+        "mouseDownY", &MouseEvent::getMouseDownY,
+
+        /// Get the mouse down x coord.
+        // @function MouseEvent.mouseDownPosition
+        "mouseDownPosition", &MouseEvent::getMouseDownPosition,
+
+        /// Distance from drag start.
+        // @function MouseEvent.distanceFromDragStart
+        "distanceFromDragStart", &MouseEvent::getDistanceFromDragStart,
+
+        /// Distance from drag start.
+        // @function MouseEvent.distanceFromDragStartX
+        "distanceFromDragStartX", &MouseEvent::getDistanceFromDragStartX,
+
+        /// Distance from drag start.
+        // @function MouseEvent.distanceFromDragStartY
+        "distanceFromDragStartY", &MouseEvent::getDistanceFromDragStartY,
+
+        /// Difference between this position and when mouse was last pressed.
+        // @function MouseEvent.offsetFromDragStart
+        "offsetFromDragStart", &MouseEvent::getOffsetFromDragStart,
+
+        /// True if has been dragged since down.
+        // @function MouseEvent.mouseWasDraggedSinceMouseDown
+        "mouseWasDraggedSinceMouseDown", &MouseEvent::mouseWasDraggedSinceMouseDown,
+
+        /// Returns the length in milliseconds of the press.
+        // @function MouseEvent.lengthOfPress
+        "lengthOfPress", &MouseEvent::getLengthOfMousePress,
+
+        /// True if the mouse was clicked.
+        // @function MouseEvent.wasClicked
+        "wasClicked", &MouseEvent::mouseWasClicked,
+
+        /// Get the number of clicks.
+        // @function MouseEvent.numberOfClicks
+        "numberOfClicks", &MouseEvent::getNumberOfClicks,
+
+        /// True if pressure is valid.
+        // @function MouseEvent.isPressureValid
+        "isPressureValid", &MouseEvent::isPressureValid,
+
+        /// True if pressure is valid.
+        // @function MouseEvent.isOrientationValid
+        "isOrientationValid", &MouseEvent::isOrientationValid,
+
+        /// True if pressure is valid.
+        // @function MouseEvent.isRotationValid
+        "isRotationValid", &MouseEvent::isRotationValid,
+
+        /// True if pressure is valid.
+        // @function MouseEvent.isTiltValid
+        "isTiltValid", &MouseEvent::isTiltValid,
+
+        /// Get the screen position X
+        // @function MouseEvent.screenX
+        "screenX", &MouseEvent::getScreenX,
+
+        /// Get the screen position Y
+        // @function MouseEvent.screenY
+        "screenY", &MouseEvent::getScreenY,
+
+        /// Get the screen position Point
+        // @function MouseEvent.screenPosition
+        "screenPosition", &MouseEvent::getScreenPosition,
+
+        /// Get the screen position X
+        // @function MouseEvent.downScreenX
+        "downScreenX", &MouseEvent::getMouseDownScreenX,
+
+        /// Get the screen position Y
+        // @function MouseEvent.downScreenY
+        "downScreenY", &MouseEvent::getMouseDownScreenY,
+
+        /// Get the screen position Point
+        // @function MouseEvent.downScreenPosition
+        "downScreenPosition", &MouseEvent::getScreenPosition,
 
         /// True if a popup menu is expected.
         // @function MouseEvent.isMenu

@@ -102,6 +102,15 @@ int luaopen_el_Widget (lua_State* L)
 
         sol::base_classes, sol::bases<juce::Component>());
 
+    sol::state_view view (L);
+    view.script (R"(
+        require ('el.MouseEvent')
+        require ('el.Graphics')
+        require ('el.Rectangle')
+        require ('el.Bounds')
+        require ('el.Point')
+    )");
+
     lua::Object<Widget>::addMethods (T, "add", "elevate");
     sol::stack::push (L, T);
 
