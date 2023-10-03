@@ -222,6 +222,7 @@ private:
     PortList userPorts;
 
     CriticalSection seqLock;
+    friend class ScriptNode; // workaround so parameter connections work when params change.
     void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();

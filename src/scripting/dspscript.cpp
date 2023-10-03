@@ -15,6 +15,7 @@ class DSPScript::Parameter : public RangedParameter,
 public:
     Parameter (DSPScript* c, const PortDescription& port)
         : RangedParameter (port),
+          info (port),
           ctx (c)
     {
         const auto sp = getPort();
@@ -32,13 +33,15 @@ public:
     void unlink()
     {
         removeListener (this);
+        info = {};
         ctx = nullptr;
     }
 
     void controlValueChanged (int index, float value) override
     {
-        if (ctx != nullptr) // index may not be set so use port channel.
-            ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
+        if (ctx != nullptr) {// index may not be set so use port channel.
+            ctx->setParameter (getPortChannel(), convertFrom0to1 (value), info.input);
+        }
     }
 
     void controlTouched (int parameterIndex, bool gestureIsStarting) override {}
@@ -51,6 +54,7 @@ public:
     }
 
 private:
+    PortDescription info;
     DSPScript* ctx { nullptr };
 };
 
@@ -146,8 +150,17 @@ DSPScript::DSPScript (sol::table tbl)
         sol::state_view view (L);
         auto tmp = view.create_table();
         tmp["params"] = &paramData;
-        params = tmp["params"];
-        ok = params.valid();
+        paramsUserData = tmp["params"];
+        ok = paramsUserData.valid();
+    }
+
+    if (ok)
+    {
+        sol::state_view view (L);
+        auto tmp = view.create_table();
+        tmp["controls"] = &controlData;
+        controlsUserData = tmp["controls"];
+        ok = controlsUserData.valid();
     }
 
     loaded = ok;
@@ -261,16 +274,19 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
         {
             if (lua_rawgeti (L, LUA_REGISTRYINDEX, midiRef) == LUA_TUSERDATA)
             {
-                if (lua_rawgeti (L, LUA_REGISTRYINDEX, params.registry_index()) == LUA_TUSERDATA)
+                if (lua_rawgeti (L, LUA_REGISTRYINDEX, paramsUserData.registry_index()) == LUA_TUSERDATA)
                 {
-                    (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
-                                                a.getNumChannels(),
-                                                a.getNumSamples());
-                    (*midi)->swapWith (m);
+                    if (lua_rawgeti (L, LUA_REGISTRYINDEX, controlsUserData.registry_index()) == LUA_TUSERDATA)
+                    {
+                        (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
+                                                    a.getNumChannels(),
+                                                    a.getNumSamples());
+                        (*midi)->swapWith (m);
 
-                    lua_call (L, 3, 0);
+                        lua_call (L, 4, 0);
 
-                    (*midi)->swapWith (m);
+                        (*midi)->swapWith (m);
+                    }
                 }
             }
         }
@@ -287,9 +303,13 @@ void DSPScript::save (MemoryBlock& out)
     MemoryBlock block;
 
     block.reset();
-    getParameterData (block);
+    getParameterData (block, true);
     if (block.getSize() > 0)
         state.setProperty ("params", block, nullptr);
+    block.reset();
+    getParameterData (block, false);
+    if (block.getSize() > 0)
+        state.setProperty ("controls", block, nullptr);
 
     sol::function save = DSP["save"];
 
@@ -347,11 +367,22 @@ void DSPScript::restore (const void* d, size_t s)
     const var& params = state.getProperty ("params");
     if (params.isBinaryData())
     {
-        setParameterData (*params.getBinaryData());
+        setParameterData (*params.getBinaryData(), true);
         for (auto* const param : inParams)
         {
             const auto port = param->getPort();
             param->update (paramData[port.channel]);
+        }
+    }
+
+    const var& controls = state.getProperty ("controls");
+    if (controls.isBinaryData())
+    {
+        setParameterData (*controls.getBinaryData(), false);
+        for (auto* const param : outParams)
+        {
+            const auto port = param->getPort();
+            param->update (controlData[port.channel]);
         }
     }
 
@@ -390,27 +421,33 @@ void DSPScript::restore (const void* d, size_t s)
     }
 }
 
-void DSPScript::setParameter (int index, float value)
+void DSPScript::setParameter (int index, float value, bool input)
 {
-    paramData[index] = value;
+    auto data = input ? paramData : controlData;
+    data[index] = value;
 }
 
 void DSPScript::copyParameterValues (const DSPScript& o)
 {
     for (int i = jmin (numParams, o.numParams); --i >= 0;)
         paramData[i] = o.paramData[i];
+    for (int i = jmin (numControls, o.numControls); --i >= 0;)
+        controlData[i] = o.controlData[i];
 }
 
-void DSPScript::getParameterData (MemoryBlock& block)
+void DSPScript::getParameterData (MemoryBlock& block, bool inputs)
 {
-    block.append (paramData, sizeof (float) * static_cast<size_t> (numParams));
+    auto data = inputs ? paramData : controlData;
+    auto size = inputs ? numParams : numControls;
+    block.append (data, sizeof (float) * static_cast<size_t> (size));
 }
 
-void DSPScript::setParameterData (MemoryBlock& block)
+void DSPScript::setParameterData (MemoryBlock& block, bool inputs)
 {
     jassert (block.getSize() % sizeof (float) == 0);
     jassert (block.getSize() < sizeof (float) * maxParams);
-    memcpy (paramData, block.getData(), block.getSize());
+    auto data = inputs ? paramData : controlData;
+    memcpy (data, block.getData(), block.getSize());
 }
 
 String DSPScript::getUI() const
@@ -558,6 +595,7 @@ void DSPScript::addParameterPorts()
         }
 
         numParams = ports.size (PortType::Control, true);
+        numControls = ports.size (PortType::Control, false);
 
         unlinkParams();
         for (const auto* port : ports.getPorts())

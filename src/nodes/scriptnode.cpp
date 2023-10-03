@@ -1,18 +1,21 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <math.h>
+
+#include <element/midipipe.hpp>
+#include <element/parameter.hpp>
+
+#include "ElementApp.h"
+
 #include "amp.lua.h"
 #include "ampui.lua.h"
 
-#include <math.h>
 #include "sol/sol.hpp"
 #include "element/element.h"
 #include "el/factories.hpp"
-
-#include "ElementApp.h"
+#include "engine/graphnode.hpp"
 #include "nodes/scriptnode.hpp"
-#include <element/midipipe.hpp>
-#include <element/parameter.hpp>
 #include "scripting/bindings.hpp"
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
@@ -59,6 +62,8 @@ void ScriptNode::refreshPorts()
     PortList newPorts;
     script->getPorts (newPorts);
     setPorts (newPorts);
+    if (auto g = getParentGraph())
+        g->triggerAsyncUpdate();
 }
 
 ParameterPtr ScriptNode::getParameter (const PortDescription& port)

@@ -55,7 +55,7 @@ public:
     void getPorts (PortList& out);
 
     //==========================================================================
-    int getNumParameters() const { return numParams; }
+    int getNumParameters (bool input = true) const { return input ? numParams : numControls; }
     element::ParameterPtr getParameterObject (int index, bool input = true) const;
     void copyParameterValues (const DSPScript&);
 
@@ -72,13 +72,15 @@ private:
     int midiRef = LUA_REFNIL;
     lua_State* L = nullptr;
     bool loaded = false;
-    int numParams = 0;
+    int numParams = 0,  // input params
+        numControls = 0;    // output params
     enum
     {
         maxParams = 128
     };
-    float paramData[maxParams];
-    sol::userdata params;
+    float paramData[maxParams],
+        controlData[maxParams];
+    sol::userdata paramsUserData, controlsUserData;
     PortList ports;
 
     class Parameter;
@@ -86,12 +88,12 @@ private:
     juce::ReferenceCountedArray<Parameter> inParams, outParams;
 
     void deref();
-    void getParameterData (juce::MemoryBlock&);
-    void setParameterData (juce::MemoryBlock&);
+    void getParameterData (juce::MemoryBlock&, bool);
+    void setParameterData (juce::MemoryBlock&, bool);
     void addAudioMidiPorts();
     void addParameterPorts();
     void unlinkParams();
-    void setParameter (int, float);
+    void setParameter (int, float, bool);
 };
 
 } // namespace element

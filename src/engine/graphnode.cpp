@@ -425,7 +425,7 @@ void GraphNode::buildRenderingSequence()
             while (midiBuffers.size() < numMidiBuffersNeeded)
                 midiBuffers.add (new MidiBuffer());
         }
-        
+
         ScopedLock sl (seqLock);
         renderingOps.swapWith (newRenderingOps);
     }
