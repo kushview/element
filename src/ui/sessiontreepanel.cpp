@@ -20,6 +20,8 @@
 #include "ui/scripteditorview.hpp"
 #include "ui/sessiontreepanel.hpp"
 #include "ui/viewhelpers.hpp"
+#include "ui/connectiongrid.hpp"
+
 #include "scopedflag.hpp"
 
 namespace element {
@@ -66,6 +68,11 @@ inline static void showGraphEditor (Component* c, const Node& node)
         {
             if (mvc->getGraph() != graph)
                 mvc->setNode (graph);
+        }
+        else if (auto pbc = dynamic_cast<ConnectionGrid*> (cc->getMainViewComponent()))
+        {
+            if (pbc->getGraph() != graph)
+                pbc->setNode (graph);
         }
         else
         {
@@ -829,7 +836,7 @@ public:
     SessionTreePanel& panel;
 };
 
-//======
+//=============================================================================
 class SessionTreePanel::Panel : public TreePanelBase
 {
 public:
