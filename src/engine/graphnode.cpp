@@ -14,7 +14,7 @@
 #include "engine/graphnode.hpp"
 
 #ifndef EL_GRAPH_NODE_NAME
-    #define EL_GRAPH_NODE_NAME "Graph"
+#define EL_GRAPH_NODE_NAME "Graph"
 #endif
 
 namespace element {
@@ -414,16 +414,18 @@ void GraphNode::buildRenderingSequence()
 
     {
         // swap over to the new rendering sequence..
-        // const ScopedLock sl (getCallbackLock());
-        renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
-        renderingBuffers.clear();
+        {
+            const ScopedLock sl (getPropertyLock());
+            renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
+            renderingBuffers.clear();
 
-        for (int i = midiBuffers.size(); --i >= 0;)
-            midiBuffers.getUnchecked (i)->clear();
+            for (int i = midiBuffers.size(); --i >= 0;)
+                midiBuffers.getUnchecked (i)->clear();
 
-        while (midiBuffers.size() < numMidiBuffersNeeded)
-            midiBuffers.add (new MidiBuffer());
-
+            while (midiBuffers.size() < numMidiBuffersNeeded)
+                midiBuffers.add (new MidiBuffer());
+        }
+        
         ScopedLock sl (seqLock);
         renderingOps.swapWith (newRenderingOps);
     }
@@ -459,7 +461,7 @@ void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock
 {
     if (prepared())
         return;
-    
+
     currentAudioInputBuffer = nullptr;
     currentAudioOutputBuffer.setSize (jmax (1, getNumAudioOutputs()), estimatedSamplesPerBlock);
     currentMidiInputBuffer = nullptr;
@@ -485,7 +487,7 @@ void GraphNode::releaseResources()
         nodes.getUnchecked (i)->unprepare();
 
     _prepared = false;
-    
+
     renderingBuffers.setSize (1, 1);
     midiBuffers.clear();
 
