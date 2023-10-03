@@ -939,8 +939,7 @@ void BlockComponent::resized()
         int startY = box.getY() + 22;
         if (displayMode == Compact || displayMode == Small)
         {
-            startY = (jmax (numIns, numOuts) * (pinSpacing + pinSize)) - pinSpacing;
-            startY = box.getY() + ((box.getHeight() - startY) / 2);
+            startY = box.getY() + 8;
         }
 
         Rectangle<int> pri (box.getX() - halfPinSize,
