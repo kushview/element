@@ -690,7 +690,7 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
             g.fillPath (filledCircle);
             g.setColour (Colours::black.brighter(0.17f));
            
-            g.strokePath (filledCircle, PathStrokeType(1.23));
+            g.strokePath (filledCircle, PathStrokeType(1.23f));
         }
 
         if (slider.isEnabled())
