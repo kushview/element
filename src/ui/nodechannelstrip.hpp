@@ -169,8 +169,8 @@ public:
             SharedConnectionBlock b2 (powerChangedConnection);
             SharedConnectionBlock b3 (muteChangedConnection);
 
-            channelStrip.setVolume (getCurrentVolume());
-            channelStrip.setPower (! object->isSuspended());
+            channelStrip.setVolume (getCurrentVolume(), dontSendNotification);
+            channelStrip.setPower (! object->isSuspended(), false);
             channelStrip.setMuted (object->isMuted(), false);
 
             b1.unblock();
