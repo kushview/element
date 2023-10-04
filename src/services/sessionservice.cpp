@@ -41,6 +41,7 @@ void SessionService::activate()
     currentSession = context().session();
     document.reset (new SessionDocument (currentSession));
     changeResetter.reset (new ChangeResetter (*this));
+    document->setFile (DataPath::defaultSessionDir());
 }
 
 void SessionService::deactivate()

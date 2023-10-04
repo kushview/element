@@ -268,7 +268,11 @@ class GuiService::Impl
 {
 public:
     Impl (GuiService& gs)
-        : gui (gs) {}
+        : gui (gs) {
+
+        lastSavedFile = DataPath::defaultSessionDir();
+        lastExportedGraph = DataPath::defaultGraphDir();
+    }
 
     void restoreRecents()
     {

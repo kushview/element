@@ -42,6 +42,7 @@ private:
     std::unique_ptr<SessionDocument> document;
     class ChangeResetter;
     std::unique_ptr<ChangeResetter> changeResetter;
+
     void loadNewSessionData();
     void refreshOtherControllers();
 };
