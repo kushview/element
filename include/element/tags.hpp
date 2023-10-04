@@ -37,6 +37,8 @@ EL_TAG (midi)
 
 EL_TAG (asset);
 EL_TAG (assetId);
+EL_TAG (portAlignment);
+
 static const juce::Identifier bpm = "bpm";
 static const juce::Identifier category = "category";
 static const juce::Identifier channel = "channel";

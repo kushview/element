@@ -206,15 +206,30 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
                       .getPropertyAsValue (tags::hiddenPorts, nullptr);
     hiddenPorts.addListener (this);
 
-    displayModeValue = node.getBlockValueTree()
-                           .getPropertyAsValue (tags::displayMode, nullptr);
+    auto blockData = node.getBlockValueTree();
+    displayModeValue = blockData.getPropertyAsValue (tags::displayMode, nullptr);
     displayModeValue.addListener (this);
     const auto idm = getDisplayModeFromString (displayModeValue.getValue());
     setDisplayModeInternal (idm, false);
     if (idm == Embed)
         embedInit.startTimer (14);
 
-    _portAlign = portAlignmentFromKey (node.getProperty ("portAlignment", "middle"));
+    // setup a fallback alignment.
+    String portAlignStr = "middle";
+    switch (getDisplayMode()) {
+        case Normal:
+        case Embed:
+            portAlignStr = "before";
+            break;
+        case Small:
+        case Compact:
+            portAlignStr = vertical_ ? "before" : "middle";
+            break;
+    }
+    
+    _portAlign = portAlignmentFromKey (blockData.getProperty (tags::portAlignment, portAlignStr));
+    if (! blockData.hasProperty (tags::portAlignment))
+        blockData.setProperty (tags::portAlignment, portAlignmentKey (_portAlign), nullptr);
 
     customWidth = node.getBlockValueTree().getProperty (tags::width, customWidth);
     customHeight = node.getBlockValueTree().getProperty (tags::height, customHeight);
@@ -361,6 +376,8 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
 
 void BlockComponent::setPortAlignment (PortAlignment newAlign)
 {
+    node.getBlockValueTree().setProperty (
+        tags::portAlignment, portAlignmentKey (newAlign), nullptr);
     _portAlign = newAlign;
     resized();
 }
@@ -928,10 +945,28 @@ void BlockComponent::resized()
         }
     }
 
+    const auto spaceNeeded = (std::max (numIns, numOuts) * (pinSpacing + pinSize)) - pinSpacing;
+    const auto spaceNeededOuts = (numOuts * (pinSpacing + pinSize)) - pinSpacing;
+
     if (vertical)
     {
-        Rectangle<int> pri (box.getX() + 9, 0, getWidth(), pinSize);
-        Rectangle<int> pro (box.getX() + 9, getHeight() - pinSize, getWidth(), pinSize);
+        int startX = box.getX() + 9;
+        int startXOuts = startX;
+        switch (_portAlign) {
+            case PortsBefore:
+                // noop
+                break;
+            case PortsMiddle:
+                startX = startXOuts = box.getX() + ((box.getWidth() - spaceNeeded) / 2);
+                break;
+            case PortsAfter:
+                startX = box.getRight() - spaceNeeded - 9;
+                startXOuts = box.getRight() - spaceNeededOuts - 9;
+                break;
+        }
+        
+        Rectangle<int> pri (startX, 0, getWidth(), pinSize);
+        Rectangle<int> pro (startXOuts, getHeight() - pinSize, getWidth(), pinSize);
 
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
@@ -946,27 +981,22 @@ void BlockComponent::resized()
     }
     else
     {
-        int startY = box.getY() + 22;
+        const int padY = displayMode == Compact || displayMode == Small ? 8 : 22;
+        int startY = box.getY() + padY;
         int startYOuts = startY;
 
-        if (displayMode == Compact || displayMode == Small)
+        switch (_portAlign)
         {
-            const auto spaceNeeded = (jmax (numIns, numOuts) * (pinSpacing + pinSize)) - pinSpacing;
-            const auto spaceNeededOuts = (numOuts * (pinSpacing + pinSize)) - pinSpacing;
-
-            switch (_portAlign)
-            {
-                case PortsBefore:
-                    startY = startYOuts = box.getY() + 8;
-                    break;
-                case PortsMiddle:
-                    startY = startYOuts = box.getY() + ((box.getHeight() - spaceNeeded) / 2);
-                    break;
-                case PortsAfter:
-                    startY = box.getBottom() - spaceNeeded - 8;
-                    startYOuts = box.getBottom() - spaceNeededOuts - 8;
-                    break;
-            }
+            case PortsBefore:
+                startY = startYOuts = box.getY() + padY;
+                break;
+            case PortsMiddle:
+                startY = startYOuts = box.getY() + ((box.getHeight() - spaceNeeded) / 2);
+                break;
+            case PortsAfter:
+                startY = box.getBottom() - spaceNeeded - padY;
+                startYOuts = box.getBottom() - spaceNeededOuts - padY;
+                break;
         }
 
         Rectangle<int> pri (box.getX() - halfPinSize,
@@ -1329,17 +1359,17 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
     for (int i = PortsBefore; i <= PortsAfter; ++i)
     {
         const auto m = static_cast<BlockComponent::PortAlignment> (i);
-        const bool enabled = getDisplayMode() == Compact || getDisplayMode() == Small;
+        const bool enabled = true;
         dMenu.addItem (portAlignmentName (m, vertical), enabled, m == _portAlign, [this, block, m]() {
             auto b = block;
-            b.setProperty ("portAlignment", portAlignmentKey (m), nullptr);
+            b.setProperty (tags::portAlignment, portAlignmentKey (m), nullptr);
             this->_portAlign = m;
             resized();
             forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
                 auto sb = sibling.node.getBlockValueTree();
-                sb.setProperty ("portAlignment", BlockComponent::portAlignmentKey (m), nullptr);
+                sb.setProperty (tags::portAlignment, BlockComponent::portAlignmentKey (m), nullptr);
                 sibling._portAlign = m;
                 sibling.resized();
             });
