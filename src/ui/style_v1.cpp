@@ -677,8 +677,11 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
 
     if (radius > 12.0f)
     {
+        int lineSize = (int) std::max (2.f, std::min (20.f, radius * 0.085f));
+
         const float thickness = 0.82f;
         const float iradius = radius * 0.7f;
+        const float csf =  rw - (rw * thickness);
         {
             const float csf =  rw - (rw * thickness);
             Path filledCircle;
@@ -708,9 +711,9 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
             Path p;
             p.addLineSegment (Line<float> (
                 0.f,
-                -18.f,
+                -5.f,
                 0.f,
-                -radius + 18), 4.0f);
+                -radius + csf + 5), lineSize);
             g.setColour (Colours::black);
             g.fillPath (p, AffineTransform::rotation (angle).translated (centreX, centreY));
         }
