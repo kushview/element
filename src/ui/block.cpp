@@ -214,6 +214,8 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     if (idm == Embed)
         embedInit.startTimer (14);
 
+    _portAlign = portAlignmentFromKey (node.getProperty ("portAlignment", "middle"));
+
     customWidth = node.getBlockValueTree().getProperty (tags::width, customWidth);
     customHeight = node.getBlockValueTree().getProperty (tags::height, customHeight);
     setSize (customWidth > 0 ? customWidth : 170,
@@ -355,6 +357,12 @@ void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
 void BlockComponent::setDisplayMode (DisplayMode mode)
 {
     setDisplayModeInternal (mode, false);
+}
+
+void BlockComponent::setPortAlignment (PortAlignment newAlign)
+{
+    _portAlign = newAlign;
+    resized();
 }
 
 void BlockComponent::moveBlockTo (double x, double y)
@@ -939,16 +947,34 @@ void BlockComponent::resized()
     else
     {
         int startY = box.getY() + 22;
+        int startYOuts = startY;
+
         if (displayMode == Compact || displayMode == Small)
         {
-            startY = box.getY() + 8;
+            const auto spaceNeeded = (jmax (numIns, numOuts) * (pinSpacing + pinSize)) - pinSpacing;
+            const auto spaceNeededOuts = (numOuts * (pinSpacing + pinSize)) - pinSpacing;
+
+            switch (_portAlign)
+            {
+                case PortsBefore:
+                    startY = startYOuts = box.getY() + 8;
+                    break;
+                case PortsMiddle:
+                    startY = startYOuts = box.getY() + ((box.getHeight() - spaceNeeded) / 2);
+                    break;
+                case PortsAfter:
+                    startY = box.getBottom() - spaceNeeded - 8;
+                    startYOuts = box.getBottom() - spaceNeededOuts - 8;
+                    break;
+            }
         }
 
         Rectangle<int> pri (box.getX() - halfPinSize,
                             startY,
                             pinSize,
                             box.getHeight());
-        Rectangle<int> pro (pri.withX (box.getWidth() - 1));
+        Rectangle<int> pro (pri.withY (startYOuts)
+                                .withX (box.getWidth() - 1));
 
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
@@ -1298,11 +1324,35 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
         });
     }
 
+    dMenu.addSeparator();
+    dMenu.addSectionHeader ("Port Alignment");
+    for (int i = PortsBefore; i <= PortsAfter; ++i)
+    {
+        const auto m = static_cast<BlockComponent::PortAlignment> (i);
+        const bool enabled = getDisplayMode() == Compact || getDisplayMode() == Small;
+        dMenu.addItem (portAlignmentName (m, vertical), enabled, m == _portAlign, [this, block, m]() {
+            auto b = block;
+            b.setProperty ("portAlignment", portAlignmentKey (m), nullptr);
+            this->_portAlign = m;
+            resized();
+            forEachSibling ([m] (BlockComponent& sibling) {
+                if (! sibling.isSelected())
+                    return;
+                auto sb = sibling.node.getBlockValueTree();
+                sb.setProperty ("portAlignment", BlockComponent::portAlignmentKey (m), nullptr);
+                sibling._portAlign = m;
+                sibling.resized();
+            });
+
+            if (auto* gp = getGraphPanel())
+                gp->updateConnectorComponents (true);
+        });
+    }
     menuToAddTo.addSubMenu (TRANS ("Display"), dMenu);
 }
 
 bool BlockComponent::isInterestedInDragSource (const SourceDetails& details)
-{    
+{
     if (! node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER))
         return false;
     if (! details.description.isArray())
@@ -1322,7 +1372,7 @@ void BlockComponent::itemDropped (const SourceDetails& details)
         auto& plugs (ViewHelpers::getGlobals (this)->plugins());
         if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString (a->getUnchecked (1).toString()))
             if (auto panel = getGraphPanel())
-                panel->postMessage (new ReplaceNodeMessage  (node, *t));
+                panel->postMessage (new ReplaceNodeMessage (node, *t));
     }
 }
 

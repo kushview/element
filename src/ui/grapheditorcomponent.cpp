@@ -364,7 +364,7 @@ void GraphEditorComponent::setNode (const Node& n)
     data.removeListener (this);
     data = graph.data();
 
-    verticalLayout = graph.getProperty (tags::vertical, false);
+    verticalLayout = graph.getProperty (tags::vertical, true);
 
     if (draggingConnector)
         removeChildComponent (draggingConnector.get());

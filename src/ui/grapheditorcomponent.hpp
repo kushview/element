@@ -105,7 +105,7 @@ private:
     std::unique_ptr<ConnectorComponent> draggingConnector;
     std::unique_ptr<BlockFactory> factory;
 
-    bool verticalLayout = false;
+    bool verticalLayout = true;
 
     LassoComponent<uint32> lasso;
     friend class SelectedNodes;
