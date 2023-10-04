@@ -698,7 +698,7 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
         }
 
         if (slider.isEnabled())
-            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.8f));
+            g.setColour (slider.findColour (Slider::rotarySliderFillColourId).withAlpha (isMouseOver ? 1.0f : 0.88f));
         else
             g.setColour (Colour (0x80808080));
 
