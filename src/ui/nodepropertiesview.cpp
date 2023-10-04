@@ -152,7 +152,7 @@ NodePropertiesView::~NodePropertiesView()
 
 void NodePropertiesView::paint (Graphics& g)
 {
-    g.fillAll (element::Colors::backgroundColor);
+    ContentView::paint (g);
 }
 
 void NodePropertiesView::resized()
