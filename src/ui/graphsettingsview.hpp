@@ -32,7 +32,7 @@ private:
     GraphButton graphButton;
     Value activeGraphIndex;
     bool updateWhenActiveGraphChanges = false;
-    boost::signals2::connection connNodeTouched;
+    boost::signals2::connection connNodeTouched, connNodeRemoved;
     void valueChanged (Value& value) override;
 };
 

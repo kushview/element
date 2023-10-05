@@ -536,6 +536,9 @@ void GraphSettingsView::stabilizeContent()
 {
     if (auto* const world = ViewHelpers::getGlobals (this))
     {
+        auto& srvc = world->services();
+        auto& eng = *srvc.find<EngineService>();
+
         if (! props->node().isValid())
             props->setNode (world->session()->getCurrentGraph());
 
@@ -547,7 +550,10 @@ void GraphSettingsView::stabilizeContent()
         {
             connNodeTouched = ui.nodeSelected.connect ([this, &ui]() {
                 auto selected = ui.getSelectedNode();
-                props->setNode (detail::findGraph (ui.getSelectedNode()));
+                auto graph = detail::findGraph (selected);
+                if (! graph.isValid() || props->node() == graph)
+                    return;
+                props->setNode (graph);
             });
         }
     }
@@ -585,7 +591,7 @@ void GraphSettingsView::setUpdateOnActiveGraphChange (bool shouldUpdate)
 
 void GraphSettingsView::valueChanged (Value& value)
 {
-    if (updateWhenActiveGraphChanges && value.refersToSameSourceAs (value))
+    if (updateWhenActiveGraphChanges && activeGraphIndex.refersToSameSourceAs (value))
         stabilizeContent();
 }
 } // namespace element
