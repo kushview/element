@@ -406,6 +406,7 @@ public:
         // instance access
         if (auto handle = module.getHandle())
         {
+            instanceFeature.URI = LV2_INSTANCE_ACCESS_URI;
             instanceFeature.data = (void*) handle;
             features.add (&instanceFeature);
         }

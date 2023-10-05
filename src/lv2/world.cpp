@@ -17,8 +17,8 @@
 #include "lv2/world.hpp"
 #include "lv2/logfeature.hpp"
 
-#ifndef JLV2_NUM_WORKERS
-#define JLV2_NUM_WORKERS 1
+#ifndef EL_LV2_NUM_WORKERS
+#define EL_LV2_NUM_WORKERS 1
 #endif
 
 namespace element {
@@ -161,7 +161,7 @@ World::World()
     suil_host_set_touch_func (suil, LV2ModuleUI::touch);
 
     currentThread = 0;
-    numThreads = JLV2_NUM_WORKERS;
+    numThreads = EL_LV2_NUM_WORKERS;
     for (int i = 0; i < numThreads; ++i)
     {
         threads.add (new WorkThread ("lv2_worker_" + String (i + 1), EL_LV2_RING_BUFFER_SIZE));
