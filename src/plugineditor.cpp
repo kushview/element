@@ -15,8 +15,8 @@
 
 #define EL_PLUGIN_MIN_WIDTH 546
 #define EL_PLUGIN_MIN_HEIGHT 266
-#define EL_PLUGIN_DEFAULT_WIDTH 760
-#define EL_PLUGIN_DEFAULT_HEIGHT 480
+#define EL_PLUGIN_DEFAULT_WIDTH 1230
+#define EL_PLUGIN_DEFAULT_HEIGHT 730
 
 namespace element {
 using element::LookAndFeel;

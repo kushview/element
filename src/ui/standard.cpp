@@ -490,17 +490,20 @@ StandardContent::StandardContent (Context& ctl_)
     statusBarVisible = true;
     statusBarSize = 22;
 
-    setSize (640, 360);
+    setSize (1230, 730);
 
     setMainView (EL_VIEW_GRAPH_EDITOR);
 
     nav->setSize (304, getHeight());
     resizerMouseUp();
-    if (auto pp = nav->findPanel<PluginsPanelView>())
-        nav->setPanelSize (pp, 20 * 4, false);
+    if (auto gp = nav->findPanel<GraphSettingsView>())
+        nav->expandPanelFully (gp, false);
+    if (auto stp = nav->findPanel<SessionTreePanel>())
+        nav->setPanelSize (stp, 200, false);
+    
     resized();
 
-    setVirtualKeyboardVisible (true);
+    setVirtualKeyboardVisible (false);
     setNodeChannelStripVisible (false);
     setMeterBridgeVisible (false);
 

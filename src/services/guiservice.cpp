@@ -268,8 +268,8 @@ class GuiService::Impl
 {
 public:
     Impl (GuiService& gs)
-        : gui (gs) {
-
+        : gui (gs)
+    {
         lastSavedFile = DataPath::defaultSessionDir();
         lastExportedGraph = DataPath::defaultGraphDir();
     }
@@ -358,11 +358,11 @@ element::LookAndFeel_E1& GuiService::getLookAndFeel()
 void GuiService::saveProperties (PropertiesFile* props)
 {
     jassert (props);
-    
+
     if (auto maps = commands().getKeyMappings())
         if (auto xml = maps->createXml (true))
             props->setValue (Settings::keymappingsKey, xml.get());
-    
+
     if (mainWindow)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
@@ -377,7 +377,7 @@ void GuiService::saveProperties (PropertiesFile* props)
 }
 
 void GuiService::activate()
-{   
+{
     auto props = context().settings().getUserSettings();
     context().devices().addChangeListener (this);
     impl->restoreRecents();
@@ -466,7 +466,7 @@ void GuiService::showPreferencesDialog (const String& section)
         prefs = std::make_unique<Preferences> (*this);
         prefs->addDefaultPages();
     }
-    
+
     opts.content.set (prefs.release(), true);
     opts.useNativeTitleBar = true;
     opts.dialogTitle = TRANS ("Preferences");
@@ -537,7 +537,8 @@ Content* GuiService::content()
         _content = factory->createMainContent (uitype);
         if (_content)
         {
-            _content->setSize (760, 480);
+            _content->setSize (std::max (544, _content->getWidth()),
+                               std::max (266, _content->getHeight()));
             if (auto tgt = dynamic_cast<ApplicationCommandTarget*> (_content.get()))
                 commands().registerAllCommandsForTarget (tgt);
         }
@@ -1178,9 +1179,9 @@ void GuiService::shutdown()
         updates->launchDetached();
 }
 
-void GuiService::saveSettings() {
+void GuiService::saveSettings()
+{
     saveProperties (settings().getUserSettings());
-
 }
 
 void GuiService::changeListenerCallback (ChangeBroadcaster* broadcaster)
