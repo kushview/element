@@ -157,6 +157,7 @@ bool WorkThread::validateMessage (RingBuffer& ring)
 WorkerBase::WorkerBase (WorkThread& thread, uint32_t bufsize)
     : owner (thread)
 {
+    bufsize = juce::nextPowerOfTwo (bufsize);
     responses = std::make_unique<RingBuffer> (bufsize);
     response.calloc (bufsize);
     thread.addWorker (this);
