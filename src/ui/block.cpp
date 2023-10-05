@@ -331,8 +331,10 @@ void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
                         NodeEditorFactory factory (ui);
                         if (auto e = factory.instantiate (node, NodeEditorPlacement::PluginWindow))
                             embedded.reset (e.release());
-                        else
-                            embedded = NodeEditorFactory::createAudioProcessorEditor (node);
+                        else if (auto ape = NodeEditorFactory::createAudioProcessorEditor (node))
+                            embedded.reset (ape.release());
+                        else if (auto ed = NodeEditorFactory::createEditor (node))
+                            embedded.reset (ed.release());
                     }
 
                     if (embedded != nullptr)
