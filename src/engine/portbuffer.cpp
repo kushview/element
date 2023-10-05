@@ -127,9 +127,10 @@ void PortBuffer::clear()
 
 void PortBuffer::reset()
 {
-    if (isAudio())
+    if (isAudio() || isCV())
     {
         buffer.atom->size = capacity - sizeof (LV2_Atom);
+        buffer.atom->type = bufferType;
     }
     else if (isControl())
     {
@@ -147,6 +148,7 @@ void PortBuffer::reset()
     }
     else if (isEvent())
     {
+        buffer.atom->type = bufferType;
         buffer.event->capacity = capacity - sizeof (LV2_Event_Buffer);
         buffer.event->header_size = sizeof (LV2_Event_Buffer);
         buffer.event->stamp_type = LV2_EVENT_AUDIO_STAMP;

@@ -31,11 +31,12 @@ public:
 
     inline uint32 getType() const { return type; }
 
-    inline bool isAtom() const { return type == PortType::Atom; }
-    inline bool isAudio() const { return type == PortType::Audio; }
-    inline bool isControl() const { return type == PortType::Control; }
-    inline bool isEvent() const { return type == PortType::Event; }
-    inline bool isSequence() const { return isAtom(); }
+    inline bool isAtom() const noexcept { return type == PortType::Atom; }
+    inline bool isAudio() const noexcept { return type == PortType::Audio; }
+    inline bool isCV() const noexcept { return type == PortType::CV; }
+    inline bool isControl() const noexcept { return type == PortType::Control; }
+    inline bool isEvent() const noexcept { return type == PortType::Event; }
+    inline bool isSequence() const noexcept { return isAtom(); }
 
     void referTo (void* location)
     {
