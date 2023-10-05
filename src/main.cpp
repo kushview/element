@@ -184,6 +184,11 @@ public:
             return;
 
         workers.clearQuick (true);
+        auto& srvs = world->services();
+        srvs.saveSettings();
+
+        auto& devices (world->devices());
+        devices.closeAudioDevice();
 
         auto engine (world->audio());
         auto& plugins (world->plugins());
@@ -192,8 +197,6 @@ public:
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
 
-        auto& srvs = world->services();
-        srvs.saveSettings();
         srvs.deactivate();
         srvs.shutdown();
 
