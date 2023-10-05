@@ -518,6 +518,14 @@ const void* LV2Module::getExtensionData (const String& uri) const
                     : nullptr;
 }
 
+LV2Module::DataFunction LV2Module::getDataFunction() const noexcept {
+    if (! isLoaded())
+        return nullptr;
+    if (auto desc = lilv_instance_get_descriptor (instance))
+        return desc->extension_data;
+    return nullptr;
+}
+
 void* LV2Module::getHandle()
 {
     return instance ? (void*) lilv_instance_get_handle (instance)

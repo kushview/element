@@ -208,6 +208,12 @@ public:
      */
     const void* getExtensionData (const String& uri) const;
 
+    /** Same signature as LV2_Descriptor::extension_data. */
+    using DataFunction = const void* (*)(const char*);
+
+    /** Returns the function to be used by data-access. */
+    DataFunction getDataFunction() const noexcept;
+
     /** Instantiate the Plugin
         @param samplerate The samplerate to use
         @note This is in the LV2 Instantiation Threading class */
@@ -412,8 +418,10 @@ public:
         }
 
         // data access
-        dataFeatureData.data_access = LV2ModuleUI::dataAccess;
+        dataFeature.URI = LV2_DATA_ACCESS_URI;
+        dataFeatureData.data_access = module.getDataFunction();
         dataFeature.data = &dataFeatureData;
+        features.add (&dataFeature);
 
         // terminate the array
         features.add (nullptr);

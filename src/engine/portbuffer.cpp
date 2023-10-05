@@ -38,6 +38,10 @@ PortBuffer::PortBuffer (bool inputPort, uint32 portType, uint32 dataType, uint32
     {
         buffer.control = (float*) data.get();
     }
+    else if (type == PortType::CV)
+    {
+        buffer.cv = (float*) data.get();
+    }
     else
     {
         // trying to use an unsupported buffer type
