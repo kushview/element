@@ -376,7 +376,7 @@ private:
 
     void timerCallback() override
     {
-        std::clog << "[element] checking updates..." << std::endl;
+        world->logger().logMessage ("[element] checking updates...");
         world->services().find<UI>()->checkUpdates();
         stopTimer();
     }
