@@ -23,7 +23,7 @@ public:
         _conns.push_back (g.sibling<SessionService>()->sigSessionLoaded.connect ([this, &g]() {
             auto graph = g.session()->getActiveGraph();
             setNode (graph.getNode (0));
-            g.selectNode (graph.getNode(0));
+            g.selectNode (graph.getNode (0));
         }));
     }
 

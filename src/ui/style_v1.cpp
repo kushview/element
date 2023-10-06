@@ -681,7 +681,6 @@ void Style::drawDial (juce::Graphics& g, int x, int y, int width, int height,
         float lineTrim = radius > 32.f ? -3.0f : -2.f;
         float lineOffset = radius >32.f ? -4.f : -1.f;
         const float thickness = 0.82f;
-        const float iradius = radius * 0.7f;
         const float csf =  rw - (rw * thickness);
         {
             const float csf =  rw - (rw * thickness);

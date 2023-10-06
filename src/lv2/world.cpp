@@ -343,8 +343,10 @@ bool World::isPluginSupported (const LilvPlugin* plugin) const
     const uint32 numPorts = lilv_plugin_get_num_ports (plugin);
     for (uint32 i = 0; i < numPorts; ++i)
     {
-        // const LilvPort* port (lilv_plugin_get_port_by_index (plugin, i));
-        // nothing here yet
+        const LilvPort* port (lilv_plugin_get_port_by_index (plugin, i));
+        if (lilv_port_is_a (plugin, port, lv2_CVPort))
+            return false;
+        ;
     }
 
     return true;

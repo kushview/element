@@ -1694,10 +1694,11 @@ Component* Preferences::createPageForName (const String& name)
     return nullptr;
 }
 
-void Preferences::addDefaultPages() {
+void Preferences::addDefaultPages()
+{
     if (pageList->getNumRows() > 0)
         return;
-    
+
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);

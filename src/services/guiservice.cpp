@@ -378,7 +378,6 @@ void GuiService::saveProperties (PropertiesFile* props)
 
 void GuiService::activate()
 {
-    auto props = context().settings().getUserSettings();
     context().devices().addChangeListener (this);
     impl->restoreRecents();
 }

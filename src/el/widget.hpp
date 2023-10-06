@@ -26,7 +26,7 @@ public:
         data = nullptr;
     }
 
-    /// Handlers. 
+    /// Handlers.
     // @section handlers
 
     /// Called when the widget resizes.
@@ -67,7 +67,7 @@ public:
         if (sol::safe_function f = widget["mouseEnter"])
             f (widget, ev);
     }
-    
+
     /// Called when the mouse exits your widget.
     // @function Widget:mouseExit
     // @tparam el.MouseEvent ev The event to process

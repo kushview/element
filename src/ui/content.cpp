@@ -74,7 +74,7 @@ public:
         addAndMakeVisible (mapButton);
 
         pluginMenu.setIcon (Icon (getIcons().falBarsOutline,
-                              findColour (TextButton::textColourOffId)));
+                                  findColour (TextButton::textColourOffId)));
         pluginMenu.setTriggeredOnMouseDown (true);
         pluginMenu.onClick = [this]() { runPluginMenu(); };
         if (owner.services().getRunMode() == RunMode::Plugin)
@@ -218,7 +218,8 @@ private:
     MidiBlinker midiBlinker;
     Array<SignalConnection> connections;
 
-    void runPluginMenu() {
+    void runPluginMenu()
+    {
         auto& ui = *owner.services().find<UI>();
         PopupMenu menu;
         MainMenu::buildPluginMainMenu (ui.commands(), menu);

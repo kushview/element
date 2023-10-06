@@ -132,13 +132,15 @@ public:
     DisplayMode getDisplayMode() const noexcept { return displayMode; }
 
     //=========================================================================
-    enum PortAlignment {
+    enum PortAlignment
+    {
         PortsBefore,
         PortsMiddle,
         PortsAfter
     };
 
-    inline static PortAlignment portAlignmentFromKey (const juce::String& slug) {
+    inline static PortAlignment portAlignmentFromKey (const juce::String& slug)
+    {
         if (slug == "before")
             return PortsBefore;
         if (slug == "middle")
@@ -148,21 +150,38 @@ public:
         return PortsMiddle;
     }
 
-    inline static juce::String portAlignmentKey (int align) {
-        switch (align) {
-            case PortsBefore: return "before"; break;
-            case PortsMiddle: return "middle"; break;
-            case PortsAfter: return "after"; break;
+    inline static juce::String portAlignmentKey (int align)
+    {
+        switch (align)
+        {
+            case PortsBefore:
+                return "before";
+                break;
+            case PortsMiddle:
+                return "middle";
+                break;
+            case PortsAfter:
+                return "after";
+                break;
         }
         return "middle";
     }
 
-    inline static juce::String portAlignmentName (int align, bool vertical) {
-        switch (align) {
-            case PortsBefore: return vertical ? "Left" : "Top"; break;
-            case PortsMiddle: return "Middle"; break;
-            case PortsAfter: return vertical ? "Right" : "Bottom"; break;
-            default: break;
+    inline static juce::String portAlignmentName (int align, bool vertical)
+    {
+        switch (align)
+        {
+            case PortsBefore:
+                return vertical ? "Left" : "Top";
+                break;
+            case PortsMiddle:
+                return "Middle";
+                break;
+            case PortsAfter:
+                return vertical ? "Right" : "Bottom";
+                break;
+            default:
+                break;
         }
         return "Middle";
     }
@@ -227,6 +246,7 @@ public:
 
     bool isInterestedInDragSource (const SourceDetails& details) override;
     void itemDropped (const SourceDetails& details) override;
+
 protected:
     inline void forEachSibling (std::function<void (BlockComponent&)> callback)
     {

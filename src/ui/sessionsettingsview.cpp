@@ -77,6 +77,5 @@ void SessionContentView::paint (Graphics& g)
 void SessionContentView::resized()
 {
     props->setBounds (getLocalBounds().reduced (2));
-    const int configButtonSize = 14;
 }
 } // namespace element

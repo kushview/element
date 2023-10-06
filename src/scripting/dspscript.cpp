@@ -39,7 +39,8 @@ public:
 
     void controlValueChanged (int index, float value) override
     {
-        if (ctx != nullptr) {// index may not be set so use port channel.
+        if (ctx != nullptr)
+        { // index may not be set so use port channel.
             ctx->setParameter (getPortChannel(), convertFrom0to1 (value), info.input);
         }
     }

@@ -211,7 +211,8 @@ void NavigationConcertinaPanel::restoreState (PropertiesFile* props)
                 if (auto* ned = dynamic_cast<NodeEditorView*> (c))
                     ned->setSticky ((bool) item.getProperty ("sticky", ned->isSticky()));
 
-                if (h > 0) {
+                if (h > 0)
+                {
                     withSize.push_back (item);
                     continue;
                 }

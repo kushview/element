@@ -72,8 +72,8 @@ private:
     int midiRef = LUA_REFNIL;
     lua_State* L = nullptr;
     bool loaded = false;
-    int numParams = 0,  // input params
-        numControls = 0;    // output params
+    int numParams = 0, // input params
+        numControls = 0; // output params
     enum
     {
         maxParams = 128

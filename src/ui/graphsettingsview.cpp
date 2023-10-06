@@ -537,12 +537,11 @@ void GraphSettingsView::stabilizeContent()
     if (auto* const world = ViewHelpers::getGlobals (this))
     {
         auto& srvc = world->services();
-        auto& eng = *srvc.find<EngineService>();
+        auto& ui = *srvc.find<UI>();
 
         if (! props->node().isValid())
             props->setNode (world->session()->getCurrentGraph());
 
-        auto& ui = *world->services().find<UI>();
         if (! props->node().isValid())
             props->setNode (detail::findGraph (ui.getSelectedNode()));
 

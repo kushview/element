@@ -558,6 +558,8 @@ struct ViewSizeListener : private ComponentMovementWatcher
     PhysicalResizeListener& listener;
 };
 
+extern bool getNativeWinodwSize (void* window, int& width, int& height);
+
 class LV2NativeEditor : public Editor,
                         public juce::Timer,
                         public PhysicalResizeListener
@@ -573,25 +575,29 @@ public:
 
         view = std::make_unique<ViewComponent> (*this);
         addAndMakeVisible (view.get());
+
         ui->setParent ((intptr_t) view->getWidget());
         ui->instantiate();
         p->getModule().sendPortEvents();
 
-        nativeViewSetup = ui->loaded();
+        nativeViewSetup = false;
 
-        setSize (ui->getClientWidth() > 0 ? ui->getClientWidth() : 240,
-                 ui->getClientHeight() > 0 ? ui->getClientHeight() : 100);
+        // some plugins will have called UI resize to define its size.
+        int w = ui->getClientWidth(), h = ui->getClientHeight();
 
+        if (w <= 0 || h <= 0)
+        {
+            // if not, try to query the window size.
+            w = h = 0;
+            getNativeWinodwSize (ui->getWidget(), w, h);
+        }
+
+        setSize (w > 0 ? w : 640, h > 0 ? h : 360);
         startTimerHz (60);
 
-        // FIXME?
         setResizable (ui->haveClientResize());
 
-        ui->onClientResize = []() -> int {
-            EL_LV2_LOG ("UI resized itself: " << ui->getClientWidth() << "x" << ui->getClientHeight());
-            // native->setSize (ui->getClientWidth(), ui->getClientHeight());
-            // setSize (native->getWidth(), native->getHeight());
-            // return 0;
+        ui->onClientResize = [this]() -> int {
             return 0;
         };
     }
@@ -620,6 +626,14 @@ public:
         if (! ui || ! ui->isNative())
             return stopTimer();
 
+        if (! nativeViewSetup)
+        {
+            if (ui->loaded())
+            {
+                int w = 0, h = 0;
+                nativeViewSetup = true;
+            }
+        }
         if (nativeViewSetup)
         {
             if (ui->haveIdleInterface())
@@ -724,6 +738,9 @@ private:
         }
 
         void paint (Graphics& g) override { g.fillAll (Colours::black); }
+
+        int getInnerWidth() { return inner.getWidth(); }
+        int getInnerHeight() { return inner.getHeight(); }
 
         LV2UI_Widget getWidget() { return getHWND(); }
 

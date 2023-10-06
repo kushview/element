@@ -18,7 +18,7 @@ public:
     ~DataPath();
 
     static const void initializeDefaultLocation();
-    
+
     /** Returns the app data dir.
         For example, on OSX this is ~/Library/Application Support/Element
      */

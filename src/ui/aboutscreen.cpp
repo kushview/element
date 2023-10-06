@@ -8,7 +8,7 @@
 #include "appinfo.hpp"
 
 #define EL_LICENSE_TEXT                                                        \
-    "Copyright (C) 2014-@0@  Kushview, LLC.  All rights reserved.\r\n\r\n"  \
+    "Copyright (C) 2014-@0@  Kushview, LLC.  All rights reserved.\r\n\r\n"     \
                                                                                \
     "This program is free software; you can redistribute it and/or modify\r\n" \
     "it under the terms of the GNU General Public License as published by\r\n" \

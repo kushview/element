@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef EL_REVERB_NODE_NAME
-    #define EL_REVERB_NODE_NAME "eVerb"
+#define EL_REVERB_NODE_NAME "eVerb"
 #endif
 
 #include "nodes/baseprocessor.hpp"

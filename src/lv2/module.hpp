@@ -209,7 +209,7 @@ public:
     const void* getExtensionData (const String& uri) const;
 
     /** Same signature as LV2_Descriptor::extension_data. */
-    using DataFunction = const void* (*)(const char*);
+    using DataFunction = const void* (*) (const char*);
 
     /** Returns the function to be used by data-access. */
     DataFunction getDataFunction() const noexcept;
@@ -539,12 +539,6 @@ private:
     String bundlePath {};
     String binaryPath {};
     bool requireShow = false;
-
-    static const void* dataAccess (const char* uri)
-    {
-        ignoreUnused (uri);
-        return nullptr;
-    }
 
     static int hostResize (LV2UI_Feature_Handle handle, int width, int height)
     {

@@ -79,7 +79,7 @@ public:
 
     /** Change the XML file to check. Default is 'Updates.xml' */
     void setUpdatesFilename (const std::string& filename);
-    
+
     /** Launch the updater GUI if possible. */
     void launch();
 

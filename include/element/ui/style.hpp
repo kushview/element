@@ -34,7 +34,7 @@ struct Style {
 
         contentBackgroundColorId,
         widgetBackgroundColorId,
-        
+
         textColorId,
         textActiveColorId,
         textBoldColorId,

@@ -500,7 +500,7 @@ StandardContent::StandardContent (Context& ctl_)
         nav->expandPanelFully (gp, false);
     if (auto stp = nav->findPanel<SessionTreePanel>())
         nav->setPanelSize (stp, 200, false);
-    
+
     resized();
 
     setVirtualKeyboardVisible (false);
@@ -868,7 +868,7 @@ void StandardContent::restoreState (PropertiesFile* props)
 }
 
 void StandardContent::setCurrentNode (const Node& node)
-{    
+{
     // clang-format off
     if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || 
         getMainViewName() == EL_VIEW_SESSION_SETTINGS || 

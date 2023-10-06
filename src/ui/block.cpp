@@ -216,7 +216,8 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
 
     // setup a fallback alignment.
     String portAlignStr = "middle";
-    switch (getDisplayMode()) {
+    switch (getDisplayMode())
+    {
         case Normal:
         case Embed:
             portAlignStr = "before";
@@ -226,7 +227,7 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
             portAlignStr = vertical_ ? "before" : "middle";
             break;
     }
-    
+
     _portAlign = portAlignmentFromKey (blockData.getProperty (tags::portAlignment, portAlignStr));
     if (! blockData.hasProperty (tags::portAlignment))
         blockData.setProperty (tags::portAlignment, portAlignmentKey (_portAlign), nullptr);
@@ -954,7 +955,8 @@ void BlockComponent::resized()
     {
         int startX = box.getX() + 9;
         int startXOuts = startX;
-        switch (_portAlign) {
+        switch (_portAlign)
+        {
             case PortsBefore:
                 // noop
                 break;
@@ -966,7 +968,7 @@ void BlockComponent::resized()
                 startXOuts = box.getRight() - spaceNeededOuts - 9;
                 break;
         }
-        
+
         Rectangle<int> pri (startX, 0, getWidth(), pinSize);
         Rectangle<int> pro (startXOuts, getHeight() - pinSize, getWidth(), pinSize);
 

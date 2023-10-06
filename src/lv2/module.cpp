@@ -518,7 +518,8 @@ const void* LV2Module::getExtensionData (const String& uri) const
                     : nullptr;
 }
 
-LV2Module::DataFunction LV2Module::getDataFunction() const noexcept {
+LV2Module::DataFunction LV2Module::getDataFunction() const noexcept
+{
     if (! isLoaded())
         return nullptr;
     if (auto desc = lilv_instance_get_descriptor (instance))
@@ -588,6 +589,8 @@ void LV2Module::getPortRange (uint32 port, float& min, float& max, float& def) c
     min = priv->mins[port];
     max = priv->maxes[port];
     def = priv->defaults[port];
+    if (std::isnan (def))
+        def = min;
 }
 
 PortType LV2Module::getPortType (uint32 index) const

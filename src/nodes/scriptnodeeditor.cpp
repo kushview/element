@@ -208,7 +208,8 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> (
         // clang format-off
-        "ControlPort", sol::no_constructor,
+        "ControlPort",
+        sol::no_constructor,
 #if 0
         "value",        sol::overload (
             [](ScriptNodeControlPort& self) -> double {
@@ -228,12 +229,17 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
             }
         ),
 #endif
-        "get", [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
-        "set", [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
-        "min", [] (ScriptNodeControlPort& self) -> double { return self.getMin(); },
-        "max", [] (ScriptNodeControlPort& self) -> double { return self.getMax(); },
-        "changed", sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction)
-        // clang-format on    
+        "get",
+        [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
+        "set",
+        [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
+        "min",
+        [] (ScriptNodeControlPort& self) -> double { return self.getMin(); },
+        "max",
+        [] (ScriptNodeControlPort& self) -> double { return self.getMax(); },
+        "changed",
+        sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction)
+        // clang-format on
     );
     env["ScriptNodeEditor.ControlPort"] = M;
 
@@ -392,7 +398,8 @@ void ScriptNodeEditor::updatePreview()
                 const bool canResize = DSPUI.get_or ("resizable", false);
 
                 std::string factoryFn = "instantiate";
-                if (DSPUI[factoryFn].get_type() != sol::type::function) {
+                if (DSPUI[factoryFn].get_type() != sol::type::function)
+                {
                     factoryFn = "editor";
                 }
 
@@ -478,9 +485,12 @@ void ScriptNodeEditor::resized()
 
     if (comp != nullptr)
     {
-        if (resizable()) {
+        if (resizable())
+        {
             comp->setBounds (getLocalBounds());
-        } else {
+        }
+        else
+        {
             auto compY = showToolbar ? r2.getBottom() : 0;
             comp->setBounds (0, compY, comp->getWidth(), comp->getHeight());
         }

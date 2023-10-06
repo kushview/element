@@ -72,7 +72,6 @@ public:
             std::bind (&NodeChannelStripComponent::muteChanged, this));
         volumeDoubleClickedConnection = channelStrip.volumeLabelDoubleClicked.connect (
             std::bind (&NodeChannelStripComponent::setUnityGain, this));
-
     }
 
     void unbindSignals()

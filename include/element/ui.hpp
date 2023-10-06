@@ -139,7 +139,7 @@ public:
     RecentFiles& recentFiles();
 
     void saveSettings() override;
-    
+
 private:
     class UpdateManager;
     std::unique_ptr<UpdateManager> updates;

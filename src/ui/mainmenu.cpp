@@ -304,7 +304,6 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
     menu.addSeparator();
     menu.addItem (7001, TRANS ("Donate..."));
 #endif
-
 }
 
 void MainMenu::buildSessionMenu (Commands& cmd, PopupMenu& menu)

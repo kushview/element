@@ -5,11 +5,11 @@
 
 #include <element/juce/gui_basics.hpp>
 
-#define EL_GENERAL_SETTINGS_NAME "General"
-#define EL_AUDIO_SETTINGS_NAME "Audio"
-#define EL_MIDI_SETTINGS_NAME "MIDI"
-#define EL_OSC_SETTINGS_NAME "OSC"
-#define EL_PLUGINS_PREFERENCE_NAME "Plugins"
+#define EL_GENERAL_SETTINGS_NAME      "General"
+#define EL_AUDIO_SETTINGS_NAME        "Audio"
+#define EL_MIDI_SETTINGS_NAME         "MIDI"
+#define EL_OSC_SETTINGS_NAME          "OSC"
+#define EL_PLUGINS_PREFERENCE_NAME    "Plugins"
 #define EL_REPOSITORY_PREFERENCE_NAME "Updates"
 
 namespace element {
@@ -20,8 +20,7 @@ class SettingsPage;
 
 //==============================================================================
 /** The main preferences UI component. */
-class Preferences : public juce::Component
-{
+class Preferences : public juce::Component {
 public:
     Preferences (GuiService& ui);
     virtual ~Preferences();
@@ -64,4 +63,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Preferences)
 };
 
-}
+} // namespace element

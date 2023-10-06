@@ -71,8 +71,7 @@ void GraphEditorView::stabilizeContent()
                 std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
             auto& s = *cc->services().find<SessionService>();
             sessionLoadedConnection = s.sigSessionLoaded.connect (
-                std::bind(&GraphEditorView::onSessionLoaded, this)
-            );
+                std::bind (&GraphEditorView::onSessionLoaded, this));
         }
     }
 
@@ -132,9 +131,8 @@ void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
     updateSizeInternal (false);
 }
 
-void GraphEditorView::onSessionLoaded() 
+void GraphEditorView::onSessionLoaded()
 {
-
 }
 
 void GraphEditorView::onNodeSelected()

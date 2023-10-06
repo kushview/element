@@ -56,19 +56,21 @@ const LV2_Feature* WorkerFeature::getFeature() const { return &feat; }
 void WorkerFeature::processRequest (uint32_t size, const void* requestData)
 {
     jassert (worker != nullptr && plugin != nullptr);
-    worker->work (plugin, LV2Callbacks::workRespond, this, size, requestData);
+    if (worker && worker->work && plugin)
+        worker->work (plugin, LV2Callbacks::workRespond, this, size, requestData);
 }
 
 void WorkerFeature::processResponse (uint32_t size, const void* responseData)
 {
     jassert (worker != nullptr && worker->work_response != nullptr && plugin != nullptr);
-    worker->work_response (plugin, size, responseData);
+    if (worker && worker->end_run && plugin)
+        worker->work_response (plugin, size, responseData);
 }
 
 void WorkerFeature::endRun()
 {
     jassert (worker != nullptr && plugin != nullptr);
-    if (worker->end_run)
+    if (plugin && worker && worker->end_run)
         worker->end_run (plugin);
 }
 

@@ -30,7 +30,7 @@ GraphNodeEditor::GraphNodeEditor (const Node& n)
     setResizable (true);
     graph = std::make_unique<Graph> (*this);
     addAndMakeVisible (graph.get());
-    
+
     auto data = detail::stateData (getNode());
     auto r = Rectangle<int>::fromString (data.getProperty ("size", "").toString());
     if (r.isEmpty())

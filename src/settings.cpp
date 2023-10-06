@@ -166,8 +166,8 @@ void Settings::setScanForPluginsOnStartup (const bool shouldScan)
 bool Settings::showPluginWindowsWhenAdded() const
 {
     if (auto* p = getProps())
-        return p->getBoolValue (showPluginWindowsKey, true);
-    return true;
+        return p->getBoolValue (showPluginWindowsKey, false);
+    return false;
 }
 
 void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow)

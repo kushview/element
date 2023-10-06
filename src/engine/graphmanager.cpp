@@ -411,10 +411,11 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
         jassert (node.getIdentifier().toString().isNotEmpty());
         node.resetPorts();
 
-        if (node.isIONode()) {
+        if (node.isIONode())
+        {
             node.getBlockValueTree().setProperty (tags::displayMode, "compact", nullptr);
         }
-        
+
         PortArray pins, pouts;
         std::vector<PortType> toHide = {
             PortType::Control, PortType::CV, PortType::Atom, PortType::Video, PortType::Event
