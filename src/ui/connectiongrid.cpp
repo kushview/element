@@ -326,11 +326,13 @@ private:
         PluginsPopupMenu menu (this);
         if (graph.isRootGraph())
         {
+#if 0
             menu.addSectionHeader ("Graph I/O");
             menu.addItem (1, "Audio Inputs", true, graph.hasAudioInputNode());
             menu.addItem (2, "Audio Outputs", true, graph.hasAudioOutputNode());
             menu.addItem (3, "MIDI Input", true, graph.hasMidiInputNode());
             menu.addItem (4, "MIDI Output", true, graph.hasMidiOutputNode());
+#endif
         }
 
         menu.addSectionHeader ("Plugins");
