@@ -43,7 +43,7 @@ struct SimpleLevelMeter : public Component,
     {
         g.fillAll (Colours::black.withAlpha (0.2f));
         // (add a bit of a skew to make the level more obvious)
-        drawLevelMeter (g, getWidth(), getHeight(), (float) std::exp (std::log (level) / 3.0), true);
+        drawLevelMeter (g, getWidth(), getHeight(), (float) std::exp (std::log (level * 0.75) / 3.f), true);
     }
 
     void drawLevelMeter (Graphics& g, int width, int height, float level, bool vertical)
@@ -74,11 +74,11 @@ struct SimpleLevelMeter : public Component,
                 }
                 else if (i < totalBlocks - 1)
                 {
-                    g.setColour (Colours::orange.withAlpha (0.7f));
+                    g.setColour (Colours::green.withAlpha (0.7f));
                 }
                 else
                 {
-                    g.setColour (Colours::red.withAlpha (0.8f));
+                    g.setColour (Colours::orange.withAlpha (0.8f));
                 }
                 g.fillRoundedRectangle (corner,
                                         corner + (float) i2 * sz + sz * 0.1f,
