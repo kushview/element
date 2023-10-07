@@ -736,10 +736,10 @@ bool LV2Module::hasEditor() const
 #if JUCE_DEBUG
     for (const auto* const sui : supportedUIs)
     {
-        DBG ("[jlv2] supported ui: " << sui->URI);
-        DBG ("[jlv2]    container: " << sui->container);
-        DBG ("[jlv2]       widget: " << sui->widget);
-        DBG ("[jlv2]         show: " << (int) sui->useShowInterface);
+        DBG ("[element] lv2: supported ui: " << sui->URI);
+        DBG ("[element] lv2: container: " << sui->container);
+        DBG ("[element] lv2: widget: " << sui->widget);
+        DBG ("[element] lv2: show: " << (int) sui->useShowInterface);
     }
 #endif
 
