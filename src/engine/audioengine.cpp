@@ -148,15 +148,15 @@ struct RootGraphRender : public AsyncUpdater
                 {
                     MidiBuffer* tmpArray[] = { &midiTemp };
                     MidiPipe midiPipe (tmpArray, 1);
-
+                    AudioSampleBuffer emptyBuff;
                     const ScopedLock sl (graph->getPropertyLock());
                     if (graph->isSuspended())
                     {
-                        graph->renderBypassed (audioTemp, midiPipe);
+                        graph->renderBypassed (audioTemp, midiPipe, emptyBuff);
                     }
                     else
                     {
-                        graph->render (audioTemp, midiPipe);
+                        graph->render (audioTemp, midiPipe, emptyBuff);
                     }
                 }
 

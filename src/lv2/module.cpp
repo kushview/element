@@ -838,17 +838,29 @@ void LV2Module::timerCallback()
     }
 }
 
-void LV2Module::referAudioReplacing (AudioSampleBuffer& buffer)
+void LV2Module::referAudioReplacing (AudioSampleBuffer& audio, AudioSampleBuffer& cv)
 {
+    // Audio
     for (int c = 0; c < priv->channels.getNumAudioInputs(); ++c)
         priv->buffers.getUnchecked ((int) priv->channels.getPort (
                                         PortType::Audio, c, true))
-            ->referTo (buffer.getWritePointer (c));
+            ->referTo (audio.getWritePointer (c));
 
     for (int c = 0; c < priv->channels.getNumAudioOutputs(); ++c)
         priv->buffers.getUnchecked ((int) priv->channels.getPort (
                                         PortType::Audio, c, false))
-            ->referTo (buffer.getWritePointer (c));
+            ->referTo (audio.getWritePointer (c));
+
+    // CV
+    for (int c = 0; c < priv->channels.getNumCVInputs(); ++c)
+        priv->buffers.getUnchecked ((int) priv->channels.getPort (
+                                        PortType::CV, c, true))
+            ->referTo (cv.getWritePointer (c));
+
+    for (int c = 0; c < priv->channels.getNumCVOutputs(); ++c)
+        priv->buffers.getUnchecked ((int) priv->channels.getPort (
+                                        PortType::CV, c, false))
+            ->referTo (cv.getWritePointer (c));
 }
 
 void LV2Module::run (uint32 nframes)
@@ -866,6 +878,8 @@ void LV2Module::run (uint32 nframes)
         {
             events->advance (pesize, false);
             events->read (evbuf, ev.size, true);
+
+            // DBG ("[element] lv2: read bytes: " << (int) ev.size);
 
             if (ev.protocol == 0)
             {

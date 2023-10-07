@@ -206,6 +206,16 @@ bool GraphNode::canConnect (const uint32 sourceNode, const uint32 sourcePort, co
     if (! sourceType.canConnect (destType))
         return false;
 
+    // Graph Builder Only Understands single connections for these types.
+    if (destType == PortType::CV || destType == PortType::Control)
+    {
+        int numSources = 0;
+        for (const auto* c : connections)
+            if (c->destNode == destNode && c->destPort == destPort)
+                if (++numSources > 0)
+                    return false;
+    }
+
     return getConnectionBetween (sourceNode, sourcePort, destNode, destPort) == nullptr;
 }
 
@@ -386,7 +396,7 @@ void GraphNode::buildRenderingSequence()
 
     {
         //XXX:
-        MessageManagerLock mml;
+        //MessageManagerLock mml;
 
         Array<void*> orderedNodes;
 
@@ -507,7 +517,7 @@ void GraphNode::reset()
 
 // MARK: Process Graph
 
-void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
+void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi, AudioSampleBuffer&)
 {
     const int32 numSamples = buffer.getNumSamples();
     auto& midiMessages = *midi.getWriteBuffer (0);

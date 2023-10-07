@@ -83,7 +83,7 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
     }
 }
 
-void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     const auto nframes = audio.getNumSamples();
     if (nframes == 0)

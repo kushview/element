@@ -410,12 +410,12 @@ public:
 
     bool wantsMidiPipe() const override { return true; }
 
-    void renderBypassed (AudioSampleBuffer& a, MidiPipe& m) override
+    void renderBypassed (AudioSampleBuffer& a, MidiPipe& m, AudioSampleBuffer& cv) override
     {
-        Processor::renderBypassed (a, m);
+        Processor::renderBypassed (a, m, cv);
     }
 
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override
+    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer& cv) override
     {
         const auto numSamples = audio.getNumSamples();
 
@@ -441,7 +441,7 @@ public:
             }
         }
 
-        module->referAudioReplacing (audio);
+        module->referAudioReplacing (audio, cv);
         module->run ((uint32) numSamples);
 
         midi.clear();

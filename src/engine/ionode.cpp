@@ -93,7 +93,7 @@ void IONode::prepareToRender (double r, int b)
 
 void IONode::releaseResources() {}
 
-void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe)
+void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe, AudioSampleBuffer&)
 {
     jassert (graph != nullptr);
     // jassert (midiPipe.getNumBuffers() > 0);

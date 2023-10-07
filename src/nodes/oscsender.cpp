@@ -129,7 +129,7 @@ void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize)
     }
 };
 
-void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     const auto nframes = audio.getNumSamples();
     auto* const midiIn = midi.getWriteBuffer (0);

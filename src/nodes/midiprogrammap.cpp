@@ -35,7 +35,7 @@ void MidiProgramMapNode::prepareToRender (double sampleRate, int maxBufferSize)
 
 void MidiProgramMapNode::releaseResources() {}
 
-void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     ignoreUnused (audio, midi);
     if (midi.getNumBuffers() <= 0)

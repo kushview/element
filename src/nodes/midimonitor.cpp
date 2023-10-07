@@ -30,7 +30,7 @@ void MidiMonitorNode::releaseResources()
     stopTimer();
 }
 
-void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();

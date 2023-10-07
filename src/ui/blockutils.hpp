@@ -63,6 +63,10 @@ static inline void updateBlockButtonVisibility (BlockComponent& block, const Nod
     }
     else
     {
+        block.setMuteButtonVisible (true);
+        block.setConfigButtonVisible (true);
+        block.setPowerButtonVisible (true);
+
         if (node.isIONode() || node.isRootGraph() || detail::isMidiDevice (node))
         {
             block.setMuteButtonVisible (false);

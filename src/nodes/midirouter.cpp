@@ -82,7 +82,7 @@ MatrixState MidiRouterNode::getMatrixState() const
     return state;
 }
 
-void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     jassert (midi.getNumBuffers() >= numDestinations);
 

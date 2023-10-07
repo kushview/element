@@ -89,8 +89,8 @@ public:
     virtual void releaseResources() = 0;
 
     virtual bool wantsMidiPipe() const { return false; }
-    virtual void render (AudioSampleBuffer&, MidiPipe&) {}
-    virtual void renderBypassed (AudioSampleBuffer&, MidiPipe&);
+    virtual void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) {}
+    virtual void renderBypassed (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&);
 
     /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;

@@ -73,7 +73,7 @@ public:
     bool wantsMidiPipe() const override { return true; }
     void prepareToRender (double, int) override;
     void releaseResources() override;
-    void render (AudioSampleBuffer&, MidiPipe&) override;
+    void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) override;
     void getState (MemoryBlock&) override {}
     void setState (const void*, int sizeInBytes) override {}
 

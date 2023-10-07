@@ -21,7 +21,7 @@ public:
     void releaseResources() override {}
 
     inline bool wantsMidiPipe() const override { return true; }
-    void render (AudioSampleBuffer&, MidiPipe&) override;
+    void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) override;
     void getState (MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 

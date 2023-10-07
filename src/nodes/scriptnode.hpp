@@ -25,7 +25,7 @@ public:
     void getPluginDescription (PluginDescription& desc) const override;
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
+    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 

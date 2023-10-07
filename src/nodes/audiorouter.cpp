@@ -148,23 +148,9 @@ MatrixState AudioRouterNode::getMatrixState() const
     return state;
 }
 
-void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     jassert (midi.getNumBuffers() == 1);
-    const auto& midiBuffer = *midi.getReadBuffer (0);
-
-    MidiMessage msg;
-    for (auto m : midiBuffer)
-    {
-        msg = m.getMessage();
-        if (! msg.isProgramChange())
-            continue;
-        if (3 == msg.getProgramChangeNumber())
-        {
-            DBG ("program ");
-        }
-    }
-
     const int numFrames = audio.getNumSamples();
     const int numChannels = audio.getNumChannels();
 

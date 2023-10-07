@@ -43,7 +43,7 @@ static void testMidiStream (ProcessorPtr node, const String& name = "Renders map
     channels.add (0);
 
     MidiPipe pipe (buffers, channels);
-    AudioSampleBuffer audio;
+    AudioSampleBuffer audio, cv;
     audio.setSize (2, 1024, false, true, false);
 
     auto* midi = pipe.getWriteBuffer (0);
@@ -51,7 +51,7 @@ static void testMidiStream (ProcessorPtr node, const String& name = "Renders map
     midi->addEvent (MidiMessage::programChange (1, 5), 200);
     midi->addEvent (MidiMessage::noteOn (1, 12, static_cast<uint8> (50)), 300);
     midi->addEvent (MidiMessage::noteOff (1, 12), 300);
-    node->render (audio, pipe);
+    node->render (audio, pipe, cv);
 
     int index = 0;
     for (auto m : *midi) {

@@ -21,6 +21,7 @@ PortBuffer::PortBuffer (bool inputPort, uint32 portType, uint32 dataType, uint32
       input (inputPort)
 {
     data.reset (new uint8[capacity]);
+    memset (data.get(), 0, capacity);
 
     if (type == PortType::Atom)
     {
@@ -37,10 +38,12 @@ PortBuffer::PortBuffer (bool inputPort, uint32 portType, uint32 dataType, uint32
     else if (type == PortType::Control)
     {
         buffer.control = (float*) data.get();
+        (*buffer.control) = 0.f;
     }
     else if (type == PortType::CV)
     {
         buffer.cv = (float*) data.get();
+        (*buffer.cv) = 0.f;
     }
     else
     {

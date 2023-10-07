@@ -617,7 +617,7 @@ void Processor::setMidiProgramsState (const String& state)
 }
 
 //=============================================================================
-void Processor::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
+void Processor::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     audio.clear (0, audio.getNumSamples());
     midi.clear();

@@ -41,7 +41,7 @@ inline static Display* xDisplay()
 bool getNativeWinodwSize (void* win, int& width, int& height)
 {
     ::Window window = (::Window) win;
-    ::Window root = 0;
+
     juce::XWindowSystemUtilities::ScopedXLock xLock;
     auto X11 = juce::X11Symbols::getInstance();
     XWindowAttributes atts;

@@ -54,10 +54,20 @@ public:
         type = o.type;
     }
 
+    using VectorType = std::vector<PortType>;
     /** Returns all types*/
-    inline static std::vector<PortType> all() noexcept
+    inline static const auto& all() noexcept
     {
-        return { Control, Audio, CV, Atom, Event, Midi, Video };
+        static VectorType _types = {
+            Control,
+            Audio,
+            CV,
+            Atom,
+            Event,
+            Midi,
+            Video
+        };
+        return _types;
     }
 
     /** Get a URI string for this port type */

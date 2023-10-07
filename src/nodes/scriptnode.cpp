@@ -143,7 +143,7 @@ void ScriptNode::releaseResources()
     script->release();
 }
 
-void ScriptNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void ScriptNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
 {
     ScopedLock sl (lock);
     script->process (audio, midi);

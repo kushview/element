@@ -47,7 +47,7 @@ public:
     /** MIDI */
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
+    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override;
     void releaseResources() override {};
 
     void refreshPorts() override;

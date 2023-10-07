@@ -23,7 +23,7 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
     void releaseResources() override {}
 
-    inline void render (AudioSampleBuffer& audio, MidiPipe& midi) override
+    inline void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override
     {
         if (midi.getNumBuffers() < 16)
         {

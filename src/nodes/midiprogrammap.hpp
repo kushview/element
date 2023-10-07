@@ -45,7 +45,7 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
 
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
+    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override;
     void sendProgramChange (int program, int channel);
     int getNumProgramEntries() const;
     void addProgramEntry (const String& name, int programIn, int programOut = -1);

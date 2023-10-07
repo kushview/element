@@ -254,14 +254,18 @@ public:
       */
     void connectPort (uint32 port, void* data);
 
-    /** Connect a channel to a data Location (realtime) 
+    /** Connect a channel to a data Location (realtime).
         This simply converts the channel number to a port index then 
         calls LV2Module::connectPort
       */
     void connectChannel (const PortType type, const int32 channel, void* data, const bool isInput);
 
-    /** Connect an audio buffer setup for in place processing (realtime) */
-    void referAudioReplacing (AudioSampleBuffer&);
+    /** Connect an audio buffer setup for in place processing (realtime)
+        
+        @param audio The buffer to use for audio ports.
+        @param cv The buffer to use for CV ports.
+    */
+    void referAudioReplacing (AudioSampleBuffer& audio, AudioSampleBuffer& cv);
 
     /** Returns a port buffer for port index (realtime) */
     PortBuffer* getPortBuffer (uint32) const;

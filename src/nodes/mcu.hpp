@@ -56,7 +56,7 @@ public:
     void releaseResources() override {}
 
     inline bool wantsMidiPipe() const override { return true; }
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override
+    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override
     {
         auto buf = midi.getWriteBuffer (0);
         for (const auto msg : *buf)
