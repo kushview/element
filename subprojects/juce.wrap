@@ -1,5 +1,5 @@
 [wrap-git]
-url = https://gitlab.com/kushview/juce.git/
+url = https://gitlab.com/kushview/juce.git
 push-url = git@gitlab.com:kushview/juce.git
 revision = main
 
