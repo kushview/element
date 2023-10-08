@@ -776,8 +776,8 @@ public:
                     if (getNativeWinodwSize (ui->getWidget(), w, h))
                         if (w != getWidth() || h != getHeight())
                             setSize (w, h);
-            }
 #endif
+            }
         }
         else
         {
