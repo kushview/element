@@ -65,4 +65,3 @@ meson compile -C build
 
 After this, you should have `build/element.exe`.  If it complains about missing boost
 and vstsdk paths, copy the `msvc.ini`, edit the paths, then use it in `meson setup`.
-
