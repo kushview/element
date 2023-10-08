@@ -508,11 +508,11 @@ public:
     /** Returns true if the plugin provided LV2_UI__idleInterface */
     bool haveIdleInterface() const { return nullptr != uiIdle && nullptr != instance; }
 
-    void idle()
+    int idle()
     {
         if (! haveIdleInterface())
-            return;
-        uiIdle->idle ((LV2UI_Handle) suil_instance_get_handle (instance));
+            return -1;
+        return uiIdle->idle ((LV2UI_Handle) suil_instance_get_handle (instance));
     }
 
     void setParent (intptr_t ptr)

@@ -732,14 +732,17 @@ public:
         setResizable (ui->haveClientResize());
 
         if (ui->haveClientResize())
-            ui->onClientResize = [this]() -> int { return 0; };
+            ui->onClientResize = []() -> int { return 0; };
+
+        nativeViewSetup = true;
     }
 
     ~LV2NativeEditor()
     {
-        view->prepareForDestruction();
-
+        nativeViewSetup = false;
         stopTimer();
+
+        view->prepareForDestruction();
 
         if (ui != nullptr)
         {
@@ -756,30 +759,29 @@ public:
 
     void timerCallback() override
     {
-        if (! ui || ! ui->isNative())
+        if (! nativeViewSetup || ! ui || ! ui->isNative())
             return stopTimer();
 
-        if (! nativeViewSetup)
+        if (ui->haveIdleInterface())
         {
-            if (ui->loaded())
+            if (ui->idle() != 0)
             {
-                int w = 0, h = 0;
-                nativeViewSetup = true;
-            }
-        }
-        if (nativeViewSetup)
-        {
-            if (ui->haveIdleInterface()) {
-                ui->idle();
-            #if JUCE_WINDOWS
-                int w = 0, h = 0;
-                if (getNativeWinodwSize (ui->getWidget(), w, h))
-                    if (w != getWidth() || h != getHeight())
-                        setSize (w, h);
-            #endif
+                stopTimer();
             }
             else
-                stopTimer();
+            {
+#if JUCE_WINDOWS || JUCE_MAC
+                int w = 0, h = 0;
+                if (ui != nullptr)
+                    if (getNativeWinodwSize (ui->getWidget(), w, h))
+                        if (w != getWidth() || h != getHeight())
+                            setSize (w, h);
+            }
+#endif
+        }
+        else
+        {
+            stopTimer();
         }
     }
 
@@ -873,60 +875,60 @@ private:
 
 #elif JUCE_MAC
 
-    struct ViewComponent : public NSViewComponentWithParent
-    {
-        explicit ViewComponent (PhysicalResizeListener&)
-            : NSViewComponentWithParent (WantsNudge::no) {}
-        LV2UI_Widget getWidget() { return getView(); }
-        void forceViewToSize() {}
-        void fitToView() { resizeToFitView(); }
-        void prepareForDestruction() {}
-    };
-#elif JUCE_WINDOWS
-    struct ViewComponent : public HWNDComponent
-    {
-        explicit ViewComponent (PhysicalResizeListener&)
+        struct ViewComponent : public NSViewComponentWithParent
         {
-            setOpaque (true);
-            inner.addToDesktop (0);
-
-            if (auto* peer = inner.getPeer())
-            {
-                setHWND (peer->getNativeHandle());
-            }
-        }
-
-        ~ViewComponent() {
-            
-        }
-
-        void paint (Graphics& g) override { g.fillAll (Colours::black); }
-
-        LV2UI_Widget getWidget() { return getHWND(); }
-
-        void forceViewToSize() { updateHWNDBounds(); }
-        void fitToView() { resizeToFit(); }
-
-        void prepareForDestruction() {}
-
-    private:
-        struct Inner : public Component
-        {
-            Inner() { setOpaque (true); }
-            void paint (Graphics& g) override { g.fillAll (Colours::black); }
+            explicit ViewComponent (PhysicalResizeListener&)
+                : NSViewComponentWithParent (WantsNudge::no) {}
+            LV2UI_Widget getWidget() { return getView(); }
+            void forceViewToSize() {}
+            void fitToView() { resizeToFitView(); }
+            void prepareForDestruction() {}
         };
+#elif JUCE_WINDOWS
+        struct ViewComponent : public HWNDComponent
+        {
+            explicit ViewComponent (PhysicalResizeListener&)
+            {
+                setOpaque (true);
+                inner.addToDesktop (0);
 
-        Inner inner;
-    };
+                if (auto* peer = inner.getPeer())
+                {
+                    setHWND (peer->getNativeHandle());
+                }
+            }
+
+            ~ViewComponent()
+            {
+            }
+
+            void paint (Graphics& g) override { g.fillAll (Colours::black); }
+
+            LV2UI_Widget getWidget() { return getHWND(); }
+
+            void forceViewToSize() { updateHWNDBounds(); }
+            void fitToView() { resizeToFit(); }
+
+            void prepareForDestruction() {}
+
+        private:
+            struct Inner : public Component
+            {
+                Inner() { setOpaque (true); }
+                void paint (Graphics& g) override { g.fillAll (Colours::black); }
+            };
+
+            Inner inner;
+        };
 #else
-    struct ViewComponent : public Component
-    {
-        explicit ViewComponent (PhysicalResizeListener&) {}
-        void* getWidget() { return nullptr; }
-        void forceViewToSize() {}
-        void fitToView() {}
-        void prepareForDestruction() {}
-    };
+        struct ViewComponent : public Component
+        {
+            explicit ViewComponent (PhysicalResizeListener&) {}
+            void* getWidget() { return nullptr; }
+            void forceViewToSize() {}
+            void fitToView() {}
+            void prepareForDestruction() {}
+        };
 #endif
 
     std::unique_ptr<ViewComponent> view;
