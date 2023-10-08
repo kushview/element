@@ -415,7 +415,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         PluginsPopupMenu menu (this);
         if (graph.isGraph())
         {
-#if 0
+#if 1
             menu.addSectionHeader ("Graph I/O");
             menu.addItem (1, "Audio Inputs", true, graph.hasAudioInputNode());
             menu.addItem (2, "Audio Outputs", true, graph.hasAudioOutputNode());
