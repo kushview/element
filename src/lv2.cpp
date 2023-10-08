@@ -769,8 +769,15 @@ public:
         }
         if (nativeViewSetup)
         {
-            if (ui->haveIdleInterface())
+            if (ui->haveIdleInterface()) {
                 ui->idle();
+            #if JUCE_WINDOWS
+                int w = 0, h = 0;
+                if (getNativeWinodwSize (ui->getWidget(), w, h))
+                    if (w != getWidth() || h != getHeight())
+                        setSize (w, h);
+            #endif
+            }
             else
                 stopTimer();
         }
@@ -884,13 +891,16 @@ private:
             inner.addToDesktop (0);
 
             if (auto* peer = inner.getPeer())
+            {
                 setHWND (peer->getNativeHandle());
+            }
+        }
+
+        ~ViewComponent() {
+            
         }
 
         void paint (Graphics& g) override { g.fillAll (Colours::black); }
-
-        int getInnerWidth() { return inner.getWidth(); }
-        int getInnerHeight() { return inner.getHeight(); }
 
         LV2UI_Widget getWidget() { return getHWND(); }
 
