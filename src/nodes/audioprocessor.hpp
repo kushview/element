@@ -19,8 +19,10 @@ public:
 
     /** Returns the processor as an AudioProcessor */
     AudioProcessor* getAudioProcessor() const noexcept override { return proc.get(); }
+
     void setPlayHead (AudioPlayHead* playhead) override
     {
+        Processor::setPlayHead (playhead);
         if (auto* p = proc.get())
             p->setPlayHead (playhead);
     }

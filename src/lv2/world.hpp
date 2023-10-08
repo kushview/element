@@ -36,7 +36,10 @@ public:
     const LilvNode* lv2_ControlPort;
     const LilvNode* lv2_EventPort;
     const LilvNode* lv2_CVPort;
+
+    const LilvNode* lv2_control;
     const LilvNode* lv2_enumeration;
+
     const LilvNode* midi_MidiEvent;
     const LilvNode* work_schedule;
     const LilvNode* work_interface;
@@ -121,6 +124,8 @@ public:
 
     /** Unmap a URID */
     String unmap (uint32 urid) { return symbolMap.unmap (urid); }
+
+    lvtk::Symbols& symbols() noexcept { return symbolMap; }
 
 private:
     LilvWorld* world = nullptr;

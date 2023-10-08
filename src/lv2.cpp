@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <lv2/midi/midi.h>
+#include <lv2/time/time.h>
 
 #include <lvtk/lvtk.hpp>
 #include <lvtk/symbols.hpp>
@@ -43,6 +44,38 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
 #endif
 
 namespace element {
+
+template <typename Constructor>
+struct ScopedFrame
+{
+    template <typename... Args>
+    explicit ScopedFrame (LV2_Atom_Forge* f, Args&&... args)
+        : forge (f)
+    {
+        Constructor::construct (forge, &frame, std::forward<Args> (args)...);
+    }
+
+    ~ScopedFrame() { lv2_atom_forge_pop (forge, &frame); }
+
+    LV2_Atom_Forge_Frame frame;
+    LV2_Atom_Forge* forge = nullptr;
+
+    JUCE_DECLARE_NON_COPYABLE (ScopedFrame)
+    JUCE_DECLARE_NON_MOVEABLE (ScopedFrame)
+    JUCE_LEAK_DETECTOR (ScopedFrame)
+};
+
+struct SequenceTraits
+{
+    static constexpr auto construct = lv2_atom_forge_sequence_head;
+};
+struct ObjectTraits
+{
+    static constexpr auto construct = lv2_atom_forge_object;
+};
+
+using SequenceFrame = ScopedFrame<SequenceTraits>;
+using ObjectFrame = ScopedFrame<ObjectTraits>;
 
 template <typename Other, typename Word>
 static auto wordCast (Word word)
@@ -266,13 +299,15 @@ public:
           initialised (false),
           isPowerOn (false),
           tempBuffer (1, 1),
-          module (module_)
+          module (module_),
+          urids (world.symbols())
     {
-        atomSequence = module->map (LV2_ATOM__Sequence);
-        midiEvent = module->map (LV2_MIDI__MidiEvent);
         numPorts = module->getNumPorts();
         midiPort = module->getMidiPort();
         notifyPort = module->getNotifyPort();
+
+        forge.init ((LV2_URID_Map*) world.symbols().map_feature()->data);
+
         wantsMidiMessages = midiPort != EL_INVALID_PORT;
         sendsMidiMessages = notifyPort != EL_INVALID_PORT;
 
@@ -410,6 +445,69 @@ public:
 
     bool wantsMidiPipe() const override { return true; }
 
+    void writeTimeInfoToPort (PortBuffer& port)
+    {
+        if (! port.isInput())
+            return;
+
+        auto* playhead = getPlayHead();
+        if (playhead == nullptr)
+        {
+            return;
+        }
+
+        // Write timing info to the control port
+        const auto info = playhead->getPosition();
+        if (! info.hasValue())
+            return;
+
+        forge.write_frame_time (0);
+
+        ObjectFrame object { &forge, (uint32_t) 0, urids.time_Position };
+
+        forge.write_key (urids.time_speed);
+        forge.write_float (info->getIsPlaying() ? 1.0f : 0.0f);
+
+        if (const auto samples = info->getTimeInSamples())
+        {
+            lv2_atom_forge_key (&forge, urids.time_frame);
+            lv2_atom_forge_long (&forge, *samples);
+        }
+
+        if (const auto bar = info->getBarCount())
+        {
+            lv2_atom_forge_key (&forge, urids.time_bar);
+            lv2_atom_forge_long (&forge, *bar);
+        }
+
+        if (const auto beat = info->getPpqPosition())
+        {
+            if (const auto barStart = info->getPpqPositionOfLastBarStart())
+            {
+                lv2_atom_forge_key (&forge, urids.time_barBeat);
+                lv2_atom_forge_float (&forge, (float) (*beat - *barStart));
+            }
+
+            lv2_atom_forge_key (&forge, urids.time_beat);
+            lv2_atom_forge_double (&forge, *beat);
+        }
+
+        if (const auto sig = info->getTimeSignature())
+        {
+            lv2_atom_forge_key (&forge, urids.time_beatUnit);
+            lv2_atom_forge_int (&forge, sig->denominator);
+
+            lv2_atom_forge_key (&forge, urids.time_beatsPerBar);
+            lv2_atom_forge_float (&forge, (float) sig->numerator);
+        }
+
+        if (const auto bpm = info->getBpm())
+        {
+            lv2_atom_forge_key (&forge, urids.time_beatsPerMinute);
+            lv2_atom_forge_float (&forge, (float) *bpm);
+        }
+    }
+
     void renderBypassed (AudioSampleBuffer& a, MidiPipe& m, AudioSampleBuffer& cv) override
     {
         Processor::renderBypassed (a, m, cv);
@@ -431,12 +529,15 @@ public:
         {
             PortBuffer* const buf = module->getPortBuffer (midiPort);
             buf->reset();
+            forge.set_buffer ((uint8_t*) buf->getPortData(), buf->getCapacity());
+            SequenceFrame frame { &forge, 0 };
+            writeTimeInfoToPort (*buf);
 
             for (auto m : *midi.getReadBuffer (0))
             {
                 buf->addEvent (m.samplePosition,
                                static_cast<uint32_t> (m.numBytes),
-                               midiEvent,
+                               urids.midi_MidiEvent,
                                m.data);
             }
         }
@@ -452,7 +553,7 @@ public:
 
             LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) buf->getPortData(), ev)
             {
-                if (ev->body.type == midiEvent)
+                if (ev->body.type == urids.midi_MidiEvent)
                 {
                     midi.getWriteBuffer (0)->addEvent (
                         LV2_ATOM_BODY_CONST (&ev->body),
@@ -505,13 +606,46 @@ private:
     OwnedArray<PortBuffer> buffers;
 
     uint32 numPorts { 0 };
+    uint32 timePort { EL_INVALID_PORT };
     uint32 midiPort { EL_INVALID_PORT };
     uint32 notifyPort { EL_INVALID_PORT };
-    uint32 atomSequence { 0 },
-        midiEvent { 0 };
 
     int totalAudioIn { 0 },
         totalAudioOut { 0 };
+
+    struct URIDs
+    {
+        URIDs (lvtk::Symbols& sym)
+            : atom_Sequence (sym.map (LV2_ATOM__Sequence)),
+              midi_MidiEvent (sym.map (LV2_MIDI__MidiEvent)),
+              time_Position (sym.map (LV2_TIME__Position)),
+              time_speed (sym.map (LV2_TIME__speed)),
+              time_frame (sym.map (LV2_TIME__frame)),
+              time_bar (sym.map (LV2_TIME__bar)),
+              time_barBeat (sym.map (LV2_TIME__barBeat)),
+              time_beat (sym.map (LV2_TIME__beat)),
+              time_beatUnit (sym.map (LV2_TIME__beatUnit)),
+              time_beatsPerBar (sym.map (LV2_TIME__beatsPerBar)),
+              time_beatsPerMinute (sym.map (LV2_TIME__beatsPerMinute))
+        {
+        }
+
+        const LV2_URID
+            atom_Sequence,
+            midi_MidiEvent,
+            time_Position,
+            time_speed,
+            time_frame,
+            time_bar,
+            time_barBeat,
+            time_beat,
+            time_beatUnit,
+            time_beatsPerBar,
+            time_beatsPerMinute;
+    };
+
+    const URIDs urids;
+    lvtk::Forge forge;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LV2Processor)
 };
@@ -575,9 +709,9 @@ public:
 
         view = std::make_unique<ViewComponent> (*this);
         addAndMakeVisible (view.get());
-
         ui->setParent ((intptr_t) view->getWidget());
         ui->instantiate();
+
         p->getModule().sendPortEvents();
 
         nativeViewSetup = false;
@@ -597,9 +731,8 @@ public:
 
         setResizable (ui->haveClientResize());
 
-        ui->onClientResize = [this]() -> int {
-            return 0;
-        };
+        if (ui->haveClientResize())
+            ui->onClientResize = [this]() -> int { return 0; };
     }
 
     ~LV2NativeEditor()
@@ -680,10 +813,12 @@ private:
     };
 
     struct ViewComponent : public InnerHolder,
-                           public XEmbedComponent
+                           public XEmbedComponent,
+                           public ComponentMovementWatcher
     {
         explicit ViewComponent (PhysicalResizeListener& l)
             : XEmbedComponent ((unsigned long) inner.getPeer()->getNativeHandle(), true, false),
+              ComponentMovementWatcher (&inner),
               listener (inner, l)
         {
             setOpaque (true);
@@ -691,6 +826,7 @@ private:
 
         ~ViewComponent()
         {
+            prepareForDestruction();
             removeClient();
         }
 
@@ -712,8 +848,22 @@ private:
             g.fillAll (Colours::black);
         }
 
+        //==============================================================================
+        void componentMovedOrResized (bool wasMoved, bool wasResized) override
+        {
+            if (wasResized)
+            {
+                if (auto pc = findParentComponentOfClass<LV2NativeEditor>())
+                    pc->setSize (inner.getWidth(), inner.getHeight());
+            }
+        }
+
+        void componentPeerChanged() override {}
+        void componentVisibilityChanged() override {};
+
         ViewSizeListener listener;
     };
+
 #elif JUCE_MAC
 
     struct ViewComponent : public NSViewComponentWithParent

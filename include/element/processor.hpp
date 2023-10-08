@@ -82,7 +82,8 @@ public:
     AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
 
     /** Set the audio play head */
-    virtual void setPlayHead (AudioPlayHead*) {}
+    virtual void setPlayHead (AudioPlayHead* playhead) { _playhead = playhead; }
+    AudioPlayHead* getPlayHead() const noexcept { return _playhead; }
 
     //==========================================================================
     virtual void prepareToRender (double sampleRate, int maxBufferSize) = 0;
@@ -509,6 +510,8 @@ private:
 
     double delayCompMillis = 0.0;
     int delayCompSamples = 0;
+
+    juce::AudioPlayHead* _playhead { nullptr };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Processor)
 };

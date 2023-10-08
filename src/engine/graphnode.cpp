@@ -206,8 +206,12 @@ bool GraphNode::canConnect (const uint32 sourceNode, const uint32 sourcePort, co
     if (! sourceType.canConnect (destType))
         return false;
 
-    // Graph Builder Only Understands single connections for these types.
-    if (destType == PortType::CV || destType == PortType::Control)
+    // Graph Builder on understands one-to-one for these configs.
+    // - Any to Control
+    // - Control to CV
+    // clang-format off
+    if (destType == PortType::Control || 
+        (sourceType == PortType::Control && destType == PortType::CV))
     {
         int numSources = 0;
         for (const auto* c : connections)
@@ -215,6 +219,7 @@ bool GraphNode::canConnect (const uint32 sourceNode, const uint32 sourcePort, co
                 if (++numSources > 0)
                     return false;
     }
+    // clang-format on
 
     return getConnectionBetween (sourceNode, sourcePort, destNode, destPort) == nullptr;
 }
@@ -586,7 +591,8 @@ void GraphNode::getPluginDescription (PluginDescription& d) const
 
 void GraphNode::setPlayHead (AudioPlayHead* newPlayHead)
 {
-    playhead = newPlayHead;
+    Processor::setPlayHead (newPlayHead);
+    playhead = getPlayHead();
     for (auto* const node : nodes)
         node->setPlayHead (playhead);
 }

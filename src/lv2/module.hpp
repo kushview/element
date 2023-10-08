@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lv2/ui/ui.h>
+#include <lv2/parameters/parameters.h>
 
 #include <lilv/lilv.h>
 #include <suil/suil.h>
@@ -12,6 +13,7 @@
 #include <lvtk/ext/extension.hpp>
 #include <lvtk/ext/data_access.hpp>
 #include <lvtk/ext/instance_access.hpp>
+#include <lvtk/options.hpp>
 
 #include <element/juce/core.hpp>
 #include <element/porttype.hpp>
@@ -198,6 +200,9 @@ public:
         @note This will re-instantiate the plugin
      */
     void setSampleRate (double newSampleRate);
+
+    /** Returns the last known sample rate. */
+    double getSampleRate() const noexcept { return currentSampleRate; }
 
     //=========================================================================
 
@@ -427,11 +432,31 @@ public:
         dataFeature.data = &dataFeatureData;
         features.add (&dataFeature);
 
+        // options
+        lvtk::OptionArray opts;
+        const float sampleRate = (float) module.getSampleRate();
+        opts.add (LV2_OPTIONS_INSTANCE,
+                  0,
+                  module.map (LV2_PARAMETERS__sampleRate),
+                  module.map (LV2_ATOM__Float),
+                  sizeof (float),
+                  &sampleRate);
+
+        LV2_Feature optsFeature { LV2_OPTIONS__options, (void*) opts.get() };
+        features.add (&optsFeature);
+
         // terminate the array
         features.add (nullptr);
 
-        instance = suil_instance_new (
-            world.getSuilHost(), this, containerType.toRawUTF8(), plugin.toRawUTF8(), ui.toRawUTF8(), widgetType.toRawUTF8(), bundlePath.toRawUTF8(), binaryPath.toRawUTF8(), features.getRawDataPointer());
+        instance = suil_instance_new (world.getSuilHost(),
+                                      this,
+                                      containerType.toRawUTF8(),
+                                      plugin.toRawUTF8(),
+                                      ui.toRawUTF8(),
+                                      widgetType.toRawUTF8(),
+                                      bundlePath.toRawUTF8(),
+                                      binaryPath.toRawUTF8(),
+                                      features.getRawDataPointer());
 
         // Nullify all UI extensions
         uiResize = nullptr;
@@ -452,6 +477,11 @@ public:
         // Show Interface
         if (const auto* showData = suil_instance_extension_data (instance, LV2_UI__showInterface))
             uiShow = (LV2UI_Show_Interface*) showData;
+
+        if (const auto* opts = suil_instance_extension_data (instance, LV2_OPTIONS__interface))
+        {
+            lvtk::ignore (opts);
+        }
     }
 
     bool haveShowInterface() const
@@ -490,7 +520,7 @@ public:
         parent.data = (void*) ptr;
     }
 
-    /** returs true if the UI provided LV2_UI__resize */
+    /** returns true if the UI provided LV2_UI__resize */
     bool haveClientResize() const
     {
         return uiResize != nullptr && uiResize->handle != nullptr && uiResize->ui_resize != nullptr;

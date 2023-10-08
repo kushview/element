@@ -131,7 +131,10 @@ World::World()
     lv2_ControlPort = lilv_new_uri (world, LV2_CORE__ControlPort);
     lv2_EventPort = lilv_new_uri (world, LV2_EVENT__EventPort);
     lv2_CVPort = lilv_new_uri (world, LV2_CORE__CVPort);
+
+    lv2_control = lilv_new_uri (world, LV2_CORE__control);
     lv2_enumeration = lilv_new_uri (world, LV2_CORE__enumeration);
+
     midi_MidiEvent = lilv_new_uri (world, LV2_MIDI__MidiEvent);
     work_schedule = lilv_new_uri (world, LV2_WORKER__schedule);
     work_interface = lilv_new_uri (world, LV2_WORKER__interface);

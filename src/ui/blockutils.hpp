@@ -31,6 +31,12 @@ static inline bool supportsEmbed (const Node& node)
 {
     if (node.isIONode() || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER))
         return false;
+    
+#if JUCE_LINUX
+    if (node.getFormat() == "LV2")
+        return false;
+#endif
+
     // Allow embedding at first to expose problems.
     return true;
 }

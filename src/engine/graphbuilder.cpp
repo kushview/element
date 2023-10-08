@@ -742,7 +742,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                     reusableInputIndex = i;
                     bufIndex = sourceBufIndex;
 
-                    if (portType == PortType::Audio)
+                    if (portType == PortType::Audio || portType == PortType::CV)
                     {
                         const int nodeDelay = getNodeDelay (sourceNodes.getUnchecked (i));
                         if (nodeDelay < maxLatency)
@@ -765,14 +765,14 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 if (srcIndex < 0)
                 {
                     // if not found, this is probably a feedback loop
-                    if (portType == PortType::Audio)
+                    if (portType == PortType::Audio || portType == PortType::CV)
                         renderingOps.add (new ClearChannelOp (bufIndex));
                     else if (portType == PortType::Midi)
                         renderingOps.add (new ClearMidiBufferOp (bufIndex));
                 }
                 else
                 {
-                    if (portType == PortType::Audio)
+                    if (portType == PortType::Audio || portType == PortType::CV)
                         renderingOps.add (new CopyChannelOp (srcIndex, bufIndex));
                     else if (portType == PortType::Midi)
                         renderingOps.add (new CopyMidiBufferOp (srcIndex, bufIndex));
@@ -795,7 +795,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                     int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j));
                     if (srcIndex >= 0)
                     {
-                        if (portType == PortType::Audio)
+                        if (portType == PortType::Audio || portType == PortType::CV)
                         {
                             const int nodeDelay = getNodeDelay (sourceNodes.getUnchecked (j));
 

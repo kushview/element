@@ -483,6 +483,10 @@ void LV2Module::setSampleRate (double newSampleRate)
         if (wasActive)
             activate();
     }
+    else
+    {
+        currentSampleRate = newSampleRate;
+    }
 }
 
 void LV2Module::connectChannel (const PortType type, const int32 channel, void* data, const bool isInput)
@@ -549,11 +553,16 @@ const PortList& LV2Module::ports() const noexcept { return priv->ports; }
 
 uint32 LV2Module::getMidiPort() const
 {
+    // lilv_plugin_get_port_by_designation ()
     for (uint32 i = 0; i < getNumPorts(); ++i)
     {
+        // clang-format off
         const LilvPort* port (getPort (i));
-        if ((lilv_port_is_a (plugin, port, world.lv2_AtomPort) || lilv_port_is_a (plugin, port, world.lv2_EventPort)) && lilv_port_is_a (plugin, port, world.lv2_InputPort) && lilv_port_supports_event (plugin, port, world.midi_MidiEvent))
+        if ((lilv_port_is_a (plugin, port, world.lv2_AtomPort) || lilv_port_is_a (plugin, port, world.lv2_EventPort)) && 
+            lilv_port_is_a (plugin, port, world.lv2_InputPort) && 
+            lilv_port_supports_event (plugin, port, world.midi_MidiEvent))
             return i;
+        // clang-format on
     }
 
     return EL_INVALID_PORT;
@@ -563,14 +572,18 @@ uint32 LV2Module::getNotifyPort() const
 {
     for (uint32 i = 0; i < numPorts; ++i)
     {
+        // clang-format off
         const LilvPort* port (getPort (i));
-        if (lilv_port_is_a (plugin, port, world.lv2_AtomPort) && lilv_port_is_a (plugin, port, world.lv2_OutputPort) && lilv_port_supports_event (plugin, port, world.midi_MidiEvent))
+        if (lilv_port_is_a (plugin, port, world.lv2_AtomPort) && 
+            lilv_port_is_a (plugin, port, world.lv2_OutputPort) && 
+            lilv_port_supports_event (plugin, port, world.midi_MidiEvent))
         {
             return i;
         }
+        // clang-format on
     }
 
-    return LV2UI_INVALID_PORT_INDEX;
+    return EL_INVALID_PORT;
 }
 
 const LilvPlugin* LV2Module::getPlugin() const { return plugin; }
