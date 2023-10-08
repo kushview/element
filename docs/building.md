@@ -23,7 +23,7 @@ meson subprojects update --reset
 
 __Installing__
 ```
-sudo meson install -C builddir
+sudo meson install -C build
 sudo ldconfig
 ```
 
