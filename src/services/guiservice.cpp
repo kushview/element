@@ -26,6 +26,10 @@
 
 #include "ui/capslock.hpp"
 
+#ifndef EL_USE_SYSTEM_TRAY
+#define EL_USE_SYSTEM_TRAY 1
+#endif
+
 namespace element {
 
 //=============================================================================
@@ -1077,7 +1081,11 @@ void GuiService::refreshSystemTray()
 {
     // stabilize systray
     auto& settings = context().settings();
+#if EL_USE_SYSTEM_TRAY
     SystemTray::setEnabled (settings.isSystrayEnabled());
+#else
+    SystemTray::setEnabled (false);
+#endif
 }
 
 void GuiService::setMainWindowTitler (std::function<juce::String()> f)
