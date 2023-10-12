@@ -68,17 +68,12 @@ private:
         String error = "No device found at startup";
         if (auto dxml = props->getXmlValue ("devices"))
         {
-            DeviceManager::AudioDeviceSetup prefered;
-            prefered.inputChannels.setRange (0, 32, true);
-            prefered.outputChannels.setRange (0, 32, true);
-            prefered.sampleRate = 44100.0;
-            prefered.bufferSize = 1024;
             error = devices.initialise (DeviceManager::maxAudioChannels,
                                         DeviceManager::maxAudioChannels,
                                         dxml.get(),
                                         true,
-                                        "default",
-                                        &prefered);
+                                        "*",
+                                        nullptr);
             if (error.isNotEmpty())
             {
                 auto setup = devices.getAudioDeviceSetup();
