@@ -1084,6 +1084,7 @@ void GuiService::refreshSystemTray()
 #if EL_USE_SYSTEM_TRAY
     SystemTray::setEnabled (settings.isSystrayEnabled());
 #else
+    juce::ignoreUnused (settings);
     SystemTray::setEnabled (false);
 #endif
 }
