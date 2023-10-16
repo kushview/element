@@ -4,6 +4,7 @@
 #include <lv2/event/event.h>
 #include <lv2/midi/midi.h>
 #include <lv2/ui/ui.h>
+#include <lv2/patch/patch.h>
 
 #include <lvtk/symbols.hpp>
 #include <lvtk/options.hpp>
@@ -139,6 +140,9 @@ World::World()
     work_schedule = lilv_new_uri (world, LV2_WORKER__schedule);
     work_interface = lilv_new_uri (world, LV2_WORKER__interface);
     options_options = lilv_new_uri (world, LV2_OPTIONS__options);
+
+    patch_writable = lilv_new_uri (world, LV2_PATCH__writable);
+
     ui_CocoaUI = lilv_new_uri (world, LV2_UI__CocoaUI);
     ui_WindowsUI = lilv_new_uri (world, LV2_UI__WindowsUI);
     ui_X11UI = lilv_new_uri (world, LV2_UI__X11UI);
@@ -207,6 +211,16 @@ World::~World()
     world = nullptr;
     suil_host_free (suil);
     suil = nullptr;
+}
+
+lvtk::Node World::get (const LilvNode* subject, const LilvNode* pred) const noexcept
+{
+    return { lilv_world_get (this->world, subject, pred, nullptr) };
+}
+
+lvtk::Node World::makeURI (const std::string& uriStr) const noexcept
+{
+    return { lilv_new_uri (this->world, uriStr.c_str()) };
 }
 
 LV2Module* World::createModule (const String& uri)

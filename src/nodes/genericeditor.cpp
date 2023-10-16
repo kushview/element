@@ -321,11 +321,73 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SliderParameterComponent)
 };
 
+class PathParameterComponent final : public juce::Component,
+                                     public juce::FilenameComponentListener
+{
+public:
+    PathParameterComponent (PatchParameter* p)
+        : patch (p),
+          path (patch->getName (128),
+                File(),
+                false,
+                false,
+                false,
+                "",
+                "",
+                "Choose a file")
+    {
+        addAndMakeVisible (path);
+        path.addListener (this);
+
+        auto updatePath = [this]() {
+            auto str = patch->getCurrentValueAsText();
+            if (File::isAbsolutePath (str))
+            {
+                path.setCurrentFile (File (str), false, juce::dontSendNotification);
+            }
+        };
+
+        conn = patch->sigChanged.connect (updatePath);
+        updatePath();
+        patch->write (PatchParameter::Get, 0, nullptr);
+    }
+
+    ~PathParameterComponent()
+    {
+        conn.disconnect();
+        path.removeListener (this);
+        patch = nullptr;
+    }
+
+    void filenameComponentChanged (FilenameComponent*) override
+    {
+        auto file = path.getCurrentFile().getFullPathName().toStdString();
+        if (juce::File::isAbsolutePath (file))
+        {
+            patch->write (PatchParameter::Set, file.size(), file.c_str());
+        }
+    }
+
+    void paint (juce::Graphics&) override {}
+    void resized() override
+    {
+        auto area = getLocalBounds().reduced (0, 8);
+        path.setBounds (area);
+    }
+
+private:
+    PatchParameterPtr patch;
+    juce::FilenameComponent path;
+    boost::signals2::connection conn;
+};
+
 class ParameterDisplayComponent : public Component
 {
 public:
     ParameterDisplayComponent (Parameter* param)
     {
+        auto patch = dynamic_cast<PatchParameter*> (param);
+
         parameterName.setFont (Font (12.f));
         parameterName.setText (param->getName (128), dontSendNotification);
         parameterName.setJustificationType (Justification::centredRight);
@@ -353,6 +415,10 @@ public:
             // parameter can be in then we should present a dropdown allowing a
             // user to pick one of them.
             parameterComp.reset (new ChoiceParameterComponent (param));
+        }
+        else if (patch != nullptr && patch->range() == PatchParameter::RangePath)
+        {
+            parameterComp.reset (new PathParameterComponent (patch));
         }
         else
         {
@@ -386,11 +452,15 @@ private:
 class ParametersPanel : public Component
 {
 public:
-    ParametersPanel (const ParameterArray& params)
+    ParametersPanel (const ParameterArray& params, const PatchParameterArray& patches)
     {
         for (auto* param : params)
             if (param->isAutomatable())
                 addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (param)));
+
+        for (auto* patch : patches)
+            if (patch->range() == PatchParameter::RangePath)
+                addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (patch)));
 
         if (auto* comp = paramComponents[0])
             setSize (comp->getWidth(), comp->getHeight() * paramComponents.size());
@@ -422,7 +492,7 @@ struct GenericNodeEditor::Pimpl
         ProcessorPtr ptr = parent.getNodeObject();
         jassert (ptr != nullptr);
         owner.setOpaque (true);
-        view.setViewedComponent (new ParametersPanel (ptr->getParameters()));
+        view.setViewedComponent (new ParametersPanel (ptr->getParameters(), ptr->getPatches()));
         owner.addAndMakeVisible (view);
         view.setScrollBarsShown (true, false);
     }

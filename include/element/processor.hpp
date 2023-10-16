@@ -101,6 +101,7 @@ public:
 
     //=========================================================================
     const ParameterArray& getParameters (bool inputs = true) const noexcept { return inputs ? parameters : parametersOut; }
+    const PatchParameterArray& getPatches() const noexcept { return _patches; }
 
     ParameterPtr getParameter (int index, bool isInput) const noexcept
     {
@@ -401,6 +402,7 @@ protected:
 
     void setPorts (const PortList&);
     virtual void initialize() {}
+    void addPatch (PatchParameter* param) { _patches.add (param); }
 
     /** Clear the top level referenced parameters. Some node types
         can use this in their destructor if deletion order is important
@@ -451,6 +453,7 @@ private:
     String name;
 
     ParameterArray parameters, parametersOut;
+    PatchParameterArray _patches;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float>> inRMS, outRMS;

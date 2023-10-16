@@ -288,6 +288,42 @@ private:
 using ParameterPtr = juce::ReferenceCountedObjectPtr<Parameter>;
 using ParameterArray = juce::ReferenceCountedArray<Parameter>;
 
+class PatchParameter : public Parameter {
+public:
+    PatchParameter() = delete;
+
+    enum Range {
+        RangeFloat,
+        RangeDouble,
+        RangeBool,
+        RangeInteger,
+        RangePath
+    };
+
+    enum Operation { Get,
+                     Set };
+
+    constexpr Range range() const noexcept { return _range; }
+
+    virtual void write (Operation op, uint32_t size, const void* data) = 0;
+
+    float getValue() const override { return 0.f; }
+    void setValue (float) override {}
+    float getDefaultValue() const override { return 0.f; }
+    float getValueForText (const juce::String& text) const override { return 0.f; }
+
+    boost::signals2::signal<void()> sigChanged;
+
+protected:
+    PatchParameter (Range r) : _range (r) {}
+
+private:
+    const Range _range;
+};
+
+using PatchParameterPtr = juce::ReferenceCountedObjectPtr<PatchParameter>;
+using PatchParameterArray = juce::ReferenceCountedArray<PatchParameter>;
+
 /** A parameter type which represents a Control port. */
 class RangedParameter : public Parameter {
 public:

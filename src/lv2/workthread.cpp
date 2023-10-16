@@ -10,7 +10,7 @@ using namespace juce;
 #endif
 
 #if JUCE_DEBUG
-#define WORKER_LOG(x) DBG (String ("worker: ") << x)
+#define WORKER_LOG(x) DBG (String ("[element] worker: ") << x)
 #else
 #define WORKER_LOG(x)
 #endif

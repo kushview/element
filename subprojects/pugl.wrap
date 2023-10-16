@@ -1,7 +1,2 @@
-[wrap-git]
-url = https://gitlab.com/lvtk/pugl.git
-push-url = git@gitlab.com:lvtk/pugl.git
-revision = lvtk
-
-[provide]
-dependency_names = pugl-0,pugl-gl-0,puglpp-0
+[wrap-redirect]
+filename = lvtk/subprojects/pugl.wrap

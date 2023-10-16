@@ -32,6 +32,19 @@ class PortBuffer;
 class World;
 class WorkerFeature;
 
+/** Details needed to identify and write to a patch:writable atom port. */
+struct LV2PatchInfo
+{
+    std::string label;
+    uint32_t subject { 0 };
+    uint32_t range { 0 };
+    uint32_t port { EL_INVALID_PORT };
+    uint32_t notifyPort { EL_INVALID_PORT };
+    inline constexpr bool valid() const noexcept { return port != EL_INVALID_PORT && range > 0; }
+};
+
+using LV2Patches = std::vector<LV2PatchInfo>;
+
 /** Representation of LV2 Scale Points */
 class ScalePoints
 {
@@ -130,11 +143,19 @@ public:
     /** Get the plugins class label (category) */
     String getClassLabel() const;
 
-    /** Get the port intended to be used as a MIDI input */
+    uint32 getAtomControlIndex() const noexcept;
+
+    /** Get the first atom input port that supports midi:MidiEvent */
     uint32 getMidiPort() const;
+
+    /** Get the patch parameters. */
+    const LV2Patches& getPatches() const noexcept;
 
     /** Get the plugin's name */
     String getName() const;
+
+    /** Returns true if this is an lv2:InstrumentPlugin. */
+    bool isInstrument() const noexcept;
 
     /** Get the plugin's notify port. e.g. the port intended to be
         used as a MIDI output */
@@ -171,7 +192,6 @@ public:
     World& getWorld() { return world; }
 
     //=========================================================================
-
     /** Returns true if the Plugin has one or more UIs */
     bool hasEditor() const;
 
@@ -274,6 +294,9 @@ public:
 
     /** Returns a port buffer for port index (realtime) */
     PortBuffer* getPortBuffer (uint32) const;
+
+    /** process events sent */
+    void processEvents (PortBuffer* seq);
 
     //=========================================================================
 

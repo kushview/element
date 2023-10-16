@@ -41,9 +41,16 @@ public:
     const LilvNode* lv2_enumeration;
 
     const LilvNode* midi_MidiEvent;
+
     const LilvNode* work_schedule;
     const LilvNode* work_interface;
+
     const LilvNode* options_options;
+
+    const LilvNode* patch_writable;
+
+    const LilvNode* rdfs_range;
+
     const LilvNode* ui_CocoaUI;
     const LilvNode* ui_WindowsUI;
     const LilvNode* ui_X11UI;
@@ -55,6 +62,9 @@ public:
     const LilvNode* ui_UI;
     const LilvNode* trueNode;
     const LilvNode* falseNode;
+
+    lvtk::Node get (const LilvNode* subject, const LilvNode* pred) const noexcept;
+    lvtk::Node makeURI (const std::string& uriStr) const noexcept;
 
     /** Create an LV2Module for a uri string */
     LV2Module* createModule (const String& uri);

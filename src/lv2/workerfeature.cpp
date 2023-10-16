@@ -27,7 +27,6 @@ WorkerFeature::WorkerFeature (WorkThread& thread, uint32_t bufsize, LV2_Handle h
     : WorkerBase (thread, bufsize)
 {
     setInterface (handle, iface);
-
     uri = LV2_WORKER__schedule;
     feat.URI = uri.toRawUTF8();
     data.handle = this;
@@ -63,7 +62,7 @@ void WorkerFeature::processRequest (uint32_t size, const void* requestData)
 void WorkerFeature::processResponse (uint32_t size, const void* responseData)
 {
     jassert (worker != nullptr && worker->work_response != nullptr && plugin != nullptr);
-    if (worker && worker->end_run && plugin)
+    if (worker && worker->work_response && plugin)
         worker->work_response (plugin, size, responseData);
 }
 

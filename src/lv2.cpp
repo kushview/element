@@ -3,6 +3,7 @@
 
 #include <lv2/midi/midi.h>
 #include <lv2/time/time.h>
+#include <lv2/patch/patch.h>
 
 #include <lvtk/lvtk.hpp>
 #include <lvtk/symbols.hpp>
@@ -15,6 +16,8 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
                                      "-Wunused-variable")
 
 #include <element/lv2.hpp>
+#include <element/filesystem.hpp>
+
 #include "lv2/logfeature.hpp"
 #include "lv2/module.hpp"
 #include "lv2/world.hpp"
@@ -45,48 +48,12 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
 
 namespace element {
 
-template <typename Constructor>
-struct ScopedFrame
-{
-    template <typename... Args>
-    explicit ScopedFrame (LV2_Atom_Forge* f, Args&&... args)
-        : forge (f)
-    {
-        Constructor::construct (forge, &frame, std::forward<Args> (args)...);
-    }
-
-    ~ScopedFrame() { lv2_atom_forge_pop (forge, &frame); }
-
-    LV2_Atom_Forge_Frame frame;
-    LV2_Atom_Forge* forge = nullptr;
-
-    JUCE_DECLARE_NON_COPYABLE (ScopedFrame)
-    JUCE_DECLARE_NON_MOVEABLE (ScopedFrame)
-    JUCE_LEAK_DETECTOR (ScopedFrame)
-};
-
-struct SequenceTraits
-{
-    static constexpr auto construct = lv2_atom_forge_sequence_head;
-};
-struct ObjectTraits
-{
-    static constexpr auto construct = lv2_atom_forge_object;
-};
-
-using SequenceFrame = ScopedFrame<SequenceTraits>;
-using ObjectFrame = ScopedFrame<ObjectTraits>;
-
 template <typename Other, typename Word>
 static auto wordCast (Word word)
 {
     static_assert (sizeof (word) == sizeof (Other), "Word sizes must match");
     return juce::readUnaligned<Other> (&word);
 }
-
-//==============================================================================
-// Node factory....
-//==============================================================================
 
 class LV2Parameter : public Parameter
 {
@@ -265,6 +232,142 @@ private:
 };
 
 //=============================================================================
+class LV2PatchParameter : public PatchParameter
+{
+public:
+    LV2PatchParameter (LV2Module& m, const LV2PatchInfo& i, int idx, LV2_URID_Map* map)
+        : PatchParameter (PatchParameter::RangePath),
+          module (m),
+          patch (i),
+          protocol (m.map (LV2_ATOM__eventTransfer)),
+          patch_Get (m.map (LV2_PATCH__Get)),
+          patch_Set (m.map (LV2_PATCH__Set)),
+          patch_property (m.map (LV2_PATCH__property)),
+          subject_key (i.subject),
+          patch_value (m.map (LV2_PATCH__value)),
+          atom_Path (m.map (LV2_ATOM__Path)),
+          atom_URID (m.map (LV2_ATOM__URID)),
+          _index (idx)
+    {
+        memset (buffer, 0, 1024);
+        lv2_atom_forge_init (&forge, map);
+    }
+
+    constexpr auto notifyPort() const noexcept { return patch.notifyPort; }
+    int getPortIndex() const noexcept override { return static_cast<int> (patch.port); }
+    int getParameterIndex() const noexcept override { return _index; }
+
+    String getName (int maxLen) const override
+    {
+        return { patch.label.substr (0, (size_t) maxLen) };
+    }
+
+    // Units e.g. Hz
+    String getLabel() const override { return {}; }
+
+    void request() { write (PatchParameter::Get, 0, nullptr); }
+
+    void update (const LV2_Atom_Object* obj)
+    {
+        if (obj->body.otype == patch_Set)
+        {
+            // Get the property and value of the set message
+            const LV2_Atom* property = NULL;
+            const LV2_Atom* value = NULL;
+
+            // clang-format off
+            lv2_atom_object_get(obj,
+                                patch_property, &property,
+                                patch_value,    &value,
+                                0);
+            // clang-format on
+
+            if (value == nullptr || property == nullptr || property->type != atom_URID)
+                return;
+
+            if (subject_key != ((const LV2_Atom_URID*) property)->body)
+                return;
+#if 0
+            std::clog << "value type: " << module.getWorld().unmap (value->type) << std::endl;
+            std::clog << "value size: " << (int) value->size << std::endl;
+#endif
+            buffer2Size = value->size;
+            memset (buffer2, 0, sizeof (buffer2));
+            memcpy (buffer2, LV2_ATOM_BODY (value), value->size);
+
+            sigChanged();
+        }
+    }
+
+    juce::String getCurrentValueAsText() const override
+    {
+        return buffer2Size > 0 ? juce::String::fromUTF8 ((const char*) buffer2, buffer2Size)
+                               : juce::String();
+    }
+
+    void write (Operation op, uint32_t size, const void* data) override
+    {
+        lv2_atom_forge_set_buffer (&forge, buffer, 1024);
+        LV2_Atom_Forge_Frame frame;
+        // clang-format off
+        const auto otype = op == Get ? patch_Get 
+                         : op == Set ? patch_Set : 0;
+        // clang-format on
+        if (otype)
+        {
+            LV2_Atom_Forge_Ref set =
+                lv2_atom_forge_object (&forge, &frame, 0, otype);
+
+            lv2_atom_forge_key (&forge, patch_property);
+            lv2_atom_forge_urid (&forge, subject_key);
+
+            if (otype == patch_Set)
+            {
+                lv2_atom_forge_key (&forge, patch_value);
+
+                switch (range())
+                {
+                    case RangePath:
+                        lv2_atom_forge_path (&forge, (const char*) data, size);
+                        break;
+                    default:
+                        lv2_atom_forge_raw (&forge, data, size);
+                        break;
+                }
+            }
+
+            lv2_atom_forge_pop (&forge, &frame);
+
+            auto atom = (LV2_Atom*) set;
+            module.write (patch.port,
+                          lv2_atom_total_size (atom),
+                          protocol,
+                          atom);
+        }
+    }
+
+private:
+    LV2Module& module;
+    const LV2PatchInfo patch;
+    const uint32_t protocol;
+    const uint32_t patch_Get;
+    const uint32_t patch_Set;
+    const uint32_t patch_property;
+    const uint32_t subject_key;
+    const uint32_t patch_value;
+    const uint32_t atom_Path;
+    const uint32_t atom_URID;
+
+    const int _index;
+    const uint32_t atomTransfer = [&] { return module.map (LV2_ATOM__atomTransfer); }();
+    const uint32_t eventTransfer = [&] { return module.map (LV2_ATOM__eventTransfer); }();
+    uint8_t buffer[1024];
+    LV2_Atom_Forge forge;
+    uint8_t buffer2[1024];
+    uint32_t buffer2Size = 0;
+};
+
+//=============================================================================
 LV2Parameter* LV2Parameter::create (const PortDescription& info, LV2Module& module)
 {
     const auto port = static_cast<uint32> (info.index);
@@ -303,13 +406,14 @@ public:
           urids (world.symbols())
     {
         numPorts = module->getNumPorts();
-        midiPort = module->getMidiPort();
-        notifyPort = module->getNotifyPort();
+        atomControlIn = module->getAtomControlIndex();
+        atomControlOut = module->getNotifyPort();
 
-        forge.init ((LV2_URID_Map*) world.symbols().map_feature()->data);
+        auto uridMap = (LV2_URID_Map*) world.symbols().map_feature()->data;
+        forge.init (uridMap);
 
-        wantsMidiMessages = midiPort != EL_INVALID_PORT;
-        sendsMidiMessages = notifyPort != EL_INVALID_PORT;
+        wantsMidiMessages = atomControlIn != EL_INVALID_PORT;
+        sendsMidiMessages = atomControlOut != EL_INVALID_PORT;
 
         setPorts (module->ports());
         if (sendsMidiMessages && getNumPorts (PortType::Midi, false) <= 0)
@@ -318,6 +422,14 @@ public:
             newPorts.add (PortType::Midi, newPorts.size(), 0, "element_midi_output", "MIDI Out", false);
             setPorts (newPorts);
         }
+
+        int pi = 0;
+        for (const auto& patch : module->getPatches())
+            addPatch (new LV2PatchParameter (*module, patch, pi++, uridMap));
+
+        for (auto* p : getPatches())
+            if (auto patch = dynamic_cast<LV2PatchParameter*> (p))
+                patch->request();
 
         const ChannelConfig& channels (module->getChannelConfig());
         totalAudioIn = channels.getNumAtomInputs();
@@ -353,16 +465,31 @@ public:
 
     void portEvent (uint32 port, uint32 size, uint32 protocol, const void* data)
     {
-        if (protocol != 0)
-            return;
-
-        // clang-format off
-        for (auto param : getParameters()) {
-            if (auto lv2param = dynamic_cast<LV2Parameter*> (param))
-                if (lv2param->getPort() == port)
-                    { lv2param->update (*(float*) data, true); break; }
+        if (protocol == 0)
+        {
+            // clang-format off
+            for (auto param : getParameters()) {
+                if (auto lv2param = dynamic_cast<LV2Parameter*> (param))
+                    if (lv2param->getPort() == port)
+                        { lv2param->update (*(float*) data, true); break; }
+            }
+            // clang-format on
         }
-        // clang-format on
+        else if (protocol == urids.atom_eventTransfer)
+        {
+            auto atom = reinterpret_cast<const LV2_Atom*> (data);
+            if (atom->type == urids.atom_Object)
+            {
+                auto obj = (const LV2_Atom_Object*) atom;
+                if (obj->body.otype == urids.patch_Set)
+                {
+                    for (auto* p : getPatches())
+                        if (auto patch = dynamic_cast<LV2PatchParameter*> (p))
+                            if (patch->notifyPort() == port)
+                                patch->update (obj);
+                }
+            }
+        }
     };
 
     //=========================================================================
@@ -386,7 +513,8 @@ public:
 
         desc.numInputChannels = totalAudioIn;
         desc.numOutputChannels = totalAudioOut;
-        desc.isInstrument = midiPort != LV2UI_INVALID_PORT_INDEX;
+        desc.isInstrument = module->isInstrument();
+        desc.lastInfoUpdateTime = Time::getCurrentTime();
     }
 
     void initialize() override
@@ -402,18 +530,11 @@ public:
         jassert (MessageManager::getInstance()->isThisTheMessageThread());
 #endif
 
-        wantsMidiMessages = midiPort != EL_INVALID_PORT;
-        sendsMidiMessages = notifyPort != EL_INVALID_PORT;
+        wantsMidiMessages = atomControlIn != EL_INVALID_PORT;
+        sendsMidiMessages = atomControlOut != EL_INVALID_PORT;
         initialised = true;
         setLatencySamples (0);
     }
-
-    double getTailLengthSeconds() const { return 0.0f; }
-    void* getPlatformSpecificData() { return module->getHandle(); }
-    const String getName() const { return module->getName(); }
-    bool silenceInProducesSilenceOut() const { return false; }
-    bool acceptsMidi() const { return wantsMidiMessages; }
-    bool producesMidi() const { return notifyPort != LV2UI_INVALID_PORT_INDEX; }
 
     //==============================================================================
     void prepareToRender (double sampleRate, int blockSize) override
@@ -443,8 +564,6 @@ public:
         tempBuffer.setSize (1, 1);
     }
 
-    bool wantsMidiPipe() const override { return true; }
-
     void writeTimeInfoToPort (PortBuffer& port)
     {
         if (! port.isInput())
@@ -463,7 +582,9 @@ public:
 
         forge.write_frame_time (0);
 
-        ObjectFrame object { &forge, (uint32_t) 0, urids.time_Position };
+        // lvtk::ObjectFrame object { &forge, (uint32_t) 0, urids.time_Position };
+        LV2_Atom_Forge_Frame frame;
+        lv2_atom_forge_object (&forge, &frame, 0, urids.time_Position);
 
         forge.write_key (urids.time_speed);
         forge.write_float (info->getIsPlaying() ? 1.0f : 0.0f);
@@ -506,6 +627,8 @@ public:
             lv2_atom_forge_key (&forge, urids.time_beatsPerMinute);
             lv2_atom_forge_float (&forge, (float) *bpm);
         }
+
+        lv2_atom_forge_pop (&forge, &frame);
     }
 
     void renderBypassed (AudioSampleBuffer& a, MidiPipe& m, AudioSampleBuffer& cv) override
@@ -525,33 +648,77 @@ public:
             return;
         }
 
-        if (wantsMidiMessages)
+        LV2_Atom_Forge_Frame seqinframe;
+        auto const atomIn = wantsMidiMessages ? module->getPortBuffer (atomControlIn) : nullptr;
+        if (atomIn != nullptr)
         {
-            PortBuffer* const buf = module->getPortBuffer (midiPort);
-            buf->reset();
-            forge.set_buffer ((uint8_t*) buf->getPortData(), buf->getCapacity());
-            SequenceFrame frame { &forge, 0 };
-            writeTimeInfoToPort (*buf);
-
-            for (auto m : *midi.getReadBuffer (0))
-            {
-                buf->addEvent (m.samplePosition,
-                               static_cast<uint32_t> (m.numBytes),
-                               urids.midi_MidiEvent,
-                               m.data);
-            }
+            atomIn->reset();
+            forge.set_buffer ((uint8_t*) atomIn->getPortData(), atomIn->getCapacity());
+            lv2_atom_forge_sequence_head (&forge, &seqinframe, 0);
+            writeTimeInfoToPort (*atomIn);
         }
 
         module->referAudioReplacing (audio, cv);
-        module->run ((uint32) numSamples);
+        module->processEvents (atomIn);
 
-        midi.clear();
-        if (sendsMidiMessages)
+        if (atomIn != nullptr)
         {
-            PortBuffer* const buf = module->getPortBuffer (notifyPort);
-            jassert (buf != nullptr);
+            for (auto m : *midi.getReadBuffer (0))
+            {
+                atomIn->addEvent (m.samplePosition,
+                                  static_cast<uint32_t> (m.numBytes),
+                                  urids.midi_MidiEvent,
+                                  m.data);
+            }
 
-            LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) buf->getPortData(), ev)
+            lv2_atom_forge_pop (&forge, &seqinframe);
+        }
+
+        if (atomIn != nullptr)
+        {
+            LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomIn->getPortData(), ev)
+            {
+                if (lv2_atom_forge_is_object_type (&forge, ev->body.type))
+                {
+                    auto obj = (LV2_Atom_Object*) &ev->body;
+                    if (obj->body.otype == urids.patch_Set)
+                    {
+                        std::clog << "SET\n";
+                        // Get the property and value of the set message
+                        const LV2_Atom* property = NULL;
+                        const LV2_Atom* value = NULL;
+
+                        // clang-format off
+                        lv2_atom_object_get(obj,
+                                            urids.patch_property, &property,
+                                            urids.patch_value,    &value,
+                                            0);
+                        // clang-format on
+
+                        if (! property)
+                        {
+                            std::clog << "Set message with no property\n";
+                        }
+
+                        else if (property->type != urids.atom_URID)
+                        {
+                            std::clog << "Set property is not a URID\n";
+                            return;
+                        }
+
+                        const uint32_t key = ((const LV2_Atom_URID*) property)->body;
+                        std::clog << "key=" << module->getWorld().unmap (key) << std::endl;
+                    }
+                }
+            }
+        }
+
+        module->run ((uint32) numSamples);
+        midi.clear();
+
+        if (auto const atomIn = sendsMidiMessages ? module->getPortBuffer (atomControlOut) : nullptr)
+        {
+            LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomIn->getPortData(), ev)
             {
                 if (ev->body.type == urids.midi_MidiEvent)
                 {
@@ -563,6 +730,15 @@ public:
             }
         }
     }
+
+    //==========================================================================
+    bool wantsMidiPipe() const override { return true; }
+    double getTailLengthSeconds() const { return 0.0f; }
+    void* getPlatformSpecificData() { return module->getHandle(); }
+    const String getName() const { return module->getName(); }
+    bool silenceInProducesSilenceOut() const { return false; }
+    bool acceptsMidi() const { return wantsMidiMessages; }
+    bool producesMidi() const { return atomControlOut != LV2UI_INVALID_PORT_INDEX; }
 
     bool hasEditor() override { return module->hasEditor(); }
     Editor* createEditor() override;
@@ -606,9 +782,8 @@ private:
     OwnedArray<PortBuffer> buffers;
 
     uint32 numPorts { 0 };
-    uint32 timePort { EL_INVALID_PORT };
-    uint32 midiPort { EL_INVALID_PORT };
-    uint32 notifyPort { EL_INVALID_PORT };
+    uint32 atomControlIn { EL_INVALID_PORT };
+    uint32 atomControlOut { EL_INVALID_PORT };
 
     int totalAudioIn { 0 },
         totalAudioOut { 0 };
@@ -616,8 +791,14 @@ private:
     struct URIDs
     {
         URIDs (lvtk::Symbols& sym)
-            : atom_Sequence (sym.map (LV2_ATOM__Sequence)),
+            : atom_eventTransfer (sym.map (LV2_ATOM__eventTransfer)),
+              atom_Object (sym.map (LV2_ATOM__Object)),
+              atom_Sequence (sym.map (LV2_ATOM__Sequence)),
+              atom_URID (sym.map (LV2_ATOM__URID)),
               midi_MidiEvent (sym.map (LV2_MIDI__MidiEvent)),
+              patch_Set (sym.map (LV2_PATCH__Set)),
+              patch_property (sym.map (LV2_PATCH__property)),
+              patch_value (sym.map (LV2_PATCH__value)),
               time_Position (sym.map (LV2_TIME__Position)),
               time_speed (sym.map (LV2_TIME__speed)),
               time_frame (sym.map (LV2_TIME__frame)),
@@ -631,8 +812,14 @@ private:
         }
 
         const LV2_URID
+            atom_eventTransfer,
+            atom_Object,
             atom_Sequence,
+            atom_URID,
             midi_MidiEvent,
+            patch_Set,
+            patch_property,
+            patch_value,
             time_Position,
             time_speed,
             time_frame,
@@ -875,60 +1062,60 @@ private:
 
 #elif JUCE_MAC
 
-        struct ViewComponent : public NSViewComponentWithParent
-        {
-            explicit ViewComponent (PhysicalResizeListener&)
-                : NSViewComponentWithParent (WantsNudge::no) {}
-            LV2UI_Widget getWidget() { return getView(); }
-            void forceViewToSize() {}
-            void fitToView() { resizeToFitView(); }
-            void prepareForDestruction() {}
-        };
+    struct ViewComponent : public NSViewComponentWithParent
+    {
+        explicit ViewComponent (PhysicalResizeListener&)
+            : NSViewComponentWithParent (WantsNudge::no) {}
+        LV2UI_Widget getWidget() { return getView(); }
+        void forceViewToSize() {}
+        void fitToView() { resizeToFitView(); }
+        void prepareForDestruction() {}
+    };
 #elif JUCE_WINDOWS
-        struct ViewComponent : public HWNDComponent
+    struct ViewComponent : public HWNDComponent
+    {
+        explicit ViewComponent (PhysicalResizeListener&)
         {
-            explicit ViewComponent (PhysicalResizeListener&)
+            setOpaque (true);
+            inner.addToDesktop (0);
+
+            if (auto* peer = inner.getPeer())
             {
-                setOpaque (true);
-                inner.addToDesktop (0);
-
-                if (auto* peer = inner.getPeer())
-                {
-                    setHWND (peer->getNativeHandle());
-                }
+                setHWND (peer->getNativeHandle());
             }
+        }
 
-            ~ViewComponent()
-            {
-            }
+        ~ViewComponent()
+        {
+        }
 
+        void paint (Graphics& g) override { g.fillAll (Colours::black); }
+
+        LV2UI_Widget getWidget() { return getHWND(); }
+
+        void forceViewToSize() { updateHWNDBounds(); }
+        void fitToView() { resizeToFit(); }
+
+        void prepareForDestruction() {}
+
+    private:
+        struct Inner : public Component
+        {
+            Inner() { setOpaque (true); }
             void paint (Graphics& g) override { g.fillAll (Colours::black); }
-
-            LV2UI_Widget getWidget() { return getHWND(); }
-
-            void forceViewToSize() { updateHWNDBounds(); }
-            void fitToView() { resizeToFit(); }
-
-            void prepareForDestruction() {}
-
-        private:
-            struct Inner : public Component
-            {
-                Inner() { setOpaque (true); }
-                void paint (Graphics& g) override { g.fillAll (Colours::black); }
-            };
-
-            Inner inner;
         };
+
+        Inner inner;
+    };
 #else
-        struct ViewComponent : public Component
-        {
-            explicit ViewComponent (PhysicalResizeListener&) {}
-            void* getWidget() { return nullptr; }
-            void forceViewToSize() {}
-            void fitToView() {}
-            void prepareForDestruction() {}
-        };
+    struct ViewComponent : public Component
+    {
+        explicit ViewComponent (PhysicalResizeListener&) {}
+        void* getWidget() { return nullptr; }
+        void forceViewToSize() {}
+        void fitToView() {}
+        void prepareForDestruction() {}
+    };
 #endif
 
     std::unique_ptr<ViewComponent> view;
@@ -1020,241 +1207,6 @@ StringArray LV2NodeProvider::findTypes()
     lv2->getTypes (types);
     return types;
 }
-
-#if 0
-
-/** Implements a plugin format manager for LV2 plugins in Juce Apps. */
-class LV2PluginFormat final : public AudioPluginFormat
-{
-public:
-    LV2PluginFormat();
-    ~LV2PluginFormat();
-
-    String getName() const override { return "LV2"; }
-    void findAllTypesForFile (OwnedArray<PluginDescription>& descrips, const String& identifier) override;
-    bool fileMightContainThisPluginType (const String& fileOrIdentifier) override;
-    String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override;
-    bool pluginNeedsRescanning (const PluginDescription&) override { return false; }
-    bool doesPluginStillExist (const PluginDescription&) override;
-    bool canScanForPlugins() const override { return true; }
-    StringArray searchPathsForPlugins (const FileSearchPath&, bool recursive, bool allowPluginsWhichRequireAsynchronousInstantiation = false) override;
-    FileSearchPath getDefaultLocationsToSearch() override;
-    bool isTrivialToScan() const override { return true; }
-
-protected:
-    void createPluginInstance (const PluginDescription&,
-                               double initialSampleRate,
-                               int initialBufferSize,
-                               PluginCreationCallback) override;
-
-    bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override { return false; }
-
-private:
-    class Internal;
-    std::unique_ptr<Internal> priv;
-};
-
-//=============================================================================
-class LV2AudioProcessorEditor : public AudioProcessorEditor
-{
-public:
-    LV2AudioProcessorEditor (LV2Processor* p, LV2ModuleUI::Ptr _ui)
-        : AudioProcessorEditor (p), plugin (*p), ui (_ui)
-    {
-        jassert (ui != nullptr);
-        ui->instantiate();
-        jassert (ui->loaded());
-        setOpaque (true);
-    }
-
-    virtual ~LV2AudioProcessorEditor() {}
-
-    virtual void paint (Graphics& g) override
-    {
-        g.fillAll (Colours::black);
-    }
-
-protected:
-    LV2Processor& plugin;
-    LV2ModuleUI::Ptr ui;
-
-    void cleanup()
-    {
-        plugin.editorBeingDeleted (this);
-        ui->unload();
-        ui = nullptr;
-    }
-};
-
-//==============================================================================
-class LV2PluginFormat::Internal : private Timer
-{
-public:
-    Internal()
-    {
-        useExternalData = false;
-        init();
-        world.setOwned (new World());
-        startTimerHz (60);
-    }
-
-    Internal (World& w)
-    {
-        useExternalData = true;
-        init();
-        world.setNonOwned (&w);
-    }
-
-    ~Internal()
-    {
-        world.clear();
-        stopTimer();
-    }
-
-    LV2Module* createModule (const String& uri)
-    {
-        return world->createModule (uri);
-    }
-
-    OptionalScopedPointer<World> world;
-    lvtk::Symbols symbols;
-
-private:
-    bool useExternalData;
-
-    void init() {}
-
-    void timerCallback() override
-    {
-        stopTimer();
-    }
-};
-
-//=============================================================================
-LV2PluginFormat::LV2PluginFormat()
-{
-    priv.reset (new Internal());
-}
-
-LV2PluginFormat::~LV2PluginFormat()
-{
-    priv.reset();
-}
-
-//=============================================================================
-void LV2PluginFormat::findAllTypesForFile (OwnedArray<PluginDescription>& results,
-                                           const String& fileOrIdentifier)
-{
-    if (! fileMightContainThisPluginType (fileOrIdentifier))
-    {
-        return;
-    }
-
-    std::unique_ptr<PluginDescription> desc (new PluginDescription());
-    desc->fileOrIdentifier = fileOrIdentifier;
-    desc->pluginFormatName = String ("LV2");
-    desc->uniqueId = 0;
-
-    try
-    {
-        auto instance (createInstanceFromDescription (*desc.get(), 44100.0, 1024));
-        if (LV2Processor* const p = dynamic_cast<LV2Processor*> (instance.get()))
-        {
-            p->fillInPluginDescription (*desc.get());
-            results.add (desc.release());
-        }
-    } catch (...)
-    {
-        EL_LV2_LOG ("crashed: " + String (desc->name));
-    }
-}
-
-bool LV2PluginFormat::fileMightContainThisPluginType (const String& fileOrIdentifier)
-{
-    bool maybe = fileOrIdentifier.contains ("http:") || fileOrIdentifier.contains ("https:") || fileOrIdentifier.contains ("urn:");
-
-    if (! maybe && File::isAbsolutePath (fileOrIdentifier))
-    {
-        const File file (fileOrIdentifier);
-        maybe = file.getChildFile ("manifest.ttl").existsAsFile();
-    }
-
-    return maybe;
-}
-
-String LV2PluginFormat::getNameOfPluginFromIdentifier (const String& fileOrIdentifier)
-{
-    const auto name = priv->world->getPluginName (fileOrIdentifier);
-    return name.isEmpty() ? fileOrIdentifier : name;
-}
-
-StringArray LV2PluginFormat::searchPathsForPlugins (const FileSearchPath& paths, bool, bool)
-{
-    if (paths.getNumPaths() > 0)
-    {
-#if JUCE_WINDOWS
-        // putenv ("LV2_PATH", paths.toString().toRawUTF8(), 0);
-        // setenv ("LV2_PATH", paths.toString().toRawUTF8(), 0);
-#else
-        setenv ("LV2_PATH", paths.toString().replace (";", ":").toRawUTF8(), 0);
-#endif
-    }
-
-    StringArray list;
-    priv->world->getSupportedPlugins (list);
-    return list;
-}
-
-FileSearchPath LV2PluginFormat::getDefaultLocationsToSearch()
-{
-    FileSearchPath paths;
-#if JUCE_LINUX
-    paths.add (File ("/usr/lib/lv2"));
-    paths.add (File ("/usr/local/lib/lv2"));
-#elif JUCE_MAC
-    paths.add (File ("/Library/Audio/Plug-Ins/LV2"));
-    paths.add (File::getSpecialLocation (File::userHomeDirectory)
-                   .getChildFile ("Library/Audio/Plug-Ins/LV2"));
-#endif
-    return paths;
-}
-
-bool LV2PluginFormat::doesPluginStillExist (const PluginDescription& desc)
-{
-    StringArray plugins (searchPathsForPlugins (FileSearchPath(), true));
-    return plugins.contains (desc.fileOrIdentifier);
-}
-
-void LV2PluginFormat::createPluginInstance (const PluginDescription& desc, double initialSampleRate, int initialBufferSize, PluginCreationCallback callback)
-{
-    if (desc.pluginFormatName != String ("LV2"))
-    {
-        callback (nullptr, "Not an LV2 plugin");
-        return;
-    }
-
-    if (LV2Module* module = priv->createModule (desc.fileOrIdentifier))
-    {
-        Result res (module->instantiate (initialSampleRate));
-        if (res.wasOk())
-        {
-            AudioPluginInstance* i = new LV2Processor (*priv->world, module);
-            callback (std::unique_ptr<AudioPluginInstance> (i), {});
-        }
-        else
-        {
-            deleteAndZero (module);
-            callback (nullptr, res.getErrorMessage());
-        }
-    }
-    else
-    {
-        EL_LV2_LOG ("Failed creating LV2 plugin instance");
-        callback (nullptr, "Failed creating LV2 plugin instance");
-    }
-}
-
-#endif
 
 } // namespace element
 

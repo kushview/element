@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <lv2/ui/ui.h>
+#include <lv2/atom/atom.h>
+#include <lv2/atom/util.h>
+
 #include <lvtk/ext/idle.hpp>
+#include <lv2/patch/patch.h>
 #include <lv2/midi/midi.h>
 #include <lvtk/ext/state.hpp>
 
@@ -11,6 +15,46 @@
 #include "lv2/workerfeature.hpp"
 
 namespace element {
+namespace detail {
+
+static LV2Patches getPatchWritables (LV2Module& module, World& world, const LilvPlugin* plugin)
+{
+    const auto atomControl = module.getAtomControlIndex();
+    const auto atomControlOut = module.getNotifyPort();
+
+    if (atomControl == EL_INVALID_PORT || atomControlOut == EL_INVALID_PORT)
+        return LV2Patches();
+
+    LV2Patches out;
+    lvtk::Node atom_Path (world.makeURI (LV2_ATOM__Path));
+    lvtk::Node label (world.makeURI (LILV_NS_RDFS "label"));
+    lvtk::Node range (world.makeURI (LILV_NS_RDFS "range"));
+
+    auto nodes = lilv_plugin_get_value (plugin, world.patch_writable);
+    LILV_FOREACH (nodes, iter, nodes)
+    {
+        LV2PatchInfo patch;
+
+        lvtk::Node node (lilv_nodes_get (nodes, iter));
+
+        patch.subject = world.map (node.as_uri());
+
+        if (auto rangeValue = world.get (node, range))
+            patch.range = world.map (rangeValue.as_uri());
+        if (auto labelValue = world.get (node, label))
+            patch.label = labelValue.as_string();
+
+        patch.port = atomControl;
+        patch.notifyPort = atomControlOut;
+
+        if (patch.valid())
+            out.push_back (patch);
+    }
+
+    lilv_nodes_free (nodes);
+    return out;
+}
+} // namespace detail
 
 enum UIQuality
 {
@@ -169,6 +213,12 @@ private:
     OwnedArray<PortBuffer> buffers;
 
     LV2_Feature instanceFeature { LV2_INSTANCE_ACCESS_URI, nullptr };
+
+    std::vector<LV2PatchInfo> patchParams;
+    uint32_t atomControlInIndex { EL_INVALID_PORT };
+    uint32_t atomControlOutIndex { EL_INVALID_PORT };
+
+    const uint32_t atom_eventTransfer = [&] { return owner.map (LV2_ATOM__eventTransfer); }();
 };
 
 LV2Module::LV2Module (World& world_, const void* plugin_)
@@ -307,6 +357,10 @@ void LV2Module::init()
         priv->author = String::fromUTF8 (lilv_node_as_string (node));
         lilv_node_free (node);
     }
+
+    priv->patchParams = detail::getPatchWritables (*this, world, plugin);
+    priv->atomControlInIndex = getAtomControlIndex();
+    priv->atomControlOutIndex = getNotifyPort();
 }
 
 void LV2Module::loadDefaultState()
@@ -503,6 +557,22 @@ String LV2Module::getURI() const { return priv->uri; }
 String LV2Module::getName() const { return priv->name; }
 String LV2Module::getAuthorName() const { return priv->author; }
 
+bool LV2Module::isInstrument() const noexcept
+{
+    if (auto c = lilv_plugin_get_class (plugin))
+    {
+        auto curi = lilv_plugin_class_get_uri (c);
+        auto lv2_InstrumentPlugin = world.makeURI (LV2_CORE__InstrumentPlugin);
+        auto lv2_GeneratorPlugin = world.makeURI (LV2_CORE__GeneratorPlugin);
+        // clang-format off
+        return lilv_node_equals (curi, lv2_InstrumentPlugin) || 
+            lilv_node_equals (curi, lv2_GeneratorPlugin);
+        // clang-format on
+    }
+
+    return false;
+}
+
 const ChannelConfig& LV2Module::getChannelConfig() const
 {
     return priv->channels;
@@ -551,9 +621,23 @@ const LilvPort* LV2Module::getPort (uint32 port) const
 
 const PortList& LV2Module::ports() const noexcept { return priv->ports; }
 
+uint32 LV2Module::getAtomControlIndex() const noexcept
+{
+    if (auto port = lilv_plugin_get_port_by_designation (
+            plugin, world.lv2_InputPort, world.lv2_control))
+    {
+        // clang-format off
+        return lilv_port_is_a (plugin, port, world.lv2_AtomPort) 
+            ? lilv_port_get_index (plugin, port)
+            : EL_INVALID_PORT;
+        // clang-format on
+    }
+
+    return EL_INVALID_PORT;
+}
+
 uint32 LV2Module::getMidiPort() const
 {
-    // lilv_plugin_get_port_by_designation ()
     for (uint32 i = 0; i < getNumPorts(); ++i)
     {
         // clang-format off
@@ -568,18 +652,17 @@ uint32 LV2Module::getMidiPort() const
     return EL_INVALID_PORT;
 }
 
+const LV2Patches& LV2Module::getPatches() const noexcept { return priv->patchParams; }
+
 uint32 LV2Module::getNotifyPort() const
 {
-    for (uint32 i = 0; i < numPorts; ++i)
+    if (auto port = lilv_plugin_get_port_by_designation (
+            plugin, world.lv2_OutputPort, world.lv2_control))
     {
         // clang-format off
-        const LilvPort* port (getPort (i));
-        if (lilv_port_is_a (plugin, port, world.lv2_AtomPort) && 
-            lilv_port_is_a (plugin, port, world.lv2_OutputPort) && 
-            lilv_port_supports_event (plugin, port, world.midi_MidiEvent))
-        {
-            return i;
-        }
+        return lilv_port_is_a (plugin, port, world.lv2_AtomPort) 
+            ? lilv_port_get_index (plugin, port)
+            : EL_INVALID_PORT;
         // clang-format on
     }
 
@@ -840,7 +923,7 @@ void LV2Module::timerCallback()
             notifications->advance (pnsize, false);
             notifications->read (ntbuf, ev.size, true);
 
-            if (ev.protocol == 0)
+            if (ev.protocol == 0 || ev.protocol == priv->atom_eventTransfer)
             {
                 if (auto ui = priv->ui)
                     ui->portEvent (ev.index, ev.size, ev.protocol, ntbuf.getData());
@@ -876,8 +959,16 @@ void LV2Module::referAudioReplacing (AudioSampleBuffer& audio, AudioSampleBuffer
             ->referTo (cv.getWritePointer (c));
 }
 
-void LV2Module::run (uint32 nframes)
+void LV2Module::processEvents (PortBuffer* seq)
 {
+    for (int i = priv->buffers.size(); --i >= 0;)
+    {
+        auto buffer = priv->buffers.getUnchecked (i);
+        if (buffer->isSequence() && ! buffer->isInput())
+            buffer->reset();
+        connectPort (static_cast<uint32> (i), buffer->getPortData());
+    }
+
     PortEvent ev;
 
     static const uint32 pesize = sizeof (PortEvent);
@@ -908,17 +999,21 @@ void LV2Module::run (uint32 nframes)
                     }
                 }
             }
+            else if (ev.protocol == priv->atom_eventTransfer)
+            {
+                auto seq = priv->buffers.getUnchecked (ev.index);
+                const auto atom = (const LV2_Atom*) evbuf.get();
+                seq->addEvent (0,
+                               atom->size,
+                               atom->type,
+                               (uint8_t*) LV2_ATOM_BODY (atom));
+            }
         }
     }
+}
 
-    for (int i = priv->buffers.size(); --i >= 0;)
-    {
-        auto buffer = priv->buffers.getUnchecked (i);
-        if (buffer->isSequence() && ! buffer->isInput())
-            buffer->reset();
-        connectPort (static_cast<uint32> (i), buffer->getPortData());
-    }
-
+void LV2Module::run (uint32 nframes)
+{
     if (worker)
         worker->processWorkResponses();
 
@@ -926,6 +1021,23 @@ void LV2Module::run (uint32 nframes)
 
     if (worker)
         worker->endRun();
+
+    if (priv->atomControlOutIndex != EL_INVALID_PORT)
+    {
+        auto out = priv->buffers.getUnchecked (priv->atomControlOutIndex);
+        LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) out->getPortData(), ev)
+        {
+            if (notifications->canWrite (sizeof (PortEvent) + ev->body.size))
+            {
+                PortEvent pe = { 0 };
+                pe.index = priv->atomControlOutIndex;
+                pe.protocol = priv->atom_eventTransfer;
+                pe.size = lv2_atom_total_size (&ev->body);
+                notifications->write (pe);
+                notifications->write (&ev->body, pe.size);
+            }
+        }
+    }
 }
 
 uint32 LV2Module::map (const String& uri) const
