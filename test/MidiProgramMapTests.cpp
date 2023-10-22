@@ -1,6 +1,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <element/context.hpp>
 #include <element/processor.hpp>
 
 #include "nodes/midiprogrammap.hpp"
@@ -79,25 +80,28 @@ BOOST_AUTO_TEST_SUITE (MidiProgramMapTests)
 
 BOOST_AUTO_TEST_CASE (Basics)
 {
-    GraphNode graph;
-    ProcessorPtr node = graph.addNode (new MidiProgramMapNode());
-    auto* pgc = dynamic_cast<MidiProgramMapNode*> (node.get());
+    Context context;
+    {
+        GraphNode graph (context);
+        ProcessorPtr node = graph.addNode (new MidiProgramMapNode());
+        auto* pgc = dynamic_cast<MidiProgramMapNode*> (node.get());
 
-    testMappings (node);
-    testMidiStream (node);
+        testMappings (node);
+        testMidiStream (node);
 
-    MemoryBlock block;
-    pgc->getState (block);
-    pgc->clear();
+        MemoryBlock block;
+        pgc->getState (block);
+        pgc->clear();
 
-    BOOST_REQUIRE_EQUAL (pgc->getNumProgramEntries(), 0);
-    pgc->setState (block.getData(), (int) block.getSize());
+        BOOST_REQUIRE_EQUAL (pgc->getNumProgramEntries(), 0);
+        pgc->setState (block.getData(), (int) block.getSize());
 
-    testMidiStream (node, "Renders mappings after load state");
+        testMidiStream (node, "Renders mappings after load state");
 
-    pgc = nullptr;
-    node = nullptr;
-    graph.clear();
+        pgc = nullptr;
+        node = nullptr;
+        graph.clear();
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

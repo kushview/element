@@ -326,6 +326,8 @@ public:
             pluginList, plugins->getDeadAudioPluginsFile());
 
         logger->logMessage ("[scanner] setting up formats");
+        auto& nf = plugins->getNodeFactory();
+        nf.add (new LV2NodeProvider());
         plugins->addDefaultFormats();
         logger->logMessage ("[scanner] restoring plugin list");
         {
@@ -733,7 +735,6 @@ void PluginManager::addDefaultFormats()
     if (priv->hasAddedFormats)
         return;
 
-    priv->nodes.add (new LV2NodeProvider());
     auto& audioPlugs = getAudioPluginFormats();
     for (const auto& fmt : Util::getSupportedAudioPluginFormats())
     {

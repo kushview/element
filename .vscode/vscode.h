@@ -1,5 +1,4 @@
-#define JUCE_AMALGAMATED_INCLUDE 1
-#define KV_JACK_AUDIO            1
+#define JUCE_PLUGINHOST_LV2 1
 
 #include <element/juce.hpp>
 #include <element/context.hpp>

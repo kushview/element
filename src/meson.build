@@ -1,6 +1,7 @@
 
 libelement_sources = '''
     arc.cpp
+    atombuffer.cpp
     bindings.cpp
     commands.cpp
     context.cpp
@@ -90,7 +91,8 @@ libelement_sources = '''
     lv2/workerfeature.cpp
     lv2/world.cpp
     lv2/native.cpp
-    
+    lv2/messages.cpp
+
     scripting/dspscript.cpp
     scripting/dspuiscript.cpp
     scripting/bindings.cpp
@@ -261,6 +263,7 @@ libelement = static_library ('element',
     gnu_symbol_visibility : 'hidden',
     dependencies : [ deps, juce_dep, lvtk_host_dep ],
     cpp_args : libelement_cpp_args,
+    link_args : [nodelete_cpp_link_args],
     install : false,
     objects : [ libelement_lua.extract_all_objects (recursive : false),
                 libelement_juce.extract_all_objects (recursive : false) ])

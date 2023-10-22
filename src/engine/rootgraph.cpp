@@ -5,7 +5,8 @@
 
 namespace element {
 
-RootGraph::RootGraph() {}
+RootGraph::RootGraph (Context& c)
+    : GraphNode (c) {}
 
 void RootGraph::refreshPorts()
 {

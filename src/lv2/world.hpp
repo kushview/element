@@ -5,8 +5,9 @@
 
 #include <suil/suil.h>
 
-#include <lvtk/symbols.hpp>
 #include <lvtk/host/node.hpp>
+
+#include <element/symbolmap.hpp>
 
 #include "lv2/lv2features.hpp"
 
@@ -26,7 +27,8 @@ class WorkThread;
 class World
 {
 public:
-    World();
+    World() = delete;
+    World (SymbolMap&);
     ~World();
 
     const LilvNode* lv2_InputPort;
@@ -135,12 +137,12 @@ public:
     /** Unmap a URID */
     String unmap (uint32 urid) { return symbolMap.unmap (urid); }
 
-    lvtk::Symbols& symbols() noexcept { return symbolMap; }
+    SymbolMap& symbols() noexcept { return symbolMap; }
 
 private:
     LilvWorld* world = nullptr;
     SuilHost* suil = nullptr;
-    lvtk::Symbols symbolMap;
+    SymbolMap& symbolMap;
     LV2FeatureArray features;
 
     // a simple rotating thread pool

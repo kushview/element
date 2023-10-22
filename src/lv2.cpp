@@ -6,17 +6,20 @@
 #include <lv2/patch/patch.h>
 
 #include <lvtk/lvtk.hpp>
-#include <lvtk/symbols.hpp>
 #include <lvtk/ext/atom.hpp>
 #include <lvtk/host/world.hpp>
 #include <lvtk/host/instance.hpp>
 
 #include <element/juce/core.hpp>
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
-                                     "-Wunused-variable")
+#include <element/juce/gui_basics.hpp>
+#include <element/juce/gui_extra.hpp>
 
-#include <element/lv2.hpp>
+#include <element/context.hpp>
 #include <element/filesystem.hpp>
+#include <element/lv2.hpp>
+#include <element/symbolmap.hpp>
+#include <element/ui/nodeeditor.hpp>
+#include <element/nodefactory.hpp>
 
 #include "lv2/logfeature.hpp"
 #include "lv2/module.hpp"
@@ -24,16 +27,14 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
 #include "lv2/workthread.hpp"
 #include "lv2/workerfeature.hpp"
 #include "lv2/native.hpp"
-
-#include <element/ui/nodeeditor.hpp>
-#include <element/nodefactory.hpp>
 #include "engine/portbuffer.hpp"
-#include <element/juce/gui_basics.hpp>
-#include <element/juce/gui_extra.hpp>
 
 #if JUCE_MAC
 #include "ui/nsviewwithparent.hpp"
 #endif
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
+                                     "-Wunused-variable")
 
 // Change this to enable logging of various LV2 activities
 #ifndef EL_LV2_LOGGING
@@ -47,6 +48,43 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations",
 #endif
 
 namespace element {
+#if 0
+LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomIn->getPortData(), ev)
+{
+    if (lv2_atom_forge_is_object_type (&forge, ev->body.type))
+    {
+        auto obj = (LV2_Atom_Object*) &ev->body;
+        if (obj->body.otype == urids.patch_Set)
+        {
+            std::clog << "SET\n";
+            // Get the property and value of the set message
+            const LV2_Atom* property = NULL;
+            const LV2_Atom* value = NULL;
+
+            // clang-format off
+            lv2_atom_object_get(obj,
+                                urids.patch_property, &property,
+                                urids.patch_value,    &value,
+                                0);
+            // clang-format on
+
+            if (! property)
+            {
+                std::clog << "Set message with no property\n";
+            }
+
+            else if (property->type != urids.atom_URID)
+            {
+                std::clog << "Set property is not a URID\n";
+                return;
+            }
+
+            const uint32_t key = ((const LV2_Atom_URID*) property)->body;
+            std::clog << "key=" << module->getWorld().unmap (key) << std::endl;
+        }
+    }
+}
+#endif
 
 template <typename Other, typename Word>
 static auto wordCast (Word word)
@@ -405,27 +443,23 @@ public:
           module (module_),
           urids (world.symbols())
     {
-        numPorts = module->getNumPorts();
-        atomControlIn = module->getAtomControlIndex();
-        atomControlOut = module->getNotifyPort();
+        setName (module->getName());
 
-        auto uridMap = (LV2_URID_Map*) world.symbols().map_feature()->data;
-        forge.init (uridMap);
+        numPorts = module->getNumPorts();
+        atomControlIn = module->bestAtomPort (true);
+        atomControlOut = module->bestAtomPort (false);
+
+        auto& sym = world.symbols();
+        forge.init (sym);
 
         wantsMidiMessages = atomControlIn != EL_INVALID_PORT;
         sendsMidiMessages = atomControlOut != EL_INVALID_PORT;
 
         setPorts (module->ports());
-        if (sendsMidiMessages && getNumPorts (PortType::Midi, false) <= 0)
-        {
-            auto newPorts = portList();
-            newPorts.add (PortType::Midi, newPorts.size(), 0, "element_midi_output", "MIDI Out", false);
-            setPorts (newPorts);
-        }
 
         int pi = 0;
         for (const auto& patch : module->getPatches())
-            addPatch (new LV2PatchParameter (*module, patch, pi++, uridMap));
+            addPatch (new LV2PatchParameter (*module, patch, pi++, sym));
 
         for (auto* p : getPatches())
             if (auto patch = dynamic_cast<LV2PatchParameter*> (p))
@@ -539,13 +573,6 @@ public:
     //==============================================================================
     void prepareToRender (double sampleRate, int blockSize) override
     {
-#if 0 // FIXME?
-        const ChannelConfig& channels (module->getChannelConfig());
-        setPlayConfigDetails (channels.getNumAudioInputs(),
-                              channels.getNumAudioOutputs(),
-                              sampleRate,
-                              blockSize);
-#endif
         initialize();
 
         if (initialised)
@@ -564,9 +591,9 @@ public:
         tempBuffer.setSize (1, 1);
     }
 
-    void writeTimeInfoToPort (PortBuffer& port)
+    void writeTimeInfoToPort (AtomBuffer& port)
     {
-        if (! port.isInput())
+        if (! module->wantsTime())
             return;
 
         auto* playhead = getPlayHead();
@@ -580,14 +607,12 @@ public:
         if (! info.hasValue())
             return;
 
-        forge.write_frame_time (0);
-
-        // lvtk::ObjectFrame object { &forge, (uint32_t) 0, urids.time_Position };
+        lv2_atom_forge_set_buffer (&forge, timeBuf, sizeof (timeBuf));
         LV2_Atom_Forge_Frame frame;
-        lv2_atom_forge_object (&forge, &frame, 0, urids.time_Position);
+        auto ref = (LV2_Atom*) lv2_atom_forge_object (&forge, &frame, 0, urids.time_Position);
 
-        forge.write_key (urids.time_speed);
-        forge.write_float (info->getIsPlaying() ? 1.0f : 0.0f);
+        lv2_atom_forge_key (&forge, urids.time_speed);
+        lv2_atom_forge_float (&forge, info->getIsPlaying() ? 1.0f : 0.0f);
 
         if (const auto samples = info->getTimeInSamples())
         {
@@ -629,116 +654,84 @@ public:
         }
 
         lv2_atom_forge_pop (&forge, &frame);
+        port.insert (0, ref->size, ref->type, LV2_ATOM_BODY (ref));
     }
 
-    void renderBypassed (AudioSampleBuffer& a, MidiPipe& m, AudioSampleBuffer& cv) override
+    void renderBypassed (RenderContext& rc) override
     {
-        Processor::renderBypassed (a, m, cv);
+        rc.atom.clear();
+        Processor::renderBypassed (rc.audio, rc.midi, rc.cv);
     }
 
-    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer& cv) override
+    void render (RenderContext& rc) override
     {
-        const auto numSamples = audio.getNumSamples();
+        const auto numSamples = rc.audio.getNumSamples();
 
         if (! initialised)
         {
             for (int i = 0; i < totalAudioOut; ++i)
-                audio.clear (i, 0, numSamples);
-            midi.clear();
+                rc.audio.clear (i, 0, numSamples);
+            rc.midi.clear (0, numSamples);
+            rc.atom.clear (0, numSamples);
             return;
         }
 
-        LV2_Atom_Forge_Frame seqinframe;
-        auto const atomIn = wantsMidiMessages ? module->getPortBuffer (atomControlIn) : nullptr;
-        if (atomIn != nullptr)
+        if (auto const atomIn = wantsMidiMessages ? rc.atom.writeBuffer (0) : nullptr)
         {
-            atomIn->reset();
-            forge.set_buffer ((uint8_t*) atomIn->getPortData(), atomIn->getCapacity());
-            lv2_atom_forge_sequence_head (&forge, &seqinframe, 0);
             writeTimeInfoToPort (*atomIn);
-        }
-
-        module->referAudioReplacing (audio, cv);
-        module->processEvents (atomIn);
-
-        if (atomIn != nullptr)
-        {
-            for (auto m : *midi.getReadBuffer (0))
+#if 0
+            LV2_ATOM_SEQUENCE_FOREACH (atomIn->sequence(), ev)
             {
-                atomIn->addEvent (m.samplePosition,
-                                  static_cast<uint32_t> (m.numBytes),
-                                  urids.midi_MidiEvent,
-                                  m.data);
-            }
 
-            lv2_atom_forge_pop (&forge, &seqinframe);
-        }
-
-        if (atomIn != nullptr)
-        {
-            LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomIn->getPortData(), ev)
-            {
-                if (lv2_atom_forge_is_object_type (&forge, ev->body.type))
-                {
-                    auto obj = (LV2_Atom_Object*) &ev->body;
-                    if (obj->body.otype == urids.patch_Set)
-                    {
-                        std::clog << "SET\n";
-                        // Get the property and value of the set message
-                        const LV2_Atom* property = NULL;
-                        const LV2_Atom* value = NULL;
-
-                        // clang-format off
-                        lv2_atom_object_get(obj,
-                                            urids.patch_property, &property,
-                                            urids.patch_value,    &value,
-                                            0);
-                        // clang-format on
-
-                        if (! property)
-                        {
-                            std::clog << "Set message with no property\n";
-                        }
-
-                        else if (property->type != urids.atom_URID)
-                        {
-                            std::clog << "Set property is not a URID\n";
-                            return;
-                        }
-
-                        const uint32_t key = ((const LV2_Atom_URID*) property)->body;
-                        std::clog << "key=" << module->getWorld().unmap (key) << std::endl;
-                    }
+                if (ev->body.type == urids.midi_MidiEvent) {
+                    MidiMessage msg (LV2_ATOM_BODY (&ev->body), ev->body.size, 0.0);
+                    std::clog << msg.getDescription() << std::endl;
                 }
+
             }
+#endif
         }
 
+        module->referBuffers (rc);
+        module->processEvents();
         module->run ((uint32) numSamples);
-        midi.clear();
+        rc.midi.clear();
+        rc.atom.clear();
 
         if (auto const atomIn = sendsMidiMessages ? module->getPortBuffer (atomControlOut) : nullptr)
         {
-            LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomIn->getPortData(), ev)
+            const auto ch = module->ports().getChannelForPort ((int) atomControlOut);
+            auto seq = (LV2_Atom_Sequence*) atomIn->getPortData();
+            auto out = rc.atom.writeBuffer (ch);
+
+            LV2_ATOM_SEQUENCE_FOREACH (seq, ev)
             {
-                if (ev->body.type == urids.midi_MidiEvent)
-                {
-                    midi.getWriteBuffer (0)->addEvent (
-                        LV2_ATOM_BODY_CONST (&ev->body),
-                        ev->body.size,
-                        (int) ev->time.frames);
+#if 0
+                if (ev->body.type == urids.midi_MidiEvent) {
+                    MidiMessage msg (LV2_ATOM_BODY (&ev->body), ev->body.size, 0.0);
+                    std::clog << msg.getDescription() << std::endl;
                 }
+#endif
+                out->insert (ev->time.frames,
+                             ev->body.size,
+                             ev->body.type,
+                             LV2_ATOM_BODY (&ev->body));
             }
+
+            atomIn->clear();
         }
     }
 
     //==========================================================================
-    bool wantsMidiPipe() const override { return true; }
+    bool wantsMidiPipe() const override { return false; }
+    bool wantsContext() const noexcept override { return true; }
+
     double getTailLengthSeconds() const { return 0.0f; }
     void* getPlatformSpecificData() { return module->getHandle(); }
-    const String getName() const { return module->getName(); }
+
     bool silenceInProducesSilenceOut() const { return false; }
     bool acceptsMidi() const { return wantsMidiMessages; }
-    bool producesMidi() const { return atomControlOut != LV2UI_INVALID_PORT_INDEX; }
+    bool producesMidi() const { return sendsMidiMessages; }
 
     bool hasEditor() override { return module->hasEditor(); }
     Editor* createEditor() override;
@@ -784,13 +777,15 @@ private:
     uint32 numPorts { 0 };
     uint32 atomControlIn { EL_INVALID_PORT };
     uint32 atomControlOut { EL_INVALID_PORT };
+    uint8_t timeBuf[512] = { 0 };
 
     int totalAudioIn { 0 },
         totalAudioOut { 0 };
 
     struct URIDs
     {
-        URIDs (lvtk::Symbols& sym)
+        template <class Sym>
+        URIDs (Sym&& sym)
             : atom_eventTransfer (sym.map (LV2_ATOM__eventTransfer)),
               atom_Object (sym.map (LV2_ATOM__Object)),
               atom_Sequence (sym.map (LV2_ATOM__Sequence)),
@@ -930,14 +925,13 @@ public:
         stopTimer();
 
         view->prepareForDestruction();
+        view.reset();
 
         if (ui != nullptr)
         {
             ui->unload();
             ui = nullptr;
         }
-
-        view.reset();
     }
 
     void viewRequestedResizeInPhysicalPixels (int width, int height) override
@@ -1087,6 +1081,7 @@ private:
 
         ~ViewComponent()
         {
+            setHWND (nullptr);
         }
 
         void paint (Graphics& g) override { g.fillAll (Colours::black); }
@@ -1137,14 +1132,27 @@ Editor* LV2Processor::createEditor()
 class LV2NodeProvider::LV2
 {
 public:
-    LV2 (LV2NodeProvider& p) : provider (p)
+    LV2 (LV2NodeProvider& p, SymbolMap& s)
+        : _symowned (false),
+          _symbols (&s),
+          provider (p)
     {
-        world = std::make_unique<World>();
+        world = std::make_unique<World> (*_symbols);
+    }
+
+    LV2 (LV2NodeProvider& p)
+        : _symowned (true),
+          _symbols (new SymbolMap()),
+          provider (p)
+    {
+        world = std::make_unique<World> (*_symbols);
     }
 
     ~LV2()
     {
         world.reset();
+        if (_symowned && _symbols != nullptr)
+            delete _symbols;
     }
 
     void getTypes (StringArray& tps)
@@ -1182,9 +1190,16 @@ public:
 
 private:
     friend class LV2NodeProvider;
+    bool _symowned = false;
+    SymbolMap* _symbols { nullptr };
     LV2NodeProvider& provider;
     std::unique_ptr<World> world;
 };
+
+LV2NodeProvider::LV2NodeProvider (SymbolMap& s)
+{
+    lv2 = std::make_unique<LV2> (*this, s);
+}
 
 LV2NodeProvider::LV2NodeProvider()
 {

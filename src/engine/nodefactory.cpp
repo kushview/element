@@ -85,9 +85,7 @@ struct SingleNodeProvider : public NodeProvider
 class NodeFactory::Impl
 {
 public:
-    Impl (NodeFactory& f) : factory (f)
-    {
-    }
+    Impl (NodeFactory& f) : factory (f) {}
 
     ~Impl()
     {
@@ -114,7 +112,6 @@ NodeFactory::NodeFactory()
     add (new SingleNodeProvider<OSCSenderNode> (EL_NODE_ID_OSC_SENDER));
     add (new SingleNodeProvider<OSCReceiverNode> (EL_NODE_ID_OSC_RECEIVER));
     add (new SingleNodeProvider<ScriptNode> (EL_NODE_ID_SCRIPT));
-    add (new SingleNodeProvider<GraphNode> (EL_NODE_ID_GRAPH));
     add (new SingleNodeProvider<MackieControlUniversal> ("el.MCU"));
 #if ! JUCE_DEBUG
     hideType ("el.MCU");

@@ -5,6 +5,8 @@
 #include <element/midipipe.hpp>
 #include <element/node.hpp>
 #include <element/portcount.hpp>
+#include <element/context.hpp>
+#include <element/symbolmap.hpp>
 
 #include "engine/graphbuilder.hpp"
 #include "engine/ionode.hpp"
@@ -22,11 +24,12 @@ namespace element {
 GraphNode::Connection::Connection (const uint32 sourceNode_, const uint32 sourcePort_, const uint32 destNode_, const uint32 destPort_) noexcept
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_) {}
 
-GraphNode::GraphNode()
+GraphNode::GraphNode (Context& c)
     : Processor (PortCount()
                      .with (PortType::Audio, 2, 2)
                      .with (PortType::Midi, 1, 1)
                      .toPortList()),
+      _context (c),
       lastNodeId (0),
       renderingBuffers (1, 1),
       currentAudioInputBuffer (nullptr),
@@ -398,6 +401,7 @@ void GraphNode::buildRenderingSequence()
     Array<void*> newRenderingOps;
     int numRenderingBuffersNeeded = 2;
     int numMidiBuffersNeeded = 1;
+    int numAtomBuffersNeeded = 1;
 
     {
         //XXX:
@@ -424,6 +428,7 @@ void GraphNode::buildRenderingSequence()
         GraphBuilder builder (*this, orderedNodes, newRenderingOps);
         numRenderingBuffersNeeded = builder.buffersNeeded (PortType::Audio);
         numMidiBuffersNeeded = builder.buffersNeeded (PortType::Midi);
+        numAtomBuffersNeeded = builder.buffersNeeded (PortType::Atom);
         setLatencySamples (builder.getTotalLatencySamples());
     }
 
@@ -433,12 +438,18 @@ void GraphNode::buildRenderingSequence()
             const ScopedLock sl (getPropertyLock());
             renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
             renderingBuffers.clear();
-
+            for (auto ab : atomBuffers)
+                ab->clear();
             for (int i = midiBuffers.size(); --i >= 0;)
                 midiBuffers.getUnchecked (i)->clear();
 
             while (midiBuffers.size() < numMidiBuffersNeeded)
                 midiBuffers.add (new MidiBuffer());
+            while (atomBuffers.size() < numAtomBuffersNeeded)
+            {
+                auto ab = atomBuffers.add (new AtomBuffer());
+                ab->setTypes (_context.symbols());
+            }
         }
 
         ScopedLock sl (seqLock);
@@ -561,10 +572,10 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi, AudioSampleBu
 
     {
         ScopedLock sl (seqLock);
-        for (int i = 0; i < renderingOps.size(); ++i)
+        for (auto ptr : renderingOps)
         {
-            GraphOp* const op = static_cast<GraphOp*> (renderingOps.getUnchecked (i));
-            op->perform (renderingBuffers, midiBuffers, numSamples);
+            GraphOp* const op = static_cast<GraphOp*> (ptr);
+            op->perform (renderingBuffers, midiBuffers, atomBuffers, numSamples);
         }
     }
 
@@ -637,5 +648,7 @@ void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
     else
         resetPorts();
 }
+
+SymbolMap& GraphNode::symbols() noexcept { return _context.symbols(); }
 
 } // namespace element

@@ -20,6 +20,7 @@ class Log;
 class PluginManager;
 class PresetManager;
 class Settings;
+class SymbolMap;
 
 class Context {
 public:
@@ -39,6 +40,7 @@ public:
     SessionPtr session();
 
     Settings& settings();
+    SymbolMap& symbols();
 
     //=========================================================================
     void openModule (const std::string& path);

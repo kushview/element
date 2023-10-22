@@ -12,7 +12,8 @@ namespace element {
 class RootGraph : public GraphNode
 {
 public:
-    RootGraph();
+    RootGraph() = delete;
+    RootGraph (Context&);
     ~RootGraph() {}
 
     enum RenderMode

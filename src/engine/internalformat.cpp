@@ -27,6 +27,8 @@
 #include "nodes/volume.hpp"
 #include "nodes/wetdry.hpp"
 
+#include "engine/graphnode.hpp"
+
 #include "engine/internalformat.hpp"
 #include "engine/ionode.hpp"
 
@@ -253,5 +255,25 @@ bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (con
 {
     return false;
 }
+
+//==============================================================================
+InternalNodes::InternalNodes (Context& c)
+    : _context (c) {}
+
+Processor* InternalNodes::create (const String& ID)
+{
+    if (ID == EL_NODE_ID_GRAPH)
+    {
+        return new GraphNode (_context);
+    }
+    return nullptr;
+}
+
+StringArray InternalNodes::findTypes()
+{
+    return { EL_NODE_ID_GRAPH };
+}
+
+StringArray InternalNodes::getHiddenTypes() { return {}; }
 
 } // namespace element

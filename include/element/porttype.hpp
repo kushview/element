@@ -119,16 +119,13 @@ public:
         if (sourceType == PortType::Unknown || destType == PortType::Unknown)
             return false;
 
-        if (sourceType == destType)
-            return true;
-
-        if (sourceType == PortType::Audio && destType == PortType::CV)
-            return true;
-
-        if (sourceType == PortType::Control && destType == PortType::CV)
-            return true;
-
-        return false;
+        // clang-format off
+        return ((sourceType == destType) ||
+            (sourceType == PortType::Audio && destType == PortType::CV) ||
+            (sourceType == PortType::Control && destType == PortType::CV) ||
+            (sourceType == PortType::Atom && destType == PortType::Midi) ||
+            (sourceType == PortType::Midi && destType == PortType::Atom));
+        // clang-forman on
     }
 
     /** Return true if this port type can connect to another

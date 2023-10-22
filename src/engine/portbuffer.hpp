@@ -38,10 +38,12 @@ public:
     inline bool isEvent() const noexcept { return type == PortType::Event; }
     inline bool isSequence() const noexcept { return isAtom(); }
 
+    constexpr bool referred() const noexcept { return referenced; }
+
     void referTo (void* location)
     {
-        buffer.referred = location;
-        referenced = true;
+        referenced = location != nullptr;
+        buffer.referred = referenced ? location : data.get();
     }
 
     float getValue() const;

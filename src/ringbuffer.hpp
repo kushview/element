@@ -22,10 +22,14 @@ public:
     inline bool canWrite (uint32 bytes) const { return bytes <= (uint32) fifo.getFreeSpace() && bytes != 0; }
     inline uint32 getWriteSpace() const { return (uint32) fifo.getFreeSpace(); }
 
-    inline uint32
-        peak (void* dest, uint32 size)
+    inline uint32 peak (void* dest, uint32 size)
     {
         return read (dest, size, false);
+    }
+
+    inline void clear()
+    {
+        fifo.reset();
     }
 
     inline void advance (uint32 bytes, bool write)
@@ -36,8 +40,7 @@ public:
             fifo.finishedRead (static_cast<int> (bytes));
     }
 
-    inline uint32
-        read (void* dest, uint32 size, bool advance = true)
+    inline uint32 read (void* dest, uint32 size, bool advance = true)
     {
         buffer = block.getData();
         fifo.prepareToRead (size, vec1.index, vec1.size, vec2.index, vec2.size);
@@ -65,8 +68,7 @@ public:
         jassertfalse;
     }
 
-    inline uint32
-        write (const void* src, uint32 bytes)
+    inline uint32 write (const void* src, uint32 bytes)
     {
         buffer = block.getData();
         fifo.prepareToWrite (bytes, vec1.index, vec1.size, vec2.index, vec2.size);

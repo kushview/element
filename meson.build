@@ -49,6 +49,8 @@ element_binaries = []
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
+nodelete_cpp_link_args = cpp.get_supported_link_arguments(['-Wl,-z,nodelete'])
+
 # Add objective-c if on mac
 if host_machine.system() == 'darwin'
   add_languages(['objc', 'objcpp'], native : false, required : true)
@@ -58,59 +60,9 @@ endif
 
 element_include_subdir = 'element-1.0' / 'element'
 element_include_dir = get_option ('includedir') / element_include_subdir
+
 subdir ('meson/juce')
-
-# Boost
-boost_dep = dependency ('boost', required : true)
-
-# LV2 / LVTK
-lv2_dep = dependency ('lv2', version: '>= 1.18.2' , required : false)
-if not lv2_dep.found()
-    lv2_proj = subproject ('lv2',
-        default_options: [])
-    lv2_dep = lv2_proj.get_variable ('lv2_dep')
-endif
-
-lvtk_proj = subproject ('lvtk', 
-    default_options: [
-        'default_library=static'
-    ])
-lvtk_host_dep = lvtk_proj.get_variable ('lvtk_dep')
-add_project_arguments (['-DLVTK_STATIC=1', '-DPUGL_STATIC=1'], 
-    language: ['c', 'cpp', 'objc', 'objcpp'])
-
-lilv_dep = dependency ('lilv-0', required : false)
-if not lilv_dep.found()
-    lilv_proj = subproject ('lilv',
-        default_options: [])
-    lilv_dep = lilv_proj.get_variable ('lilv_dep')
-endif
-
-suil_dep = dependency ('suil-0', required : false)
-if not suil_dep.found()
-    suil_proj = subproject ('suil',
-        default_options: [])
-    suil_dep = suil_proj.get_variable ('suil_dep')
-endif
-
-# JACK
-jack_enabled = false
-jack_includes = include_directories()
-
-if not get_option('jack').disabled()
-    jack_enabled = cpp.check_header ('jack/jack.h', 
-        required : get_option('jack').enabled(),
-        include_directories : jack_includes)
-endif
-if jack_enabled
-    add_project_arguments ('-DEL_USE_JACK=1', language : [ 'c', 'objc', 'cpp', 'objcpp' ])
-endif
-
-# Sol3
-if cpp.get_argument_syntax() == 'gcc'
-    # silence warnings from sol3
-    add_project_arguments (['-Wno-array-bounds'], language : ['cpp'])
-endif
+subdir ('meson/deps')
 
 deps = [ boost_dep, lv2_dep, lilv_dep, suil_dep, lvtk_host_dep ]
 
@@ -178,7 +130,7 @@ if not get_option ('element-apps').disabled()
         gnu_symbol_visibility : 'hidden',
         dependencies : element_app_deps,
         include_directories : [ 'src', libelement_includes ],
-        link_args : element_app_link_args,
+        link_args : [ element_app_link_args, nodelete_cpp_link_args ],
         link_with : [ libelement ])
     element_binaries += element_app
 endif

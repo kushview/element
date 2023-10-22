@@ -5,6 +5,7 @@
 
 #include <element/node.h>
 #include <element/juce/audio_processors.hpp>
+#include <element/nodefactory.hpp>
 
 namespace element {
 
@@ -37,6 +38,21 @@ protected:
 private:
     Context& _context;
     juce::AudioPluginInstance* instantiatePlugin (const juce::PluginDescription& desc, double rate, int block);
+};
+
+class InternalNodes : public NodeProvider
+{
+public:
+    InternalNodes() = delete;
+    InternalNodes (Context& c);
+
+    juce::String format() const override { return EL_NODE_FORMAT_NAME; }
+    Processor* create (const String& ID) override;
+    juce::StringArray findTypes() override;
+    juce::StringArray getHiddenTypes() override;
+
+private:
+    Context& _context;
 };
 
 } // namespace element

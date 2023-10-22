@@ -4,18 +4,21 @@
 #pragma once
 
 #include <element/nodefactory.hpp>
-#include <element/processor.hpp>
 
 namespace element {
+
+class SymbolMap;
+class Processor;
 
 //==============================================================================
 class LV2NodeProvider : public NodeProvider {
 public:
     LV2NodeProvider();
+    LV2NodeProvider (SymbolMap&);
     ~LV2NodeProvider();
-    String format() const override { return "LV2"; }
-    Processor* create (const String&) override;
-    StringArray findTypes() override;
+    juce::String format() const override { return "LV2"; }
+    Processor* create (const juce::String&) override;
+    juce::StringArray findTypes() override;
 
 private:
     class LV2;

@@ -9,15 +9,17 @@ BOOST_AUTO_TEST_SUITE (NodeFactoryTests)
 
 BOOST_AUTO_TEST_CASE (Internals)
 {
+    // Check SingleNode registrants.
+
     NodeFactory nodes;
     const StringArray expectedIDs (
         EL_NODE_ID_AUDIO_ROUTER,
-        EL_NODE_ID_GRAPH,
+        // EL_NODE_ID_GRAPH, // see InternalNodes
         EL_NODE_ID_MIDI_CHANNEL_SPLITTER,
         EL_NODE_ID_MIDI_MONITOR,
         EL_NODE_ID_MIDI_PROGRAM_MAP,
         EL_NODE_ID_MIDI_ROUTER,
-        // EL_NODE_ID_MIDI_SEQUENCER,
+        // EL_NODE_ID_MIDI_SEQUENCER, // Not available
         EL_NODE_ID_OSC_RECEIVER,
         EL_NODE_ID_OSC_SENDER,
         EL_NODE_ID_SCRIPT,

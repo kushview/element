@@ -11,14 +11,18 @@
 
 namespace element {
 
+class Context;
+class SymbolMap;
+
 class GraphNode : public Processor,
                   private AsyncUpdater
 {
 public:
     Signal<void()> renderingSequenceChanged;
 
+    GraphNode() = delete;
     /** Creates an empty graph. */
-    GraphNode();
+    GraphNode (Context&);
 
     /** Destructor.
         Any processor objects that have been added to the graph will also be deleted.
@@ -180,6 +184,8 @@ public:
     /** Returns true if the graph is prepared. */
     bool prepared() const noexcept { return _prepared; }
 
+    SymbolMap& symbols() noexcept;
+
 protected:
     //==========================================================================
     virtual void preRenderNodes() {}
@@ -196,6 +202,8 @@ private:
     friend class NodeObjectSync;
     friend class Node;
 
+    Context& _context;
+
     typedef ArcTable<Connection> LookupTable;
     ReferenceCountedArray<Processor> nodes;
     OwnedArray<Connection> connections;
@@ -204,6 +212,7 @@ private:
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
     OwnedArray<MidiBuffer> midiBuffers;
+    OwnedArray<AtomBuffer> atomBuffers;
     Array<void*> renderingOps;
     bool _prepared = false;
 

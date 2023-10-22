@@ -1,4 +1,5 @@
 test_element_sources = '''
+    atomtests.cpp
     datapathtests.cpp
     GraphNodeTests.cpp  
     NodeFactoryTests.cpp  
@@ -40,6 +41,7 @@ test_element_app = executable ('test_element',
     install : false
 )
 
+test ('Atoms',          test_element_app, args : [ '-t', 'AtomTests' ])
 test ('DataPath',       test_element_app, args : [ '-t', 'DataPathTests' ])
 test ('GraphNode',      test_element_app, args : [ '-t', 'GraphNodeTests' ])
 test ('RootGraph',      test_element_app, args : [ '-t', 'RootGraphTests' ])

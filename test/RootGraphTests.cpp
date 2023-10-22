@@ -1,4 +1,7 @@
 #include <boost/test/unit_test.hpp>
+
+#include <element/context.hpp>
+
 #include "engine/rootgraph.hpp"
 #include "utils.hpp"
 
@@ -19,12 +22,15 @@ BOOST_AUTO_TEST_SUITE (RootGraphTests)
 
 BOOST_AUTO_TEST_CASE (Layout)
 {
-    RootGraph root;
-    DummyAudioDeviceSetup setup;
-    root.setPlayConfigFor (setup);
-    BOOST_REQUIRE (root.getSampleRate() == setup.sampleRate);
-    BOOST_REQUIRE (root.getBlockSize() == setup.bufferSize);
-    root.clear();
+    Context context (RunMode::Standalone);
+    {
+        RootGraph root (context);
+        DummyAudioDeviceSetup setup;
+        root.setPlayConfigFor (setup);
+        BOOST_REQUIRE (root.getSampleRate() == setup.sampleRate);
+        BOOST_REQUIRE (root.getBlockSize() == setup.bufferSize);
+        root.clear();
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

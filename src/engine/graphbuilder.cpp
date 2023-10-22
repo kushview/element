@@ -1,13 +1,24 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <element/atombuffer.hpp>
+#include <element/symbolmap.hpp>
 #include <element/processor.hpp>
+
 #include "engine/miditranspose.hpp"
 #include "engine/graphnode.hpp"
 #include "engine/graphbuilder.hpp"
 #include "engine/ionode.hpp"
 
+#ifndef EL_TRACE_GRAPH_OPS
+#define EL_TRACE_GRAPH_OPS 0
+#endif
+
 namespace element {
+
+using SharedMidi = OwnedArray<MidiBuffer>;
+using SharedAtom = OwnedArray<AtomBuffer>;
+using SharedAudio = AudioSampleBuffer;
 
 class ApplyParamToCVOp : public GraphOp
 {
@@ -18,7 +29,7 @@ public:
         value.setCurrentAndTargetValue (param->getValue());
     }
 
-    void perform (AudioSampleBuffer& buffer, const OwnedArray<MidiBuffer>&, const int nframes) override
+    void perform (AudioSampleBuffer& buffer, const OwnedArray<MidiBuffer>&, const SharedAtom&, const int nframes) override
     {
         value.setTargetValue (param->getValue());
         auto ptr = buffer.getWritePointer (cvIndex);
@@ -57,13 +68,145 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const int) override {}
+    void perform (AudioSampleBuffer&, const SharedMidi&, const SharedAtom&, const int) override {}
 
 private:
     ParameterPtr param1, param2;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BindParameterOp)
 };
 
+//==============================================================================
+class CopyAtomBufferOp : public GraphOp
+{
+public:
+    CopyAtomBufferOp (const int srcBufferNum_, const int dstBufferNum_)
+        : srcBufferNum (srcBufferNum_),
+          dstBufferNum (dstBufferNum_)
+    {
+    }
+
+    std::string traceStep() const noexcept
+    {
+        String str;
+        str << "CopyAtomBuffer: buffers " << srcBufferNum << " to " << dstBufferNum;
+        return str.toStdString();
+    }
+
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const SharedAtom& atom, const int)
+    {
+        auto dst = atom.getUnchecked (dstBufferNum);
+        dst->clear();
+        dst->add (*atom.getUnchecked (srcBufferNum));
+    }
+
+private:
+    const int srcBufferNum, dstBufferNum;
+
+    JUCE_DECLARE_NON_COPYABLE (CopyAtomBufferOp)
+};
+
+class AddAtomBufferOp : public GraphOp
+{
+public:
+    AddAtomBufferOp (const int srcBufferNum_, const int dstBufferNum_)
+        : srcBufferNum (srcBufferNum_),
+          dstBufferNum (dstBufferNum_)
+    {
+    }
+
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const SharedAtom& atom, const int numSamples)
+    {
+        atom.getUnchecked (dstBufferNum)
+            ->add (*atom.getUnchecked (srcBufferNum)); // TODO: -> , 0, numSamples, 0);
+    }
+
+private:
+    const int srcBufferNum, dstBufferNum;
+
+    JUCE_DECLARE_NON_COPYABLE (AddAtomBufferOp)
+};
+
+class ClearAtomBufferOp : public GraphOp
+{
+    const int bufferIdx;
+
+public:
+    ClearAtomBufferOp (int b)
+        : bufferIdx (b) {}
+
+    std::string traceStep() const noexcept
+    {
+        String str;
+        str << "ClearAtomBufferOp: buffer " << bufferIdx;
+        return str.toStdString();
+    }
+
+    void perform (SharedAudio&, const SharedMidi&, const SharedAtom& atom, const int numSamples) override
+    {
+        atom.getUnchecked (bufferIdx)->clear (0, numSamples);
+    }
+};
+
+class MidiToAtomOp : public GraphOp
+{
+public:
+    MidiToAtomOp (int midiIndex, int atomIndex)
+        : _midiIdx (midiIndex), _atomIdx (atomIndex) {}
+
+    std::string traceStep() const noexcept
+    {
+        String str;
+        str << "MidiToAtomOp: midi " << _midiIdx << " to atom " << _atomIdx;
+        return str.toStdString();
+    }
+
+    void perform (SharedAudio&, const SharedMidi& midi, const SharedAtom& atom, const int) override
+    {
+        atom.getUnchecked (_atomIdx)->add (*midi.getUnchecked (_midiIdx));
+    }
+
+private:
+    const int _midiIdx, _atomIdx;
+};
+
+class AtomToMidiOp : public GraphOp
+{
+public:
+    AtomToMidiOp (int atomIndex, int midiIndex, uint32_t midiEventURID) noexcept
+        : _atomIdx (atomIndex),
+          _midiIdx (midiIndex),
+          midi_MidiEvent (midiEventURID) {}
+
+    std::string traceStep() const noexcept
+    {
+        String str;
+        str << "AtomToMidiOp: atom " << _atomIdx << " to midi " << _midiIdx;
+        return str.toStdString();
+    }
+
+    void perform (SharedAudio&, const SharedMidi& midi, const SharedAtom& atom, const int nframes) override
+    {
+        auto seq = atom.getUnchecked (_atomIdx)->sequence();
+        auto mb = midi.getUnchecked (_midiIdx);
+
+        LV2_ATOM_SEQUENCE_FOREACH (seq, ev)
+        {
+            if (ev->time.frames > nframes)
+                break;
+            if (ev->body.type != midi_MidiEvent)
+                continue;
+            mb->addEvent (LV2_ATOM_BODY (&ev->body),
+                          ev->body.size,
+                          static_cast<int> (ev->time.frames));
+        }
+    }
+
+private:
+    const int _atomIdx, _midiIdx;
+    const uint32_t midi_MidiEvent;
+};
+
+//==============================================================================
 class ClearChannelOp : public GraphOp
 {
 public:
@@ -72,7 +215,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const SharedAtom&, const int numSamples)
     {
         sharedBufferChans.clear (channelNum, 0, numSamples);
     }
@@ -92,7 +235,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const SharedAtom&, const int numSamples)
     {
         sharedBufferChans.copyFrom (dstChannelNum, 0, sharedBufferChans, srcChannelNum, 0, numSamples);
     }
@@ -112,7 +255,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const SharedAtom&, const int numSamples)
     {
         sharedBufferChans.addFrom (dstChannelNum, 0, sharedBufferChans, srcChannelNum, 0, numSamples);
     }
@@ -131,7 +274,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const SharedAtom&, const int)
     {
         sharedMidiBuffers.getUnchecked (bufferNum)->clear();
     }
@@ -142,6 +285,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ClearMidiBufferOp)
 };
 
+//==============================================================================
 class CopyMidiBufferOp : public GraphOp
 {
 public:
@@ -151,7 +295,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const SharedAtom&, const int)
     {
         *sharedMidiBuffers.getUnchecked (dstBufferNum) = *sharedMidiBuffers.getUnchecked (srcBufferNum);
     }
@@ -171,7 +315,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const SharedAtom&, const int numSamples)
     {
         sharedMidiBuffers.getUnchecked (dstBufferNum)
             ->addEvents (*sharedMidiBuffers.getUnchecked (srcBufferNum), 0, numSamples, 0);
@@ -195,7 +339,7 @@ public:
         buffer.calloc ((size_t) bufferSize);
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const SharedAtom&, const int numSamples)
     {
         float* data = sharedBufferChans.getWritePointer (channel, 0);
 
@@ -232,6 +376,7 @@ public:
           audioChannelsToUse (chans[PortType::Audio]),
           cvChannelsToUse (chans[PortType::CV]),
           midiChannelsToUse (chans[PortType::Midi]),
+          atomChannelsToUse (chans[PortType::Atom]),
           totalChans (std::max (1, totalChans_)),
           totalCV (std::max (1, totalCV_)),
           numAudioIns (node_->getNumPorts (PortType::Audio, true)),
@@ -251,6 +396,9 @@ public:
         else
             midiChannelsToUse.add (midiBufferToUse);
 
+        if (atomChannelsToUse.isEmpty())
+            atomChannelsToUse.add (0);
+
         lastMute = node->isMuted();
 
         osChanSize = totalChans;
@@ -258,21 +406,27 @@ public:
         tempMidi.ensureSize (128);
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (SharedAudio& sharedBufferChans,
+                  const SharedMidi& sharedMidiBuffers,
+                  const SharedAtom& sharedAtomBuffers,
+                  const int numSamples) override
     {
         for (int i = totalChans; --i >= 0;)
             channels[i] = sharedBufferChans.getWritePointer (audioChannelsToUse.getUnchecked (i), 0);
         for (int i = totalCV; --i >= 0;)
             cv[i] = sharedBufferChans.getWritePointer (cvChannelsToUse.getUnchecked (i), 0);
 
-        AudioSampleBuffer buffer (channels, totalChans, numSamples);
-        AudioSampleBuffer cvbuffer (cv, totalCV, numSamples);
-        MidiPipe midiPipe (sharedMidiBuffers, midiChannelsToUse);
+        // clang-format off
+        RenderContext context (channels, totalChans, cv, totalCV, 
+                               sharedMidiBuffers, midiChannelsToUse, 
+                               sharedAtomBuffers, atomChannelsToUse,
+                               numSamples);
+        // clang-format on
 
         if (! node->isEnabled())
         {
             for (int ch = numAudioIns; ch < numAudioOuts; ++ch)
-                buffer.clear (ch, 0, buffer.getNumSamples());
+                context.audio.clear (ch, 0, numSamples);
             return;
         }
 
@@ -284,30 +438,30 @@ public:
             if (lastMute != muted)
             {
                 // just became muted
-                buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), 0.0);
+                context.audio.applyGainRamp (0, numSamples, node->getLastInputGain(), 0.0);
             }
             else
             {
                 // normal mute processing
-                buffer.applyGain (0, numSamples, 0.0);
+                context.audio.applyGain (0, numSamples, 0.0);
             }
         }
         else if (! muted && muteInput && muted != lastMute)
         {
             // just became unmuted
-            buffer.applyGainRamp (0, numSamples, 0.0, node->getInputGain());
+            context.audio.applyGainRamp (0, numSamples, 0.0, node->getInputGain());
         }
         else if (node->getInputGain() != node->getLastInputGain())
         {
-            buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), node->getInputGain());
+            context.audio.applyGainRamp (0, numSamples, node->getLastInputGain(), node->getInputGain());
         }
         else
         {
-            buffer.applyGain (0, numSamples, node->getInputGain());
+            context.audio.applyGain (0, numSamples, node->getInputGain());
         }
 
         for (int i = numAudioIns; --i >= 0;)
-            node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
+            node->setInputRMS (i, context.audio.getRMSLevel (i, 0, numSamples));
 
         // Begin MIDI filters
         {
@@ -320,9 +474,9 @@ public:
 
             if (keyRange.getLength() > 0 || ! midiChans.isOmni() || useMidiProgram)
             {
-                for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
+                for (int i = 0; i < context.midi.getNumBuffers(); ++i)
                 {
-                    auto& midi = *midiPipe.getWriteBuffer (i);
+                    auto& midi = *context.midi.getWriteBuffer (i);
                     for (auto m : midi)
                     {
                         auto msg = m.getMessage();
@@ -353,33 +507,40 @@ public:
             }
             else
             {
-                for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
-                    transpose.process (*midiPipe.getWriteBuffer (i), numSamples);
+                for (int i = context.midi.getNumBuffers(); --i >= 0;)
+                    transpose.process (*context.midi.getWriteBuffer (i), numSamples);
             }
         }
 
         tempMidi.clear();
         // End MIDI filters
 
-        auto pluginProcessBlock = [=] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, AudioSampleBuffer& cvbuffer, bool isSuspended) {
+        auto pluginProcessBlock = [=] (RenderContext& context, bool isSuspended) {
             if (node->wantsMidiPipe())
             {
                 if (! node->isSuspended())
-                    node->render (buffer, midiPipe, cvbuffer);
+                    node->render (context.audio, context.midi, context.cv);
                 else
-                    node->renderBypassed (buffer, midiPipe, cvbuffer);
+                    node->renderBypassed (context.audio, context.midi, context.cv);
+            }
+            else if (node->wantsContext())
+            {
+                if (! node->isSuspended())
+                    node->render (context);
+                else
+                    node->renderBypassed (context);
             }
             else
             {
                 jassert (processor != nullptr);
                 if (! isSuspended)
                 {
-                    processor->processBlock (buffer, *midiPipe.getWriteBuffer (0));
+                    processor->processBlock (context.audio, *context.midi.getWriteBuffer (0));
                     // processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
                 }
                 else
                 {
-                    processor->processBlockBypassed (buffer, *midiPipe.getWriteBuffer (0));
+                    processor->processBlockBypassed (context.audio, *context.midi.getWriteBuffer (0));
                     // processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
                 }
             }
@@ -390,27 +551,27 @@ public:
         {
             auto osProcessor = node->getOversamplingProcessor();
 
-            dsp::AudioBlock<float> block (buffer);
+            dsp::AudioBlock<float> block (context.audio);
             dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
 
-            if (buffer.getNumChannels() > osChanSize)
+            if (context.audio.getNumChannels() > osChanSize)
             {
-                osChanSize = buffer.getNumChannels();
+                osChanSize = context.audio.getNumChannels();
                 osChans.reset (new float*[osChanSize]);
             }
 
             float** osData = osChans.get();
-            for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+            for (int ch = 0; ch < context.audio.getNumChannels(); ++ch)
                 osData[ch] = osBlock.getChannelPointer (ch);
 
-            AudioSampleBuffer osBuffer (osData,
-                                        buffer.getNumChannels(),
-                                        static_cast<int> (osBlock.getNumSamples()));
+            context.audio.setDataToReferTo (osData,
+                                            context.audio.getNumChannels(),
+                                            static_cast<int> (osBlock.getNumSamples()));
 
             tempMidi.clear();
-            for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
+            for (int i = 0; i < context.midi.getNumBuffers(); ++i)
             {
-                auto& mb = *midiPipe.getWriteBuffer (i);
+                auto& mb = *context.midi.getWriteBuffer (i);
                 for (const MidiMessageMetadata msg : mb)
                 {
                     tempMidi.addEvent (
@@ -422,13 +583,13 @@ public:
                 tempMidi.clear();
             }
 
-            pluginProcessBlock (osBuffer, midiPipe, cvbuffer, node->isSuspended());
+            pluginProcessBlock (context, node->isSuspended());
             osProcessor->processSamplesDown (block);
 
             tempMidi.clear();
-            for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
+            for (int i = 0; i < context.midi.getNumBuffers(); ++i)
             {
-                auto& mb = *midiPipe.getWriteBuffer (i);
+                auto& mb = *context.midi.getWriteBuffer (i);
                 for (const MidiMessageMetadata msg : mb)
                 {
                     tempMidi.addEvent (
@@ -442,7 +603,7 @@ public:
         }
         else
         {
-            pluginProcessBlock (buffer, midiPipe, cvbuffer, node->isSuspended());
+            pluginProcessBlock (context, node->isSuspended());
         }
 
         if (muted && ! muteInput)
@@ -450,33 +611,33 @@ public:
             if (lastMute != muted)
             {
                 // just became muted
-                buffer.applyGainRamp (0, numSamples, node->getLastGain(), 0.0);
+                context.audio.applyGainRamp (0, numSamples, node->getLastGain(), 0.0);
             }
             else
             {
                 // normal mute processing
-                buffer.applyGain (0, numSamples, 0.0);
+                context.audio.applyGain (0, numSamples, 0.0);
             }
         }
         else if (! muted && ! muteInput && muted != lastMute)
         {
             // just became unmuted
-            buffer.applyGainRamp (0, numSamples, 0.0, node->getGain());
+            context.audio.applyGainRamp (0, numSamples, 0.0, node->getGain());
         }
         else if (node->getGain() != node->getLastGain())
         {
-            buffer.applyGainRamp (0, numSamples, node->getLastGain(), node->getGain());
+            context.audio.applyGainRamp (0, numSamples, node->getLastGain(), node->getGain());
         }
         else
         {
-            buffer.applyGain (0, numSamples, node->getGain());
+            context.audio.applyGain (0, numSamples, node->getGain());
         }
 
         node->updateGain();
         lastMute = muted;
 
         for (int i = 0; i < numAudioOuts; ++i)
-            node->setOutputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
+            node->setOutputRMS (i, context.audio.getRMSLevel (i, 0, numSamples));
     }
 
     const ProcessorPtr node;
@@ -486,6 +647,8 @@ private:
     Array<int> audioChannelsToUse;
     Array<int> cvChannelsToUse;
     Array<int> midiChannelsToUse;
+    Array<int> atomChannelsToUse;
+
     HeapBlock<float*> channels;
     HeapBlock<float*> cv;
     int totalChans, totalCV, numAudioIns, numAudioOuts;
@@ -504,6 +667,7 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
                             Array<void*>& renderingOps)
     : graph (graph_),
       orderedNodes (orderedNodes_),
+      midi_MidiEvent (graph.symbols().map (LV2_MIDI__MidiEvent)),
       totalLatency (0)
 {
     for (int i = 0; i < PortType::Unknown; ++i)
@@ -519,6 +683,27 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
                                    i);
         markUnusedBuffersFree (i);
     }
+
+#if EL_TRACE_GRAPH_OPS
+    std::clog << "BEGIN\n";
+
+    for (auto op : renderingOps)
+    {
+        auto obj = static_cast<GraphOp*> (op);
+        if (auto rnd = dynamic_cast<ProcessBufferOp*> (obj))
+        {
+            std::clog << "  " << rnd->node->getName() << std::endl;
+        }
+        auto step = obj->traceStep();
+        if (step.empty())
+            continue;
+        else
+            std::clog << "    " << step;
+
+        std::clog << std::endl;
+    }
+    std::clog << "END" << std::endl;
+#endif
 }
 
 int GraphBuilder::buffersNeeded (PortType _type)
@@ -627,6 +812,8 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
         // get a list of all the inputs to this node
         Array<uint32> sourceNodes;
         Array<uint32> sourcePorts;
+        Array<PortType> sourceTypes;
+
         for (int i = graph.getNumConnections(); --i >= 0;)
         {
             const auto* const c = graph.getConnection (i);
@@ -634,10 +821,14 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             {
                 sourceNodes.add (c->sourceNode);
                 sourcePorts.add (c->sourcePort);
+                auto src = graph.getNodeForId (c->sourceNode);
+                sourceTypes.add (src->getPortType (c->sourcePort));
             }
         }
 
         int bufIndex = -1;
+        PortType bufType = portType;
+
         if (sourceNodes.size() == 0)
         {
             // unconnected input channel
@@ -658,6 +849,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                     case PortType::Midi:
                         renderingOps.add (new ClearMidiBufferOp (bufIndex));
                         break;
+                    case PortType::Atom:
+                        renderingOps.add (new ClearAtomBufferOp (bufIndex));
+                        break;
                     default:
                         break;
                 }
@@ -671,7 +865,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             auto srcObj = graph.getNodeForId (srcNode);
             const auto srcType = srcObj->getPortType (srcPort);
 
-            bufIndex = getBufferContaining (portType, srcNode, srcPort);
+            bufIndex = getBufferContaining (srcType, srcNode, srcPort);
 
             if (bufIndex < 0)
             {
@@ -681,6 +875,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             }
 
             const bool bufNeededLater = isBufferNeededLater (ourRenderingIndex, port, srcNode, srcPort);
+
             if (portType == PortType::Control)
             {
                 auto src = graph.getNodeForId (srcNode);
@@ -688,19 +883,56 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                     src->getParameter ((int) srcPort),
                     node->getParameter ((int) port)));
             }
-            else if (srcType == PortType::Control && portType == PortType::CV)
+            else if (srcType.isControl() && portType.isCv())
             {
                 auto src = graph.getNodeForId (srcNode);
                 const int newFreeBuffer = getFreeBuffer (portType);
                 renderingOps.add (new ApplyParamToCVOp (src->getParameter ((int) srcPort), newFreeBuffer));
                 bufIndex = newFreeBuffer;
             }
-            else if (bufNeededLater && (inputChan < (int) numOuts || portType == PortType::Midi))
+
+            else if (srcType.isMidi() && portType.isAtom())
             {
+                const int newAtomBuffer = getFreeBuffer (portType);
+
+                // needed?
+                // const auto outPort = node->getPortForChannel (portType, inputChan, false);
+                // markBufferAsContaining (newAtomBuffer,
+                //                         portType,
+                //                         outPort == EL_INVALID_PORT ? anonymousNodeID : node->nodeId,
+                //                         outPort == EL_INVALID_PORT ? 0 : outPort);
+
+                renderingOps.add (new ClearAtomBufferOp (newAtomBuffer));
+                renderingOps.add (new MidiToAtomOp (bufIndex, newAtomBuffer));
+
+                bufIndex = newAtomBuffer;
+            }
+            else if (srcType.isAtom() && portType.isMidi())
+            {
+                const int newMidiBuffer = getFreeBuffer (portType);
+
+                // needed?
+                // const auto outPort = node->getPortForChannel (portType, inputChan, false);
+                // markBufferAsContaining (newMidiBuffer,
+                //                         portType,
+                //                         outPort == EL_INVALID_PORT ? anonymousNodeID : node->nodeId,
+                //                         outPort == EL_INVALID_PORT ? 0 : outPort);
+
+                renderingOps.add (new ClearMidiBufferOp (newMidiBuffer));
+                renderingOps.add (new AtomToMidiOp (bufIndex, newMidiBuffer, midi_MidiEvent));
+                bufIndex = newMidiBuffer;
+            }
+            // clang-format off
+            else if (bufNeededLater && srcType == portType && 
+                     (inputChan < (int) numOuts || portType == PortType::Midi || portType == PortType::Atom))
+            // clang-format on
+            {
+                jassert (! portType.isControl());
                 // can't mess up this channel because it's needed later by another node, so we
                 // need to use a copy of it..
                 const int newFreeBuffer = getFreeBuffer (portType);
                 markBufferAsContaining (newFreeBuffer, portType, anonymousNodeID, 0);
+
                 switch (portType.id())
                 {
                     case PortType::CV:
@@ -709,6 +941,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                         break;
                     case PortType::Midi:
                         renderingOps.add (new CopyMidiBufferOp (bufIndex, newFreeBuffer));
+                        break;
+                    case PortType::Atom:
+                        renderingOps.add (new CopyAtomBufferOp (bufIndex, newFreeBuffer));
                         break;
                     default:
                         break;
@@ -826,7 +1061,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
         }
 
         jassert (bufIndex >= 0);
-        channelsToUse[portType.id()].add (bufIndex);
+        channelsToUse[bufType.id()].add (bufIndex);
 
         if (inputChan < (int) numOuts)
         {
@@ -895,7 +1130,36 @@ void GraphBuilder::markUnusedBuffersFree (const int stepIndex)
     }
 }
 
-bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputChannelOfIndexToIgnore, const uint32 sourceNode, const uint32 outputPortIndex) const
+bool GraphBuilder::isBufferNeededLater (int stepIndexToSearchFrom,
+                                        uint32 inputChannelOfIndexToIgnore,
+                                        const uint32 sourceNode,
+                                        const uint32 outputPortIndex) const
+{
+    while (stepIndexToSearchFrom < orderedNodes.size())
+    {
+        const Processor* const node = (const Processor*) orderedNodes.getUnchecked (stepIndexToSearchFrom);
+
+        {
+            for (uint32 port = 0; port < node->getNumPorts(); ++port)
+            {
+                if (port != inputChannelOfIndexToIgnore && graph.getConnectionBetween (sourceNode, outputPortIndex, node->nodeId, port) != nullptr)
+                {
+                    return true;
+                }
+            }
+        }
+
+        inputChannelOfIndexToIgnore = EL_INVALID_PORT;
+        ++stepIndexToSearchFrom;
+    }
+
+    return false;
+}
+
+bool GraphBuilder::isBufferNeededLater2 (int stepIndexToSearchFrom,
+                                         uint32 inputChannelOfIndexToIgnore,
+                                         const uint32 sourceNode,
+                                         const uint32 outputPortIndex) const
 {
     while (stepIndexToSearchFrom < orderedNodes.size())
     {

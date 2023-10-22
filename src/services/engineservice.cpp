@@ -58,7 +58,7 @@ struct RootGraphHolder
             return true;
         }
 
-        node = new RootGraph();
+        node = new RootGraph (engine->context());
 
         if (auto* root = getRootGraph())
         {

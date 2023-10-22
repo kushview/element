@@ -1,6 +1,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <element/context.hpp>
+
 #include "engine/graphnode.hpp"
 #include "nodes/audioprocessor.hpp"
 #include "engine/ionode.hpp"
@@ -23,6 +25,8 @@ public:
     }
 
 private:
+    element::Context context;
+
     void testProcess()
     {
         MidiChannelMap chmap;
@@ -67,7 +71,7 @@ private:
 
     void testPortConfig()
     {
-        GraphNode proc;
+        GraphNode proc (context);
         proc.setRenderDetails (44100.f, 512);
         proc.prepareToRender (44100.0, 512);
         auto* processor = new MidiChannelMapProcessor();

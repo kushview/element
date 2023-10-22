@@ -29,6 +29,7 @@ namespace element {
 
 class LV2ModuleUI;
 class PortBuffer;
+struct RenderContext;
 class World;
 class WorkerFeature;
 
@@ -134,6 +135,9 @@ public:
     /** Returns the port list as generated from Lilv data. */
     const PortList& ports() const noexcept;
 
+    /** Returns the best atom port to use. */
+    uint32_t bestAtomPort (bool input) const noexcept;
+
     /** Get the plugin's Author/Manufacturer name */
     String getAuthorName() const;
 
@@ -145,8 +149,8 @@ public:
 
     uint32 getAtomControlIndex() const noexcept;
 
-    /** Get the first atom input port that supports midi:MidiEvent */
-    uint32 getMidiPort() const;
+    /** Get the first atom port that supports midi:MidiEvent */
+    uint32 getMidiPort (bool input) const;
 
     /** Get the patch parameters. */
     const LV2Patches& getPatches() const noexcept;
@@ -287,16 +291,15 @@ public:
 
     /** Connect an audio buffer setup for in place processing (realtime)
         
-        @param audio The buffer to use for audio ports.
-        @param cv The buffer to use for CV ports.
+        @param rc The rendering connext to refer to.
     */
-    void referAudioReplacing (AudioSampleBuffer& audio, AudioSampleBuffer& cv);
+    void referBuffers (RenderContext& rc);
 
     /** Returns a port buffer for port index (realtime) */
     PortBuffer* getPortBuffer (uint32) const;
 
-    /** process events sent */
-    void processEvents (PortBuffer* seq);
+    /** Process events from UIs */
+    void processEvents();
 
     //=========================================================================
 
@@ -324,6 +327,9 @@ public:
     /** Returns a mapped LV2_URID */
     uint32 map (const String& uri) const;
 
+    /** Returns true if time events are wanted. */
+    bool wantsTime() const noexcept;
+
 private:
     LilvInstance* instance { nullptr };
     const LilvPlugin* plugin { nullptr };
@@ -336,18 +342,9 @@ private:
     uint32 numPorts { 0 };
     Array<const LV2_Feature*> features;
 
-    std::unique_ptr<RingBuffer> events;
-    HeapBlock<uint8> evbuf;
-    uint32 evbufsize { 0 };
-
-    std::unique_ptr<RingBuffer> notifications;
-    HeapBlock<uint8> ntbuf;
-    uint32 ntbufsize { 0 };
-
     OwnedArray<SupportedUI> supportedUIs;
     OwnedArray<ScalePoints> scalePoints;
 
-    void activatePorts();
     void freeInstance();
     void init();
 
@@ -461,8 +458,8 @@ public:
         opts.add (LV2_OPTIONS_INSTANCE,
                   0,
                   module.map (LV2_PARAMETERS__sampleRate),
-                  module.map (LV2_ATOM__Float),
                   sizeof (float),
+                  module.map (LV2_ATOM__Float),
                   &sampleRate);
 
         LV2_Feature optsFeature { LV2_OPTIONS__options, (void*) opts.get() };

@@ -6,7 +6,9 @@
 #include <element/settings.hpp>
 #include <element/plugins.hpp>
 #include <element/services.hpp>
+#include <element/symbolmap.hpp>
 #include <element/context.hpp>
+#include <element/lv2.hpp>
 
 #include "engine/audioprocessorfactory.hpp"
 #include "engine/internalformat.hpp"
@@ -38,6 +40,7 @@ public:
     AudioEnginePtr engine;
     SessionPtr session;
 
+    std::unique_ptr<SymbolMap> symbols;
     std::unique_ptr<DeviceManager> devices;
     std::unique_ptr<PluginManager> plugins;
     std::unique_ptr<Settings> settings;
@@ -53,8 +56,8 @@ private:
 
     void init()
     {
+        symbols.reset (new SymbolMap());
         log.reset (new Log());
-
         devices.reset (new DeviceManager());
         settings.reset (new Settings());
         mapping.reset (new MappingEngine());
@@ -70,7 +73,9 @@ private:
 
         plugins.reset (new PluginManager());
         auto& nf = plugins->getNodeFactory();
+        nf.add (new InternalNodes (owner));
         nf.add (new AudioProcessorFactory (owner));
+        nf.add (new LV2NodeProvider (*symbols));
         plugins->addDefaultFormats();
     }
 
@@ -241,9 +246,7 @@ void Context::addModulePath (const std::string& path)
     sp.add (path);
 }
 
-void Context::discoverModules()
-{
-    impl->modules->discover();
-}
+void Context::discoverModules() { impl->modules->discover(); }
+SymbolMap& Context::symbols() { return *impl->symbols; }
 
 } // namespace element

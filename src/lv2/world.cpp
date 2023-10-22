@@ -6,7 +6,6 @@
 #include <lv2/ui/ui.h>
 #include <lv2/patch/patch.h>
 
-#include <lvtk/symbols.hpp>
 #include <lvtk/options.hpp>
 #include <lvtk/ext/atom.hpp>
 #include <lvtk/ext/bufsize.hpp>
@@ -52,7 +51,7 @@ private:
 class OptionsFeature : public LV2Feature
 {
 public:
-    OptionsFeature (lvtk::Symbols& symbolMap)
+    OptionsFeature (SymbolMap& symbolMap)
     {
         uri = LV2_OPTIONS__options;
         feat.URI = uri.toRawUTF8();
@@ -110,7 +109,8 @@ private:
 };
 
 //=============================================================================
-World::World()
+World::World (SymbolMap& s)
+    : symbolMap (s)
 {
 #if JUCE_MAC
     StringArray path;
@@ -174,8 +174,8 @@ World::World()
         threads.add (new WorkThread ("lv2_worker_" + String (i + 1), EL_LV2_RING_BUFFER_SIZE));
     }
 
-    addFeature (new GenericFeature (*symbolMap.map_feature()), false);
-    addFeature (new GenericFeature (*symbolMap.unmap_feature()), false);
+    addFeature (new GenericFeature (*symbolMap.mapFeature()), false);
+    addFeature (new GenericFeature (*symbolMap.unmapFeature()), false);
     addFeature (new LogFeature(), false);
     addFeature (new OptionsFeature (symbolMap), false);
     addFeature (new BoundedBlockLengthFeature(), true);

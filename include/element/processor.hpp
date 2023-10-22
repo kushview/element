@@ -4,11 +4,13 @@
 #pragma once
 
 #include <element/juce/core.hpp>
+#include <element/juce/audio_basics.hpp>
 #include <element/juce/audio_processors.hpp>
 
+#include <element/atombuffer.hpp>
+#include <element/atomic.hpp>
 #include <element/midipipe.hpp>
 #include <element/oversampler.hpp>
-#include <element/atomic.hpp>
 #include <element/parameter.hpp>
 #include <element/portcount.hpp>
 #include <element/midichannels.hpp>
@@ -23,9 +25,47 @@ namespace GraphRender {
 class ProcessBufferOp;
 }
 
+class AtomBuffer;
 class Editor;
 class GraphNode;
 class ProcessBufferOp;
+
+struct RenderContext {
+    juce::AudioSampleBuffer audio;
+    juce::AudioSampleBuffer cv;
+    MidiPipe midi;
+    AtomPipe atom;
+
+    // clang-format off
+    RenderContext (float* const *audioData, 
+                   int numAudio,
+                   float* const *cvData, 
+                   int numCV,
+                   const juce::OwnedArray<juce::MidiBuffer>& sharedMidi,
+                   const juce::Array<int>& midiIndexes,
+                   const juce::OwnedArray<AtomBuffer>& sharedAtom,
+                   const juce::Array<int>& atomIndexes,
+                   int numSamples)
+        : audio (audioData, numAudio, numSamples),
+          cv (cvData, numCV, numSamples),
+          midi (sharedMidi, midiIndexes),
+          atom (sharedAtom, atomIndexes)
+    {}
+
+    // clang-format off
+    RenderContext (float* const *audioData, 
+                   int numAudio,
+                   float* const *cvData, 
+                   int numCV,
+                   const juce::OwnedArray<juce::MidiBuffer>& sharedMidi,
+                   const juce::Array<int>& midiIndexes,
+                   int numSamples)
+        : audio (audioData, numAudio, numSamples),
+          cv (cvData, numCV, numSamples),
+          midi (sharedMidi, midiIndexes)
+    {}
+    // clang-format on
+};
 
 class Processor : public ReferenceCountedObject {
 public:
@@ -89,9 +129,15 @@ public:
     virtual void prepareToRender (double sampleRate, int maxBufferSize) = 0;
     virtual void releaseResources() = 0;
 
+    /** FIXME: Consolodate to RenderContext. Remove `wantsMidiPipe` */
     virtual bool wantsMidiPipe() const { return false; }
     virtual void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) {}
     virtual void renderBypassed (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&);
+    virtual bool wantsContext() const noexcept { return false; }
+
+    /** FIXME: All nodes need converted to this signature. */
+    virtual void render (RenderContext&) {}
+    virtual void renderBypassed (RenderContext&) {}
 
     /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;
