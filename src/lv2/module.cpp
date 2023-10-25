@@ -23,6 +23,7 @@
 
 namespace element {
 namespace detail {
+
 static uint32_t findMidiPort (World& world, const LilvPlugin* plugin, bool input)
 {
     auto flowType = input ? world.lv2_InputPort : world.lv2_OutputPort;
@@ -275,7 +276,7 @@ private:
 
     LV2ModuleUI::Ptr ui;
 
-    HeapBlock<float> mins, maxes, defaults;
+    HeapBlock<float> mins, maxes, defaults, current;
     OwnedArray<PortBuffer> buffers;
 
     LV2_Feature instanceFeature { LV2_INSTANCE_ACCESS_URI, nullptr };
@@ -319,6 +320,7 @@ void LV2Module::init()
     priv->mins.allocate (numPorts, true);
     priv->maxes.allocate (numPorts, true);
     priv->defaults.allocate (numPorts, true);
+    priv->current.allocate (numPorts, true);
 
     lilv_plugin_get_port_ranges_float (plugin, priv->mins, priv->maxes, priv->defaults);
 
@@ -1059,8 +1061,11 @@ void LV2Module::referBuffers (RenderContext& rc)
         auto buffer = priv->buffers.getUnchecked (i);
         if (buffer->isSequence() && ! buffer->isInput())
             buffer->reset();
+        else if (buffer->isControl())
+            priv->current[i] = buffer->getValue();
 
         lilv_instance_connect_port (instance, static_cast<uint32_t> (i), buffer->getPortData());
+
     }
 }
 
@@ -1110,6 +1115,16 @@ void LV2Module::run (uint32 nframes)
 
     if (worker)
         worker->endRun();
+
+    for (int i = priv->buffers.size(); --i >= 0;)
+    {
+        auto buffer = priv->buffers.getUnchecked (i);
+        if (buffer->isControl() && priv->current[i] != buffer->getValue()) {
+            priv->current[i] = buffer->getValue();
+            lvtk::MessageHeader header = { static_cast<uint32_t> (i), 0 };
+            priv->eventsOut.push_message (header, sizeof(float), &priv->current[i]);
+        }
+    }
 
     if (priv->atomControlOutIndex != EL_INVALID_PORT)
     {

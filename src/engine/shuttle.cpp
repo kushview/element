@@ -36,54 +36,38 @@ Shuttle::~Shuttle() {}
 double Shuttle::getBeatsPerFrame() const { return beatsPerFrame; }
 double Shuttle::getFramesPerBeat() const { return framesPerBeat; }
 
-bool Shuttle::getCurrentPosition (CurrentPositionInfo& result)
-{
-    result.bpm = (double) ts.getTempo();
-    result.frameRate = AudioPlayHead::fps24;
-
-    result.isLooping = isLooping();
-    result.isPlaying = isPlaying();
-    result.isRecording = isRecording();
-
-    result.ppqLoopStart = 0.0f; // ppqLoopStart;
-    result.ppqLoopEnd = 0.0f; // ppqLoopEnd;
-    result.ppqPosition = getPositionBeats();
-    result.ppqPositionOfLastBarStart = 0.0f;
-
-    result.editOriginTime = 0.0f;
-
-    result.timeInSamples = getPositionFrames();
-    result.timeInSeconds = getPositionSeconds();
-    result.timeSigNumerator = ts.beatsPerBar();
-    result.timeSigDenominator = (1 << ts.beatDivisor());
-
-    return true;
-}
-
 juce::Optional<juce::AudioPlayHead::PositionInfo> Shuttle::getPosition() const
 {
     juce::AudioPlayHead::PositionInfo info;
-    info.setBpm ((double) ts.getTempo());
-    info.setFrameRate (AudioPlayHead::fps24);
-
-    info.setIsLooping (isLooping());
-    info.setIsPlaying (isPlaying());
-    info.setIsRecording (isRecording());
-
-    // juce::AudioPlayHead::LoopPoints loops;
-    // info.setLoopPoints ()
-    // info.ppqLoopEnd   = 0.0f; // ppqLoopEnd;
-    info.setPpqPosition (getPositionBeats());
-    info.setPpqPositionOfLastBarStart (0.0f);
-
-    info.setEditOriginTime (0.0f);
-
-    juce::AudioPlayHead::TimeSignature timesig;
     info.setTimeInSamples (getPositionFrames());
     info.setTimeInSeconds (getPositionSeconds());
+    info.setBpm ((double) ts.getTempo());
+    juce::AudioPlayHead::TimeSignature timesig;
     timesig.numerator = ts.beatsPerBar();
     timesig.denominator = (1 << ts.beatDivisor());
     info.setTimeSignature (timesig);
+    juce::AudioPlayHead::LoopPoints loops;
+    loops.ppqEnd = 0.0;
+    loops.ppqStart = 0.0;
+    info.setLoopPoints (loops);
+    
+    {
+        auto posBeats = getPositionBeats();
+        info.setPpqPosition (posBeats);
+        auto bar = static_cast<int64_t> (std::floor (posBeats / (float) ts.beatsPerBar()));
+        info.setBarCount (bar);
+        info.setPpqPositionOfLastBarStart (static_cast<double> (bar * ts.beatsPerBar()));
+    }
+    
+    info.setEditOriginTime (0.0f);
+    // info.setHostTimeNs();
+
+    info.setFrameRate (AudioPlayHead::fps24);
+
+    info.setIsPlaying (isPlaying());
+    info.setIsRecording (isRecording());
+    info.setIsLooping (isLooping());
+
     return info;
 }
 

@@ -171,6 +171,8 @@ void TransportBar::stabilize()
 {
     if (checkForMonitor())
     {
+        // std::clog << "pos beats monitor: " << monitor->getPositionBeats() << std::endl;
+
         int bars = 0, beats = 0, sub = 0;
         monitor->getBarsAndBeats (bars, beats, sub);
         barLabel->tempoValue = bars + 1;

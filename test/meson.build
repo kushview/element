@@ -12,6 +12,7 @@ test_element_sources = '''
     RootGraphTests.cpp
     NodeTests.cpp
     MidiProgramMapTests.cpp
+    shuttletests.cpp
 
     engine/VelocityCurveTest.cpp
     engine/MidiChannelMapTest.cpp
@@ -60,7 +61,8 @@ test ('Node',           test_element_app, args : [ '-t', 'NodeTests' ], suite: '
 test ('LinearFade',     test_element_app, args : [ '-t', 'LinearFadeTest'], suite: 'engine' )
 test ('MidiChannelMap', test_element_app, args : [ '-t', 'MidiChannelMapTest'], suite: 'engine' )
 test ('MidiProgramMap', test_element_app, args : [ '-t', 'MidiProgramMapTests'], suite: 'engine' )
-test ('Processor',      test_element_app, args : [ '-t',  'NodeObjectTests' ], suite : 'engine')
+test ('Processor',      test_element_app, args : [ '-t', 'NodeObjectTests' ], suite : 'engine')
+test ('Shuttle',        test_element_app, args : [ '-t', 'ShuttleTests' ], suite : 'engine')
 test ('ToggleGrid',     test_element_app, args : [ '-t', 'ToggleGridTest'], suite: 'engine' )
 test ('VelocityCurve',  test_element_app, args : [ '-t', 'VelocityCurveTest'], suite: 'engine' )
 

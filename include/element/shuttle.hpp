@@ -62,7 +62,6 @@ public:
         framePos = frame;
     }
 
-    bool getCurrentPosition (juce::AudioPlayHead::CurrentPositionInfo& result);
     juce::Optional<juce::AudioPlayHead::PositionInfo> getPosition() const override;
 
 protected:

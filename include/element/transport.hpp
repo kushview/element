@@ -14,13 +14,7 @@ class Transport : public Shuttle {
 public:
     class Monitor : public juce::ReferenceCountedObject {
     public:
-        Monitor()
-        {
-            sampleRate.set (44100.0);
-            beatsPerBar.set (4);
-            beatType.set (2);
-            beatDivisor.set (2);
-        }
+        Monitor();
 
         juce::Atomic<int> beatsPerBar;
         juce::Atomic<int> beatType;
@@ -31,27 +25,10 @@ public:
         juce::Atomic<bool> recording;
         juce::Atomic<int64_t> positionFrames;
 
-        inline double getPositionSeconds() const
-        {
-            return (double) positionFrames.get() / sampleRate.get();
-        }
-
-        inline float getPositionBeats() const
-        {
-            float numerator = (float) (1 << beatDivisor.get());
-            float divisor = (float) (1 << beatType.get());
-            divisor = divisor / numerator;
-            divisor *= 60.f;
-            return getPositionSeconds() * (tempo.get() / divisor);
-        }
-
-        inline void getBarsAndBeats (int& bars, int& beats, int& subBeats, int subDivisions = 4)
-        {
-            float t = getPositionBeats();
-            bars = juce::roundToInt (std::floor (t / beatsPerBar.get()));
-            beats = juce::roundToInt (std::floor (t)) % beatsPerBar.get();
-            subBeats = juce::roundToInt (std::floor (t * subDivisions)) % subDivisions;
-        }
+        double beatRatio() const noexcept;
+        double getPositionSeconds() const;
+        float getPositionBeats() const;
+        void getBarsAndBeats (int& bars, int& beats, int& subBeats, int subDivisions = 4);
     };
 
     typedef juce::ReferenceCountedObjectPtr<Monitor> MonitorPtr;

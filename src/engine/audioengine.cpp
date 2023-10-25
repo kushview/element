@@ -754,6 +754,8 @@ private:
 
     void prepareToPlay (double sampleRate, int estimatedBlockSize)
     {
+        transport.setSampleRate (sampleRate);
+        transport.getMonitor()->sampleRate.set (transport.getSampleRate());
         midiClockMaster.setSampleRate (sampleRate);
         midiClockMaster.setTempo (transport.getTempo());
         for (int i = 0; i < graphs.size(); ++i)

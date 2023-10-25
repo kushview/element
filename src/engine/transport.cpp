@@ -8,6 +8,56 @@ using namespace juce;
 
 namespace element {
 
+Transport::Monitor::Monitor()
+{
+    sampleRate.set (44100.0);
+    beatsPerBar.set (4);
+    beatType.set (2);
+    beatDivisor.set (2);
+}
+
+double Transport::Monitor::beatRatio() const noexcept
+{
+    switch (beatType.get())
+    {
+        case 0:
+            return 0.25;
+            break;
+        case 1:
+            return 0.5;
+            break;
+        case 2:
+            return 1.0;
+            break;
+        case 3:
+            return 2.0;
+            break;
+        case 4:
+            return 4.0;
+            break;
+    }
+
+    return 1.0;
+}
+
+double Transport::Monitor::getPositionSeconds() const
+{
+    return (double) positionFrames.get() / sampleRate.get();
+}
+
+float Transport::Monitor::getPositionBeats() const
+{
+    return getPositionSeconds() * (tempo.get() / 60.f);
+}
+
+void Transport::Monitor::getBarsAndBeats (int& bars, int& beats, int& subBeats, int subDivisions)
+{
+    float t = getPositionBeats();
+    bars = juce::roundToInt (std::floor (t / beatsPerBar.get()));
+    beats = juce::roundToInt (std::floor (t)) % beatsPerBar.get();
+    subBeats = juce::roundToInt (std::floor (t * subDivisions)) % subDivisions;
+}
+
 Transport::Transport()
     : playState (false),
       recordState (false)
@@ -66,7 +116,8 @@ void Transport::postProcess (int nframes)
 
     if (ts.beatDivisor() != nextBeatDivisor.get())
     {
-        ts.setBeatDivisor ((unsigned short) nextBeatDivisor.get());
+        ts.setBeatType ((unsigned short) nextBeatDivisor.get());
+        ts.setBeatDivisor (1 << ts.beatType());
         monitor->beatDivisor.set (nextBeatDivisor.get());
         updateTimeScale = true;
     }
@@ -84,6 +135,7 @@ void Transport::postProcess (int nframes)
 
 void Transport::requestMeter (int beatsPerBar, int beatDivisor)
 {
+    // std::clog << "request meter: " << beatsPerBar << "/" << (1 << beatDivisor) << std::endl;
     if (beatsPerBar < 1)
         beatsPerBar = 1;
     if (beatsPerBar > 99)
