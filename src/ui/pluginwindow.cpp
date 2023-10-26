@@ -157,8 +157,16 @@ public:
         {
             if (auto* pw = findParentComponentOfClass<PluginWindow>())
             {
+                if (editor)
+                    removeChildComponent (editor.get());
+
                 pw->setAlwaysOnTop (! pw->isAlwaysOnTop());
                 node.setProperty (tags::windowOnTop, pw->isAlwaysOnTop());
+
+                if (editor)
+                    addChildComponent (editor.get());
+
+                resized();
             }
         }
         else if (button == &muteButton)
