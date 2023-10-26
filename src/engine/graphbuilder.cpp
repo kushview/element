@@ -965,11 +965,13 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
             for (int i = 0; i < sourceNodes.size(); ++i)
             {
-                const int sourceBufIndex = getBufferContaining (portType, sourceNodes.getUnchecked (i), sourcePorts.getUnchecked (i));
+                const int sourceBufIndex = getBufferContaining (sourceTypes.getUnchecked (i),
+                                                                sourceNodes.getUnchecked (i),
+                                                                sourcePorts.getUnchecked (i));
 
                 if (sourceBufIndex >= 0
                     && ! isBufferNeededLater (ourRenderingIndex,
-                                              inputChan,
+                                              port,
                                               sourceNodes.getUnchecked (i),
                                               sourcePorts.getUnchecked (i)))
                 {
@@ -996,7 +998,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
                 markBufferAsContaining (bufIndex, portType, anonymousNodeID, 0);
 
-                const int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (0), sourcePorts.getUnchecked (0));
+                const int srcIndex = getBufferContaining (sourceTypes.getUnchecked (0),
+                                                          sourceNodes.getUnchecked (0),
+                                                          sourcePorts.getUnchecked (0));
                 if (srcIndex < 0)
                 {
                     // if not found, this is probably a feedback loop
@@ -1004,13 +1008,27 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                         renderingOps.add (new ClearChannelOp (bufIndex));
                     else if (portType == PortType::Midi)
                         renderingOps.add (new ClearMidiBufferOp (bufIndex));
+                    else if (portType == PortType::Atom)
+                        renderingOps.add (new ClearAtomBufferOp (bufIndex));
                 }
                 else
                 {
                     if (portType == PortType::Audio || portType == PortType::CV)
                         renderingOps.add (new CopyChannelOp (srcIndex, bufIndex));
-                    else if (portType == PortType::Midi)
+                    else if (sourceTypes.getUnchecked (0).isMidi() && portType.isMidi())
                         renderingOps.add (new CopyMidiBufferOp (srcIndex, bufIndex));
+                    else if (sourceTypes.getUnchecked (0).isAtom() && portType.isAtom())
+                        renderingOps.add (new CopyAtomBufferOp (srcIndex, bufIndex));
+                    else if (sourceTypes.getUnchecked (0).isAtom() && portType.isMidi())
+                    {
+                        renderingOps.add (new ClearMidiBufferOp (bufIndex));
+                        renderingOps.add (new AtomToMidiOp (srcIndex, bufIndex, midi_MidiEvent));
+                    }
+                    else if (sourceTypes.getUnchecked (0).isMidi() && portType.isAtom())
+                    {
+                        renderingOps.add (new ClearAtomBufferOp (bufIndex));
+                        renderingOps.add (new MidiToAtomOp (srcIndex, bufIndex));
+                    }
                 }
 
                 reusableInputIndex = 0;
@@ -1027,7 +1045,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             {
                 if (j != reusableInputIndex)
                 {
-                    int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j));
+                    int srcIndex = getBufferContaining (sourceTypes.getUnchecked (j),
+                                                        sourceNodes.getUnchecked (j),
+                                                        sourcePorts.getUnchecked (j));
                     if (srcIndex >= 0)
                     {
                         if (portType == PortType::Audio || portType == PortType::CV)
@@ -1051,9 +1071,21 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
                             renderingOps.add (new AddChannelOp (srcIndex, bufIndex));
                         }
-                        else if (portType == PortType::Midi)
+                        else if (sourceTypes.getUnchecked (j).isMidi() && portType.isMidi())
                         {
                             renderingOps.add (new AddMidiBufferOp (srcIndex, bufIndex));
+                        }
+                        else if (sourceTypes.getUnchecked (j).isAtom() && portType.isAtom())
+                        {
+                            renderingOps.add (new AddAtomBufferOp (srcIndex, bufIndex));
+                        }
+                        else if (sourceTypes.getUnchecked (j).isAtom() && portType.isMidi())
+                        {
+                            renderingOps.add (new AtomToMidiOp (srcIndex, bufIndex, midi_MidiEvent));
+                        }
+                        else if (sourceTypes.getUnchecked (j).isMidi() && portType.isAtom())
+                        {
+                            renderingOps.add (new MidiToAtomOp (srcIndex, bufIndex));
                         }
                     }
                 }

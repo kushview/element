@@ -652,7 +652,7 @@ public:
 
         lv2_atom_forge_key (&forge, urids.time_speed);
         lv2_atom_forge_float (&forge, info->getIsPlaying() ? 1.0f : 0.0f);
-        
+
         lv2_atom_forge_pop (&forge, &frame);
         port.insert (0, ref->size, ref->type, LV2_ATOM_BODY (ref));
     }

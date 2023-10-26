@@ -1065,7 +1065,6 @@ void LV2Module::referBuffers (RenderContext& rc)
             priv->current[i] = buffer->getValue();
 
         lilv_instance_connect_port (instance, static_cast<uint32_t> (i), buffer->getPortData());
-
     }
 }
 
@@ -1119,10 +1118,11 @@ void LV2Module::run (uint32 nframes)
     for (int i = priv->buffers.size(); --i >= 0;)
     {
         auto buffer = priv->buffers.getUnchecked (i);
-        if (buffer->isControl() && priv->current[i] != buffer->getValue()) {
+        if (buffer->isControl() && priv->current[i] != buffer->getValue())
+        {
             priv->current[i] = buffer->getValue();
             lvtk::MessageHeader header = { static_cast<uint32_t> (i), 0 };
-            priv->eventsOut.push_message (header, sizeof(float), &priv->current[i]);
+            priv->eventsOut.push_message (header, sizeof (float), &priv->current[i]);
         }
     }
 

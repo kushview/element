@@ -69,4 +69,4 @@ static AlignedData<Alignment> grow (SingleSizeAlignedStorage<Alignment> storage,
 }
 #endif
 
-}
+} // namespace element

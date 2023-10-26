@@ -50,7 +50,7 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> Shuttle::getPosition() const
     loops.ppqEnd = 0.0;
     loops.ppqStart = 0.0;
     info.setLoopPoints (loops);
-    
+
     {
         auto posBeats = getPositionBeats();
         info.setPpqPosition (posBeats);
@@ -58,7 +58,7 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> Shuttle::getPosition() const
         info.setBarCount (bar);
         info.setPpqPositionOfLastBarStart (static_cast<double> (bar * ts.beatsPerBar()));
     }
-    
+
     info.setEditOriginTime (0.0f);
     // info.setHostTimeNs();
 
