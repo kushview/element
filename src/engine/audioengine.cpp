@@ -43,7 +43,7 @@ struct RootGraphRender : public AsyncUpdater
         return currentGraph;
     }
 
-    const int getCurrentGraphIndex() const { return currentGraph; }
+    constexpr const int getCurrentGraphIndex() const noexcept { return currentGraph; }
 
     RootGraph* getCurrentGraph() const
     {
@@ -245,7 +245,6 @@ struct RootGraphRender : public AsyncUpdater
     int size() const { return graphs.size(); }
 
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked (i); }
-    int getGraphIndex() const { return currentGraph; }
     const Array<RootGraph*>& getGraphs() const { return graphs; }
 
 private:
@@ -348,7 +347,7 @@ public:
         int renderingIndex = -1;
         {
             ScopedLock sl (lock);
-            renderingIndex = graphs.getGraphIndex();
+            renderingIndex = graphs.getCurrentGraphIndex();
         }
 
         if (renderingIndex != currentGraph.get())
@@ -500,10 +499,16 @@ public:
                 midiClockMaster.render (midi, numSamples);
             }
 
-            if (currentGraph.get() != graphs.getCurrentGraphIndex())
-                graphs.setCurrentGraph (currentGraph.get());
+            const auto nextGraph = currentGraph.get();
+            if (nextGraph != graphs.getCurrentGraphIndex())
+            {
+                graphs.setCurrentGraph (nextGraph);
+            }
             graphs.renderGraphs (buffer, midi); // user requested index can be cancelled by program changed
-            currentGraph.set (graphs.getCurrentGraphIndex());
+            if (nextGraph != graphs.getCurrentGraphIndex())
+            {
+                currentGraph.set (graphs.getCurrentGraphIndex());
+            }
         }
         else
         {
@@ -857,9 +862,9 @@ void AudioEngine::addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueu
 
 void AudioEngine::setActiveGraph (const int index)
 {
-    if (priv == nullptr)
-        return;
-    priv->currentGraph.set (index);
+    while (priv != nullptr && index != priv->currentGraph.get())
+        priv->currentGraph.set (index);
+    std::clog << "set = " << priv->currentGraph.get() << std::endl;
 }
 
 int AudioEngine::getActiveGraph() const { return (priv != nullptr) ? priv->currentGraph.get() : -1; }

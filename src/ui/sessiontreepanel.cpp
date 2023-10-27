@@ -389,7 +389,6 @@ public:
 
     void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
     {
-        std::clog << "dropped\n";
         ignoreUnused (index);
 
         auto* world = ViewHelpers::getGlobals (getOwnerView());
@@ -576,18 +575,11 @@ public:
         ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->removeGraph (index);
     }
 
-    void itemDoubleClicked (const MouseEvent& ev) override
+    void activateGraph()
     {
-        if (! node.isRootGraph() || session() == nullptr || content() == nullptr)
-        {
-            jassertfalse;
+        const bool nodeIsCurrent = node == session()->getCurrentGraph();
+        if (nodeIsCurrent)
             return;
-        }
-
-        if (node == session()->getCurrentGraph())
-        {
-            return;
-        }
 
         if (auto tree = getSessionTreePanel())
         {
@@ -596,9 +588,12 @@ public:
             ScopedFlag scopedFlag (tree->ignoreActiveRootGraphSelectionHandler, true);
 
             // TODO: this needs moved down to the services level
-            gui->closeAllPluginWindows (true);
+            if (! nodeIsCurrent)
+                gui->closeAllPluginWindows (true);
+            updateIndexInParent();
             auto graphs = session()->data().getChildWithName (tags::graphs);
             graphs.setProperty (tags::active, graphs.indexOf (node.data()), 0);
+
             engine->setRootNode (node);
             gui->showPluginWindowsFor (node, true, false, false);
         }
@@ -606,8 +601,21 @@ public:
         treeHasChanged();
     }
 
+    void itemDoubleClicked (const MouseEvent& ev) override
+    {
+        if (! node.isRootGraph() || session() == nullptr || content() == nullptr)
+        {
+            jassertfalse;
+            return;
+        }
+
+        activateGraph();
+    }
+
     void showDocument() override
     {
+        auto src = juce::Desktop::getInstance().getMainMouseSource();
+
         if (content() == nullptr)
         {
             return;
@@ -631,6 +639,11 @@ public:
         else
         {
             detail::showGraphEditor (content(), graph);
+        }
+
+        if (src.getNumberOfMultipleClicks() >= 2)
+        {
+            activateGraph();
         }
 
         content()->services().find<UI>()->selectNode (graph);
