@@ -864,7 +864,6 @@ void AudioEngine::setActiveGraph (const int index)
 {
     while (priv != nullptr && index != priv->currentGraph.get())
         priv->currentGraph.set (index);
-    std::clog << "set = " << priv->currentGraph.get() << std::endl;
 }
 
 int AudioEngine::getActiveGraph() const { return (priv != nullptr) ? priv->currentGraph.get() : -1; }
