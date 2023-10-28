@@ -160,7 +160,9 @@ struct RootGraphRender : public AsyncUpdater
                     }
                 }
 
-                if (graphChanged && ((current->isSingle() && current != graph) || (modeChanged && ! current->isSingle() && graph->isSingle())))
+                // clang-format off
+                if (graphChanged && ((current->isSingle() && graph == last) || 
+                                     (modeChanged && ! current->isSingle() && graph->isSingle() && graph == last)))
 
                 {
                     // DBG("  FADE OUT LAST GRAPH: " << graph->engineIndex);
@@ -184,6 +186,7 @@ struct RootGraphRender : public AsyncUpdater
 
                     midiOut.addEvents (midiTemp, 0, numSamples, 0);
                 }
+                // clang-format on
             }
 
             for (int i = 0; i < numChans; ++i)
