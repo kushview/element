@@ -29,8 +29,14 @@ static inline bool isMidiDevice (const Node& node)
 // true if the node probably supports embedding outside a plugin window.
 static inline bool supportsEmbed (const Node& node)
 {
-    if (node.isIONode() || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER))
+    // clang-format off
+    if (node.isIONode() ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_GRAPH))
+    {
         return false;
+    }
+    // clang-format on
 
 #if JUCE_LINUX
     if (node.getFormat() == "LV2")
