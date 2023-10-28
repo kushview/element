@@ -144,13 +144,14 @@ public:
 
     void onChannelsChanged()
     {
-        if (graph.isRootGraph())
-            if (auto* node = graph.getObject())
-                if (auto* proc = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
-                {
-                    proc->setMidiChannels (getChannels());
-                    graph.setProperty (tags::midiChannels, getChannels().toMemoryBlock());
-                }
+        if (! graph.isRootGraph())
+            return;
+
+        if (auto* node = dynamic_cast<RootGraph*> (graph.getObject()))
+        {
+            node->setMidiChannels (getChannels());
+            graph.setProperty (tags::midiChannels, getChannels().toMemoryBlock());
+        }
     }
 
     Node graph;
