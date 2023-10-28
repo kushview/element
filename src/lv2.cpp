@@ -466,8 +466,10 @@ public:
                 patch->request();
 
         const ChannelConfig& channels (module->getChannelConfig());
-        totalAudioIn = channels.getNumAtomInputs();
+        totalAudioIn = channels.getNumAudioInputs();
         totalAudioOut = channels.getNumAudioOutputs();
+        totalAtomIn = channels.getNumAtomInputs();
+        totalAtomOut = channels.getNumAtomOutputs();
 
         // if (! module->hasEditor())
         {
@@ -659,8 +661,12 @@ public:
 
     void renderBypassed (RenderContext& rc) override
     {
-        rc.atom.clear();
-        Processor::renderBypassed (rc.audio, rc.midi, rc.cv);
+        const auto numSamples = rc.audio.getNumSamples();
+        rc.midi.clear();
+        for (int adc = totalAudioIn; adc < totalAudioOut; ++adc)
+            rc.audio.clear (adc, 0, numSamples);
+        for (int atc = totalAtomIn; atc < totalAtomOut; ++atc)
+            rc.atom.clear (atc, 0, numSamples);
     }
 
     void render (RenderContext& rc) override
@@ -780,7 +786,9 @@ private:
     uint8_t timeBuf[512] = { 0 };
 
     int totalAudioIn { 0 },
-        totalAudioOut { 0 };
+        totalAudioOut { 0 },
+        totalAtomIn { 0 },
+        totalAtomOut { 0 };
 
     struct URIDs
     {
