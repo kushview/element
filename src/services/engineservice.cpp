@@ -67,7 +67,19 @@ struct RootGraphHolder
             const auto channels = model.getMidiChannels();
             const auto program = (int) model.getProperty ("midiProgram", -1);
 
-            root->setPlayConfigFor (devices);
+            // TODO: Uniform method for saving/restoring nodes with custom ports.
+            PortArray ins, outs;
+            model.getPorts (ins, outs, PortType::Audio);
+            root->setNumPorts (PortType::Audio, ins.size(), true, false);
+            root->setNumPorts (PortType::Audio, outs.size(), false, false);
+
+            ins.clearQuick();
+            outs.clearQuick();
+            model.getPorts (ins, outs, PortType::Midi);
+            root->setNumPorts (PortType::Midi, ins.size(), true, false);
+            root->setNumPorts (PortType::Midi, outs.size(), false, false);
+
+            // root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
             root->setMidiChannels (channels);
             root->setMidiProgram (program);
@@ -77,11 +89,6 @@ struct RootGraphHolder
                 controller = std::make_unique<RootGraphManager> (*root, plugins);
                 model.setProperty (tags::object, node.get());
 
-                // TODO: Uniform method for saving/restoring nodes with custom ports.
-                PortArray ins, outs;
-                model.getPorts (ins, outs, PortType::Audio);
-                root->setNumPorts (PortType::Audio, ins.size(), true, false);
-                root->setNumPorts (PortType::Audio, outs.size(), false, false);
                 controller->setNodeModel (model);
             }
             else
@@ -619,30 +626,6 @@ void EngineService::removeNode (const Node& node)
     if (! graph.isGraph())
         return;
 
-#if 0
-    if (auto gp = dynamic_cast<GraphNode*> (graph.getObject()))
-    {
-        // workaround: removal of a duplex node in reality has
-        // cleared the graph's ports
-        if (node.isAudioInputNode())
-        {
-            gp->setNumPorts (PortType::Audio, 0, true, true);
-        }
-        else if (node.isAudioOutputNode())
-        {
-            gp->setNumPorts (PortType::Audio, 0, false, true);
-        }
-        else if (node.isMidiInputNode())
-        {
-            gp->setNumPorts (PortType::Midi, 0, true, true);
-        }
-        else if (node.isMidiOutputNode())
-        {
-            gp->setNumPorts (PortType::Midi, 0, false, true);
-        }
-    }
-#endif
-
     auto* const gui = sibling<GuiService>();
     if (auto* manager = graphs->findGraphManagerFor (graph))
     {
@@ -652,6 +635,29 @@ void EngineService::removeNode (const Node& node)
             gui->selectNode (Node());
         manager->removeNode (node.getNodeId());
         sigNodeRemoved (node);
+    }
+
+    if (auto gp = dynamic_cast<GraphNode*> (graph.getObject()))
+    {
+        const bool asyncNotify = false;
+        // workaround: removal of a duplex node in reality has
+        // cleared the graph's ports
+        if (node.isAudioInputNode())
+        {
+            gp->setNumPorts (PortType::Audio, 0, true, asyncNotify);
+        }
+        else if (node.isAudioOutputNode())
+        {
+            gp->setNumPorts (PortType::Audio, 0, false, asyncNotify);
+        }
+        else if (node.isMidiInputNode())
+        {
+            gp->setNumPorts (PortType::Midi, 0, true, asyncNotify);
+        }
+        else if (node.isMidiOutputNode())
+        {
+            gp->setNumPorts (PortType::Midi, 0, false, asyncNotify);
+        }
     }
 }
 

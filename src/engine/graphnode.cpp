@@ -637,7 +637,9 @@ void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
     for (int ti = 0; ti < PortType::Unknown; ++ti)
     {
         auto tp = PortType (ti);
-        newCount.set (tp, (inputs && type == tp) ? count : getNumPorts (tp, true), (! inputs && type == tp) ? count : getNumPorts (tp, false));
+        newCount.set (tp,
+                      (inputs && type == tp) ? count : getNumPorts (tp, true),
+                      (! inputs && type == tp) ? count : getNumPorts (tp, false));
     }
 
     userPorts = newCount.toPortList();
@@ -646,7 +648,10 @@ void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
     if (async)
         triggerPortReset();
     else
+    {
         resetPorts();
+        portsChanged();
+    }
 }
 
 SymbolMap& GraphNode::symbols() noexcept { return _context.symbols(); }

@@ -183,7 +183,10 @@ private:
             data.addChild (newPorts, index, nullptr);
             manager.removeIllegalConnections();
         }
-
+        if (object->isGraph())
+        {
+            IONodeEnforcer enforce (manager);
+        }
         manager.syncArcsModel();
     }
 

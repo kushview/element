@@ -632,7 +632,7 @@ void Processor::setPorts (const PortList& newPorts)
     if (ports.size (PortType::Midi, true) <= 0 &&
          ports.size (PortType::Atom, true) <= 0 && 
         ! isMidiIONode() && ! isAudioIONode() && 
-        ! isMidiDeviceNode())
+        ! isMidiDeviceNode() && ! isRootGraph())
     // clang-format on
     {
         ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
