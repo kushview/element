@@ -18,6 +18,7 @@ namespace element {
 class MidiPipe {
 public:
     MidiPipe();
+    MidiPipe (juce::MidiBuffer& buffer);
     MidiPipe (juce::MidiBuffer** buffers, int numBuffers);
     MidiPipe (const juce::OwnedArray<juce::MidiBuffer>& buffers, const juce::Array<int>& channels);
     ~MidiPipe();

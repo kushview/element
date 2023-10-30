@@ -729,7 +729,6 @@ public:
     }
 
     //==========================================================================
-    bool wantsMidiPipe() const override { return false; }
     bool wantsContext() const noexcept override { return true; }
 
     double getTailLengthSeconds() const { return 0.0f; }

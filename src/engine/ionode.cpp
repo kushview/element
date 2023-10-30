@@ -93,19 +93,19 @@ void IONode::prepareToRender (double r, int b)
 
 void IONode::releaseResources() {}
 
-void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe, AudioSampleBuffer&)
+void IONode::render (RenderContext& rc) // AudioSampleBuffer& buffer, MidiPipe& midiPipe, AudioSampleBuffer&)
 {
     jassert (graph != nullptr);
     // jassert (midiPipe.getNumBuffers() > 0);
-    auto& midiMessages = *midiPipe.getWriteBuffer (0);
+    auto& midiMessages = *rc.midi.getWriteBuffer (0);
     switch (type)
     {
         case audioOutputNode: {
             for (int i = jmin (graph->currentAudioOutputBuffer.getNumChannels(),
-                               buffer.getNumChannels());
+                               rc.audio.getNumChannels());
                  --i >= 0;)
             {
-                graph->currentAudioOutputBuffer.addFrom (i, 0, buffer, i, 0, buffer.getNumSamples());
+                graph->currentAudioOutputBuffer.addFrom (i, 0, rc.audio, i, 0, rc.audio.getNumSamples());
             }
 
             break;
@@ -113,10 +113,10 @@ void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe, AudioSampleB
 
         case audioInputNode: {
             for (int i = jmin (graph->currentAudioInputBuffer->getNumChannels(),
-                               buffer.getNumChannels());
+                               rc.audio.getNumChannels());
                  --i >= 0;)
             {
-                buffer.copyFrom (i, 0, *graph->currentAudioInputBuffer, i, 0, buffer.getNumSamples());
+                rc.audio.copyFrom (i, 0, *graph->currentAudioInputBuffer, i, 0, rc.audio.getNumSamples());
             }
 
             break;
@@ -124,13 +124,13 @@ void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe, AudioSampleB
 
         case midiOutputNode:
             graph->currentMidiOutputBuffer.clear();
-            graph->currentMidiOutputBuffer.addEvents (midiMessages, 0, buffer.getNumSamples(), 0);
+            graph->currentMidiOutputBuffer.addEvents (midiMessages, 0, rc.audio.getNumSamples(), 0);
             midiMessages.clear();
             break;
 
         case midiInputNode:
             midiMessages.clear();
-            midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, buffer.getNumSamples(), 0);
+            midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, rc.audio.getNumSamples(), 0);
             graph->currentMidiInputBuffer->clear();
             break;
 

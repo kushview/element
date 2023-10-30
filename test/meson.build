@@ -52,7 +52,6 @@ test ('NodeFactory',    test_element_app, args : [ '-t', 'NodeFactoryTests' ])
 test ('Oversampler',    test_element_app, args : [ '-t', 'OversamplerTests' ])
 test ('PortList',       test_element_app, args : [ '-t', 'PortListTests' ])
 test ('PortType',       test_element_app, args : [ '-t', 'PortTypeTests' ])
-test ('Processor',      test_element_app, args : [ '-t', 'NodeObjectTests' ])
 test ('PluginManager',  test_element_app, args : [ '-t', 'PluginManagerTests' ])
 test ('Updates',        test_element_app, args : [ '-t', 'UpdateTests' ])
 

@@ -10,6 +10,7 @@ namespace element {
 OSCReceiverNode::OSCReceiverNode()
     : MidiFilterNode (0)
 {
+    setName ("OSC Receiver");
     oscReceiver.addListener (this);
 }
 
@@ -83,14 +84,14 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
     }
 }
 
-void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void OSCReceiverNode::render (RenderContext& rc)
 {
-    const auto nframes = audio.getNumSamples();
+    const auto nframes = rc.audio.getNumSamples();
     if (nframes == 0)
         return;
 
-    midi.clear();
-    outputMidiMessages.removeNextBlockOfMessages (*midi.getWriteBuffer (0), nframes);
+    rc.midi.clear();
+    outputMidiMessages.removeNextBlockOfMessages (*rc.midi.getWriteBuffer (0), nframes);
 }
 
 /** OSCReceiver real-time callbacks */

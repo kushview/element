@@ -8,7 +8,10 @@
 namespace element {
 
 MidiProgramMapNode::MidiProgramMapNode()
-    : MidiFilterNode (0) {}
+    : MidiFilterNode (0)
+{
+    setName ("Midi Program Map");
+}
 
 MidiProgramMapNode::~MidiProgramMapNode() {}
 
@@ -35,10 +38,9 @@ void MidiProgramMapNode::prepareToRender (double sampleRate, int maxBufferSize)
 
 void MidiProgramMapNode::releaseResources() {}
 
-void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void MidiProgramMapNode::render (RenderContext& rc)
 {
-    ignoreUnused (audio, midi);
-    if (midi.getNumBuffers() <= 0)
+    if (rc.midi.getNumBuffers() <= 0)
     {
         if (! assertedLowChannels)
         {
@@ -49,7 +51,7 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi, Audio
         return;
     }
 
-    auto* const midiIn = midi.getWriteBuffer (0);
+    auto* const midiIn = rc.midi.getWriteBuffer (0);
 
     ScopedLock sl (lock);
     MidiMessage msg;

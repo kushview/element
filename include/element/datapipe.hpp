@@ -21,6 +21,13 @@ public:
         memset (referencedBuffers, 0, sizeof (Buf*) * maxReferencedBuffers);
     }
 
+    DataPipe (Buf& buffer)
+    {
+        memset (referencedBuffers, 0, sizeof (Buf*) * maxReferencedBuffers);
+        referencedBuffers[0] = &buffer;
+        _size = 1;
+    }
+
     DataPipe (Buf** buffers, int numBuffers)
     {
         assert (numBuffers < maxReferencedBuffers);

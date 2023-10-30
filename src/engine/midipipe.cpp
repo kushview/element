@@ -22,6 +22,13 @@ MidiPipe::MidiPipe()
     memset (referencedBuffers, 0, sizeof (MidiBuffer*) * maxReferencedBuffers);
 }
 
+MidiPipe::MidiPipe (juce::MidiBuffer& buffer)
+{
+    memset (referencedBuffers, 0, sizeof (MidiBuffer*) * maxReferencedBuffers);
+    referencedBuffers[0] = &buffer;
+    size = 1;
+}
+
 MidiPipe::MidiPipe (MidiBuffer** buffers, int numBuffers)
 {
     jassert (numBuffers < maxReferencedBuffers);

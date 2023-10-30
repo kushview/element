@@ -8,6 +8,7 @@ namespace element {
 MidiMonitorNode::MidiMonitorNode()
     : MidiFilterNode (0)
 {
+    setName ("MIDI Monitor");
     midiTemp.ensureSize (3 * 32);
 }
 
@@ -30,15 +31,15 @@ void MidiMonitorNode::releaseResources()
     stopTimer();
 }
 
-void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void MidiMonitorNode::render (RenderContext& rc)
 {
     auto timestamp = Time::getMillisecondCounterHiRes();
-    const auto nframes = audio.getNumSamples();
+    const auto nframes = rc.audio.getNumSamples();
 
     if (nframes == 0)
         return;
 
-    auto* const midiIn = midi.getWriteBuffer (0);
+    auto* const midiIn = rc.midi.getWriteBuffer (0);
 
     for (auto m : *midiIn)
     {

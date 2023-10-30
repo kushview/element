@@ -25,11 +25,8 @@ public:
 
     void releaseResources() override {}
 
-    bool wantsMidiPipe() const override { return true; }
-
-    void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) override {}
-
-    void renderBypassed (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) override {}
+    void render (RenderContext&) override {}
+    void renderBypassed (RenderContext&) override {}
 
     int getNumPrograms() const override { return 1; }
     int getCurrentProgram() const override { return 0; }

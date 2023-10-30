@@ -2,7 +2,7 @@
 
 <Session version="1" name="Atom Ports" tempo="120.0" notes="Session for testing functionality of LV2 Atom support in Element.&#10;&#10;DEPENDENCIES&#10;==========&#10;&#10;X42 MIDI Collection: &#10;https://x42-plugins.com/x42/x42-midifilter&#10;"
          beatsPerBar="4" beatDivisor="2">
-  <graphs active="0">
+  <graphs active="4">
     <Node version="1" type="Graph" uuid="d2b69cf0a38248d3a9abfa7619217ba5"
           name="One To One To Three" bypass="0" persistent="1" renderMode="single"
           keyStart="0" keyEnd="127" transpose="0" delayCompensation="0"
@@ -23,7 +23,7 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node id="4" format="Internal" identifier="midi.output" type="plugin"
@@ -41,14 +41,14 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
         <Node id="9" format="Element" identifier="element.midiMonitor" type="plugin"
-              name="MIDI Monitor" relativeX="0.1073891625615764" relativeY="0.3561643835616438"
+              name="MIDI Monitor" relativeX="0.1344873501997337" relativeY="0.4872958257713249"
               pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8" uuid="79eadf1e94bc42118471385903c9c234"
               bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
-              transpose="0" delayCompensation="0.0" tempo="120.0" x="7.0" y="226.0"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="0.0" y="276.0"
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1" windowX="468" windowY="303"
@@ -60,39 +60,39 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node format="Element" identifier="element.midiMonitor" type="plugin"
               name="MIDI Monitor" pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8"
               uuid="089c65857382414b9a65eab9c82b7bb6" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="432.0" y="243.0" midiProgram="0" globalMidiPrograms="0"
+              tempo="120.0" x="413.0" y="272.0" midiProgram="0" globalMidiPrograms="0"
               midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
-              oversamplingFactor="1" enabled="1" version="1" id="12" relativeX="0.8516746411483254"
-              relativeY="0.4144602851323829">
+              oversamplingFactor="1" enabled="1" version="1" id="12" relativeX="0.681757656458056"
+              relativeY="0.4773139745916515">
           <nodes/>
           <scripts/>
           <ui>
-            <Block portAlignment="before" displayMode="embed" width="508" height="198"/>
+            <Block portAlignment="before" displayMode="embed" width="535" height="204"/>
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node format="Element" identifier="element.midiMonitor" type="plugin"
               name="MIDI Monitor" pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8"
               uuid="619854d839364a98a4eeb650d6544845" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="231.0" y="222.0" midiProgram="0" globalMidiPrograms="0"
+              tempo="120.0" x="208.0" y="274.0" midiProgram="0" globalMidiPrograms="0"
               midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
-              oversamplingFactor="1" enabled="1" version="1" id="17" relativeX="0.4555403556771546"
-              relativeY="0.3525114155251142">
+              oversamplingFactor="1" enabled="1" version="1" id="17" relativeX="0.4101198402130493"
+              relativeY="0.4891107078039927">
           <nodes/>
           <scripts/>
           <ui>
@@ -100,17 +100,17 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node id="21" format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
-              type="plugin" name="MIDI Channel Map" relativeX="0.8437001594896332"
-              relativeY="0.1446028513238289" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
+              type="plugin" name="MIDI Channel Map" relativeX="0.677762982689747"
+              relativeY="0.1116152450090744" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
               uuid="42b7d32fd2af4b979f9dc06b33a4280d" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="469.0" y="121.0" state="875.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckAxLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtn."
+              tempo="120.0" x="453.0" y="102.0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckAxLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtnfB"
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1" windowX="179" windowY="185"
@@ -123,54 +123,52 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
             <Port index="2" channel="0" type="control" name="latency" symbol="latency"
-                  flow="output" hiddenOnBlock="1"/>
+                  flow="output"/>
             <Port index="3" channel="0" type="control" name="Channel  1 to" symbol="chn1"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="4" channel="1" type="control" name="Channel  2 to" symbol="chn2"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="5" channel="2" type="control" name="Channel  3 to" symbol="chn3"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="6" channel="3" type="control" name="Channel  4 to" symbol="chn4"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="7" channel="4" type="control" name="Channel  5 to" symbol="chn5"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="8" channel="5" type="control" name="Channel  6 to" symbol="chn6"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="9" channel="6" type="control" name="Channel  7 to" symbol="chn7"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="10" channel="7" type="control" name="Channel  8 to" symbol="chn8"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="11" channel="8" type="control" name="Channel  9 to" symbol="chn9"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="12" channel="9" type="control" name="Channel 10 to" symbol="chn10"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="13" channel="10" type="control" name="Channel 11 to" symbol="chn11"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="14" channel="11" type="control" name="Channel 12 to" symbol="chn12"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="15" channel="12" type="control" name="Channel 13 to" symbol="chn13"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="16" channel="13" type="control" name="Channel 14 to" symbol="chn14"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="17" channel="14" type="control" name="Channel 15 to" symbol="chn15"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
-                  flow="input" hiddenOnBlock="1"/>
-            <Port index="19" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
         <Node id="23" format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
-              type="plugin" name="MIDI Channel Map" relativeX="0.8405103668261563"
-              relativeY="0.2026476578411405" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
+              type="plugin" name="MIDI Channel Map" relativeX="0.6750998668442078"
+              relativeY="0.1633393829401089" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
               uuid="0a20a5ee358547058fef6d73b1536fc9" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="467.0" y="178.0" windowX="70" windowY="27" windowVisible="0"
-              state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtQiHfriBIj.byUFc5XWXrUWYfPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VMh.xNJjPBvMWYzoicgwVckARMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla1HBH6nPBI.2bkQmN1EFa0UFH13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtciHfriBIj.byUFc5XWXrUWYfbiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4FNh.xNJjPBvMWYzoicgwVckABNt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla4HBH6nPBI.2bkQmN1EFa0UFH43BLJjPWf3hB"
+              tempo="120.0" x="451.0" y="159.0" windowX="70" windowY="27" windowVisible="0"
+              state="877.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtQiHfriBIj.byUFc5XWXrUWYfPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VMh.xNJjPBvMWYzoicgwVckARMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla1HBH6nPBI.2bkQmN1EFa0UFH13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtciHfriBIj.byUFc5XWXrUWYfbiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4FNh.xNJjPBvMWYzoicgwVckABNt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla4HBH6nPBI.2bkQmN1EFa0UFH43BLJjPWf3hBJ."
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1">
@@ -182,45 +180,43 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
             <Port index="2" channel="0" type="control" name="latency" symbol="latency"
-                  flow="output" hiddenOnBlock="1"/>
+                  flow="output"/>
             <Port index="3" channel="0" type="control" name="Channel  1 to" symbol="chn1"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="4" channel="1" type="control" name="Channel  2 to" symbol="chn2"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="5" channel="2" type="control" name="Channel  3 to" symbol="chn3"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="6" channel="3" type="control" name="Channel  4 to" symbol="chn4"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="7" channel="4" type="control" name="Channel  5 to" symbol="chn5"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="8" channel="5" type="control" name="Channel  6 to" symbol="chn6"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="9" channel="6" type="control" name="Channel  7 to" symbol="chn7"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="10" channel="7" type="control" name="Channel  8 to" symbol="chn8"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="11" channel="8" type="control" name="Channel  9 to" symbol="chn9"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="12" channel="9" type="control" name="Channel 10 to" symbol="chn10"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="13" channel="10" type="control" name="Channel 11 to" symbol="chn11"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="14" channel="11" type="control" name="Channel 12 to" symbol="chn12"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="15" channel="12" type="control" name="Channel 13 to" symbol="chn13"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="16" channel="13" type="control" name="Channel 14 to" symbol="chn14"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="17" channel="14" type="control" name="Channel 15 to" symbol="chn15"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
-                  flow="input" hiddenOnBlock="1"/>
-            <Port index="19" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
         <Node id="24" format="Internal" identifier="audio.input" type="plugin"
@@ -229,7 +225,8 @@
               bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
               transpose="0" delayCompensation="0.0" tempo="120.0" midiProgram="0"
               globalMidiPrograms="0" midiProgramsEnabled="0" mute="0" muteInput="0"
-              midiProgramsState="" oversamplingFactor="1" x="58.0" y="59.0">
+              midiProgramsState="" oversamplingFactor="1" x="58.0" y="59.0"
+              enabled="1">
           <nodes/>
           <scripts/>
           <ui>
@@ -237,9 +234,9 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="audio" name="Audio Out 1" symbol="audio_out_1"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
             <Port index="1" channel="1" type="audio" name="Audio Out 2" symbol="audio_out_2"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node id="25" format="Internal" identifier="audio.output" type="plugin"
@@ -248,7 +245,8 @@
               bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
               transpose="0" delayCompensation="0.0" tempo="120.0" midiProgram="0"
               globalMidiPrograms="0" midiProgramsEnabled="0" mute="0" muteInput="0"
-              midiProgramsState="" oversamplingFactor="1" x="26.0" y="916.0">
+              midiProgramsState="" oversamplingFactor="1" x="26.0" y="916.0"
+              enabled="1">
           <nodes/>
           <scripts/>
           <ui>
@@ -256,21 +254,21 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="audio" name="Audio In 1" symbol="audio_in_1"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="1" type="audio" name="Audio In 2" symbol="audio_in_2"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
       </nodes>
       <scripts/>
       <ui>
         <Block/>
-        <GraphEditorView width="982" height="627"/>
+        <GraphEditorView width="1004" height="569"/>
       </ui>
       <arcs>
+        <Arc sourceNode="3" sourcePort="0" destNode="9" destPort="0"/>
         <Arc sourceNode="3" sourcePort="0" destNode="21" destPort="0"/>
         <Arc sourceNode="12" sourcePort="1" destNode="4" destPort="0"/>
-        <Arc sourceNode="21" sourcePort="1" destNode="9" destPort="0"/>
         <Arc sourceNode="21" sourcePort="1" destNode="17" destPort="0"/>
         <Arc sourceNode="21" sourcePort="1" destNode="23" destPort="0"/>
         <Arc sourceNode="23" sourcePort="1" destNode="12" destPort="0"/>
@@ -310,7 +308,7 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node id="4" format="Internal" identifier="midi.output" type="plugin"
@@ -328,17 +326,17 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
         <Node format="Element" identifier="element.midiMonitor" type="plugin"
               name="MIDI Monitor" pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8"
               uuid="b2fb55f2ff684eb5b2bc157561865b2a" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="175.0" y="236.0" midiProgram="0" globalMidiPrograms="0"
+              tempo="120.0" x="208.0" y="218.0" midiProgram="0" globalMidiPrograms="0"
               midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
-              oversamplingFactor="1" enabled="1" version="1" id="17" relativeX="0.3884826325411335"
-              relativeY="0.4314465408805032">
+              oversamplingFactor="1" enabled="1" version="1" id="17" relativeX="0.4156079854809437"
+              relativeY="0.4088050314465409">
           <nodes/>
           <scripts/>
           <ui>
@@ -346,9 +344,9 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node id="21" format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
@@ -356,7 +354,7 @@
               relativeY="0.1962264150943396" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
               uuid="7f74ae62a9bf4208acd4cd587277cfa1" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="37.0" y="126.0" state="875.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckAxLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtn."
+              tempo="120.0" x="37.0" y="126.0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckAxLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtnfB"
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1" windowX="70" windowY="195"
@@ -369,52 +367,50 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
             <Port index="2" channel="0" type="control" name="latency" symbol="latency"
-                  flow="output" hiddenOnBlock="1"/>
+                  flow="output"/>
             <Port index="3" channel="0" type="control" name="Channel  1 to" symbol="chn1"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="4" channel="1" type="control" name="Channel  2 to" symbol="chn2"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="5" channel="2" type="control" name="Channel  3 to" symbol="chn3"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="6" channel="3" type="control" name="Channel  4 to" symbol="chn4"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="7" channel="4" type="control" name="Channel  5 to" symbol="chn5"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="8" channel="5" type="control" name="Channel  6 to" symbol="chn6"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="9" channel="6" type="control" name="Channel  7 to" symbol="chn7"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="10" channel="7" type="control" name="Channel  8 to" symbol="chn8"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="11" channel="8" type="control" name="Channel  9 to" symbol="chn9"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="12" channel="9" type="control" name="Channel 10 to" symbol="chn10"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="13" channel="10" type="control" name="Channel 11 to" symbol="chn11"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="14" channel="11" type="control" name="Channel 12 to" symbol="chn12"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="15" channel="12" type="control" name="Channel 13 to" symbol="chn13"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="16" channel="13" type="control" name="Channel 14 to" symbol="chn14"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="17" channel="14" type="control" name="Channel 15 to" symbol="chn15"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
-                  flow="input" hiddenOnBlock="1"/>
-            <Port index="19" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
         <Node format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
               type="plugin" name="MIDI Channel Map" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
               uuid="b0b16dd0b4e74933b218d274757208bd" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="38.0" y="296.0" state="875.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfLiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckABMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtn."
+              tempo="120.0" x="38.0" y="296.0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfLiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckABMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtnfB"
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1" version="1" id="22" relativeX="0.07861060329067641"
@@ -427,55 +423,53 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
             <Port index="2" channel="0" type="control" name="latency" symbol="latency"
-                  flow="output" hiddenOnBlock="1"/>
+                  flow="output"/>
             <Port index="3" channel="0" type="control" name="Channel  1 to" symbol="chn1"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="4" channel="1" type="control" name="Channel  2 to" symbol="chn2"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="5" channel="2" type="control" name="Channel  3 to" symbol="chn3"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="6" channel="3" type="control" name="Channel  4 to" symbol="chn4"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="7" channel="4" type="control" name="Channel  5 to" symbol="chn5"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="8" channel="5" type="control" name="Channel  6 to" symbol="chn6"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="9" channel="6" type="control" name="Channel  7 to" symbol="chn7"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="10" channel="7" type="control" name="Channel  8 to" symbol="chn8"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="11" channel="8" type="control" name="Channel  9 to" symbol="chn9"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="12" channel="9" type="control" name="Channel 10 to" symbol="chn10"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="13" channel="10" type="control" name="Channel 11 to" symbol="chn11"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="14" channel="11" type="control" name="Channel 12 to" symbol="chn12"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="15" channel="12" type="control" name="Channel 13 to" symbol="chn13"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="16" channel="13" type="control" name="Channel 14 to" symbol="chn14"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="17" channel="14" type="control" name="Channel 15 to" symbol="chn15"
-                  flow="input" hiddenOnBlock="1"/>
+                  flow="input"/>
             <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
-                  flow="input" hiddenOnBlock="1"/>
-            <Port index="19" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
           </ports>
         </Node>
         <Node format="Element" identifier="element.midiMonitor" type="plugin"
               name="MIDI Monitor" pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8"
               uuid="7af36d1956f042ec904a227e7d1434f7" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="175.0" y="453.0" midiProgram="0" globalMidiPrograms="0"
+              tempo="120.0" x="208.0" y="435.0" midiProgram="0" globalMidiPrograms="0"
               midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
-              oversamplingFactor="1" enabled="1" version="1" id="23" relativeX="0.3912248628884826"
-              relativeY="0.6981132075471698">
+              oversamplingFactor="1" enabled="1" version="1" id="23" relativeX="0.4183303085299456"
+              relativeY="0.6754716981132075">
           <nodes/>
           <scripts/>
           <ui>
@@ -483,19 +477,19 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
         <Node format="Element" identifier="element.midiMonitor" type="plugin"
               name="MIDI Monitor" pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8"
               uuid="93a64196d4c14037b71f246ca9d42f50" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="179.0" y="31.0" midiProgram="0" globalMidiPrograms="0"
+              tempo="120.0" x="212.0" y="18.0" midiProgram="0" globalMidiPrograms="0"
               midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
-              oversamplingFactor="1" enabled="1" version="1" id="24" relativeX="0.3908675799086758"
-              relativeY="0.1270935960591133">
+              oversamplingFactor="1" enabled="1" version="1" id="24" relativeX="0.4183303085299456"
+              relativeY="0.1459119496855346">
           <nodes/>
           <scripts/>
           <ui>
@@ -503,16 +497,16 @@
           </ui>
           <ports>
             <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
-                  flow="input" hiddenOnBlock="0"/>
+                  flow="input"/>
             <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
-                  flow="output" hiddenOnBlock="0"/>
+                  flow="output"/>
           </ports>
         </Node>
       </nodes>
       <scripts/>
       <ui>
         <Block/>
-        <GraphEditorView width="982" height="627"/>
+        <GraphEditorView width="1004" height="569"/>
       </ui>
       <arcs>
         <Arc sourceNode="3" sourcePort="0" destNode="21" destPort="0"/>
@@ -577,7 +571,7 @@
               relativeY="0.1331987891019173" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
               uuid="9161d5495f45452cb834d896944a0fae" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="73.0" y="111.0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHwPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLvHBH6nPBI.2bkQmN1EFa0UFHw.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLwHBH6nPBI.2bkQmN1EFa0UFHwDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLxHBH6nPBI.2bkQmN1EFa0UFHwHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLyHBH6nPBI.2bkQmN1EFa0UFHwLiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLzHBH6nPBI.2bkQmN1EFa0UFHwPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL0HBH6nPBI.2bkQmN1EFa0UFHwTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL1HBH6nPBI.2bkQmN1EFa0UFHwXiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lLh.xNJjPBvMWYzoicgwVckAhLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglayHBH6nPBI.2bkQmN1EFa0UFHy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtQiHfriBIj.byUFc5XWXrUWYfPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VMh.xNJjPBvMWYzoicgwVckARMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla1HBH6nPBI.2bkQmN1EFa0UFH13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtciHfriBIj.byUFc5XWXrUWYfbiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4FNh.xNJjPBvMWYzoicgwVckABNt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla4HBH6nPBI.2bkQmN1EFa0UFH43BLJjPWf3hB"
+              tempo="120.0" x="73.0" y="111.0" state="877.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHwPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLvHBH6nPBI.2bkQmN1EFa0UFHw.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLwHBH6nPBI.2bkQmN1EFa0UFHwDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLxHBH6nPBI.2bkQmN1EFa0UFHwHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLyHBH6nPBI.2bkQmN1EFa0UFHwLiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLzHBH6nPBI.2bkQmN1EFa0UFHwPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL0HBH6nPBI.2bkQmN1EFa0UFHwTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL1HBH6nPBI.2bkQmN1EFa0UFHwXiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lLh.xNJjPBvMWYzoicgwVckAhLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglayHBH6nPBI.2bkQmN1EFa0UFHy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtQiHfriBIj.byUFc5XWXrUWYfPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VMh.xNJjPBvMWYzoicgwVckARMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla1HBH6nPBI.2bkQmN1EFa0UFH13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtciHfriBIj.byUFc5XWXrUWYfbiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4FNh.xNJjPBvMWYzoicgwVckABNt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla4HBH6nPBI.2bkQmN1EFa0UFH43BLJjPWf3hBJ."
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1" windowX="461" windowY="125"
@@ -627,15 +621,13 @@
                   flow="input" hiddenOnBlock="1"/>
             <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
                   flow="input" hiddenOnBlock="1"/>
-            <Port index="19" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
-                  flow="input" hiddenOnBlock="0"/>
           </ports>
         </Node>
         <Node format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
               type="plugin" name="MIDI Channel Map" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
               uuid="dd0046f414c7455fa8db92d0b80509c9" bypass="0" persistent="1"
               renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
-              tempo="120.0" x="239.0" y="114.0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHwTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLvHBH6nPBI.2bkQmN1EFa0UFHw.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLwHBH6nPBI.2bkQmN1EFa0UFHwDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLxHBH6nPBI.2bkQmN1EFa0UFHwHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLyHBH6nPBI.2bkQmN1EFa0UFHwLiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLzHBH6nPBI.2bkQmN1EFa0UFHwPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL0HBH6nPBI.2bkQmN1EFa0UFHwTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL1HBH6nPBI.2bkQmN1EFa0UFHwXiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lLh.xNJjPBvMWYzoicgwVckAhLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglayHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtQiHfriBIj.byUFc5XWXrUWYfPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VMh.xNJjPBvMWYzoicgwVckARMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla1HBH6nPBI.2bkQmN1EFa0UFH13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtciHfriBIj.byUFc5XWXrUWYfbiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4FNh.xNJjPBvMWYzoicgwVckABNt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla4HBH6nPBI.2bkQmN1EFa0UFH43BLJjPWf3hB"
+              tempo="120.0" x="239.0" y="114.0" state="877.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHwTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLvHBH6nPBI.2bkQmN1EFa0UFHw.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLwHBH6nPBI.2bkQmN1EFa0UFHwDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLxHBH6nPBI.2bkQmN1EFa0UFHwHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLyHBH6nPBI.2bkQmN1EFa0UFHwLiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VLzHBH6nPBI.2bkQmN1EFa0UFHwPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL0HBH6nPBI.2bkQmN1EFa0UFHwTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VL1HBH6nPBI.2bkQmN1EFa0UFHwXiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lLh.xNJjPBvMWYzoicgwVckAhLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglayHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtQiHfriBIj.byUFc5XWXrUWYfPiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VMh.xNJjPBvMWYzoicgwVckARMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla1HBH6nPBI.2bkQmN1EFa0UFH13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtciHfriBIj.byUFc5XWXrUWYfbiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4FNh.xNJjPBvMWYzoicgwVckABNt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla4HBH6nPBI.2bkQmN1EFa0UFH43BLJjPWf3hBJ."
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1" version="1" id="22" relativeX="0.4035567715458276"
@@ -685,8 +677,6 @@
                   flow="input" hiddenOnBlock="1"/>
             <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
                   flow="input" hiddenOnBlock="1"/>
-            <Port index="19" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
-                  flow="input" hiddenOnBlock="0"/>
           </ports>
         </Node>
         <Node format="Element" identifier="element.midiMonitor" type="plugin"
@@ -806,7 +796,7 @@
       <scripts/>
       <ui>
         <Block/>
-        <GraphEditorView width="1100" height="737"/>
+        <GraphEditorView width="1004" height="569"/>
       </ui>
       <arcs>
         <Arc sourceNode="3" sourcePort="0" destNode="21" destPort="0"/>
@@ -823,8 +813,267 @@
               flow="output"/>
       </ports>
     </Node>
+    <Node version="1" type="Graph" uuid="aaaa6aad45b844fc823b8711205bffbe"
+          name="One Midi to Atom to Midi + Atom" bypass="0" persistent="1"
+          renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0"
+          tempo="120.0">
+      <nodes>
+        <Node id="2" format="Internal" identifier="midi.input" type="plugin"
+              name="" relativeX="0.1073080481036078" relativeY="0.07692307692307693"
+              pluginIdentifierString="Internal--6e34cabd-0" uuid="16b3abd6c0cc444fb2fc24835fdacdc4"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="71.0"
+              y="29.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1"
+              enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block displayMode="compact" portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="6" format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#passthru"
+              type="plugin" name="MIDI Thru" relativeX="0.05272895467160037"
+              relativeY="0.2015384615384615" pluginIdentifierString="LV2-MIDI Thru-94b91cef-94b91cef"
+              uuid="d691ff55a76548ac95a983fe12ebc9d9" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="12.0" y="101.0" state="114.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMBbgM2bzglb04CHtnfB"
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" windowX="134" windowY="38" windowVisible="0"
+              enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="latency" portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="control" name="latency" symbol="latency"
+                  flow="output" hiddenOnBlock="1"/>
+          </ports>
+        </Node>
+        <Node id="7" format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
+              type="plugin" name="MIDI Channel Map" relativeX="0.1581868640148011"
+              relativeY="0.1672955974842767" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
+              uuid="8f6718a0f3dd436aa7be175856549776" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="123.0" y="103.0" windowX="334" windowY="190"
+              windowVisible="0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFH03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckAxLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtnfB"
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="chn1,chn2,chn3,chn4,chn5,chn6,chn7,chn8,chn9,chn10,chn11,chn12,chn13,chn14,chn15,chn16,latency"
+                   portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="control" name="latency" symbol="latency"
+                  flow="output" hiddenOnBlock="1"/>
+            <Port index="3" channel="0" type="control" name="Channel  1 to" symbol="chn1"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="4" channel="1" type="control" name="Channel  2 to" symbol="chn2"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="5" channel="2" type="control" name="Channel  3 to" symbol="chn3"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="6" channel="3" type="control" name="Channel  4 to" symbol="chn4"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="7" channel="4" type="control" name="Channel  5 to" symbol="chn5"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="8" channel="5" type="control" name="Channel  6 to" symbol="chn6"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="9" channel="6" type="control" name="Channel  7 to" symbol="chn7"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="10" channel="7" type="control" name="Channel  8 to" symbol="chn8"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="11" channel="8" type="control" name="Channel  9 to" symbol="chn9"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="12" channel="9" type="control" name="Channel 10 to" symbol="chn10"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="13" channel="10" type="control" name="Channel 11 to" symbol="chn11"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="14" channel="11" type="control" name="Channel 12 to" symbol="chn12"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="15" channel="12" type="control" name="Channel 13 to" symbol="chn13"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="16" channel="13" type="control" name="Channel 14 to" symbol="chn14"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="17" channel="14" type="control" name="Channel 15 to" symbol="chn15"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
+                  flow="input" hiddenOnBlock="1"/>
+          </ports>
+        </Node>
+        <Node format="Element" identifier="element.midiMonitor" type="plugin"
+              pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8" uuid="875f627b092946eea3016c1c3db776b6"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="66.0"
+              y="207.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" name="Node" id="9" relativeX="0.3191489361702128"
+              relativeY="0.5907692307692308" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block portAlignment="before" displayMode="embed" width="558" height="355"/>
+          </ui>
+          <arcs/>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+      </nodes>
+      <scripts/>
+      <ui>
+        <Block/>
+        <GraphEditorView width="1004" height="569"/>
+      </ui>
+      <arcs>
+        <Arc sourceNode="2" sourcePort="0" destNode="6" destPort="0"/>
+        <Arc sourceNode="2" sourcePort="0" destNode="7" destPort="0"/>
+        <Arc sourceNode="6" sourcePort="1" destNode="9" destPort="0"/>
+        <Arc sourceNode="7" sourcePort="1" destNode="9" destPort="0"/>
+      </arcs>
+      <ports>
+        <Port index="0" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
+              flow="input"/>
+      </ports>
+    </Node>
+    <Node version="1" type="Graph" uuid="db9a2ba9391748eb88a4a578ccb08af9"
+          name="Atom-MIDI to MIDI" bypass="0" persistent="1" renderMode="single"
+          keyStart="0" keyEnd="127" transpose="0" delayCompensation="0"
+          tempo="120.0">
+      <nodes>
+        <Node format="Element" identifier="element.midiMonitor" type="plugin"
+              pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8" uuid="7135ffa1580040a4887f46488c19fbbc"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="13.0"
+              y="185.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" name="MIDI Monitor 2" id="9" relativeX="0.2701202590194264"
+              relativeY="0.556923076923077" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block portAlignment="before" displayMode="embed" width="558" height="355"/>
+          </ui>
+          <arcs/>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="2" format="Internal" identifier="midi.input" type="plugin"
+              name="" pluginIdentifierString="Internal--6e34cabd-0" uuid="e04a756e241b4e5facb304493d006d65"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="224.0"
+              y="64.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1"
+              enabled="1" relativeX="0.2488436632747456" relativeY="0.1069182389937107">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block displayMode="compact" portAlignment="before"/>
+          </ui>
+          <arcs/>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="10" format="LV2" identifier="http://gareus.org/oss/lv2/midifilter#channelmap"
+              type="plugin" name="MIDI Channel Map" pluginIdentifierString="LV2-MIDI Channel Map-904b7160-904b7160"
+              uuid="a34085ed3ec94bc2a6cb2bf43ca40ced" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="44.0" y="80.0" state="876.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczAmNu7xYgIWY0MmKuI2Yu71by8Ba1IyKskFYoYVZrQWYxMxXnElatUFasEFb9.xNJj.a1IiNv8lbzAxVJjPBrYmL5LWdsI1arAhHiglawHBH6nPBI.2bkQmN1EFa0UFHx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECLh.xNJjPBvMWYzoicgwVckARLv3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESLh.xNJjPBvMWYzoicgwVckARLw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiLh.xNJjPBvMWYzoicgwVckARLx3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEyLh.xNJjPBvMWYzoicgwVckARLy3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtECMh.xNJjPBvMWYzoicgwVckARLz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtESMh.xNJjPBvMWYzoicgwVckARL03BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtEiMh.xNJjPBvMWYzoicgwVckARL13BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtIiHfriBIj.byUFc5XWXrUWYfHiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn41Lh.xNJjPBvMWYzoicgwVckAxLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHiglazHBH6nPBI.2bkQmN1EFa0UFHz3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtUiHfriBIj.byUFc5XWXrUWYfTiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4lMh.xNJjPBvMWYzoicgwVckAhMt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHigla2HBH6nPBI.2bkQmN1EFa0UFH23BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhLFZtgiHfriBIj.byUFc5XWXrUWYffiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXn4VNh.xNJjPBvMWYzoicgwVckARNt.iBIzEHtnfB"
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1" relativeX="0.0851063829787234"
+              relativeY="0.1383647798742138">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="latency,chn1,chn2,chn3,chn4,chn5,chn6,chn7,chn8,chn9,chn10,chn11,chn12,chn13,chn14,chn15,chn16"
+                   portAlignment="before"/>
+          </ui>
+          <arcs/>
+          <ports>
+            <Port index="0" channel="0" type="atom" name="MIDI In" symbol="midiin"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="atom" name="MIDI Out" symbol="midiout"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="control" name="latency" symbol="latency"
+                  flow="output" hiddenOnBlock="1"/>
+            <Port index="3" channel="0" type="control" name="Channel  1 to" symbol="chn1"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="4" channel="1" type="control" name="Channel  2 to" symbol="chn2"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="5" channel="2" type="control" name="Channel  3 to" symbol="chn3"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="6" channel="3" type="control" name="Channel  4 to" symbol="chn4"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="7" channel="4" type="control" name="Channel  5 to" symbol="chn5"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="8" channel="5" type="control" name="Channel  6 to" symbol="chn6"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="9" channel="6" type="control" name="Channel  7 to" symbol="chn7"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="10" channel="7" type="control" name="Channel  8 to" symbol="chn8"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="11" channel="8" type="control" name="Channel  9 to" symbol="chn9"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="12" channel="9" type="control" name="Channel 10 to" symbol="chn10"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="13" channel="10" type="control" name="Channel 11 to" symbol="chn11"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="14" channel="11" type="control" name="Channel 12 to" symbol="chn12"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="15" channel="12" type="control" name="Channel 13 to" symbol="chn13"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="16" channel="13" type="control" name="Channel 14 to" symbol="chn14"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="17" channel="14" type="control" name="Channel 15 to" symbol="chn15"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="18" channel="15" type="control" name="Channel 16 to" symbol="chn16"
+                  flow="input" hiddenOnBlock="1"/>
+          </ports>
+        </Node>
+      </nodes>
+      <scripts/>
+      <ui>
+        <Block/>
+        <GraphEditorView width="1004" height="569"/>
+      </ui>
+      <arcs>
+        <Arc sourceNode="2" sourcePort="0" destNode="9" destPort="0"/>
+        <Arc sourceNode="2" sourcePort="0" destNode="10" destPort="0"/>
+        <Arc sourceNode="10" sourcePort="1" destNode="9" destPort="0"/>
+      </arcs>
+      <ports>
+        <Port index="0" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
+              flow="input"/>
+      </ports>
+    </Node>
   </graphs>
   <controllers/>
   <maps/>
-  <ui content="180.3ocgNGzCBBBFFGmZquNrV0zt1JYg4plYDvVGbKJEIecHKnu8YG6TGdt9+2SuqzoPiFuGtoRtU6.KqV4QitNIJBOGVl5za1QOS3ZHNbH4dQpuaAyHq.s4AHAJswRIh1GLd0BhzlXjvJxSaCsT6MuN5azhf3BccVX6oL7qYEQ28nuZGsPmx5pU8+WbEiKBFQ2Pcmmw0ThLOmYZElgmPEh.iWjadNL+Ohuyv3owwXLB8AfCL3js"/>
+  <ui content="194.3occMGsaBBCE.FtrDecZhaLzaMazrCXTDYczlsKHyBkRGGRswhu85xtdO.++em8MdEI5gc3IU5odO538p.I5qEIIzmv0Ydyq4v6rZCtZdeZaUVXJlakZzX6PIBvfCXhwNdsNlIcoVItg8ia.ZLA6khvfQLK9.dY67aG2Ru7XURaf7qVgCmTNeu57ehetH44+U79YDG3ZlbJkU2BLyHvq6hQgVPwxkE4GyQSosSmCWMW8k2yOXETZ02i6Z2SH2b40NcD"/>
 </Session>

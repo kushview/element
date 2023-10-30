@@ -25,7 +25,7 @@ public:
     void getPluginDescription (PluginDescription& desc) const override;
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
-    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override;
+    void render (RenderContext&) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 
@@ -43,7 +43,7 @@ public:
     void refreshPorts() override;
 
 protected:
-    inline bool wantsMidiPipe() const override { return true; }
+    inline bool wantsContext() const noexcept override { return true; }
     ParameterPtr getParameter (const PortDescription& port) override;
 
 private:

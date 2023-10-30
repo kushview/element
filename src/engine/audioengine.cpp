@@ -146,17 +146,15 @@ struct RootGraphRender : public AsyncUpdater
                 }
 
                 {
-                    MidiBuffer* tmpArray[] = { &midiTemp };
-                    MidiPipe midiPipe (tmpArray, 1);
-                    AudioSampleBuffer emptyBuff;
+                    RenderContext rc (audioTemp, cvTemp, midiTemp, atomTemp, numSamples);
                     const ScopedLock sl (graph->getPropertyLock());
                     if (graph->isSuspended())
                     {
-                        graph->renderBypassed (audioTemp, midiPipe, emptyBuff);
+                        graph->renderBypassed (rc);
                     }
                     else
                     {
-                        graph->render (audioTemp, midiPipe, emptyBuff);
+                        graph->render (rc);
                     }
                 }
 
@@ -270,9 +268,9 @@ private:
 
     int numInputChans = -1;
     int numOutputChans = -1;
-    AudioSampleBuffer audioOut, audioTemp;
-
+    AudioSampleBuffer audioOut, audioTemp, cvTemp;
     MidiBuffer midiOut, midiTemp;
+    AtomBuffer atomTemp;
 
     void updateIndexes()
     {

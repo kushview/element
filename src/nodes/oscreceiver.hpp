@@ -37,7 +37,7 @@ public:
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
-    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override;
+    void render (RenderContext&) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 

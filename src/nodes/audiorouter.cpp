@@ -17,6 +17,8 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
       toggles (ins, outs),
       nextToggles (ins, outs)
 {
+    setName ("Audio Router");
+    
     fadeIn.setFadesIn (true);
     fadeIn.setLength (fadeLengthSeconds);
     fadeOut.setFadesIn (false);
@@ -148,11 +150,11 @@ MatrixState AudioRouterNode::getMatrixState() const
     return state;
 }
 
-void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void AudioRouterNode::render (RenderContext& rc)
 {
-    jassert (midi.getNumBuffers() == 1);
-    const int numFrames = audio.getNumSamples();
-    const int numChannels = audio.getNumChannels();
+    jassert (rc.midi.getNumBuffers() == 1);
+    const int numFrames = rc.audio.getNumSamples();
+    const int numChannels = rc.audio.getNumChannels();
 
     tempAudio.setSize (numChannels, numFrames, false, false, true);
     tempAudio.clear (0, numFrames);
@@ -177,8 +179,8 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSam
 
     if (numSources > numChannels || numDestinations > numChannels)
     {
-        audio.clear();
-        midi.clear();
+        rc.audio.clear();
+        rc.midi.clear();
         return;
     }
 
@@ -210,7 +212,7 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSam
                     {
                         // no patch change and on means 1 to 1 mix
                         tempAudio.getWritePointer (j)[frame] +=
-                            audio.getReadPointer (i)[frame];
+                            rc.audio.getReadPointer (i)[frame];
                     }
                     else if (! toggles.get (i, j) && ! nextToggles.get (i, j))
                     {
@@ -220,12 +222,12 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSam
                     else if (! toggles.get (i, j) && nextToggles.get (i, j))
                     {
                         tempAudio.getWritePointer (j)[frame] +=
-                            (audio.getReadPointer (i)[frame] * fadeInGain);
+                            (rc.audio.getReadPointer (i)[frame] * fadeInGain);
                     }
                     else if (toggles.get (i, j) && ! nextToggles.get (i, j))
                     {
                         tempAudio.getWritePointer (j)[frame] +=
-                            (audio.getReadPointer (i)[frame] * fadeOutGain);
+                            (rc.audio.getReadPointer (i)[frame] * fadeOutGain);
                     }
                 }
             }
@@ -252,7 +254,7 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSam
                         if (toggles.get (i, j) && nextToggles.get (i, j))
                         {
                             // no patch change and on means 1 to 1 mix
-                            tempAudio.addFrom (j, frame, audio.getReadPointer (i, frame), framesToProcess);
+                            tempAudio.addFrom (j, frame, rc.audio.getReadPointer (i, frame), framesToProcess);
                         }
                         else if (! toggles.get (i, j) && ! nextToggles.get (i, j))
                         {
@@ -261,11 +263,11 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSam
                         }
                         else if (! toggles.get (i, j) && nextToggles.get (i, j))
                         {
-                            tempAudio.addFromWithRamp (j, frame, audio.getReadPointer (i, frame), framesToProcess, fadeInGain, 1.0f);
+                            tempAudio.addFromWithRamp (j, frame, rc.audio.getReadPointer (i, frame), framesToProcess, fadeInGain, 1.0f);
                         }
                         else if (toggles.get (i, j) && ! nextToggles.get (i, j))
                         {
-                            tempAudio.addFromWithRamp (j, frame, audio.getReadPointer (i, frame), framesToProcess, fadeOutGain, 0.0f);
+                            tempAudio.addFromWithRamp (j, frame, rc.audio.getReadPointer (i, frame), framesToProcess, fadeOutGain, 0.0f);
                         }
                         else
                         {
@@ -285,12 +287,12 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSam
         for (int i = 0; i < numSources; ++i)
             for (int j = 0; j < numDestinations; ++j)
                 if (toggles.get (i, j))
-                    tempAudio.addFrom (j, 0, audio, i, 0, numFrames);
+                    tempAudio.addFrom (j, 0, rc.audio, i, 0, numFrames);
     }
 
     for (int c = 0; c < numChannels; ++c)
-        audio.copyFrom (c, 0, tempAudio.getReadPointer (c), numFrames);
-    midi.clear();
+        rc.audio.copyFrom (c, 0, tempAudio.getReadPointer (c), numFrames);
+    rc.midi.clear();
 }
 
 void AudioRouterNode::getState (MemoryBlock& block)

@@ -55,16 +55,16 @@ public:
 
     void releaseResources() override {}
 
-    inline bool wantsMidiPipe() const override { return true; }
-    void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override
+    inline bool wantsContext() const noexcept override { return true; }
+    void render (RenderContext& rc) override
     {
-        auto buf = midi.getWriteBuffer (0);
+        auto buf = rc.midi.getWriteBuffer (0);
         for (const auto msg : *buf)
         {
             juce::ignoreUnused (msg);
         }
-        midi.clear();
-        col.removeNextBlockOfMessages (*buf, audio.getNumSamples());
+        rc.midi.clear();
+        col.removeNextBlockOfMessages (*buf, rc.audio.getNumSamples());
     }
 
     void getState (MemoryBlock&) override {}

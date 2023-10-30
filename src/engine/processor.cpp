@@ -617,10 +617,13 @@ void Processor::setMidiProgramsState (const String& state)
 }
 
 //=============================================================================
-void Processor::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void Processor::renderBypassed (RenderContext& rc)
 {
-    audio.clear (0, audio.getNumSamples());
-    midi.clear();
+    const auto numSamples = rc.audio.getNumSamples();
+    rc.audio.clear (0, numSamples);
+    rc.cv.clear (0, numSamples);
+    rc.midi.clear (0, numSamples);
+    rc.atom.clear (0, numSamples);
 }
 
 //=============================================================================

@@ -533,12 +533,12 @@ void GraphNode::reset()
 
 // MARK: Process Graph
 
-void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi, AudioSampleBuffer&)
+void GraphNode::render (RenderContext& rc)
 {
-    const int32 numSamples = buffer.getNumSamples();
-    auto& midiMessages = *midi.getWriteBuffer (0);
-    currentAudioInputBuffer = &buffer;
-    currentAudioOutputBuffer.setSize (jmax (1, buffer.getNumChannels()), numSamples);
+    const int32 numSamples = rc.audio.getNumSamples();
+    auto& midiMessages = *rc.midi.getWriteBuffer (0);
+    currentAudioInputBuffer = &rc.audio;
+    currentAudioOutputBuffer.setSize (jmax (1, rc.audio.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
 
     if (midiChannels.isOmni() && velocityCurve.getMode() == VelocityCurve::Linear)
@@ -579,8 +579,8 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi, AudioSampleBu
         }
     }
 
-    for (int i = 0; i < buffer.getNumChannels(); ++i)
-        buffer.copyFrom (i, 0, currentAudioOutputBuffer, i, 0, numSamples);
+    for (int i = 0; i < rc.audio.getNumChannels(); ++i)
+        rc.audio.copyFrom (i, 0, currentAudioOutputBuffer, i, 0, numSamples);
 
     midiMessages.clear();
     midiMessages.addEvents (currentMidiOutputBuffer, 0, numSamples, 0);

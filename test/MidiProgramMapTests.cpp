@@ -38,24 +38,21 @@ static void testMappings (ProcessorPtr node)
 
 static void testMidiStream (ProcessorPtr node, const String& name = "Renders mappings")
 {
-    OwnedArray<MidiBuffer> buffers;
-    Array<int> channels;
-    buffers.add (new MidiBuffer());
-    channels.add (0);
-
-    MidiPipe pipe (buffers, channels);
+    AtomBuffer atoms;
+    MidiBuffer midi;
     AudioSampleBuffer audio, cv;
     audio.setSize (2, 1024, false, true, false);
 
-    auto* midi = pipe.getWriteBuffer (0);
-    midi->addEvent (MidiMessage::programChange (1, 10), 100);
-    midi->addEvent (MidiMessage::programChange (1, 5), 200);
-    midi->addEvent (MidiMessage::noteOn (1, 12, static_cast<uint8> (50)), 300);
-    midi->addEvent (MidiMessage::noteOff (1, 12), 300);
-    node->render (audio, pipe, cv);
+    midi.addEvent (MidiMessage::programChange (1, 10), 100);
+    midi.addEvent (MidiMessage::programChange (1, 5), 200);
+    midi.addEvent (MidiMessage::noteOn (1, 12, static_cast<uint8> (50)), 300);
+    midi.addEvent (MidiMessage::noteOff (1, 12), 300);
+
+    RenderContext rc (audio, cv, midi, atoms, audio.getNumSamples());
+    node->render (rc);
 
     int index = 0;
-    for (auto m : *midi) {
+    for (auto m : midi) {
         auto msg = m.getMessage();
         switch (index) {
             case 0:

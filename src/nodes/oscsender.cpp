@@ -11,6 +11,7 @@ OSCSenderNode::OSCSenderNode()
     : MidiFilterNode (0),
       Thread ("osc sender midi processing thread")
 {
+    setName ("OSC Sender");
     startThread();
 }
 
@@ -129,10 +130,10 @@ void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize)
     }
 };
 
-void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void OSCSenderNode::render (RenderContext& rc)
 {
-    const auto nframes = audio.getNumSamples();
-    auto* const midiIn = midi.getWriteBuffer (0);
+    const auto nframes = rc.audio.getNumSamples();
+    auto* const midiIn = rc.midi.getWriteBuffer (0);
 
     if (nframes == 0 || ! connected || paused)
     {

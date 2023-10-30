@@ -18,6 +18,7 @@ MidiRouterNode::MidiRouterNode (int ins, int outs)
       toggles (ins, outs),
       nextToggles (ins, outs)
 {
+    setName ("MIDI Router");
     clearPatches();
     initMidiOuts (midiOuts);
 
@@ -82,13 +83,13 @@ MatrixState MidiRouterNode::getMatrixState() const
     return state;
 }
 
-void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void MidiRouterNode::render (RenderContext& rc)
 {
-    jassert (midi.getNumBuffers() >= numDestinations);
+    jassert (rc.midi.getNumBuffers() >= numDestinations);
 
-    const auto nsamples = audio.getNumSamples();
-    const auto nbuffers = midi.getNumBuffers();
-    audio.clear();
+    const auto nsamples = rc.audio.getNumSamples();
+    const auto nbuffers = rc.midi.getNumBuffers();
+    rc.audio.clear();
 
     ScopedLock sl (getLock());
     for (int src = 0; src < numSources; ++src)
@@ -96,7 +97,7 @@ void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSamp
         if (src >= nbuffers)
             break;
 
-        const auto& rb = *midi.getReadBuffer (src);
+        const auto& rb = *rc.midi.getReadBuffer (src);
         for (int dst = 0; dst < numDestinations; ++dst)
             if (toggles.get (src, dst))
                 midiOuts.getUnchecked (dst)->addEvents (rb, 0, nsamples, 0);
@@ -105,7 +106,7 @@ void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSamp
     for (int i = midiOuts.size(); --i >= 0;)
     {
         auto* const ob = midiOuts.getUnchecked (i);
-        ob->swapWith (*midi.getWriteBuffer (i));
+        ob->swapWith (*rc.midi.getWriteBuffer (i));
         ob->clear();
     }
 }

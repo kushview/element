@@ -70,10 +70,10 @@ public:
 
     //==========================================================================
     void refreshPorts() override;
-    bool wantsMidiPipe() const override { return true; }
+    bool wantsContext() const noexcept override { return true; }
     void prepareToRender (double, int) override;
     void releaseResources() override;
-    void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) override;
+    void render (RenderContext&) override;
     void getState (MemoryBlock&) override {}
     void setState (const void*, int sizeInBytes) override {}
 

@@ -40,6 +40,7 @@ namespace element {
 ScriptNode::ScriptNode() noexcept
     : Processor (0)
 {
+    setName ("Script");
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
     dspCode.replaceAllContent (String::fromUTF8 (
@@ -143,10 +144,10 @@ void ScriptNode::releaseResources()
     script->release();
 }
 
-void ScriptNode::render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&)
+void ScriptNode::render (RenderContext& rc)
 {
     ScopedLock sl (lock);
-    script->process (audio, midi);
+    script->process (rc.audio, rc.midi);
 }
 
 void ScriptNode::setState (const void* data, int size)

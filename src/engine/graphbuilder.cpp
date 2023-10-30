@@ -516,14 +516,7 @@ public:
         // End MIDI filters
 
         auto pluginProcessBlock = [=] (RenderContext& context, bool isSuspended) {
-            if (node->wantsMidiPipe())
-            {
-                if (! node->isSuspended())
-                    node->render (context.audio, context.midi, context.cv);
-                else
-                    node->renderBypassed (context.audio, context.midi, context.cv);
-            }
-            else if (node->wantsContext())
+            if (node->wantsContext())
             {
                 if (! node->isSuspended())
                     node->render (context);
@@ -687,20 +680,42 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
 #if EL_TRACE_GRAPH_OPS
     std::clog << "BEGIN\n";
 
+    ProcessBufferOp* lastPbOp = nullptr;
+    String nodeName;
+    String stepsOutput;
+
     for (auto op : renderingOps)
     {
         auto obj = static_cast<GraphOp*> (op);
+
         if (auto rnd = dynamic_cast<ProcessBufferOp*> (obj))
         {
-            std::clog << "  " << rnd->node->getName() << std::endl;
+            if (rnd != lastPbOp)
+            {
+                String nodeName = rnd->node->getName();
+                if (nodeName.isEmpty())
+                    nodeName = "Unknown Node";
+                lastPbOp = rnd;
+
+                std::clog << "  " << nodeName << std::endl;
+                std::clog << stepsOutput;
+                stepsOutput.clear();
+            }
+            else
+            {
+                std::clog << "  -- proc step error --\n";
+            }
+            continue;
         }
+
         auto step = obj->traceStep();
         if (step.empty())
-            continue;
+            stepsOutput << "    "
+                        << "undefined step description";
         else
-            std::clog << "    " << step;
+            stepsOutput << "    " << step;
 
-        std::clog << std::endl;
+        stepsOutput << "\n";
     }
     std::clog << "END" << std::endl;
 #endif
@@ -832,7 +847,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
         if (sourceNodes.size() == 0)
         {
             // unconnected input channel
-            if ((portType == PortType::Audio || portType == PortType::CV) && inputChan >= (int) numOuts)
+            if ((portType.isAudio() || portType.isCv()) && inputChan >= (int) numOuts)
             {
                 bufIndex = getReadOnlyEmptyBuffer();
                 jassert (bufIndex >= 0);
@@ -840,7 +855,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             else
             {
                 bufIndex = getFreeBuffer (portType);
-                switch (portType.id())
+                markBufferAsContaining (bufIndex, portType, anonymousNodeID, 0);
+
+                switch (portType)
                 {
                     case PortType::Audio:
                     case PortType::CV:
@@ -869,6 +886,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
             if (bufIndex < 0)
             {
+                std::clog << "[element] feedback loop in one-to-one connection";
                 // if not found, this is probably a feedback loop
                 bufIndex = getReadOnlyEmptyBuffer();
                 jassert (bufIndex >= 0);
@@ -890,41 +908,11 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 renderingOps.add (new ApplyParamToCVOp (src->getParameter ((int) srcPort), newFreeBuffer));
                 bufIndex = newFreeBuffer;
             }
-
-            else if (srcType.isMidi() && portType.isAtom())
-            {
-                const int newAtomBuffer = getFreeBuffer (portType);
-
-                // needed?
-                // const auto outPort = node->getPortForChannel (portType, inputChan, false);
-                // markBufferAsContaining (newAtomBuffer,
-                //                         portType,
-                //                         outPort == EL_INVALID_PORT ? anonymousNodeID : node->nodeId,
-                //                         outPort == EL_INVALID_PORT ? 0 : outPort);
-
-                renderingOps.add (new ClearAtomBufferOp (newAtomBuffer));
-                renderingOps.add (new MidiToAtomOp (bufIndex, newAtomBuffer));
-
-                bufIndex = newAtomBuffer;
-            }
-            else if (srcType.isAtom() && portType.isMidi())
-            {
-                const int newMidiBuffer = getFreeBuffer (portType);
-
-                // needed?
-                // const auto outPort = node->getPortForChannel (portType, inputChan, false);
-                // markBufferAsContaining (newMidiBuffer,
-                //                         portType,
-                //                         outPort == EL_INVALID_PORT ? anonymousNodeID : node->nodeId,
-                //                         outPort == EL_INVALID_PORT ? 0 : outPort);
-
-                renderingOps.add (new ClearMidiBufferOp (newMidiBuffer));
-                renderingOps.add (new AtomToMidiOp (bufIndex, newMidiBuffer, midi_MidiEvent));
-                bufIndex = newMidiBuffer;
-            }
             // clang-format off
-            else if (bufNeededLater && srcType == portType && 
-                     (inputChan < (int) numOuts || portType == PortType::Midi || portType == PortType::Atom))
+            else if (srcType != portType || 
+                     (bufNeededLater && (inputChan < (int) numOuts || 
+                                         portType == PortType::Midi || 
+                                         portType == PortType::Atom)))
             // clang-format on
             {
                 jassert (! portType.isControl());
@@ -933,20 +921,27 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 const int newFreeBuffer = getFreeBuffer (portType);
                 markBufferAsContaining (newFreeBuffer, portType, anonymousNodeID, 0);
 
-                switch (portType.id())
+                if (portType.isAudio() || portType.isCv())
                 {
-                    case PortType::CV:
-                    case PortType::Audio:
-                        renderingOps.add (new CopyChannelOp (bufIndex, newFreeBuffer));
-                        break;
-                    case PortType::Midi:
-                        renderingOps.add (new CopyMidiBufferOp (bufIndex, newFreeBuffer));
-                        break;
-                    case PortType::Atom:
-                        renderingOps.add (new CopyAtomBufferOp (bufIndex, newFreeBuffer));
-                        break;
-                    default:
-                        break;
+                    renderingOps.add (new CopyChannelOp (bufIndex, newFreeBuffer));
+                }
+                else if (srcType.isMidi() && portType.isMidi())
+                {
+                    renderingOps.add (new CopyMidiBufferOp (bufIndex, newFreeBuffer));
+                }
+                else if (srcType.isAtom() && portType.isAtom())
+                {
+                    renderingOps.add (new CopyAtomBufferOp (bufIndex, newFreeBuffer));
+                }
+                else if (srcType.isMidi() && portType.isAtom())
+                {
+                    renderingOps.add (new ClearAtomBufferOp (newFreeBuffer));
+                    renderingOps.add (new MidiToAtomOp (bufIndex, newFreeBuffer));
+                }
+                else if (srcType.isAtom() && portType.isMidi())
+                {
+                    renderingOps.add (new ClearMidiBufferOp (newFreeBuffer));
+                    renderingOps.add (new AtomToMidiOp (bufIndex, newFreeBuffer, midi_MidiEvent));
                 }
 
                 bufIndex = newFreeBuffer;
@@ -965,6 +960,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
             for (int i = 0; i < sourceNodes.size(); ++i)
             {
+                if (sourceTypes.getUnchecked (i != portType))
+                    continue;
+
                 const int sourceBufIndex = getBufferContaining (sourceTypes.getUnchecked (i),
                                                                 sourceNodes.getUnchecked (i),
                                                                 sourcePorts.getUnchecked (i));
@@ -1004,6 +1002,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 if (srcIndex < 0)
                 {
                     // if not found, this is probably a feedback loop
+                    std::clog << "[element] many-to-one feedback loop" << std::endl;
                     if (portType == PortType::Audio || portType == PortType::CV)
                         renderingOps.add (new ClearChannelOp (bufIndex));
                     else if (portType == PortType::Midi)
@@ -1014,11 +1013,17 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 else
                 {
                     if (portType == PortType::Audio || portType == PortType::CV)
+                    {
                         renderingOps.add (new CopyChannelOp (srcIndex, bufIndex));
+                    }
                     else if (sourceTypes.getUnchecked (0).isMidi() && portType.isMidi())
+                    {
                         renderingOps.add (new CopyMidiBufferOp (srcIndex, bufIndex));
+                    }
                     else if (sourceTypes.getUnchecked (0).isAtom() && portType.isAtom())
+                    {
                         renderingOps.add (new CopyAtomBufferOp (srcIndex, bufIndex));
+                    }
                     else if (sourceTypes.getUnchecked (0).isAtom() && portType.isMidi())
                     {
                         renderingOps.add (new ClearMidiBufferOp (bufIndex));

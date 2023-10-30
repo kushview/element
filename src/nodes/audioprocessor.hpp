@@ -35,6 +35,7 @@ public:
     void refreshPorts() override;
 
     void getPluginDescription (PluginDescription& desc) const override;
+    bool wantsContext() const noexcept override { return false; }
 
 protected:
     ParameterPtr getParameter (const PortDescription& port) override;

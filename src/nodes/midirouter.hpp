@@ -20,8 +20,8 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
     void releaseResources() override {}
 
-    inline bool wantsMidiPipe() const override { return true; }
-    void render (AudioSampleBuffer&, MidiPipe&, AudioSampleBuffer&) override;
+    inline bool wantsContext() const noexcept override { return true; }
+    void render (RenderContext&) override;
     void getState (MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 

@@ -23,9 +23,9 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
     void releaseResources() override {}
 
-    inline void render (AudioSampleBuffer& audio, MidiPipe& midi, AudioSampleBuffer&) override
+    inline void render (RenderContext& rc) override
     {
-        if (midi.getNumBuffers() < 16)
+        if (rc.midi.getNumBuffers() < 16)
         {
             if (! assertedLowChannels)
             {
@@ -33,18 +33,18 @@ public:
                 jassertfalse;
             }
 
-            midi.clear (0, audio.getNumSamples());
+            rc.midi.clear (0, rc.audio.getNumSamples());
             return;
         }
 
         buffers[0] = &tempMidi;
         for (int ch = 1; ch < 16; ++ch)
         {
-            buffers[ch] = midi.getWriteBuffer (ch);
+            buffers[ch] = rc.midi.getWriteBuffer (ch);
             buffers[ch]->clear();
         }
 
-        MidiBuffer& input (*midi.getWriteBuffer (0));
+        MidiBuffer& input (*rc.midi.getWriteBuffer (0));
         for (auto m : input)
         {
             auto msg = m.getMessage();

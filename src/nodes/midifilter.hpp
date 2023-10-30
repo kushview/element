@@ -14,7 +14,7 @@ public:
 
 protected:
     MidiFilterNode (uint32 nodeId);
-    inline bool wantsMidiPipe() const override { return true; }
+    inline bool wantsContext() const noexcept override { return true; }
 };
 
 } // namespace element
