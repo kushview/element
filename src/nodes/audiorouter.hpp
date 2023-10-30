@@ -20,7 +20,7 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
     void releaseResources() override {}
 
-    inline bool wantsContext() const noexcept { return true; }
+    inline bool wantsContext() const noexcept override { return true; }
     void render (RenderContext&) override;
 
     void getState (MemoryBlock&) override;

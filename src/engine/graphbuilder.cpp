@@ -134,7 +134,7 @@ public:
     ClearAtomBufferOp (int b)
         : bufferIdx (b) {}
 
-    std::string traceStep() const noexcept
+    std::string traceStep() const noexcept override
     {
         String str;
         str << "ClearAtomBufferOp: buffer " << bufferIdx;
@@ -153,7 +153,7 @@ public:
     MidiToAtomOp (int midiIndex, int atomIndex)
         : _midiIdx (midiIndex), _atomIdx (atomIndex) {}
 
-    std::string traceStep() const noexcept
+    std::string traceStep() const noexcept override
     {
         String str;
         str << "MidiToAtomOp: midi " << _midiIdx << " to atom " << _atomIdx;
@@ -177,7 +177,7 @@ public:
           _midiIdx (midiIndex),
           midi_MidiEvent (midiEventURID) {}
 
-    std::string traceStep() const noexcept
+    std::string traceStep() const noexcept override
     {
         String str;
         str << "AtomToMidiOp: atom " << _atomIdx << " to midi " << _midiIdx;
