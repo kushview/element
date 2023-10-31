@@ -1,5 +1,5 @@
 // JBridge 
-#ifdef _M_AMD64
+#ifdef _WIN32
 	#ifndef JUCE_VST_WRAPPER_LOAD_CUSTOM_MAIN
 		#define JUCE_VST_WRAPPER_LOAD_CUSTOM_MAIN	if(moduleMain == nullptr)\
 			{ \
