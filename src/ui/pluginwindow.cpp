@@ -257,7 +257,7 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
       delayedNodeFocus (*this)
 {
 #if JUCE_LINUX || JUCE_BSD
-    setUsingNativeTitleBar (false);
+    setUsingNativeTitleBar (true);
 #else
     setUsingNativeTitleBar (true);
 #endif

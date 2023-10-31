@@ -150,7 +150,9 @@ public:
     void resized()
     {
         const int labSize = 15;
-        auto r = bridge.getLocalBounds().reduced (3);
+        auto r = bridge.getLocalBounds()
+                     .reduced (0, 3)
+                     .withWidth (totalSpaceRequired());
         r.removeFromTop (4);
         r.removeFromBottom (4);
         if (audioInsVisible && ! audioOutsVisible)
@@ -294,7 +296,7 @@ public:
 
         auto refreshIOLabel = [this] (Label& lab, bool vis) {
             lab.setVisible (vis);
-            lab.setFont (juce::Font (meterSize > 14 ? 11.f : 10.f));
+            lab.setFont (juce::Font (meterSize > 14 ? 10.f : 9.4f));
             lab.setJustificationType (juce::Justification::centred);
         };
 

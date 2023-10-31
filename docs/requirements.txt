@@ -1,5 +1,5 @@
 sphinx_rtd_theme
 myst-parser
-sphinxcontrib-luadomain==1.1.2
-sphinx-lua==1.1.3
+sphinxcontrib-luadomain>=1.1.2
+sphinx-lua>=1.1.3
 markupsafe==2.0.1

@@ -23,7 +23,7 @@ copyright = '2021, Kushview'
 author = 'Kushview'
 
 # The full version, including alpha/beta/rc tags
-release = '0.46.2'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,7 +40,7 @@ extensions = [
 
 # a list of lua source root
 lua_source_path = [ 
-    "../libs/lua/el",
+    "../src/el",
     "../src/engine" 
 ]
 

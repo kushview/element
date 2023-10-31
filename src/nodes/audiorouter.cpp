@@ -18,7 +18,7 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
       nextToggles (ins, outs)
 {
     setName ("Audio Router");
-    
+
     fadeIn.setFadesIn (true);
     fadeIn.setLength (fadeLengthSeconds);
     fadeOut.setFadesIn (false);

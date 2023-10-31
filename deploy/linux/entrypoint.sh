@@ -18,6 +18,6 @@ meson subprojects update --reset
 
 set -e
 meson setup -Dbuildtype=release $nativefiles $builddir
-meson compile -C $builddir
+meson compile -C $builddir -j3
 meson test -C $builddir
 sh deploy/linux/appimage.sh "$builddir"

@@ -72,7 +72,8 @@ MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
             n->clearMessages();
     };
 
-    setSize (320, 160);
+    setSize (320 * 1.2, 160 * 1.2);
+    setResizable (true);
 }
 
 MidiMonitorNodeEditor::~MidiMonitorNodeEditor()

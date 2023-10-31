@@ -8,8 +8,7 @@ in a long-running project, and we do provide rationale for many of the design
 decisions listed below.
 
 The list of recommendations in this document was based on the ones mentioned
-in the following style guides: (sometimes copying material verbatim, sometimes
-giving the opposite advice! :) )
+in the following style guides:
 
 * https://github.com/Olivine-Labs/lua-style-guide/
 * https://github.com/zaki/lua-style-guide

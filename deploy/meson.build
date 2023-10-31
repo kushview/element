@@ -18,6 +18,10 @@ elif host_machine.system() == 'windows'
     element_release_url = element_repo_url + '/stable/windows'
     element_deploy_targetdir = '@HomeDir@/AppData/Roaming/Kushview/Element/installer'
     element_runprogram = '@ApplicationsDirX64@/Kushview/Element/bin/element.exe'
+elif host_machine.system() == 'linux'
+    element_release_url = element_repo_url + '/stable/linux'
+    element_deploy_targetdir = '@HomeDir@/.config/Kushview/Element/installer'
+    element_runprogram = '@HomeDir@/Applications/Element-@0@-x86_64.AppImage'.format(version_with_build)
 endif
 
 if get_option ('deploy')
@@ -104,6 +108,16 @@ SignTool  sign /as /v /sha1 @0@ /fd SHA256 /tr http://sha256timestamp.ws.symante
             'INSTALLERBASE': basename,
             'ARCHIVEGEN': archivegen.full_path(),
             'SIGNTOOL': signtool_script
+        })
+elif host_machine.system() == 'linux'
+    basename = 'element-linux64-@0@'.format (version_with_build)
+    configure_file (input : 'installer-linux.sh', output : 'installer.sh',
+        install : true, install_dir : installerdir,
+        configuration: {
+            'CONFIGFILE': 'config' / 'config.xml',
+            'PACKAGES': 'packages',
+            'INSTALLERBASE': basename,
+            'ARCHIVEGEN': archivegen.full_path()
         })
 endif
 

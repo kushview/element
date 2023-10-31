@@ -393,6 +393,7 @@ public:
         parameterName.setJustificationType (Justification::centredRight);
         addAndMakeVisible (parameterName);
 
+        parameterLabel.setFont (parameterLabel.getFont().withHeight (10.f));
         parameterLabel.setText (param->getLabel(), dontSendNotification);
         addAndMakeVisible (parameterLabel);
 
@@ -438,7 +439,7 @@ public:
         auto area = getLocalBounds();
 
         parameterName.setBounds (area.removeFromLeft (80));
-        parameterLabel.setBounds (area.removeFromRight (54));
+        parameterLabel.setBounds (area.removeFromRight (56));
         parameterComp->setBounds (area);
     }
 
