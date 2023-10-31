@@ -44,7 +44,7 @@ void MidiProgramMapNode::render (RenderContext& rc)
     {
         if (! assertedLowChannels)
         {
-            DBG ("[element] PGC map: num bufs: " << midi.getNumBuffers());
+            DBG ("[element] PGC map: num bufs: " << rc.midi.getNumBuffers());
             assertedLowChannels = true;
         }
 
