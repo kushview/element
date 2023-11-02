@@ -1,5 +1,8 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
-// Author: LiquidSky <paolo.onersi@outlook.it>
+// Author: @fbeguec on forum.juce.com
+// Modified: @gettdunne on forum.juce.com (JUCE v5 support)
+// Modified: Integrated in with Element. LiquidSky <paolo.onersi@outlook.it>
+// Thread: https://forum.juce.com/t/jbridge-x64-bridge-for-x86-vst-support-in-juce-vst-host-windows/11608
 // SPDX-License-Identifier: GPL3-or-later
 
 // JBridge 
