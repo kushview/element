@@ -67,3 +67,16 @@ html_static_path = ['_static']
 
 # The master doc to use
 master_doc = 'index'
+
+latex_toplevel_sectioning = 'chapter'
+
+# latex_documents = [
+#     ('index', 'element.idx', 'Element', 'Kushview', 'manual', False)
+# ]
+
+latex_elements = {
+    'geometry': r'''
+\usepackage[paperheight=9in,paperwidth=6in,margin=0.72in]{geometry}
+'''
+}
+
