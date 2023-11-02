@@ -51,22 +51,27 @@ Option                                      Description
 **Control Panel**                           If using ASIO, this button will open the 
                                             driver's control panel.
 =========================================== ==============================================
+
 MIDI
 -------
-
-:MIDI Output Device:
-    The device chosen here is used as the Global MIDI output
-
-:MIDI Input Devices:
-    Devices enabled here aggregate MIDI to the Global MIDI input
+=========================================== ==============================================
+Option                                      Description
+=========================================== ==============================================
+**Midi Output Device**                      The MIDI device to use as global output.
+**Output latency**                          Latency adjustment for MIDI output.
+**Generate MIDI Clock**                     Enable to generate MIDI clock.
+**Send Clock to MIDI Input?**               When enabled, render MIDI clock as input in 
+                                            root level graphs.
+**Active MIDI Inputs**                      List of MIDI devices used as the global MIDI
+                                            sources.
+=========================================== ==============================================
 
 OSC
 ---
-:OSC Host Enabled?:
-    Whether to use OSC should be used or not
-
-:OSC Host:
-    The host address to serve on
-
-:OSC Host Port:
-    The port to run on
+=========================================== ==============================================
+Option                                      Description
+=========================================== ==============================================
+**OSC Host enabled**                        If yes, then run an OSC server.
+**OSC Host**                                Hostname or IP address clients connect to.
+**Midi Output Device**                      The port.
+=========================================== ==============================================
