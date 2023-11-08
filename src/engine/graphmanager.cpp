@@ -258,7 +258,7 @@ private:
     Node node;
     ValueTree data;
     std::unique_ptr<GraphManager> manager;
-    UndoManager* undo = nullptr;
+    [[maybe_unused]] UndoManager* undo = nullptr;
 };
 
 //==============================================================================

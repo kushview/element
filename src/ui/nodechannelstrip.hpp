@@ -253,7 +253,7 @@ private:
     int meterSpeedHz = 15;
     bool isAudioOutNode = false;
     bool isAudioInNode = false;
-    bool monoMeter = false;
+    [[maybe_unused]] bool monoMeter = false;
 
     Value displayName;
 

@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://gitlab.com/lv2/lilv.git
+revision = master
+
+[provide]
+dependency_names = lilv-0

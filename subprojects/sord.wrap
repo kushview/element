@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://gitlab.com/drobilla/sord.git
+revision = master
+
+[provide]
+dependency_names = sord-0

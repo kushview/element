@@ -9,7 +9,8 @@ rm -rf archives && mkdir archives
 cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
     ../archives/element-linux.tar.gz \
         net.kushview.element \
-        net.kushview.element.lua
+        net.kushview.element.lua \
+        net.kushview.element.vst3
 
 # @ARCHIVEGEN@ -f tar.gz -c 9 \
 #     ../archives/element-plugins-linux.tar.gz \
@@ -18,4 +19,3 @@ cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
 #         net.kushview.element.vst3
 
 cd ../archives
-md5 *.* > md5.sum

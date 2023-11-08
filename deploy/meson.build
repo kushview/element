@@ -114,6 +114,7 @@ elif host_machine.system() == 'linux'
     configure_file (input : 'installer-linux.sh', output : 'installer.sh',
         install : true, install_dir : installerdir,
         configuration: {
+            'BINARYCREATOR': binarycreator.full_path(),
             'CONFIGFILE': 'config' / 'config.xml',
             'PACKAGES': 'packages',
             'INSTALLERBASE': basename,

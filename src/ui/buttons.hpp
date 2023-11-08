@@ -356,8 +356,8 @@ private:
     Value beatsPerBar;
     Value beatDivisor;
     bool isDraggingBeatDivisor = false;
-    int stickyValue = 0;
-    int decimalPlaces = 0;
+    [[maybe_unused]] int stickyValue = 0;
+    [[maybe_unused]] int decimalPlaces = 0;
     int lastY = 0;
     bool dragging = false;
 

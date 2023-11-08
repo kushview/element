@@ -96,7 +96,7 @@ public:
 private:
     friend class NodeFactory;
     OwnedArray<NodeProvider> providers;
-    NodeFactory& factory;
+    [[maybe_unused]] NodeFactory& factory;
     StringArray knownIDs;
     StringArray denyIDs;
 };

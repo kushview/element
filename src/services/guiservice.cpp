@@ -299,7 +299,7 @@ public:
 
 private:
     friend class GuiService;
-    GuiService& gui;
+    [[maybe_unused]] GuiService& gui;
     Commands commands;
     juce::RecentlyOpenedFilesList recents;
     juce::UndoManager undo;

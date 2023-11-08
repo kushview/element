@@ -256,7 +256,7 @@ private:
     HorizontalListBox& box;
     Node _node;
     NodeArray nodes;
-    bool dragging = false;
+    [[maybe_unused]] bool dragging = false;
 };
 
 class GraphMixerView::Content : public Component,
@@ -327,7 +327,7 @@ public:
 private:
     UI& ui;
     SessionPtr session;
-    GraphMixerView& view;
+    [[maybe_unused]] GraphMixerView& view;
     std::unique_ptr<GraphMixerListBoxModel> model;
     ChannelStripComponent channelStrip;
     HorizontalListBox box;

@@ -286,7 +286,7 @@ public:
     ~NavigationTree() {}
 
 private:
-    NavigationView* view;
+    [[maybe_unused]] NavigationView* view;
     int rootItem;
 };
 

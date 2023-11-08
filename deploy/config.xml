@@ -12,8 +12,8 @@
     <MaintenanceToolName>updater</MaintenanceToolName>
 
     <InstallerApplicationIcon>@APPICON@</InstallerApplicationIcon>
-    <!-- <InstallerWindowIcon>logo.png</InstallerWindowIcon> -->
-    <Logo>logo.png</Logo>
+    <InstallerWindowIcon>logo.png</InstallerWindowIcon>
+    <!-- <Logo>logo.png</Logo> -->
 
     <RunProgram>@RUNPROGRAM@</RunProgram>
 

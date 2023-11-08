@@ -100,7 +100,12 @@ element_exe_install = true
 element_exe_install_dir = get_option ('bindir')
 element_exe_name = 'element'
 
-if host_machine.system() == 'darwin'
+if host_machine.system() == 'linux'
+    if get_option('deploy')
+        element_exe_install_dir = packagedir_element / 'data' / 'bin'
+        element_app_link_args += [ '-static-libgcc', '-static-libstdc++' ]
+    endif
+elif host_machine.system() == 'darwin'
     element_exe_install = false
     element_exe_name = 'Element'
 elif host_machine.system() == 'windows'
@@ -117,7 +122,6 @@ elif host_machine.system() == 'windows'
                                    '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
                                    '-Wl,--no-whole-archive' ]
     endif
-else
 endif
 
 subdir ('test')

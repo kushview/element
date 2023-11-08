@@ -1,7 +1,7 @@
 function isWindows() { return systemInfo.kernelType === "winnt"; }
 
 function extractDir() {
-    var dir = "";
+    var dir = "/usr/local";
     if (systemInfo.kernelType === "darwin") {
         dir = "/Applications";
     } else if (systemInfo.kernelType === "winnt") {

@@ -76,8 +76,8 @@ private:
     uint32_t duration;
     double sampleRate;
 
-    double ppqLoopStart;
-    double ppqLoopEnd;
+    [[maybe_unused]] double ppqLoopStart;
+    [[maybe_unused]] double ppqLoopEnd;
 };
 
 } // namespace element

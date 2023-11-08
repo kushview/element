@@ -4,3 +4,4 @@ revision = v1.18.10
 
 [provide]
 dependency_names = lv2
+lv2 = lv2_dep

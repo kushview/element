@@ -67,7 +67,7 @@ public:
 private:
     juce::Array<Node> _nodes;
     std::function<bool (const Node&)> _filter;
-    const int _noneId = 1;
+    [[maybe_unused]] const int _noneId = 1;
     int _offset = 2;
 
     bool filterNode (const Node& node) const noexcept

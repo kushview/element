@@ -99,10 +99,10 @@ private:
     FileSearchPathListComponent pathList;
     String pluginBeingScanned;
     double progress;
-    int numThreads;
-    bool allowAsync, finished;
+    [[maybe_unused]] int numThreads;
+    [[maybe_unused]] bool allowAsync, finished;
     std::unique_ptr<ThreadPool> pool;
-    bool useBackgroundScanner = false;
+    [[maybe_unused]] bool useBackgroundScanner = false;
     StringArray formatsToScan;
 
     static void startScanCallback (int result, AlertWindow* alert, Scanner* scanner)

@@ -20,8 +20,8 @@ public:
 
 private:
     friend class Designer;
-    Context& context;
-    Designer& designer;
+    [[maybe_unused]] Context& context;
+    [[maybe_unused]] Designer& designer;
 };
 
 Designer::Designer (Context& c)

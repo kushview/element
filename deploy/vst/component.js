@@ -1,5 +1,5 @@
 function extractDir() {
-    var dir = "";
+    var dir = "/usr/local/lib/vst";
     if (systemInfo.kernelType === "darwin") {
         dir = "/Library/Audio/Plug-Ins/VST";
     } else if (systemInfo.kernelType === "winnt") {

@@ -70,7 +70,7 @@ public:
 private:
     // TODO: optimize: use plain C array
     Array<int> channelMap;
-    int channels[17];
+    [[maybe_unused]] int channels[17];
     MidiBuffer tempMidi;
 };
 

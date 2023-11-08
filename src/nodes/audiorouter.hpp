@@ -93,8 +93,10 @@ public:
 
 private:
     CriticalSection lock;
-    int numSources, nextNumSources;
-    int numDestinations, nextNumDestinations;
+    [[maybe_unused]] int numSources;
+    [[maybe_unused]] int nextNumSources;
+    [[maybe_unused]] int numDestinations;
+    [[maybe_unused]] int nextNumDestinations;
     AudioSampleBuffer tempAudio { 1, 1 };
     bool rebuildPorts = true;
 

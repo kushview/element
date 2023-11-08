@@ -1,4 +1,4 @@
-// Copyright 2023 Kushview, LLC <info@kushview.net>
+// Copyright 2014-2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/nodefactory.hpp>
@@ -216,6 +216,7 @@ private:
     {
         resetScannerVariables();
         auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
+        Logger::writeToLog (String ("launching plugin scanner: ") + scannerExe.getFullPathName());
         return launchWorkerProcess (scannerExe,
                                     EL_PLUGIN_SCANNER_PROCESS_ID,
                                     timeout,

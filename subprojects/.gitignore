@@ -5,3 +5,10 @@
 !.gitignore
 !evg.wrap
 !lv2.wrap
+!suil.wrap
+!lilv.wrap
+!pugl.wrap
+!serd.wrap
+!sord.wrap
+!sratom.wrap
+!zix.wrap
