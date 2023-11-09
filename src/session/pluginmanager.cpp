@@ -1,6 +1,8 @@
 // Copyright 2014-2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <boost/dll.hpp>
+
 #include <element/nodefactory.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
@@ -23,6 +25,9 @@
 
 #define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT 20000 // 20 Seconds
 
+#include <errno.h>
+extern char* program_invocation_name;
+
 namespace element {
 using namespace juce;
 
@@ -31,6 +36,27 @@ static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
 static void pluginScannerCrashHandler (void*) {}
 static File pluginsXmlFile() { return DataPath::applicationDataDir().getChildFile ("plugins.xml"); }
+
+static File scannerExeFullPath()
+{
+    auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
+
+#if JUCE_LINUX
+    if (! scannerExe.existsAsFile())
+    {
+        char* path = (char*) malloc (PATH_MAX);
+        if (path != NULL)
+        {
+            if (readlink ("/proc/self/exe", path, PATH_MAX) > 0)
+                scannerExe = File (String (path));
+            std::free (path);
+        }
+    }
+#endif
+
+    return scannerExe;
+}
+
 } // namespace detail
 
 //==============================================================================
@@ -215,7 +241,13 @@ private:
     bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 3)
     {
         resetScannerVariables();
-        auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
+
+        auto scannerExe = detail::scannerExeFullPath();
+        if (! scannerExe.existsAsFile()) {
+            Logger::writeToLog ("Failed to launch plugin scanner.");
+            return false;
+        }
+
         Logger::writeToLog (String ("launching plugin scanner: ") + scannerExe.getFullPathName());
         return launchWorkerProcess (scannerExe,
                                     EL_PLUGIN_SCANNER_PROCESS_ID,
