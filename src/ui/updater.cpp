@@ -396,11 +396,9 @@ bool Updater::exists() const noexcept
 
 void Updater::launch()
 {
-    std::clog << "[element] launching updater.\n";
-    StringArray cmd;
+    Logger::writeToLog ("launching updater");
     if (updates->exeFile.empty())
         updates->exeFile = findExe ("updater");
-
     if (! exists())
     {
 #if EL_TRACE_UPDATER
@@ -409,6 +407,12 @@ void Updater::launch()
 #endif
         return;
     }
+
+#if JUCE_LINUX
+    juce::File exeFile = File (updates->exeFile);
+    exeFile.startAsProcess ("--su");
+#else
+    StringArray cmd;
 #if JUCE_WINDOWS
     cmd.add (String (updates->exeFile).quoted());
 #elif JUCE_MAC
@@ -421,6 +425,7 @@ void Updater::launch()
 #endif
     auto _ = std::system (cmd.joinIntoString (" ").toRawUTF8());
     (void) _; // some systems define with 'warn_unused_result'
+#endif
 }
 
 //==============================================================================

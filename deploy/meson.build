@@ -21,7 +21,7 @@ elif host_machine.system() == 'windows'
 elif host_machine.system() == 'linux'
     element_release_url = element_repo_url + '/stable/linux'
     element_deploy_targetdir = '@HomeDir@/.config/Kushview/Element/installer'
-    element_runprogram = '@HomeDir@/Applications/Element-@0@-x86_64.AppImage'.format(version_with_build)
+    element_runprogram = '/usr/local/bin/element'
 endif
 
 if get_option ('deploy')
