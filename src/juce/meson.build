@@ -120,15 +120,18 @@ if host_machine.system() == 'linux'
     juce_conf_data.set10 ('JUCE_ALSA', alsa_dep.found())
     deps += alsa_dep
 
-    deps += [ 
-        dependency ('freetype2', required : true),
-        dependency ('x11', required : true),
+    # juce lazy loads x11
+    x11_deps = [ dependency ('x11', required : true),
         dependency ('xext', required : true),
         dependency ('xrandr', required : true),
         dependency ('xcomposite', required : true),
         dependency ('xinerama', required : true),
-        dependency ('xcursor', required : true)
+        dependency ('xcursor', required : true) ]
+
+    deps += [ 
+        dependency ('freetype2', required : true),
     ]
+
     juce_conf_data.set10 ('JUCE_USE_XRANDR', true)
     juce_conf_data.set10 ('JUCE_USE_XINERAMA', true)
     juce_conf_data.set10 ('JUCE_USE_XSHM', true)
