@@ -31,14 +31,13 @@ int Oversampler<T>::getFactor (int index) const
 template <typename T>
 void Oversampler<T>::prepare (int numChannels, int blockSize)
 {
-    reset();
-
     numChannels = juce::jmax (1, numChannels);
+    const bool procSpecChanged = channels != numChannels || buffer != blockSize;
+    channels = numChannels;
+    buffer = blockSize;
 
-    if (processors.size() <= 0 || channels != numChannels || buffer != blockSize)
+    if (processors.size() <= 0 || procSpecChanged)
     {
-        buffer = blockSize;
-        channels = numChannels;
         processors.clear();
         for (int f = 0; f < maxProc; ++f)
             processors.add (new ProcessorType (channels, f + 1, ProcessorType::FilterType::filterHalfBandPolyphaseIIR));

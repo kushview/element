@@ -518,7 +518,7 @@ public:
         auto pluginProcessBlock = [=] (RenderContext& context, bool isSuspended) {
             if (node->wantsContext())
             {
-                if (! node->isSuspended())
+                if (! isSuspended)
                     node->render (context);
                 else
                     node->renderBypassed (context);
@@ -544,22 +544,19 @@ public:
         {
             auto osProcessor = node->getOversamplingProcessor();
 
-            dsp::AudioBlock<float> block (context.audio);
+            dsp::AudioBlock<float> block (channels, static_cast<size_t> (totalChans), static_cast<size_t> (numSamples));
             dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
 
-            if (context.audio.getNumChannels() > osChanSize)
+            if (totalChans > osChanSize)
             {
                 osChanSize = context.audio.getNumChannels();
                 osChans.reset (new float*[osChanSize]);
             }
 
             float** osData = osChans.get();
-            for (int ch = 0; ch < context.audio.getNumChannels(); ++ch)
+            for (int ch = 0; ch < totalChans; ++ch)
                 osData[ch] = osBlock.getChannelPointer (ch);
-
-            context.audio.setDataToReferTo (osData,
-                                            context.audio.getNumChannels(),
-                                            static_cast<int> (osBlock.getNumSamples()));
+            context.audio.setDataToReferTo (osData, totalChans, static_cast<int> (osBlock.getNumSamples()));
 
             tempMidi.clear();
             for (int i = 0; i < context.midi.getNumBuffers(); ++i)
@@ -577,7 +574,11 @@ public:
             }
 
             pluginProcessBlock (context, node->isSuspended());
+
             osProcessor->processSamplesDown (block);
+            for (int ch = 0; ch < totalChans; ++ch)
+                osData[ch] = block.getChannelPointer (ch);
+            context.audio.setDataToReferTo (osData, totalChans, numSamples);
 
             tempMidi.clear();
             for (int i = 0; i < context.midi.getNumBuffers(); ++i)

@@ -16,7 +16,7 @@ public:
     Oversampler() = default;
     ~Oversampler();
 
-    int getNumProcessors() const { return processors.size(); }
+    int getNumProcessors() const noexcept { return processors.size(); }
     ProcessorType* getProcessor (int index) const { return processors[index]; }
 
     float getLatencySamples (int index) const;

@@ -319,6 +319,11 @@ void Processor::prepare (const double newSampleRate,
                                     getNumPorts (PortType::Audio, false)),
                               blockSize);
 
+        if (auto* const osProc = getOversamplingProcessor())
+            osLatency = osProc->getLatencyInSamples();
+        else
+            osLatency = 0.0f;
+
         const int osFactor = jmax (1, getOversamplingFactor());
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
@@ -707,7 +712,7 @@ void Processor::setMuted (bool muted)
 //==============================================================================
 dsp::Oversampling<float>* Processor::getOversamplingProcessor()
 {
-    return oversampler->getProcessor (osPow - 1);
+    return osPow > 0 ? oversampler->getProcessor (osPow - 1) : nullptr;
 }
 
 void Processor::setOversamplingFactor (int osFactor)
@@ -726,16 +731,16 @@ void Processor::setOversamplingFactor (int osFactor)
 
         if (osFactor > 1)
         {
-            osPow = (int) log2f ((float) osFactor);
+            osPow = newOsPow;
             if (auto* const osProc = getOversamplingProcessor())
-            {
                 osLatency = osProc->getLatencyInSamples();
-            }
+            else
+                osLatency = 0.0f;
         }
         else
         {
             osPow = 0;
-            osLatency = 0.0;
+            osLatency = 0.0f;
         }
 
         setEnabled (wasEnabled);
