@@ -94,8 +94,21 @@ public:
     virtual ~LookAndFeel_E1();
 
     juce::Typeface::Ptr getTypefaceForFont (const juce::Font&) override;
-    int getDefaultScrollbarWidth() override;
 
+    //==========================================================================
+    int getDefaultScrollbarWidth() override;
+    bool areScrollbarButtonsVisible() override;
+    virtual void drawScrollbar (juce::Graphics& g, 
+                                juce::ScrollBar& sb, 
+                                int x, int y, 
+                                int width, int height, 
+                                bool isScrollbarVertical, 
+                                int thumbStartPosition, 
+                                int thumbSize, 
+                                bool isMouseOver, 
+                                bool isMouseDown) override;
+
+    //==========================================================================
     juce::Font getComboBoxFont (juce::ComboBox& box) override;
     juce::Font getLabelFont (juce::Label&) override;
     
@@ -111,7 +124,7 @@ public:
     void drawTickBox (juce::Graphics&, juce::Component&, float x, float y, float w, float h, bool ticked, bool isEnabled, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
     void changeToggleButtonWidthToFitText (juce::ToggleButton&) override;
 
-    ////====///===//===///====
+    //========================================
     // Buttons
     virtual void drawButtonBackground (juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour, bool isMouseOverButton, bool isButtonDown) override;
 
@@ -153,8 +166,6 @@ public:
 
     virtual void drawStretchableLayoutResizerBar (juce::Graphics&, int w, int h, bool isVerticalBar, bool isMouseOver, bool isMouseDragging) override;
 
-    bool areScrollbarButtonsVisible() override;
-    virtual void drawScrollbar (juce::Graphics&, juce::ScrollBar&, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown) override;
 
     virtual void drawConcertinaPanelHeader (juce::Graphics&, const juce::Rectangle<int>& area, bool isMouseOver, bool isMouseDown, juce::ConcertinaPanel&, juce::Component&) override;
 

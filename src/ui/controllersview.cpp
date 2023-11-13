@@ -221,8 +221,6 @@ private:
     private:
         friend class ControllerMapsTable;
         ComboBox comboBox;
-        int columnId = 0;
-        int rowNumber = -1;
         ControllerMapObjects mapp;
     };
 };

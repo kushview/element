@@ -273,7 +273,7 @@ private:
     Label formatNotice;
 
     const String key = Settings::pluginFormatsKey;
-    bool hasChanged = false;
+    [[maybe_unused]] bool hasChanged = false;
 
     String nameForFormat (const String& name)
     {
@@ -678,7 +678,7 @@ public:
 private:
     // element::AudioDeviceSelectorComponent devs;
     juce::AudioDeviceSelectorComponent devs;
-    DeviceManager& devices;
+    [[maybe_unused]] DeviceManager& devices;
 };
 
 //==============================================================================

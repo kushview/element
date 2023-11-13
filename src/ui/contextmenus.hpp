@@ -80,7 +80,6 @@ public:
 private:
     Array<PluginDescription> available;
     OwnedArray<PluginDescription> unverified;
-    Component* sender { nullptr };
     PluginManager* plugins { nullptr };
     bool hasAddedPlugins = false;
 };

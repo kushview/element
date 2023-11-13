@@ -200,7 +200,6 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (ListBox::textColourId, Colors::textColor);
 
     // Slider
-    
     setColour (Slider::thumbColourId,               Colours::black.brighter());
     setColour (Slider::trackColourId,               Colors::toggleOrange.darker(0.7f));
     setColour (Slider::backgroundColourId,          Colours::black.brighter (0.002f));
@@ -224,10 +223,8 @@ LookAndFeel_E1::LookAndFeel_E1()
     // ToggleButton
     setColour (ToggleButton::tickColourId, Colors::toggleBlue.darker());
 
-    
-
     // Scrollbar
-    setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.2f));
+    setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.24f));
 
     // code editor. TODO
     setColour (CodeEditorComponent::backgroundColourId, findColour (Style::widgetBackgroundColorId).darker (0.6f));
@@ -276,8 +273,36 @@ Typeface::Ptr LookAndFeel_E1::getTypefaceForFont (const Font& font)
     return LookAndFeel_V2::getTypefaceForFont (font);
 }
 
+//=============================================================================
 int LookAndFeel_E1::getDefaultScrollbarWidth() { return 14; }
 bool LookAndFeel_E1::areScrollbarButtonsVisible() { return false; }
+
+void LookAndFeel_E1::drawScrollbar (Graphics& g, ScrollBar& scrollbar, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown)
+{
+    Path thumbPath;
+
+    if (thumbSize > 0)
+    {
+        const float thumbIndent = (isScrollbarVertical ? width : height) * 0.12f;
+        const float thumbIndentx2 = thumbIndent * 2.0f;
+        const float cornerSize = 0.f;
+        if (isScrollbarVertical)
+            thumbPath.addRoundedRectangle (x + thumbIndent, thumbStartPosition + thumbIndent, width - thumbIndentx2, thumbSize - thumbIndentx2, cornerSize);
+        else
+            thumbPath.addRoundedRectangle (thumbStartPosition + thumbIndent, y + thumbIndent, thumbSize - thumbIndentx2, height - thumbIndentx2, cornerSize);
+    }
+
+    Colour thumbCol (scrollbar.findColour (ScrollBar::thumbColourId, true));
+
+    if (isMouseOver || isMouseDown)
+        thumbCol = thumbCol.withMultipliedAlpha (2.0f);
+
+    g.setColour (thumbCol);
+    g.fillPath (thumbPath);
+
+    g.setColour (thumbCol.contrasting ((isMouseOver || isMouseDown) ? 0.2f : 0.1f));
+    g.strokePath (thumbPath, PathStrokeType (1.0f));
+}
 
 //=============================================================================
 int LookAndFeel_E1::getSliderThumbRadius (Slider& slider)
@@ -481,33 +506,6 @@ void LookAndFeel_E1::drawStretchableLayoutResizerBar (Graphics& g, int /*w*/, in
 {
     if (isMouseOver || isMouseDragging)
         g.fillAll (Colors::elemental.withAlpha (0.4f));
-}
-
-void LookAndFeel_E1::drawScrollbar (Graphics& g, ScrollBar& scrollbar, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown)
-{
-    Path thumbPath;
-
-    if (thumbSize > 0)
-    {
-        const float thumbIndent = (isScrollbarVertical ? width : height) * 0.25f;
-        const float thumbIndentx2 = thumbIndent * 2.0f;
-
-        if (isScrollbarVertical)
-            thumbPath.addRoundedRectangle (x + thumbIndent, thumbStartPosition + thumbIndent, width - thumbIndentx2, thumbSize - thumbIndentx2, 1.f);
-        else
-            thumbPath.addRoundedRectangle (thumbStartPosition + thumbIndent, y + thumbIndent, thumbSize - thumbIndentx2, height - thumbIndentx2, 1.f);
-    }
-
-    Colour thumbCol (scrollbar.findColour (ScrollBar::thumbColourId, true));
-
-    if (isMouseOver || isMouseDown)
-        thumbCol = thumbCol.withMultipliedAlpha (2.0f);
-
-    g.setColour (thumbCol);
-    g.fillPath (thumbPath);
-
-    g.setColour (thumbCol.contrasting ((isMouseOver || isMouseDown) ? 0.2f : 0.1f));
-    g.strokePath (thumbPath, PathStrokeType (1.0f));
 }
 
 void LookAndFeel_E1::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area, bool isMouseOver, bool isMouseDown, ConcertinaPanel& concertina, Component& panel)

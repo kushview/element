@@ -338,7 +338,6 @@ private:
     int barSize = 2;
     int lastSecondaryHeight = 172;
     int capturedAccessoryHeight = -1;
-    const int accessoryHeightThreshold = 10;
     bool locked = true;
 
     void lockLayout()

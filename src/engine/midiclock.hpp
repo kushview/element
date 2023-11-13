@@ -39,7 +39,7 @@ private:
     double lastKnownTimeDiff = 0.0;
     int midiClockTicks = 0;
     int syncPeriodTicks = 48;
-    double bpmUpdateSeconds = 1.0;
+    [[maybe_unused]] double bpmUpdateSeconds = 1.0;
 
     Array<Listener*> listeners;
 };

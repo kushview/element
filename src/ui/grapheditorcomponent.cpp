@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    Context& context;
+    [[maybe_unused]] Context& context;
     GraphEditorComponent& editor;
 };
 

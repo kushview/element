@@ -243,7 +243,8 @@ private:
         resetScannerVariables();
 
         auto scannerExe = detail::scannerExeFullPath();
-        if (! scannerExe.existsAsFile()) {
+        if (! scannerExe.existsAsFile())
+        {
             Logger::writeToLog ("Failed to launch plugin scanner.");
             return false;
         }

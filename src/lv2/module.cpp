@@ -279,8 +279,6 @@ private:
     HeapBlock<float> mins, maxes, defaults, current;
     OwnedArray<PortBuffer> buffers;
 
-    LV2_Feature instanceFeature { LV2_INSTANCE_ACCESS_URI, nullptr };
-
     std::vector<LV2PatchInfo> patchParams;
     uint32_t atomControlInIndex { EL_INVALID_PORT };
     uint32_t atomControlOutIndex { EL_INVALID_PORT };
