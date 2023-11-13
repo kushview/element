@@ -479,9 +479,6 @@ void PluginEditor::handleAsyncUpdate()
 
     setWantsPluginKeyboardFocus (processor.getEditorWantsKeyboard());
 
-    gui->stabilizeContent();
-    gui->stabilizeViews();
-
     if (auto session = app->context().session())
     {
         const auto graph (session->getActiveGraph());
@@ -502,6 +499,9 @@ void PluginEditor::handleAsyncUpdate()
     if (auto* const cc = dynamic_cast<element::Content*> (content.getComponent()))
         if (srvc != nullptr)
             cc->restoreState (srvc->context().settings().getUserSettings());
+    
+    gui->stabilizeContent();
+    gui->stabilizeViews();
 }
 
 } // namespace element

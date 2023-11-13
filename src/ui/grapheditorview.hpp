@@ -36,6 +36,7 @@ public:
     void paint (Graphics& g) override;
     bool keyPressed (const KeyPress& key) override;
     void changeListenerCallback (ChangeBroadcaster*) override;
+    void parentHierarchyChanged() override;
 
 protected:
     void graphDisplayResized (const Rectangle<int>& area) override;

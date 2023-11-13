@@ -16,9 +16,9 @@ GraphEditorView::GraphEditorView()
 }
 
 GraphEditorView::GraphEditorView (const Node& g)
+    : node (g)
 {
     init();
-    setNode (g);
 }
 
 void GraphEditorView::init()
@@ -55,6 +55,16 @@ bool GraphEditorView::keyPressed (const KeyPress& key)
     }
 
     return ContentView::keyPressed (key);
+}
+
+void GraphEditorView::parentHierarchyChanged()
+{
+    if (node.isValid())
+    {
+        setNode (node);
+        node = Node();
+        stabilizeContent();
+    }
 }
 
 void GraphEditorView::stabilizeContent()
@@ -152,9 +162,9 @@ void GraphEditorView::onNodeSelected()
     }
 }
 
-void GraphEditorView::onNodeRemoved (const Node& node)
+void GraphEditorView::onNodeRemoved (const Node& rnode)
 {
-    if (node.isGraph() && node == getGraph())
+    if (rnode.isGraph() && rnode == getGraph())
     {
         auto nextGraph = Node();
         if (auto session = ViewHelpers::getSession (this))

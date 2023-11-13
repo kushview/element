@@ -148,6 +148,7 @@ NodePropertiesView::~NodePropertiesView()
 {
     midiProgramChangedConnection.disconnect();
     selectedNodeConnection.disconnect();
+    sessionLoadedConnection.disconnect();
 }
 
 void NodePropertiesView::paint (Graphics& g)
