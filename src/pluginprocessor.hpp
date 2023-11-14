@@ -462,6 +462,9 @@ private:
 
     std::unique_ptr<AsyncPrepare> asyncPrepare;
 
+    struct Latency;
+    std::unique_ptr<Latency> _latency;
+
     void initialize();
     friend class AsyncUpdater;
     void handleAsyncUpdate() override;

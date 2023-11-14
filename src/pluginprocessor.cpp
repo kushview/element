@@ -36,6 +36,19 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 }
 
 //=============================================================================
+struct PluginProcessor::Latency : public juce::Timer
+{
+    Latency (PluginProcessor& p) : plugin (p) {}
+
+    void timerCallback() override
+    {
+        plugin.calculateLatencySamples();
+    }
+
+    PluginProcessor& plugin;
+};
+
+//=============================================================================
 #define enginectl context->services().find<EngineService>()
 #define guictl context->services().find<GuiService>()
 #define sessionctl context->services().find<SessionService>()
@@ -61,6 +74,8 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     prepared = controllerActive = false;
     shouldProcess.set (false);
     asyncPrepare.reset (new AsyncPrepare (*this));
+    _latency = std::make_unique<Latency> (*this);
+
     if (MessageManager::getInstance()->isThisTheMessageThread())
         handleAsyncUpdate();
     else
@@ -172,6 +187,8 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
     }
 
     updateLatencySamples();
+    _latency->startTimer (1000);
+    
     engine->sampleLatencyChanged.connect (
         std::bind (&PluginProcessor::updateLatencySamples, this));
 
@@ -181,6 +198,8 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
 void PluginProcessor::releaseResources()
 {
     PLUGIN_DBG ("[element] release resources: " << (int) prepared);
+    _latency->stopTimer();
+
     if (engine)
         engine->sampleLatencyChanged.disconnect_all_slots();
     if (prepared)
@@ -568,20 +587,28 @@ void PluginProcessor::setForceZeroLatency (bool force)
     if (force == forceZeroLatency)
         return;
     forceZeroLatency = force;
-    updateLatencySamples();
+    if (forceZeroLatency)
+        updateLatencySamples();
+    else
+        calculateLatencySamples();
 }
 
 int PluginProcessor::calculateLatencySamples() const
 {
-    if (forceZeroLatency)
+    if (forceZeroLatency || engine == nullptr)
         return 0;
-    return engine != nullptr ? engine->getExternalLatencySamples()
-                             : 0;
+    engine->updateExternalLatencySamples();
+    return engine->getExternalLatencySamples();
 }
 
 void PluginProcessor::updateLatencySamples()
 {
-    setLatencySamples (calculateLatencySamples());
+    int latency = 0;
+    if (! forceZeroLatency && engine != nullptr) {
+        std::clog << "update latency from change signal\n";
+        latency = engine->getExternalLatencySamples();
+    }
+    setLatencySamples (latency);
 }
 
 //=============================================================================
