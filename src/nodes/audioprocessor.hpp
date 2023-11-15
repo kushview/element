@@ -9,7 +9,8 @@ namespace element {
 
 class MidiPipe;
 
-class AudioProcessorNode : public Processor
+class AudioProcessorNode : public Processor,
+                           public juce::AudioProcessorListener
 {
 public:
     AudioProcessorNode (uint32 nodeId, AudioProcessor* processor);
@@ -36,6 +37,9 @@ public:
 
     void getPluginDescription (PluginDescription& desc) const override;
     bool wantsContext() const noexcept override { return false; }
+
+    void audioProcessorChanged (AudioProcessor*, const ChangeDetails&) override;
+    void audioProcessorParameterChanged (juce::AudioProcessor*, int, float) override {}
 
 protected:
     ParameterPtr getParameter (const PortDescription& port) override;

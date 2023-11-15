@@ -4,6 +4,8 @@
 #include "nodes/audioprocessor.hpp"
 #include "nodes/baseprocessor.hpp"
 #include "nodes/mididevice.hpp"
+#include "engine/graphnode.hpp"
+
 #include "scopedflag.hpp"
 
 namespace element {
@@ -91,11 +93,13 @@ void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize)
     if (! proc)
     {
         jassertfalse;
+        setLatencySamples (0);
         return;
     }
 
     proc->setRateAndBufferSizeDetails (sampleRate, maxBufferSize);
     proc->prepareToPlay (sampleRate, maxBufferSize);
+    setLatencySamples (proc->getLatencySamples());
 }
 
 void AudioProcessorNode::releaseResources()
@@ -123,12 +127,13 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
 {
     proc.reset (processor);
     jassert (proc != nullptr);
-    setLatencySamples (proc->getLatencySamples());
     setName (proc->getName());
-    proc->refreshParameterList();
 
+    proc->refreshParameterList();
     for (auto* param : proc->getParameters())
         params.add (new AudioProcessorNodeParameter (*param));
+
+    proc->addListener (this);
 }
 
 AudioProcessorNode::~AudioProcessorNode()
@@ -137,7 +142,16 @@ AudioProcessorNode::~AudioProcessorNode()
     Processor::clearParameters();
     enablement.cancelPendingUpdate();
     pluginState.reset();
+    proc->removeListener (this);
     proc = nullptr;
+}
+
+void AudioProcessorNode::audioProcessorChanged (AudioProcessor*, const ChangeDetails& details)
+{
+    if (details.latencyChanged)
+    {
+        setLatencySamples (proc->getLatencySamples());
+    }
 }
 
 void AudioProcessorNode::getState (MemoryBlock& block)

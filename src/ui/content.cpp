@@ -299,6 +299,8 @@ public:
     void updateLabels()
     {
         auto engine = world.audio();
+        const auto mode = world.services().getRunMode();
+
         if (auto* dev = devices.getCurrentAudioDevice())
         {
             String text = "Sample Rate: ";
@@ -315,6 +317,14 @@ public:
 
             statusLabel.setText (String ("Device: ") + dev->getName(), dontSendNotification);
             statusLabel.setColour (Label::textColourId, Colors::textColor);
+        }
+        else if (mode == RunMode::Plugin)
+        {
+            sampleRateLabel.setText ("", dontSendNotification);
+            String text = String (engine->getExternalLatencySamples());
+            text << " samples";
+            streamingStatusLabel.setText (text, dontSendNotification);
+            statusLabel.setText ("Host", dontSendNotification);
         }
         else
         {
