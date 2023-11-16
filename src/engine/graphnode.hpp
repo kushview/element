@@ -195,12 +195,14 @@ protected:
     void initialize() override {}
 
 private:
+    // TODO: techdebt. to many friend ckasses.
     friend class GraphPort;
     friend class IONode;
     friend class GraphManager;
     friend class Processor;
     friend class NodeObjectSync;
     friend class Node;
+    friend class AudioProcessorNode;
 
     Context& _context;
 

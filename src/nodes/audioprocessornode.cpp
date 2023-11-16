@@ -87,31 +87,6 @@ private:
     }
 };
 
-//=============================================================================
-void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize)
-{
-    if (! proc)
-    {
-        jassertfalse;
-        setLatencySamples (0);
-        return;
-    }
-
-    proc->setRateAndBufferSizeDetails (sampleRate, maxBufferSize);
-    proc->prepareToPlay (sampleRate, maxBufferSize);
-    setLatencySamples (proc->getLatencySamples());
-}
-
-void AudioProcessorNode::releaseResources()
-{
-    if (! proc)
-    {
-        jassertfalse;
-        return;
-    }
-
-    proc->releaseResources();
-}
 
 void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 {
@@ -146,11 +121,39 @@ AudioProcessorNode::~AudioProcessorNode()
     proc = nullptr;
 }
 
+//=============================================================================
+void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize)
+{
+    if (! proc)
+    {
+        jassertfalse;
+        setLatencySamples (0);
+        return;
+    }
+
+    proc->setRateAndBufferSizeDetails (sampleRate, maxBufferSize);
+    proc->prepareToPlay (sampleRate, maxBufferSize);
+    setLatencySamples (proc->getLatencySamples());
+}
+
+void AudioProcessorNode::releaseResources()
+{
+    if (! proc)
+    {
+        jassertfalse;
+        return;
+    }
+
+    proc->releaseResources();
+}
+
 void AudioProcessorNode::audioProcessorChanged (AudioProcessor*, const ChangeDetails& details)
 {
     if (details.latencyChanged)
     {
         setLatencySamples (proc->getLatencySamples());
+        if (auto g = getParentGraph())
+            g->triggerAsyncUpdate();
     }
 }
 
