@@ -24,12 +24,16 @@ EL_TAG (Node)
 EL_TAG (Port)
 EL_TAG (Script)
 EL_TAG (Session)
+
+EL_TAG (AudioChannelSet)
 } // namespace types
 
 namespace tags {
+EL_TAG (arrangement)
 EL_TAG (attack)
 EL_TAG (audio)
 EL_TAG (block)
+EL_TAG (buses)
 
 EL_TAG (flow)
 EL_TAG (input)
@@ -38,6 +42,9 @@ EL_TAG (midi)
 EL_TAG (asset);
 EL_TAG (assetId);
 EL_TAG (portAlignment);
+
+EL_TAG (inputs)
+EL_TAG (outputs)
 
 static const juce::Identifier bpm = "bpm";
 static const juce::Identifier category = "category";

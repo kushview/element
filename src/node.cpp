@@ -922,6 +922,32 @@ void Node::savePluginState()
 
             setProperty (tags::bypass, proc->isSuspended());
             setProperty (tags::program, proc->getCurrentProgram());
+
+            const auto layout = proc->getBusesLayout();
+            auto buses = objectData.getOrCreateChildWithName (tags::buses, nullptr);
+            buses.removeAllChildren (nullptr);
+
+            auto channelSetToData = [] (const AudioChannelSet& acs) -> ValueTree {
+                ValueTree bus (types::AudioChannelSet);
+                bus.setProperty (tags::arrangement, acs.getSpeakerArrangementAsString(), nullptr);
+                return bus;
+            };
+
+            auto bins = buses.getOrCreateChildWithName (tags::inputs, nullptr);
+            for (int i = 0; i < layout.inputBuses.size(); ++i)
+            {
+                auto data = channelSetToData (layout.inputBuses.getReference (i));
+                if (data.isValid())
+                    bins.addChild (data, -1, nullptr);
+            }
+
+            auto bouts = buses.getOrCreateChildWithName (tags::outputs, nullptr);
+            for (int i = 0; i < layout.outputBuses.size(); ++i)
+            {
+                auto data = channelSetToData (layout.outputBuses.getReference (i));
+                if (data.isValid())
+                    bouts.addChild (data, -1, nullptr);
+            }
         }
         else
         {

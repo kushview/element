@@ -348,7 +348,9 @@ uint32 GraphManager::addNode (const Node& newNode)
 {
     if (! newNode.isValid())
     {
-        AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create Node"), "Cannot instantiate node without a description");
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon,
+                                     TRANS ("Couldn't create Node"),
+                                     "Cannot instantiate node without a description");
         return EL_INVALID_NODE;
     }
 
@@ -775,10 +777,44 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
     juce::ignoreUnused (resetPorts);
     if (auto* const proc = obj->getAudioProcessor())
     {
-        // try to match ports
-        if (proc->getTotalNumInputChannels() != ins.size() || proc->getTotalNumOutputChannels() != outs.size())
+        bool busesConfigured = false;
+        {
+            // try to load buses layout.
+            const auto buses = node.data().getChildWithName (tags::buses);
+            if (buses.isValid() && buses.getNumChildren() >= 2)
+            {
+                AudioProcessor::BusesLayout layout;
+                busesConfigured = false;
+                for (const auto& data : buses.getChildWithName (tags::inputs))
+                {
+                    const auto str = data.getProperty (tags::arrangement).toString();
+                    const auto acs = AudioChannelSet::fromAbbreviatedString (str);
+                    layout.inputBuses.add (acs);
+                }
+
+                for (const auto& data : buses.getChildWithName (tags::outputs))
+                {
+                    const auto str = data.getProperty (tags::arrangement).toString();
+                    const auto acs = AudioChannelSet::fromAbbreviatedString (str);
+                    layout.outputBuses.add (acs);
+                }
+
+                if (proc->checkBusesLayoutSupported (layout))
+                {
+                    proc->suspendProcessing (true);
+                    proc->releaseResources();
+                    busesConfigured = proc->setBusesLayoutWithoutEnabling (layout);
+                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                    proc->suspendProcessing (false);
+                }
+            }
+        }
+
+        // try to match ports if needed
+        if (! busesConfigured && (proc->getTotalNumInputChannels() != ins.size() || proc->getTotalNumOutputChannels() != outs.size()))
         {
             AudioProcessor::BusesLayout layout;
+
             layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
             layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
 
