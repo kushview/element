@@ -847,16 +847,30 @@ Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc,
     if (! graph.isGraph())
         return Node();
 
+    auto& list (context().plugins().getKnownPlugins());
     OwnedArray<PluginDescription> plugs;
+
     if (! verified)
     {
-        auto* format = context().plugins().getAudioPluginFormat (desc.pluginFormatName);
-        jassert (format != nullptr);
-        auto& list (context().plugins().getKnownPlugins());
-        list.removeFromBlacklist (desc.fileOrIdentifier);
-        if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
+        if (desc.pluginFormatName == "LV2")
         {
-            context().plugins().saveUserPlugins (context().settings());
+            if (auto lv2 = context().plugins().getProvider ("LV2"))
+            {
+                list.removeFromBlacklist (desc.fileOrIdentifier);
+                list.addType (desc);
+            }
+        }
+        else
+        {
+            auto* format = context().plugins().getAudioPluginFormat (desc.pluginFormatName);
+            jassert (format != nullptr);
+
+            list.removeFromBlacklist (desc.fileOrIdentifier);
+
+            if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
+            {
+                context().plugins().saveUserPlugins (context().settings());
+            }
         }
     }
     else

@@ -19,7 +19,7 @@ public:
     void resized() override;
 
 private:
-    EQFilterProcessor& proc; // reference to processor for this editor
+    [[maybe_unused]] EQFilterProcessor& proc; // reference to processor for this editor
     KnobsComponent knobs;
 
     class FreqViz : public Component

@@ -188,7 +188,7 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
 
     updateLatencySamples();
     _latency->startTimer (1000);
-    
+
     engine->sampleLatencyChanged.connect (
         std::bind (&PluginProcessor::updateLatencySamples, this));
 
@@ -604,7 +604,8 @@ int PluginProcessor::calculateLatencySamples() const
 void PluginProcessor::updateLatencySamples()
 {
     int latency = 0;
-    if (! forceZeroLatency && engine != nullptr) {
+    if (! forceZeroLatency && engine != nullptr)
+    {
         std::clog << "update latency from change signal\n";
         latency = engine->getExternalLatencySamples();
     }

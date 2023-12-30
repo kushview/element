@@ -15,6 +15,7 @@ class AudioProcessorFactory : public NodeProvider
 public:
     AudioProcessorFactory (Context&);
     ~AudioProcessorFactory();
+    String format() const override { return EL_NODE_FORMAT_NAME; }
     /** Create the instance by ID string. */
     Processor* create (const String&) override;
     /** return a list of types contained in this provider. */

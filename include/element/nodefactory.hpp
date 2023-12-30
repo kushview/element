@@ -17,7 +17,7 @@ public:
     NodeProvider() = default;
     virtual ~NodeProvider() = default;
     /** Return the format. */
-    virtual String format() const { return "Element"; }
+    virtual String format() const = 0;
     /** Create the instance by ID string. */
     virtual Processor* create (const String&) = 0;
     /** return a list of types contained in this provider. */

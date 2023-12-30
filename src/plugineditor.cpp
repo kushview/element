@@ -499,7 +499,7 @@ void PluginEditor::handleAsyncUpdate()
     if (auto* const cc = dynamic_cast<element::Content*> (content.getComponent()))
         if (srvc != nullptr)
             cc->restoreState (srvc->context().settings().getUserSettings());
-    
+
     gui->stabilizeContent();
     gui->stabilizeViews();
 }

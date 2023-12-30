@@ -71,6 +71,7 @@ struct SingleNodeProvider : public NodeProvider
         : ID (inID) {}
     ~SingleNodeProvider() = default;
 
+    String format() const override { return EL_NODE_FORMAT_NAME; }
     StringArray findTypes() override
     {
         return StringArray (ID);

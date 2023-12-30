@@ -73,7 +73,7 @@ public:
 private:
     friend class Services;
 
-    Services& owner;
+    [[maybe_unused]] Services& owner;
     bool initialized { false };
     bool activated = false;
     juce::OwnedArray<Service> services;

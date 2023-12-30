@@ -38,7 +38,7 @@ public:
 
 private:
     friend class Session;
-    Session& owner;
+    [[maybe_unused]] Session& owner;
 };
 
 Session::Session()

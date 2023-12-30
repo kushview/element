@@ -23,6 +23,23 @@
 
 namespace element {
 
+namespace detail {
+inline static void setupChildProcessHandlers (RunMode mode)
+{
+    if (mode == RunMode::Plugin)
+        return;
+#if JUCE_LINUX
+    // JUCE allows zombie processes... this prevents them as a workaround.
+    static bool _init = false;
+    if (! _init)
+    {
+        _init = true;
+        signal (SIGCHLD, SIG_IGN);
+    }
+#endif
+}
+} // namespace detail
+
 class Context::Impl
 {
 public:
@@ -97,6 +114,7 @@ private:
 Context::Context (RunMode mode, const String& _cli)
 {
     impl.reset (new Impl (*this, mode));
+    detail::setupChildProcessHandlers (mode);
     impl->init();
 }
 

@@ -79,7 +79,7 @@ public:
 
 private:
     friend class ScriptManager;
-    ScriptManager& owner;
+    [[maybe_unused]] ScriptManager& owner;
     Array<ScriptInfo> scripts;
     Array<ScriptInfo> dsp, dspui;
 };

@@ -87,7 +87,6 @@ private:
     }
 };
 
-
 void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 {
     node.setEnabled (! node.isEnabled());

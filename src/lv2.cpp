@@ -438,7 +438,6 @@ public:
         : Processor (0),
           wantsMidiMessages (false),
           initialised (false),
-          isPowerOn (false),
           tempBuffer (1, 1),
           module (module_),
           urids (world.symbols())
@@ -772,7 +771,7 @@ public:
 private:
     CriticalSection lock, midiInLock;
     bool wantsMidiMessages, sendsMidiMessages,
-        initialised, isPowerOn;
+        initialised;
     mutable StringArray programNames;
 
     AudioSampleBuffer tempBuffer;
@@ -985,7 +984,7 @@ public:
     }
 
 private:
-    LV2Processor& plugin;
+    [[maybe_unused]] LV2Processor& plugin;
     LV2ModuleUI::Ptr ui = nullptr;
     bool nativeViewSetup = false;
 
@@ -1199,7 +1198,7 @@ private:
     friend class LV2NodeProvider;
     bool _symowned = false;
     SymbolMap* _symbols { nullptr };
-    LV2NodeProvider& provider;
+    [[maybe_unused]] LV2NodeProvider& provider;
     std::unique_ptr<World> world;
 };
 
@@ -1228,6 +1227,14 @@ StringArray LV2NodeProvider::findTypes()
     StringArray types;
     lv2->getTypes (types);
     return types;
+}
+
+String LV2NodeProvider::nameForURI (const String& uri) const noexcept
+{
+    auto plugin = lv2->world->getPlugin (uri);
+    return plugin != nullptr
+               ? juce::String (lvtk::Node (lilv_plugin_get_name (plugin)).as_string())
+               : String();
 }
 
 } // namespace element

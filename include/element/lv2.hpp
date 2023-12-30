@@ -20,6 +20,8 @@ public:
     Processor* create (const juce::String&) override;
     juce::StringArray findTypes() override;
 
+    String nameForURI (const String& uri) const noexcept;
+
 private:
     class LV2;
     std::unique_ptr<LV2> lv2;

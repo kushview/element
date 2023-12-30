@@ -187,7 +187,7 @@ inline static void kv_jack_log (const char* msg)
     std::cerr << "[jack] " << msg << std::endl;
 }
 
-inline static void kv_jack_dump_error (const jack_status_t status)
+[[maybe_unused]] inline static void kv_jack_dump_error (const jack_status_t status)
 {
     if ((status & JackServerFailed) || (status & JackServerError))
         kv_jack_log ("Unable to connect to JACK server");

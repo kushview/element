@@ -124,7 +124,7 @@ public:
 
 private:
     friend class Context;
-    Context& backend;
+    [[maybe_unused]] Context& backend;
     vector_type mods;
     SearchPath searchpath;
     std::map<std::string, std::string> discovered;

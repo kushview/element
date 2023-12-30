@@ -13,6 +13,7 @@ class ChildProcessSlave;
 class Processor;
 class Node;
 class NodeFactory;
+class NodeProvider;
 class PluginScannerCoordinator;
 class PluginScanner;
 
@@ -119,6 +120,9 @@ public:
 
     /** Returns the last saved default node state */
     Node getDefaultNode (const juce::PluginDescription& desc) const;
+
+    /** Get the first node factory by format. e.g. "LV2" */
+    NodeProvider* getProvider (const juce::String& format) noexcept;
 
 private:
     juce::PropertiesFile* props = nullptr;

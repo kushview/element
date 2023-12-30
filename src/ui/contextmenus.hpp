@@ -29,7 +29,10 @@ public:
 
     bool isPluginResultCode (const int resultCode)
     {
-        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) || (isPositiveAndBelow (int (resultCode - 20000), unverified.size()));
+        // clang-format off
+        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) || 
+               (isPositiveAndBelow (int (resultCode - 20000), unverified.size()));
+        // clang-format on
     }
 
     PluginDescription getPluginDescription (int resultCode, bool& verified)
@@ -64,8 +67,16 @@ public:
             const int lastSize = unverified.size();
             plugins->getUnverifiedPlugins (name, unverified);
             if (auto* format = plugins->getAudioPluginFormat (name))
+            {
                 for (int i = lastSize; i < unverified.size(); ++i)
                     menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (unverified.getUnchecked (i)->fileOrIdentifier));
+            }
+            else if (name == "LV2")
+            {
+                for (int i = lastSize; i < unverified.size(); ++i)
+                    menu.addItem (i + 20000, unverified[i]->name);
+            }
+
             if (menu.getNumItems() > 0)
                 unvMenu.addSubMenu (name, menu);
         }

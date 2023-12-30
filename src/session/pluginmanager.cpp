@@ -156,14 +156,18 @@ public:
                 DBG ("[element] scanning... and running....");
             }
         }
-        else if (state == "finished")
+        else if (state == EL_PLUGIN_SCANNER_FINISHED_ID)
         {
             DBG ("[element] worker finished scanning");
+            sendQuitMessage();
+            killWorkerProcess();
+
             {
                 ScopedLock sl (lock);
                 running = false;
                 slaveState = "idle";
             }
+
             owner.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
         }
         else if (state == EL_PLUGIN_SCANNER_WAITING_STATE)
@@ -238,7 +242,7 @@ private:
         progress = -1.f;
     }
 
-    bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 3)
+    bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
         resetScannerVariables();
 
@@ -304,7 +308,7 @@ public:
         if (! scanFile.existsAsFile())
         {
             sendState ("scanning");
-            sendState ("finished");
+            sendState (EL_PLUGIN_SCANNER_FINISHED_ID);
             return;
         }
 
@@ -313,15 +317,14 @@ public:
         sendState ("scanning");
 
         for (const auto& format : formatsToScan)
+        {
+            logger->logMessage ("[scanner] scanning " + format + " plugins");
             scanFor (format);
+        }
 
         settings->saveIfNeeded();
-        sendState ("finished");
-
-#if JUCE_LINUX
-        // workaround to get the background process to quit
-        handleConnectionLost();
-#endif
+        logger->logMessage ("[scanner] finished");
+        sendState (EL_PLUGIN_SCANNER_FINISHED_ID);
     }
 
     void updateScanFileWithSettings()
@@ -376,11 +379,13 @@ public:
 
     void handleConnectionLost() override
     {
+        cancelPendingUpdate();
+        logger->logMessage ("[scanner] connection lost");
         logger.reset();
         settings = nullptr;
         plugins = nullptr;
         scanner = nullptr;
-        exit (0);
+        Process::terminate();
     }
 
 private:
@@ -522,7 +527,7 @@ void PluginScanner::cancel()
 {
     if (master)
     {
-        master->cancelPendingUpdate();
+        master->handleUpdateNowIfNeeded();
         master->sendQuitMessage();
         master.reset();
     }
@@ -592,7 +597,20 @@ public:
                      KnownPluginList& list)
     {
         ScopedLock sl (lock);
-        if (plugins.contains (format))
+        if (format == "LV2")
+        {
+            std::clog << "get LV2 unverified...\n";
+            for (const auto& item : lv2Items)
+            {
+                if (nullptr != list.getTypeForFile (item.identifier))
+                    continue;
+                auto desc = plugs.add (new PluginDescription());
+                desc->pluginFormatName = "LV2";
+                desc->fileOrIdentifier = item.identifier;
+                desc->name = item.name;
+            }
+        }
+        else if (plugins.contains (format))
         {
             for (const auto& file : plugins.getReference (format))
             {
@@ -610,6 +628,15 @@ private:
     CriticalSection lock;
     UnverifiedPluginMap plugins;
     UnverifiedPluginPaths paths;
+
+    struct Item
+    {
+        String name;
+        String identifier;
+    };
+
+    std::vector<Item> lv2Items;
+
     Atomic<int> cancelFlag;
 
     void run() override
@@ -618,8 +645,10 @@ private:
 
         PluginManager pluginManager;
         pluginManager.addDefaultFormats();
+        pluginManager.getNodeFactory().add (new LV2NodeProvider());
         auto& manager (pluginManager.getAudioPluginFormats());
 
+        // JUCE Formats.
         for (int i = 0; i < manager.getNumFormats(); ++i)
         {
             if (threadShouldExit() || cancelFlag.get() != 0)
@@ -632,6 +661,30 @@ private:
 
             ScopedLock sl (lock);
             plugins.set (format->getName(), found);
+        }
+
+        // Element Node Providers
+        lv2Items.clear();
+        auto& factory = pluginManager.getNodeFactory();
+        for (auto provider : factory.providers())
+        {
+            std::clog << "unverified check format: " << provider->format() << std::endl;
+            if (auto* lv2 = dynamic_cast<LV2NodeProvider*> (provider))
+            {
+                std::clog << "check LV2 unverified...\n";
+                const auto types = lv2->findTypes();
+                lv2Items.clear();
+                lv2Items.reserve ((size_t) types.size());
+                for (const auto& uri : types)
+                {
+                    const auto name = lv2->nameForURI (uri);
+                    std::clog << "unverified added: " << name << std::endl;
+                    lv2Items.push_back ({ name, uri });
+                }
+
+                lv2Items.shrink_to_fit();
+                break;
+            }
         }
 
         cancelFlag.set (0);
@@ -1145,6 +1198,14 @@ Node PluginManager::getDefaultNode (const PluginDescription& desc) const
     Node::sanitizeProperties (data);
     data.removeProperty (tags::name, nullptr);
     return node;
+}
+
+NodeProvider* PluginManager::getProvider (const String& format) noexcept
+{
+    for (auto provider : getNodeFactory().providers())
+        if (provider->format() == format)
+            return provider;
+    return nullptr;
 }
 
 } // namespace element
