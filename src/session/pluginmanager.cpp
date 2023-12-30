@@ -126,7 +126,6 @@ public:
     {
         // this probably will happen when a plugin crashes.
         {
-            std::clog << "[element] scanner connection lost...\n";
             ScopedLock sl (lock);
             running = false;
         }
@@ -599,7 +598,6 @@ public:
         ScopedLock sl (lock);
         if (format == "LV2")
         {
-            std::clog << "get LV2 unverified...\n";
             for (const auto& item : lv2Items)
             {
                 if (nullptr != list.getTypeForFile (item.identifier))
@@ -668,17 +666,14 @@ private:
         auto& factory = pluginManager.getNodeFactory();
         for (auto provider : factory.providers())
         {
-            std::clog << "unverified check format: " << provider->format() << std::endl;
             if (auto* lv2 = dynamic_cast<LV2NodeProvider*> (provider))
             {
-                std::clog << "check LV2 unverified...\n";
                 const auto types = lv2->findTypes();
                 lv2Items.clear();
                 lv2Items.reserve ((size_t) types.size());
                 for (const auto& uri : types)
                 {
                     const auto name = lv2->nameForURI (uri);
-                    std::clog << "unverified added: " << name << std::endl;
                     lv2Items.push_back ({ name, uri });
                 }
 
@@ -749,7 +744,6 @@ private:
             scanner->removeListener (this);
             scanner->cancel();
             scanner = nullptr;
-            std::clog << "[element] cancel already running scanner.\n";
         }
 
         StringArray formatsToScan = names;
@@ -760,11 +754,6 @@ private:
                     formatsToScan.add (formats.getFormat (i)->getName());
             formatsToScan.add ("LV2");
         }
-
-        std::clog << "[element] preparing to scan: ";
-        for (const auto& fmt : formatsToScan)
-            std::clog << fmt.toStdString() << " ";
-        std::clog << std::endl;
 
         scanner = std::make_unique<PluginScanner> (allPlugins);
         scanner->addListener (this);
