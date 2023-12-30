@@ -10,12 +10,7 @@ cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
     ../archives/element-linux.tar.gz \
         net.kushview.element \
         net.kushview.element.lua \
+        net.kushview.element.vst \
         net.kushview.element.vst3
-
-# @ARCHIVEGEN@ -f tar.gz -c 9 \
-#     ../archives/element-plugins-linux.tar.gz \
-#         net.kushview.element.au \
-#         net.kushview.element.vst \
-#         net.kushview.element.vst3
 
 cd ../archives
