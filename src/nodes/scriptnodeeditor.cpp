@@ -375,7 +375,7 @@ void ScriptNodeEditor::updateSize()
     }
 }
 
-void ScriptNodeEditor::unload() 
+void ScriptNodeEditor::unload()
 {
     if (_generic != nullptr)
         _generic.reset();

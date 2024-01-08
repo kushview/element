@@ -772,10 +772,13 @@ public:
         PopupMenu menu;
         menu.addItem (5, "Add graph...");
         PopupMenu scripts;
+#if 0
+        // TODO enable script types at the graph level.
         scripts.addItem (6, "Anonymous");
         scripts.addItem (7, "View", ! hasView, hasView);
 
         menu.addSubMenu ("Add Script", scripts, true);
+#endif
         menu.addSeparator();
         menu.addItem (4, "Edit Graph...");
         menu.addItem (3, "View Settings...");
