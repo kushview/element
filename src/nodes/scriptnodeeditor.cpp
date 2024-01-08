@@ -286,6 +286,7 @@ ScriptNodeEditor::~ScriptNodeEditor()
 
     auto SNE = getScriptNodeEditorState (getNode());
     SNE.setProperty ("showParams", paramsButton.getToggleState(), nullptr);
+    unload();
 }
 
 void ScriptNodeEditor::setToolbarVisible (bool visible)
@@ -374,19 +375,28 @@ void ScriptNodeEditor::updateSize()
     }
 }
 
-void ScriptNodeEditor::updatePreview()
+void ScriptNodeEditor::unload() 
 {
     if (_generic != nullptr)
-    {
         _generic.reset();
-    }
 
     if (comp != nullptr)
     {
+        if (widget.valid())
+            if (sol::safe_function destroyFn = descriptor["destroy"])
+                destroyFn (widget);
         removeChildComponent (comp);
-        widget = sol::table();
-        comp = nullptr;
     }
+
+    descriptor = sol::table();
+    widget = sol::table();
+    comp = nullptr;
+    state.collect_garbage();
+}
+
+void ScriptNodeEditor::updatePreview()
+{
+    unload();
 
     bool ok = false;
     auto& codeDoc = lua->getCodeDocument (true);
@@ -454,6 +464,7 @@ void ScriptNodeEditor::updatePreview()
                 {
                     comp = c;
                     widget = editor;
+                    descriptor = DSPUI;
                     addAndMakeVisible (*comp);
                     comp->setAlwaysOnTop (true);
                     setResizable (canResize);

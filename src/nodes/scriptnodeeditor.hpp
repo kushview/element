@@ -31,6 +31,7 @@ private:
     sol::state_view state;
     sol::environment env;
     sol::table widget;
+    sol::table descriptor;
     Component* comp = nullptr;
 
     std::unique_ptr<GenericNodeEditor> _generic;
@@ -56,6 +57,7 @@ private:
     void updateSize();
     void onPortsChanged();
     sol::table createContext();
+    void unload();
     void log (const String& txt) { Logger::writeToLog (txt); }
 };
 
