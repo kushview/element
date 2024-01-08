@@ -42,6 +42,14 @@ public:
 
     void refreshPorts() override;
 
+    void setPlayHead (juce::AudioPlayHead*) override;
+
+    //==========================================================================
+    int getNumPrograms() const override { return 2; }
+    int getCurrentProgram() const override { return _program; }
+    const String getProgramName (int index) const override;
+    void setCurrentProgram (int index) override;
+
 protected:
     inline bool wantsContext() const noexcept override { return true; }
     ParameterPtr getParameter (const PortDescription& port) override;
@@ -52,6 +60,8 @@ private:
     CodeDocument dspCode, edCode;
     std::unique_ptr<DSPScript> script;
     ParameterArray inParams, outParams;
+
+    int _program = 0;
 
     int blockSize = 512;
     double sampleRate = 44100.0;

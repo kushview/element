@@ -1,30 +1,38 @@
+// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
+
+#include <string>
 
 #include <element/juce/core.hpp>
 
 #include "scripting/bindings.hpp"
 #include "sol/sol.hpp"
+#include "testutil.hpp"
 
 //=============================================================================
 class LuaFixture {
 public:
-    using juce::File;
-    using juce::String;
+    using File = juce::File;
+    using String = juce::String;
 
     LuaFixture()
     {
         element::Lua::initializeState (state);
-        lua["BOOST_REQUIRE"] = sol::overload (
-            [this] (bool result) -> void {
+        state["BOOST_REQUIRE"] = sol::overload (
+            [] (bool result) -> void {
                 BOOST_REQUIRE (result);
-            })
-            resetPaths();
+            });
+        state["expect"] = state["BOOST_REQUIRE"];
+        resetPaths();
     }
+
+    lua_State* luaState() const { return state.lua_state(); }
 
     juce::String getPath() const
     {
-        String path (lua["package"]["path"].get_or<std::string> (""));
+        String path (state["package"]["path"].get_or<std::string> (""));
         DBG (path);
         return path;
     }
@@ -57,8 +65,10 @@ public:
 
     sol::call_status runSnippet (const String& filename)
     {
+        auto file = getSnippetFile (filename);
+        auto path = file.getFullPathName().toStdString();
         try {
-            auto res = lua.script_file (getSnippetPath (filename));
+            auto res = state.script_file (path);
             if (! res.valid()) {
                 sol::error e = res;
                 std::cerr << e.what();

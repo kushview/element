@@ -4,9 +4,243 @@
 #include "el/factories.hpp"
 #include <element/midipipe.hpp>
 #include "scripting/dspscript.hpp"
+#include "scripting/scriptloader.hpp"
+#include "scripting/bindings.hpp"
+#include <element/processor.hpp>
 
 using namespace element;
 namespace element {
+
+//==============================================================================
+struct DSPScriptPosition
+{
+    using PositionType = juce::AudioPlayHead::PositionInfo;
+    bool valid = false;
+    bool playing { false },
+        looping { false },
+        recording { false };
+
+    lua_Integer frame = 0;
+    lua_Number seconds = 0.0;
+
+    lua_Number bpm = 0.0;
+    lua_Integer beatsPerBar = 4, beatUnit = 4;
+    lua_Integer bar = 0;
+    lua_Number beat = 0.0;
+
+    void update (Optional<PositionType> pos)
+    {
+        valid = pos.hasValue();
+        if (! valid)
+            return;
+
+        playing = pos->getIsPlaying();
+        looping = pos->getIsLooping();
+        recording = pos->getIsRecording();
+
+        if (auto f = pos->getTimeInSamples())
+            frame = static_cast<lua_Integer> (*f);
+
+        if (auto s = pos->getTimeInSeconds())
+            seconds = *s;
+
+        if (auto b = pos->getBpm())
+            bpm = *b;
+
+        if (auto ts = pos->getTimeSignature())
+        {
+            beatsPerBar = ts->numerator;
+            beatUnit = ts->denominator;
+        }
+
+        if (auto b = pos->getBarCount())
+            bar = *b;
+        if (auto b = pos->getPpqPosition())
+            beat = *b;
+    }
+
+    static DSPScriptPosition** create (lua_State* L)
+    {
+        auto pos = lua::new_userdata<DSPScriptPosition> (L, "el.DSPScriptPosition");
+        return pos;
+    }
+
+    static int gc (lua_State* L) { return 0; }
+
+    static int _valid (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushboolean (L, self->valid);
+        return 1;
+    }
+
+    static int _playing (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushboolean (L, self->playing);
+        return 1;
+    }
+
+    static int _recording (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushboolean (L, self->recording);
+        return 1;
+    }
+
+    static int _looping (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushboolean (L, self->looping);
+        return 1;
+    }
+
+    static int _frame (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->frame);
+        return 1;
+    }
+
+    static int _seconds (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->seconds);
+        return 1;
+    }
+
+    static int _bpm (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->bpm);
+        return 1;
+    }
+
+    static int _beatsPerBar (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->beatsPerBar);
+        return 1;
+    }
+
+    static int _beatUnit (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->beatUnit);
+        return 1;
+    }
+
+    static int _bar (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->bar);
+        return 1;
+    }
+
+    static int _beat (lua_State* L)
+    {
+        auto self = *(DSPScriptPosition**) lua_touserdata (L, 1);
+        lua_pushinteger (L, self->beat);
+        return 1;
+    }
+
+    static const luaL_Reg* methods()
+    {
+        static const luaL_Reg sPositionMethods[] = {
+            { "__gc", DSPScriptPosition::gc },
+
+            /// True if playing.
+            // @within Methods
+            // @function DSPScriptPosition:playing
+            { "playing", DSPScriptPosition::_playing },
+
+            /// True if recording.
+            // @within Methods
+            // @function DSPScriptPosition:recording
+            { "recording", DSPScriptPosition::_recording },
+
+            /// True if looping
+            // @within Methods
+            // @function DSPScriptPosition:looping
+            { "looping", DSPScriptPosition::_looping },
+
+            /// True if this position is valid.
+            // All other methods are not reliable if this returns false.
+            // @within Methods
+            // @function DSPScriptPosition:valid
+            { "valid", DSPScriptPosition::_valid },
+
+            /// Time in audio samples.
+            // @within Methods
+            // @function DSPScriptPosition:frame
+            // @return The frame as an Integer
+            { "frame", DSPScriptPosition::_frame },
+
+            /// Time in seconds.
+            // @within Methods
+            // @function DSPScriptPosition:seconds
+            // @return Time in seconds as a number
+            { "seconds", DSPScriptPosition::_seconds },
+
+            /// The current BPM.
+            // @within Methods
+            // @function DSPScriptPosition:bpm
+            // @return The bpm
+            { "bpm", DSPScriptPosition::_bpm },
+
+            /// Beats per bar e.g. the numerator in a time signature
+            // @within Methods
+            // @function DSPScriptPosition:beatsPerBar
+            // @return The time signature numerator.
+            { "beatsPerBar", DSPScriptPosition::_beatsPerBar },
+
+            /// Denominator of a the time signature.
+            // @within Methods
+            // @function DSPScriptPosition:beatUnit
+            // @return The time signature denominator
+            { "beatUnit", DSPScriptPosition::_beatUnit },
+
+            /// The current bar.
+            // @within Methods
+            // @function DSPScriptPosition:bar
+            // @return The bar
+            { "bar", DSPScriptPosition::_bar },
+
+            /// The current beat in terms of quarter note.
+            // @within Methods
+            // @function DSPScriptPosition:beat
+            // @return The beat
+            { "beat", DSPScriptPosition::_beat },
+
+            { nullptr, nullptr }
+        };
+        return sPositionMethods;
+    }
+
+    static int loadModule (lua_State* L)
+    {
+        if (luaL_newmetatable (L, "el.DSPScriptPosition"))
+        {
+            lua_pushvalue (L, -1); /* duplicate the metatable */
+            lua_setfield (L, -2, "__index"); /* mt.__index = mt */
+            luaL_setfuncs (L, methods(), 0);
+            lua_pop (L, 1);
+        }
+
+        if (luaL_newmetatable (L, "el.DSPScriptPositionClass"))
+        {
+            // lua_pushcfunction (L, midipipe_new); /* push audio_new function */
+            // lua_setfield (L, -2, "__call"); /* mt.__call = audio_new */
+            lua_pop (L, 1);
+        }
+
+        lua_newtable (L);
+        luaL_setmetatable (L, "el.DSPScriptPositionClass");
+        // lua_pushcfunction (L, DSPScriptPosition::create);
+        // lua_setfield (L, -2, "new");
+        return 1;
+    }
+};
 
 //==============================================================================
 class DSPScript::Parameter : public RangedParameter,
@@ -74,6 +308,9 @@ DSPScript::DSPScript (sol::table tbl)
     {
         try
         {
+            DSPScriptPosition::loadModule (L);
+            lua_pop (L, 1);
+
             sol::state_view lua (L);
             auto result = lua.safe_script (R"(
                 require ('el.audio')
@@ -164,6 +401,13 @@ DSPScript::DSPScript (sol::table tbl)
         ok = controlsUserData.valid();
     }
 
+    if (ok)
+    {
+        position = DSPScriptPosition::create (L);
+        positionRef = luaL_ref (L, LUA_REGISTRYINDEX);
+        ok = positionRef != LUA_REFNIL && positionRef != LUA_NOREF;
+    }
+
     loaded = ok;
     if (! loaded)
     {
@@ -183,17 +427,19 @@ Result DSPScript::validate (const String& script)
         return Result::fail ("script contains no code");
     return Result::ok();
 #if 0
-    Script loader;
-    loader.load (script);
+    sol::state state;
+    element::Lua::initializeState (state);
+    ScriptLoader loader (state.lua_state(), script);
 
-    auto result = ctx->load (script);
-    if (result.failed())
-        return result;
+    if (loader.hasError())
+        return Result::fail (loader.getErrorMessage());
     
-    auto ctx = std::make_unique<DSPScript>();
-    if (! ctx->ready())
+    auto ctx = std::make_unique<DSPScript> (loader.call());
+    if (! ctx->isValid())
         return Result::fail ("could not parse script");
 
+    juce::Result result (juce::Result::fail ("Unknown script problem"));
+    
     try
     {
         const int block = 1024;
@@ -212,12 +458,11 @@ Result DSPScript::validate (const String& script)
                             validatePorts.size (PT::Midi, false));
         
         ctx->prepare (rate, block);
-
-        ctx->state["__ln_validate_rate"]    = rate;
-        ctx->state["__ln_validate_nmidi"]   = nmidi;
-        ctx->state["__ln_validate_nchans"]  = nchans;
-        ctx->state["__ln_validate_nframes"] = block;
-        ctx->state.script (R"(
+        state["__ln_validate_rate"]    = rate;
+        state["__ln_validate_nmidi"]   = nmidi;
+        state["__ln_validate_nchans"]  = nchans;
+        state["__ln_validate_nframes"] = block;
+        state.script (R"(
             function __ln_validate_render()
                 local AudioBuffer = require ('el.AudioBuffer')
                 local MidiPipe    = require ('el.MidiPipe')
@@ -279,14 +524,26 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
                 {
                     if (lua_rawgeti (L, LUA_REGISTRYINDEX, controlsUserData.registry_index()) == LUA_TUSERDATA)
                     {
-                        (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
-                                                    a.getNumChannels(),
-                                                    a.getNumSamples());
-                        (*midi)->swapWith (m);
+                        if (lua_rawgeti (L, LUA_REGISTRYINDEX, positionRef) == LUA_TUSERDATA)
+                        {
+                            (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
+                                                        a.getNumChannels(),
+                                                        a.getNumSamples());
+                            (*midi)->swapWith (m);
 
-                        lua_call (L, 4, 0);
+                            if (playhead != nullptr)
+                                (*position)->update (playhead->getPosition());
 
-                        (*midi)->swapWith (m);
+                            try
+                            {
+                                lua_call (L, 5, 0);
+                            } catch (const sol::error& e)
+                            {
+                                std::clog << e.what() << std::endl;
+                                loaded = false;
+                            }
+                            (*midi)->swapWith (m);
+                        }
                     }
                 }
             }
@@ -463,12 +720,18 @@ String DSPScript::getUI() const
 void DSPScript::deref()
 {
     loaded = false;
+
     audio = nullptr;
     luaL_unref (L, LUA_REGISTRYINDEX, audioRef);
     audioRef = LUA_REFNIL;
+
     midi = nullptr;
     luaL_unref (L, LUA_REGISTRYINDEX, midiRef);
     midiRef = LUA_REFNIL;
+
+    position = nullptr;
+    luaL_unref (L, LUA_REGISTRYINDEX, positionRef);
+    positionRef = LUA_REFNIL;
 }
 
 void DSPScript::addAudioMidiPorts()
@@ -539,64 +802,81 @@ void DSPScript::addAudioMidiPorts()
     }
 }
 
-element::ParameterPtr
-    DSPScript::getParameterObject (int index, bool input) const
+element::ParameterPtr DSPScript::getParameterObject (int index, bool input) const
 {
     return input ? inParams[index] : outParams[index];
 }
 
+void DSPScript::addParameter (const sol::table& param, bool input)
+{
+    const int channel = ports.size (PortType::Control, input);
+
+    String name = param["name"].get_or (std::string ("Param ") + String (channel + 1).toStdString());
+    String sym = param["symbol"].get_or (std::string());
+    if (sym.isEmpty())
+    {
+        sym = name.trim().toLowerCase().replaceCharacter ('-', '_').replaceCharacter (' ', '_');
+    }
+
+    String type = param["type"].get_or (std::string ("float"));
+    String flow = param["flow"].get_or (std::string ("input"));
+    jassert (flow == "input" || flow == "output");
+
+    float min = param["min"].get_or (0.0);
+    float max = param["max"].get_or (1.0);
+    float dfault = param["default"].get_or (1.0);
+    ignoreUnused (min, max, dfault);
+
+    // EL_LUA_DBG("index = " << index);
+    // EL_LUA_DBG("channel = " << channel);
+    // EL_LUA_DBG("is input = " << (int) input);
+    // EL_LUA_DBG("name = " << name);
+    // EL_LUA_DBG("symbol = " << sym);
+    // EL_LUA_DBG("min = " << min);
+    // EL_LUA_DBG("max = " << max);
+    // EL_LUA_DBG("default = " << dfault);
+
+    if (input)
+    {
+        paramData[channel] = dfault;
+    }
+    else
+    {
+        controlData[channel] = dfault;
+    }
+
+    ports.addControl (ports.size(),
+                      channel,
+                      sym,
+                      name,
+                      min,
+                      max,
+                      dfault,
+                      input);
+}
+
 void DSPScript::addParameterPorts()
 {
-    sol::function f = DSP["parameters"];
+    sol::function f = DSP["layout"];
     if (! f.valid())
         return;
 
     try
     {
-        int index = ports.size();
-        int inChan = 0, outChan = 0;
-        sol::table params = f();
+        sol::table layout = f();
+        sol::table control = layout["control"].get_or_create<sol::table>();
+        sol::table params = control[1].get_or_create<sol::table>();
         for (size_t i = 0; i < params.size(); ++i)
         {
             auto param = params[i + 1];
+            addParameter (param, true);
+        }
 
-            String name = param["name"].get_or (std::string ("Param ") + String (i + 1).toStdString());
-            String sym = param["symbol"].get_or (std::string());
-            if (sym.isEmpty())
-            {
-                sym = name.trim().toLowerCase().replaceCharacter ('-', '_').replaceCharacter (' ', '_');
-            }
-
-            String type = param["type"].get_or (std::string ("float"));
-            String flow = param["flow"].get_or (std::string ("input"));
-            jassert (flow == "input" || flow == "output");
-
-            bool isInput = flow == "input";
-            float min = param["min"].get_or (0.0);
-            float max = param["max"].get_or (1.0);
-            float dfault = param["default"].get_or (1.0);
-            ignoreUnused (min, max, dfault);
-            const int channel = isInput ? inChan++ : outChan++;
-
-            // EL_LUA_DBG("index = " << index);
-            // EL_LUA_DBG("channel = " << channel);
-            // EL_LUA_DBG("is input = " << (int) isInput);
-            // EL_LUA_DBG("name = " << name);
-            // EL_LUA_DBG("symbol = " << sym);
-            // EL_LUA_DBG("min = " << min);
-            // EL_LUA_DBG("max = " << max);
-            // EL_LUA_DBG("default = " << dfault);
-
-            if (isInput)
-            {
-                paramData[channel] = dfault;
-            }
-            else
-            {
-                controlData[channel] = dfault;
-            }
-
-            ports.addControl (index++, channel, sym, name, min, max, dfault, isInput);
+        sol::table controls = control[2].get_or_create<sol::table>();
+        for (size_t i = 0; i < controls.size(); ++i)
+        {
+            auto param = controls[i + 1];
+            addParameter (param, false);
         }
 
         numParams = ports.size (PortType::Control, true);
@@ -627,3 +907,11 @@ void DSPScript::unlinkParams()
 }
 
 } // namespace element
+
+using element::DSPScriptPosition;
+
+EL_PLUGIN_EXPORT
+int luaopen_el_DSPScriptPosition (lua_State* L)
+{
+    return DSPScriptPosition::loadModule (L);
+}

@@ -1,11 +1,10 @@
---- A new View script.
+--- A new View script (experimental)
 -- 
 -- Script description.
 -- 
 -- @type View
 -- @license GPL3-or-later
 -- @author Your Name
-
 
 local object = require ('el.object')
 local new = object.new

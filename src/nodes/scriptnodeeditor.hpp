@@ -10,7 +10,9 @@
 
 namespace element {
 
+class GenericNodeEditor;
 class ScriptingEngine;
+
 class ScriptNodeEditor : public NodeEditor,
                          public ChangeListener
 {
@@ -31,6 +33,8 @@ private:
     sol::table widget;
     Component* comp = nullptr;
 
+    std::unique_ptr<GenericNodeEditor> _generic;
+
     bool showToolbar = false;
     TextButton paramsButton;
 
@@ -39,6 +43,7 @@ private:
         propsGap = 2;
 
     SignalConnection portsChangedConnection;
+
     ScriptNode::Ptr lua;
 
     FileBrowserComponent fileBrowser;

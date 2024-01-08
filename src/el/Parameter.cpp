@@ -15,9 +15,8 @@
 // @function Parameter:changed
 // @within Handlers
 // @usage
-// -- The first argument, `self`, will be the Parameter object
-// param.changed = function (self)
-//     local value = self:get()
+// param.changed = function()
+//     local value = param:get()
 //     print (value)
 // end
 

@@ -133,7 +133,7 @@ public:
 private:
     friend class ScriptView;
     ScriptView& view;
-    Context& context;
+    [[maybe_unused]] Context& context;
     ScriptingEngine& scripting;
     Script script;
     juce::Value codeValue;

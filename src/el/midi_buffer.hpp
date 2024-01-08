@@ -45,7 +45,7 @@ struct MidiBufferImpl final
         }
     }
 
-    void reset_iter()
+    void resetIterator()
     {
         iter = buffer.begin();
         **message = juce::MidiMessage();
@@ -53,8 +53,7 @@ struct MidiBufferImpl final
 };
 
 /** Allocate a new kv.MidiBuffer to the stack and set the metatable */
-inline static MidiBufferImpl**
-    new_midibuffer (lua_State* L)
+inline static MidiBufferImpl** new_midibuffer (lua_State* L)
 {
     auto** impl = (MidiBufferImpl**) lua_newuserdata (L, sizeof (MidiBufferImpl**));
     *impl = new MidiBufferImpl (L);

@@ -21,10 +21,22 @@ ScriptLoader::ScriptLoader (lua_State* state)
     }
 }
 
+ScriptLoader::ScriptLoader (lua_State* L, const String& buffer)
+    : ScriptLoader (L)
+{
+    this->load (buffer);
+}
+
 ScriptLoader::ScriptLoader (sol::state_view& view, const String& buffer)
     : ScriptLoader (view.lua_state())
 {
     this->load (buffer);
+}
+
+ScriptLoader::ScriptLoader (lua_State* L, File file)
+    : ScriptLoader (L)
+{
+    this->load (file);
 }
 
 ScriptLoader::ScriptLoader (sol::state_view& view, File file)

@@ -6,16 +6,19 @@ file = {
     '../src/engine/midipipe.cpp',
     exclude = {
         '../docs/examples',
-        '../src/el/audio_buffer.hpp',
         '../src/el/midi_buffer.hpp',
-        '../src/el/sol_helpers.hpp'
+        '../src/el/sol_helpers.hpp',
+        '../src/el/vector.c',
+        '../src/el/color.lua',
+        '../src/el/session.lua',
+        '../src/el/Parameter.cpp'
     }
 }
 
 examples = {
-    '../docs/examples/helloworld.lua',
-    '../docs/examples/sysex.lua',
-    '../docs/examples/sysexui.lua',
+--    '../docs/examples/helloworld.lua',
+--    '../docs/examples/sysex.lua',
+--    '../docs/examples/sysexui.lua',
     '../scripts/amp.lua',
     '../scripts/ampui.lua',
     '../scripts/channelize.lua'

@@ -16,7 +16,7 @@ public:
     ~Impl() {}
 
 private:
-    DeviceService& owner;
+    [[maybe_unused]] DeviceService& owner;
 };
 
 DeviceService::DeviceService()

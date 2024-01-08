@@ -76,7 +76,7 @@ private:
     juce::Array<element::lua::MidiBufferImpl**> buffers;
     juce::Array<int> refs;
     int used { 0 };
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LuaMidiPipe);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LuaMidiPipe)
 };
 
 } // namespace element

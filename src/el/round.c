@@ -57,7 +57,7 @@ static int f_integer (lua_State* L)
 
 static const luaL_Reg round_f[] = {
     /// Round a number to 32bit precision.
-    // @function floats
+    // @function float
     // @number input Number to round
     // @treturn number Rounded value
     { "float", f_float },

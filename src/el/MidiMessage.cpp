@@ -126,12 +126,12 @@ static int midimessage_isforchannel (lua_State* L)
 }
 
 midimessage_is (note_on, isNoteOn)
-    midimessage_is (note_off, isNoteOff)
-        midimessage_is (note, isNoteOnOrOff)
-            midimessage_get_int (note, getNoteNumber)
-                midimessage_set_int (set_note, setNoteNumber)
+midimessage_is (note_off, isNoteOff)
+midimessage_is (note, isNoteOnOrOff)
+midimessage_get_int (note, getNoteNumber)
+midimessage_set_int (set_note, setNoteNumber)
 
-                    static int midimessage_data (lua_State* L)
+static int midimessage_data (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     lua_pushlightuserdata (L, (void*) msg->getRawData());
@@ -139,16 +139,15 @@ midimessage_is (note_on, isNoteOn)
     return 2;
 }
 
-midimessage_is (sysex, isSysEx) 
+midimessage_is (sysex, isSysEx)
 
-static int midimessage_sysex_data (lua_State* L)
+static int midimessage_sysexData (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     lua_pushlightuserdata (L, (void*) msg->getSysExData());
     lua_pushinteger (L, msg->getSysExDataSize());
     return 2;
 }
-
 
 midimessage_get_int (velocity, getVelocity)
 midimessage_get_number (velocity_float, getFloatVelocity)
@@ -170,9 +169,8 @@ midimessage_get_int (pressure, getChannelPressureValue)
 midimessage_is (controller, isController)
 midimessage_get_int (controller, getControllerNumber)
 midimessage_get_int (controller_value, getControllerValue)
-    // clang-format on
 
-    static int midimessage_is_controller_type (lua_State* L)
+static int midimessage_is_controller_type (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     lua_pushboolean (L, msg->isControllerOfType (static_cast<int> (lua_tointeger (L, 2))));
@@ -180,14 +178,14 @@ midimessage_get_int (controller_value, getControllerValue)
 }
 
 midimessage_is (notes_off, isAllNotesOff)
-    midimessage_is (sound_off, isAllSoundOff)
-        midimessage_is (reset_controllers, isResetAllControllers)
+midimessage_is (sound_off, isAllSoundOff)
+midimessage_is (reset_controllers, isResetAllControllers)
 
-            midimessage_is (meta, isMetaEvent)
-                midimessage_get_int (meta_type, getMetaEventType)
-                    midimessage_get_int (meta_length, getMetaEventLength)
+midimessage_is (meta, isMetaEvent)
+midimessage_get_int (meta_type, getMetaEventType)
+midimessage_get_int (meta_length, getMetaEventLength)
 
-                        static int midimessage_meta_data (lua_State* L)
+static int midimessage_meta_data (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     lua_pushlightuserdata (L, (void*) msg->getMetaEventData());
@@ -195,16 +193,16 @@ midimessage_is (notes_off, isAllNotesOff)
 }
 
 midimessage_is (track, isTrackMetaEvent)
-    midimessage_is (end_of_track, isEndOfTrackMetaEvent)
-        midimessage_is (track_name, isTrackNameEvent)
+midimessage_is (end_of_track, isEndOfTrackMetaEvent)
+midimessage_is (track_name, isTrackNameEvent)
 
-            midimessage_is (text, isTextMetaEvent)
-                midimessage_get_string (text, getTextFromTextMetaEvent)
+midimessage_is (text, isTextMetaEvent)
+midimessage_get_string (text, getTextFromTextMetaEvent)
 
-                    midimessage_is (tempo, isTempoMetaEvent)
-                        midimessage_get_number (tempo_seconds_pqn, getTempoSecondsPerQuarterNote)
+midimessage_is (tempo, isTempoMetaEvent)
+midimessage_get_number (tempo_seconds_pqn, getTempoSecondsPerQuarterNote)
 
-                            static int midimessage_tempo_ticks (lua_State* L)
+static int midimessage_tempo_ticks (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     lua_pushnumber (L, msg->getTempoMetaEventTickLength (static_cast<short> (lua_tointeger (L, 2))));
@@ -213,21 +211,21 @@ midimessage_is (track, isTrackMetaEvent)
 
 midimessage_is (active_sense, isActiveSense)
 
-    midimessage_is (start, isMidiStart)
-        midimessage_is (stop, isMidiStart)
-            midimessage_is (continue, isMidiStart)
-                midimessage_is (clock, isMidiClock)
+midimessage_is (start, isMidiStart)
+midimessage_is (stop, isMidiStart)
+midimessage_is (continue, isMidiStart)
+midimessage_is (clock, isMidiClock)
 
-                    midimessage_is (spp, isSongPositionPointer)
-                        midimessage_get_int (spp_beat, getSongPositionPointerMidiBeat)
+midimessage_is (spp, isSongPositionPointer)
+midimessage_get_int (spp_beat, getSongPositionPointerMidiBeat)
 
-                            midimessage_is (quarter_frame, isQuarterFrame)
-                                midimessage_get_int (quarter_frame_seq, getQuarterFrameSequenceNumber)
-                                    midimessage_get_int (quarter_frame_value, getQuarterFrameValue)
+midimessage_is (quarter_frame, isQuarterFrame)
+midimessage_get_int (quarter_frame_seq, getQuarterFrameSequenceNumber)
+midimessage_get_int (quarter_frame_value, getQuarterFrameValue)
 
-                                        midimessage_is (full_frame, isFullFrame)
+midimessage_is (full_frame, isFullFrame)
 
-                                            static int midimessage_full_frame_params (lua_State* L)
+static int midimessage_full_frame_params (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     juce::MidiMessage::SmpteTimecodeType tc;
@@ -244,9 +242,9 @@ midimessage_is (active_sense, isActiveSense)
 }
 
 midimessage_is (mmc, isMidiMachineControlMessage)
-    midimessage_get_int (mmc_command, getMidiMachineControlCommand)
+midimessage_get_int (mmc_command, getMidiMachineControlCommand)
 
-        static int midimessage_goto (lua_State* L)
+static int midimessage_goto (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     int h, m, s, f;
@@ -280,8 +278,9 @@ static const luaL_Reg midimessage_methods[] = {
     // @treturn number Timestamp
     { "time", midimessage_time },
 
-    /// Change timestamp.
-    // @function MidiMessage:settime
+    /// Change timestamp. The time format depends on the context in which the
+    // message is being used.
+    // @function MidiMessage:setTime
     // @number t Timestamp to set
     { "setTime", midimessage_set_time },
 
@@ -314,15 +313,15 @@ static const luaL_Reg midimessage_methods[] = {
     { "setChannel", midimessage_set_channel },
 
     /// Is sysex.
-    // @function MidiMessage:issysex
+    // @function MidiMessage:isSysex
     // @return True if is sysex message
-    { "issysex", midimessage_is_sysex },
+    { "isSysex", midimessage_is_sysex },
 
     /// Sysex Data.
     // @function MidiMessage:sysexData
     // @return Raw sysex bytes
     // @return Sysex data size
-    { "sysexData", midimessage_sysex_data },
+    { "sysexData", midimessage_sysexData },
 
     /// Is note on.
     // @function MidiMessage:isNoteOn

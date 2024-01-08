@@ -70,13 +70,12 @@ master_doc = 'index'
 
 latex_toplevel_sectioning = 'chapter'
 
-# latex_documents = [
-#     ('index', 'element.idx', 'Element', 'Kushview', 'manual', False)
-# ]
+latex_documents = [
+    ('manual', 'manual.tex', 'Element', 'Michael R. Fisher', 'manual', False)
+]
 
 latex_elements = {
     'geometry': r'''
-\usepackage[paperheight=9in,paperwidth=6in,margin=0.72in]{geometry}
+\usepackage[paperwidth=6in,paperheight=9in,margin=0.5in]{geometry}
 '''
 }
-

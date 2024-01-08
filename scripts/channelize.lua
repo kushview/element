@@ -17,20 +17,17 @@ local output        = MidiBuffer.new()
 
 local function layout()
     return {
-        audio = { 0, 0 },
-        midi  = { 1, 1 }
-    }
-end
-
-local function parameters()
-    return {
-        {
-            name        = "Channel",
-            label       = "channel",
-            min         = 0,
-            max         = 16,
-            default     = 0
-        }
+        audio       = { 0, 0 },
+        midi        = { 1, 1 },
+        control     = {{
+            {
+                name        = "Channel",
+                symbol      = "channel",
+                min         = 0,
+                max         = 16,
+                default     = 0
+            }
+        }}
     }
 end
 
@@ -52,9 +49,9 @@ local function process (_, m, p)
     output:clear()
     for msg, frame in input:messages() do
         if channel > 0 and msg:channel() > 0 then
-            msg:setchannel (channel)
+            msg:setChannel (channel)
         end
-        output:addmessage (msg, frame)
+        output:insert (msg, frame)
     end
 
     -- DSP scripts use replace processing, so swap in the rendered output

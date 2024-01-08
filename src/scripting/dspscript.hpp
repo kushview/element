@@ -4,14 +4,18 @@
 #pragma once
 
 #include "sol/sol.hpp"
+
 #include <element/parameter.hpp>
 #include <element/juce/core.hpp>
+#include <element/juce/audio_basics.hpp>
 
 #include "scripting/scriptinstance.hpp"
 
 namespace element {
 
+struct DSPScriptPosition;
 class LuaMidiPipe;
+class MidiPipe;
 
 class DSPScript : public ScriptInstance
 {
@@ -27,8 +31,10 @@ public:
 
     static juce::Result validate (const juce::String& script);
 
+    void setPlayHead (juce::AudioPlayHead* ph) noexcept { playhead = ph; }
+
     /** Returns true if the script loaded ok */
-    bool isValid() const { return loaded; }
+    bool isValid() const noexcept { return loaded; }
 
     //==========================================================================
     void prepare (double rate, int block)
@@ -65,11 +71,16 @@ public:
 private:
     sol::table DSP;
     sol::function processFunc;
-    AudioBuffer<float>** audio = nullptr;
+    juce::AudioBuffer<float>** audio = nullptr;
     LuaMidiPipe** midi = nullptr;
+    juce::AudioPlayHead* playhead = nullptr;
+    DSPScriptPosition** position = nullptr;
+
     int processRef = LUA_REFNIL;
     int audioRef = LUA_REFNIL;
     int midiRef = LUA_REFNIL;
+    int positionRef = LUA_REFNIL;
+
     lua_State* L = nullptr;
     bool loaded = false;
     int numParams = 0, // input params
@@ -87,10 +98,14 @@ private:
     friend class Parameter;
     juce::ReferenceCountedArray<Parameter> inParams, outParams;
 
+    struct Context;
+    struct Position;
+
     void deref();
     void getParameterData (juce::MemoryBlock&, bool);
     void setParameterData (juce::MemoryBlock&, bool);
     void addAudioMidiPorts();
+    void addParameter (const sol::table&, bool);
     void addParameterPorts();
     void unlinkParams();
     void setParameter (int, float, bool);

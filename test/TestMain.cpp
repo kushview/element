@@ -3,6 +3,26 @@
 #include <element/juce.hpp>
 using namespace juce;
 
+#include <element/context.hpp>
+
+namespace element {
+namespace test {
+static std::unique_ptr<Context> _context;
+Context* context()
+{
+    if (_context == nullptr) {
+        _context = std::make_unique<Context> (RunMode::Standalone);
+    }
+    return _context.get();
+}
+
+void resetContext()
+{
+    _context.reset();
+}
+} // namespace test
+} // namespace element
+
 struct JuceMessageManagerFixture {
     JuceMessageManagerFixture()
     {
@@ -12,6 +32,7 @@ struct JuceMessageManagerFixture {
 
     ~JuceMessageManagerFixture()
     {
+        element::test::resetContext();
         juce::shutdownJuce_GUI();
     }
 };

@@ -11,8 +11,11 @@ class ScriptLoader final : public juce::ReferenceCountedObject
 public:
     ScriptLoader() = delete;
     explicit ScriptLoader (lua_State* L);
+    ScriptLoader (lua_State* L, const juce::String& buffer);
     ScriptLoader (sol::state_view& view, const juce::String& buffer);
+    ScriptLoader (lua_State* L, juce::File file);
     ScriptLoader (sol::state_view& view, juce::File file);
+
     ~ScriptLoader();
 
     bool isLoaded() const { return hasloaded; }
@@ -83,11 +86,12 @@ private:
     {
         jassert (L != nullptr);
         sol::state_view view (L);
-        sol::reference ref = view.safe_script ("return nil");
-        if (! isLoaded() || hasError())
-            return ref;
+        sol::reference ref;
         try
         {
+            ref = view.safe_script ("return nil");
+            if (! isLoaded() || hasError())
+                return ref;
             // env["testvalue"] = true;
             sol::function f = caller();
             if (e.valid())

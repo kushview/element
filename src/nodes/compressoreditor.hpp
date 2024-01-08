@@ -19,7 +19,7 @@ public:
     void resized() override;
 
 private:
-    CompressorProcessor& proc;
+    [[maybe_unused]] CompressorProcessor& proc;
     KnobsComponent knobs;
 
     class CompViz : public Component,

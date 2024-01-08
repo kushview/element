@@ -1,10 +1,12 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-/// An audio sample buffer
+/// An Audio buffer designed for real time performance.
+// - **Safety**: For speed, virtually no type checking in method calls.
+// - **Indexing**: Sample positions and channel numbers are 1-indexed.
 // @classmod el.AudioBuffer
 
-#if EL_LUA_AUDIO_BUFFER_COMPILE
+#if 1 // EL_LUA_AUDIO_BUFFER_COMPILE
 
 #include <element/element.h>
 #include <element/juce/audio_basics.hpp>
@@ -66,12 +68,14 @@ static int audio_clear (lua_State* L)
     switch (lua_gettop (L))
     {
         case 2: {
-            buf->clear (static_cast<int> (lua_tointeger (L, 2) - 1), 0, buf->getNumSamples());
+            buf->clear (static_cast<int> (lua_tointeger (L, 2) - 1),
+                        0,
+                        buf->getNumSamples());
             break;
         }
 
         case 3: {
-            buf->clear (static_cast<int> (lua_tointeger (L, 2)) - 1,
+            buf->clear (static_cast<int> (lua_tointeger (L, 2)),
                         static_cast<int> (lua_tointeger (L, 3)));
             break;
         }
@@ -108,33 +112,21 @@ static int audio_length (lua_State* L)
 
 static int audio_get (lua_State* L)
 {
+    // clang-format off
     auto* buf = toclassref (L, 1);
-    if (lua_gettop (L) < 3)
-    {
-        lua_pushnumber (L, 0.0);
-    }
-    else
-    {
-        lua_pushnumber (L, buf->getSample (static_cast<int> (lua_tointeger (L, 2)) - 1, static_cast<int> (lua_tointeger (L, 3)) - 1));
-    }
+    lua_pushnumber (L, buf->getArrayOfReadPointers()
+        [lua_tointeger (L, 2) - 1]
+        [lua_tointeger (L, 3) - 1]);
     return 1;
+    // clang-format on
 }
 
 static int audio_set (lua_State* L)
 {
     auto* buf = toclassref (L, 1);
-
-    if (lua_gettop (L) < 4)
-        return 0;
-
-    if (buf != nullptr)
-    {
-        buf->setSample (
-            static_cast<int> (lua_tointeger (L, 2)) - 1,
-            static_cast<int> (lua_tointeger (L, 3)) - 1,
-            static_cast<SampleType> (lua_tonumber (L, 4)));
-    }
-
+    buf->getArrayOfWritePointers()
+        [lua_tointeger (L, 2) - 1]
+        [lua_tointeger (L, 3) - 1] = static_cast<SampleType> (lua_tonumber (L, 4));
     return 0;
 }
 
@@ -183,7 +175,10 @@ static int audio_fade (lua_State* L)
     {
         case 3: {
             // apply gain to all channels/frames
-            buf->applyGainRamp (0, buf->getNumSamples(), static_cast<SampleType> (lua_tonumber (L, 2)), static_cast<SampleType> (lua_tonumber (L, 3)));
+            buf->applyGainRamp (0,
+                                buf->getNumSamples(),
+                                static_cast<SampleType> (lua_tonumber (L, 2)),
+                                static_cast<SampleType> (lua_tonumber (L, 3)));
             break;
         }
 
@@ -262,7 +257,8 @@ static const luaL_Reg buffer_methods[] = {
     /// Free used memory.
     // Invoke this to free the buffer when it is no longer needed.  Once called,
     // the buffer is no longer valid and WILL crash the interpreter if used after
-    // the fact.
+    // the fact. Only use this when you don't want to rely on the garbage collector
+    // to free memory.
     // @function AudioBuffer:free
     { "free", audio_free },
 

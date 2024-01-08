@@ -123,7 +123,6 @@ public:
 
 private:
     Node graph;
-    int index;
 };
 
 class RootGraphMidiChannels : public MidiMultiChannelPropertyComponent

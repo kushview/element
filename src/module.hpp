@@ -60,8 +60,8 @@ public:
     const std::string& bundle_path() const noexcept { return m_bundle_path; }
 
 private:
-    Context& backend;
-    Scripting& scripting;
+    [[maybe_unused]] Context& backend;
+    [[maybe_unused]] Scripting& scripting;
     Manifest manifest;
     const std::string m_bundle_path;
     void* library = nullptr;

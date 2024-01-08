@@ -1,6 +1,6 @@
 --- SysEx MIDI Example.
 --
--- @script      el.examples.content
+-- @script      UI.Content
 -- @type        Content
 -- @license     GPL v3
 -- @author      Michael Fisher

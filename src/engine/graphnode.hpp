@@ -186,6 +186,9 @@ public:
 
     SymbolMap& symbols() noexcept;
 
+    /** Rebuild rendering ops immediately. */
+    void rebuild() noexcept;
+
 protected:
     //==========================================================================
     virtual void preRenderNodes() {}
@@ -195,7 +198,7 @@ protected:
     void initialize() override {}
 
 private:
-    // TODO: techdebt. to many friend ckasses.
+    // TODO: techdebt. to many friend classes.
     friend class GraphPort;
     friend class IONode;
     friend class GraphManager;

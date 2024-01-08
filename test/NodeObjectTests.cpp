@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE (DelayCompensation)
 
     ProcessorPtr node2 = graph.addNode (new IONode (IONode::audioOutputNode));
     node1->connectAudioTo (node2);
-    MessageManager::getInstance()->runDispatchLoopUntil (14);
+    graph.rebuild();
     BOOST_REQUIRE (graph.getNumConnections() == 2);
     BOOST_REQUIRE (graph.getLatencySamples() == node1->getLatencySamples());
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE (PortChannelMapping)
     ProcessorPtr midiOut = graph.addNode (new element::IONode (
         IONode::midiOutputNode));
     ProcessorPtr filter = graph.addNode (new TestNode (0, 0, 1, 16));
-    MessageManager::getInstance()->runDispatchLoopUntil (14);
+    graph.rebuild();
 
     BOOST_REQUIRE (filter->getNumPorts() == 17);
     BOOST_REQUIRE (filter->getNumPorts (PortType::Midi, true) == 1);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE (PortChannelMapping)
     for (int ch = 0; ch < 16; ++ch)
         BOOST_REQUIRE (graph.connectChannels (PortType::Midi, filter->nodeId, ch, midiOut->nodeId, 0));
 
-    MessageManager::getInstance()->runDispatchLoopUntil (14);
+    graph.rebuild();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

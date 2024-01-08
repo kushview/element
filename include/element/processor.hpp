@@ -409,21 +409,21 @@ public:
             return proc->setCurrentProgram (index);
     }
 
-    //=========================================================================
+    //==========================================================================
     void setMuted (bool muted);
     bool isMuted() const { return mute.get() == 1; }
     void setMuteInput (bool shouldMuteInput) { muteInput.set (shouldMuteInput ? 1 : 0); }
     bool isMutingInputs() const { return muteInput.get() == 1; }
 
-    //=========================================================================
+    //==========================================================================
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
 
-    //=========================================================================
+    //==========================================================================
     void setOversamplingFactor (int osFactor);
     int getOversamplingFactor();
 
-    //=========================================================================
+    //==========================================================================
     void setDelayCompensation (double delayMs);
     double getDelayCompensation() const;
     int getDelayCompensationSamples() const;

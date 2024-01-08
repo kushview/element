@@ -56,6 +56,6 @@ local function instantiate (ctx)
 end
 
 return {
-    type    = 'DSPUI',
-    editor  = instantiate
+    type        = 'DSPUI',
+    instantiate = instantiate
 }

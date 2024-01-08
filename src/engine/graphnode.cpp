@@ -656,4 +656,10 @@ void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
 
 SymbolMap& GraphNode::symbols() noexcept { return _context.symbols(); }
 
+void GraphNode::rebuild() noexcept
+{
+    cancelPendingUpdate();
+    handleAsyncUpdate();
+}
+
 } // namespace element

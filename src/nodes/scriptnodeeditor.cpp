@@ -4,6 +4,7 @@
 #include <element/ui/style.hpp>
 
 #include "el/object.hpp"
+#include "nodes/genericeditor.hpp"
 #include "nodes/scriptnodeeditor.hpp"
 #include "scripting/bindings.hpp"
 #include "scripting.hpp"
@@ -306,15 +307,19 @@ sol::table ScriptNodeEditor::createContext()
     ctx["params"] = view.create_table();
     for (auto* param : lua->getParameters (true))
     {
-        ctx["params"][1 + param->getParameterIndex()] =
-            std::make_shared<ScriptNodeControlPort> (param);
+        auto obj = std::make_shared<ScriptNodeControlPort> (param);
+        ctx["params"][1 + param->getParameterIndex()] = obj;
+        if (auto rp = dynamic_cast<RangedParameter*> (param))
+            ctx.set (rp->getPort().symbol.trim().toStdString(), obj);
     }
 
     ctx["controls"] = view.create_table();
     for (auto* param : lua->getParameters (false))
     {
-        ctx["controls"][1 + param->getParameterIndex()] =
-            std::make_shared<ScriptNodeControlPort> (param);
+        auto obj = std::make_shared<ScriptNodeControlPort> (param);
+        ctx["controls"][1 + param->getParameterIndex()] = obj;
+        if (auto rp = dynamic_cast<RangedParameter*> (param))
+            ctx.set (rp->getPort().symbol.trim().toStdString(), obj);
     }
 
     return ctx;
@@ -348,6 +353,11 @@ void ScriptNodeEditor::updateProperties()
 
 void ScriptNodeEditor::updateSize()
 {
+    if (_generic != nullptr)
+    {
+        setSize (_generic->getWidth(), _generic->getHeight());
+    }
+
     if (comp != nullptr)
     {
         int w = comp->getWidth(), h = comp->getHeight();
@@ -366,6 +376,11 @@ void ScriptNodeEditor::updateSize()
 
 void ScriptNodeEditor::updatePreview()
 {
+    if (_generic != nullptr)
+    {
+        _generic.reset();
+    }
+
     if (comp != nullptr)
     {
         removeChildComponent (comp);
@@ -373,10 +388,23 @@ void ScriptNodeEditor::updatePreview()
         comp = nullptr;
     }
 
+    bool ok = false;
+    auto& codeDoc = lua->getCodeDocument (true);
+    const auto code = codeDoc.getAllContent();
+
+    if (code.trim().isEmpty())
+    {
+        // show generic editor if document is empty...
+        _generic = std::make_unique<GenericNodeEditor> (getNode());
+        addAndMakeVisible (_generic.get());
+        updateSize();
+        return;
+    }
+
     try
     {
         ScriptLoader loader (state);
-        if (loader.load (lua->getCodeDocument (true).getAllContent()))
+        if (loader.load (code))
         {
             auto f = loader.caller();
             env.set_on (f);
@@ -399,9 +427,7 @@ void ScriptNodeEditor::updatePreview()
 
                 std::string factoryFn = "instantiate";
                 if (DSPUI[factoryFn].get_type() != sol::type::function)
-                {
                     factoryFn = "editor";
-                }
 
                 switch (DSPUI[factoryFn].get_type())
                 {
@@ -432,6 +458,7 @@ void ScriptNodeEditor::updatePreview()
                     comp->setAlwaysOnTop (true);
                     setResizable (canResize);
                     updateSize();
+                    ok = true;
                 }
                 else
                 {
@@ -449,12 +476,17 @@ void ScriptNodeEditor::updatePreview()
             log (line);
     }
 
+    if (! ok)
+    {
+        // noop
+    }
+
     resized();
 }
 
 void ScriptNodeEditor::onPortsChanged()
 {
-    updateProperties();
+    updateAll();
 }
 
 void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
@@ -470,6 +502,12 @@ void ScriptNodeEditor::paint (Graphics& g)
 
 void ScriptNodeEditor::resized()
 {
+    if (_generic != nullptr)
+    {
+        _generic->setBounds (0, 0, _generic->getWidth(), _generic->getHeight());
+        return;
+    }
+
     const int toolbarSize = 22;
     auto r1 = getLocalBounds().reduced (4);
     auto r2 = r1.removeFromTop (toolbarSize);

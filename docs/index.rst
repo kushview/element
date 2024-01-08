@@ -1,49 +1,42 @@
-.. Element documentation master file, created by
-   sphinx-quickstart on Wed Jul 14 13:56:01 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Element documentation master file, created  on Wed Jul 14 13:56:01 2021.
 
-Element
-=======
-Welcome to the Element user/developer manual.
+.. include:: /shortcuts.rstext
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Application
+.. _index:
 
-   app/preferences
-   app/keyboard-commands
-   app/midi-mapping
-   app/osc
-   app/vst-paths
-   app/vst-presets
-   app/keyboard-splits
-   app/midi-clock
-   app/virtual-keyboard
-   app/automatic-connections
-   app/graph-midi-channel
-   app/switching-graphs
-   app/velocity-curves
+Element |version| User Manual
+=============================
+
+`Under construction: This manual is a work in progress. Topics might be misplaced
+in the navigation. Some sections are more complete than others.`
+
+Element is `free <https://www.gnu.org/philosophy/free-sw.html>`_ plugin software 
+for Linux, macOS and Windows.  Defacto modular audio software for routing, 
+control, and scrtipting. Control Element with with :term:`MIDI` or your 
+computer's keyboard and mouse.
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Plugin
+   :maxdepth: 2
+   :caption: Manual
 
-   plugin/performance-parameters
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Scripting
-
-   Overview <scripting/overview>
-   Script Types <scripting/script-types>
-   Examples <scripting/examples>
-   Element API <https://api.kushview.net/lua/el/latest>
+   chapters/introduction
+   chapters/ui
+   chapters/preferences
+   chapters/scripting
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: Developers
 
-   Building <building>
-   C++ Code Style <code-style>
-   Lua Code Style <lua-style>
+   developers/building
+   developers/code-style
+   developers/lua-style
+   Miscellaneous <developers/misc>
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Appendix
+
+   appendix/osc-commands
+   appendix/plugin
+   glossary

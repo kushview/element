@@ -346,7 +346,7 @@ private:
     bool audioOutsVisible = false;
     int meterSize = 18;
     int meterSpace = 4;
-    int meterSegments = 7;
+    [[maybe_unused]] int meterSegments = 7;
     uint32_t visibility = 0;
 };
 

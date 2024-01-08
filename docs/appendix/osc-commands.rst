@@ -1,5 +1,8 @@
-OSC
-#####
+.. _osc-commands:
+
+OSC Commands
+############
+
 Element can be controlled by OSC.
 
 Engine Control

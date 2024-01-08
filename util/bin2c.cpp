@@ -165,7 +165,7 @@ int main (int argc, char* argv[])
             "#include \""
          << baseName << ".h\"\r\n\r\n";
 
-    int totalBytes = 0;
+    [[maybe_unused]] int totalBytes = 0;
 
     Array<File> files;
     files.add (sourceFile);

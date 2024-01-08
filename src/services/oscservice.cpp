@@ -37,7 +37,7 @@ struct CommandOSCListener final : juce::OSCReceiver::ListenerWithOSCAddress<>
     }
 
 private:
-    Context& world;
+    [[maybe_unused]] Context& world;
 };
 
 //=============================================================================

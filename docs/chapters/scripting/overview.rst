@@ -1,21 +1,20 @@
-Scripting Overview
-==================
+Overview
+--------
 
 Scripts in Element are written in `Lua <https://www.lua.org>`_.
 
 Defining a Script
------------------
+~~~~~~~~~~~~~~~~~
 
-Scripts must include an `ldoc` style header that define basic metadata about 
+Scripts should include an `ldoc` style header that define basic metadata about 
 it. The header should include a title, description and a list of properties 
-encapsulated in a Lua comment section.
+as outlined in a Lua comment section.  The script itself should also return a 
+descriptor table containing full implementation details.
 
 **Title**
-
-    This should be the first line of the script.
+    This should be the first line of the script ending with a period ``.``
 
 **Description**
-
     Free form text after the first line.
 
 **Properties**
@@ -24,14 +23,15 @@ encapsulated in a Lua comment section.
     Key         Description
     =========== ======================================
     @script     The script's identifier. **required**
-    @type       The type of script. **required if not 
-                an Anonymous script**
+    @type       The type of script. **required**
     @author     Who wrote it
     @license    License information
     =========== ======================================    
 
 **Example**
     
+    Below is a bare-bones script definition comment.
+
     .. code-block:: lua
 
         --- Script Title.

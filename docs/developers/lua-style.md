@@ -1,42 +1,24 @@
 
 # Lua Style Guide
 
-This style guides lists the coding conventions used in the
-[LuaRocks](http://github.com/luarocks/luarocks) project (adapted). It does not 
-claim to be the best Lua coding style in the planet, but it is used successfully
-in a long-running project, and we do provide rationale for many of the design
-decisions listed below.
+This style guide should be followed whenever possible. The suggestions below
+are based on LuaRocks with camel case style for OOP types.
 
-The list of recommendations in this document was based on the ones mentioned
-in the following style guides:
+## Indentation and Formatting
 
-* https://github.com/Olivine-Labs/lua-style-guide/
-* https://github.com/zaki/lua-style-guide
-* http://lua-users.org/wiki/LuaStyleGuide
-* http://sputnik.freewisdom.org/en/Coding_Standard
-* https://gist.github.com/catwell/b3c01dbea413aa78675740546dfd5ce2
-
-## Indentation and formatting
-
-* Let's address the elephant in the room first. LuaRocks is indented with 3 spaces.
+* Let's address the elephant in the room first. Use 4 spaces.
 
 ```lua
-for i, pkg in ipairs(packages) do
-   for name, version in pairs(pkg) do
-      if name == searched then
-         print(version)
-      end
-   end
+for i, pkg in ipairs (packages) do
+    for name, version in pairs (pkg) do
+        if name == searched then
+            print (version)
+        end
+    end
 end
 ```
 
-> **Rationale:** There is no agreement in the Lua community as for indentation, so
-3 spaces lies nicely as a middle ground between the 2-space camp and the
-4-space camp. Also, for a language that nests with `do`/`end` blocks, it
-produces pleasant-looking block-closing staircases, as in the example above.
-
 * One should not use tabs for indentation, or mix it with spaces.
-
 * Use LF (Unix) line endings.
 
 ## Documentation
@@ -49,11 +31,11 @@ after each parameter or return value is a nice plus.
 --- Load a local or remote manifest describing a repository.
 -- All functions that use manifest tables assume they were obtained
 -- through either this function or load_local_manifest.
--- @param repo_url string: URL or pathname for the repository.
--- @param lua_version string: Lua version in "5.x" format, defaults to installed version.
+-- @param repo string: URL or pathname for the repository.
+-- @param version string: Lua version in "5.x" format, defaults to installed version.
 -- @return table or (nil, string, [string]): A table representing the manifest,
 -- or nil followed by an error message and an optional error code.
-function manif.load_manifest(repo_url, lua_version)
+function manif.load (repo, version)
    -- code
 end
 ```
@@ -87,19 +69,19 @@ or `ipairs`).
 * Prefer more descriptive names than `k` and `v` when iterating with `pairs`,
 unless you are writing a function that operates on generic tables.
 
-* Use `_` for ignored variables (e.g. in for loops:)
+* Use `_` for ignored variables (e.g. in for loops or unused function arguments:)
 
 ```lua
-for _, item in ipairs(items) do
-   do_something_with_item(item)
+for _, item in ipairs (items) do
+   process (item)
 end
 ```
 
-* Variables and function names should use `snake_case`.
+* Local variables and function names should use `joinedlowercase` or `snake_case`
+for longer, more wordy, names.
 
 ```lua
 -- bad
-local OBJEcttsssss = {}
 local thisIsMyObject = {}
 local c = function()
    -- ...stuff...
@@ -111,6 +93,10 @@ local this_is_my_object = {}
 local function do_that_thing()
    -- ...stuff...
 end
+
+local function togain (db)
+    -- convert gain to dB
+end
 ```
 
 > **Rationale:** The standard library uses lowercase APIs, with `joinedlowercase`
@@ -119,26 +105,25 @@ tends to look good enough and not too out-of-place along side the standard
 APIs.
 
 * When doing OOP, classes should use `CamelCase`. Acronyms (e.g. XML) should
-only uppercase the first letter (`XmlDocument`). Methods use `snake_case` too.
-In LuaRocks, this is used in the `Api` object in the `luarocks.upload.api`
-module.
+only uppercase the first letter (`XmlDocument`). Methods use `camelCase` too.
 
 ```lua
-for _, name in pairs(names) do
+for _, name in pairs (names) do
    -- ...stuff...
 end
 ```
 
-* Prefer using `is_` when naming boolean functions:
+* Prefer using `is` when naming boolean functions aren't obvious. Never use
+`is` for c++ STL equivalients: `empty`, `valid`, etc..
 
 ```lua
 -- bad
-local function evil(alignment)
+local function evil (alignment)
    return alignment < 100
 end
 
 -- good
-local function is_evil(alignment)
+local function isevil(alignment)
    return alignment < 100
 end
 ```
@@ -181,12 +166,13 @@ table = {
 
 ## Strings
 
-* Use `"double quotes"` for strings; use `'single quotes'` when writing strings
-that contain double quotes.
+* Use `"double quotes"` for strings; use `'single quotes'` when writing 
+strings that contain double quotes; For exiting files, follow the dominant style 
+of the document.
 
 ```lua
-local name = "LuaRocks"
-local sentence = 'The name of the program is "LuaRocks"'
+local name = "Element"
+local sentence = 'The name of the program is "Element"'
 ```
 
 > **Rationale:** Double quotes are used as string delimiters in a larger number of
@@ -201,23 +187,23 @@ too long (e.g. an expression that produces a line over 256-characters long,
 for example), this means the expression is too complex and would do better
 split into subexpressions with reasonable names.
 
-> **Rationale:** No one works on VT100 terminals anymore. If line lengths are a proxy
-for code complexity, we should address code complexity instead of using line
+> **Rationale:** No one works on VT100 terminals anymore. If line lengths are a 
+proxy for code complexity, we should address code complexity instead of using line
 breaks to fit mind-bending statements over multiple lines.
 
-## Function declaration syntax
+## Function Declaration Syntax
 
 * Prefer function syntax over variable syntax. This helps differentiate between
 named and anonymous functions.
 
 ```lua
 -- bad
-local nope = function(name, options)
+local nope = function (name, options)
    -- ...stuff...
 end
 
 -- good
-local function yup(name, options)
+local function yup (name, options)
    -- ...stuff...
 end
 ```
@@ -227,12 +213,12 @@ end
 ```lua
 -- bad
 local function is_good_name(name, options, arg)
-   local is_good = #name > 3
-   is_good = is_good and #name < 30
+   local ok = #name > 3
+   ok = ok and #name < 30
 
    -- ...stuff...
 
-   return is_good
+   return ok
 end
 
 -- good
@@ -254,10 +240,10 @@ unique string literal argument.
 
 ```lua
 -- bad
-local data = get_data"KRP"..tostring(area_number)
+local data = getdata"KRP"..tostring(area_number)
 -- good
-local data = get_data("KRP"..tostring(area_number))
-local data = get_data("KRP")..tostring(area_number)
+local data = getdata("KRP"..tostring(area_number))
+local data = getdata("KRP")..tostring(area_number)
 ```
 
 > **Rationale:** It is not obvious at a glace what the precedence rules are
@@ -270,16 +256,16 @@ argument on a single line. You may do so for table arguments that span several
 lines.
 
 ```lua
-local an_instance = a_module.new {
-   a_parameter = 42,
-   another_parameter = "yay",
+local instance = MyClass.new {
+   parameter_1 = 42,
+   parameter_2 = "yay",
 }
 ```
 
-> **Rationale:** The use as in `a_module.new` above occurs alone in a statement,
+> **Rationale:** The use as in `MyClass.new` above occurs alone in a statement,
 so there are no precedence issues.
 
-## Table attributes
+## Table Attributes
 
 * Use dot notation when accessing known properties.
 
@@ -296,26 +282,28 @@ local is_jedi = luke["jedi"]
 local is_jedi = luke.jedi
 ```
 
-* Use subscript notation `[]` when accessing properties with a variable or if using a table as a list.
+* Use subscript notation `[]` when accessing properties with a variable or if 
+using a table as a list.
 
 ```lua
 local vehicles = load_vehicles_from_disk("vehicles.dat")
 
 if vehicles["Porsche"] then
-   porsche_handler(vehicles["Porsche"])
+   porsche_handler (vehicles["Porsche"])
    vehicles["Porsche"] = nil
 end
-for name, cars in pairs(vehicles) do
-   regular_handler(cars)
+for name, cars in pairs (vehicles) do
+   regular_handler (cars)
 end
 ```
 
 > **Rationale:** Using dot notation makes it clearer that the given key is meant
 to be used as a record/object field.
 
-## Functions in tables
+## Functions in Tables
 
-* When declaring modules and classes, declare functions external to the table definition:
+* When declaring modules and classes, declare functions external to the table 
+definition:
 
 ```lua
 local my_module = {}
@@ -329,10 +317,10 @@ end
 
 ```lua
 local version_mt = {
-   __eq = function(a, b)
+   __eq = function (a, b)
       -- code
    end,
-   __lt = function(a, b)
+   __lt = function (a, b)
       -- code
    end,
 }
@@ -345,10 +333,10 @@ be able to get a view of the complete behavior of the metatable at a glance.
 This is not as important for objects and modules, which usually have way more
 code, and which don't fit in a single screen anyway, so nesting them inside
 the table does not gain much: when scrolling a longer file, it is more evident
-that `check_version` is a method of `Api` if it says `function Api:check_version()`
-than if it says `check_version = function()` under some indentation level.
+that `checkVersion` is a method of `Api` if it says `function Api:checkVersion()`
+than if it says `checkVersion = function()` under some indentation level.
 
-## Variable declaration
+## Variable Declaration
 
 * Always use `local` to declare variables. 
 
@@ -363,48 +351,7 @@ local superpower = get_superpower()
 > **Rationale:** Not doing so will result in global variables to avoid polluting
 the global namespace. 
 
-## Variable scope
-
-* Assign variables with the smallest possible scope.
-
-```lua
--- bad
-local function good()
-   local name = get_name()
-
-   test()
-   print("doing stuff..")
-
-   --...other stuff...
-
-   if name == "test" then
-      return false
-   end
-
-   return name
-end
-
--- good
-local bad = function()
-   test()
-   print("doing stuff..")
-
-   --...other stuff...
-
-   local name = get_name()
-
-   if name == "test" then
-      return false
-   end
-
-   return name
-end
-```
-
-> **Rationale:** Lua has proper lexical scoping. Declaring the function later means that its
-scope is smaller, so this makes it easier to check for the effects of a variable.
-
-## Conditional expressions
+## Conditional Expressions
 
 * False and nil are falsy in conditional expressions. Use shortcuts when you
 can, unless you need to know the difference between false and nil.
@@ -428,12 +375,12 @@ more straightforward code. When nesting expressions, use parentheses to make it
 easier to scan visually:
 
 ```lua
-local function default_name(name)
+local function default_name (name)
    -- return the default "Waldo" if name is nil
    return name or "Waldo"
 end
 
-local function brew_coffee(machine)
+local function brew_coffee (machine)
    return (machine and machine.is_loaded) and "coffee brewing" or "fill your water"
 end
 ```
@@ -444,7 +391,8 @@ values which may be nil.
 
 ## Blocks
 
-* Use single-line blocks only for `then return`, `then break` and `function return` (a.k.a "lambda") constructs:
+* Use single-line blocks only for `then return`, `then break` and `function return` 
+(a.k.a "lambda") constructs:
 
 ```lua
 -- good
@@ -512,14 +460,14 @@ dog.set( "attr",{
 
 -- good
 local x = y * 9
-local numbers = {1, 2, 3}
+local numbers = { 1, 2, 3 }
 local strings = {
    "hello",
    "Lua",
    "world",
 }
-dog.set("attr", {
-   age = "1 year",
+dog.set ("attr", {
+   age   = "1 year",
    breed = "Bernese Mountain Dog",
 })
 ```
@@ -559,16 +507,22 @@ local message = "Hello, "..user.."! This is your day # "..day.." in our platform
 
 > **Rationale:** Being at the baseline, the dots already provide some visual spacing.
 
-* No spaces after the name of a function in a declaration or in its arguments:
+* Use spaces after the name of a function in a declaration that has arguments
+* Don't use spaces for functions without arguments
+* Don't use spaces inside its arguments:
 
 ```lua
 -- bad
-local function hello ( name, language )
+local function goodbye () end
+
+local function hello1( name, language )
    -- code
 end
 
 -- good
-local function hello(name, language)
+local function goodbye() end
+
+local function hello (name, language)
    -- code
 end
 ```
@@ -630,7 +584,7 @@ function manif.load_manifest(repo_url, lua_version)
 end
 ```
 
-> **Rationale:** This is a practice adopted early on in the development of LuaRocks
+> **Rationale:** This is a practice adopted early on in the development of Element
 that has shown to be beneficial in many occasions.
 
 * Use the standard functions for type conversion, avoid relying on coercion:
@@ -656,19 +610,20 @@ or `assert()`.
 
 Follow [these guidelines](http://hisham.hm/2014/01/02/how-to-write-lua-modules-in-a-post-module-world/) for writing modules. In short:
 
-* Always require a module into a local variable named after the last component of the module’s full name.
+* Always require a module into a local variable named after the last component 
+of the module’s full name.
 
 ```lua
-local bar = require("foo.bar") -- requiring the module
+local bar = require ("foo.bar") -- requiring the module
 
-bar.say("hello") -- using the module
+bar.say ("hello") -- using the module
 ```
 
 * Don’t rename modules arbitrarily:
 
 ```lua
 -- bad
-local skt = require("socket")
+local skt = require ("socket")
 ```
 
 > **Rationale:** Code is much harder to read if we have to keep going back to the top
@@ -694,8 +649,8 @@ That is, `local function helper_foo()` means that `helper_foo` is really local.
 * Public functions are declared in the module table, with dot syntax:
 
 ```lua
-function bar.say(greeting)
-   print(greeting)
+function bar.say (greeting)
+   print (greeting)
 end
 ```
 
@@ -712,9 +667,8 @@ contents inspected via the Lua interactive interpreter or other tools.
 * Requiring a module should cause no side-effect other than loading other
 modules and returning the module table.
 
-* A module should not have state (this still needs to be fixed for some
-LuaRocks modules). If a module needs configuration, turn it into a factory.
-For example, do not make something like this:
+* A module should not have state.  If a module needs configuration, turn it into
+a factory. For example, do not make something like this:
 
 ```lua
 -- bad
@@ -726,8 +680,8 @@ and do something like this instead:
 
 ```lua
 -- good
-local messagepack = require("messagepack")
-local mpack = messagepack.new({integer = "unsigned"})
+local messagepack = require ("messagepack")
+local mpack = messagepack.new ({integer = "unsigned"})
 ```
 
 * The invocation of require should look like a regular Lua function call, because it is.
@@ -737,38 +691,43 @@ local mpack = messagepack.new({integer = "unsigned"})
 local bla = require "bla"
 
 -- good
-local bla = require("bla")
+local bla = require ("bla")
 ```
 
-> **Rationale:** This makes it explicit that require is a function call and not a keyword. Many other languages employ keywords for this purpose, so having a "special syntax" for require would trip up Lua newcomers.
+> **Rationale:** This makes it explicit that require is a function call and not
+a keyword. Many other languages employ keywords for this purpose, so having a
+"special syntax" for require would trip up Lua newcomers.
 
 ## OOP
 
-* Create classes like this:
+* Use CamelCase class names and methods.
+* Create native classes like this:
 
 ```lua
---- @module myproject.myclass
-local myclass = {}
+--- @module myproject.MyClass
+
+-- 'M' for Module
+local M = {}
 
 -- class table
 local MyClass = {}
 
-function MyClass:some_method()
+function MyClass:someMethod()
    -- code
 end
 
-function MyClass:another_one()
-   self:some_method()
+function MyClass:anotherOne()
+   self:someMethod()
    -- more code
 end
 
-function myclass.new()
+function M.new()
    local self = {}
-   setmetatable(self, { __index = MyClass })
+   setmetatable (self, { __index = MyClass })
    return self
 end
 
-return myclass
+return M
 ```
 
 * The class table and the class metatable should both be local. If containing
@@ -781,11 +740,13 @@ design rationale for this is found [here](http://hisham.hm/2014/01/02/how-to-wri
 
 * Use the method notation when invoking methods:
 
-```
+```lua
+local instance = MyClass.new()
+
 -- bad 
-my_object.my_method(my_object)
+instance.perform (instance)
 -- good
-my_object:my_method()
+instance:perform()
 ```
 
 > **Rationale:** This makes it explicit that the intent is to use the function as an OOP method.
@@ -805,15 +766,8 @@ on other resources.
 
 ## File structure
 
-* Lua files should be named in all lowercase.
-
-* Lua files should be in a top-level `src` directory. The main library file
-should be called `modulename.lua`.
-
-* Tests should be in a top-level `spec` directory. LuaRocks uses
-[Busted](http://olivinelabs.com/busted/) for testing.
-
-* Executables are in `src/bin` directory.
+* Lua files should be named in all lowercase, except those containing a class
+definition.
 
 ## Static checking
 

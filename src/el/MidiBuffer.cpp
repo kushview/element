@@ -1,9 +1,9 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-/// A MIDI buffer.
-// Designed for real time performance, therefore does virtually no type
-// checking in method calls.
+/// A MIDI buffer designed for real time performance.
+// - **Safety**: For speed, virtually no type checking in method calls.
+// - **Indexing**: Sample positions and channel numbers are 1-indexed.
 // @classmod el.MidiBuffer
 // @pragma nostrip
 
@@ -14,7 +14,7 @@
 
 #include <element/juce.hpp>
 
-#define EL_MT_MIDI_BUFFER_TYPE "kv.MidiBufferClass"
+#define EL_MT_MIDI_BUFFER_TYPE "el.MidiBufferClass"
 
 using MidiBuffer = juce::MidiBuffer;
 using Iterator = juce::MidiBufferIterator;
@@ -96,7 +96,7 @@ static int midibuffer_events_closure (lua_State* L)
 static int midibuffer_events (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
-    impl->reset_iter();
+    impl->resetIterator();
     lua_pushlightuserdata (L, impl);
     lua_pushcclosure (L, midibuffer_events_closure, 1);
     return 1;
@@ -124,28 +124,28 @@ static int midibuffer_messages_closure (lua_State* L)
 static int midibuffer_messages (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
-    impl->reset_iter();
+    impl->resetIterator();
     lua_pushlightuserdata (L, impl);
     lua_pushcclosure (L, midibuffer_messages_closure, 1);
     return 1;
 }
 
 //==============================================================================
-static int midibuffer_addmessage (lua_State* L)
+static int midibuffer_insertMessage (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
     impl->buffer.addEvent (
         **(MidiMessage**) lua_touserdata (L, 2),
-        static_cast<int> (lua_tointeger (L, 3) + 1));
+        static_cast<int> (lua_tointeger (L, 3)) - 1);
     return 0;
 }
 
-static int midibuffer_addevent (lua_State* L)
+static int midibuffer_insertEvent (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
     impl->buffer.addEvent ((juce::uint8*) lua_touserdata (L, 2),
                            static_cast<int> (lua_tointeger (L, 3)),
-                           static_cast<int> (lua_tointeger (L, 4) - 1));
+                           static_cast<int> (lua_tointeger (L, 4)) - 1);
     return 0;
 }
 
@@ -171,7 +171,7 @@ static int midibuffer_clear (lua_State* L)
         }
 
         case 3: {
-            (*impl).buffer.clear (static_cast<int> (lua_tointeger (L, 2) - 1),
+            (*impl).buffer.clear (static_cast<int> (lua_tointeger (L, 2)) - 1,
                                   static_cast<int> (lua_tointeger (L, 3)));
             break;
         }
@@ -180,14 +180,12 @@ static int midibuffer_clear (lua_State* L)
     return 0;
 }
 
-#if 0
-static int midibuffer_clear_range (lua_State* L) {
+static int midibuffer_empty (lua_State* L)
+{
     auto* impl = *(Impl**) lua_touserdata (L, 1);
-    (*impl).buffer.clear (static_cast<int> (lua_tointeger (L, 2)),
-                          static_cast<int> (lua_tointeger (L, 3)));
-    return 0;
+    lua_pushboolean (L, static_cast<int> (impl->buffer.isEmpty()));
+    return 1;
 }
-#endif
 
 static int midibuffer_size (lua_State* L)
 {
@@ -196,14 +194,14 @@ static int midibuffer_size (lua_State* L)
     return 1;
 }
 
-static int midibuffer_addbuffer (lua_State* L)
+static int midibuffer_addBuffer (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
     if (lua_gettop (L) >= 5)
     {
         impl->buffer.addEvents (
             **(MidiBuffer**) lua_touserdata (L, 2),
-            static_cast<int> (lua_tointeger (L, 3) - 1),
+            static_cast<int> (lua_tointeger (L, 3)) - 1,
             static_cast<int> (lua_tointeger (L, 4)),
             static_cast<int> (lua_tointeger (L, 5)));
     }
@@ -214,23 +212,49 @@ static int midibuffer_addbuffer (lua_State* L)
     return 0;
 }
 
-static int midibuffer_insertbytes (lua_State* L)
+static int midibuffer_insertBytes (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
     auto* b = (EL_Bytes*) lua_touserdata (L, 2);
     auto n = static_cast<int> (lua_tointeger (L, 3));
-    auto f = static_cast<int> (lua_tointeger (L, 4)) - 1;
-    impl->buffer.addEvent (b->data, n, f);
+    auto f = static_cast<int> (lua_tointeger (L, 4));
+    impl->buffer.addEvent (b->data, n, f - 1);
     return 0;
 }
 
 static int midibuffer_insert (lua_State* L)
 {
     auto* impl = *(Impl**) lua_touserdata (L, 1);
+    lua_isinteger (L, 0);
+    switch (lua_type (L, 2))
+    {
+        case LUA_TNUMBER: {
+            kv_packed_t pack;
+            pack.packed = lua_tointeger (L, 2);
+            impl->buffer.addEvent (
+                (uint8_t*) pack.data, 4, static_cast<int> (lua_tointeger (L, 3)) - 1);
+            break;
+        }
+
+        case LUA_TUSERDATA: {
+            impl->buffer.addEvent (**(MidiMessage**) lua_touserdata (L, 2),
+                                   static_cast<int> (lua_tointeger (L, 3)) - 1);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+static int midibuffer_insertPacked (lua_State* L)
+{
+    auto* impl = *(Impl**) lua_touserdata (L, 1);
     kv_packed_t pack;
     pack.packed = lua_tointeger (L, 2);
 
-    impl->buffer.addEvent ((uint8_t*) pack.data, 4, static_cast<int> (lua_tointeger (L, 3) - 1));
+    impl->buffer.addEvent ((uint8_t*) pack.data,
+                           4,
+                           static_cast<int> (lua_tointeger (L, 3)) - 1);
     return 0;
 }
 
@@ -253,14 +277,20 @@ static const luaL_Reg buffer_methods[] = {
     // @int last
     { "clear", midibuffer_clear },
 
-    // { "clear_range",        midibuffer_clear_range },
+    /// Returns true if the buffer is empty.
+    // @function MidiBuffer:empty
+    // @return True if no events present
+    { "empty", midibuffer_empty },
 
-    /// Number of events in the buffer.
+    /// Counts the number of events in the buffer.
+    // This is actually quite a slow operation, as it has to iterate through all
+    // the events, so you might prefer to call MidiBuffer:empty if that's all you need
+    // to know.
     // @function MidiBuffer:size
     { "size", midibuffer_size },
 
     /// Reserve an amount of space.
-    // @param size Size in bytes to reserve
+    // @int size Size in bytes to reserve
     // @function MidiBuffer:reserve
     // @return Size reserved in bytes or false
     { "reserve", midibuffer_reserve },
@@ -272,63 +302,72 @@ static const luaL_Reg buffer_methods[] = {
     // @tparam el.MidiBuffer other Buffer to swap with
     { "swap", midibuffer_swap },
 
-    /// Insert some MIDI in the buffer.
+    /// Insert MIDI.
+    // Inserts MIDI from a packed integer or a @{el.MidiMessage}. If performance
+    // seems to be an issue, then use a specialized insert method.
+    // @see insertPacked, insertMessage
     // @function MidiBuffer:insert
-    // @int data Packed integer data
-    // @int frame Sample index to insert at
+    // @param data an el.MidiMessage or a packed integer.
+    // @int frame Sample position to insert at
     { "insert", midibuffer_insert },
 
-    /// Insert some bytes into the buffer.
+    /// Insert packed MIDI in the buffer.
+    // @function MidiBuffer:insertPacked
+    // @int data Packed integer data
+    // @int frame Sample position to insert at
+    { "insertPacked", midibuffer_insertPacked },
+
+    // Insert some bytes into the buffer.
     // The el.ByteArray passed in should contain a complete MIDI message
     // of any type.
-    // @function MidiBuffer:addBytes
+    // @function MidiBuffer:insertBytes
     // @tparam el.ByteArray bytes The bytes to add
     // @int size Max number of bytes to add
-    // @int frame Sample index to insert at
-    { "addBytes", midibuffer_insertbytes },
+    // @int frame Sample position to insert at
+    { "insertBytes", midibuffer_insertBytes },
 
-    /// Iterate over MIDI data.
+    // Iterate over MIDI data.
     // Iterate over midi data in this buffer
     // @function MidiBuffer:events
     // @return Event data iterator
     // @usage
-    // -- @data    Raw byte array
-    // -- @size    Size in bytes
-    // -- @frame   Audio frame index in buffer
+    // -- @data    Raw data.
+    // -- @size    Size in bytes.
+    // -- @frame   Sample position in buffer
     // for data, size, frame in buffer:events() do
     //     -- do something with midi data
     // end
     { "events", midibuffer_events },
 
-    /// Add a raw MIDI Event.
-    // @function MidiBuffer:addEvent
+    // Add a raw MIDI Event.
+    // @function MidiBuffer:insertEvent
     // @param data Raw event data to add
     // @int size Size of data in bytes
-    // @int frame Insert index
-    { "addEvent", midibuffer_addevent },
+    // @int frame Sample position to insert at
+    { "insertEvent", midibuffer_insertEvent },
 
     /// Iterate over MIDI Messages.
-    // Iterate over messages (el.MidiMessage) in the buffer
+    // Iterate over messages @{el.MidiMessage} in the buffer
     // @function MidiBuffer:messages
     // @return message iterator
     // @usage
     // -- @msg     A el.MidiMessage
-    // -- @frame   Audio frame index in buffer
+    // -- @frame   Sample position in buffer
     // for msg, frame in buffer:messages() do
     //     -- do something with midi data
     // end
     { "messages", midibuffer_messages },
 
     /// Add a message to the buffer.
-    // @function MidiBuffer:addMessage
+    // @function MidiBuffer:insertMessage
     // @tparam el.MidiMessage msg Message to add
-    // @int frame Insert index
-    { "addMessage", midibuffer_addmessage },
+    // @int frame Sample position to insert at
+    { "insertMessage", midibuffer_insertMessage },
 
     /// Add messages from another buffer.
     // @function MidiBuffer:addBuffer
     // @tparam el.MidiBuffer buf Buffer to copy from
-    { "addBuffer", midibuffer_addbuffer },
+    { "addBuffer", midibuffer_addBuffer },
 
     { NULL, NULL }
 };

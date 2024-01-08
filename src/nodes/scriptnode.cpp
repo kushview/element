@@ -10,6 +10,7 @@
 
 #include "amp.lua.h"
 #include "ampui.lua.h"
+#include "channelize.lua.h"
 
 #include "sol/sol.hpp"
 #include "element/element.h"
@@ -67,6 +68,13 @@ void ScriptNode::refreshPorts()
         g->triggerAsyncUpdate();
 }
 
+void ScriptNode::setPlayHead (juce::AudioPlayHead* playhead)
+{
+    Processor::setPlayHead (playhead);
+    if (script)
+        script->setPlayHead (playhead);
+}
+
 ParameterPtr ScriptNode::getParameter (const PortDescription& port)
 {
     jassert (port.type == PortType::Control);
@@ -92,6 +100,7 @@ Result ScriptNode::loadScript (const String& newCode)
 
     if (true)
     {
+        newScript->setPlayHead (getPlayHead());
         if (prepared)
             newScript->prepare (sampleRate, blockSize);
         triggerPortReset();
@@ -197,6 +206,52 @@ void ScriptNode::getState (MemoryBlock& out)
 void ScriptNode::setParameter (int index, float value)
 {
     ScopedLock sl (lock);
+}
+
+//==============================================================================
+const String ScriptNode::getProgramName (int index) const
+{
+    if (! juce::isPositiveAndBelow (index, getNumPrograms()))
+        return {};
+
+    switch (index)
+    {
+        case 0:
+            return "Amp";
+            break;
+        case 1:
+            return "Channelizer";
+            break;
+    }
+
+    String name = TRANS ("Program");
+    name << " " << int (index + 1);
+    return name;
+}
+
+void ScriptNode::setCurrentProgram (int index)
+{
+    if (! juce::isPositiveAndBelow (index, getNumPrograms()))
+        return;
+    _program = index;
+
+    String newDspCode, newUiCode;
+
+    switch (index)
+    {
+        case 0:
+            newDspCode = String::fromUTF8 (scripts::amp_lua, scripts::amp_luaSize);
+            newUiCode = String::fromUTF8 (scripts::ampui_lua, scripts::ampui_luaSize);
+            break;
+        case 1:
+            newDspCode = String::fromUTF8 (scripts::channelize_lua, scripts::channelize_luaSize);
+            newUiCode.clear();
+            break;
+    }
+
+    dspCode.replaceAllContent (newDspCode);
+    loadScript (dspCode.getAllContent());
+    edCode.replaceAllContent (newUiCode);
 }
 
 } // namespace element
