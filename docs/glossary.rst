@@ -507,3 +507,9 @@ Glossary of Terms
      :term:`operating systems <operating system>` without special drivers (on
      Windows, special drivers might still be necessary to use the :term:`ASIO`
      sound :term:`API` though).
+
+   garbage collector
+     The garbage collector periodically scans the memory to identify objects that 
+     are no longer reachable from the program (i.e., there are no references left 
+     to these objects). Such objects are considered "garbage" and their memory is 
+     reclaimed.

@@ -192,23 +192,30 @@ This is a UI for a DSP script.
 
     Must always equal ``DSPUI``
 
-.. lua:function:: instantiate (ctx)
+.. lua:function:: instantiate (context)
 
     Implement this and return an `el.Widget`_ to be used as the editor for the DSP 
     script. The editor UI will be displayed in the Plugin Window of the Script Node.
 
-    Note: DSPUI scripts must be able to create multiple instances of it's widgets. Do
-    not create singleton widgets and return them in this method.
+    `Note`: DSPUI scripts should always return a new instance of `el.Widget`.
 
-    :param ctx: The owner context of this
-    :type ctx: table
+    :param context: The owner context of this UI
+    :type context: table
 
     :return: The widget to use as the editor.
     :rtype: `el.Widget`_
 
+.. lua:function:: destroy (widget)
+
+    Called by Element when the editor is will be deleted. This is handy to use, 
+    for example, when resources need freed but can't or don't want to wait for 
+    Lua's :term:`garbage collector`. All references to the widget should be dropped
+    if possible.
+
 Context
 *******
-The ``ctx`` parameter in ``instantiate(...)`` is a table containing these properties:
+The ``context`` parameter in ``instantiate(...)`` is a table containing these 
+properties:
 
 ============    ============================================================
 **params**      (table) List of control input objects. e.g Parameters. Indexes 
