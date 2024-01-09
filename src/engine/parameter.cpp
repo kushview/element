@@ -143,7 +143,7 @@ void RangedParameter::setPort (const PortDescription& newPort, bool preserveValu
     }
 }
 
-RangedParameter& RangedParameter::operator= (float newValue)
+RangedParameter& RangedParameter::operator= (float newValue) noexcept
 {
     if (value != newValue)
         setValueNotifyingHost (convertTo0to1 (newValue));

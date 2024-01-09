@@ -334,11 +334,11 @@ public:
     float get() const { return value; }
     operator float() const { return value; }
 
-    /** Sets the value.
+    /** Sets the value sending notification only if the value is differnt.
         @param newValue Human understandable value.
-    */
-    void set (float newValue) { operator= (newValue); }
-    RangedParameter& operator= (float newValue);
+     */
+    void set (float newValue) noexcept { operator= (newValue); }
+    RangedParameter& operator= (float newValue) noexcept;
 
     /** Returns the index of this port. */
     int getPortIndex() const noexcept override { return port.index; }
