@@ -158,6 +158,7 @@ private:
         if (extButton.isVisible() && extButton.getToggleState())
         {
             tempoLabel.setEnabled (false);
+            tapTempoButton.setEnabled (false);
             // MIDI clock doesn't change the meter, only disable user
             // interaction in the plugin.
             if (auto* cc = ViewHelpers::findContentComponent (this))
@@ -168,6 +169,7 @@ private:
         {
             tempoLabel.setEnabled (true);
             meter->setEnabled (true);
+            tapTempoButton.setEnabled (true);
         }
     }
 

@@ -93,8 +93,10 @@ public:
     void setSession (SessionPtr s)
     {
         session = s;
-        auto& settings (ViewHelpers::getGlobals (this)->settings());
-        auto engine (ViewHelpers::getGlobals (this)->audio());
+        
+        auto& context = *ViewHelpers::getGlobals (this);
+        auto& settings (context.settings());
+        auto engine (context.audio());
 
         if (midiIOMonitor == nullptr)
         {
@@ -106,10 +108,9 @@ public:
         }
 
         auto* props = settings.getUserSettings();
-
-        bool showExt = false;
-        showExt = props->getValue ("clockSource") == "midiClock";
-
+        const bool showExt = context.services().getRunMode() == RunMode::Plugin ||
+            props->getValue ("clockSource") == "midiClock";
+        
         if (session)
         {
             tempoBar.setUseExtButton (showExt);
