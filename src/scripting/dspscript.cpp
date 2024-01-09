@@ -273,7 +273,7 @@ public:
 
     void controlValueChanged (int index, float value) override
     {
-        if (ctx != nullptr)
+        if (!_block && ctx != nullptr)
         { // index may not be set so use port channel.
             ctx->setParameter (getPortChannel(), convertFrom0to1 (value), info.input);
         }
@@ -281,16 +281,18 @@ public:
 
     void controlTouched (int parameterIndex, bool gestureIsStarting) override {}
 
+    // update the value notifiying listeners, but not this parameter.
     void update (float value)
     {
-        removeListener (this);
+        _block = true;
         set (value);
-        addListener (this);
+        _block = false;
     }
 
 private:
     PortDescription info;
     DSPScript* ctx { nullptr };
+    bool _block = false;
 };
 
 //==============================================================================
@@ -543,6 +545,9 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
                                 loaded = false;
                             }
                             (*midi)->swapWith (m);
+
+                            for (int ci = outParams.size(); --ci >= 0;)
+                                outParams.getUnchecked(ci)->update (controlData [ci]);
                         }
                     }
                 }
@@ -753,8 +758,8 @@ void DSPScript::addAudioMidiPorts()
         numAudioIn = audio[1].get_or (0);
         numAudioOut = audio[2].get_or (0);
         sol::table midi = layout["midi"].get_or_create<sol::table>();
-        numMidiIn = midi[1].get_or (0);
-        numMidiOut = midi[2].get_or (0);
+        numMidiIn = juce::jlimit (0, 64, (int) midi[1].get_or (0));
+        numMidiOut = juce::jlimit (0, 64, (int) midi[2].get_or (0));
 
         int index = ports.size();
         int channel = 0;

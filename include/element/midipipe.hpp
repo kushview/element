@@ -33,7 +33,7 @@ public:
 
 private:
     enum {
-        maxReferencedBuffers = 32
+        maxReferencedBuffers = 64
     };
     int size = 0;
     juce::MidiBuffer* referencedBuffers[maxReferencedBuffers];
