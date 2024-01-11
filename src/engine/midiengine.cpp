@@ -350,18 +350,17 @@ void MidiEngine::setDefaultMidiOutput (const MidiDeviceInfo& device)
             newMidiOut = MidiOutput::openDevice (device.identifier);
 
         if (newMidiOut)
-        {
             newMidiOut->startBackgroundThread();
-            {
-                ScopedLock sl (midiOutputLock);
-                defaultMidiOutput.swap (newMidiOut);
-            }
 
-            if (newMidiOut) // is now the old output
-            {
-                newMidiOut->stopBackgroundThread();
-                newMidiOut.reset();
-            }
+        {
+            ScopedLock sl (midiOutputLock);
+            defaultMidiOutput.swap (newMidiOut);
+        }
+
+        if (newMidiOut) // is now the old output
+        {
+            newMidiOut->stopBackgroundThread();
+            newMidiOut.reset();
         }
 
         defaultMidiOutputName = device.name;

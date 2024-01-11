@@ -812,9 +812,9 @@ public:
 
     void comboBoxChanged (ComboBox* box) override
     {
-        const auto name = outputs[midiOutput.getSelectedId() - 10];
+        const auto dev = outputs[midiOutput.getSelectedId() - 10];
         if (box == &midiOutput)
-            midi.setDefaultMidiOutput (name);
+            midi.setDefaultMidiOutput (dev);
     }
 
     void changeListenerCallback (ChangeBroadcaster*) override
