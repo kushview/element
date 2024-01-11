@@ -273,7 +273,7 @@ public:
 
     void controlValueChanged (int index, float value) override
     {
-        if (!_block && ctx != nullptr)
+        if (! _block && ctx != nullptr)
         { // index may not be set so use port channel.
             ctx->setParameter (getPortChannel(), convertFrom0to1 (value), info.input);
         }
@@ -547,7 +547,7 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
                             (*midi)->swapWith (m);
 
                             for (int ci = outParams.size(); --ci >= 0;)
-                                outParams.getUnchecked(ci)->update (controlData [ci]);
+                                outParams.getUnchecked (ci)->update (controlData[ci]);
                         }
                     }
                 }

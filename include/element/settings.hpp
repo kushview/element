@@ -46,6 +46,7 @@ public:
     static const char* updateChannelKey;
     static const char* updateKeyTypeKey;
     static const char* updateKeyKey;
+    static const char* updateKeyUserKey;
 
     std::unique_ptr<juce::XmlElement> getLastGraph() const;
     void setLastGraph (const juce::ValueTree& data);
@@ -126,6 +127,12 @@ public:
         membership.
      */
     void setUpdateKeyType (const String& slug);
+
+    /** Returns the update key user. */
+    juce::String getUpdateKeyUser() const;
+
+    /** Set the update key user. */
+    void setUpdateKeyUser (const String& user);
 
     /** Returns the update Key to use when checking. */
     juce::String getUpdateKey() const;

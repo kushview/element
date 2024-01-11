@@ -165,7 +165,7 @@ public:
         juce::URL url (repoToCheck.host);
         String urlStr = url.toString (true);
 
-        if (! repoToCheck.username.empty() && ! repoToCheck.password.empty())
+        if (updatesFilename != "latest.xml" && ! repoToCheck.username.empty() && ! repoToCheck.password.empty())
         {
             String creds = repoToCheck.username;
             creds << ":" << repoToCheck.password << "@";

@@ -1029,8 +1029,15 @@ public:
             _ui.settings().setUpdateKeyType (slug);
             _ui.settings().saveIfNeeded();
             saveRepos();
+            updateInputs();
         };
         addAndMakeVisible (updateKeyType);
+
+        userLabel.setText ("Username or Email", juce::dontSendNotification);
+        addAndMakeVisible (userLabel);
+        userText.setText (_ui.context().settings().getUpdateKeyUser());
+        userText.onTextChange = [this]() { _ui.context().settings().setUpdateKeyUser (userText.getText()); };
+        addAndMakeVisible (userText);
 
         updateKeyLabel.setText ("Update key", dontSendNotification);
         addAndMakeVisible (updateKeyLabel);
@@ -1116,6 +1123,7 @@ public:
         addButton.setVisible (_table.isEnabled());
 
         setSize (30 + 360 + 220 + 220, 500);
+        updateInputs();
     }
 
     ~UpdatesSettingsPage()
@@ -1124,12 +1132,22 @@ public:
         _table.setModel (nullptr);
     }
 
+    // update states with current data.
+    void updateInputs()
+    {
+        userText.setVisible (updateKeyTypeSlug() != "patreon");
+        userLabel.setVisible (userText.isVisible());
+        resized();
+    }
+
     void resized() override
     {
         auto r = getLocalBounds();
 
         layoutSetting (r, updateChannelLabel, updateChannel, r.getWidth() / 3, 160);
         layoutSetting (r, updateKeyTypeLabel, updateKeyType, r.getWidth() / 3, 160);
+        if (userText.isVisible())
+            layoutSetting (r, userLabel, userText, r.getWidth() / 3, 160);
         layoutSetting (r, updateKeyLabel, updateKey, r.getWidth() * 0.66f, 160);
 
         r.removeFromTop (8);
@@ -1275,6 +1293,9 @@ private:
     juce::Label updateKeyLabel;
     UpdateKey updateKey;
 
+    juce::Label userLabel;
+    juce::TextEditor userText;
+
     juce::Label mirrorsHeading { "Custom Repositories", "Custom Repositories" };
     juce::TableListBox _table;
     juce::TextButton addButton { "Add" },
@@ -1405,6 +1426,7 @@ private:
     std::vector<Repo> makeReposForUpdateKey()
     {
         std::vector<Repo> out;
+        const auto user = userText.getText().trim().toStdString();
         const auto tp = updateKeyTypeSlug();
         const auto key = updateKey.text.getText().trim();
         if (key.isEmpty())
@@ -1416,9 +1438,12 @@ private:
             Repo r;
             r.enabled = true;
 
+            r.username = user;
             if (tp == "patreon" || tp == "element-v1" || tp == "membership")
-                r.username = tp.toStdString();
-            r.password = key.toStdString();
+                r.password = tp.toStdString();
+            if (! r.password.empty())
+                r.password += ":";
+            r.password += key.toStdString();
             r.host = makeRepoUrl (pkg);
             out.push_back (r);
         }
@@ -1452,8 +1477,6 @@ private:
 
             for (const auto& repo : makeReposForUpdateKey())
                 addRepoToXml (repo, *repos);
-            // for (const auto& repo : _repos)
-            //     addRepoToXml (repo, *repos);
         }
 
         XmlElement::TextFormat format;

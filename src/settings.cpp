@@ -38,6 +38,7 @@ const char* Settings::clockSourceKey = "clockSource";
 const char* Settings::updateChannelKey = "updateChannel";
 const char* Settings::updateKeyTypeKey = "updateKeyType";
 const char* Settings::updateKeyKey = "updateKey";
+const char* Settings::updateKeyUserKey = "updateKeyUserKey";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -426,6 +427,19 @@ void Settings::setUpdateKeyType (const String& slug)
 
     if (auto p = getProps())
         p->setValue (updateKeyTypeKey, slug);
+}
+
+juce::String Settings::getUpdateKeyUser() const
+{
+    if (auto* p = getProps())
+        return p->getValue (updateKeyUserKey, "");
+    return "";
+}
+
+void Settings::setUpdateKeyUser (const String& user)
+{
+    if (auto p = getProps())
+        p->setValue (updateKeyUserKey, user.trim());
 }
 
 juce::String Settings::getUpdateKey() const
