@@ -420,43 +420,22 @@ public:
             }
         }
 
-        const bool wasPlaying = transport.isPlaying();
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
-        processCurrentGraph (buffer, incomingMidi);
+        tempMidi.clear();
+        processCurrentGraph (buffer, tempMidi);
 
         {
             ScopedLock lockMidiOut (engine.world.midi().getMidiOutputLock());
             if (auto* const midiOut = engine.world.midi().getDefaultMidiOutput())
             {
-                if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
-                {
-                    if (wasPlaying != transport.isPlaying())
-                    {
-                        if (transport.isPlaying())
-                        {
-                            incomingMidi.addEvent (transport.getPositionFrames() <= 0
-                                                       ? MidiMessage::midiStart()
-                                                       : MidiMessage::midiContinue(),
-                                                   0);
-                        }
-                        else
-                        {
-                            incomingMidi.addEvent (MidiMessage::midiStop(), 0);
-                        }
-                    }
-
-                    midiClockMaster.setTempo (transport.getTempo());
-                    midiClockMaster.render (incomingMidi, numSamples);
-                }
-
                 const double delayMs = midiOutLatency.get();
-                if (! incomingMidi.isEmpty())
+                if (! tempMidi.isEmpty())
                 {
                     midiIOMonitor->sent();
 #if JUCE_WINDOWS
-                    midiOut->sendBlockOfMessagesNow (incomingMidi);
+                    midiOut->sendBlockOfMessagesNow (tempMidi);
 #else
-                    midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
+                    midiOut->sendBlockOfMessages (tempMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
 #endif
                 }
             }
@@ -464,7 +443,6 @@ public:
 
         for (int c = 0; c < numOutputChannels; ++c)
             outMeters.getObjectPointerUnchecked (c)->updateLevel (outputChannelData, c, numSamples);
-        incomingMidi.clear();
     }
 
     void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
@@ -474,47 +452,65 @@ public:
         // element::traceMidi (midi);
 
         const ScopedLock sl (lock);
-        const bool shouldProcess = shouldBeLocked.get() == 0;
         const bool wasPlaying = transport.isPlaying();
         transport.preProcess (numSamples);
 
-        if (shouldProcess)
+        const bool generateClock = generateMidiClock.get() == 1;
+        const bool clockToInput = sendMidiClockToInput.get() == 1;
+
+        // MIDI Clock to input
+        if (generateClock && clockToInput)
         {
-            if (generateMidiClock.get() == 1 && sendMidiClockToInput.get() == 1)
+            if (wasPlaying != transport.isPlaying())
             {
-                if (wasPlaying != transport.isPlaying())
+                if (transport.isPlaying())
                 {
-                    if (transport.isPlaying())
-                    {
-                        midi.addEvent (transport.getPositionFrames() <= 0
-                                           ? MidiMessage::midiStart()
-                                           : MidiMessage::midiContinue(),
-                                       0);
-                    }
-                    else
-                    {
-                        midi.addEvent (MidiMessage::midiStop(), 0);
-                    }
+                    midi.addEvent (transport.getPositionFrames() <= 0
+                                       ? MidiMessage::midiStart()
+                                       : MidiMessage::midiContinue(),
+                                   0);
                 }
-                midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));
-                midiClockMaster.render (midi, numSamples);
+                else
+                {
+                    midi.addEvent (MidiMessage::midiStop(), 0);
+                }
             }
 
-            const auto nextGraph = currentGraph.get();
-            if (nextGraph != graphs.getCurrentGraphIndex())
-            {
-                graphs.setCurrentGraph (nextGraph);
-            }
-            graphs.renderGraphs (buffer, midi); // user requested index can be cancelled by program changed
-            if (nextGraph != graphs.getCurrentGraphIndex())
-            {
-                currentGraph.set (graphs.getCurrentGraphIndex());
-            }
+            midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));
+            midiClockMaster.render (midi, numSamples);
         }
-        else
+
+        const auto nextGraph = currentGraph.get();
+        if (nextGraph != graphs.getCurrentGraphIndex())
         {
-            for (int i = 0; i < buffer.getNumChannels(); ++i)
-                zeromem (buffer.getWritePointer (i), sizeof (float) * (size_t) numSamples);
+            graphs.setCurrentGraph (nextGraph);
+        }
+        graphs.renderGraphs (buffer, midi); // user requested index can be cancelled by program changed
+        if (nextGraph != graphs.getCurrentGraphIndex())
+        {
+            currentGraph.set (graphs.getCurrentGraphIndex());
+        }
+
+        // MIDI Clock out.
+        if (generateClock && ! clockToInput)
+        {
+            if (wasPlaying != transport.isPlaying())
+            {
+                if (transport.isPlaying())
+                {
+                    midi.addEvent (transport.getPositionFrames() <= 0
+                                       ? MidiMessage::midiStart()
+                                       : MidiMessage::midiContinue(),
+                                   0);
+                }
+                else
+                {
+                    midi.addEvent (MidiMessage::midiStop(), 0);
+                }
+            }
+
+            midiClockMaster.setTempo (transport.getTempo());
+            midiClockMaster.render (midi, numSamples);
         }
 
         if (transport.isPlaying())
@@ -724,7 +720,7 @@ private:
     int numInputChans, numOutputChans;
     HeapBlock<float*> channels;
     AudioSampleBuffer tempBuffer;
-    MidiBuffer incomingMidi;
+    MidiBuffer tempMidi;
     MidiMessageCollector messageCollector;
     MidiKeyboardState keyboardState;
 
@@ -741,9 +737,6 @@ private:
     MidiClockMaster midiClockMaster;
 
     int latencySamples = 0;
-
-    // GraphRender::locked must match this default value
-    Atomic<int> shouldBeLocked { 0 };
 
     MidiIOMonitorPtr midiIOMonitor;
 
@@ -831,8 +824,12 @@ void AudioEngine::applySettings (Settings& settings)
     if (useMidiClock)
         priv->resetMidiClock();
     priv->processMidiClock.set (useMidiClock ? 1 : 0);
-    priv->generateMidiClock.set (settings.generateMidiClock() ? 1 : 0);
-    priv->sendMidiClockToInput.set (settings.sendMidiClockToInput() ? 1 : 0);
+    // clang-format off
+    priv->generateMidiClock.set (runMode == RunMode::Plugin ? 0
+        : settings.generateMidiClock() ? 1 : 0);
+    priv->sendMidiClockToInput.set (runMode == RunMode::Plugin ? 0 
+        : settings.sendMidiClockToInput() ? 1 : 0);
+    // clang-format on                                                                                                    
     priv->midiOutLatency.set (settings.getMidiOutLatency());
 }
 
