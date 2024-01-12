@@ -419,7 +419,7 @@ juce::String Settings::getUpdateKeyType() const
 
 void Settings::setUpdateKeyType (const String& slug)
 {
-    if (slug != "patreon" && slug != "element-v1" && slug != "membership")
+    if (slug != "patreon" && slug != "element-v1" && slug != "member")
     {
         jassertfalse;
         return;

@@ -226,16 +226,16 @@ AboutScreen::AboutScreen()
 
     auto* authors = new AboutCreditsComponent();
     authors->getPanel().addSection ("Lead Developer", { "Michael Fisher (mfisher31)" });
-    authors->getPanel().addSection ("Developers", detail::developers());
+    authors->getPanel().addSection ("Contributers", detail::developers());
     tabs.addTab ("Authors", tabc, authors, true);
 
-    auto* donors = new AboutCreditsComponent();
+    // auto* donors = new AboutCreditsComponent();
     // donors->getPanel().addSection ("Gold Sponsors", { "None" });
     // donors->getPanel().addSection ("Silver Sponsors", { "None" });
     // donors->getPanel().addSection ("Gold Backers", { "None" });
-    donors->getPanel().addSection ("Sponsors", { "Davide Anselmi", "Greg Gibbs", "Kent Kingery", "Michael Kıral" });
+    // donors->getPanel().addSection ("Sponsors", { "Davide Anselmi", "Greg Gibbs", "Kent Kingery", "Michael Kıral" });
 
-    tabs.addTab ("Donors", tabc, donors, true);
+    // tabs.addTab ("Donors", tabc, donors, true);
     tabs.addTab ("License", tabc, new LicenseTextComponent(), true);
     tabs.addTab ("Credits", tabc, new AckTextComponent(), true);
 

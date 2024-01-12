@@ -999,6 +999,13 @@ class UpdatesSettingsPage : public SettingsPage,
                             private AsyncUpdater
 {
 public:
+    enum UpdateKeyTypeID
+    {
+        PatreonTypeID = 1,
+        Element_v1TypeID = 2,
+        MemberTypeID = 3
+    };
+
     UpdatesSettingsPage (GuiService& ui)
         : _ui (ui)
     {
@@ -1019,8 +1026,9 @@ public:
 
         updateKeyTypeLabel.setText ("Update key type", dontSendNotification);
         addAndMakeVisible (updateKeyTypeLabel);
-        updateKeyType.addItem ("Element v1", 2);
-        updateKeyType.addItem ("Patreon", 1);
+        updateKeyType.addItem ("Element v1", Element_v1TypeID);
+        updateKeyType.addItem ("Member", MemberTypeID);
+        updateKeyType.addItem ("Patreon", PatreonTypeID);
 
         // updateKeyType.addItem ("Membership", 3);
         updateKeyType.setSelectedId (savedUpdateKeyTypeId(), dontSendNotification);
@@ -1439,7 +1447,7 @@ private:
             r.enabled = true;
 
             r.username = user;
-            if (tp == "patreon" || tp == "element-v1" || tp == "membership")
+            if (tp == "patreon" || tp == "element-v1" || tp == "member")
                 r.password = tp.toStdString();
             if (! r.password.empty())
                 r.password += ":";
@@ -1562,14 +1570,14 @@ private:
 
         switch (comboId)
         {
-            case 1:
+            case PatreonTypeID:
                 return "Patreon";
                 break;
-            case 2:
+            case Element_v1TypeID:
                 return "Element (v1)";
                 break;
-            case 3:
-                return "Membership";
+            case MemberTypeID:
+                return "Member";
                 break;
         }
 
@@ -1582,14 +1590,14 @@ private:
             comboId = updateKeyType.getSelectedId();
         switch (comboId)
         {
-            case 1:
+            case PatreonTypeID:
                 return "patreon";
                 break;
-            case 2:
+            case Element_v1TypeID:
                 return "element-v1";
                 break;
-            case 3:
-                return "membership";
+            case MemberTypeID:
+                return "member";
                 break;
         }
 
@@ -1599,11 +1607,11 @@ private:
     int updateKeyTypeId (const String& slug)
     {
         if (slug == "patreon")
-            return 1;
+            return PatreonTypeID;
         if (slug == "element-v1")
-            return 2;
-        if (slug == "membership")
-            return 3;
+            return Element_v1TypeID;
+        if (slug == "membership" || slug == "member")
+            return MemberTypeID;
 
         return 0;
     }

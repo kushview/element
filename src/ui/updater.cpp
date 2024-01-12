@@ -408,23 +408,12 @@ void Updater::launch()
         return;
     }
 
-#if JUCE_LINUX
+#if JUCE_MAC || JUCE_LINUX
     juce::File exeFile = File (updates->exeFile);
     exeFile.startAsProcess ("--su");
-#else
-    StringArray cmd;
-#if JUCE_WINDOWS
-    cmd.add (String (updates->exeFile).quoted());
-#elif JUCE_MAC
-    cmd.add (String (updates->exeFile).quoted());
-#endif
-
-    cmd.add ("--su");
-#if JUCE_MAC || JUCE_LINUX
-    cmd.add ("&");
-#endif
-    auto _ = std::system (cmd.joinIntoString (" ").toRawUTF8());
-    (void) _; // some systems define with 'warn_unused_result'
+#elif JUCE_WINDOWS
+    juce::File exeFile = File (updates->exeFile);
+    exeFile.startAsProcess ("--su");
 #endif
 }
 
