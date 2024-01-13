@@ -5,7 +5,6 @@ file = {
     '../src/el',
     '../src/engine/midipipe.cpp',
     exclude = {
-        '../docs/examples',
         '../src/el/midi_buffer.hpp',
         '../src/el/sol_helpers.hpp',
         '../src/el/vector.c',
