@@ -767,13 +767,12 @@ public:
 
     void showPopupMenu() override
     {
-        bool hasView = Graph (getNode()).hasViewScript();
-
         PopupMenu menu;
         menu.addItem (5, "Add graph...");
         PopupMenu scripts;
 #if 0
         // TODO enable script types at the graph level.
+        bool hasView = Graph (getNode()).hasViewScript();
         scripts.addItem (6, "Anonymous");
         scripts.addItem (7, "View", ! hasView, hasView);
 

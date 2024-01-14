@@ -49,6 +49,12 @@ element_binaries = []
 fs = import ('fs')
 cpp = meson.get_compiler ('cpp')
 
+# GCC
+if cpp.get_id() == 'gcc'
+    add_project_arguments('-Wno-attributes', language: ['cpp'])
+endif
+
+# No delete
 nodelete_cpp_link_args = cpp.get_supported_link_arguments(['-Wl,-z,nodelete'])
 
 # Add objective-c if on mac

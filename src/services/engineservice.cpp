@@ -856,6 +856,7 @@ Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc,
         {
             if (auto lv2 = context().plugins().getProvider ("LV2"))
             {
+                juce::ignoreUnused (lv2);
                 list.removeFromBlacklist (desc.fileOrIdentifier);
                 list.addType (desc);
             }
