@@ -1,5 +1,4 @@
-
-Lua v5.3.5
+Lua v5.4.1
 ----------
 Copyright (C) 1994-2018 Lua.org, PUC-Rio.
 
@@ -49,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 LV2
 ---
-Copyright 2006-2019 Steve Harris, David Robillard.
+Copyright 2006-2024 Steve Harris, David Robillard.
 
 Based on LADSPA, Copyright 2000-2002 Richard W.E. Furse,
 Paul Barton-Davis, Stefan Westerfeld.
@@ -69,7 +68,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 JUCE (open source)
 ------------------
-Copyright (c) 2017 - ROLI Ltd.
+Copyright (c) 2023 - Raw Material Software Limited.
 
 JUCE is an open source library subject to commercial or open-source
 licensing. You may also use this code under the terms of the GPL v3 (see

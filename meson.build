@@ -150,7 +150,7 @@ subdir ('plugins')
 app_logo_png = files ('data/ElementIcon.png')
 app_icon = app_logo_png
 if host_machine.system() == 'windows'
-    app_icon = files ('data/ElementIcon.ico')
+    app_icon = files ('src/res/icon.ico')
 elif host_machine.system() == 'darwin'
     app_icon = files ('deploy/osx/Icon.icns')
 endif
