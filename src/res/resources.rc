@@ -5,18 +5,18 @@
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION  0,47,0,611
+FILEVERSION  1,0,0,190
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName",  "Kushview\0"
-      VALUE "LegalCopyright",  "Copyright (c) 2014-2023 Kushview, LLC\0"
+      VALUE "LegalCopyright",  "Copyright (c) 2014-2024 Kushview, LLC\0"
       VALUE "FileDescription",  "Element\0"
-      VALUE "FileVersion",  "0.47.0\0"
+      VALUE "FileVersion",  "1.0.0\0"
       VALUE "ProductName",  "Element\0"
-      VALUE "ProductVersion",  "0.47.0\0"
+      VALUE "ProductVersion",  "1.0.0\0"
     END
   END
 
