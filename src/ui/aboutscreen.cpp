@@ -44,6 +44,14 @@ static StringArray developers()
     return devs;
 }
 
+static void setupMonoEditor (TextEditor& text)
+{
+    text.setCaretVisible (false);
+    text.setMultiLine (true, false);
+    text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
+    text.setReadOnly (true);
+}
+
 } // namespace detail
 
 class AboutCreditsPanel : public Component
@@ -138,10 +146,7 @@ public:
     LicenseTextComponent()
     {
         addAndMakeVisible (text);
-        text.setCaretVisible (false);
-        text.setMultiLine (true, false);
-        text.setFont (Font (Font::getDefaultMonospacedFontName(), 10.f, Font::plain));
-        text.setReadOnly (true);
+        detail::setupMonoEditor (text);
         setLicenseText (detail::licenseText());
     }
 
@@ -167,11 +172,8 @@ public:
     AckTextComponent()
     {
         addAndMakeVisible (text);
-        text.setCaretVisible (false);
-        text.setMultiLine (true, false);
-        text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
+        detail::setupMonoEditor (text);
         text.setText (String (BinaryData::acknowledgements_txt, BinaryData::acknowledgements_txtSize));
-        text.setReadOnly (true);
     }
 
     void resized() override
