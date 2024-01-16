@@ -29,7 +29,8 @@
 - Better error handling and logging in Lua scripts.
 
 ### Removed
-- **Breaking**: Controller view to be removed...
+- Stop using juce BinaryData from old Projucer project. Resources are now generated with Meson.
+- **Breaking**: Controller view to be removed.
 
 ### Fixed
 - Plugin UIs not filling the plugin window (WAVES and others)
