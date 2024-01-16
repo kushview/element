@@ -12,6 +12,7 @@
 - Root graph channel counts are now independent fromt he audio interface.
 - Improve multiple selection in graph editor.
 - Updated app icon.
+- Session, Graph and Node file formats.  Old files can be loaded in 1.0, but 1.0 can't be backported.
 - **Breaking** Final Script node Lua API has changed. v0.46.x scripts need updated.
 - **Breaking** Old 'Lua Node' removed & replaced with Script node instead.
 
