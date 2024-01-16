@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/ui/commands.hpp>
+#include <element/ui/mainwindow.hpp>
 #include <element/ui.hpp>
 #include <element/context.hpp>
 
-#include <element/ui/mainwindow.hpp>
 #include "ui/systemtray.hpp"
+#include "ui/res.hpp"
 #include "utils.hpp"
-
-#include "BinaryData.h"
 
 #define EL_USE_NEW_SYSTRAY_ICON 0
 #define EL_SYSTRAY_MIN_SIZE 22
@@ -51,8 +50,8 @@ SystemTray::SystemTray()
     }
 #else
     setIconImage (
-        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
-        ImageCache::getFromMemory (BinaryData::ElementIconTemplate_png, BinaryData::ElementIcon_pngSize));
+        ImageCache::getFromMemory (res::ElementIcon_png, res::ElementIcon_pngSize),
+        ImageCache::getFromMemory (res::ElementIconTemplate_png, res::ElementIcon_pngSize));
 #endif
 #if JUCE_LINUX
     setSize (EL_SYSTRAY_MIN_SIZE, EL_SYSTRAY_MIN_SIZE);

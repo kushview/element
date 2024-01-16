@@ -199,8 +199,9 @@ libelement_sources = '''
     el/TextButton.cpp
     el/View.cpp
     el/Widget.cpp
-    juce/BinaryData.cpp
 '''.split()
+
+libelement_sources += res_sources
 
 libelement_includes =  [
     include_directories (
@@ -215,7 +216,8 @@ libelement_includes =  [
     juce_vst3_includes, 
     juce_vst2_includes, 
     juce_lv2_includes,
-    jack_includes 
+    jack_includes,
+    res_includes
 ]
 
 if jack_enabled

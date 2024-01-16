@@ -89,6 +89,7 @@ subdir ('src/lua')
 subdir ('src/juce')
 subdir ('util')
 subdir ('scripts')
+subdir ('data')
 subdir ('src')
 
 ###############################################################################

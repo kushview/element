@@ -26,6 +26,9 @@
 
 #include "ui/capslock.hpp"
 
+#include "ElementIcon.png.h"
+#include "ElementIconTemplate.png.h"
+
 #ifndef EL_USE_SYSTEM_TRAY
 #define EL_USE_SYSTEM_TRAY 1
 #endif

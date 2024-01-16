@@ -4,8 +4,10 @@
 #include <element/version.hpp>
 
 #include "ui/aboutscreen.hpp"
-#include "BinaryData.h"
 #include "appinfo.hpp"
+
+// resources
+#include "ui/res.hpp"
 
 #define EL_LICENSE_TEXT                                                        \
     "Copyright (C) 2014-@0@  Kushview, LLC.  All rights reserved.\r\n\r\n"     \
@@ -36,7 +38,7 @@ static String licenseText()
 
 static StringArray developers()
 {
-    const auto str = String (BinaryData::developers_txt, BinaryData::developers_txtSize);
+    const auto str = String (res::developers_txt, res::developers_txtSize);
     StringArray devs;
     devs.addTokens (str, "\n", {});
     devs.removeDuplicates (false);
@@ -173,7 +175,7 @@ public:
     {
         addAndMakeVisible (text);
         detail::setupMonoEditor (text);
-        text.setText (String (BinaryData::acknowledgements_txt, BinaryData::acknowledgements_txtSize));
+        text.setText (String (res::acknowledgements_txt, res::acknowledgements_txtSize));
     }
 
     void resized() override
@@ -192,7 +194,7 @@ AboutScreen::AboutScreen()
     setOpaque (true);
 
     elementLogo = Drawable::createFromImageData (
-        BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize);
+        res::ElementIcon_png, res::ElementIcon_pngSize);
 
     addAndMakeVisible (titleLabel);
     titleLabel.setJustificationType (Justification::centred);

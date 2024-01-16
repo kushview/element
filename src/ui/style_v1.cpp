@@ -6,7 +6,7 @@
 
 #include "ui/buttons.hpp"
 #include "ui/midiblinker.hpp"
-#include "BinaryData.h"
+#include "ui/res.hpp"
 
 // clang-format off
 
@@ -246,7 +246,7 @@ Typeface::Ptr LookAndFeel_E1::getTypefaceForFont (const Font& font)
     if (font.getTypefaceName() == Font::getDefaultSansSerifFontName())
     {
         return Typeface::createSystemTypefaceFor (
-            BinaryData::RobotoRegular_ttf, BinaryData::RobotoRegular_ttfSize);
+            res::RobotoRegular_ttf, res::RobotoRegular_ttfSize);
     }
     else if (font.getTypefaceName() == Font::getDefaultMonospacedFontName())
     {

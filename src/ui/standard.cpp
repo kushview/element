@@ -47,8 +47,6 @@
 
 #include <element/ui/standard.hpp>
 
-#include "BinaryData.h"
-
 #ifndef EL_USE_ACCESSORY_BUTTONS
 #define EL_USE_ACCESSORY_BUTTONS 0
 #endif

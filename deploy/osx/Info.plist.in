@@ -27,11 +27,11 @@
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.47.0</string>
+    <string>@VERSION@</string>
     <key>CFBundleVersion</key>
-    <string>0.47.0</string>
+    <string>@VERSION@</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright (c) 2014-2022 Kushview, LLC</string>
+    <string>Copyright (c) 2014-2024 Kushview, LLC</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleDocumentTypes</key>
