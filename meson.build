@@ -148,7 +148,7 @@ endif
 
 subdir ('plugins')
 
-app_logo_png = files ('data/ElementIcon.png')
+app_logo_png = files ('data/images/icon.png')
 app_icon = app_logo_png
 if host_machine.system() == 'windows'
     app_icon = files ('src/res/icon.ico')

@@ -50,8 +50,8 @@ SystemTray::SystemTray()
     }
 #else
     setIconImage (
-        ImageCache::getFromMemory (res::ElementIcon_png, res::ElementIcon_pngSize),
-        ImageCache::getFromMemory (res::ElementIconTemplate_png, res::ElementIcon_pngSize));
+        ImageCache::getFromMemory (res::icon_png, res::icon_pngSize),
+        ImageCache::getFromMemory (res::icontemplate_png, res::icontemplate_pngSize));
 #endif
 #if JUCE_LINUX
     setSize (EL_SYSTRAY_MIN_SIZE, EL_SYSTRAY_MIN_SIZE);

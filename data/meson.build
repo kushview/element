@@ -4,9 +4,8 @@ res_gen = generator (bin2c,
 res_includes = include_directories ('.')
 res_sources = res_gen.process (
     'acknowledgements.txt',
-    'developers.txt',
-    'ElementIcon.png', 
-    'ElementIconTemplate.png'
+    'developers.txt'
 )
 
 subdir ('fonts')
+subdir ('images')

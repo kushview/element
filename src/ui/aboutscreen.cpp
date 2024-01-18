@@ -194,7 +194,7 @@ AboutScreen::AboutScreen()
     setOpaque (true);
 
     elementLogo = Drawable::createFromImageData (
-        res::ElementIcon_png, res::ElementIcon_pngSize);
+        res::icon_png, res::icon_pngSize);
 
     addAndMakeVisible (titleLabel);
     titleLabel.setJustificationType (Justification::centred);

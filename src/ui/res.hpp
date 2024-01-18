@@ -5,6 +5,6 @@
 
 #include "acknowledgements.txt.h"
 #include "developers.txt.h"
-#include "ElementIcon.png.h"
-#include "ElementIconTemplate.png.h"
+#include "icon.png.h"
+#include "icon-template.png.h"
 #include "Roboto-Regular.ttf.h"
