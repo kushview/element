@@ -4,4 +4,4 @@ push-url = git@github.com:lvtk/pugl.git
 revision = lvtk
 
 [provide]
-dependency_names = pugl-0,pugl-gl-0,puglpp-0
+dependency_names = pugl-0,pugl-gl-0,puglpp-0,pugl-cairo-0
