@@ -1,6 +1,6 @@
 [wrap-git]
-url = https://gitlab.com/lvtk/lvtk.git
-push-url = git@gitlab.com:lvtk/lvtk.git
+url = https://github.com/lvtk/lvtk.git
+push-url = git@github.com:lvtk/lvtk.git
 revision = main
 
 [provide]
