@@ -24,6 +24,7 @@ test_element_sources = '''
     scripting/scriptloadertest.cpp
     scripting/scriptmanagertest.cpp
     scripting/scriptplayground.cpp
+    scripting/bytestest.cpp
 
     updatetests.cpp
     porttypetests.cpp
@@ -69,8 +70,9 @@ test ('Shuttle',        test_element_app, args: [ '-t', 'ShuttleTests' ],       
 test ('ToggleGrid',     test_element_app, args: [ '-t', 'ToggleGridTest'],      suite: 'engine' )
 test ('VelocityCurve',  test_element_app, args: [ '-t', 'VelocityCurveTest'],   suite: 'engine' )
 
-test ('DSPScript',      test_element_app, args: [ '-t', 'DSPScriptTest' ],     suite: 'lua')
-test ('ScriptInfo',     test_element_app, args: [ '-t', 'ScriptInfoTest' ],    suite: 'lua')
-test ('ScriptManager',  test_element_app, args: [ '-t', 'ScriptManagerTest' ], suite: 'lua')
-test ('ScriptLoader',   test_element_app, args: [ '-t', 'ScriptLoaderTest' ],  suite: 'lua')
-test ('ScriptPlayground', test_element_app, args: [ '-t', 'ScriptPlayground' ],  suite: 'lua')
+test ('Bytes',          test_element_app, args: [ '-t', 'BytesTest' ],          suite: 'lua')
+test ('DSPScript',      test_element_app, args: [ '-t', 'DSPScriptTest' ],      suite: 'lua')
+test ('ScriptInfo',     test_element_app, args: [ '-t', 'ScriptInfoTest' ],     suite: 'lua')
+test ('ScriptManager',  test_element_app, args: [ '-t', 'ScriptManagerTest' ],  suite: 'lua')
+test ('ScriptLoader',   test_element_app, args: [ '-t', 'ScriptLoaderTest' ],   suite: 'lua')
+test ('ScriptPlayground', test_element_app, args: [ '-t', 'ScriptPlayground' ], suite: 'lua')

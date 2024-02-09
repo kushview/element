@@ -85,6 +85,19 @@ static int f_get (lua_State* L)
     return 1;
 }
 
+/// Get a byte from the array.
+// This is the same as bytes.get() but for speed does not check for valid
+// argments.
+// @function rawget
+// @param bytes Bytes to get from
+// @int index Index in the array
+static int f_rawget (lua_State* L)
+{
+    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
+    lua_pushinteger (L, (lua_Integer) b->data[lua_tointeger (L, 2) - 1]);
+    return 1;
+}
+
 /// Set a byte in the array.
 // @function set
 // @param bytes Target bytes
@@ -101,6 +114,20 @@ static int f_set (lua_State* L)
     return 1;
 }
 
+/// Set a byte in the array.
+// This is the same as bytes.set() but for speed does not check for valid
+// arguments.
+// @function set
+// @param bytes Target bytes
+// @int index Index in the array
+// @int value Value to set in the range 0x00 to 0xFF inclusive
+static int f_rawset (lua_State* L)
+{
+    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
+    b->data[lua_tointeger (L, 2) - 1] = (uint8_t) lua_tointeger (L, 3);
+    return 1;
+}
+
 /// Returns the size in bytes.
 // @function size
 // @param bytes Target bytes
@@ -114,7 +141,8 @@ static int f_size (lua_State* L)
 }
 
 /// Pack 4 bytes in a 64bit integer.
-// Undefined params are treated as zero
+// Undefined params are treated as zero. This function does not check arguments
+// and therefor can crash if client code passes in bad data.
 // @function pack
 // @int b1 First byte
 // @int b2 Second byte
@@ -163,10 +191,16 @@ static int f_pack (lua_State* L)
 
 static const luaL_Reg bytes_f[] = {
     { "new", f_new },
+
     { "free", f_free },
     { "size", f_size },
+
     { "get", f_get },
+    { "rawget", f_rawget },
+
     { "set", f_set },
+    { "rawset", f_rawset },
+
     { "pack", f_pack },
     { NULL, NULL }
 };
