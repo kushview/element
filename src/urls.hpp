@@ -8,7 +8,7 @@
 #define EL_URL_HOME "https://kushview.net"
 
 //==============================================================================
-#define EL_URL_BUG_TRACKER "https://github.com/kushview/element/issues"
+#define EL_URL_BUG_TRACKER "https://github.com/kushview/element/issues/new/choose"
 #define EL_URL_DONATE EL_URL_HOME "/donate/"
 
 //==============================================================================
