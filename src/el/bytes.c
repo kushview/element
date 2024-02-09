@@ -54,10 +54,14 @@ void element_bytes_set (EL_Bytes* b, lua_Integer index, uint8_t value)
 // @treturn kv.ByteArray The new byte array.
 static int f_new (lua_State* L)
 {
-    EL_Bytes* b = (EL_Bytes*) lua_newuserdata (L, sizeof (EL_Bytes));
-    luaL_setmetatable (L, EL_MT_BYTE_ARRAY);
+    // EL_Bytes* b = (EL_Bytes*) lua_newuserdata (L, sizeof (EL_Bytes));
+    // luaL_setmetatable (L, EL_MT_BYTE_ARRAY);
+    
     size_t size = lua_isnumber (L, 1) ? (size_t) lua_tonumber (L, 1) : 0;
-    element_bytes_init (b, size);
+    // element_bytes_init (b, size);
+    uint8_t* data = (uint8_t*) lua_newuserdata (L, size);
+    memset (data, size, sizeof (uint8_t));
+    lua_pushlightuserdata (L, data);
     return 1;
 }
 
@@ -93,8 +97,8 @@ static int f_get (lua_State* L)
 // @int index Index in the array
 static int f_rawget (lua_State* L)
 {
-    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
-    lua_pushinteger (L, (lua_Integer) b->data[lua_tointeger (L, 2) - 1]);
+    uint8_t* data = (uint8_t*) lua_touserdata (L, 1);
+    lua_pushinteger (L, (lua_Integer) data[lua_tointeger (L, 2) - 1]);
     return 1;
 }
 
@@ -123,8 +127,8 @@ static int f_set (lua_State* L)
 // @int value Value to set in the range 0x00 to 0xFF inclusive
 static int f_rawset (lua_State* L)
 {
-    EL_Bytes* b = (EL_Bytes*) lua_touserdata (L, 1);
-    b->data[lua_tointeger (L, 2) - 1] = (uint8_t) lua_tointeger (L, 3);
+    uint8_t* data = (uint8_t*) lua_touserdata (L, 1);
+    data[lua_tointeger (L, 2) - 1] = (uint8_t) lua_tointeger (L, 3);
     return 1;
 }
 
