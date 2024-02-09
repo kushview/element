@@ -73,7 +73,7 @@ static int f_free (lua_State* L)
 
 /// Get a byte from the array.
 // @function get
-// @param bytes Bytes to get from
+// @tparam el.Bytes The Bytes to retrieve from
 // @int index Index in the array
 static int f_get (lua_State* L)
 {
@@ -85,12 +85,19 @@ static int f_get (lua_State* L)
     return 1;
 }
 
-/// Get a byte from raw memory.
-// This is the same as bytes.get() but can be used on raw memory
-// in the form of light userdata.
+/// Get a byte from a raw memory block.
 // @function rawget
-// @param bytes Bytes to get from
+// @tparam lightuserdata data Raw data pointer.
 // @int index Index in the array
+// @usage
+// -- Raw access is useful when reading MIDI data like SysEx.
+// local msg = get_the_message() -- msg is a `el.MidiMessage`
+// if msg:isSysEx() then
+//   local data, _ = msg:sysExData()
+//   -- its "1 + .." because MIDI channels start at one, and the data is zero indexed
+//   local sysexValue = bytes.rawget (data, 5)
+//   -- special sysex handling follows...
+// end
 static int f_rawget (lua_State* L)
 {
     uint8_t* data = (uint8_t*) lua_touserdata (L, 1);
@@ -100,7 +107,7 @@ static int f_rawget (lua_State* L)
 
 /// Set a byte in the array.
 // @function set
-// @param bytes Target bytes
+// @tparam el.Bytes obj The Bytes object to modify
 // @int index Index in the array
 // @int value Value to set in the range 0x00 to 0xFF inclusive
 static int f_set (lua_State* L)
@@ -115,10 +122,9 @@ static int f_set (lua_State* L)
 }
 
 /// Set a byte in the array.
-// This is the same as bytes.set() but can be used on raw memory
-// in the form of light userdata.
+// Sets a byte in a raw data buffer.
 // @function rawset
-// @param bytes Target bytes
+// @tparam lightuserdata data Target bytes to modify
 // @int index Index in the array
 // @int value Value to set in the range 0x00 to 0xFF inclusive
 static int f_rawset (lua_State* L)
@@ -134,13 +140,13 @@ static int f_rawset (lua_State* L)
 // @treturn el.Bytes The new byte array.
 static int f_toraw (lua_State* L)
 {
-    lua_pushlightuserdata (L, ((EL_Bytes*)lua_touserdata (L, 1))->data);
+    lua_pushlightuserdata (L, ((EL_Bytes*) lua_touserdata (L, 1))->data);
     return 1;
 }
 
 /// Returns the size in bytes.
 // @function size
-// @param bytes Target bytes
+// @tparam el.Bytes obj The Bytes object to check.
 // @treturn int The size in bytes.
 static int f_size (lua_State* L)
 {

@@ -17,11 +17,11 @@ BOOST_AUTO_TEST_CASE (Basics)
     LuaFixture fix;
     sol::state_view lua (fix.luaState());
     auto script = fix.readSnippet ("test_bytes.lua");
-    BOOST_REQUIRE(!script.isEmpty());
+    BOOST_REQUIRE (! script.isEmpty());
     try {
         lua.safe_script (script.toRawUTF8(), "[test:bytes]");
     } catch (const std::exception& e) {
-        BOOST_REQUIRE_MESSAGE(false, e.what());
+        BOOST_REQUIRE_MESSAGE (false, e.what());
     }
 }
 
