@@ -141,7 +141,7 @@ static int midimessage_data (lua_State* L)
 
 midimessage_is (sysex, isSysEx)
 
-static int midimessage_sysexData (lua_State* L)
+static int midimessage_sysExData (lua_State* L)
 {
     auto* msg = *(juce::MidiMessage**) lua_touserdata (L, 1);
     lua_pushlightuserdata (L, (void*) msg->getSysExData());
@@ -312,16 +312,16 @@ static const luaL_Reg midimessage_methods[] = {
     // @int ch Channel to set (1-16)
     { "setChannel", midimessage_set_channel },
 
-    /// Is sysex.
+    /// Is System Exclusive.
     // @function MidiMessage:isSysex
-    // @return True if is sysex message
+    // @return True if is SysEx message
     { "isSysex", midimessage_is_sysex },
 
     /// Sysex Data.
-    // @function MidiMessage:sysexData
+    // @function MidiMessage:sysExData
     // @return Raw sysex bytes
     // @return Sysex data size
-    { "sysexData", midimessage_sysexData },
+    { "sysExData", midimessage_sysExData },
 
     /// Is note on.
     // @function MidiMessage:isNoteOn
