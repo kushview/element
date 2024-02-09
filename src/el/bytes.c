@@ -51,17 +51,13 @@ void element_bytes_set (EL_Bytes* b, lua_Integer index, uint8_t value)
 /// Create a new byte array.
 // @function new
 // @int size Size in bytes to allocate
-// @treturn kv.ByteArray The new byte array.
+// @treturn el.Bytes The new byte array.
 static int f_new (lua_State* L)
 {
-    // EL_Bytes* b = (EL_Bytes*) lua_newuserdata (L, sizeof (EL_Bytes));
-    // luaL_setmetatable (L, EL_MT_BYTE_ARRAY);
-    
+    EL_Bytes* b = (EL_Bytes*) lua_newuserdata (L, sizeof (EL_Bytes));
+    luaL_setmetatable (L, EL_MT_BYTES);
     size_t size = lua_isnumber (L, 1) ? (size_t) lua_tonumber (L, 1) : 0;
-    // element_bytes_init (b, size);
-    uint8_t* data = (uint8_t*) lua_newuserdata (L, size);
-    memset (data, size, sizeof (uint8_t));
-    lua_pushlightuserdata (L, data);
+    element_bytes_init (b, size);
     return 1;
 }
 
@@ -89,9 +85,9 @@ static int f_get (lua_State* L)
     return 1;
 }
 
-/// Get a byte from the array.
-// This is the same as bytes.get() but for speed does not check for valid
-// argments.
+/// Get a byte from raw memory.
+// This is the same as bytes.get() but can be used on raw memory
+// in the form of light userdata.
 // @function rawget
 // @param bytes Bytes to get from
 // @int index Index in the array
@@ -119,9 +115,9 @@ static int f_set (lua_State* L)
 }
 
 /// Set a byte in the array.
-// This is the same as bytes.set() but for speed does not check for valid
-// arguments.
-// @function set
+// This is the same as bytes.set() but can be used on raw memory
+// in the form of light userdata.
+// @function rawset
 // @param bytes Target bytes
 // @int index Index in the array
 // @int value Value to set in the range 0x00 to 0xFF inclusive
@@ -129,6 +125,16 @@ static int f_rawset (lua_State* L)
 {
     uint8_t* data = (uint8_t*) lua_touserdata (L, 1);
     data[lua_tointeger (L, 2) - 1] = (uint8_t) lua_tointeger (L, 3);
+    return 1;
+}
+
+/// Get the raw data as lightuserdata.
+// @function toraw
+// @tparam el.Bytes The byte array to get raw data from.
+// @treturn el.Bytes The new byte array.
+static int f_toraw (lua_State* L)
+{
+    lua_pushlightuserdata (L, ((EL_Bytes*)lua_touserdata (L, 1))->data);
     return 1;
 }
 
@@ -205,6 +211,8 @@ static const luaL_Reg bytes_f[] = {
     { "set", f_set },
     { "rawset", f_rawset },
 
+    { "toraw", f_toraw },
+
     { "pack", f_pack },
     { NULL, NULL }
 };
@@ -217,7 +225,7 @@ static const luaL_Reg bytes_m[] = {
 EL_PLUGIN_EXPORT
 int luaopen_el_bytes (lua_State* L)
 {
-    if (luaL_newmetatable (L, EL_MT_BYTE_ARRAY))
+    if (luaL_newmetatable (L, EL_MT_BYTES))
     {
         lua_pushvalue (L, -1); /* duplicate the metatable */
         lua_setfield (L, -2, "__index"); /* mt.__index = mt */

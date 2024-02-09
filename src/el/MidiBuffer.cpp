@@ -318,10 +318,10 @@ static const luaL_Reg buffer_methods[] = {
     { "insertPacked", midibuffer_insertPacked },
 
     // Insert some bytes into the buffer.
-    // The el.ByteArray passed in should contain a complete MIDI message
+    // The el.Bytes passed in should contain a complete MIDI message
     // of any type.
     // @function MidiBuffer:insertBytes
-    // @tparam el.ByteArray bytes The bytes to add
+    // @tparam el.Bytes bytes The bytes to add
     // @int size Max number of bytes to add
     // @int frame Sample position to insert at
     { "insertBytes", midibuffer_insertBytes },
