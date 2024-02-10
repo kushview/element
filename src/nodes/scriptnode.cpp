@@ -43,6 +43,42 @@ ScriptNode::ScriptNode() noexcept
 {
     setName ("Script");
     Lua::initializeState (lua);
+
+    lua.set_function ("print", [this] (sol::variadic_args va) {
+        auto& e = lua;
+        String msg;
+        for (auto v : va)
+        {
+            if (sol::type::string == v.get_type())
+            {
+                msg << v.as<const char*>() << " ";
+                continue;
+            }
+
+            sol::function ts = e["tostring"];
+            if (ts.valid())
+            {
+                sol::object str = ts ((sol::object) v);
+                if (str.valid())
+                    if (const char* sstr = str.as<const char*>())
+                        msg << sstr << "  ";
+            }
+        }
+
+        if (msg.isNotEmpty())
+        {
+            if (MessageManager::getInstance()->isThisTheMessageThread())
+            {
+                Logger::writeToLog (msg);
+            }
+            else
+            {
+                MessageManagerLock ml;
+                Logger::writeToLog (msg);
+            }
+        }
+    });
+
     script.reset (new DSPScript (lua.create_table()));
     dspCode.replaceAllContent (String::fromUTF8 (
         scripts::amp_lua, scripts::amp_luaSize));

@@ -57,7 +57,7 @@ typedef enum {
 //==============================================================================
 #define EL_MT_AUDIO_BUFFER_64 "el.AudioBuffer64"
 #define EL_MT_AUDIO_BUFFER_32 "el.AudioBuffer32"
-#define EL_MT_BYTE_ARRAY      "el.ByteArray"
+#define EL_MT_BYTES           "el.Bytes"
 #define EL_MT_MIDI_MESSAGE    "el.MidiMessage"
 #define EL_MT_MIDI_BUFFER     "el.MidiBuffer"
 #define EL_MT_MIDI_PIPE       "el.MidiPipe"

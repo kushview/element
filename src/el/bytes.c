@@ -51,11 +51,11 @@ void element_bytes_set (EL_Bytes* b, lua_Integer index, uint8_t value)
 /// Create a new byte array.
 // @function new
 // @int size Size in bytes to allocate
-// @treturn kv.ByteArray The new byte array.
+// @treturn el.Bytes The new byte array.
 static int f_new (lua_State* L)
 {
     EL_Bytes* b = (EL_Bytes*) lua_newuserdata (L, sizeof (EL_Bytes));
-    luaL_setmetatable (L, EL_MT_BYTE_ARRAY);
+    luaL_setmetatable (L, EL_MT_BYTES);
     size_t size = lua_isnumber (L, 1) ? (size_t) lua_tonumber (L, 1) : 0;
     element_bytes_init (b, size);
     return 1;
@@ -73,7 +73,7 @@ static int f_free (lua_State* L)
 
 /// Get a byte from the array.
 // @function get
-// @param bytes Bytes to get from
+// @tparam el.Bytes The Bytes to retrieve from
 // @int index Index in the array
 static int f_get (lua_State* L)
 {
@@ -85,9 +85,29 @@ static int f_get (lua_State* L)
     return 1;
 }
 
+/// Get a byte from a raw memory block.
+// @function rawget
+// @tparam lightuserdata data Raw data pointer.
+// @int index Index in the array
+// @usage
+// -- Raw access is useful when reading MIDI data like SysEx.
+// local msg = get_the_message() -- msg is a `el.MidiMessage`
+// if msg:isSysEx() then
+//   local data, _ = msg:sysExData()
+//   -- its "1 + .." because MIDI channels start at one, and the data is zero indexed
+//   local sysexValue = bytes.rawget (data, 5)
+//   -- special sysex handling follows...
+// end
+static int f_rawget (lua_State* L)
+{
+    uint8_t* data = (uint8_t*) lua_touserdata (L, 1);
+    lua_pushinteger (L, (lua_Integer) data[lua_tointeger (L, 2) - 1]);
+    return 1;
+}
+
 /// Set a byte in the array.
 // @function set
-// @param bytes Target bytes
+// @tparam el.Bytes obj The Bytes object to modify
 // @int index Index in the array
 // @int value Value to set in the range 0x00 to 0xFF inclusive
 static int f_set (lua_State* L)
@@ -101,9 +121,32 @@ static int f_set (lua_State* L)
     return 1;
 }
 
+/// Set a byte in the array.
+// Sets a byte in a raw data buffer.
+// @function rawset
+// @tparam lightuserdata data Target bytes to modify
+// @int index Index in the array
+// @int value Value to set in the range 0x00 to 0xFF inclusive
+static int f_rawset (lua_State* L)
+{
+    uint8_t* data = (uint8_t*) lua_touserdata (L, 1);
+    data[lua_tointeger (L, 2) - 1] = (uint8_t) lua_tointeger (L, 3);
+    return 1;
+}
+
+/// Get the raw data as lightuserdata.
+// @function toraw
+// @tparam el.Bytes The byte array to get raw data from.
+// @treturn el.Bytes The new byte array.
+static int f_toraw (lua_State* L)
+{
+    lua_pushlightuserdata (L, ((EL_Bytes*) lua_touserdata (L, 1))->data);
+    return 1;
+}
+
 /// Returns the size in bytes.
 // @function size
-// @param bytes Target bytes
+// @tparam el.Bytes obj The Bytes object to check.
 // @treturn int The size in bytes.
 static int f_size (lua_State* L)
 {
@@ -114,7 +157,8 @@ static int f_size (lua_State* L)
 }
 
 /// Pack 4 bytes in a 64bit integer.
-// Undefined params are treated as zero
+// Undefined params are treated as zero. This function does not check arguments
+// and therefor can crash if client code passes in bad data.
 // @function pack
 // @int b1 First byte
 // @int b2 Second byte
@@ -163,10 +207,18 @@ static int f_pack (lua_State* L)
 
 static const luaL_Reg bytes_f[] = {
     { "new", f_new },
+
     { "free", f_free },
     { "size", f_size },
+
     { "get", f_get },
+    { "rawget", f_rawget },
+
     { "set", f_set },
+    { "rawset", f_rawset },
+
+    { "toraw", f_toraw },
+
     { "pack", f_pack },
     { NULL, NULL }
 };
@@ -179,7 +231,7 @@ static const luaL_Reg bytes_m[] = {
 EL_PLUGIN_EXPORT
 int luaopen_el_bytes (lua_State* L)
 {
-    if (luaL_newmetatable (L, EL_MT_BYTE_ARRAY))
+    if (luaL_newmetatable (L, EL_MT_BYTES))
     {
         lua_pushvalue (L, -1); /* duplicate the metatable */
         lua_setfield (L, -2, "__index"); /* mt.__index = mt */

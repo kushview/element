@@ -60,6 +60,7 @@ private:
     CodeDocument dspCode, edCode;
     std::unique_ptr<DSPScript> script;
     ParameterArray inParams, outParams;
+    StringArray printMessages;
 
     int _program = 0;
 

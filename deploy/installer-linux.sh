@@ -3,13 +3,15 @@
 set -e
 rm -rf *.gz *.app *.dmg
 
-@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@
+@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@.run
 
 rm -rf archives && mkdir archives
 cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
-    ../archives/element-linux.tar.gz \
+    ../archives/element-osx.tar.gz \
         net.kushview.element \
-        net.kushview.element.lua \
+        net.kushview.element.lua
+@ARCHIVEGEN@ -f tar.gz -c 9 \
+    ../archives/element-plugins-osx.tar.gz \
         net.kushview.element.vst \
         net.kushview.element.vst3
 
