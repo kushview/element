@@ -5,6 +5,8 @@
 // @author Michael Fisher
 // @module el.midi
 
+#include <math.h>
+
 #include "element/element.h"
 #include <lauxlib.h>
 
@@ -79,12 +81,36 @@ static int f_noteoff (lua_State* L)
     return f_msg3bytes (L, 0x80);
 }
 
-static int f_tohertz (lua_State* L)
+/// Make a program change message.
+// @function programchange
+// @int channel MIDI Channel
+// @int program Program number
+// @return MIDI message packed as Integer
+// @within Messages
+static int f_programchange (lua_State* L)
 {
-    lua_pushinteger (L, 0);
-    return 0;
+    lua_pushinteger (L, 0x00);
+    return f_msg3bytes (L, 0xC0);
 }
 
+/// Convert a MIDI note to hertz.
+// This version assumes A 440 Hz
+// @function tohertz
+// @int note Note number
+// @return Value in hertz
+// @within Utils
+static int f_tohertz (lua_State* L)
+{
+    double value = 440.0 * pow (2.0, (lua_tointeger (L, 1) - 69) / 12.0);
+    lua_pushnumber (L, value);
+    return 1;
+}
+
+/// Clamp to a valid MIDI value (0 - 127)
+// @function clamp
+// @int value The value to clamp
+// @return The clamped value.
+// @within Utils
 static int f_clamp (lua_State* L)
 {
     lua_Integer value = lua_tointeger (L, 1);
@@ -100,6 +126,7 @@ static const luaL_Reg midi_f[] = {
     { "controller", f_controller },
     { "noteon", f_noteon },
     { "noteoff", f_noteoff },
+    { "programchange", f_programchange },
     { "tohertz", f_tohertz },
     { "clamp", f_clamp },
     { NULL, NULL }
