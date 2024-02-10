@@ -1,7 +1,7 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <windows.h>
 #include <winuser.h>
 #elif defined(__linux__)
@@ -18,8 +18,8 @@
 
 namespace element {
 
-#if defined(_MSC_VER)
-bool getNativeWinodwSize (void* window, int& width, int& height)
+#if defined(_MSC_VER) || defined(__MINGW32__)
+bool getNativeWindowSize (void* window, int& width, int& height)
 {
     HWND w = (HWND) window;
     RECT r;
@@ -38,7 +38,7 @@ inline static Display* xDisplay()
     return juce::XWindowSystem::getInstance()->getDisplay();
 }
 
-bool getNativeWinodwSize (void* win, int& width, int& height)
+bool getNativeWindowSize (void* win, int& width, int& height)
 {
     ::Window window = (::Window) win;
 

@@ -880,7 +880,7 @@ struct ViewSizeListener : private ComponentMovementWatcher
     PhysicalResizeListener& listener;
 };
 
-extern bool getNativeWinodwSize (void* window, int& width, int& height);
+extern bool getNativeWindowSize (void* window, int& width, int& height);
 
 class LV2NativeEditor : public Editor,
                         public juce::Timer,
@@ -911,7 +911,7 @@ public:
         {
             // if not, try to query the window size.
             w = h = 0;
-            getNativeWinodwSize (ui->getWidget(), w, h);
+            getNativeWindowSize (ui->getWidget(), w, h);
         }
 
         setSize (w > 0 ? w : 640, h > 0 ? h : 360);
@@ -960,7 +960,7 @@ public:
 #if JUCE_WINDOWS || JUCE_MAC
                 int w = 0, h = 0;
                 if (ui != nullptr)
-                    if (getNativeWinodwSize (ui->getWidget(), w, h))
+                    if (getNativeWindowSize (ui->getWidget(), w, h))
                         if (w != getWidth() || h != getHeight())
                             setSize (w, h);
 #endif

@@ -5,7 +5,8 @@
 bin2c_sources = [ 'bin2c.cpp' ]
 bin2c_deps = [ juce_dep ]
 
-if cpp.get_id() == 'gcc'
+if host_machine.system() == 'windows' and cpp.get_id() == 'gcc' and cpp.get_argument_syntax() == 'gcc'
+    # bin2c also needs these since it uses JUCE
     foreach l : 'uuid wsock32 wininet version ole32 ws2_32 oleaut32 imm32 comdlg32 shlwapi rpcrt4 winmm dxgi'.split()
         bin2c_deps += cpp.find_library (l, required : true)
     endforeach
