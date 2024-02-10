@@ -96,7 +96,14 @@ else
 endif
 
 juce_conf_data.set10 ('JUCE_VST3_CAN_REPLACE_VST2', vstfxstore_h_found)
-juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', true)
+
+have_vst3 = true
+if host_machine.system() == 'windows' and cpp.get_id() == 'gcc' and cpp.get_argument_syntax() == 'gcc'
+    # compiler errors need worked out inside juce for mingw32 cross
+    have_vst3 = false
+endif
+
+juce_conf_data.set10 ('JUCE_PLUGINHOST_VST3', have_vst3)
 
 juce_lv2_includes = []
 # include_directories (

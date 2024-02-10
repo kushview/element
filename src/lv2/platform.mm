@@ -7,7 +7,7 @@
 
 namespace element {
 
-bool getNativeWinodwSize (void* v, int& width, int& height)
+bool getNativeWindowSize (void* v, int& width, int& height)
 {
     NSView* view = (NSView*) v;
     width = static_cast<int> (view.frame.size.width);
