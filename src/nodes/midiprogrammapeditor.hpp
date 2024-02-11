@@ -51,6 +51,7 @@ private:
     float fontSize = 15.f;
     SignalConnection lastProgramChangeConnection;
     void selectLastProgram();
+    void updateTableHeaderSizes();
 };
 
 } // namespace element

@@ -29,14 +29,14 @@ public:
     {
         desc.fileOrIdentifier = EL_NODE_ID_MIDI_PROGRAM_MAP;
         desc.name = "MIDI Program Map";
-        desc.descriptiveName = "Filter MIDI Program Changes";
+        desc.descriptiveName = "Filter MIDI Program Changes and set tempo.";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
         desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
-        desc.pluginFormatName = "Element";
-        desc.version = "1.0.0";
+        desc.pluginFormatName = EL_NODE_FORMAT_NAME;
+        desc.version = "1.1.0";
         desc.uniqueId = EL_NODE_UID_MIDI_PROGRAM_MAP;
     }
 
