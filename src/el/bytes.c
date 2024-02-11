@@ -73,7 +73,7 @@ static int f_free (lua_State* L)
 
 /// Get a byte from the array.
 // @function get
-// @tparam el.Bytes The Bytes to retrieve from
+// @tparam el.Bytes obj The Bytes to retrieve from
 // @int index Index in the array
 static int f_get (lua_State* L)
 {
