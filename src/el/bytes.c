@@ -136,7 +136,7 @@ static int f_rawset (lua_State* L)
 
 /// Get the raw data as lightuserdata.
 // @function toraw
-// @tparam el.Bytes The byte array to get raw data from.
+// @tparam el.Bytes obj The byte array to get raw data from.
 // @treturn el.Bytes The new byte array.
 static int f_toraw (lua_State* L)
 {
