@@ -47,10 +47,6 @@
 
 #include <element/ui/standard.hpp>
 
-#ifndef EL_USE_ACCESSORY_BUTTONS
-#define EL_USE_ACCESSORY_BUTTONS 0
-#endif
-
 #define EL_NAV_MIN_WIDTH 170
 #define EL_NAV_MAX_WIDTH 510
 

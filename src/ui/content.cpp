@@ -20,10 +20,6 @@
 #include "ui/transportbar.hpp"
 #include "ui/viewhelpers.hpp"
 
-#ifndef EL_USE_ACCESSORY_BUTTONS
-#define EL_USE_ACCESSORY_BUTTONS 0
-#endif
-
 namespace element {
 
 ContentView::ContentView()
