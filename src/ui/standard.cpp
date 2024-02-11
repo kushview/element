@@ -51,8 +51,8 @@
 #define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
-#define EL_NAV_MIN_WIDTH 100
-#define EL_NAV_MAX_WIDTH 440
+#define EL_NAV_MIN_WIDTH 170
+#define EL_NAV_MAX_WIDTH 510
 
 namespace element {
 
