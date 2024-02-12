@@ -1,2 +1,4 @@
-custom: "https://kushview.net/donate/"
-custom: "https://shop.kushview.net"
+custom: [
+   "https://kushview.net/donate",
+   "https://kushview.gumroad.com"
+]
