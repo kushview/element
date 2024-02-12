@@ -16,6 +16,7 @@
 #include "nodes/oscsendereditor.hpp"
 #include "nodes/volumeeditor.hpp"
 #include "nodes/scriptnodeeditor.hpp"
+#include "nodes/midisetlisteditor.hpp"
 #include "../nodes/mcu.hpp"
 
 #include "ui/nodeeditorfactory.hpp"
@@ -103,6 +104,14 @@ private:
 
             return pgced;
         }
+        else if (NID == EL_NODE_ID_MIDI_SET_LIST)
+        {
+            auto* const msled = new MidiSetListEditor (node);
+            if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getObject()))
+                msled->setSize (object->getWidth(), object->getHeight());
+
+            return msled;
+        }
         else if (NID == EL_NODE_ID_AUDIO_ROUTER)
         {
             auto* ared = new AudioRouterEditor (node);
@@ -143,6 +152,14 @@ private:
         if (node.getIdentifier() == EL_NODE_ID_MIDI_PROGRAM_MAP)
         {
             auto* const programChangeMapEditor = new MidiProgramMapEditor (node);
+            programChangeMapEditor->setStoreSize (false);
+            programChangeMapEditor->setFontSize (programChangeMapEditor->getDefaultFontSize(), false);
+            programChangeMapEditor->setFontControlsVisible (false);
+            return programChangeMapEditor;
+        }
+        if (node.getIdentifier() == EL_NODE_ID_MIDI_SET_LIST)
+        {
+            auto* const programChangeMapEditor = new MidiSetListEditor (node);
             programChangeMapEditor->setStoreSize (false);
             programChangeMapEditor->setFontSize (programChangeMapEditor->getDefaultFontSize(), false);
             programChangeMapEditor->setFontControlsVisible (false);

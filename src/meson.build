@@ -66,6 +66,8 @@ libelement_sources = '''
     nodes/midiprogrammapeditor.cpp
     nodes/midirouter.cpp
     nodes/midiroutereditor.cpp
+    nodes/midisetlist.cpp
+    nodes/midisetlisteditor.cpp
     nodes/oscreceiver.cpp
     nodes/oscreceivereditor.cpp
     nodes/oscsender.cpp

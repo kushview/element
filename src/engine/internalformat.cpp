@@ -22,13 +22,14 @@
 #include "nodes/mediaplayer.hpp"
 #include "nodes/midichannelmap.hpp"
 #include "nodes/mididevice.hpp"
+#include "nodes/midisetlist.hpp"
 #include "nodes/placeholder.hpp"
 #include "nodes/everb.hpp"
 #include "nodes/volume.hpp"
 #include "nodes/wetdry.hpp"
+#include "nodes/midiprogrammap.hpp"
 
 #include "engine/graphnode.hpp"
-
 #include "engine/internalformat.hpp"
 #include "engine/ionode.hpp"
 
@@ -266,12 +267,17 @@ Processor* InternalNodes::create (const String& ID)
     {
         return new GraphNode (_context);
     }
+    else if (ID == EL_NODE_ID_MIDI_SET_LIST)
+    {
+        return new MidiSetListProcessor (_context);
+    }
+
     return nullptr;
 }
 
 StringArray InternalNodes::findTypes()
 {
-    return { EL_NODE_ID_GRAPH };
+    return { EL_NODE_ID_GRAPH, EL_NODE_ID_MIDI_SET_LIST };
 }
 
 StringArray InternalNodes::getHiddenTypes() { return {}; }
