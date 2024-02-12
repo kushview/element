@@ -114,9 +114,8 @@ public:
     MidiProgramMapEditor& editor;
     enum ColumnId
     {
-        InProgram = 1,
-        Name,
-        Tempo,
+        Name = 1,
+        InProgram,
         OutProgram
     };
 
@@ -148,9 +147,6 @@ public:
                 break;
             case TableModel::InProgram:
                 text = String (1 + program.in);
-                break;
-            case TableModel::Tempo:
-                text = String (120.00, 2) + " bpm";
                 break;
             case TableModel::OutProgram:
                 text = String (1 + program.out);
@@ -225,10 +221,9 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
 
     auto& header = table.getHeader();
     const int flags = TableHeaderComponent::visible;
-    header.addColumn ("IN", TableModel::InProgram, 50, 50, -1, flags, -1);
-    header.addColumn ("NAME", TableModel::Name, 100, 100, -1, flags, -1);
-    header.addColumn ("TEMPO", TableModel::Tempo, 70, 70, -1, flags, -1);
-    header.addColumn ("OUT", TableModel::OutProgram, 50, 50, -1, flags, -1);
+    header.addColumn ("Name", TableModel::Name, 100, 100, -1, flags, -1);
+    header.addColumn ("Input", TableModel::InProgram, 50, 50, -1, flags, -1);
+    header.addColumn ("Output", TableModel::OutProgram, 50, 50, -1, flags, -1);
     model.reset (new TableModel (*this));
     table.setModel (model.get());
     table.updateContent();
@@ -300,14 +295,21 @@ void MidiProgramMapEditor::setFontControlsVisible (bool visible)
 
 void MidiProgramMapEditor::setFontSize (float newSize, bool updateNode)
 {
+    float defaultSize = getDefaultFontSize();
     fontSize = jlimit (9.f, 72.f, newSize);
 
-    table.setRowHeight (6 + static_cast<int> (1.125 * fontSize));
-   
+    if (isRunningInPluginWindow())
+    {
+        table.setRowHeight (6 + static_cast<int> (1.125 * fontSize));
+    }
+    else
+    {
+        table.setRowHeight (6 + static_cast<int> (1.125 * defaultSize));
+    }
+
     if ((double) fontSize != fontSlider.getValue())
         fontSlider.setValue (fontSize, dontSendNotification);
 
-    updateTableHeaderSizes();
     table.updateContent();
 
     if (updateNode)
@@ -444,7 +446,10 @@ void MidiProgramMapEditor::resized()
     fontSlider.setBounds (r2);
 
     table.setBounds (r.reduced (2));
-    updateTableHeaderSizes();
+    auto& header = table.getHeader();
+
+    header.setColumnWidth (TableModel::Name,
+                           table.getWidth() - (header.getColumnWidth (TableModel::InProgram) + header.getColumnWidth (TableModel::OutProgram)));
 
     if (isRunningInPluginWindow())
         if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
@@ -455,27 +460,10 @@ void MidiProgramMapEditor::setStoreSize (const bool storeSize)
 {
     if (storeSize == storeSizeInNode)
         return;
-    
     storeSizeInNode = storeSize;
-
     if (storeSizeInNode)
         if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
             node->setSize (getWidth(), getHeight());
-}
-
-void MidiProgramMapEditor::updateTableHeaderSizes()
-{
-    auto& header = table.getHeader();
-    const auto tempoSize = Font(getFontSize()).getStringWidth ("120.00 bpm") + 4;
-    header.setColumnWidth (TableModel::Tempo, tempoSize);
-    
-    // clang-format on
-    const auto fixedTotalSize = header.getColumnWidth (TableModel::InProgram) 
-        + header.getColumnWidth (TableModel::OutProgram)
-        + header.getColumnWidth (TableModel::Tempo);
-
-    header.setColumnWidth (TableModel::Name, table.getWidth() - fixedTotalSize);
-    // clang-format off
 }
 
 void MidiProgramMapEditor::selectLastProgram()
