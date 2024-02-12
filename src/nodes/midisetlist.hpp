@@ -13,8 +13,8 @@ namespace element {
 class Context;
 
 class MidiSetListProcessor : public MidiFilterNode,
-                           public AsyncUpdater,
-                           public ChangeBroadcaster
+                             public AsyncUpdater,
+                             public ChangeBroadcaster
 {
 public:
     struct ProgramEntry

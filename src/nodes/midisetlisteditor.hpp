@@ -9,7 +9,7 @@
 namespace element {
 
 class MidiSetListEditor : public NodeEditor,
-                             public ChangeListener
+                          public ChangeListener
 {
 public:
     MidiSetListEditor (const Node& node);

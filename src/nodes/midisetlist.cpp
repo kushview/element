@@ -151,10 +151,10 @@ void MidiSetListProcessor::addProgramEntry (const String& name, int programIn, i
 }
 
 void MidiSetListProcessor::editProgramEntry (int index,
-                                           const String& name,
-                                           int inProgram,
-                                           int outProgram,
-                                           double tempo)
+                                             const String& name,
+                                             int inProgram,
+                                             int outProgram,
+                                             double tempo)
 {
     tempo = (tempo <= 0) ? 0.0 : std::max (20.0, std::min (999.0, tempo));
     if (auto* entry = entries[index])

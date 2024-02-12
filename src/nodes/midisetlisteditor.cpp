@@ -448,9 +448,11 @@ void MidiSetListEditor::setProgram (int index, MidiSetListProcessor::ProgramEntr
 {
     if (MidiSetListProcessorPtr node = getNodeObjectOfType<MidiSetListProcessor>())
     {
-        node->editProgramEntry (index, 
-            entry.name, entry.in, entry.out,
-            entry.tempo);
+        node->editProgramEntry (index,
+                                entry.name,
+                                entry.in,
+                                entry.out,
+                                entry.tempo);
         table.updateContent();
     }
 }
