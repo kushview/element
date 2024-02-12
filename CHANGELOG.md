@@ -28,6 +28,7 @@
 - Bulk routing feature in the patch bay.
 - Online update features.
 - Better error handling and logging in Lua scripts.
+- MIDI Set List node with Tempo change.
 
 ### Removed
 - Stop using juce BinaryData from old Projucer project. Resources are now generated with Meson.

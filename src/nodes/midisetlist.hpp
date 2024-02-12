@@ -1,18 +1,20 @@
-// Copyright 2023 Kushview, LLC <info@kushview.net>
+// Copyright 2024 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
 #pragma once
 
 #include "nodes/midifilter.hpp"
+#include <element/node.h>
 #include <element/midipipe.hpp>
-#include "nodes/baseprocessor.hpp"
 #include <element/signals.hpp>
 
 namespace element {
 
-class MidiProgramMapNode : public MidiFilterNode,
-                           public AsyncUpdater,
-                           public ChangeBroadcaster
+class Context;
+
+class MidiSetListProcessor : public MidiFilterNode,
+                             public AsyncUpdater,
+                             public ChangeBroadcaster
 {
 public:
     struct ProgramEntry
@@ -20,24 +22,25 @@ public:
         String name;
         int in;
         int out;
+        double tempo { 0.0 };
     };
 
-    MidiProgramMapNode();
-    virtual ~MidiProgramMapNode();
+    MidiSetListProcessor (Context&);
+    virtual ~MidiSetListProcessor();
 
     void getPluginDescription (PluginDescription& desc) const override
     {
-        desc.fileOrIdentifier = EL_NODE_ID_MIDI_PROGRAM_MAP;
-        desc.name = "MIDI Program Map";
-        desc.descriptiveName = "Filter MIDI Program Changes and set tempo.";
+        desc.fileOrIdentifier = EL_NODE_ID_MIDI_SET_LIST;
+        desc.name = getName();
+        desc.descriptiveName = "Filter MIDI Programs and change tempo.";
         desc.numInputChannels = 0;
         desc.numOutputChannels = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument = false;
         desc.manufacturerName = EL_NODE_FORMAT_AUTHOR;
         desc.pluginFormatName = EL_NODE_FORMAT_NAME;
-        desc.version = "1.1.0";
-        desc.uniqueId = EL_NODE_UID_MIDI_PROGRAM_MAP;
+        desc.version = "1.0.0";
+        desc.uniqueId = EL_NODE_UID_MIDI_SET_LIST;
     }
 
     void clear();
@@ -47,10 +50,15 @@ public:
 
     void render (RenderContext&) override;
     void sendProgramChange (int program, int channel);
+
     int getNumProgramEntries() const;
     void addProgramEntry (const String& name, int programIn, int programOut = -1);
     void removeProgramEntry (int index);
-    void editProgramEntry (int index, const String& name, int inProgram, int outProgram);
+    void editProgramEntry (int index,
+                           const String& name,
+                           int inProgram,
+                           int outProgram,
+                           double tempo);
     ProgramEntry getProgramEntry (int index) const;
 
     inline int getWidth() const { return width; }
@@ -93,6 +101,7 @@ public:
             entry->name = e["name"].toString();
             entry->in = (int) e["in"];
             entry->out = (int) e["out"];
+            entry->tempo = (double) e["tempo"];
         }
 
         {
@@ -110,12 +119,14 @@ public:
         tree.setProperty ("fontSize", fontSize, nullptr)
             .setProperty ("width", width, nullptr)
             .setProperty ("height", height, nullptr);
+
         for (const auto* const entry : entries)
         {
             ValueTree e ("entry");
             e.setProperty ("name", entry->name, nullptr)
                 .setProperty ("in", entry->in, nullptr)
-                .setProperty ("out", entry->out, nullptr);
+                .setProperty ("out", entry->out, nullptr)
+                .setProperty ("tempo", entry->tempo, nullptr);
             tree.appendChild (e, nullptr);
         }
 
@@ -127,10 +138,11 @@ public:
         }
     }
 
-    inline void handleAsyncUpdate() override { lastProgramChanged(); }
+    void handleAsyncUpdate() override;
     Signal<void()> lastProgramChanged;
 
 protected:
+    Context& _context;
     CriticalSection lock;
     OwnedArray<ProgramEntry> entries;
     int programMap[128];
@@ -157,6 +169,8 @@ protected:
         createdPorts = true;
         setPorts (newPorts);
     }
+
+    void maybeSendTempo (int program);
 };
 
 } // namespace element
