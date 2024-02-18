@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Session version="1" name="pluginstack" tempo="60.0" notes="" beatsPerBar="4"
+         beatDivisor="2">
+  <graphs active="0">
+    <Node version="1" type="Graph" uuid="69f279b47eec4883ad744157dba427a0"
+          name="Graph" bypass="0" persistent="1" renderMode="single" keyStart="0"
+          keyEnd="127" transpose="0" delayCompensation="0" tempo="120.0">
+      <nodes>
+        <Node id="1" format="Internal" identifier="audio.input" type="plugin"
+              name="" relativeX="0.204136690647482" relativeY="0.04503311258278146"
+              pluginIdentifierString="Internal--da9d27b2-0" uuid="d76b107d36ed4c3097fe052412975153"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="13.0"
+              y="13.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1"
+              enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block displayMode="compact" portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="Audio Out 1" symbol="audio_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="Audio Out 2" symbol="audio_out_2"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="2" channel="2" type="audio" name="Audio Out 3" symbol="audio_out_3"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="3" channel="3" type="audio" name="Audio Out 4" symbol="audio_out_4"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="4" channel="4" type="audio" name="Audio Out 5" symbol="audio_out_5"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="5" channel="5" type="audio" name="Audio Out 6" symbol="audio_out_6"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="6" channel="6" type="audio" name="Audio Out 7" symbol="audio_out_7"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="7" channel="7" type="audio" name="Audio Out 8" symbol="audio_out_8"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="8" channel="8" type="audio" name="Audio Out 9" symbol="audio_out_9"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="9" channel="9" type="audio" name="Audio Out 10" symbol="audio_out_10"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="10" channel="10" type="audio" name="Audio Out 11" symbol="audio_out_11"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="11" channel="11" type="audio" name="Audio Out 12" symbol="audio_out_12"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="12" channel="12" type="audio" name="Audio Out 13" symbol="audio_out_13"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="13" channel="13" type="audio" name="Audio Out 14" symbol="audio_out_14"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="14" channel="14" type="audio" name="Audio Out 15" symbol="audio_out_15"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="15" channel="15" type="audio" name="Audio Out 16" symbol="audio_out_16"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="16" channel="16" type="audio" name="Audio Out 17" symbol="audio_out_17"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="17" channel="17" type="audio" name="Audio Out 18" symbol="audio_out_18"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="18" channel="18" type="audio" name="Audio Out 19" symbol="audio_out_19"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="19" channel="19" type="audio" name="Audio Out 20" symbol="audio_out_20"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="20" channel="20" type="audio" name="Audio Out 21" symbol="audio_out_21"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="21" channel="21" type="audio" name="Audio Out 22" symbol="audio_out_22"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="22" channel="22" type="audio" name="Audio Out 23" symbol="audio_out_23"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="23" channel="23" type="audio" name="Audio Out 24" symbol="audio_out_24"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="24" channel="24" type="audio" name="Audio Out 25" symbol="audio_out_25"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="25" channel="25" type="audio" name="Audio Out 26" symbol="audio_out_26"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="26" channel="26" type="audio" name="Audio Out 27" symbol="audio_out_27"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="27" channel="27" type="audio" name="Audio Out 28" symbol="audio_out_28"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="28" channel="28" type="audio" name="Audio Out 29" symbol="audio_out_29"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="29" channel="29" type="audio" name="Audio Out 30" symbol="audio_out_30"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="30" channel="30" type="audio" name="Audio Out 31" symbol="audio_out_31"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="31" channel="31" type="audio" name="Audio Out 32" symbol="audio_out_32"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="2" format="Internal" identifier="audio.output" type="plugin"
+              name="" relativeX="0.2266187050359712" relativeY="0.5774834437086093"
+              pluginIdentifierString="Internal--83a94619-0" uuid="79bcc8631ff840f7911cd47f211841d5"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="38.0"
+              y="415.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1"
+              enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block displayMode="compact" portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="Audio In 1" symbol="audio_in_1"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="Audio In 2" symbol="audio_in_2"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="2" channel="2" type="audio" name="Audio In 3" symbol="audio_in_3"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="3" channel="3" type="audio" name="Audio In 4" symbol="audio_in_4"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="4" channel="4" type="audio" name="Audio In 5" symbol="audio_in_5"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="5" channel="5" type="audio" name="Audio In 6" symbol="audio_in_6"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="6" channel="6" type="audio" name="Audio In 7" symbol="audio_in_7"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="7" channel="7" type="audio" name="Audio In 8" symbol="audio_in_8"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="8" channel="8" type="audio" name="Audio In 9" symbol="audio_in_9"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="9" channel="9" type="audio" name="Audio In 10" symbol="audio_in_10"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="10" channel="10" type="audio" name="Audio In 11" symbol="audio_in_11"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="11" channel="11" type="audio" name="Audio In 12" symbol="audio_in_12"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="12" channel="12" type="audio" name="Audio In 13" symbol="audio_in_13"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="13" channel="13" type="audio" name="Audio In 14" symbol="audio_in_14"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="14" channel="14" type="audio" name="Audio In 15" symbol="audio_in_15"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="15" channel="15" type="audio" name="Audio In 16" symbol="audio_in_16"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="16" channel="16" type="audio" name="Audio In 17" symbol="audio_in_17"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="17" channel="17" type="audio" name="Audio In 18" symbol="audio_in_18"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="18" channel="18" type="audio" name="Audio In 19" symbol="audio_in_19"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="19" channel="19" type="audio" name="Audio In 20" symbol="audio_in_20"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="20" channel="20" type="audio" name="Audio In 21" symbol="audio_in_21"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="21" channel="21" type="audio" name="Audio In 22" symbol="audio_in_22"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="22" channel="22" type="audio" name="Audio In 23" symbol="audio_in_23"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="23" channel="23" type="audio" name="Audio In 24" symbol="audio_in_24"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="24" channel="24" type="audio" name="Audio In 25" symbol="audio_in_25"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="25" channel="25" type="audio" name="Audio In 26" symbol="audio_in_26"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="26" channel="26" type="audio" name="Audio In 27" symbol="audio_in_27"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="27" channel="27" type="audio" name="Audio In 28" symbol="audio_in_28"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="28" channel="28" type="audio" name="Audio In 29" symbol="audio_in_29"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="29" channel="29" type="audio" name="Audio In 30" symbol="audio_in_30"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="30" channel="30" type="audio" name="Audio In 31" symbol="audio_in_31"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="31" channel="31" type="audio" name="Audio In 32" symbol="audio_in_32"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="3" format="Internal" identifier="midi.input" type="plugin"
+              name="" relativeX="0.4955035971223021" relativeY="0.0423841059602649"
+              pluginIdentifierString="Internal--6e34cabd-0" uuid="0c1caa89214a4b6190b8e7c39005f1cf"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="506.0"
+              y="11.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1"
+              enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block displayMode="compact" portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="6" format="LV2" identifier="https://kushview.net/plugins/roboverb"
+              type="plugin" name="Roboverb" relativeX="0.07733812949640288"
+              relativeY="0.2278145695364238" pluginIdentifierString="LV2-Roboverb-d7d34e05-d7d34e05"
+              uuid="9c68fb1eafdd49079ed64698497f5ce6" bypass="0" persistent="1"
+              renderMode="single" keyStart="0" keyEnd="127" transpose="0" delayCompensation="0.0"
+              tempo="120.0" x="41.0" y="142.0" windowX="482" windowY="463"
+              windowVisible="0" state="955.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczA2b57xKqU2bnYWZkcmKtUFcu.Ga0cVZtM2Kx8lXuYWYxIlOfriBIvlcxnCbuIGcfrkBIj.a1IiNykWah8FafHRXrwFbgM2beEiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHRXrwFbgM2beIiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHRXrwFbgM2beMiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHRXrwFbgM2beQiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeEiHfriBIj.byUFc5XWXrUWYfDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeIiHfriBIj.byUFc5XWXrUWYfDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeMiHfriBIj.byUFc5XWXrUWYfDiKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeQiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeUiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeYiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXeciHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHxXu0lXegiHfriBIj.byUFc5XWXrUWYf.iKvnPBcABKfrkBIj.a1IiNykWah8FafHBYg0Fbo41Yh.xNJjPBvMWYzoicgwVckABLtTiBIzEHr.xVJjPBrYmL5LWdsI1arAhHjIWdh.xNJjPBvMWYzoicgwVckABLtPCLv.CLv.SLJjPWfvBHaoPBIvlcxnyb40lXuwFHhH2au01WykldkIBH6nPBI.2bkQmN1EFa0UFHv3RMJjPWfvBHaoPBIvlcxnyb40lXuwFHhbWYzIBH6nPBI.2bkQmN1EFa0UFHw3BLJjPWfvBHaoPBIvlcxnyb40lXuwFHhbWZjQGZh.xNJjPBvMWYzoicgwVckABLtTSLyLyLyLiLJjPWf3hBJ."
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="wet,dry,room_size,damping,width,comb_1,comb_2,comb_3,comb_4,comb_5,comb_6,comb_7,comb_8,allpass_1,allpass_2,allpass_3,allpass_4"
+                   portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="In 1" symbol="in_1"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="In 2" symbol="in_2"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="audio" name="Out 1" symbol="out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="3" channel="1" type="audio" name="Out 2" symbol="out_2"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="4" channel="0" type="control" name="Wet" symbol="wet"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="5" channel="1" type="control" name="Dry" symbol="dry"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="6" channel="2" type="control" name="Room Size" symbol="room_size"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="7" channel="3" type="control" name="Damping" symbol="damping"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="8" channel="4" type="control" name="Width" symbol="width"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="9" channel="5" type="control" name="Comb 1" symbol="comb_1"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="10" channel="6" type="control" name="Comb 2" symbol="comb_2"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="11" channel="7" type="control" name="Comb 3" symbol="comb_3"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="12" channel="8" type="control" name="Comb 4" symbol="comb_4"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="13" channel="9" type="control" name="Comb 5" symbol="comb_5"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="14" channel="10" type="control" name="Comb 6" symbol="comb_6"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="15" channel="11" type="control" name="Comb 7" symbol="comb_7"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="16" channel="12" type="control" name="Comb 8" symbol="comb_8"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="17" channel="13" type="control" name="Allpass 1" symbol="allpass_1"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="18" channel="14" type="control" name="Allpass 2" symbol="allpass_2"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="19" channel="15" type="control" name="Allpass 3" symbol="allpass_3"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="20" channel="16" type="control" name="Allpass 4" symbol="allpass_4"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="21" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="7" format="LV2" identifier="https://kushview.net/plugins/ksp1"
+              type="plugin" name="KSP1" relativeX="0.2643884892086331" relativeY="0.1920529801324503"
+              pluginIdentifierString="LV2-KSP1-eae965c5-eae965c5" uuid="4b5ac607805c44649db0bcdd036b583b"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="249.0"
+              y="115.0" windowX="402" windowY="332" windowVisible="0" state="581.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczA2b57xKqU2bnYWZkcmKtUFcu.Ga0cVZtM2KqMGbw3CH6nPByQWXzUlNyQWXzUFHaoPBIvCZzQGbyoyKurVcyglcoU1ct3VYz8BbrU2Yo41bur1bvEyHSEVavwVYxMUdtQGZ9.hHhHxdhjDQhnCHvvBHhX2arUWakIhNf.iKvvBHhL2a04FYyIhNfr0dhjDQhnCHwvBHh31azUlH5.xM4vBHhvVYtcFcnIhNf.CKfHhcuwVcsUlH5.BLt.CKfHhcuk1XkcjbuUGbhnCHsDCKfHBcxk1YmUlbM8FYkIhNf.CKfHBagkWYxMmH5.xV6IRRDIhNfTCLvDyMyXCKfHRZtQVY3IhNfzRLr.hHt8FckIhNfbSNr.hH18Fa00VYhnCHv3BLr.hHvkFciglH5.BLt.CKfHBbg4lao41YhnCHv3RMr.hH1UFauMVZzkGSucWYxIhNf.iKvvBHhXWYr81XoQWdUAGbkImH5.BLt.CKfHxbzElbzIhNf.iKvvBHhvVYtcFcnIhNfDiKvLyLxfyM4fSL3TSNzDSLr.hHlkFakIhNfHxKn8Vak8Ralk1bnUlbu3Ba1IyKqMGbw3Ba1IyKqkFcy8xbt0hb3zBLz7hTsfiXk4FYfP2as4xcgYmHr.hHtEVakIhNfHhTsfiXk4FYfP2asIRec0WW8IhHhnPBcAhKJn."
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1" gain="1.0">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="atom" name="Events In" symbol="events_in"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="atom" name="Events Out" symbol="events_out"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="audio" name="Main Left" symbol="main_left"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="3" channel="1" type="audio" name="Main Right" symbol="main_right"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="8" format="LV2" identifier="https://kushview.net/plugins/everb"
+              type="plugin" name="eVerb" relativeX="0.2778776978417266" relativeY="0.414569536423841"
+              pluginIdentifierString="LV2-eVerb-71f001e8-71f001e8" uuid="8721daf32f194308b70c60e109e3ea50"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="264.0"
+              y="283.0" windowX="977" windowY="712" windowVisible="0" state="378.7fFczAmNu7xZ0MGZ1kVY24hakQ2KqY2KyQWXzUlOJjPXf.2bkQmNPIWYyUFcfriBIvlcxnSXvAGaoU1bT8FH7fFczA2b57xKqU2bnYWZkcmKtUFcu.Ga0cVZtM2KkYWYxIlOfriBIvlcxnCbuIGcfrkBIj.a1IiNykWah8FafHBYg0Fbo41Yh.xNJjPBvMWYzoicgwVckARLt.iBIzEHr.xVJjPBrYmL5LWdsI1arAhHjIWdh.xNJjPBvMWYzoicgwVckABLtbyMzTCL4bSNJjPWfvBHaoPBIvlcxnyb40lXuwFHhH2au01WykldkIBH6nPBI.2bkQmN1EFa0UFHv3RN1.yM3PyLxnPBcABKfrkBIj.a1IiNykWah8FafHxckQmHfriBIj.byUFc5XWXrUWYf.iKvLCL3TCN0jiBIzEHr.xVJjPBrYmL5LWdsI1arAhH2kFYzglHfriBIj.byUFc5XWXrUWYf.iK3DyL2HSMzbiBIzEHtnfB"
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1" gain="0.435311359229638">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block hiddenPorts="wet,dry,room_size,damping,width" portAlignment="before"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="audio" name="In 1" symbol="in_1"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="1" type="audio" name="In 2" symbol="in_2"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="2" channel="0" type="audio" name="Out 1" symbol="out_1"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="3" channel="1" type="audio" name="Out 2" symbol="out_2"
+                  flow="output" hiddenOnBlock="0"/>
+            <Port index="4" channel="0" type="control" name="Wet" symbol="wet"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="5" channel="1" type="control" name="Dry" symbol="dry"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="6" channel="2" type="control" name="Room Size" symbol="room_size"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="7" channel="3" type="control" name="Damping" symbol="damping"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="8" channel="4" type="control" name="Width" symbol="width"
+                  flow="input" hiddenOnBlock="1"/>
+            <Port index="9" channel="0" type="midi" name="MIDI In" symbol="element_midi_input"
+                  flow="input" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+        <Node id="11" format="Element" identifier="element.midiMonitor" type="plugin"
+              name="MIDI Monitor" relativeX="0.5665467625899281" relativeY="0.3165562913907285"
+              pluginIdentifierString="Element-MIDI Monitor-b08bd707-3f8" uuid="b5f41a503a3843aca6e1bd1f77fa9ba1"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" tempo="120.0" x="434.0"
+              y="120.0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <scripts/>
+          <ui>
+            <Block portAlignment="before" displayMode="embed"/>
+          </ui>
+          <ports>
+            <Port index="0" channel="0" type="midi" name="MIDI In" symbol="midi_in"
+                  flow="input" hiddenOnBlock="0"/>
+            <Port index="1" channel="0" type="midi" name="MIDI Out" symbol="midi_out"
+                  flow="output" hiddenOnBlock="0"/>
+          </ports>
+        </Node>
+      </nodes>
+      <scripts/>
+      <ui>
+        <Block/>
+        <GraphEditorView width="1074" height="493"/>
+      </ui>
+      <arcs>
+        <Arc sourceNode="3" sourcePort="0" destNode="7" destPort="0"/>
+        <Arc sourceNode="3" sourcePort="0" destNode="11" destPort="0"/>
+        <Arc sourceNode="7" sourcePort="2" destNode="8" destPort="0"/>
+        <Arc sourceNode="7" sourcePort="3" destNode="8" destPort="1"/>
+        <Arc sourceNode="8" sourcePort="2" destNode="2" destPort="0"/>
+        <Arc sourceNode="8" sourcePort="3" destNode="2" destPort="1"/>
+      </arcs>
+      <ports>
+        <Port index="0" channel="0" type="audio" name="Audio In 1" symbol="audio_in_1"
+              flow="input"/>
+        <Port index="1" channel="1" type="audio" name="Audio In 2" symbol="audio_in_2"
+              flow="input"/>
+        <Port index="2" channel="2" type="audio" name="Audio In 3" symbol="audio_in_3"
+              flow="input"/>
+        <Port index="3" channel="3" type="audio" name="Audio In 4" symbol="audio_in_4"
+              flow="input"/>
+        <Port index="4" channel="4" type="audio" name="Audio In 5" symbol="audio_in_5"
+              flow="input"/>
+        <Port index="5" channel="5" type="audio" name="Audio In 6" symbol="audio_in_6"
+              flow="input"/>
+        <Port index="6" channel="6" type="audio" name="Audio In 7" symbol="audio_in_7"
+              flow="input"/>
+        <Port index="7" channel="7" type="audio" name="Audio In 8" symbol="audio_in_8"
+              flow="input"/>
+        <Port index="8" channel="8" type="audio" name="Audio In 9" symbol="audio_in_9"
+              flow="input"/>
+        <Port index="9" channel="9" type="audio" name="Audio In 10" symbol="audio_in_10"
+              flow="input"/>
+        <Port index="10" channel="10" type="audio" name="Audio In 11" symbol="audio_in_11"
+              flow="input"/>
+        <Port index="11" channel="11" type="audio" name="Audio In 12" symbol="audio_in_12"
+              flow="input"/>
+        <Port index="12" channel="12" type="audio" name="Audio In 13" symbol="audio_in_13"
+              flow="input"/>
+        <Port index="13" channel="13" type="audio" name="Audio In 14" symbol="audio_in_14"
+              flow="input"/>
+        <Port index="14" channel="14" type="audio" name="Audio In 15" symbol="audio_in_15"
+              flow="input"/>
+        <Port index="15" channel="15" type="audio" name="Audio In 16" symbol="audio_in_16"
+              flow="input"/>
+        <Port index="16" channel="16" type="audio" name="Audio In 17" symbol="audio_in_17"
+              flow="input"/>
+        <Port index="17" channel="17" type="audio" name="Audio In 18" symbol="audio_in_18"
+              flow="input"/>
+        <Port index="18" channel="18" type="audio" name="Audio In 19" symbol="audio_in_19"
+              flow="input"/>
+        <Port index="19" channel="19" type="audio" name="Audio In 20" symbol="audio_in_20"
+              flow="input"/>
+        <Port index="20" channel="20" type="audio" name="Audio In 21" symbol="audio_in_21"
+              flow="input"/>
+        <Port index="21" channel="21" type="audio" name="Audio In 22" symbol="audio_in_22"
+              flow="input"/>
+        <Port index="22" channel="22" type="audio" name="Audio In 23" symbol="audio_in_23"
+              flow="input"/>
+        <Port index="23" channel="23" type="audio" name="Audio In 24" symbol="audio_in_24"
+              flow="input"/>
+        <Port index="24" channel="24" type="audio" name="Audio In 25" symbol="audio_in_25"
+              flow="input"/>
+        <Port index="25" channel="25" type="audio" name="Audio In 26" symbol="audio_in_26"
+              flow="input"/>
+        <Port index="26" channel="26" type="audio" name="Audio In 27" symbol="audio_in_27"
+              flow="input"/>
+        <Port index="27" channel="27" type="audio" name="Audio In 28" symbol="audio_in_28"
+              flow="input"/>
+        <Port index="28" channel="28" type="audio" name="Audio In 29" symbol="audio_in_29"
+              flow="input"/>
+        <Port index="29" channel="29" type="audio" name="Audio In 30" symbol="audio_in_30"
+              flow="input"/>
+        <Port index="30" channel="30" type="audio" name="Audio In 31" symbol="audio_in_31"
+              flow="input"/>
+        <Port index="31" channel="31" type="audio" name="Audio In 32" symbol="audio_in_32"
+              flow="input"/>
+        <Port index="32" channel="0" type="audio" name="Audio Out 1" symbol="audio_out_1"
+              flow="output"/>
+        <Port index="33" channel="1" type="audio" name="Audio Out 2" symbol="audio_out_2"
+              flow="output"/>
+        <Port index="34" channel="2" type="audio" name="Audio Out 3" symbol="audio_out_3"
+              flow="output"/>
+        <Port index="35" channel="3" type="audio" name="Audio Out 4" symbol="audio_out_4"
+              flow="output"/>
+        <Port index="36" channel="4" type="audio" name="Audio Out 5" symbol="audio_out_5"
+              flow="output"/>
+        <Port index="37" channel="5" type="audio" name="Audio Out 6" symbol="audio_out_6"
+              flow="output"/>
+        <Port index="38" channel="6" type="audio" name="Audio Out 7" symbol="audio_out_7"
+              flow="output"/>
+        <Port index="39" channel="7" type="audio" name="Audio Out 8" symbol="audio_out_8"
+              flow="output"/>
+        <Port index="40" channel="8" type="audio" name="Audio Out 9" symbol="audio_out_9"
+              flow="output"/>
+        <Port index="41" channel="9" type="audio" name="Audio Out 10" symbol="audio_out_10"
+              flow="output"/>
+        <Port index="42" channel="10" type="audio" name="Audio Out 11" symbol="audio_out_11"
+              flow="output"/>
+        <Port index="43" channel="11" type="audio" name="Audio Out 12" symbol="audio_out_12"
+              flow="output"/>
+        <Port index="44" channel="12" type="audio" name="Audio Out 13" symbol="audio_out_13"
+              flow="output"/>
+        <Port index="45" channel="13" type="audio" name="Audio Out 14" symbol="audio_out_14"
+              flow="output"/>
+        <Port index="46" channel="14" type="audio" name="Audio Out 15" symbol="audio_out_15"
+              flow="output"/>
+        <Port index="47" channel="15" type="audio" name="Audio Out 16" symbol="audio_out_16"
+              flow="output"/>
+        <Port index="48" channel="16" type="audio" name="Audio Out 17" symbol="audio_out_17"
+              flow="output"/>
+        <Port index="49" channel="17" type="audio" name="Audio Out 18" symbol="audio_out_18"
+              flow="output"/>
+        <Port index="50" channel="18" type="audio" name="Audio Out 19" symbol="audio_out_19"
+              flow="output"/>
+        <Port index="51" channel="19" type="audio" name="Audio Out 20" symbol="audio_out_20"
+              flow="output"/>
+        <Port index="52" channel="20" type="audio" name="Audio Out 21" symbol="audio_out_21"
+              flow="output"/>
+        <Port index="53" channel="21" type="audio" name="Audio Out 22" symbol="audio_out_22"
+              flow="output"/>
+        <Port index="54" channel="22" type="audio" name="Audio Out 23" symbol="audio_out_23"
+              flow="output"/>
+        <Port index="55" channel="23" type="audio" name="Audio Out 24" symbol="audio_out_24"
+              flow="output"/>
+        <Port index="56" channel="24" type="audio" name="Audio Out 25" symbol="audio_out_25"
+              flow="output"/>
+        <Port index="57" channel="25" type="audio" name="Audio Out 26" symbol="audio_out_26"
+              flow="output"/>
+        <Port index="58" channel="26" type="audio" name="Audio Out 27" symbol="audio_out_27"
+              flow="output"/>
+        <Port index="59" channel="27" type="audio" name="Audio Out 28" symbol="audio_out_28"
+              flow="output"/>
+        <Port index="60" channel="28" type="audio" name="Audio Out 29" symbol="audio_out_29"
+              flow="output"/>
+        <Port index="61" channel="29" type="audio" name="Audio Out 30" symbol="audio_out_30"
+              flow="output"/>
+        <Port index="62" channel="30" type="audio" name="Audio Out 31" symbol="audio_out_31"
+              flow="output"/>
+        <Port index="63" channel="31" type="audio" name="Audio Out 32" symbol="audio_out_32"
+              flow="output"/>
+        <Port index="64" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
+              flow="input"/>
+      </ports>
+    </Node>
+  </graphs>
+  <controllers/>
+  <maps/>
+  <ui content="146.3ocsMGsBBBCE..cFzWifuTo8d4k1RJoVKUvGLbkZWaxbja+8geDc9ANilJij3s3jpVFW2ZTZQqbh3UtLLLXkZKyzs+H8Fj0ohrmiexYSEWPDo.9QAYOZfpWTnOyRKDC.xY.hqwdQi.4MfMc5cWtM+NcWh8v0jfuga7Cbj4sTsZPpMsxw+2nadLxO0QH+.jo1NED"/>
+</Session>
