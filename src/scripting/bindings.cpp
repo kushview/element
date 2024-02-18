@@ -27,7 +27,7 @@
 #include "object.lua.h"
 #include "script.lua.h"
 #include "session.lua.h"
-#include "slug.lua.h"
+#include "strings.lua.h"
 
 extern "C" {
 extern int luaopen_el_audio (lua_State* L);
@@ -238,7 +238,7 @@ DEFINE_LUA_TXT_LOADER (command)
 DEFINE_LUA_TXT_LOADER (object)
 DEFINE_LUA_TXT_LOADER (script)
 DEFINE_LUA_TXT_LOADER (session)
-DEFINE_LUA_TXT_LOADER (slug)
+DEFINE_LUA_TXT_LOADER (strings)
 DEFINE_LUA_TXT_LOADER (color)
 #undef DEFINE_LUA_TXT_LOADER
 
@@ -265,9 +265,9 @@ static int searchInternalModules (lua_State* L)
     {
         sol::stack::push (L, load_el_session);
     }
-    else if (mod == "el.slug")
+    else if (mod == "el.strings")
     {
-        sol::stack::push (L, load_el_slug);
+        sol::stack::push (L, load_el_strings);
     }
     else if (mod == "el.color")
     {

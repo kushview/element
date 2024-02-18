@@ -15,10 +15,10 @@
 -- ...
 
 local CMD   = require ('el.CommandManager')
-local slug  = require ('el.slug')
+local strings  = require ('el.strings')
 local format = select (1, ...) or 'constants'
 
-if not slug.valid (format) then
+if not strings.isslug (format) then
     error ("Invalid format: " .. tostring (format))
 end
 
@@ -26,7 +26,7 @@ local list = {
     -- List as constants used with the el.command module
     constants = function (cmds)
         for k,v in pairs (cmds) do
-            local out = string.upper (slug.tosnake (k))
+            local out = string.upper (strings.tosnake (k))
             out = out .. " = " .. tostring(v)
             print (out)
         end

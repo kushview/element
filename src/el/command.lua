@@ -32,6 +32,7 @@ function M.invoke (cmd, async)
 end
 
 --- Create a closure for a command.
+--
 -- Returns a function which invokes the command async or not. By default the
 -- command is not invoked async
 -- @int cmd Command ID
@@ -61,10 +62,10 @@ end
 -- Define standard commands as constants. 
 -- e.g. Commands::showAbout in C++ becomes command.SHOW_ABOUT
 for _,cmd in ipairs (Commands.standard()) do
-    local slug = require ('el.slug')
+    local strings = require ('el.strings')
     local s = Commands.toString (cmd)
-    if string.len(s) > 0 and slug.valid(s) then
-        local k = slug.tosnake (s)
+    if string.len(s) > 0 and strings.valid(s) then
+        local k = strings.tosnake (s)
         M[string.upper (k)] = cmd
     end
 end

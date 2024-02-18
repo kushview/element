@@ -254,7 +254,7 @@ libelement_sources += luael_gen.process (
     'el/color.lua',
     'el/script.lua',
     'el/session.lua',
-    'el/slug.lua'
+    'el/strings.lua'
 )
 
 libelement_includes += scripts_includes
