@@ -9,19 +9,19 @@
 
 namespace element {
 
-typedef MidiSetListEditor PGCME;
+typedef MidiSetListEditor MSLE;
 typedef ReferenceCountedObjectPtr<MidiSetListProcessor> MidiSetListProcessorPtr;
 
-class ProgramNameLabel : public Label
+class MidiSetListProgramNameLabel : public Label
 {
 public:
-    ProgramNameLabel (MidiSetListEditor& e)
+    MidiSetListProgramNameLabel (MidiSetListEditor& e)
         : editor (e)
     {
         setEditable (false, true);
     }
 
-    ~ProgramNameLabel() {}
+    ~MidiSetListProgramNameLabel() {}
 
     void setRow (int r) { row = r; }
 
@@ -43,6 +43,7 @@ public:
 protected:
     void textWasEdited() override
     {
+        std::clog << "text was edited\n";
         auto program = editor.getProgram (row);
         program.name = getText();
         editor.setProgram (row, program);
@@ -53,17 +54,17 @@ private:
     int row = -1;
 };
 
-class ProgramNumberLabel : public Label
+class MidiSetListProgramNumberLabel : public Label
 {
 public:
-    ProgramNumberLabel (MidiSetListEditor& e, bool input)
+    MidiSetListProgramNumberLabel (MidiSetListEditor& e, bool input)
         : editor (e), isInput (input)
     {
         setEditable (false, true);
         setJustificationType (Justification::centred);
     }
 
-    ~ProgramNumberLabel() {}
+    ~MidiSetListProgramNumberLabel() {}
 
     void mouseDown (const MouseEvent& ev) override
     {
@@ -108,17 +109,17 @@ private:
     int row = -1;
 };
 
-class ProgramTempoLabel : public Label
+class MidiSetListProgramTempoLabel : public Label
 {
 public:
-    ProgramTempoLabel (MidiSetListEditor& e)
+    MidiSetListProgramTempoLabel (MidiSetListEditor& e)
         : editor (e)
     {
         setEditable (false, true);
         setJustificationType (Justification::centred);
     }
 
-    ~ProgramTempoLabel() {}
+    ~MidiSetListProgramTempoLabel() {}
 
     void mouseDown (const MouseEvent& ev) override
     {
@@ -167,7 +168,7 @@ private:
     int row = -1;
 };
 
-class PGCME::TableModel : public TableListBoxModel
+class MSLE::TableModel : public TableListBoxModel
 {
 public:
     MidiSetListEditor& editor;
@@ -228,8 +229,8 @@ public:
         {
             case TableModel::Name: {
                 auto* name = existing == nullptr
-                                 ? new ProgramNameLabel (editor)
-                                 : dynamic_cast<ProgramNameLabel*> (existing);
+                                 ? new MidiSetListProgramNameLabel (editor)
+                                 : dynamic_cast<MidiSetListProgramNameLabel*> (existing);
                 name->setText (program.name, dontSendNotification);
                 name->setRow (rowNumber);
                 label = name;
@@ -238,8 +239,8 @@ public:
 
             case TableModel::InProgram: {
                 auto* input = existing == nullptr
-                                  ? new ProgramNumberLabel (editor, true)
-                                  : dynamic_cast<ProgramNumberLabel*> (existing);
+                                  ? new MidiSetListProgramNumberLabel (editor, true)
+                                  : dynamic_cast<MidiSetListProgramNumberLabel*> (existing);
                 input->setProgram (program.in);
                 input->setRow (rowNumber);
                 label = input;
@@ -248,8 +249,8 @@ public:
 
             case TableModel::OutProgram: {
                 auto* output = existing == nullptr
-                                   ? new ProgramNumberLabel (editor, false)
-                                   : dynamic_cast<ProgramNumberLabel*> (existing);
+                                   ? new MidiSetListProgramNumberLabel (editor, false)
+                                   : dynamic_cast<MidiSetListProgramNumberLabel*> (existing);
                 output->setProgram (program.out);
                 output->setRow (rowNumber);
                 label = output;
@@ -258,8 +259,8 @@ public:
 
             case TableModel::Tempo: {
                 auto* t = existing == nullptr
-                              ? new ProgramTempoLabel (editor)
-                              : dynamic_cast<ProgramTempoLabel*> (existing);
+                              ? new MidiSetListProgramTempoLabel (editor)
+                              : dynamic_cast<MidiSetListProgramTempoLabel*> (existing);
                 t->setTempo (program.tempo);
                 t->setRow (rowNumber);
                 label = t;
