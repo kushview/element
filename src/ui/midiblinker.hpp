@@ -25,6 +25,8 @@ public:
     void triggerReceived();
     void triggerSent();
 
+    void setInputOutputVisibility (bool in, bool out);
+    
     void paint (Graphics&) override;
     void resized() override;
 
@@ -32,6 +34,8 @@ private:
     int holdMillis = 100;
     bool haveInput = false;
     bool haveOutput = false;
+    bool showInput = true;
+    bool showOutput = true;
     friend class Timer;
     void timerCallback() override;
 };

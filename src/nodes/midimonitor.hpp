@@ -60,6 +60,7 @@ public:
 
 private:
     friend class MidiMonitorNodeEditor;
+    friend class MidiMonitorBlock;
     Signal<void()> messagesLogged;
     double currentSampleRate = 44100.0;
     int numSamples = 0;

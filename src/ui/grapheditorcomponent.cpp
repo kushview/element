@@ -31,8 +31,48 @@
 
 #include "scopedflag.hpp"
 
+// midi mon. block
+#include "nodes/midimonitor.hpp"
+#include "ui/midiblinker.hpp"
+
 namespace element {
 
+//==============================================================================
+class MidiMonitorBlock : public BlockComponent {
+public:
+    MidiMonitorBlock() = delete;
+    explicit MidiMonitorBlock (const Node& node, bool vertical)
+        : BlockComponent (node.getParentGraph(), node, vertical) {
+        mmnode = dynamic_cast<MidiMonitorNode*> (node.getObject());
+        if (auto n = mmnode) {
+            loggedConn = n->messagesLogged.connect ([this]() { onLogged(); });
+        }
+        addAndMakeVisible (blinker);
+        blinker.setInputOutputVisibility (true, false);
+    }
+
+    ~MidiMonitorBlock() {
+        loggedConn.disconnect();
+    }
+
+    void resized() override {
+        BlockComponent::resized();
+        auto r = getLocalBounds();
+        r.removeFromBottom (8);
+        r.removeFromRight (8);
+        r = r.removeFromBottom (30);
+        r = r.removeFromRight (30);
+        blinker.setBounds (r);
+    }
+
+private:
+    ReferenceCountedObjectPtr<MidiMonitorNode> mmnode;
+    boost::signals2::connection loggedConn;
+    MidiBlinker blinker;
+    void onLogged() { blinker.triggerReceived(); }
+};
+
+//==============================================================================
 class DefaultBlockFactory : public BlockFactory
 {
 public:
@@ -41,7 +81,13 @@ public:
 
     BlockComponent* createBlockComponent (const Node& node) override
     {
-        auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
+        BlockComponent* block {nullptr};
+        if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR)) {
+            block = new MidiMonitorBlock (node, editor.isLayoutVertical());
+        } else {
+            block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
+        }
+
         detail::updateBlockButtonVisibility (*block, node);
         return block;
     }
