@@ -38,24 +38,29 @@
 namespace element {
 
 //==============================================================================
-class MidiMonitorBlock : public BlockComponent {
+class MidiMonitorBlock : public BlockComponent
+{
 public:
     MidiMonitorBlock() = delete;
     explicit MidiMonitorBlock (const Node& node, bool vertical)
-        : BlockComponent (node.getParentGraph(), node, vertical) {
+        : BlockComponent (node.getParentGraph(), node, vertical)
+    {
         mmnode = dynamic_cast<MidiMonitorNode*> (node.getObject());
-        if (auto n = mmnode) {
+        if (auto n = mmnode)
+        {
             loggedConn = n->messagesLogged.connect ([this]() { onLogged(); });
         }
         addAndMakeVisible (blinker);
         blinker.setInputOutputVisibility (true, false);
     }
 
-    ~MidiMonitorBlock() {
+    ~MidiMonitorBlock()
+    {
         loggedConn.disconnect();
     }
 
-    void resized() override {
+    void resized() override
+    {
         BlockComponent::resized();
         auto r = getLocalBounds();
         r.removeFromBottom (8);
@@ -81,10 +86,13 @@ public:
 
     BlockComponent* createBlockComponent (const Node& node) override
     {
-        BlockComponent* block {nullptr};
-        if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR)) {
+        BlockComponent* block { nullptr };
+        if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR))
+        {
             block = new MidiMonitorBlock (node, editor.isLayoutVertical());
-        } else {
+        }
+        else
+        {
             block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
         }
 

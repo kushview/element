@@ -18,7 +18,8 @@ void MidiBlinker::paint (Graphics& g)
     const auto bgc = findColour (MidiBlinker::backgroundColourId);
     const auto olc = findColour (MidiBlinker::outlineColourId);
 
-    if (showInput && showOutput) {
+    if (showInput && showOutput)
+    {
         auto r1 = getLocalBounds().removeFromTop ((getHeight() / 2) - 1);
         auto r2 = getLocalBounds().removeFromBottom ((getHeight() / 2) - 1);
 
@@ -31,14 +32,19 @@ void MidiBlinker::paint (Graphics& g)
         g.setColour (olc);
         g.drawRect (r1);
         g.drawRect (r2);
-    } else if (! showInput && ! showOutput) {
+    }
+    else if (! showInput && ! showOutput)
+    {
         g.fillAll (bgc);
         g.setColour (olc);
         g.drawRect (getLocalBounds());
-    } else {
+    }
+    else
+    {
         auto r3 = getLocalBounds().reduced (1);
-        auto c = (showInput && haveInput) || (showOutput && haveOutput) 
-            ? Colors::toggleGreen : bgc;
+        auto c = (showInput && haveInput) || (showOutput && haveOutput)
+                     ? Colors::toggleGreen
+                     : bgc;
         g.setColour (c);
         g.fillRect (r3);
         g.setColour (olc);
@@ -46,7 +52,8 @@ void MidiBlinker::paint (Graphics& g)
     }
 }
 
-void MidiBlinker::setInputOutputVisibility (bool in, bool out) {
+void MidiBlinker::setInputOutputVisibility (bool in, bool out)
+{
     showInput = in;
     showOutput = out;
     repaint();

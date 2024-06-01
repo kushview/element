@@ -26,7 +26,7 @@ public:
     void triggerSent();
 
     void setInputOutputVisibility (bool in, bool out);
-    
+
     void paint (Graphics&) override;
     void resized() override;
 
