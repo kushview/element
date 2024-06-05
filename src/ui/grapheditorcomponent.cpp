@@ -62,18 +62,31 @@ public:
     void resized() override
     {
         BlockComponent::resized();
-        auto r = getLocalBounds();
-        r.removeFromBottom (8);
-        r.removeFromRight (8);
-        r = r.removeFromBottom (30);
-        r = r.removeFromRight (30);
-        blinker.setBounds (r);
+
+        if (getDisplayMode() != BlockComponent::Compact)
+        {
+            blinker.setVisible (true);
+            auto r = getLocalBounds();
+            r.removeFromTop (vPad);
+            r.removeFromLeft (hPad);
+            r = r.removeFromTop (vSize);
+            r = r.removeFromLeft (hSize);
+            blinker.setBounds (r);
+        }
+        else
+        {
+            blinker.setVisible (false);
+        }
     }
 
 private:
     ReferenceCountedObjectPtr<MidiMonitorNode> mmnode;
     boost::signals2::connection loggedConn;
     MidiBlinker blinker;
+    int vSize = 18,
+        hSize = 18,
+        vPad = 4,
+        hPad = 4;
     void onLogged() { blinker.triggerReceived(); }
 };
 
