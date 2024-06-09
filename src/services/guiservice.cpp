@@ -16,6 +16,8 @@
 #include <element/ui/mainwindow.hpp>
 #include <element/ui/preferences.hpp>
 
+#include "engine/midipanic.hpp"
+
 #include "services/sessionservice.hpp"
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/aboutscreen.hpp"
@@ -1021,17 +1023,11 @@ bool GuiService::perform (const InvocationInfo& info)
         //======================================================================
         case Commands::panic: {
             auto e = context().audio();
-            for (int c = 1; c <= 16; ++c)
-            {
-                auto msg = MidiMessage::allNotesOff (c);
-                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
+            for (const auto msg : MidiPanic::messages())
                 e->addMidiMessage (msg);
-                msg = MidiMessage::allSoundOff (c);
-                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
-                e->addMidiMessage (msg);
-            }
             break;
         }
+
         //======================================================================
         case Commands::checkNewerVersion:
             updates->showAlertWhenNoUpdatesReady = true;
