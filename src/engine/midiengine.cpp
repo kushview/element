@@ -197,7 +197,7 @@ MidiEngine::MidiInputHolder* MidiEngine::getMidiInput (const String& identifier,
     }
 
     juce::ignoreUnused (index);
-    
+
     if (found)
     {
         std::unique_ptr<MidiInputHolder> holder;
