@@ -59,6 +59,38 @@ public:
         }
         return msgs;
     }
+
+    /** Replace the given CC messags with a panic set of messages.
+      
+        The input buffer is left unmodified. The out buffer will contain
+        the original contents with the CC's replaced with panic messages.
+
+        @param buffer Input midi
+        @param out Output midi
+        @param ccNumber The CC number to check.
+     */
+    inline static bool processCC (const juce::MidiBuffer& buffer, juce::MidiBuffer& out, int ccNumber)
+    {
+        bool processed = false;
+
+        for (const auto r : buffer)
+        {
+            auto msg = r.getMessage();
+            if (! msg.isControllerOfType (ccNumber))
+            {
+                out.addEvent (msg, r.samplePosition);
+                continue;
+            }
+
+            if (! processed)
+            {
+                write (out, r.samplePosition);
+                processed = true;
+            }
+        }
+
+        return processed;
+    }
 };
 
 } // namespace element

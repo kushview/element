@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include <element/audioengine.hpp>
+#include <element/transport.hpp>
+#include <element/context.hpp>
+#include <element/settings.hpp>
+
 #include "engine/internalformat.hpp"
 #include "engine/midiclock.hpp"
 #include "engine/midichannelmap.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/miditranspose.hpp"
-#include <element/transport.hpp>
 #include "engine/rootgraph.hpp"
-#include <element/context.hpp>
-#include <element/settings.hpp>
-#include "tempo.hpp"
-
+#include "engine/midipanic.hpp"
 #include "engine/trace.hpp"
+
+#include "tempo.hpp"
 
 namespace element {
 
@@ -449,7 +451,14 @@ public:
     {
         const int numSamples = buffer.getNumSamples();
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
-        // element::traceMidi (midi);
+
+        extraMidi.clear();
+        const int panicCC = -1;
+        if (MidiPanic::processCC (midi, extraMidi, panicCC))
+        {
+            midi.swapWith (extraMidi);
+            extraMidi.clear();
+        }
 
         const ScopedLock sl (lock);
         const bool wasPlaying = transport.isPlaying();
@@ -720,7 +729,7 @@ private:
     int numInputChans, numOutputChans;
     HeapBlock<float*> channels;
     AudioSampleBuffer tempBuffer;
-    MidiBuffer tempMidi;
+    MidiBuffer tempMidi, extraMidi;
     MidiMessageCollector messageCollector;
     MidiKeyboardState keyboardState;
 
