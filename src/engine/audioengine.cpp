@@ -453,8 +453,10 @@ public:
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
 
         extraMidi.clear();
-        const int panicCC = -1;
-        if (MidiPanic::processCC (midi, extraMidi, panicCC))
+        const int panicCC = 21;
+        const int panicChannel = 1;
+
+        if (MidiPanic::processCC (midi, extraMidi, panicCC, panicChannel))
         {
             midi.swapWith (extraMidi);
             extraMidi.clear();
