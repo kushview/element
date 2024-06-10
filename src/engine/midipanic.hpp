@@ -72,7 +72,6 @@ public:
     inline static bool processCC (const juce::MidiBuffer& buffer, juce::MidiBuffer& out, int ccNumber)
     {
         bool processed = false;
-
         for (const auto r : buffer)
         {
             auto msg = r.getMessage();
