@@ -1023,7 +1023,7 @@ bool GuiService::perform (const InvocationInfo& info)
         //======================================================================
         case Commands::panic: {
             auto e = context().audio();
-            for (const auto msg : MidiPanic::messages())
+            for (const auto& msg : MidiPanic::messages())
                 e->addMidiMessage (msg);
             break;
         }
