@@ -13,8 +13,9 @@ namespace element {
  */
 struct MidiPanicParams
 {
+    bool enabled { false };
     int channel { 0 }; ///> MIDI channel to allow detection on (zero is omni)
-    int ccNumber { -1 }; ///> MIDI CC number. less than zero means 'disabled'
+    int ccNumber { 0 }; ///> MIDI CC number. less than zero means 'disabled'
 };
 
 /** Collection of helpers to render panic messages. */
@@ -84,6 +85,9 @@ public:
      */
     inline static bool processCC (const juce::MidiBuffer& buffer, juce::MidiBuffer& out, int ccNumber, int channel)
     {
+        if (ccNumber < 0 || ccNumber > 127)
+            return false;
+
         bool processed = false;
         for (const auto r : buffer)
         {

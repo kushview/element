@@ -853,12 +853,19 @@ private:
     Array<MidiDeviceInfo> outputs;
 
     Label panicLabel;
-    class Panic : public Component {
+    class Panic : public Component
+    {
     public:
         Panic (MidiSettingsPage& o) : owner (o)
         {
+            addAndMakeVisible (enabled);
+            enabled.setTooltip ("Enabled?");
+            enabled.setButtonText ("");
+            enabled.setToggleState (false, dontSendNotification);
+            enabled.onClick = [this]() { save(); };
+
             addAndMakeVisible (channel);
-            channel.setTooltip ("CC channel. Set to zero is omni");
+            channel.setTooltip ("CC channel. 0 = omni");
             channel.setSliderStyle (Slider::IncDecButtons);
             channel.setRange (0.0, 16.0, 1.0);
             channel.setValue (1.0, juce::dontSendNotification);
@@ -867,42 +874,53 @@ private:
             channel.onValueChange = [this]() { save(); };
 
             addAndMakeVisible (ccNumber);
-            ccNumber.setTooltip ("CC to trigger panic.");
+            ccNumber.setTooltip ("CC number");
             ccNumber.setSliderStyle (Slider::IncDecButtons);
             ccNumber.setRange (0.0, 127, 1.0);
             ccNumber.setValue (21, juce::dontSendNotification);
             ccNumber.setTextBoxStyle (Slider::TextBoxLeft, false, 34, ccNumber.getTextBoxHeight());
             ccNumber.setWantsKeyboardFocus (false);
             ccNumber.onValueChange = channel.onValueChange;
+
+            stabilize();
         }
 
-        ~Panic() {
+        ~Panic()
+        {
+            enabled.onClick = nullptr;
             ccNumber.onValueChange = nullptr;
             channel.onValueChange = nullptr;
         }
 
-        void resized() override {
+        void resized() override
+        {
             auto r1 = getLocalBounds();
-            auto r2 = r1.removeFromRight (getWidth() * 0.5);
+            enabled.setBounds (r1.removeFromLeft (r1.getHeight()));
+            auto r2 = r1.removeFromRight (r1.getWidth() * 0.5);
             channel.setBounds (r1);
             ccNumber.setBounds (r2);
         }
 
-        void stabilize() {
+        void stabilize()
+        {
             const auto params = owner.settings.getMidiPanicParams();
+            enabled.setToggleState (params.enabled, juce::dontSendNotification);
             channel.setValue (params.channel, juce::dontSendNotification);
             ccNumber.setValue (params.ccNumber, juce::dontSendNotification);
         }
 
     private:
+        ToggleButton enabled;
         Slider channel;
         Slider ccNumber;
         MidiSettingsPage& owner;
 
-        void save() {
+        void save()
+        {
             MidiPanicParams params = {
-                (int)channel.getValue(),
-                (int)ccNumber.getValue()
+                enabled.getToggleState(),
+                (int) channel.getValue(),
+                (int) ccNumber.getValue()
             };
 
             owner.settings.setMidiPanicParams (params);

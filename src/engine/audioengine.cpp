@@ -843,6 +843,11 @@ void AudioEngine::applySettings (Settings& settings)
         : settings.sendMidiClockToInput() ? 1 : 0);
     // clang-format on
     priv->midiOutLatency.set (settings.getMidiOutLatency());
+    {
+        auto panic = settings.getMidiPanicParams();
+        priv->panicCC.set (panic.enabled ? panic.ccNumber : -1);
+        priv->panicChannel.set (panic.enabled ? panic.channel : -1);
+    }
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)
