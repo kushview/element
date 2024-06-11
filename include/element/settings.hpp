@@ -11,6 +11,8 @@ namespace element {
 
 class Context;
 
+struct MidiPanicParams;
+
 class Settings : public juce::ApplicationProperties {
 public:
     Settings();
@@ -145,6 +147,12 @@ public:
 
     /** Change the update channgel. stable or nightly. */
     void setUpdateChannel (const String& key);
+
+    /** Set global midi panic settings. */
+    void setMidiPanicParams (MidiPanicParams);
+
+    /** Get global midi panic settings. */
+    MidiPanicParams getMidiPanicParams() const;
 
 private:
     juce::PropertiesFile* getProps() const;

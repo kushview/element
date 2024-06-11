@@ -7,6 +7,7 @@
 
 #include "appinfo.hpp"
 #include "engine/midiengine.hpp"
+#include "engine/midipanic.hpp"
 
 namespace element {
 
@@ -466,6 +467,26 @@ void Settings::setUpdateChannel (const String& channel)
 {
     if (auto p = getProps())
         p->setValue (updateChannelKey, channel.trim());
+}
+
+void Settings::setMidiPanicParams (MidiPanicParams params)
+{
+    if (auto p = getProps())
+    {
+        p->setValue ("midiPanicCCNumber", params.ccNumber);
+        p->setValue ("midiPanicChannel", params.channel);
+    }
+}
+
+MidiPanicParams Settings::getMidiPanicParams() const
+{
+    MidiPanicParams params;
+    if (auto p = getProps())
+    {
+        params.ccNumber = p->getIntValue ("midiPanicCCNumber", -1);
+        params.channel = p->getIntValue ("midiPanicChannel", 1);
+    }
+    return params;
 }
 
 //=============================================================================

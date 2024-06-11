@@ -453,10 +453,8 @@ public:
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
 
         extraMidi.clear();
-        const int panicCC = 21;
-        const int panicChannel = 1;
 
-        if (MidiPanic::processCC (midi, extraMidi, panicCC, panicChannel))
+        if (MidiPanic::processCC (midi, extraMidi, panicCC.get(), panicChannel.get()))
         {
             midi.swapWith (extraMidi);
             extraMidi.clear();
@@ -744,6 +742,9 @@ private:
     Atomic<int> generateMidiClock { 0 };
     Atomic<int> sendMidiClockToInput { 0 };
 
+    Atomic<int> panicCC { -1 },
+        panicChannel { 0 };
+
     MidiClock midiClock;
     MidiClockMaster midiClockMaster;
 
@@ -840,7 +841,7 @@ void AudioEngine::applySettings (Settings& settings)
         : settings.generateMidiClock() ? 1 : 0);
     priv->sendMidiClockToInput.set (runMode == RunMode::Plugin ? 0 
         : settings.sendMidiClockToInput() ? 1 : 0);
-    // clang-format on                                                                                                    
+    // clang-format on
     priv->midiOutLatency.set (settings.getMidiOutLatency());
 }
 

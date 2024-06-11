@@ -16,6 +16,7 @@
 #include "ui/viewhelpers.hpp"
 #include "services/oscservice.hpp"
 #include "engine/midiengine.hpp"
+#include "engine/midipanic.hpp"
 
 namespace element {
 
@@ -693,7 +694,8 @@ public:
         : devices (g.devices()),
           settings (g.settings()),
           midi (g.midi()),
-          world (g)
+          world (g),
+          panic (*this)
     {
         addAndMakeVisible (midiOutputLabel);
         midiOutputLabel.setFont (Font (12.0, Font::bold));
@@ -743,6 +745,12 @@ public:
         sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
         sendClockToInput.addListener (this);
 
+        addAndMakeVisible (panicLabel);
+        panicLabel.setFont (Font (12.0, Font::bold));
+        panicLabel.setText ("MIDI Panic CC", juce::dontSendNotification);
+        addAndMakeVisible (panic);
+        panic.stabilize();
+
         addAndMakeVisible (midiInputHeader);
         midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
         midiInputHeader.setFont (Font (12, Font::bold));
@@ -785,6 +793,8 @@ public:
         layoutSetting (r, midiOutLatencyLabel, midiOutLatency, getWidth() / 4);
         layoutSetting (r, generateClockLabel, generateClock);
         layoutSetting (r, sendClockToInputLabel, sendClockToInput);
+        layoutSetting (r, panicLabel, panic, getWidth() / 2);
+
         r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
         midiInputHeader.setBounds (r.removeFromTop (24));
 
@@ -841,6 +851,70 @@ private:
     SettingButton sendClockToInput;
     Label midiInputHeader;
     Array<MidiDeviceInfo> outputs;
+
+    Label panicLabel;
+    class Panic : public Component
+    {
+    public:
+        Panic (MidiSettingsPage& o) : owner (o)
+        {
+            addAndMakeVisible (channel);
+            channel.setTooltip ("CC channel. Set to zero is omni");
+            channel.setSliderStyle (Slider::IncDecButtons);
+            channel.setRange (0.0, 16.0, 1.0);
+            channel.setValue (1.0, juce::dontSendNotification);
+            channel.setTextBoxStyle (Slider::TextBoxLeft, false, 30, channel.getTextBoxHeight());
+            channel.setWantsKeyboardFocus (false);
+            channel.onValueChange = [this]() { save(); };
+
+            addAndMakeVisible (ccNumber);
+            ccNumber.setTooltip ("CC to trigger panic.");
+            ccNumber.setSliderStyle (Slider::IncDecButtons);
+            ccNumber.setRange (0.0, 127, 1.0);
+            ccNumber.setValue (21, juce::dontSendNotification);
+            ccNumber.setTextBoxStyle (Slider::TextBoxLeft, false, 34, ccNumber.getTextBoxHeight());
+            ccNumber.setWantsKeyboardFocus (false);
+            ccNumber.onValueChange = channel.onValueChange;
+        }
+
+        ~Panic()
+        {
+            ccNumber.onValueChange = nullptr;
+            channel.onValueChange = nullptr;
+        }
+
+        void resized() override
+        {
+            auto r1 = getLocalBounds();
+            auto r2 = r1.removeFromRight (getWidth() * 0.5);
+            channel.setBounds (r1);
+            ccNumber.setBounds (r2);
+        }
+
+        void stabilize()
+        {
+            const auto params = owner.settings.getMidiPanicParams();
+            channel.setValue (params.channel, juce::dontSendNotification);
+            ccNumber.setValue (params.ccNumber, juce::dontSendNotification);
+        }
+
+    private:
+        Slider channel;
+        Slider ccNumber;
+        MidiSettingsPage& owner;
+
+        void save()
+        {
+            MidiPanicParams params = {
+                (int) channel.getValue(),
+                (int) ccNumber.getValue()
+            };
+
+            owner.settings.setMidiPanicParams (params);
+            auto audio = owner.world.audio();
+            audio->applySettings (owner.settings);
+        }
+    } panic;
 
     class MidiInputs : public Component,
                        public Button::Listener
