@@ -853,8 +853,7 @@ private:
     Array<MidiDeviceInfo> outputs;
 
     Label panicLabel;
-    class Panic : public Component
-    {
+    class Panic : public Component {
     public:
         Panic (MidiSettingsPage& o) : owner (o)
         {
@@ -877,22 +876,19 @@ private:
             ccNumber.onValueChange = channel.onValueChange;
         }
 
-        ~Panic()
-        {
+        ~Panic() {
             ccNumber.onValueChange = nullptr;
             channel.onValueChange = nullptr;
         }
 
-        void resized() override
-        {
+        void resized() override {
             auto r1 = getLocalBounds();
             auto r2 = r1.removeFromRight (getWidth() * 0.5);
             channel.setBounds (r1);
             ccNumber.setBounds (r2);
         }
 
-        void stabilize()
-        {
+        void stabilize() {
             const auto params = owner.settings.getMidiPanicParams();
             channel.setValue (params.channel, juce::dontSendNotification);
             ccNumber.setValue (params.ccNumber, juce::dontSendNotification);
@@ -903,11 +899,10 @@ private:
         Slider ccNumber;
         MidiSettingsPage& owner;
 
-        void save()
-        {
+        void save() {
             MidiPanicParams params = {
-                (int) channel.getValue(),
-                (int) ccNumber.getValue()
+                (int)channel.getValue(),
+                (int)ccNumber.getValue()
             };
 
             owner.settings.setMidiPanicParams (params);
