@@ -473,6 +473,7 @@ void Settings::setMidiPanicParams (MidiPanicParams params)
 {
     if (auto p = getProps())
     {
+        p->setValue ("midiPanicCCEnabled", params.enabled);
         p->setValue ("midiPanicCCNumber", params.ccNumber);
         p->setValue ("midiPanicChannel", params.channel);
     }
@@ -483,6 +484,7 @@ MidiPanicParams Settings::getMidiPanicParams() const
     MidiPanicParams params;
     if (auto p = getProps())
     {
+        params.enabled = p->getBoolValue ("midiPanicCCEnabled", false);
         params.ccNumber = p->getIntValue ("midiPanicCCNumber", -1);
         params.channel = p->getIntValue ("midiPanicChannel", 1);
     }
