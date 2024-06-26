@@ -720,6 +720,7 @@ void GuiService::getAllCommands (Array<CommandID>& ids)
                     Commands::exportGraph,
                     //======================================================================
                     Commands::panic,
+                    Commands::transportSeekZero,
                     //======================================================================
                     Commands::checkNewerVersion,
                     //======================================================================
@@ -819,6 +820,10 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
             result.addDefaultKeypress ('p', ModifierKeys::altModifier | ModifierKeys::commandModifier);
             result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
+        case Commands::transportSeekZero:
+            result.addDefaultKeypress ('/', 0);
+            result.setInfo ("Seek Start", "Seek to Beginning", "Engine", 0);
+            break;
         //======================================================================
         case Commands::checkNewerVersion:
             result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
@@ -847,9 +852,7 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
         case Commands::transportRecord:
             result.setInfo ("Record", "Transport Record", "Engine", 0);
             break;
-        case Commands::transportSeekZero:
-            result.setInfo ("Seek Start", "Seek to Beginning", "Engine", 0);
-            break;
+        
         case Commands::transportStop:
             result.setInfo ("Stop", "Transport Stop", "Engine", 0);
             break;
@@ -1025,6 +1028,12 @@ bool GuiService::perform (const InvocationInfo& info)
             auto e = context().audio();
             for (const auto& msg : MidiPanic::messages())
                 e->addMidiMessage (msg);
+            break;
+        }
+
+        case Commands::transportSeekZero: {
+            auto e = context().audio();
+            e->seekToAudioFrame (0);
             break;
         }
 
