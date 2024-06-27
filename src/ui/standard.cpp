@@ -1072,6 +1072,7 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
         }
         //======================================================================
         case Commands::toggleVirtualKeyboard: {
+            result.addDefaultKeypress ('k', ModifierKeys::altModifier);
             int flags = 0;
             if (isVirtualKeyboardVisible())
                 flags |= Info::isTicked;
@@ -1079,6 +1080,7 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
             break;
         }
         case Commands::toggleMeterBridge: {
+            result.addDefaultKeypress ('m', ModifierKeys::altModifier);
             int flags = 0;
             if (isMeterBridgeVisible())
                 flags |= Info::isTicked;
