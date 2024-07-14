@@ -89,10 +89,6 @@ private:
 
 class MidiRouterEditor::Content : public Component
 {
-    int padding = 10;
-    int labelWidth = 60;
-    Rectangle<int> matrixArea;
-
 public:
     Content (MidiRouterEditor& o)
         : owner (o)
@@ -153,6 +149,9 @@ public:
 
 private:
     friend class MidiRouterEditor;
+    int padding = 10;
+    int labelWidth = 60;
+    Rectangle<int> matrixArea;
     MidiRouterEditor& owner;
     Slider slider;
     std::unique_ptr<MidiRouterMatrix> matrix;
@@ -191,6 +190,7 @@ void MidiRouterEditor::changeListenerCallback (ChangeBroadcaster*)
     if (auto* const node = getNodeObjectOfType<MidiRouterNode>())
     {
         matrix = node->getMatrixState();
+        content->resized();
         content->matrix->repaint();
     }
 }
