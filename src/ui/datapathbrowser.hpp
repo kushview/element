@@ -220,7 +220,7 @@ private:
     void runFileMenu (const File& file)
     {
         PopupMenu menu;
-        menu.addItem (1, "Rename");
+        // menu.addItem (1, "Rename");
         menu.addItem (2, "Delete");
 
         auto* callback = ModalCallbackFunction::forComponent (fileMenuCallback, this);
