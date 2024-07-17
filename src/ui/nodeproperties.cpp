@@ -15,9 +15,18 @@
 namespace element {
 
 namespace detail {
-inline static bool showMidiFilters (const Node& node)
+inline static bool showNodeMidiPrograms (const Node& node)
 {
     if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR))
+    {
+        return false;
+    }
+    return true;
+}
+
+inline static bool showMidiFilters (const Node& node)
+{
+    if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_PROGRAM_MAP) || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_SET_LIST))
     {
         return false;
     }
@@ -258,11 +267,14 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
         // MIDI Channel
         add (new NodeMidiChannelsPropertyComponent (node));
 
-        if (detail::showMidiFilters (node))
+        if (detail::showNodeMidiPrograms (node))
         {
             // MIDI Program
             add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
+        }
 
+        if (detail::showMidiFilters (node))
+        {
             // Key Start
             add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyStart, false), "Key Start"));
 
