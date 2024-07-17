@@ -14,6 +14,15 @@
 
 namespace element {
 
+namespace detail {
+static inline String ioNodeMessage (const Node& node)
+{
+    String msg = node.getName();
+    msg << ": " << TRANS ("see preferences") << "...";
+    return msg;
+}
+} // namespace detail
+
 class NodePropertiesView::NodeWatcher : private ValueTree::Listener
 {
 public:
@@ -105,7 +114,7 @@ void NodePropertiesView::init()
     setMouseClickGrabsKeyboardFocus (false);
     setInterceptsMouseClicks (true, true);
     addAndMakeVisible (combo);
-    combo.setFilter (NodeListComboBox::rejectIONodes);
+    combo.setFilter (NodeListComboBox::allowAllNodes);
     combo.onChange = [this]() {
         setNode (combo.selectedNode());
     };
@@ -156,6 +165,15 @@ void NodePropertiesView::paint (Graphics& g)
     ContentView::paint (g);
 }
 
+void NodePropertiesView::paintOverChildren (Graphics& g) {
+    if (! _node.isIONode())
+        return;
+    g.setFont (Font (20.f));
+    g.setColour (findColour (Label::textColourId));
+    g.drawText (detail::ioNodeMessage(_node), 
+                getLocalBounds().toFloat(), Justification::centred, true);
+}
+
 void NodePropertiesView::resized()
 {
     auto r1 (getLocalBounds().reduced (2));
@@ -179,7 +197,7 @@ void NodePropertiesView::setNode (const Node& newNode)
         combo.addNodes (_graph, dontSendNotification);
 
     auto nextNode = newNode;
-    if (! combo.nodes().contains (nextNode) || nextNode.isIONode())
+    if (! combo.nodes().contains (nextNode) && ! nextNode.isIONode())
         nextNode = combo.nodes().getFirst();
 
     if (nextNode != _node)
@@ -315,10 +333,22 @@ void NodePropertiesView::updateProperties()
     props.clear();
     if (_node.isValid())
     {
-        props.addSection ("Node", NodeProperties (_node, true, false));
-        props.addSection ("MIDI", NodeProperties (_node, false, true));
+        if (_node.isIONode())
+        {
+            props.setMessageWhenEmpty ("");
+        }
+        else
+        {
+            String nodeName = "Node";
+            if (_node.getPluginName().isNotEmpty())
+                nodeName << " - " << _node.getPluginName();
+            props.addSection (nodeName, NodeProperties (_node, true, false));
+            props.addSection ("MIDI", NodeProperties (_node, false, true));
+            props.setMessageWhenEmpty ("");
+        }
     }
     resized();
+    repaint();
 }
 
 void NodePropertiesView::updateMidiProgram()

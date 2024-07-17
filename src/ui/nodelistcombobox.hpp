@@ -19,6 +19,8 @@ public:
 
     using FilterFunction = std::function<bool (const Node&)>;
     inline static bool rejectIONodes (const Node& node) { return ! node.isIONode(); }
+    inline static bool allowAllNodes (const Node& node) { return true; }
+
     virtual ~NodeListComboBox() {}
 
     void setFilter (FilterFunction fn)

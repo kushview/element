@@ -27,6 +27,7 @@ public:
     void stabilizeContent() override;
     void resized() override;
     void paint (Graphics& g) override;
+    void paintOverChildren (Graphics& g) override;
 
     void getState (String& state) override;
     void setState (const String& state) override;
