@@ -14,6 +14,17 @@
 
 namespace element {
 
+namespace detail {
+inline static bool showMidiFilters (const Node& node)
+{
+    if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR))
+    {
+        return false;
+    }
+    return true;
+}
+} // namespace detail
+
 class NodeMidiProgramPropertyComponent : public PropertyComponent
 {
 public:
@@ -237,7 +248,7 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
                                         100,
                                         false,
                                         true));
-        if (! node.isIONode())
+        if (! node.isIONode() && ! node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR))
             add (new MillisecondSliderPropertyComponent (
                 node.getPropertyAsValue (tags::delayCompensation), "Delay comp."));
     }
@@ -247,17 +258,20 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
         // MIDI Channel
         add (new NodeMidiChannelsPropertyComponent (node));
 
-        // MIDI Program
-        add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
+        if (detail::showMidiFilters (node))
+        {
+            // MIDI Program
+            add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
 
-        // Key Start
-        add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyStart, false), "Key Start"));
+            // Key Start
+            add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyStart, false), "Key Start"));
 
-        // Key End
-        add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyEnd, false), "Key End"));
+            // Key End
+            add (new MidiNotePropertyComponent (node.getPropertyAsValue (tags::keyEnd, false), "Key End"));
 
-        // Transpose
-        add (new SliderPropertyComponent (node.getPropertyAsValue (tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
+            // Transpose
+            add (new SliderPropertyComponent (node.getPropertyAsValue (tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
+        }
     }
 }
 
