@@ -170,7 +170,7 @@ protected:
         setPorts (newPorts);
     }
 
-    void maybeSendTempo (int program);
+    void maybeSendTempoAndPosition (int program);
 };
 
 } // namespace element

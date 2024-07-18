@@ -100,15 +100,18 @@ void MidiSetListProcessor::sendProgramChange (int program, int channel)
     toSendMidi.addEvent (msg, 0);
 }
 
-void MidiSetListProcessor::maybeSendTempo (int program)
+void MidiSetListProcessor::maybeSendTempoAndPosition (int program)
 {
+    auto s = _context.session();
+    if (s == nullptr)
+        return;
+
     if (auto* entry = entries[program])
     {
         if (entry->tempo >= 20.0)
-            if (auto s = _context.session())
-            {
-                s->getValueTree().setProperty (tags::tempo, entry->tempo, nullptr);
-            }
+           s->getValueTree().setProperty (tags::tempo, entry->tempo, nullptr);
+        if (auto e = _context.audio())
+            e->seekToAudioFrame (0);
     }
 }
 
@@ -193,7 +196,7 @@ void MidiSetListProcessor::handleAsyncUpdate()
 {
     const auto program = getLastProgram();
     if (isPositiveAndBelow (program, getNumProgramEntries()))
-        maybeSendTempo (program);
+        maybeSendTempoAndPosition (program);
     lastProgramChanged();
 }
 
