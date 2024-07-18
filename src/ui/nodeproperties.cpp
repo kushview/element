@@ -15,9 +15,12 @@
 namespace element {
 
 namespace detail {
+// clang-format off
 inline static bool showNodeMidiPrograms (const Node& node)
 {
-    if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR))
+    if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_INPUT_DEVICE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_OUTPUT_DEVICE))
     {
         return false;
     }
@@ -26,12 +29,16 @@ inline static bool showNodeMidiPrograms (const Node& node)
 
 inline static bool showMidiFilters (const Node& node)
 {
-    if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_PROGRAM_MAP) || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_SET_LIST))
+    if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) || 
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_PROGRAM_MAP) || 
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_SET_LIST) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_INPUT_DEVICE))
     {
         return false;
     }
     return true;
 }
+// clang-format on
 } // namespace detail
 
 class NodeMidiProgramPropertyComponent : public PropertyComponent
