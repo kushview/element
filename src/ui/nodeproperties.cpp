@@ -20,6 +20,9 @@ inline static bool showNodeDelayComp (const Node& node)
 {
     if (node.isIONode() ||
         node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_PROGRAM_MAP) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_INPUT_DEVICE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_SET_LIST) ||
         node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_AUDIO_FILE_PLAYER) ||
         node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_AUDIO_ROUTER) ||
         node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_CHANNEL_MAP) ||
