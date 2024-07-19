@@ -13,7 +13,10 @@ class MidiChannelSplitterNode : public MidiFilterNode
 {
 public:
     MidiChannelSplitterNode()
-        : MidiFilterNode (0) {}
+        : MidiFilterNode (0)
+    {
+        setName ("MIDI Channel Splitter");
+    }
 
     ~MidiChannelSplitterNode() {}
 
