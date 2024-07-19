@@ -16,6 +16,23 @@ namespace element {
 
 namespace detail {
 // clang-format off
+inline static bool showNodeDelayComp (const Node& node)
+{
+    if (node.isIONode() ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_AUDIO_FILE_PLAYER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_AUDIO_ROUTER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_CHANNEL_MAP) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_CHANNEL_SPLITTER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_CHANNELIZE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_OUTPUT_DEVICE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_ROUTER))
+    {
+        return false;
+    }
+    return true;
+}
+
 inline static bool showNodeMidiPrograms (const Node& node)
 {
     if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) ||
@@ -32,7 +49,14 @@ inline static bool showMidiFilters (const Node& node)
     if (node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR) || 
         node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_PROGRAM_MAP) || 
         node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_SET_LIST) ||
-        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_INPUT_DEVICE))
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_INPUT_DEVICE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_AUDIO_FILE_PLAYER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_AUDIO_ROUTER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_CHANNEL_MAP) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_CHANNEL_SPLITTER) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_CHANNELIZE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_OUTPUT_DEVICE) ||
+        node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_ROUTER))
     {
         return false;
     }
@@ -264,7 +288,7 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
                                         100,
                                         false,
                                         true));
-        if (! node.isIONode() && ! node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_MIDI_MONITOR))
+        if (detail::showNodeDelayComp (node))
             add (new MillisecondSliderPropertyComponent (
                 node.getPropertyAsValue (tags::delayCompensation), "Delay comp."));
     }
