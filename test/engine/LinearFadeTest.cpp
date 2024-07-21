@@ -24,6 +24,7 @@ private:
         BOOST_REQUIRE (fader.isActive());
 
         int frame = 0;
+        juce::ignoreUnused (frame);
 
         while (fader.isActive()) {
             float gain = fader.getNextEnvelopeValue();
