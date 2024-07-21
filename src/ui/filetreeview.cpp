@@ -1,13 +1,12 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <element/juce/gui_basics.hpp>
+#include <juce_gui_basics/detail/juce_WindowingHelpers.h>
 #include "ui/filetreeview.hpp"
 
-namespace juce {
-extern Image juce_createIconForFile (const File& file);
-}
-
 using namespace juce;
+using juce::detail::WindowingHelpers;
 
 namespace element {
 
@@ -285,7 +284,7 @@ private:
 
             if (im.isNull() && ! onlyUpdateIfCached)
             {
-                im = juce::juce_createIconForFile (file);
+                im = WindowingHelpers::createIconForFile (file);
 
                 if (im.isValid())
                     ImageCache::addImageToCache (im, hashCode);

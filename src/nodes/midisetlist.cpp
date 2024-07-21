@@ -109,7 +109,7 @@ void MidiSetListProcessor::maybeSendTempoAndPosition (int program)
     if (auto* entry = entries[program])
     {
         if (entry->tempo >= 20.0)
-           s->getValueTree().setProperty (tags::tempo, entry->tempo, nullptr);
+            s->getValueTree().setProperty (tags::tempo, entry->tempo, nullptr);
         if (auto e = _context.audio())
             e->seekToAudioFrame (0);
     }

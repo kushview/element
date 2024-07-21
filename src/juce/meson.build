@@ -154,10 +154,14 @@ if host_machine.system() == 'linux'
         cpp.find_library ('pthread', required : true) 
     ]
 elif host_machine.system() == 'darwin'
-    deps += dependency ('appleframeworks', modules : [
+    juce_mac_frameworks = [
         'accelerate', 'audiotoolbox', 'audiounit', 'coreaudio',
         'coreaudiokit', 'coremidi', 'cocoa', 'carbon',
-        'discrecording', 'iokit', 'quartzcore', 'metal' ])
+        'discrecording', 'iokit', 'quartzcore', 'metal',
+        'security'
+    ]
+    
+    deps += dependency ('appleframeworks', modules : juce_mac_frameworks)
     juce_conf_data.set10 ('JUCE_PLUGINHOST_AU', true)
     juce_au_includes += juce_proj.get_variable ('juce_au_includes')
 elif host_machine.system() == 'windows'
