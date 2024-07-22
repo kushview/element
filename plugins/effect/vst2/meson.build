@@ -1,7 +1,6 @@
 if aeffect_h_found
 element_fx_vst2_sources = [
     '../plugin.cpp',
-    '../../vst2client.cpp',
     '../../utilities.cpp'
 ]
 
@@ -18,7 +17,10 @@ element_fx_vst2_juce_args = [
 ]
 
 if host_machine.system() == 'darwin'
+    element_fx_vst2_sources += '../../vst2client.mm'
     element_fx_vst2_sources += '../../macvstutils.mm'
+else
+    element_fx_vst2_sources += '../../vst2client.cpp'
 endif
 
 element_fx_vst2 = shared_module ('KV-Element-FX',

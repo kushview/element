@@ -2,7 +2,6 @@
 # Element FX
 element_fx_vst3_sources = [
     '../plugin.cpp',
-    '../../vst3client.cpp',
     '../../utilities.cpp'
 ]
 
@@ -19,7 +18,10 @@ element_fx_vst3_juce_args = [
 ]
 
 if host_machine.system() == 'darwin'
+    element_fx_vst3_sources += '../../vst2client.mm'
     element_fx_vst3_sources += '../../macvstutils.mm'
+else
+    element_fx_vst3_sources += '../../vst2client.cpp'
 endif
 
 element_fx_vst3 = shared_module ('KV-Element-FX',

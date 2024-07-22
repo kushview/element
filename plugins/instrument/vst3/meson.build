@@ -2,7 +2,6 @@
 # Element
 element_vst3_sources = [
     '../plugin.cpp',
-    '../../vst3client.cpp',
     '../../utilities.cpp'
 ]
 
@@ -19,7 +18,10 @@ element_vst3_juce_args = [
 ]
 
 if host_machine.system() == 'darwin'
+    element_vst3_sources += '../../vst3client.mm'
     element_vst3_sources += '../../macvstutils.mm'
+else
+    element_vst3_sources += '../../vst3client.cpp'
 endif
 
 element_vst3 = shared_module ('KV-Element',
