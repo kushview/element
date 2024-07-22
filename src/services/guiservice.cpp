@@ -678,6 +678,7 @@ void GuiService::run()
     sibling<SessionService>()->resetChanges();
     refreshSystemTray();
     stabilizeViews();
+    refreshMainMenu();
 }
 
 SessionRef GuiService::session()
