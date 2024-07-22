@@ -475,6 +475,7 @@ private:
 
     void getSessionProperties (PropertyArray& props, Node g)
     {
+#if ! ELEMENT_SE
         props.add (new TextPropertyComponent (g.getPropertyAsValue (tags::name),
                                               TRANS ("Name"),
                                               256,
@@ -482,9 +483,12 @@ private:
 
         props.add (new RenderModePropertyComponent (g));
         props.add (new VelocityCurvePropertyComponent (g));
+#endif
         props.add (new RootGraphMidiChannels (g, getWidth() - 100));
+#if ! ELEMENT_SE
         props.add (new MidiProgramPropertyComponent (g));
         props.add (new KeyMapPropertyComponent (g));
+#endif
         props.add (new GraphChannelCountPropertyComponent (g, PortType::Audio, true));
         props.add (new GraphChannelCountPropertyComponent (g, PortType::Audio, false));
         props.add (new GraphChannelCountPropertyComponent (g, PortType::Midi, true));
