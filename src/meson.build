@@ -24,7 +24,7 @@ libelement_sources = '''
     script.cpp
     timescale.cpp
     utils.cpp
-
+    
     plugineditor.cpp
     pluginprocessor.cpp
 
@@ -231,17 +231,20 @@ endif
 host_cpp_args = []
 if host_machine.system() == 'linux'
     libelement_sources += [ 'lv2/platform.cpp' ]
+    libelement_sources += [ 'filesystemwatcher.cpp' ]
     absdatadir = get_option('prefix') / get_option('datadir')
     host_cpp_args += [
         '-DEL_LUADIR="@0@"'.format (absdatadir / 'element' / 'lua'),
         '-DEL_SCRIPTSDIR="@0@"'.format (absdatadir / 'element' / 'scripts')
     ]
 elif host_machine.system() == 'windows'
+    libelement_sources += [ 'filesystemwatcher.cpp' ]
     libelement_sources += [ 'lv2/platform.cpp' ]
     libelement_sources += [ 'dlfcn-win32.c' ]
 elif host_machine.system() == 'darwin'
     libelement_sources += [ 'lv2/platform.mm' ]
     libelement_sources += [ 'ui/nsviewwithparent.mm']
+    libelement_sources += [ 'filesystemwatcher.mm' ]
 endif
 
 luael_gen = generator (bin2c,

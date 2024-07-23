@@ -9,13 +9,14 @@
 #include "ui/filetreeview.hpp"
 #include "ui/viewhelpers.hpp"
 #include "datapath.hpp"
+#include "filesystemwatcher.hpp"
 #include "messages.hpp"
 
 namespace element {
 
 class DataPathTreeComponent : public juce::Component,
                               public juce::FileBrowserListener,
-                              private juce::Timer
+                              public FileSystemWatcher::Listener
 {
 public:
     DataPathTreeComponent()
@@ -25,6 +26,9 @@ public:
         thread.startThread();
         list.reset (new DirectoryContentsList (&filter, thread));
         list->setDirectory (DataPath::defaultLocation(), true, true);
+        
+        watcher.addFolder (list->getDirectory());
+        watcher.addListener (this);
 
         tree.reset (new FileTreeView (*list));
         addAndMakeVisible (tree.get());
@@ -42,6 +46,9 @@ public:
 
     ~DataPathTreeComponent()
     {
+        watcher.removeListener (this);
+        watcher.removeAllFolders();
+        list->removeAllChangeListeners();
         tree->removeListener (this);
         renameWindow.setVisible (false);
         tree.reset();
@@ -98,6 +105,8 @@ public:
     }
 
     virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
+    void folderChanged (const juce::File&) override { refresh(); }
+    void fileChanged (const juce::File&, FileSystemWatcher::FileSystemEvent) override { refresh(); }
 
 private:
     class Filter : public FileFilter
@@ -119,10 +128,8 @@ private:
     TimeSliceThread thread;
 
     AlertWindow renameWindow;
-
-    friend class Timer;
-    void timerCallback() override {}
-
+    FileSystemWatcher watcher;
+    
     void deleteSelectedFile()
     {
         const auto file (getSelectedFile());
