@@ -385,7 +385,14 @@ public:
 
         addAndMakeVisible (openLastSessionLabel);
 
-        openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
+        #if ! ELEMENT_SE
+            const String sessionStr = "session";
+        #else
+            const String sessionStr = "graph";
+        #endif
+
+        openLastSessionLabel.setText (String("Open last used XXX").replace ("XXX", sessionStr), 
+                                      dontSendNotification);
         openLastSessionLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (openLastSession);
         openLastSession.setClickingTogglesState (true);
@@ -393,7 +400,8 @@ public:
         openLastSession.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (askToSaveSessionLabel);
-        askToSaveSessionLabel.setText ("Ask to save sessions on exit", dontSendNotification);
+        askToSaveSessionLabel.setText (String ("Ask to save XXXs on exit").replace ("XXX", sessionStr), 
+                                       dontSendNotification);
         askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (askToSaveSession);
         askToSaveSession.setClickingTogglesState (true);
@@ -439,6 +447,10 @@ public:
         addAndMakeVisible (defaultSessionClearButton);
         defaultSessionClearButton.setButtonText ("X");
         defaultSessionClearButton.addListener (this);
+#if ELEMENT_SE
+        defaultSessionFileLabel.setVisible (false);
+        defaultSessionFile.setVisible (false);
+#endif
 
         const int source = String ("internal") == settings.getClockSource()
                                ? ClockSourceInternal
@@ -525,11 +537,13 @@ public:
         layoutSetting (r, systrayLabel, systray);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
 
+#if ! ELEMENT_SE
         layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
         defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
                                              defaultSessionFile.getY(),
                                              settingHeight - 2,
                                              defaultSessionFile.getHeight());
+#endif
 
         if (pluginSettings.isVisible())
         {
@@ -1820,7 +1834,9 @@ void Preferences::addDefaultPages()
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
+#if ! ELEMENT_SE
     addPage (EL_OSC_SETTINGS_NAME);
+#endif
 #if EL_UPDATER
     addPage (EL_REPOSITORY_PREFERENCE_NAME);
 #endif
