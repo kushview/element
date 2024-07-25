@@ -26,9 +26,11 @@ public:
         thread.startThread();
         list.reset (new DirectoryContentsList (&filter, thread));
         list->setDirectory (DataPath::defaultLocation(), true, true);
-        
+
+#if JUCE_MAC
         watcher.addFolder (list->getDirectory());
         watcher.addListener (this);
+#endif
 
         tree.reset (new FileTreeView (*list));
         addAndMakeVisible (tree.get());
@@ -46,8 +48,10 @@ public:
 
     ~DataPathTreeComponent()
     {
+#if JUCE_MAC
         watcher.removeListener (this);
         watcher.removeAllFolders();
+#endif
         list->removeAllChangeListeners();
         tree->removeListener (this);
         renameWindow.setVisible (false);
@@ -128,8 +132,9 @@ private:
     TimeSliceThread thread;
 
     AlertWindow renameWindow;
+#if JUCE_MAC
     FileSystemWatcher watcher;
-    
+#endif
     void deleteSelectedFile()
     {
         const auto file (getSelectedFile());

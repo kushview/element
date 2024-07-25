@@ -5,6 +5,8 @@ For more information visit www.rabiensoftware.com
 
 ==============================================================================*/
 
+#if __APPLE__ // not supported elsewhere yet.
+
 #include <algorithm>
 
 #if JUCE_WINDOWS
@@ -27,21 +29,19 @@ public:
         NSString* newPath = [NSString stringWithUTF8String:folder.getFullPathName().toRawUTF8()];
 
         paths = [[NSArray arrayWithObject:newPath] retain];
-        context.version         = 0L;
-        context.info            = this;
-        context.retain          = nil;
-        context.release         = nil;
+        context.version = 0L;
+        context.info = this;
+        context.retain = nil;
+        context.release = nil;
         context.copyDescription = nil;
 
-        dispatch_queue_t queue = dispatch_queue_create("com.gin.filesystemwatcher", DISPATCH_QUEUE_SERIAL);
-        stream = FSEventStreamCreate (kCFAllocatorDefault, callback, &context, (CFArrayRef)paths, kFSEventStreamEventIdSinceNow, 0.05,
-                                      kFSEventStreamCreateFlagNoDefer | kFSEventStreamCreateFlagFileEvents);
+        dispatch_queue_t queue = dispatch_queue_create ("com.gin.filesystemwatcher", DISPATCH_QUEUE_SERIAL);
+        stream = FSEventStreamCreate (kCFAllocatorDefault, callback, &context, (CFArrayRef) paths, kFSEventStreamEventIdSinceNow, 0.05, kFSEventStreamCreateFlagNoDefer | kFSEventStreamCreateFlagFileEvents);
         if (stream)
         {
-            FSEventStreamSetDispatchQueue(stream, queue);
+            FSEventStreamSetDispatchQueue (stream, queue);
             FSEventStreamStart (stream);
         }
-
     }
 
     ~Impl()
@@ -49,29 +49,26 @@ public:
         if (stream)
         {
             FSEventStreamStop (stream);
-            FSEventStreamSetDispatchQueue(stream, nullptr);
+            FSEventStreamSetDispatchQueue (stream, nullptr);
             FSEventStreamInvalidate (stream);
             FSEventStreamRelease (stream);
         }
     }
 
-    static void callback (ConstFSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths,
-                          const FSEventStreamEventFlags* eventFlags, const FSEventStreamEventId* eventIds)
+    static void callback (ConstFSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, const FSEventStreamEventFlags* eventFlags, const FSEventStreamEventId* eventIds)
     {
         juce::ignoreUnused (streamRef, numEvents, eventIds, eventPaths, eventFlags);
 
-        Impl* impl = (Impl*)clientCallBackInfo;
-
+        Impl* impl = (Impl*) clientCallBackInfo;
 
         auto safeOwner = juce::WeakReference<FileSystemWatcher> (&impl->owner);
 
-        juce::MessageManager::callAsync ([safeOwner, f = impl->folder]
-        {
+        juce::MessageManager::callAsync ([safeOwner, f = impl->folder] {
             if (safeOwner)
                 safeOwner->folderChanged (f);
         });
 
-        char** files = (char**)eventPaths;
+        char** files = (char**) eventPaths;
 
         for (int i = 0; i < int (numEvents); i++)
         {
@@ -93,8 +90,7 @@ public:
 
             if (event != FileSystemEvent::undefined)
             {
-                juce::MessageManager::callAsync ([safeOwner, path, event]
-                {
+                juce::MessageManager::callAsync ([safeOwner, path, event] {
                     if (safeOwner)
                         safeOwner->fileChanged (path, event);
                 });
@@ -113,7 +109,7 @@ public:
 
 //==============================================================================
 #ifdef JUCE_LINUX
-#define BUF_LEN (10 * (sizeof(struct inotify_event) + NAME_MAX + 1))
+#define BUF_LEN (10 * (sizeof (struct inotify_event) + NAME_MAX + 1))
 
 class FileSystemWatcher::Impl final : public juce::Thread,
                                       private juce::AsyncUpdater
@@ -121,8 +117,8 @@ class FileSystemWatcher::Impl final : public juce::Thread,
 public:
     struct Event
     {
-        Event () = delete;
-        Event (const juce::File& f, const FileSystemEvent e) : file(f), fsEvent(e) {}
+        Event() = delete;
+        Event (const juce::File& f, const FileSystemEvent e) : file (f), fsEvent (e) {}
         Event (Event& other) = default;
         Event (Event&& other) = default;
 
@@ -136,14 +132,13 @@ public:
     };
 
     Impl (FileSystemWatcher& o, juce::File f)
-      : juce::Thread ("FileSystemWatcher::Impl"), owner (o), folder (std::move(f))
+        : juce::Thread ("FileSystemWatcher::Impl"), owner (o), folder (std::move (f))
     {
         fd = inotify_init();
 
         wd = inotify_add_watch (fd,
                                 folder.getFullPathName().toRawUTF8(),
-                                IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF |
-                                IN_MODIFY | IN_MOVE_SELF | IN_MOVED_TO | IN_MOVED_FROM);
+                                IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_TO | IN_MOVED_FROM);
 
         startThread (juce::Thread::Priority::background);
     }
@@ -169,33 +164,42 @@ public:
             if (numRead <= 0 || threadShouldExit())
                 break;
 
-            for (const char* ptr = buf; ptr < buf + numRead; ptr += sizeof(struct inotify_event) + iNotifyEvent->len)
+            for (const char* ptr = buf; ptr < buf + numRead; ptr += sizeof (struct inotify_event) + iNotifyEvent->len)
             {
-                iNotifyEvent = reinterpret_cast<const inotify_event*>(ptr);
+                iNotifyEvent = reinterpret_cast<const inotify_event*> (ptr);
 
                 FileSystemEvent eventType = undefined;
-                     if (iNotifyEvent->mask & IN_CREATE)      eventType = FileSystemEvent::fileCreated;
-                else if (iNotifyEvent->mask & IN_CLOSE_WRITE) eventType = FileSystemEvent::fileUpdated;
-                else if (iNotifyEvent->mask & IN_MODIFY)      eventType = FileSystemEvent::fileUpdated;
-                else if (iNotifyEvent->mask & IN_MOVED_FROM)  eventType = FileSystemEvent::fileRenamedOldName;
-                else if (iNotifyEvent->mask & IN_MOVED_TO)    eventType = FileSystemEvent::fileRenamedNewName;
-                else if (iNotifyEvent->mask & IN_DELETE)      eventType = FileSystemEvent::fileDeleted;
+                if (iNotifyEvent->mask & IN_CREATE)
+                    eventType = FileSystemEvent::fileCreated;
+                else if (iNotifyEvent->mask & IN_CLOSE_WRITE)
+                    eventType = FileSystemEvent::fileUpdated;
+                else if (iNotifyEvent->mask & IN_MODIFY)
+                    eventType = FileSystemEvent::fileUpdated;
+                else if (iNotifyEvent->mask & IN_MOVED_FROM)
+                    eventType = FileSystemEvent::fileRenamedOldName;
+                else if (iNotifyEvent->mask & IN_MOVED_TO)
+                    eventType = FileSystemEvent::fileRenamedNewName;
+                else if (iNotifyEvent->mask & IN_DELETE)
+                    eventType = FileSystemEvent::fileDeleted;
 
-                if (eventType == FileSystemEvent::undefined) {
+                if (eventType == FileSystemEvent::undefined)
+                {
                     continue;
                 }
 
                 juce::ScopedLock sl (lock);
                 Event e (folder.getFullPathName() + '/' + iNotifyEvent->name, eventType);
-                if (std::ranges::none_of(events, [&](const auto& event) {
-                    return event == e;
-                })) {
+                if (std::ranges::none_of (events, [&] (const auto& event) {
+                        return event == e;
+                    }))
+                {
                     events.add (std::move (e));
                 }
             }
 
             juce::ScopedLock sl (lock);
-            if (!events.isEmpty()) {
+            if (! events.isEmpty())
+            {
                 triggerAsyncUpdate();
             }
         }
@@ -207,7 +211,8 @@ public:
 
         owner.folderChanged (folder);
 
-        for (const auto& e : events) {
+        for (const auto& e : events)
+        {
             owner.fileChanged (e.file, e.fsEvent);
         }
 
@@ -234,7 +239,7 @@ public:
     struct Event
     {
         Event() = delete;
-        Event(const juce::File& f, FileSystemEvent event) : file(f), fsEvent(event) {}
+        Event (const juce::File& f, FileSystemEvent event) : file (f), fsEvent (event) {}
 
         juce::File file;
         FileSystemEvent fsEvent = FileSystemEvent::undefined;
@@ -246,14 +251,12 @@ public:
     };
 
     Impl (FileSystemWatcher& o, juce::File f)
-      : Thread ("FileSystemWatcher::Impl"), owner (o), folder (std::move(f))
+        : Thread ("FileSystemWatcher::Impl"), owner (o), folder (std::move (f))
     {
-        WCHAR path[_MAX_PATH] = {0};
+        WCHAR path[_MAX_PATH] = { 0 };
         wcsncpy_s (path, folder.getFullPathName().toWideCharPointer(), _MAX_PATH - 1);
 
-        folderHandle = CreateFileW (path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                    NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-
+        folderHandle = CreateFileW (path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
         if (folderHandle != INVALID_HANDLE_VALUE)
             startThread (juce::Thread::Priority::background);
@@ -282,9 +285,7 @@ public:
         while (! threadShouldExit())
         {
             uint8_t buffer[heapSize] = {};
-            const BOOL success = ReadDirectoryChangesW (folderHandle, buffer, heapSize, true,
-                                                        FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION,
-                                                        &bytesOut, nullptr, nullptr);
+            const BOOL success = ReadDirectoryChangesW (folderHandle, buffer, heapSize, true, FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION, &bytesOut, nullptr, nullptr);
 
             if (success && bytesOut > 0)
             {
@@ -293,7 +294,7 @@ public:
                 uint8_t* rawData = buffer;
                 while (true)
                 {
-                    const FILE_NOTIFY_INFORMATION* fni = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(rawData);
+                    const FILE_NOTIFY_INFORMATION* fni = reinterpret_cast<FILE_NOTIFY_INFORMATION*> (rawData);
 
                     auto eventType = FileSystemEvent::undefined;
                     switch (fni->Action)
@@ -317,15 +318,17 @@ public:
                             break;
                     }
 
-                    if (eventType == undefined) {
+                    if (eventType == undefined)
+                    {
                         continue;
                     }
 
-                    Event e { folder.getChildFile (juce::String (fni->FileName, fni->FileNameLength / sizeof(wchar_t))), eventType };
+                    Event e { folder.getChildFile (juce::String (fni->FileName, fni->FileNameLength / sizeof (wchar_t))), eventType };
 
-                    if (std::ranges::none_of(events, [&](const auto& event) {
-                        return event == e;
-                    })) {
+                    if (std::ranges::none_of (events, [&] (const auto& event) {
+                            return event == e;
+                        }))
+                    {
                         events.add (std::move (e));
                     }
 
@@ -335,7 +338,7 @@ public:
                         break;
                 }
 
-                if (!events.isEmpty())
+                if (! events.isEmpty())
                     triggerAsyncUpdate();
             }
         }
@@ -377,7 +380,7 @@ void FileSystemWatcher::addFolder (const juce::File& folder)
     // You can only listen to folders that exist
     jassert (folder.isDirectory());
 
-    if ( ! getWatchedFolders().contains (folder))
+    if (! getWatchedFolders().contains (folder))
         watched.add (new Impl (*this, folder));
 }
 
@@ -429,4 +432,5 @@ juce::Array<juce::File> FileSystemWatcher::getWatchedFolders()
 }
 }
 
+#endif
 #endif

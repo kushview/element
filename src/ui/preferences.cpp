@@ -385,13 +385,13 @@ public:
 
         addAndMakeVisible (openLastSessionLabel);
 
-        #if ! ELEMENT_SE
-            const String sessionStr = "session";
-        #else
-            const String sessionStr = "graph";
-        #endif
+#if ! ELEMENT_SE
+        const String sessionStr = "session";
+#else
+        const String sessionStr = "graph";
+#endif
 
-        openLastSessionLabel.setText (String("Open last used XXX").replace ("XXX", sessionStr), 
+        openLastSessionLabel.setText (String ("Open last used XXX").replace ("XXX", sessionStr),
                                       dontSendNotification);
         openLastSessionLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (openLastSession);
@@ -400,7 +400,7 @@ public:
         openLastSession.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (askToSaveSessionLabel);
-        askToSaveSessionLabel.setText (String ("Ask to save XXXs on exit").replace ("XXX", sessionStr), 
+        askToSaveSessionLabel.setText (String ("Ask to save XXXs on exit").replace ("XXX", sessionStr),
                                        dontSendNotification);
         askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
         addAndMakeVisible (askToSaveSession);

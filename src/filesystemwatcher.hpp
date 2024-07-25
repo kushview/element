@@ -101,6 +101,6 @@ private:
     JUCE_DECLARE_WEAK_REFERENCEABLE (FileSystemWatcher)
 };
 
-}
+} // namespace element
 
 #endif
