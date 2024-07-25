@@ -4,6 +4,10 @@ Copyright 2018 by Roland Rabien
 For more information visit www.rabiensoftware.com
 
 ==============================================================================*/
+#if JUCE_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 #include <element/juce/events.hpp>
 #include "filesystemwatcher.hpp"
