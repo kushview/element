@@ -4,8 +4,10 @@ Copyright 2018 by Roland Rabien
 For more information visit www.rabiensoftware.com
 
 ==============================================================================*/
+
+#include <algorithm>
+
 #if JUCE_WINDOWS
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
