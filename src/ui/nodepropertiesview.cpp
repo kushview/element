@@ -311,7 +311,7 @@ void NodePropertiesView::setState (const String& state)
     }
     else
     {
-        DBG ("[element] couldn't find node to to select in node properties view");
+        Logger::writeToLog (TRANS ("could not find node to to select in node properties view"));
     }
 }
 
