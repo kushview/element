@@ -177,12 +177,14 @@ public:
 
     inline void addOptionsSubmenu()
     {
+#if ! ELEMENT_SE
         PopupMenu menu;
         int index = 30000;
         ProcessorPtr ptr = node.getObject();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
         addOversamplingSubmenu (menu);
         addSubMenu (TRANS ("Options"), menu, ptr != nullptr);
+#endif
     }
 
     inline void addColorSubmenu (ColourSelector& selector)
@@ -217,12 +219,14 @@ public:
 
     inline void addReplaceSubmenu (PluginManager& plugins)
     {
+#if ! ELEMENT_SE
         PopupMenu menu;
         KnownPluginList::addToMenu (menu,
                                     plugins.getKnownPlugins().getTypes(),
                                     KnownPluginList::sortByManufacturer,
                                     node.getFileOrIdentifier().toString());
         addSubMenu ("Replace", menu);
+#endif
     }
 
     inline void addProgramsMenu (const String& subMenuName = "Factory Presets")
@@ -263,7 +267,7 @@ public:
             addItemInternal (native, "Load FXB/FXP", new FXBPresetOp (node, true));
             menu.addSubMenu ("Native Presets", native);
         }
-
+#if ! ELEMENT_SE
         auto identifier = node.getProperty (tags::identifier).toString();
         if (identifier.isEmpty())
             identifier = node.getProperty (tags::file);
@@ -278,6 +282,9 @@ public:
 
         for (int i = 0; i < presetItems.size(); ++i)
             menu.addItem (offset + i, presetItems[i]->name);
+#else
+        juce::ignoreUnused (offset);
+#endif
     }
 
     inline void getProgramsMenu (PopupMenu& menu)
