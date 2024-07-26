@@ -767,7 +767,7 @@ public:
 
         addAndMakeVisible (startStopContLabel);
         startStopContLabel.setFont (Font (12.0, Font::bold));
-        startStopContLabel.setText (TRANS ("Transport responds to MIDI start/stop/continue?"),
+        startStopContLabel.setText (TRANS ("Transport: MIDI Start/Stop"),
                                     juce::dontSendNotification);
         addAndMakeVisible (startStopCont);
         startStopCont.setYesNoText ("Yes", "No");
