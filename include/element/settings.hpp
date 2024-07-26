@@ -49,6 +49,7 @@ public:
     static const char* updateKeyTypeKey;
     static const char* updateKeyKey;
     static const char* updateKeyUserKey;
+    static const char* transportStartStopContinue;
 
     std::unique_ptr<juce::XmlElement> getLastGraph() const;
     void setLastGraph (const juce::ValueTree& data);
@@ -153,6 +154,9 @@ public:
 
     /** Get global midi panic settings. */
     MidiPanicParams getMidiPanicParams() const;
+
+    void setTransportRespondToStartStopContinue (bool shouldRespond);
+    bool transportRespondToStartStopContinue() const;
 
 private:
     juce::PropertiesFile* getProps() const;

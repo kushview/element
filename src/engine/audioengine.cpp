@@ -599,22 +599,28 @@ public:
             midiIOMonitor->received();
         messageCollector.addMessageToQueue (message);
         const bool clockWanted = processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0;
-        if (clockWanted && message.isMidiClock())
+        const bool doStartStop = startStopCont.get() != 0;
+
+        // handle start/stop/continue
+        if (clockWanted || doStartStop)
         {
-            midiClock.process (message);
-        }
-        else if (clockWanted && message.isMidiStart())
-        {
-            transport.requestPlayState (true);
-            transport.requestAudioFrame (0);
-        }
-        else if (clockWanted && message.isMidiStop())
-        {
-            transport.requestPlayState (false);
-        }
-        else if (clockWanted && message.isMidiContinue())
-        {
-            transport.requestPlayState (true);
+            if (message.isMidiClock())
+            {
+                midiClock.process (message);
+            }
+            else if (message.isMidiStart())
+            {
+                transport.requestPlayState (true);
+                transport.requestAudioFrame (0);
+            }
+            else if (message.isMidiStop())
+            {
+                transport.requestPlayState (false);
+            }
+            else if (message.isMidiContinue())
+            {
+                transport.requestPlayState (true);
+            }
         }
     }
 
@@ -745,6 +751,8 @@ private:
     Atomic<int> panicCC { -1 },
         panicChannel { 0 };
 
+    Atomic<int> startStopCont { 0 };
+
     MidiClock midiClock;
     MidiClockMaster midiClockMaster;
 
@@ -848,6 +856,8 @@ void AudioEngine::applySettings (Settings& settings)
         priv->panicCC.set (panic.enabled ? panic.ccNumber : -1);
         priv->panicChannel.set (panic.enabled ? panic.channel : -1);
     }
+
+    priv->startStopCont.set (settings.transportRespondToStartStopContinue() ? 1 : 0);
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

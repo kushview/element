@@ -40,6 +40,7 @@ const char* Settings::updateChannelKey = "updateChannel";
 const char* Settings::updateKeyTypeKey = "updateKeyType";
 const char* Settings::updateKeyKey = "updateKey";
 const char* Settings::updateKeyUserKey = "updateKeyUserKey";
+const char* Settings::transportStartStopContinue = "transportStartStopContinueKey";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -489,6 +490,19 @@ MidiPanicParams Settings::getMidiPanicParams() const
         params.channel = p->getIntValue ("midiPanicChannel", 1);
     }
     return params;
+}
+
+void Settings::setTransportRespondToStartStopContinue (bool shouldRespond)
+{
+    if (auto p = getProps())
+        p->setValue (transportStartStopContinue, shouldRespond);
+}
+
+bool Settings::transportRespondToStartStopContinue() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (transportStartStopContinue, false);
+    return false;
 }
 
 //=============================================================================

@@ -765,6 +765,17 @@ public:
         addAndMakeVisible (panic);
         panic.stabilize();
 
+        addAndMakeVisible (startStopContLabel);
+        startStopContLabel.setFont (Font (12.0, Font::bold));
+        startStopContLabel.setText (TRANS ("Transport responds to MIDI start/stop/continue?"),
+                                    juce::dontSendNotification);
+        addAndMakeVisible (startStopCont);
+        startStopCont.setYesNoText ("Yes", "No");
+        startStopCont.setClickingTogglesState (true);
+        startStopCont.setToggleState (settings.transportRespondToStartStopContinue(),
+                                      dontSendNotification);
+        startStopCont.addListener (this);
+
         addAndMakeVisible (midiInputHeader);
         midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
         midiInputHeader.setFont (Font (12, Font::bold));
@@ -782,6 +793,7 @@ public:
 
     ~MidiSettingsPage()
     {
+        startStopCont.removeListener (this);
         devices.removeChangeListener (this);
         midiInputs = nullptr;
         midiOutput.removeListener (this);
@@ -807,6 +819,7 @@ public:
         layoutSetting (r, midiOutLatencyLabel, midiOutLatency, getWidth() / 4);
         layoutSetting (r, generateClockLabel, generateClock);
         layoutSetting (r, sendClockToInputLabel, sendClockToInput);
+        layoutSetting (r, startStopContLabel, startStopCont);
         layoutSetting (r, panicLabel, panic, getWidth() / 2);
 
         r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
@@ -818,20 +831,33 @@ public:
 
     void buttonClicked (Button* button) override
     {
+        bool sendChanges = true;
+
         if (button == &generateClock)
         {
             settings.setGenerateMidiClock (generateClock.getToggleState());
             generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
-            if (auto engine = world.audio())
-                engine->applySettings (settings);
         }
         else if (button == &sendClockToInput)
         {
             settings.setSendMidiClockToInput (sendClockToInput.getToggleState());
-            sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
+            sendClockToInput.setToggleState (settings.sendMidiClockToInput(),
+                                             dontSendNotification);
+        }
+        else if (button == &startStopCont)
+        {
+            settings.setTransportRespondToStartStopContinue (startStopCont.getToggleState());
+            startStopCont.setToggleState (settings.transportRespondToStartStopContinue(),
+                                          dontSendNotification);
+        }
+        else
+        {
+            sendChanges = false;
+        }
+
+        if (sendChanges)
             if (auto engine = world.audio())
                 engine->applySettings (settings);
-        }
     }
 
     void comboBoxChanged (ComboBox* box) override
@@ -863,6 +889,9 @@ private:
     SettingButton generateClock;
     Label sendClockToInputLabel;
     SettingButton sendClockToInput;
+    Label startStopContLabel;
+    SettingButton startStopCont;
+
     Label midiInputHeader;
     Array<MidiDeviceInfo> outputs;
 
