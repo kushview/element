@@ -50,11 +50,12 @@ void PresetService::refresh()
 void PresetService::add (const Node& node, const String& presetName)
 {
     const DataPath path;
+    
     if (! node.savePresetTo (path, presetName))
     {
         AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                          "Preset",
-                                          "Could not save preset");
+                                          TRANS ("Preset"),
+                                          TRANS ("Could not save preset"));
     }
     else
     {

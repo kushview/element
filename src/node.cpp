@@ -404,6 +404,9 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
     preset.addChild (data, -1, 0);
 
     const auto targetFile = path.createNewPresetFile (*this, name);
+    if (! targetFile.getParentDirectory().exists())
+        targetFile.getParentDirectory().createDirectory();
+
     data.setProperty (tags::version, EL_NODE_VERSION, 0);
     data.setProperty (tags::name, targetFile.getFileNameWithoutExtension(), 0);
     data.setProperty (tags::type, tags::node.toString(), 0);
