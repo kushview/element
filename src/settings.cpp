@@ -523,8 +523,20 @@ void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
 
     sub.addSeparator(); // session items
 
-    sub.addItem (OpenLastUsedSession, "Open Last Saved Session", true, openLastUsedSession());
-    sub.addItem (AskToSaveSessions, "Ask To Save Session", true, askToSaveSession());
+#if ! ELEMENT_SE
+    const String sessTxt = "Session";
+#else
+    const String sessTxt = "Graph";
+#endif
+
+    sub.addItem (OpenLastUsedSession,
+                 String ("Open Last Saved ") + sessTxt,
+                 true,
+                 openLastUsedSession());
+    sub.addItem (AskToSaveSessions,
+                 String ("Ask To Save ") + sessTxt,
+                 true,
+                 askToSaveSession());
 
     menu.addSubMenu ("General", sub);
 
