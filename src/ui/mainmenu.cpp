@@ -128,7 +128,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         auto dir = DataPath::defaultSettingsFile().getParentDirectory();
         dir = dir.getChildFile ("log");
-        world.logger().writeToLog (String ("opening log folder ") + dir.getFullPathName());
+        Logger::writeToLog (String ("opening log folder ") + dir.getFullPathName());
         dir.startAsProcess();
     }
 
