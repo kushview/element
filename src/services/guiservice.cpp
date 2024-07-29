@@ -468,7 +468,7 @@ void GuiService::showPreferencesDialog (const String& section)
     auto prefs = factory->createPreferences();
     if (prefs == nullptr)
     {
-        DBG ("[element] falling back to default preferences.");
+        Logger::writeToLog ("[element] falling back to default preferences.");
         prefs = std::make_unique<Preferences> (*this);
         prefs->addDefaultPages();
     }
