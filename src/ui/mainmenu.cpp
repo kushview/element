@@ -1,26 +1,26 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL3-or-later
 
+#include <element/audioengine.hpp>
+#include <element/context.hpp>
+#include <element/node.hpp>
+#include <element/settings.hpp>
+#include <element/session.hpp>
 #include <element/ui.hpp>
 #include <element/ui/content.hpp>
-#include <element/audioengine.hpp>
-#include <element/session.hpp>
 #include <element/ui/commands.hpp>
-#include <element/node.hpp>
+#include <element/ui/mainwindow.hpp>
 #include <element/ui/commands.hpp>
-#include <element/context.hpp>
-#include <element/settings.hpp>
 
+#include "log.hpp"
+#include "utils.hpp"
+#include "urls.hpp"
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/mainmenu.hpp"
-#include <element/ui/mainwindow.hpp>
 #include "ui/viewhelpers.hpp"
 #include "ui/pluginwindow.hpp"
-
-#include "utils.hpp"
-#include "urls.hpp"
 
 namespace element {
 
@@ -127,11 +127,11 @@ void MainMenu::menuItemSelected (int index, int menu)
     else if (index == 7002)
     {
         auto dir = DataPath::defaultSettingsFile().getParentDirectory();
-        dir = dir.getChildFile("log");
-        Logger::writeToLog (String ("openening logs folder ") + dir.getFullPathName());
+        dir = dir.getChildFile ("log");
+        world.logger().writeToLog (String ("opening log folder ") + dir.getFullPathName());
         dir.startAsProcess();
     }
-    
+
     else if (index == 2000 && menu == Window)
     {
         ViewHelpers::closePluginWindows (&owner, false);

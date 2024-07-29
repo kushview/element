@@ -4,6 +4,7 @@
 #pragma once
 
 #include "appinfo.hpp"
+#include <element/datapath.hpp>
 
 namespace element {
 
@@ -16,11 +17,15 @@ class Log : public juce::Logger
 public:
     Log()
     {
-        mainlogger.reset (FileLogger::createDefaultAppLogger (
-            getSubPath(), "main.log", "Element (main)"));
+        mainlogger = std::make_unique<FileLogger> (
+            getMainLogFile(), "Element (main)");
     }
 
-    ~Log() {}
+    ~Log()
+    {
+        listeners.clear();
+        mainlogger.reset();
+    }
 
     class Listener
     {
@@ -30,11 +35,13 @@ public:
         virtual void messageLogged (const String& msg) = 0;
     };
 
-    /** Returns the relative path in the system log directory */
-    static String getSubPath() { return String (EL_APP_DATA_SUBDIR) + "/log"; }
-
-    /** Returns the absolute path to the log directory */
-    static File getTopDir() { return FileLogger::getSystemLogFileFolder().getChildFile (getSubPath()); }
+    /** Returns the absolute path to the main log file */
+    static File getMainLogFile()
+    {
+        return DataPath::defaultSettingsFile()
+            .getParentDirectory()
+            .getChildFile ("log/main.log");
+    }
 
     /** Add a listener to receive callbacks */
     void addListener (Listener* listener) { listeners.add (listener); }
