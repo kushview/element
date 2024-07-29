@@ -50,7 +50,7 @@ void PresetService::refresh()
 void PresetService::add (const Node& node, const String& presetName)
 {
     const DataPath path;
-    
+
     if (! node.savePresetTo (path, presetName))
     {
         AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,

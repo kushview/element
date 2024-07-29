@@ -68,7 +68,7 @@ public:
         mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
         mapButton.addListener (this);
         addAndMakeVisible (mapButton);
-        mapButton.setVisible (false);  // TODO: MAP removal
+        mapButton.setVisible (false); // TODO: MAP removal
 
         pluginMenu.setIcon (Icon (getIcons().falBarsOutline,
                                   findColour (TextButton::textColourOffId)));
