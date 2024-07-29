@@ -124,6 +124,14 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         URL (EL_URL_DONATE).launchInDefaultBrowser();
     }
+    else if (index == 7002)
+    {
+        auto dir = DataPath::defaultSettingsFile().getParentDirectory();
+        dir = dir.getChildFile("log");
+        Logger::writeToLog (String ("openening logs folder ") + dir.getFullPathName());
+        dir.startAsProcess();
+    }
+    
     else if (index == 2000 && menu == Window)
     {
         ViewHelpers::closePluginWindows (&owner, false);
@@ -297,8 +305,8 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
     menu.addSeparator();
 #endif
     menu.addItem (6000, TRANS ("User's Manual"));
-    menu.addItem (6001, TRANS ("Lua API"));
     menu.addSeparator();
+    menu.addItem (7002, TRANS ("Log files..."));
     menu.addItem (7000, TRANS ("Issue tracking..."));
 #if ! EL_UPDATER
     menu.addSeparator();
