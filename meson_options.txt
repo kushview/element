@@ -19,6 +19,7 @@ option ('codesign-identity', type : 'string', value : '', description : 'Identit
 option ('signtool-sha1', type : 'string', value : '', description : 'Certificate thumbprint for SignTool.exe')
 
 option ('notarize', type : 'boolean', value : false, description : 'Whether to notarize or not.')
-option ('app-password', type : 'string', value : '',  description : 'App Password for notoary')
+option ('app-password', type : 'string', value : '',  description : 'App Password for notary')
 option ('apple-id', type : 'string', value : '',  description : 'Apple ID owning the app password')
 option ('bundle-id', type : 'string', value : '',  description : 'OSX app bundle id')
+option ('team-id', type : 'string', value : '',  description : 'Team ID for notary')

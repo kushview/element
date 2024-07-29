@@ -70,11 +70,12 @@ if host_machine.system() == 'darwin'
 
     notary_script = ''
     if get_option('notarize') and get_option('sign')
-        notary_script = '''xcrun altool --notarize-app --primary-bundle-id="net.kushview.element.installer"  \
-            -u @0@ -p @1@ --file @2@'''.format(
-                get_option('apple-id'), 
-                get_option ('app-password'),
-                basename + '.dmg')
+        notary_script = '''xcrun notarytool submit @0@ \
+            --apple-id @1@ --team-id @2@ --password @3@ --wait'''.format(
+                basename + '.dmg',
+                get_option ('apple-id'),
+                get_option ('team-id'), 
+                get_option ('app-password'))
     endif
 
     configure_file (input : 'installer.sh', output : 'installer.sh',
