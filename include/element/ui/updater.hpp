@@ -12,7 +12,9 @@
     #define EL_UPDATE_REPOSITORY_HOST "https://repo.kushview.net"
 #endif
 
-#define EL_UPDATE_REPOSITORY_URL_BASE EL_UPDATE_REPOSITORY_HOST "/element/1/stable"
+#ifndef EL_UPDATE_REPOSITORY_URL_BASE
+    #define EL_UPDATE_REPOSITORY_URL_BASE EL_UPDATE_REPOSITORY_HOST "/element/1/stable"
+#endif
 
 #if JUCE_MAC
     #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/osx"
