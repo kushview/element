@@ -239,6 +239,12 @@ public:
             juce::ScopedLock sl (lock);
             cachedXml = out;
             cachedPackages = pkgs;
+#if EL_TRACE_UPDATER
+            std::clog << "[updater] local: " << local.ID << ": " << local.version << std::endl;
+            for (const auto& p : cachedPackages) {
+                std::clog << "[updater] cached: " << p.ID << ": " << p.version << std::endl;
+            }
+#endif
         }
 
         triggerAsyncUpdate();
@@ -264,6 +270,9 @@ public:
 
     void handleAsyncUpdate() override
     {
+#if EL_TRACE_UPDATER
+        std::clog << "[updater] invoke updates available signal\n";
+#endif
         owner.sigUpdatesAvailable();
     }
 
@@ -345,6 +354,7 @@ void Updater::clear()
 
 void Updater::check (bool async)
 {
+    std::clog << "Updater::check()\n";
     if (async)
     {
         updates->checkAsync();
