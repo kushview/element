@@ -18,6 +18,7 @@
 
 #include "engine/midipanic.hpp"
 
+#include "appinfo.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/aboutscreen.hpp"
