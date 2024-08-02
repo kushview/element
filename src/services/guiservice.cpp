@@ -217,8 +217,8 @@ private:
             {
                 if (showAlertWhenNoUpdatesReady)
                     AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                                      "Updates",
-                                                      "You're up to date with the latest Element");
+                                                      TRANS ("Updates"),
+                                                      String("You're up to date with the latest XXX").replace("XXX", EL_APP_NAME));
             }
         });
     }
