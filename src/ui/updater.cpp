@@ -355,7 +355,9 @@ void Updater::clear()
 
 void Updater::check (bool async)
 {
-    std::clog << "Updater::check()\n";
+#if EL_TRACE_UPDATER
+    std::clog << "[updater] check inititated\n";
+#endif
     if (async)
     {
         updates->checkAsync();
