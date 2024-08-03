@@ -122,6 +122,8 @@ private:
         auto& plugins (world.plugins());
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
+        auto& factory = plugins.getNodeFactory();
+        factory.hideType (EL_NODE_ID_SCRIPT);
         plugins.scanInternalPlugins();
         plugins.searchUnverifiedPlugins();
     }

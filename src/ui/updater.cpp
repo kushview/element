@@ -241,7 +241,8 @@ public:
             cachedPackages = pkgs;
 #if EL_TRACE_UPDATER
             std::clog << "[updater] local: " << local.ID << ": " << local.version << std::endl;
-            for (const auto& p : cachedPackages) {
+            for (const auto& p : cachedPackages)
+            {
                 std::clog << "[updater] cached: " << p.ID << ": " << p.version << std::endl;
             }
 #endif

@@ -196,8 +196,8 @@ private:
             {
                 auto res = AlertWindow::showYesNoCancelBox (
                     AlertWindow::InfoIcon,
-                    TRANS("Updates Ready"),
-                    String("There are updates ready.  Would you like to quit XXX and launch the Updater?").replace("XXX", EL_APP_NAME));
+                    TRANS ("Updates Ready"),
+                    String ("There are updates ready.  Would you like to quit XXX and launch the Updater?").replace ("XXX", EL_APP_NAME));
                 if (res == 1)
                 {
                     if (! updater.exists())
@@ -219,7 +219,7 @@ private:
                 if (showAlertWhenNoUpdatesReady)
                     AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
                                                       TRANS ("Updates"),
-                                                      String("You're up to date with the latest XXX").replace("XXX", EL_APP_NAME));
+                                                      String ("You're up to date with the latest XXX").replace ("XXX", EL_APP_NAME));
             }
         });
     }
@@ -435,11 +435,12 @@ void GuiService::closeAllWindows()
 
 Commands& GuiService::commands() { return impl->commands; }
 
-void GuiService::setUpdaterPackage (const std::string_view package, std::string_view version) {
-    #if EL_UPDATER
-        auto& upd = updates->updater;
-        upd.setInfo (package.data(), version.data());
-    #endif
+void GuiService::setUpdaterPackage (const std::string_view package, std::string_view version)
+{
+#if EL_UPDATER
+    auto& upd = updates->updater;
+    upd.setInfo (package.data(), version.data());
+#endif
 }
 
 void GuiService::checkUpdates()

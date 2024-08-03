@@ -362,7 +362,6 @@ void MainMenu::buildViewMenu (Commands& cmd, PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
-    menu.addCommandItem (&cmd, Commands::showControllers, "Controllers");
 }
 
 void MainMenu::buildPluginMainMenu (Commands& cmd, PopupMenu& menu)

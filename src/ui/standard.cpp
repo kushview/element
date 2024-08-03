@@ -975,7 +975,6 @@ void StandardContent::getAllCommands (Array<CommandID>& commands)
 {
     // clang-format off
     commands.addArray ({
-        Commands::showControllers,
         Commands::showKeymapEditor,
         Commands::showPluginManager,
         Commands::showSessionConfig,
@@ -1000,13 +999,6 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
 
     switch (commandID)
     {
-        case Commands::showControllers: {
-            int flags = 0;
-            if (getMainViewName() == EL_VIEW_CONTROLLERS)
-                flags |= Info::isTicked;
-            result.setInfo ("Controllers", "Show the session's controllers", "UI", flags);
-            break;
-        }
         case Commands::showKeymapEditor: {
             int flags = 0;
             if (getMainViewName() == EL_VIEW_KEYMAP_EDITOR)
@@ -1116,10 +1108,6 @@ bool StandardContent::perform (const InvocationInfo& info)
     bool result = true;
     switch (info.commandID)
     {
-        case Commands::showControllers: {
-            setMainView (EL_VIEW_CONTROLLERS);
-            break;
-        }
         case Commands::showKeymapEditor:
             setMainView (EL_VIEW_KEYMAP_EDITOR);
             break;
