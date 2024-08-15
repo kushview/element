@@ -66,6 +66,14 @@ TransportBar::TransportBar()
     record->addListener (this);
     record->setColour (SettingButton::backgroundOnColourId, Colours::red);
 
+    toZero = std::make_unique<SettingButton>();
+    addAndMakeVisible (toZero.get());
+    auto toZeroPath = getIcons().fasChevronRight;
+    toZeroPath.applyTransform (AffineTransform().rotated (juce::MathConstants<float>::pi));
+    toZero->setPath (toZeroPath, 4.4f);
+    toZero->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
+    toZero->addListener (this);
+
     barLabel = std::make_unique<BarLabel> (*this);
     addAndMakeVisible (barLabel.get());
     barLabel->setName ("barLabel");
@@ -79,7 +87,7 @@ TransportBar::TransportBar()
     subLabel->setName ("subLabel");
 
     setBeatTime (0.f);
-    setSize (260, 16);
+    setSize (280, 16);
     updateWidth();
 
     startTimer (88);
@@ -132,6 +140,7 @@ void TransportBar::resized()
     play->setBounds (80, 0, 20, 16);
     stop->setBounds (102, 0, 20, 16);
     record->setBounds (124, 0, 20, 16);
+    toZero->setBounds (146, 0, 20, 16);
 
     barLabel->setBounds (0, 0, 24, 16);
     beatLabel->setBounds (26, 0, 24, 16);
@@ -149,6 +158,10 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
             engine->seekToAudioFrame (0);
         else
             engine->setPlaying (true);
+    }
+    else if (buttonThatWasClicked == toZero.get())
+    {
+        engine->seekToAudioFrame (0);
     }
     else if (buttonThatWasClicked == stop.get())
     {
@@ -185,7 +198,7 @@ void TransportBar::stabilize()
 
 void TransportBar::updateWidth()
 {
-    setSize (record->getRight(), getHeight());
+    setSize (toZero->getRight(), getHeight());
 }
 
 } // namespace element

@@ -12,7 +12,7 @@ namespace element {
 
 class BarLabel;
 class TransportBar : public Component,
-                     public Button::Listener,
+                     private Button::Listener,
                      private Timer
 {
 public:
@@ -25,22 +25,19 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
 
 private:
     SessionPtr session;
     AudioEnginePtr engine;
     Transport::MonitorPtr monitor;
 
-    std::unique_ptr<SettingButton> play;
-    std::unique_ptr<SettingButton> stop;
-    std::unique_ptr<SettingButton> record;
-    std::unique_ptr<DragableIntLabel> barLabel;
-    std::unique_ptr<DragableIntLabel> beatLabel;
-    std::unique_ptr<DragableIntLabel> subLabel;
+    std::unique_ptr<SettingButton> play, stop, record, toZero;
+    std::unique_ptr<DragableIntLabel> barLabel, beatLabel, subLabel;
 
     friend class BarLabel;
     friend class Timer;
+
+    void buttonClicked (Button* buttonThatWasClicked) override;
     void timerCallback() override;
 
     bool checkForMonitor();
