@@ -139,6 +139,8 @@ protected:
 #endif
 
 private:
+    friend class AudioFilePlayerEditor;
+
     TimeSliceThread thread { "MediaPlayer" };
     std::unique_ptr<AudioFormatReaderSource> reader;
     AudioFormatManager formats;

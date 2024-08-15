@@ -45,7 +45,7 @@ public:
 
 TransportBar::TransportBar()
 {
-    play = std::make_unique<SettingButton>();
+    play = std::make_unique<PlayButton>();
     addAndMakeVisible (play.get());
     play->setPath (getIcons().fasPlay, 4.4f);
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
@@ -53,20 +53,20 @@ TransportBar::TransportBar()
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
     play->setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
 
-    stop = std::make_unique<SettingButton>();
+    stop = std::make_unique<StopButton>();
     addAndMakeVisible (stop.get());
     stop->setPath (getIcons().fasStop, 4.4f);
     stop->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stop->addListener (this);
 
-    record = std::make_unique<SettingButton>();
+    record = std::make_unique<RecordButton>();
     addAndMakeVisible (record.get());
     record->setPath (getIcons().fasCircle, 4.4f);
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
     record->setColour (SettingButton::backgroundOnColourId, Colours::red);
 
-    toZero = std::make_unique<SettingButton>();
+    toZero = std::make_unique<SeekZeroButton>();
     addAndMakeVisible (toZero.get());
     auto toZeroPath = getIcons().fasChevronRight;
     toZeroPath.applyTransform (AffineTransform().rotated (juce::MathConstants<float>::pi));

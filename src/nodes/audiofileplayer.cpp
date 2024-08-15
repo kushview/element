@@ -19,6 +19,64 @@
 
 namespace element {
 
+class AudioFilePlayerEditor;
+
+class AudioFilePlayerTransport : public juce::Component
+{
+public:
+    AudioFilePlayerTransport()
+    {
+        addAndMakeVisible (play);
+        addAndMakeVisible (stop);
+        addAndMakeVisible (cont);
+        addAndMakeVisible (rewind);
+
+        setSize (22 * 4 + 2 * 3, 18);
+    }
+
+    ~AudioFilePlayerTransport()
+    {
+        play.onClick = nullptr;
+        stop.onClick = nullptr;
+        cont.onClick = nullptr;
+        rewind.onClick = nullptr;
+    }
+
+    void resized() override
+    {
+        auto r = getLocalBounds();
+        std::vector<Component*> comps = {
+            &play, &stop, &cont, &rewind
+        };
+
+        for (auto* c : comps)
+        {
+            c->setBounds (r.removeFromLeft (_buttonSize));
+            r.removeFromLeft (2);
+        }
+    }
+
+    int requiredWidth()
+    {
+        const int btnW = std::max (14, _buttonSize), nbtn = 4, pad = 2;
+        return nbtn * btnW + (nbtn - 1) * pad;
+    }
+
+    void setButtonSize (int newSize)
+    {
+        _buttonSize = std::max (14, newSize);
+        setSize (requiredWidth(), std::max (14, _buttonSize - 6));
+    }
+
+private:
+    friend class AudioFilePlayerEditor;
+    int _buttonSize = 22;
+    PlayButton play { "Play" };
+    StopButton stop { "Stop" };
+    ContinueButton cont { "Continue" };
+    SeekZeroButton rewind { "Seek to Zero" };
+};
+
 class AudioFilePlayerEditor : public AudioProcessorEditor,
                               public FileComboBoxListener,
                               public ChangeListener,
@@ -32,12 +90,21 @@ public:
           processor (o)
     {
         setOpaque (true);
-        chooser.reset (new FileComboBox ("Audio File", File(), false, false, false, o.getWildcard(), String(), TRANS ("Select Audio File")));
+        chooser.reset (new FileComboBox ("Audio File",
+                                         File(),
+                                         false,
+                                         false,
+                                         false,
+                                         o.getWildcard(),
+                                         String(),
+                                         TRANS ("Select Audio File")));
         addAndMakeVisible (chooser.get());
         chooser->setShowFullPathName (false);
 
         addAndMakeVisible (watchButton);
         watchButton.setIcon (Icon (getIcons().fasFolderOpen, Colours::black));
+
+        addAndMakeVisible (transport);
 
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
@@ -62,7 +129,7 @@ public:
         stabilizeComponents();
         bindHandlers();
 
-        setSize (360, 144);
+        setSize (356, 204);
         startTimer (1001);
     }
 
@@ -101,8 +168,7 @@ public:
             if (processor.getAudioFile().existsAsFile())
                 chooser->setCurrentFile (processor.getAudioFile(), dontSendNotification);
 
-        playButton.setToggleState (processor.getPlayer().isPlaying(), dontSendNotification);
-        playButton.setButtonText (playButton.getToggleState() ? "Pause" : "Play");
+        transport.play.setToggleState (processor.getPlayer().isPlaying(), dontSendNotification);
 
         loopButton.setToggleState (processor.isLooping(), dontSendNotification);
 
@@ -118,6 +184,7 @@ public:
             {
                 position.setValue (position.getMinimum(), dontSendNotification);
             }
+            position.updateText();
         }
 
         volume.setValue (
@@ -145,7 +212,11 @@ public:
         chooser->setBounds (r2);
 
         r.removeFromTop (4);
+        transport.setButtonSize (_transportButtonSize);
+        transport.setBounds (r.removeFromTop (77).withSizeKeepingCentre (transport.getWidth(), transport.getHeight()));
+#if 0
         playButton.setBounds (r.removeFromTop (18));
+#endif
         r.removeFromTop (4);
         loopButton.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
@@ -199,6 +270,7 @@ public:
 private:
     AudioFilePlayerNode& processor;
     std::unique_ptr<FileComboBox> chooser;
+    AudioFilePlayerTransport transport;
     Slider position;
     Slider volume;
     TextButton playButton;
@@ -209,6 +281,8 @@ private:
     SignalConnection stateRestoredConnection;
 
     bool draggingPos = false;
+
+    int _transportButtonSize = 32;
 
     void sortRecents()
     {
@@ -233,14 +307,31 @@ private:
             }
         };
 
-        playButton.onClick = [this]() {
+        transport.play.onClick = [this]() {
             int index = AudioFilePlayerNode::Playing;
             if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[index]))
             {
-                *playing = ! *playing;
+                *playing = true;
                 stabilizeComponents();
             }
         };
+
+        transport.stop.onClick = [this]() {
+            int index = AudioFilePlayerNode::Playing;
+            if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[index]))
+            {
+                *playing = false;
+                stabilizeComponents();
+            }
+        };
+
+        transport.cont.onClick = transport.play.onClick;
+
+        transport.rewind.onClick = [this]() {
+            processor.getPlayer().setPosition (0.0);
+        };
+
+        playButton.onClick = transport.play.onClick;
 
         loopButton.onClick = [this]() {
             processor.setLooping (! processor.isLooping());
@@ -280,6 +371,12 @@ private:
     void unbindHandlers()
     {
         stateRestoredConnection.disconnect();
+
+        transport.play.onClick = nullptr;
+        transport.stop.onClick = nullptr;
+        transport.cont.onClick = nullptr;
+        transport.rewind.onClick = nullptr;
+
         playButton.onClick = nullptr;
         loopButton.onClick = nullptr;
         position.onDragStart = nullptr;

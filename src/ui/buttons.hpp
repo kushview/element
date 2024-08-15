@@ -30,7 +30,7 @@ private:
 class SettingButton : public Button
 {
 public:
-    SettingButton (const String& name = String()) : Button (name) {}
+    explicit SettingButton (const String& name = String()) : Button (name) {}
     ~SettingButton() override {}
 
     enum ColourIds
@@ -72,6 +72,60 @@ private:
     int pathReduction = 2;
 };
 
+//==============================================================================
+class PlayButton : public SettingButton
+{
+public:
+    explicit PlayButton (const juce::String& name = "")
+        : SettingButton (name)
+    {
+        setPath (getIcons().fasPlay, 4.4f);
+    }
+};
+
+class StopButton : public SettingButton
+{
+public:
+    explicit StopButton (const juce::String& name = "")
+        : SettingButton (name)
+    {
+        setPath (getIcons().fasStop, 4.4f);
+    }
+};
+
+class ContinueButton : public SettingButton
+{
+public:
+    explicit ContinueButton (const juce::String& name = "")
+        : SettingButton (name)
+    {
+        setPath (getIcons().fasChevronRight, 4.4f);
+    }
+};
+
+class RecordButton : public SettingButton
+{
+public:
+    explicit RecordButton (const juce::String& name = "")
+        : SettingButton (name)
+    {
+        setPath (getIcons().fasCircle, 4.4f);
+    }
+};
+
+class SeekZeroButton : public SettingButton
+{
+public:
+    explicit SeekZeroButton (const juce::String& name = "")
+        : SettingButton (name)
+    {
+        auto path = getIcons().fasChevronRight;
+        path.applyTransform (AffineTransform().rotated (juce::degreesToRadians (180.0)));
+        setPath (path, 4.4f);
+    }
+};
+
+//==============================================================================
 class PanicButton : public SettingButton
 {
 public:
