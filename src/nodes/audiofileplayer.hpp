@@ -59,6 +59,9 @@ public:
     void setRespondToStartStopContinue (bool);
     bool respondsToStartStopContinue() const;
 
+    void enableHostSync (bool sync);
+    bool hostSyncEnabled() const noexcept;
+
     const String getName() const override { return "Audio File Player"; }
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
     void releaseResources() override;

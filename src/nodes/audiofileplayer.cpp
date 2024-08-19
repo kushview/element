@@ -114,7 +114,11 @@ public:
         loopButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
 
         addAndMakeVisible (startStopContinueToggle);
-        startStopContinueToggle.setButtonText ("Respond to MIDI start/stop/continue");
+        startStopContinueToggle.setButtonText (TRANS ("MIDI S/S/C"));
+
+        addAndMakeVisible (hostToggle);
+        hostToggle.setClickingTogglesState (true);
+        hostToggle.setButtonText (TRANS ("Host"));
 
         addAndMakeVisible (position);
         position.setSliderStyle (Slider::LinearBar);
@@ -193,6 +197,7 @@ public:
 
         startStopContinueToggle.setToggleState (processor.respondsToStartStopContinue(),
                                                 dontSendNotification);
+        hostToggle.setToggleState (processor.hostSyncEnabled(), dontSendNotification);
     }
 
     void fileComboBoxChanged (FileComboBox*) override
@@ -214,9 +219,7 @@ public:
         r.removeFromTop (4);
         transport.setButtonSize (_transportButtonSize);
         transport.setBounds (r.removeFromTop (77).withSizeKeepingCentre (transport.getWidth(), transport.getHeight()));
-#if 0
-        playButton.setBounds (r.removeFromTop (18));
-#endif
+
         r.removeFromTop (4);
         loopButton.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
@@ -224,7 +227,10 @@ public:
         r.removeFromTop (4);
         position.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
-        startStopContinueToggle.setBounds (r.removeFromTop (18));
+        r = r.removeFromTop (18);
+
+        startStopContinueToggle.setBounds (r.removeFromLeft (getWidth() / 3));
+        hostToggle.setBounds (r.removeFromLeft (getWidth() / 3));
     }
 
     void paint (Graphics& g) override
@@ -276,7 +282,8 @@ private:
     TextButton playButton;
     TextButton loopButton;
     IconButton watchButton;
-    ToggleButton startStopContinueToggle;
+    ToggleButton startStopContinueToggle,
+        hostToggle;
     Atomic<int> startStopContinue { 0 };
     SignalConnection stateRestoredConnection;
 
@@ -366,6 +373,10 @@ private:
             startStopContinueToggle.setToggleState (
                 processor.respondsToStartStopContinue(), dontSendNotification);
         };
+
+        hostToggle.onClick = [this]() {
+            processor.enableHostSync (hostToggle.getToggleState());
+        };
     }
 
     void unbindHandlers()
@@ -384,6 +395,7 @@ private:
         position.textFromValueFunction = nullptr;
         volume.onValueChange = nullptr;
         startStopContinueToggle.onClick = nullptr;
+        hostToggle.onClick = nullptr;
         processor.getPlayer().removeChangeListener (this);
         chooser->removeListener (this);
         watchButton.onClick = nullptr;
@@ -429,6 +441,18 @@ void AudioFilePlayerNode::setRespondToStartStopContinue (bool respond)
 bool AudioFilePlayerNode::respondsToStartStopContinue() const
 {
     return midiStartStopContinue.get() == 1;
+}
+
+void AudioFilePlayerNode::enableHostSync (bool sync)
+{
+    juce::ScopedLock sl (getCallbackLock());
+    *slave = sync;
+}
+
+bool AudioFilePlayerNode::hostSyncEnabled() const noexcept
+{
+    juce::ScopedLock sl (getCallbackLock());
+    return *slave;
 }
 
 void AudioFilePlayerNode::fillInPluginDescription (PluginDescription& desc) const
@@ -513,12 +537,24 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     const auto nframes = buffer.getNumSamples();
     for (int c = buffer.getNumChannels(); --c >= 0;)
         buffer.clear (c, 0, nframes);
-
-    if (*slave)
+    const bool hostSync = *slave;
+    if (hostSync)
     {
         if (auto* const playhead = getPlayHead())
         {
-            // TODO: Implement
+            auto pos = playhead->getPosition();
+            if (pos)
+            {
+                if (player.isPlaying() != pos->getIsPlaying())
+                {
+                    if (pos->getIsPlaying())
+                        midiPlayState.set (Continue);
+                    else
+                        midiPlayState.set (Stop);
+
+                    triggerAsyncUpdate();
+                }
+            }
         }
     }
 
@@ -528,7 +564,7 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     info.buffer = &buffer;
 
     ScopedLock sl (getCallbackLock());
-    if (midiStartStopContinue.get() == 1)
+    if (! hostSync && midiStartStopContinue.get() == 1)
     {
         for (auto m : midi)
         {
