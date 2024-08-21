@@ -109,9 +109,8 @@ public:
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
 
-        addAndMakeVisible (loopButton);
-        loopButton.setButtonText ("Loop");
-        loopButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+        addAndMakeVisible (loopToggle);
+        loopToggle.setButtonText ("Loop");
 
         addAndMakeVisible (startStopContinueToggle);
         startStopContinueToggle.setButtonText (TRANS ("MIDI S/S/C"));
@@ -133,7 +132,7 @@ public:
         stabilizeComponents();
         bindHandlers();
 
-        setSize (356, 204);
+        setSize (356, 175);
         startTimer (1001);
     }
 
@@ -174,7 +173,7 @@ public:
 
         transport.play.setToggleState (processor.getPlayer().isPlaying(), dontSendNotification);
 
-        loopButton.setToggleState (processor.isLooping(), dontSendNotification);
+        loopToggle.setToggleState (processor.isLooping(), dontSendNotification);
 
         if (! draggingPos)
         {
@@ -221,16 +220,17 @@ public:
         transport.setBounds (r.removeFromTop (77).withSizeKeepingCentre (transport.getWidth(), transport.getHeight()));
 
         r.removeFromTop (4);
-        loopButton.setBounds (r.removeFromTop (18));
-        r.removeFromTop (4);
         volume.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
         position.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
         r = r.removeFromTop (18);
 
-        startStopContinueToggle.setBounds (r.removeFromLeft (getWidth() / 3));
-        hostToggle.setBounds (r.removeFromLeft (getWidth() / 3));
+        std::vector<ToggleButton*> toggles {
+            &loopToggle, &hostToggle, &startStopContinueToggle
+        };
+        for (auto* t : toggles)
+            t->setBounds (r.removeFromLeft (getWidth() / (int) toggles.size()));
     }
 
     void paint (Graphics& g) override
@@ -280,10 +280,10 @@ private:
     Slider position;
     Slider volume;
     TextButton playButton;
-    TextButton loopButton;
     IconButton watchButton;
     ToggleButton startStopContinueToggle,
-        hostToggle;
+        hostToggle,
+        loopToggle;
     Atomic<int> startStopContinue { 0 };
     SignalConnection stateRestoredConnection;
 
@@ -340,7 +340,7 @@ private:
 
         playButton.onClick = transport.play.onClick;
 
-        loopButton.onClick = [this]() {
+        loopToggle.onClick = [this]() {
             processor.setLooping (! processor.isLooping());
             stabilizeComponents();
         };
@@ -389,7 +389,7 @@ private:
         transport.rewind.onClick = nullptr;
 
         playButton.onClick = nullptr;
-        loopButton.onClick = nullptr;
+        loopToggle.onClick = nullptr;
         position.onDragStart = nullptr;
         position.onDragEnd = nullptr;
         position.textFromValueFunction = nullptr;
@@ -537,6 +537,8 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     const auto nframes = buffer.getNumSamples();
     for (int c = buffer.getNumChannels(); --c >= 0;)
         buffer.clear (c, 0, nframes);
+
+    ScopedLock sl (getCallbackLock());
     const bool hostSync = *slave;
     if (hostSync)
     {
@@ -545,6 +547,11 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
             auto pos = playhead->getPosition();
             if (pos)
             {
+                if (pos->getTimeInSamples() == 0 && player.getCurrentPosition() != 0.0)
+                {
+                    player.setPosition (0.0);
+                }
+
                 if (player.isPlaying() != pos->getIsPlaying())
                 {
                     if (pos->getIsPlaying())
@@ -563,7 +570,6 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     AudioSourceChannelInfo info;
     info.buffer = &buffer;
 
-    ScopedLock sl (getCallbackLock());
     if (! hostSync && midiStartStopContinue.get() == 1)
     {
         for (auto m : midi)
