@@ -16,7 +16,7 @@ inline static StringArray getSubDirs()
 {
     auto dirs = StringArray ({ "Controllers",
                                "Graphs",
-                               "Presets",
+                               "Nodes",
                                "Scripts",
                                "Sessions" });
     return dirs;
@@ -89,18 +89,18 @@ const File DataPath::defaultControllersDir() { return defaultUserDataPath().getC
 
 File DataPath::createNewPresetFile (const Node& node, const String& name) const
 {
-    String path = "Presets/";
+    String path = "Nodes/";
     if (name.isNotEmpty())
         path << name;
     else
         path << String (node.getName().isNotEmpty() ? node.getName() : "New Preset");
-    path << ".elpreset";
+    path << ".eln";
     return getRootDir().getChildFile (path).getNonexistentSibling();
 }
 
 void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const
 {
-    const auto presetsDir = getRootDir().getChildFile ("Presets");
+    const auto presetsDir = getRootDir().getChildFile ("Nodes");
     if (! presetsDir.exists() || ! presetsDir.isDirectory())
         return;
 
@@ -116,7 +116,7 @@ void DataPath::findPresetsFor (const String& format, const String& identifier, N
 
 void DataPath::findPresetFiles (StringArray& results) const
 {
-    const auto presetsDir = getRootDir().getChildFile ("Presets");
+    const auto presetsDir = getRootDir().getChildFile ("Nodes");
     if (! presetsDir.exists() || ! presetsDir.isDirectory())
         return;
     for (DirectoryEntry entry : RangedDirectoryIterator (presetsDir, true, EL_PRESET_FILE_EXTENSIONS))

@@ -262,7 +262,7 @@ void Services::handleMessage (const Message& msg)
 
         if (name.isEmpty())
         {
-            AlertWindow alert ("Add Preset", "Enter preset name", AlertWindow::NoIcon, 0);
+            AlertWindow alert (TRANS ("Save Node"), TRANS ("Enter a node name"), AlertWindow::NoIcon, 0);
             alert.addTextEditor ("name", aps->node.getName());
             alert.addButton ("Save", 1, KeyPress (KeyPress::returnKey));
             alert.addButton ("Cancel", 0, KeyPress (KeyPress::escapeKey));

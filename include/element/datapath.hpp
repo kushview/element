@@ -5,7 +5,7 @@
 
 #include <element/juce/core.hpp>
 
-#define EL_PRESET_FILE_EXTENSIONS "*.elp;*.elpreset;"
+#define EL_PRESET_FILE_EXTENSIONS "*.elp;*.elpreset;*.eln"
 
 namespace element {
 

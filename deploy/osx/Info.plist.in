@@ -42,6 +42,8 @@
           <string>elc</string>
           <string>elg</string>
           <string>els</string>
+          <string>eln</string>
+          <string>elpreset</string>
         </array>
         <key>CFBundleTypeName</key>
         <string>elc</string>

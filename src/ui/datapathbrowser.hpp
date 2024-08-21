@@ -99,7 +99,7 @@ public:
             {
                 cc->post (new OpenSessionMessage (file));
             }
-            else if (file.getFileExtension().toLowerCase() == ".elpreset")
+            else if (file.hasFileExtension ("eln;elpreset"))
             {
                 const Node node (Node::parse (file), false);
                 if (node.isValid())

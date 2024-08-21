@@ -700,7 +700,7 @@ bool StandardContent::isInterestedInFileDrag (const StringArray& files)
     for (const auto& path : files)
     {
         const File file (path);
-        if (file.hasFileExtension ("elc;elg;els;dll;vst3;vst;elpreset"))
+        if (file.hasFileExtension ("elc;elg;els;dll;vst3;vst;elpreset;eln"))
             return true;
     }
     return false;
@@ -720,7 +720,7 @@ void StandardContent::filesDropped (const StringArray& files, int x, int y)
             if (auto* sess = services().find<SessionService>())
                 sess->importGraph (file);
         }
-        else if (file.hasFileExtension ("elpreset"))
+        else if (file.hasFileExtension ("elpreset;eln"))
         {
             const auto data = Node::parse (file);
             if (data.hasType (types::Node))
@@ -730,7 +730,9 @@ void StandardContent::filesDropped (const StringArray& files, int x, int y)
             }
             else
             {
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Presets", "Error adding preset");
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+                                             TRANS ("Node"),
+                                             TRANS ("Error adding node from file"));
             }
         }
         else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) && (getMainViewName() == EL_VIEW_GRAPH_EDITOR || getMainViewName() == "PatchBay" || getMainViewName() == EL_VIEW_PLUGIN_MANAGER))

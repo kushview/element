@@ -1050,7 +1050,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
 bool GraphEditorComponent::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
-        if (File (path).hasFileExtension ("elg;elpreset"))
+        if (File (path).hasFileExtension ("elg;elpreset;eln"))
             return true;
     return false;
 }

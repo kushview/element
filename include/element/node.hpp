@@ -293,6 +293,8 @@ public:
 
     inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
 
+    inline bool isDuplex() const { return isAudioIONode() || isMidiIONode(); }
+
     /** Returns true if this is a single MIDI input device (not global) */
     bool isMidiInputDevice() const;
 

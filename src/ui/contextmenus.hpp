@@ -246,10 +246,11 @@ public:
     inline void getPresetsMenu (PresetManager& collection, PopupMenu& menu)
     {
         const int offset = 20000;
-        if (node.isAudioIONode() || node.isMidiIONode())
+        if (node.isDuplex())
             return;
+
         const String format = node.getProperty (tags::format).toString();
-        addItemInternal (menu, "Add Preset", new AddPresetOp (node));
+        addItemInternal (menu, TRANS ("Save node..."), new AddPresetOp (node));
         addItemInternal (menu, "Save as default...", new SaveDefaultNodeOp (node));
         addItemInternal (menu, "Reset default...", new ResetDefaultNodeOp (node));
         menu.addSeparator();
@@ -257,7 +258,7 @@ public:
         {
             PopupMenu progs;
             getProgramsMenu (progs);
-            menu.addSubMenu ("Factory Presets", progs);
+            menu.addSubMenu (TRANS ("Factory Presets"), progs);
         }
 
         if (format == "VST")
@@ -265,7 +266,7 @@ public:
             PopupMenu native;
             addItemInternal (native, "Save FXB/FXP", new FXBPresetOp (node, false));
             addItemInternal (native, "Load FXB/FXP", new FXBPresetOp (node, true));
-            menu.addSubMenu ("Native Presets", native);
+            menu.addSubMenu (TRANS ("Native Presets"), native);
         }
 #if ! ELEMENT_SE
         auto identifier = node.getProperty (tags::identifier).toString();
