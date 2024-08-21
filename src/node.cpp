@@ -550,6 +550,49 @@ void Node::getAudioOutputs (PortArray& ports) const
 }
 
 //==============================================================================
+// clang-format off
+bool Node::isAudioIONode() const
+{
+    return objectData.getProperty (tags::format) == "Internal" &&
+        (objectData.getProperty (tags::identifier) == "audio.input" ||
+         objectData.getProperty (tags::identifier) == "audio.output");
+}
+
+bool Node::isAudioInputNode() const
+{
+    return objectData.getProperty (tags::format) == "Internal" && 
+        objectData.getProperty (tags::identifier) == "audio.input";
+}
+
+bool Node::isAudioOutputNode() const
+{
+    return objectData.getProperty (tags::format) == "Internal" && 
+        objectData.getProperty (tags::identifier) == "audio.output";
+}
+
+bool Node::isMidiIONode() const
+{
+    return objectData.getProperty (tags::format) == "Internal" && 
+        (objectData.getProperty (tags::identifier) == "midi.input" || 
+         objectData.getProperty (tags::identifier) == "midi.output");
+}
+
+/** Returns true if a global MIDI input node. e.g */
+bool Node::isMidiInputNode() const
+{
+    return objectData.getProperty (tags::format) == "Internal" && 
+        objectData.getProperty (tags::identifier) == "midi.input";
+}
+
+/** Returns true if a global MIDI output node. e.g */
+bool Node::isMidiOutputNode() const
+{
+    return objectData.getProperty (tags::format) == "Internal" && 
+        objectData.getProperty (tags::identifier) == "midi.output";
+}
+// clang-format on
+
+//==============================================================================
 bool Node::isMidiInputDevice() const
 {
     return objectData.getProperty (tags::format) == EL_NODE_FORMAT_NAME && objectData.getProperty (tags::identifier) == EL_NODE_ID_MIDI_INPUT_DEVICE;

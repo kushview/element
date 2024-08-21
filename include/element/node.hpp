@@ -259,42 +259,24 @@ public:
     void getAudioInputs (PortArray& ports) const;
     void getAudioOutputs (PortArray& ports) const;
 
-    inline bool isAudioIONode() const
-    {
-        return objectData.getProperty (tags::format) == "Internal" && (objectData.getProperty (tags::identifier) == "audio.input" || objectData.getProperty (tags::identifier) == "audio.output");
-    }
-
-    inline bool isAudioInputNode() const
-    {
-        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "audio.input";
-    }
-
-    inline bool isAudioOutputNode() const
-    {
-        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "audio.output";
-    }
-
-    inline bool isMidiIONode() const
-    {
-        return objectData.getProperty (tags::format) == "Internal" && (objectData.getProperty (tags::identifier) == "midi.input" || objectData.getProperty (tags::identifier) == "midi.output");
-    }
+    //==========================================================================
+    bool isAudioIONode() const;
+    bool isAudioInputNode() const;
+    bool isAudioOutputNode() const;
+    bool isMidiIONode() const;
 
     /** Returns true if a global MIDI input node. e.g */
-    inline bool isMidiInputNode() const
-    {
-        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "midi.input";
-    }
+    bool isMidiInputNode() const;
 
     /** Returns true if a global MIDI output node. e.g */
-    inline bool isMidiOutputNode() const
-    {
-        return objectData.getProperty (tags::format) == "Internal" && objectData.getProperty (tags::identifier) == "midi.output";
-    }
+    bool isMidiOutputNode() const;
 
+    /** Returns true if this node is an inlet or outlet */
     inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
-
+    /** Returns true if this node is an inlet or outlet */
     inline bool isDuplex() const { return isAudioIONode() || isMidiIONode(); }
 
+    //==========================================================================
     /** Returns true if this is a single MIDI input device (not global) */
     bool isMidiInputDevice() const;
 
