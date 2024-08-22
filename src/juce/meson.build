@@ -122,6 +122,8 @@ juce_conf_data.set10 ('JUCE_PLUGINHOST_LADSPA', cpp.check_header ('ladspa.h'))
 ### AudioUnit
 juce_au_includes = []
 
+alsa_dep = dependency('', required : false)
+
 if host_machine.system() == 'linux'
     alsa_dep = dependency ('alsa', required : false)
     juce_conf_data.set10 ('JUCE_ALSA', alsa_dep.found())

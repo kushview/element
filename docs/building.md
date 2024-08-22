@@ -7,8 +7,8 @@ __Dependencies__
 The following packages are needed...
 ```
 sudo apt-get install python git build-essential pkg-config libboost-dev \
-    libfreetype6-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev \
-    libxinerama-dev libxcursor-dev libasound2-dev lv2-dev liblilv-dev \
+    libfreetype-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev \
+    libxinerama-dev libxcursor-dev libjack-dev libasound2-dev lv2-dev liblilv-dev \
     libsuil-dev ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
 ```
 
@@ -18,7 +18,7 @@ meson setup build
 meson compile -C build
 ```
 
-If meson gives errors about missing packages, namely the LV2 related ones, then you might need to also setup subprojects.
+If meson gives errors about missing packages, then you might need to also setup subprojects.
 
 ```
 meson subprojects update --reset

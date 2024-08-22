@@ -195,6 +195,7 @@ if get_option('sign')
 endif # end code signing.
 
 summary ('JACK', jack_enabled, bool_yn: true, section: 'Application')
+summary ('ALSA', alsa_dep.found(), bool_yn: true, section: 'Application')
 
 summary ('Prefix', get_option('prefix'), section : 'Paths')
 summary ('Programs', get_option('prefix') / get_option('bindir'), section : 'Paths')
