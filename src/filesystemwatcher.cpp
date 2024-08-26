@@ -5,13 +5,13 @@ For more information visit www.rabiensoftware.com
 
 ==============================================================================*/
 
-#if __APPLE__  || defined(_WIN32) // not supported elsewhere yet.
-
 #include <algorithm>
 #include <ranges>
 
 #if defined(_WIN32)
 #include <windows.h>
+#elif defined(__linux__)
+#include <sys/inotify.h>
 #endif
 
 #include <element/juce/events.hpp>
@@ -433,5 +433,4 @@ juce::Array<juce::File> FileSystemWatcher::getWatchedFolders()
 }
 }
 
-#endif
 #endif
