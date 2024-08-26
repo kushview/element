@@ -961,7 +961,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
             for (int i = 0; i < sourceNodes.size(); ++i)
             {
-                if (sourceTypes.getUnchecked (i != portType))
+                if (! sourceTypes.getUnchecked (i).canConnect (portType))
                     continue;
 
                 const int sourceBufIndex = getBufferContaining (sourceTypes.getUnchecked (i),

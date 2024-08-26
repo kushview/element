@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE (Types)
 
     const PortType midiType (PortType::Midi);
     BOOST_REQUIRE (ports.isInput (16) == true);
-    BOOST_REQUIRE (ports.getType (16) == midiType);
+    BOOST_REQUIRE (ports.getType (16) == (int) midiType);
     BOOST_REQUIRE (ports.isOutput (17) == true);
-    BOOST_REQUIRE (ports.getType (17) == midiType);
+    BOOST_REQUIRE (ports.getType (17) == (int) midiType);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -5,11 +5,12 @@ For more information visit www.rabiensoftware.com
 
 ==============================================================================*/
 
-#if __APPLE__ // not supported elsewhere yet.
+#if __APPLE__  || defined(_WIN32) // not supported elsewhere yet.
 
 #include <algorithm>
+#include <ranges>
 
-#if JUCE_WINDOWS
+#if defined(_WIN32)
 #include <windows.h>
 #endif
 

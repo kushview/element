@@ -3,7 +3,7 @@ project ('element', ['c', 'cpp' ],
     meson_version : '>= 0.58.0',
     default_options : [ 
         'c_std=c11', 
-        'cpp_std=c++17', 
+        'cpp_std=c++20', 
         'buildtype=release' ])
 
 pymod       = import ('python')

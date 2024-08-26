@@ -27,7 +27,7 @@ public:
         list.reset (new DirectoryContentsList (&filter, thread));
         list->setDirectory (DataPath::defaultLocation(), true, true);
 
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
         watcher.addFolder (list->getDirectory());
         watcher.addListener (this);
 #endif
@@ -48,7 +48,7 @@ public:
 
     ~DataPathTreeComponent()
     {
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
         watcher.removeListener (this);
         watcher.removeAllFolders();
 #endif
@@ -132,7 +132,7 @@ private:
     TimeSliceThread thread;
 
     AlertWindow renameWindow;
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     FileSystemWatcher watcher;
 #endif
     void deleteSelectedFile()
