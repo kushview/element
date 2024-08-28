@@ -11,6 +11,7 @@ For more information visit www.rabiensoftware.com
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(__linux__)
+#include <climits>
 #include <sys/inotify.h>
 #include <unistd.h>
 #endif
