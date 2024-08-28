@@ -369,7 +369,7 @@ public:
 };
 #endif
 
-#if defined JUCE_MAC || defined JUCE_WINDOWS || defined JUCE_LINUX
+#if defined(JUCE_MAC) || defined(JUCE_WINDOWS) || defined(JUCE_LINUX)
 FileSystemWatcher::FileSystemWatcher()
 {
 }
