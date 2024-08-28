@@ -12,6 +12,7 @@ For more information visit www.rabiensoftware.com
 #include <windows.h>
 #elif defined(__linux__)
 #include <sys/inotify.h>
+#include <unistd.h>
 #endif
 
 #include <element/juce/events.hpp>
