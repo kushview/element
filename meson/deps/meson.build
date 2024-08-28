@@ -1,6 +1,6 @@
 
 # Boost
-boost_dep = dependency ('boost', required : true)
+boost_dep = dependency ('boost', version: '>= 1.76.0', required : true)
 
 # LV2
 if get_option ('deploy')
