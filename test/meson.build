@@ -44,6 +44,7 @@ test_element_app = executable ('test_element',
     link_with : [],
     gnu_symbol_visibility : 'hidden',
     cpp_args : test_element_cpp_args,
+    link_args : [ element_app_link_args ],
     install : false
 )
 

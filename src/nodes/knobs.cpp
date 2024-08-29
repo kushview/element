@@ -10,7 +10,7 @@ using namespace juce;
 
 KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> paramLambda)
 {
-    auto setupSlider = [=] (AudioParameterFloat* param, String suffix = {}) {
+    auto setupSlider = [=, this] (AudioParameterFloat* param, String suffix = {}) {
         Slider* newSlider = new Slider;
 
         // set slider style
@@ -37,7 +37,7 @@ KnobsComponent::KnobsComponent (AudioProcessor& proc, std::function<void()> para
         sliders.add (newSlider);
     };
 
-    auto setupBox = [=] (AudioParameterChoice* param) {
+    auto setupBox = [=, this] (AudioParameterChoice* param) {
         ComboBox* newBox = new ComboBox;
 
         addAndMakeVisible (newBox);
