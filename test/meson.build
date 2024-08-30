@@ -33,6 +33,8 @@ test_element_cpp_args = [
     '-DEL_TEST_SOURCE_ROOT="@0@"'.format (meson.project_source_root())
 ]
 
+test_element_link_args = element_app_link_args
+
 if cpp.get_argument_syntax() == 'gcc'
     test_element_cpp_args += [ '-Wno-unused-function', '-Wno-unused-variable' ]
 endif
@@ -43,8 +45,8 @@ test_element_app = executable ('test_element',
     dependencies : [ element_app_deps, juce_dep, element_dep ],
     link_with : [],
     gnu_symbol_visibility : 'hidden',
-    cpp_args : test_element_cpp_args,
-    link_args : [ element_app_link_args ],
+    cpp_args : [ test_element_cpp_args ],
+    link_args : [ test_element_link_args ],
     install : false
 )
 
