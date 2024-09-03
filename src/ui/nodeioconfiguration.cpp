@@ -483,7 +483,9 @@ void NodeAudioBusesComponent::buttonClicked (Button* b)
 
         if (! posted)
         {
-            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, node.getName(), "Could request update of audio buses.");
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                              node.getName(),
+                                              TRANS ("Could request update of audio buses."));
         }
     }
 

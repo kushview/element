@@ -450,12 +450,11 @@ void BlockComponent::buttonClicked (Button* b)
     }
     else if (proc != nullptr && b == &configButton && ! configButton.getToggleState())
     {
-        auto* component = new NodeAudioBusesComponent (node, proc, ViewHelpers::findContentComponent (this));
+        auto* const cc = ViewHelpers::findContentComponent (this);
         CallOutBox::launchAsynchronously (
-            std::unique_ptr<Component> (component),
+            std::make_unique<NodeAudioBusesComponent> (node, proc, cc),
             configButton.getScreenBounds(),
             nullptr);
-        // ioBox.setNonOwned (&box);
     }
     else if (b == &powerButton)
     {
