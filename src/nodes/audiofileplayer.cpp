@@ -28,17 +28,15 @@ public:
     {
         addAndMakeVisible (play);
         addAndMakeVisible (stop);
-        addAndMakeVisible (cont);
         addAndMakeVisible (rewind);
 
-        setSize (22 * 4 + 2 * 3, 18);
+        setSize (22 * 3 + 2 * 3, 18);
     }
 
     ~AudioFilePlayerTransport()
     {
         play.onClick = nullptr;
         stop.onClick = nullptr;
-        cont.onClick = nullptr;
         rewind.onClick = nullptr;
     }
 
@@ -46,7 +44,7 @@ public:
     {
         auto r = getLocalBounds();
         std::vector<Component*> comps = {
-            &play, &stop, &cont, &rewind
+            &play, &stop, &rewind
         };
 
         for (auto* c : comps)
@@ -58,7 +56,7 @@ public:
 
     int requiredWidth()
     {
-        const int btnW = std::max (14, _buttonSize), nbtn = 4, pad = 2;
+        const int btnW = std::max (14, _buttonSize), nbtn = 3, pad = 2;
         return nbtn * btnW + (nbtn - 1) * pad;
     }
 
@@ -73,7 +71,6 @@ private:
     int _buttonSize = 22;
     PlayButton play { "Play" };
     StopButton stop { "Stop" };
-    ContinueButton cont { "Continue" };
     SeekZeroButton rewind { "Seek to Zero" };
 };
 
@@ -332,8 +329,6 @@ private:
             }
         };
 
-        transport.cont.onClick = transport.play.onClick;
-
         transport.rewind.onClick = [this]() {
             processor.getPlayer().setPosition (0.0);
         };
@@ -385,7 +380,6 @@ private:
 
         transport.play.onClick = nullptr;
         transport.stop.onClick = nullptr;
-        transport.cont.onClick = nullptr;
         transport.rewind.onClick = nullptr;
 
         playButton.onClick = nullptr;
