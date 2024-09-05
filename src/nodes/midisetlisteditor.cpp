@@ -474,7 +474,7 @@ void MidiSetListEditor::addProgram()
         const int program = nextBestProgram (*node);
         if (program >= 0)
         {
-            String name = "Program ";
+            String name = "Song ";
             name << (program + 1);
             node->addProgramEntry (name, program);
             table.updateContent();
