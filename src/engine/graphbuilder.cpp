@@ -515,7 +515,7 @@ public:
         tempMidi.clear();
         // End MIDI filters
 
-        auto pluginProcessBlock = [=] (RenderContext& context, bool isSuspended) {
+        auto pluginProcessBlock = [this] (RenderContext& context, bool isSuspended) {
             if (node->wantsContext())
             {
                 if (! isSuspended)
