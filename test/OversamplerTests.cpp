@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE (Basics)
         if (auto* const proc = os.getProcessor (i)) {
             size_t factora = static_cast<size_t> (std::pow (2.0, (double) (i + 1)));
             size_t factorb = proc->getOversamplingFactor();
-            BOOST_REQUIRE_EQUAL (os.getFactor (i), proc->getOversamplingFactor());
+            BOOST_REQUIRE_EQUAL (os.getFactor (i), (int) proc->getOversamplingFactor());
             BOOST_REQUIRE_EQUAL (factora, factorb);
             BOOST_REQUIRE (proc->getLatencyInSamples() > 0.f);
             BOOST_REQUIRE (os.getLatencySamples (i) > 0.f);
