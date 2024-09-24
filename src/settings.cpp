@@ -335,9 +335,15 @@ void Settings::setOscHostPort (int port)
 //=============================================================================
 bool Settings::isSystrayEnabled() const
 {
+#if JUCE_LINUX
+    const bool defaultSysTrayEnabled = false;
+#else
+    const bool defaultSysTrayEnabled = true;
+#endif
+
     if (auto* p = getProps())
-        return p->getBoolValue (systrayKey, true);
-    return true;
+        return p->getBoolValue (systrayKey, defaultSysTrayEnabled);
+    return defaultSysTrayEnabled;
 }
 
 void Settings::setSystrayEnabled (bool enabled)

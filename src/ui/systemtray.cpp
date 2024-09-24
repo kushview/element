@@ -66,11 +66,10 @@ void SystemTray::setEnabled (bool enabled)
     if (enabled)
     {
         if (instance == nullptr)
-        {
             instance = new SystemTray();
-            if (! instance->isOnDesktop())
-                instance->addToDesktop (0);
-        }
+
+        if (instance != nullptr && ! instance->isOnDesktop())
+            instance->addToDesktop (0);
     }
     else
     {
@@ -78,8 +77,6 @@ void SystemTray::setEnabled (bool enabled)
         {
             if (instance->isOnDesktop())
                 instance->removeFromDesktop();
-            delete instance;
-            instance = nullptr;
         }
     }
 }
