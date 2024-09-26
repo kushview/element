@@ -667,27 +667,21 @@ void GuiService::run()
     mainWindow->addKeyListener (commands().getKeyMappings());
     _content->restoreState (pf);
 
-    mainWindow->addToDesktop();
-
-    Desktop::getInstance().setGlobalScaleFactor (
-        context().settings().getDesktopScale());
-
     if (pf->getBoolValue ("mainWindowVisible", true))
     {
         mainWindow->setVisible (true);
         if (pf->getBoolValue ("mainWindowFullScreen", false))
             mainWindow->setFullScreen (true);
-    }
-    else
-    {
-        mainWindow->setVisible (false);
-        mainWindow->removeFromDesktop();
+        mainWindow->addToDesktop();
     }
 
     sibling<SessionService>()->resetChanges();
     refreshSystemTray();
     stabilizeViews();
     refreshMainMenu();
+
+    Desktop::getInstance().setGlobalScaleFactor (
+        context().settings().getDesktopScale());
 }
 
 SessionRef GuiService::session()

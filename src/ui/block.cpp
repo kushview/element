@@ -484,6 +484,7 @@ void BlockComponent::changeListenerCallback (ChangeBroadcaster* broadcaster)
         forEachSibling ([this] (BlockComponent& sibling) {
             if (! sibling.isSelected() || sibling.color == color)
                 return;
+
             sibling.color = color;
             sibling.node.getUIValueTree().setProperty ("color",
                                                        sibling.color.toString(),
