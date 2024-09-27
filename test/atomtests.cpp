@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE (insert)
             BOOST_REQUIRE_EQUAL (obj->body.otype, urids::time_Position);
         } else if (index == 1) {
             // BOOST_REQUIRE_EQUAL (ev->body.type, urids::midi_MidiEvent);
-            BOOST_REQUIRE_EQUAL (ev->body.size, 3);
+            BOOST_REQUIRE_EQUAL (ev->body.size, 3U);
             BOOST_REQUIRE_EQUAL (1, ev->time.frames);
             MidiMessage t (LV2_ATOM_BODY (&ev->body), ev->body.size);
             BOOST_REQUIRE (t.isNoteOff());
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE (insert)
             BOOST_REQUIRE_EQUAL (t.getChannel(), 1);
         } else if (index == 2) {
             BOOST_REQUIRE_EQUAL (ev->body.type, urids::midi_MidiEvent);
-            BOOST_REQUIRE_EQUAL (ev->body.size, 3);
+            BOOST_REQUIRE_EQUAL (ev->body.size, 3U);
             BOOST_REQUIRE_EQUAL (50, ev->time.frames);
             MidiMessage t (LV2_ATOM_BODY (&ev->body), ev->body.size);
             BOOST_REQUIRE (t.isNoteOn());
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE (insert)
             BOOST_REQUIRE_EQUAL (t.getChannel(), 1);
         } else if (index == 3) {
             BOOST_REQUIRE_EQUAL (ev->body.type, urids::midi_MidiEvent);
-            BOOST_REQUIRE_EQUAL (ev->body.size, 3);
+            BOOST_REQUIRE_EQUAL (ev->body.size, 3U);
             BOOST_REQUIRE_EQUAL (100, ev->time.frames);
             MidiMessage t (LV2_ATOM_BODY (&ev->body), ev->body.size);
             BOOST_REQUIRE (t.isNoteOff());
