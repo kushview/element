@@ -87,15 +87,20 @@ const File DataPath::defaultSessionDir() { return defaultUserDataPath().getChild
 const File DataPath::defaultGraphDir() { return defaultUserDataPath().getChildFile ("Graphs"); }
 const File DataPath::defaultControllersDir() { return defaultUserDataPath().getChildFile ("Controllers"); }
 
-File DataPath::createNewPresetFile (const Node& node, const String& name) const
+juce::File DataPath::getPresetFile (const juce::String& name) const
 {
     String path = "Nodes/";
     if (name.isNotEmpty())
         path << name;
     else
-        path << String (node.getName().isNotEmpty() ? node.getName() : "New Preset");
+        path << String (name.trim().isNotEmpty() ? name : "New Preset");
     path << ".eln";
-    return getRootDir().getChildFile (path).getNonexistentSibling();
+    return getRootDir().getChildFile (path);
+}
+
+File DataPath::createNewPresetFile (const Node& node, const String& name) const
+{
+    return getPresetFile (node.getName()).getNonexistentSibling();
 }
 
 void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const

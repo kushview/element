@@ -54,6 +54,7 @@ public:
     static const juce::File installDir();
 
     const juce::File& getRootDir() const { return root; }
+    juce::File getPresetFile (const juce::String& name) const;
     juce::File createNewPresetFile (const Node& node, const juce::String& name = juce::String()) const;
     void findPresetsFor (const juce::String& format, const juce::String& identifier, NodeArray& nodes) const;
     void findPresetFiles (juce::StringArray& results) const;

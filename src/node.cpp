@@ -403,7 +403,7 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
     sanitizeProperties (data, true);
     preset.addChild (data, -1, 0);
 
-    const auto targetFile = path.createNewPresetFile (*this, name);
+    const auto targetFile = path.getPresetFile (name);
     if (! targetFile.getParentDirectory().exists())
         targetFile.getParentDirectory().createDirectory();
 
