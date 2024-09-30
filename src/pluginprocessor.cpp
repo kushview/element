@@ -238,6 +238,7 @@ void PluginProcessor::reset()
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     bool supported = false;
+    // clang-format off
     switch (variant)
     {
         case Instrument:
@@ -247,7 +248,10 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 
         case Effect:
             // require at least a main input and output bus
-            supported = layouts.inputBuses.size() > 0 && layouts.getNumChannels (true, 0) > 0 && layouts.outputBuses.size() > 0 && layouts.getNumChannels (false, 0) > 0;
+            supported = layouts.inputBuses.size() > 0 && 
+                layouts.getNumChannels (true, 0) > 0 && 
+                layouts.outputBuses.size() > 0 && 
+                layouts.getNumChannels (false, 0) > 0;
             break;
 
         case MidiEffect:
@@ -256,6 +260,7 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
             supported = false;
             break;
     }
+    // clang-format on
 
     return supported;
 }
