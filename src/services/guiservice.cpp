@@ -1084,6 +1084,8 @@ void GuiService::stabilizeViews()
         if (cc->isEnabled() != shouldBeEnabled)
             cc->setEnabled (shouldBeEnabled);
         cc->stabilizeViews();
+        cc->refreshToolbar();
+        cc->refreshStatusBar();
     }
 }
 

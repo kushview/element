@@ -438,6 +438,13 @@ public:
             }
         };
 
+        addAndMakeVisible (legacyCtlLabel);
+        legacyCtlLabel.setText ("Enable legacy controllers?", dontSendNotification);
+        addAndMakeVisible (legacyCtl);
+        legacyCtl.setClickingTogglesState (true);
+        legacyCtl.setToggleState (settings.getBool ("legacyControllers", false), dontSendNotification);
+        legacyCtl.getToggleStateValue().addListener (this);
+
         addAndMakeVisible (defaultSessionFileLabel);
         defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
         defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
@@ -536,6 +543,7 @@ public:
 
         layoutSetting (r, systrayLabel, systray);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
+        layoutSetting (r, legacyCtlLabel, legacyCtl);
 
 #if ! ELEMENT_SE
         layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
@@ -559,7 +567,10 @@ public:
             settings.setCheckForUpdates (checkForUpdates.getToggleState());
             jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
         }
-
+        else if (value.refersToSameSourceAs (legacyCtl.getToggleStateValue()))
+        {
+            settings.set ("legacyControllers", legacyCtl.getToggleState());
+        }
         // clock source
         else if (value.refersToSameSourceAs (clockSource))
         {
@@ -665,6 +676,9 @@ private:
 
     Label mainContentLabel;
     ComboBox mainContentBox;
+
+    Label legacyCtlLabel;
+    SettingButton legacyCtl;
 
     Settings& settings;
     AudioEnginePtr engine;

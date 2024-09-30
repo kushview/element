@@ -51,6 +51,10 @@ public:
     static const char* updateKeyUserKey;
     static const char* transportStartStopContinue;
 
+    bool getBool (std::string_view key, bool fallback = false) const noexcept;
+
+    void set (std::string_view key, const juce::var& value);
+
     std::unique_ptr<juce::XmlElement> getLastGraph() const;
     void setLastGraph (const juce::ValueTree& data);
 

@@ -132,6 +132,19 @@ PropertiesFile* Settings::getProps() const
     return (const_cast<Settings*> (this))->getUserSettings();
 }
 
+bool Settings::getBool (std::string_view key, bool fallback) const noexcept
+{
+    auto p = getProps();
+    return p != nullptr ? p->getBoolValue (key.data(), fallback) : fallback;
+}
+
+void Settings::set (std::string_view key, const var& value)
+{
+    if (auto p = getProps())
+        p->setValue (key.data(), value);
+}
+
+//=============================================================================
 std::unique_ptr<XmlElement> Settings::getLastGraph() const
 {
     if (auto* p = getProps())

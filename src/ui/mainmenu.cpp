@@ -260,7 +260,16 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
 }
 
 void MainMenu::buildEditMenu (PopupMenu& menu) { buildEditMenu (cmd, menu); }
-void MainMenu::buildViewMenu (PopupMenu& menu) { buildViewMenu (cmd, menu); }
+void MainMenu::buildViewMenu (PopupMenu& menu)
+{
+    auto& settings (world.settings());
+    buildViewMenu (cmd, menu);
+    if (settings.getBool ("legacyControllers", false))
+    {
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showControllers, "Controllers");
+    }
+}
 
 void MainMenu::buildWindowMenu (PopupMenu& menu)
 {
