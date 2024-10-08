@@ -325,10 +325,8 @@ void AboutScreen::updateAboutInfo()
 
     if (info.licenseText.isNotEmpty())
     {
-        tabs.removeTab (0); // authors
-        tabs.removeTab (0); // donors
-        tabs.removeTab (1); // credits
-        if (auto t = dynamic_cast<LicenseTextComponent*> (tabs.getTabContentComponent (0)))
+        const auto idx = tabs.getTabNames().indexOf ("License");
+        if (auto t = dynamic_cast<LicenseTextComponent*> (tabs.getTabContentComponent (idx)))
         {
             t->setLicenseText (info.licenseText);
             tabs.setCurrentTabIndex (0);
