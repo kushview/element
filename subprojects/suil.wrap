@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://gitlab.com/lv2/suil.git
-revision = master
+revision = main
 
 [provide]
 dependency_names = suil-0

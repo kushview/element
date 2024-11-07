@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://github.com/lv2/sratom.git
-revision = master
+revision = main
 
 [provide]
 dependency_names = sratom-0

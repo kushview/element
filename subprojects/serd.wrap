@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://gitlab.com/drobilla/serd.git
-revision = master
+revision = main
 
 [provide]
 dependency_names = serd-0
