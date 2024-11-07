@@ -97,26 +97,30 @@ void MidiMonitorNode::timerCallback()
         else if (msg.isMidiContinue())
             text << "Continue";
 
-        if (text.isNotEmpty()) {
-            midiLog.add(text);
-        } else if (msg.isNoteOn()) {
+        if (text.isNotEmpty())
+        {
+            midiLog.add (text);
+        }
+        else if (msg.isNoteOn())
+        {
             text.clear();
             text << "Note On "
-                 << msg.getMidiNoteName(msg.getNoteNumber(), true, true, 5)
-                 << " ("  << msg.getNoteNumber() << ") "
+                 << msg.getMidiNoteName (msg.getNoteNumber(), true, true, 5)
+                 << " (" << msg.getNoteNumber() << ") "
                  << " Velocity " << msg.getVelocity()
                  << " Channel " << msg.getChannel();
-        } else if (msg.isNoteOff()) {
+        }
+        else if (msg.isNoteOff())
+        {
             text.clear();
             text << "Note Off "
-                 << msg.getMidiNoteName(msg.getNoteNumber(), true, true, 5)
-                 << " ("  << msg.getNoteNumber() << ") "
+                 << msg.getMidiNoteName (msg.getNoteNumber(), true, true, 5)
+                 << " (" << msg.getNoteNumber() << ") "
                  << " Velocity " << msg.getVelocity()
                  << " Channel " << msg.getChannel();
-        } else {
-            midiLog.add (msg.getDescription());
         }
 
+        midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
         text.clear();
         ++numLogged;
     }
