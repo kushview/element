@@ -1143,6 +1143,13 @@ class UpdatesSettingsPage : public SettingsPage,
                             private AsyncUpdater
 {
 public:
+    enum UpdateChannelID
+    {
+        PublicChannel = 3,
+        StableChannel = 1,
+        NightlyChannel = 2
+    };
+
     enum UpdateKeyTypeID
     {
         PatreonTypeID = 1,
@@ -1155,12 +1162,14 @@ public:
     {
         updateChannelLabel.setText ("Update channel", dontSendNotification);
         addAndMakeVisible (updateChannelLabel);
-        updateChannel.addItem ("Stable", 1);
-        updateChannel.addItem ("Nightly", 2);
-        // updateChannel.addItem ("Beta", 3);
+        updateChannel.addItem ("Public", PublicChannel);
+        updateChannel.addSeparator();
+        updateChannel.addItem ("Stable", StableChannel);
+        updateChannel.addItem ("Nightly", NightlyChannel);
 
         updateChannel.setSelectedId (savedUpdateChannelId(), dontSendNotification);
         updateChannel.onChange = [this]() {
+            updateInputs();
             String ch = updateChannelSlug();
             _ui.settings().setUpdateChannel (ch);
             _ui.settings().saveIfNeeded();
@@ -1289,6 +1298,15 @@ public:
     {
         userText.setVisible (updateKeyTypeSlug() != "patreon");
         userLabel.setVisible (userText.isVisible());
+
+        const auto usingUpdateKey = updateChannel.getSelectedId() != PublicChannel;
+        updateKeyType.setVisible (usingUpdateKey);
+        updateKeyTypeLabel.setVisible (usingUpdateKey);
+        updateKey.setVisible (usingUpdateKey);
+        updateKeyLabel.setVisible (usingUpdateKey);
+        userText.setVisible (usingUpdateKey);
+        userLabel.setVisible (usingUpdateKey);
+    
         resized();
     }
 
@@ -1627,8 +1645,9 @@ private:
             xml->removeChildElement (repos, true);
             repos = xml->createNewChildElement ("Repositories");
 
-            for (const auto& repo : makeReposForUpdateKey())
-                addRepoToXml (repo, *repos);
+            if (updateChannel.getSelectedId() != PublicChannel)
+                for (const auto& repo : makeReposForUpdateKey())
+                    addRepoToXml (repo, *repos);
         }
 
         XmlElement::TextFormat format;
@@ -1697,14 +1716,14 @@ private:
             comboId = updateChannel.getSelectedId();
 
         String ch = "";
-        if (comboId == 1)
+        if (comboId == StableChannel)
             ch = "stable";
-        else if (comboId == 2)
+        else if (comboId == NightlyChannel)
             ch = "nightly";
-        if (ch.isEmpty())
-            ch = "stable";
-
-        return ch;
+        else if (comboId == PublicChannel)
+            ch = "public";
+        
+        return ch.isEmpty() ? juce::String ("public") : ch;
     }
 
     String updateKeyTypeName (int comboId = 0)
@@ -1766,16 +1785,13 @@ private:
         auto tpi = 0;
 
         if (tp == "stable")
-            tpi = 1;
+            tpi = StableChannel;
         else if (tp == "nightly")
-            tpi = 2;
+            tpi = NightlyChannel;
+        else if (tp == "public")
+            tpi = PublicChannel;
 
-        if (tpi < 1)
-            tpi = 1;
-        if (tpi > 2)
-            tpi = 2;
-
-        return tpi;
+        return juce::jlimit (1, 3, tpi);
     }
 
     /** returns the update key type saved currently in settings. */
