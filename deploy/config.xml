@@ -23,10 +23,10 @@
 
     <RepositorySettingsPageVisible>true</RepositorySettingsPageVisible>
     <RemoteRepositories>
-        <!-- <Repository>
+        <Repository>
             <Url>@RELEASEREPO@</Url>
             <Enabled>1</Enabled>
             <DisplayName>Public</DisplayName>
-        </Repository> -->
+        </Repository>
     </RemoteRepositories>
 </Installer>
