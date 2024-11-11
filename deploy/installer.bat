@@ -8,9 +8,13 @@ cd packages
 @ARCHIVEGEN@ -c 9 -f tar.gz ../archives/element-win64.tar.gz^
   net.kushview.element^
   net.kushview.element.lua || exit
-@ARCHIVEGEN@ -c 9 -f tar.gz ../archives/element-plugins-win64.tar.gz^
-  net.kushview.element.vst^
-  net.kushview.element.vst3 || exit
+
+if exist net.kushview.element.vst\ (
+  @ARCHIVEGEN@ -c 9 -f tar.gz ../archives/element-plugins-win64.tar.gz^
+    net.kushview.element.vst^
+    net.kushview.element.vst3 || exit
+)
+
 cd ..
 
 call "C:\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\Auxiliary\\Build\\vcvars64.bat"
