@@ -1306,7 +1306,7 @@ public:
         updateKeyLabel.setVisible (usingUpdateKey);
         userText.setVisible (usingUpdateKey);
         userLabel.setVisible (usingUpdateKey);
-    
+
         resized();
     }
 
@@ -1722,7 +1722,7 @@ private:
             ch = "nightly";
         else if (comboId == PublicChannel)
             ch = "public";
-        
+
         return ch.isEmpty() ? juce::String ("public") : ch;
     }
 

@@ -13,10 +13,16 @@
 #endif
 
 #define EL_PACKAGE_ID "net.kushview.element"
+#if JUCE_MAC
+#define EL_UPDATER_EXE_NAME "manage"
+#else
+#define EL_UPDATER_EXE_NAME "updater"
+#endif
 
 using namespace juce;
 
 namespace element {
+
 namespace ui {
 
 //==============================================================================
@@ -328,7 +334,7 @@ private:
 Updater::Updater()
 {
     updates = std::make_unique<Updates> (*this);
-    setExeFile (Updater::findExe ("updater"));
+    setExeFile (Updater::findExe (EL_UPDATER_EXE_NAME));
     setInfo (EL_PACKAGE_ID, EL_VERSION_STRING, EL_UPDATE_REPOSITORY_URL);
 }
 
@@ -392,12 +398,23 @@ std::string Updater::findExe (const std::string& basename)
     String fileName (boost::trim_copy (basename));
 #if JUCE_WINDOWS
     fileName << ".exe";
-#elif JUCE_MAC
-    fileName << ".app/Contents/MacOS/" << boost::trim_copy (basename);
-#endif
     const auto updaterExe = DataPath::applicationDataDir()
                                 .getChildFile ("installer")
                                 .getChildFile (fileName);
+#elif JUCE_MAC
+    fileName << ".app/Contents/MacOS/"; // << boost::trim_copy ("updater");
+    const auto installerDir = DataPath::applicationDataDir()
+                                  .getChildFile ("installer");
+
+    auto updaterExe = installerDir.getChildFile (fileName + boost::trim_copy (basename));
+
+    if (! updaterExe.existsAsFile())
+    {
+        // workaround for when the actual exe name has to be 'updater'
+        updaterExe = installerDir.getChildFile (fileName + "updater");
+    }
+#endif
+    std::clog << "exe = " << updaterExe.getFullPathName().toStdString() << std::endl;
     return updaterExe.getFullPathName().toStdString();
 }
 
@@ -411,7 +428,7 @@ void Updater::launch()
 {
     Logger::writeToLog ("launching updater");
     if (updates->exeFile.empty())
-        updates->exeFile = findExe ("updater");
+        updates->exeFile = findExe (EL_UPDATER_EXE_NAME);
     if (! exists())
     {
 #if EL_TRACE_UPDATER

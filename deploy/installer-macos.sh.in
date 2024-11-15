@@ -4,6 +4,17 @@ set -e
 
 rm -rf *.gz *.app *.dmg
 
+# Create a signed updater app.
+updaterdir="packages/net.kushview.element.updater"
+if [ -f "${updaterdir}/meta/package.xml" ]; then
+    mkdir -p "${updaterdir}/data"
+    rm -rf "${updaterdir}/data/updater.app"
+
+    @BINARYCREATOR@ -v -c "config/config.xml" @SIGNOPT@ \
+        --mt -p "packages"
+    rsync -var updater.app/ "${updaterdir}/data/manage.app/"
+fi
+
 @BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@
 
 sed -i '' 's/com.yourcompany.installerbase/net.kushview.element.installer/' "@INSTALLERBASE@.app/Contents/Info.plist"

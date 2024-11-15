@@ -60,12 +60,16 @@ endforeach
 if not meson.is_subproject()
 
 if host_machine.system() == 'darwin'
+    subdir('updater')
     basename = 'element-osx-@0@'.format (version_with_build)
 
     extra_args = ''
-    if get_option ('sign')
-        ident = get_option ('codesign-identity')
+    signopt = ''
+    ident = get_option ('codesign-identity')
+
+    if get_option ('sign')    
         extra_args = '-codesign="@0@" -hardened-runtime -sign-for-notarization="@0@" -timestamp'.format(ident)
+        signopt = '-s "' + ident + '"'
     endif
 
     notary_script = ''
@@ -78,7 +82,7 @@ if host_machine.system() == 'darwin'
                 get_option ('app-password'))
     endif
 
-    configure_file (input : 'installer.sh', output : 'installer.sh',
+    configure_file (input : 'installer-macos.sh.in', output : 'installer-macos.sh',
         install : true, install_dir : installerdir,
         configuration: {
             'BINARYCREATOR': binarycreator.full_path(),
@@ -88,7 +92,8 @@ if host_machine.system() == 'darwin'
             'MACDEPLOYQT': macdeployqt.full_path(),
             'MACDEPLOYQT_ARGS': extra_args,
             'NOTARYSCRIPT': notary_script,
-            'ARCHIVEGEN': archivegen.full_path()
+            'ARCHIVEGEN': archivegen.full_path(),
+            'SIGNOPT': signopt
         })
 elif host_machine.system() == 'windows'
     basename = 'element-win64-@0@'.format (version_with_build)
@@ -112,7 +117,7 @@ SignTool  sign /as /v /sha1 @0@ /fd SHA256 /tr http://sha256timestamp.ws.symante
         })
 elif host_machine.system() == 'linux'
     basename = 'element-linux64-@0@'.format (version_with_build)
-    configure_file (input : 'installer-linux.sh', output : 'installer.sh',
+    configure_file (input : 'installer-linux.sh.in', output : 'installer-linux.sh',
         install : true, install_dir : installerdir,
         configuration: {
             'BINARYCREATOR': binarycreator.full_path(),
