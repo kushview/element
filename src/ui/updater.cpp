@@ -413,8 +413,12 @@ std::string Updater::findExe (const std::string& basename)
         // workaround for when the actual exe name has to be 'updater'
         updaterExe = installerDir.getChildFile (fileName + "updater");
     }
+#else
+    const auto updaterExe = DataPath::applicationDataDir()
+                                .getChildFile ("installer")
+                                .getChildFile (fileName);
 #endif
-    std::clog << "exe = " << updaterExe.getFullPathName().toStdString() << std::endl;
+
     return updaterExe.getFullPathName().toStdString();
 }
 
