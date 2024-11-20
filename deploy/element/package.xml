@@ -18,7 +18,4 @@
     </Licenses>
     <TreeName>net.kushview.element.app</TreeName>
     <SortingPriority>100</SortingPriority>
-    <UserInterfaces>
-        <UserInterface>updatekey.ui</UserInterface>
-    </UserInterfaces>
 </Package>
