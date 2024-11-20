@@ -21,7 +21,7 @@
     <WizardDefaultWidth>782</WizardDefaultWidth>
     <WizardDefaultHeight>512</WizardDefaultHeight>
 
-    <RepositorySettingsPageVisible>true</RepositorySettingsPageVisible>
+    <RepositorySettingsPageVisible>false</RepositorySettingsPageVisible>
     <RemoteRepositories>
         <Repository>
             <Url>@RELEASEREPO@</Url>
