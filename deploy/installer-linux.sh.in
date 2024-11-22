@@ -3,7 +3,8 @@
 set -e
 rm -rf *.gz *.app *.dmg
 
-@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@.run
+@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" \
+    -t "/opt/SDKs/bin/installerbase-element" @INSTALLERBASE@.run
 
 rm -rf archives && mkdir archives
 cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
