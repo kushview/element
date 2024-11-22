@@ -105,7 +105,7 @@ SignTool  sign /as /v /sha1 @0@ /fd SHA256 /tr http://sha256timestamp.ws.symante
 '''.format (get_option('signtool-sha1'), basename + '.exe')
     endif
 
-    configure_file (input : 'installer.bat', output : 'installer.bat',
+    configure_file (input : 'installer.bat.in', output : 'installer.bat',
         install : true, install_dir : installerdir,
         configuration: {
             'BINARYCREATOR': binarycreator.full_path(),

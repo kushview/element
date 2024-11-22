@@ -1,5 +1,6 @@
 
-@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@ || exit
+@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@"^
+  -t "c:\SDKs\bin\installerbase-element.exe" @INSTALLERBASE@ || exit
 
 rmdir archives /s /q
 mkdir archives

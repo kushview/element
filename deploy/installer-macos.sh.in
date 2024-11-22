@@ -15,7 +15,8 @@ if [ -f "${updaterdir}/meta/package.xml" ]; then
     rsync -var updater.app/ "${updaterdir}/data/manage.app/"
 fi
 
-@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" @INSTALLERBASE@
+@BINARYCREATOR@ -v -c "@CONFIGFILE@" -p "@PACKAGES@" \
+    -t "/opt/SDKs/bin/installerbase-element" @INSTALLERBASE@
 
 sed -i '' 's/com.yourcompany.installerbase/net.kushview.element.installer/' "@INSTALLERBASE@.app/Contents/Info.plist"
 
