@@ -396,6 +396,9 @@ void Updater::setInfo (const std::string& package, const std::string& version)
 std::string Updater::findExe (const std::string& basename)
 {
     String fileName (boost::trim_copy (basename));
+    if (fileName.isEmpty())
+        fileName = "updater";
+
 #if JUCE_WINDOWS
     fileName << ".exe";
     const auto updaterExe = DataPath::applicationDataDir()

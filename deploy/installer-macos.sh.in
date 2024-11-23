@@ -30,7 +30,8 @@ rm -rf archives && mkdir archives
 cd packages && @ARCHIVEGEN@ -f tar.gz -c 9 \
     ../archives/element-osx.tar.gz \
         net.kushview.element \
-        net.kushview.element.lua
+        net.kushview.element.lua \
+        net.kushview.element.updater
 
 if [ -d "net.kushview.element.vst3" ]; then
     @ARCHIVEGEN@ -f tar.gz -c 9 \
