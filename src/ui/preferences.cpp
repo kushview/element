@@ -1164,8 +1164,8 @@ public:
         addAndMakeVisible (updateChannelLabel);
         updateChannel.addItem ("Public", PublicChannel);
         updateChannel.addSeparator();
-        updateChannel.addItem ("Stable", StableChannel);
-        updateChannel.addItem ("Nightly", NightlyChannel);
+        updateChannel.addItem ("Pro (stable)", StableChannel);
+        updateChannel.addItem ("Pro (nightly)", NightlyChannel);
 
         updateChannel.setSelectedId (savedUpdateChannelId(), dontSendNotification);
         updateChannel.onChange = [this]() {
@@ -1782,7 +1782,7 @@ private:
     int savedUpdateChannelId()
     {
         auto tp = _ui.settings().getUpdateChannel();
-        auto tpi = 0;
+        int tpi = PublicChannel;
 
         if (tp == "stable")
             tpi = StableChannel;

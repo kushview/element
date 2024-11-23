@@ -26,14 +26,6 @@ namespace element {
 namespace ui {
 
 //==============================================================================
-struct UpdateRepo
-{
-    std::string host;
-    std::string username;
-    std::string password;
-    bool enabled { false };
-};
-
 static File networkFile() noexcept
 {
     return DataPath::applicationDataDir().getChildFile ("installer/network.xml");
@@ -83,43 +75,6 @@ static void saveRepos (const std::vector<UpdateRepo>& _repos)
     }
 }
 #endif
-
-static std::vector<UpdateRepo> updateRepos()
-{
-    std::vector<UpdateRepo> _repos;
-    if (auto xml = readNetworkFile())
-    {
-        if (auto xml2 = xml->getChildByName ("Repositories"))
-        {
-            for (const auto* const e : xml2->getChildIterator())
-            {
-                UpdateRepo repo;
-
-                if (auto c = e->getChildByName ("Host"))
-                    repo.host = c->getAllSubText().toStdString();
-                if (auto c = e->getChildByName ("Username"))
-                    repo.username = c->getAllSubText().toStdString();
-                if (auto c = e->getChildByName ("Password"))
-                    repo.password = c->getAllSubText().toStdString();
-
-                if (auto c = e->getChildByName ("Enabled"))
-                {
-                    auto st = c->getAllSubText();
-                    repo.enabled = st.getIntValue() != 0;
-                }
-
-                if (! repo.host.empty())
-                {
-#if EL_TRACE_UPDATER
-                    std::clog << "[element] found repo: " << repo.host << std::endl;
-#endif
-                    _repos.push_back (repo);
-                }
-            }
-        }
-    }
-    return _repos;
-}
 
 //==============================================================================
 class Updater::Updates : public juce::Thread,
@@ -225,7 +180,7 @@ public:
     void run() override
     {
         std::vector<UpdatePackage> pkgs;
-        std::vector<UpdateRepo> repos (updateRepos());
+        std::vector<UpdateRepo> repos (Updater::repositories());
         if (repos.empty())
             repos.push_back (fallbackRepo());
 
@@ -452,6 +407,44 @@ void Updater::launch()
     juce::File exeFile = File (updates->exeFile);
     exeFile.startAsProcess ("--su");
 #endif
+}
+
+//==============================================================================
+std::vector<UpdateRepo> Updater::repositories()
+{
+    std::vector<UpdateRepo> _repos;
+    if (auto xml = readNetworkFile())
+    {
+        if (auto xml2 = xml->getChildByName ("Repositories"))
+        {
+            for (const auto* const e : xml2->getChildIterator())
+            {
+                UpdateRepo repo;
+
+                if (auto c = e->getChildByName ("Host"))
+                    repo.host = c->getAllSubText().toStdString();
+                if (auto c = e->getChildByName ("Username"))
+                    repo.username = c->getAllSubText().toStdString();
+                if (auto c = e->getChildByName ("Password"))
+                    repo.password = c->getAllSubText().toStdString();
+
+                if (auto c = e->getChildByName ("Enabled"))
+                {
+                    auto st = c->getAllSubText();
+                    repo.enabled = st.getIntValue() != 0;
+                }
+
+                if (! repo.host.empty())
+                {
+#if EL_TRACE_UPDATER
+                    std::clog << "[element] found repo: " << repo.host << std::endl;
+#endif
+                    _repos.push_back (repo);
+                }
+            }
+        }
+    }
+    return _repos;
 }
 
 //==============================================================================

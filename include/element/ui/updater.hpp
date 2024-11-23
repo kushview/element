@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <element/signals.hpp>
 
@@ -37,6 +38,13 @@ struct UpdatePackage {
         can be 3 or 4 segements.
      */
     std::string version;
+};
+
+struct UpdateRepo {
+    std::string host;
+    std::string username;
+    std::string password;
+    bool enabled { false };
 };
 
 /** Updater helper that can deal with Qt Installer Framework installers */
@@ -88,6 +96,9 @@ public:
     void launch();
 
     //==========================================================================
+    /** Returns a list of user repositories. */
+    static std::vector<UpdateRepo> repositories();
+
     /** Returns the repository URL or file:/// path */
     std::string repository() const noexcept;
 

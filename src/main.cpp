@@ -4,18 +4,18 @@
 #include "ElementApp.h"
 #include <element/services.hpp>
 #include <element/version.hpp>
-#include "engine/internalformat.hpp"
-
 #include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
 #include <element/settings.hpp>
 #include <element/ui.hpp>
-
 #include <element/ui/commands.hpp>
+#include <element/ui/commands.hpp>
+#include <element/ui/updater.hpp>
+
+#include "engine/internalformat.hpp"
 #include "engine/midiengine.hpp"
 #include "scripting.hpp"
-#include <element/ui/commands.hpp>
 #include "datapath.hpp"
 #include "services/sessionservice.hpp"
 #include "log.hpp"
@@ -44,6 +44,7 @@ public:
         setupPlugins();
         setupMidiEngine();
         setupScripting();
+        setupRepos();
 
         sendActionMessage ("finishedLaunching");
     }
@@ -132,6 +133,73 @@ private:
     {
         auto& scripts = world.scripting();
         ignoreUnused (scripts);
+    }
+
+    void setupRepos()
+    {
+        if (! isFirstRun)
+            return;
+#if EL_UPDATER
+        auto& settings = world.settings();
+        const auto repos (ui::Updater::repositories());
+        if (repos.empty())
+            return;
+
+        const auto repo (repos.front());
+        if (! juce::URL::isProbablyAWebsiteURL (repo.host))
+            return;
+
+        auto setPublic = [&]() -> void {
+            settings.setUpdateChannel ("public");
+            settings.setUpdateKeyUser ("");
+            settings.setUpdateKey ("");
+        };
+
+        const juce::String host (repo.host);
+        if (host.contains ("/public"))
+        {
+            setPublic();
+            return;
+        }
+
+        const auto channel = [&]() -> juce::String {
+            if (host.contains ("stable") || host.contains ("release"))
+            {
+                return "stable";
+            }
+            else if (host.contains ("nightly"))
+            {
+                return "nightly";
+            }
+            return "";
+        }();
+
+        const juce::String username (repo.username);
+        const juce::String passData (repo.password);
+        const auto keyType = passData.upToFirstOccurrenceOf (":", false, false);
+        const auto key = passData.fromFirstOccurrenceOf (":", false, false);
+
+        // clang-format off
+        auto repoValid = [&]() -> bool {
+            return username.isNotEmpty() &&
+                key.isNotEmpty() &&
+                (keyType == "member" || keyType == "element-v1" || keyType == "patreon") &&
+                (channel == "stable" || channel == "nightly");
+        };
+        // clang-format on
+
+        if (repoValid())
+        {
+            settings.setUpdateChannel (channel);
+            settings.setUpdateKeyUser (username);
+            settings.setUpdateKeyType (keyType);
+            settings.setUpdateKey (key);
+        }
+        else
+        {
+            setPublic();
+        }
+#endif
     }
 
     void setupLogging()
