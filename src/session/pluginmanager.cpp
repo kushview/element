@@ -365,6 +365,7 @@ public:
         auto& nf = plugins->getNodeFactory();
         nf.add (new LV2NodeProvider());
         plugins->addDefaultFormats();
+        plugins->setPlayConfig (48000.0, 1024);
         logger->logMessage ("[scanner] restoring plugin list");
         {
             juce::MessageManagerLock mml;

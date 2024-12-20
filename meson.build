@@ -171,6 +171,7 @@ if get_option('sign')
         foreach bundle : element_bundles
             signed_name = fs.name(bundle.full_path())+'_signed'
             codesign_command = [ find_program ('codesign', required : true),
+                    '--all-architectures',
                     '--verbose=2', '--timestamp', 
                     '--sign', get_option ('codesign-identity'),
                     '--options', 'runtime', '--deep', '--force',
