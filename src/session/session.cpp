@@ -333,7 +333,7 @@ ValueTree Session::migrate (const ValueTree& oldData, String& error)
     if (model.version() == 0)
     {
         newData = Model::copyWithType (oldData, types::Session);
-        std::clog << "type: " << newData.getType().toString().toStdString() << std::endl;
+
         {
             auto oldGraphs = oldData.getChildWithName (tags::graphs);
             auto newGraphs = newData.getOrCreateChildWithName (tags::graphs, 0);

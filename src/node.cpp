@@ -1042,7 +1042,6 @@ static ValueTree migrateNode (const ValueTree& data, String& error)
     ValueTree newData;
     if (model.version() == 0)
     {
-        std::clog << "[element] migrating node v0\n";
         Identifier newType = types::Node;
         if (model.getProperty (tags::type).toString() == tags::graph.toString())
             newType = types::Graph;
@@ -1181,10 +1180,6 @@ ValueTree Node::migrate (const ValueTree& data, String& error) noexcept
         std::clog << newData.toXmlString().toStdString() << std::endl;
     }
 
-    if (Node (newData, false).isGraph())
-    {
-        std::cout << "isAgraph() = true" << std::endl;
-    }
     return newData;
 }
 
