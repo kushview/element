@@ -127,6 +127,7 @@ public:
                 *wetLevel = params.wetLevel = ((float) state.getProperty ("wetLevel", 0.0));
                 *dryLevel = params.dryLevel = ((float) state.getProperty ("dryLevel", 0.0));
                 *width = params.width = ((float) state.getProperty ("width", 0.0));
+                verb.setParameters (params);
             }
         }
     }
