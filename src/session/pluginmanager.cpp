@@ -60,191 +60,71 @@ static File scannerExeFullPath()
 } // namespace detail
 
 //==============================================================================
-class PluginScannerCoordinator : public juce::ChildProcessCoordinator,
-                                 public AsyncUpdater
+class PluginScannerCoordinator : public juce::ChildProcessCoordinator
 {
 public:
-    explicit PluginScannerCoordinator (PluginScanner& o) : owner (o) {}
+    explicit PluginScannerCoordinator (PluginScanner& o)
+        : owner (o)
+    {
+        launchScanner (0, 0);
+    }
+
     ~PluginScannerCoordinator() {}
 
-    bool startScanning (const StringArray& names = StringArray())
+    enum class State
     {
-        if (isRunning())
-            return true;
+        timeout,
+        gotResult,
+        connectionLost,
+    };
 
-        {
-            ScopedLock sl (lock);
-            slaveState = EL_PLUGIN_SCANNER_WAITING_STATE;
-            running = false;
-            formatNames = names;
-        }
+    struct Response
+    {
+        State state;
+        std::unique_ptr<XmlElement> xml;
+    };
 
-        const bool res = launchScanner();
+    Response getResponse()
+    {
+        std::unique_lock<std::mutex> lock { mutex };
 
-        {
-            ScopedLock sl (lock);
-            running = res;
-        }
+        if (! condvar.wait_for (lock, std::chrono::milliseconds { 50 }, [&] { return gotResult || connectionLost; }))
+            return { State::timeout, nullptr };
 
-        DBG ("[element] scanner launched: " << (isRunning() ? "yes" : "no"));
-        return res;
+        const auto state = connectionLost ? State::connectionLost : State::gotResult;
+        connectionLost = false;
+        gotResult = false;
+
+        return { state, std::move (pluginDescription) };
     }
 
     void handleMessageFromWorker (const MemoryBlock& mb) override
     {
-        const auto data (mb.toString());
-        const auto type (data.upToFirstOccurrenceOf (":", false, false));
-        const auto message (data.fromFirstOccurrenceOf (":", false, false));
-
-        if (type == "state")
-        {
-            ScopedLock sl (lock);
-            const String lastState = slaveState;
-            slaveState = message;
-            if (lastState != slaveState)
-            {
-                ScopedUnlock sul (lock);
-                triggerAsyncUpdate();
-            }
-        }
-        else if (type == "name")
-        {
-            owner.listeners.call (&PluginScanner::Listener::audioPluginScanStarted, message.trim());
-            ScopedLock sl (lock);
-            pluginBeingScanned = message.trim();
-        }
-        else if (type == "progress")
-        {
-            float newProgress = (float) var (message);
-            owner.listeners.call (&PluginScanner::Listener::audioPluginScanProgress, newProgress);
-            ScopedLock sl (lock);
-            progress = newProgress;
-        }
+        const std::lock_guard<std::mutex> lock { mutex };
+        pluginDescription = juce::parseXML (mb.toString());
+        gotResult = true;
+        condvar.notify_one();
     }
 
     void handleConnectionLost() override
     {
-        // this probably will happen when a plugin crashes.
-        {
-            ScopedLock sl (lock);
-            running = false;
-        }
-
-        triggerAsyncUpdate();
-    }
-
-    void handleAsyncUpdate() override
-    {
-        const auto state = getWorkerState();
-        if (state == "ready" && isRunning())
-        {
-            String msg = "scan:";
-            msg << formatNames.joinIntoString (",");
-            MemoryBlock mb (msg.toRawUTF8(), msg.length());
-            sendMessageToWorker (mb);
-        }
-        else if (state == "scanning")
-        {
-            if (! isRunning())
-            {
-                DBG ("[element] a plugin crashed or timed out during scan");
-                updateListAndLaunchWorker();
-            }
-            else
-            {
-                DBG ("[element] scanning... and running....");
-            }
-        }
-        else if (state == EL_PLUGIN_SCANNER_FINISHED_ID)
-        {
-            DBG ("[element] worker finished scanning");
-            sendQuitMessage();
-            killWorkerProcess();
-
-            {
-                ScopedLock sl (lock);
-                running = false;
-                slaveState = "idle";
-            }
-
-            owner.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
-        }
-        else if (state == EL_PLUGIN_SCANNER_WAITING_STATE)
-        {
-            if (! isRunning())
-            {
-                DBG ("[element] waiting for plugin scanner");
-                updateListAndLaunchWorker();
-            }
-        }
-        else if (slaveState == "quitting")
-        {
-            return;
-        }
-        else
-        {
-            DBG ("[element] invalid worker state: " << state);
-        }
-    }
-
-    const String getWorkerState() const
-    {
-        ScopedLock sl (lock);
-        return slaveState;
-    }
-
-    float getProgress() const
-    {
-        ScopedLock sl (lock);
-        return progress;
-    }
-
-    bool isRunning() const
-    {
-        ScopedLock sl (lock);
-        return running;
-    }
-
-    bool sendQuitMessage()
-    {
-        if (isRunning())
-            return sendMessageToWorker (MemoryBlock ("quit", 4));
-        return false;
+        const std::lock_guard<std::mutex> lock { mutex };
+        connectionLost = true;
+        condvar.notify_one();
     }
 
 private:
     PluginScanner& owner;
 
-    CriticalSection lock;
-    bool running = false;
-    float progress = 0.f;
-    String slaveState;
-    StringArray formatNames;
-    StringArray faileFiles;
+    std::mutex mutex;
+    std::condition_variable condvar;
 
-    String pluginBeingScanned;
-
-    void updateListAndLaunchWorker()
-    {
-        if (auto xml = XmlDocument::parse (PluginScanner::getWorkerPluginListFile()))
-            owner.list.recreateFromXml (*xml);
-
-        const bool res = launchScanner();
-        ScopedLock sl (lock);
-        running = res;
-    }
-
-    void resetScannerVariables()
-    {
-        ScopedLock sl (lock);
-        pluginBeingScanned = String();
-        progress = -1.f;
-    }
+    std::unique_ptr<XmlElement> pluginDescription;
+    bool connectionLost = false;
+    bool gotResult = false;
 
     bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
-        resetScannerVariables();
-
         auto scannerExe = detail::scannerExeFullPath();
         if (! scannerExe.existsAsFile())
         {
@@ -262,12 +142,11 @@ private:
 
 //==============================================================================
 class PluginScannerWorker : public juce::ChildProcessWorker,
-                            public AsyncUpdater
+                            public juce::AsyncUpdater
 {
 public:
     PluginScannerWorker()
     {
-        scanFile = PluginScanner::getWorkerPluginListFile();
         SystemStats::setApplicationCrashHandler (detail::pluginScannerCrashHandler);
         auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
         logfile.create();
@@ -280,279 +159,313 @@ public:
 
     void handleMessageFromCoordinator (const MemoryBlock& mb) override
     {
-        const auto data (mb.toString());
-        const auto type (data.upToFirstOccurrenceOf (":", false, false));
-        const auto message (data.fromFirstOccurrenceOf (":", false, false));
-
-        String msg = "[scanner] received message: ";
-        msg << type;
-        logger->logMessage (msg);
-
-        if (type == "quit")
-        {
-            handleConnectionLost();
+        if (mb.isEmpty())
             return;
-        }
 
-        if (type == "scan")
+        const std::lock_guard<std::mutex> lock (mutex);
+
+        if (const auto results = doScan (mb); ! results.isEmpty())
         {
-            const auto formats (StringArray::fromTokens (message.trim(), ",", "'"));
-            formatsToScan = formats;
+            sendResults (results);
+        }
+        else
+        {
+            pendingBlocks.emplace (mb);
             triggerAsyncUpdate();
         }
     }
 
     void handleAsyncUpdate() override
     {
-        if (! scanFile.existsAsFile())
+        for (;;)
         {
-            sendState ("scanning");
-            sendState (EL_PLUGIN_SCANNER_FINISHED_ID);
-            return;
+            const std::lock_guard<std::mutex> lock (mutex);
+
+            if (pendingBlocks.empty())
+                return;
+
+            sendResults (doScan (pendingBlocks.front()));
+            pendingBlocks.pop();
         }
-
-        updateScanFileWithSettings();
-
-        sendState ("scanning");
-
-        for (const auto& format : formatsToScan)
-        {
-            logger->logMessage ("[scanner] scanning " + format + " plugins");
-            scanFor (format);
-        }
-
-        settings->saveIfNeeded();
-        logger->logMessage ("[scanner] finished");
-        sendState (EL_PLUGIN_SCANNER_FINISHED_ID);
     }
 
-    void updateScanFileWithSettings()
+    OwnedArray<PluginDescription> doScan (const MemoryBlock& block)
     {
-        if (! plugins)
-            return;
+        MemoryInputStream stream { block, false };
+        const auto formatName = stream.readString();
+        const auto identifier = stream.readString();
+        return formatName == "LV2" ? scanLV2 (identifier)
+                                   : scanJuce (formatName, identifier);
+    }
 
-        auto& list = plugins->getKnownPlugins();
-        const auto types = list.getTypes();
-        for (const auto& type : types)
-            pluginList.addType (type);
+    OwnedArray<PluginDescription> scanJuce (const String& formatName, const String& identifier)
+    {
+        PluginDescription pd;
+        pd.pluginFormatName = formatName;
+        pd.fileOrIdentifier = identifier;
+        pd.uniqueId = pd.deprecatedUid = 0;
 
-        for (const auto& file : list.getBlacklistedFiles())
-            pluginList.addToBlacklist (file);
+        const auto matchingFormat = plugins->getAudioPluginFormat (formatName);
 
-        writePluginListNow();
+        OwnedArray<PluginDescription> results;
+
+        if (matchingFormat != nullptr
+            && (MessageManager::getInstance()->isThisTheMessageThread()
+                || matchingFormat->requiresUnblockedMessageThreadDuringCreation (pd)))
+        {
+            matchingFormat->findAllTypesForFile (results, identifier);
+        }
+
+        return results;
+    }
+
+    OwnedArray<PluginDescription> scanLV2 (const String& uri)
+    {
+        auto& nodes = plugins->getNodeFactory();
+
+        OwnedArray<PluginDescription> results;
+
+        for (auto* p : nodes.providers())
+        {
+            if (p->format() != "LV2")
+                continue;
+
+            if (auto inst = p->create (uri))
+            {
+                auto d = results.add (new PluginDescription());
+                inst->getPluginDescription (*d);
+            }
+
+            break;
+        }
+
+        return results;
+    }
+
+    void sendResults (const OwnedArray<PluginDescription>& results)
+    {
+        XmlElement xml ("LIST");
+
+        for (const auto& desc : results)
+            xml.addChildElement (desc->createXml().release());
+
+        const auto str = xml.toString();
+        sendMessageToCoordinator ({ str.toRawUTF8(), str.getNumBytesAsUTF8() });
     }
 
     void handleConnectionMade() override
     {
         logger->logMessage ("[scanner] connection to coordinator established");
+        logger->logMessage ("[scanner] creating global objects");
         settings = std::make_unique<Settings>();
         plugins = std::make_unique<PluginManager>();
-        logger->logMessage ("[scanner] created global objects");
-
-        if (! scanFile.existsAsFile())
-            scanFile.create();
-
-        if (auto xml = XmlDocument::parse (scanFile))
-            pluginList.recreateFromXml (*xml);
-
-        logger->logMessage ("[scanner] processing blacklist");
-        // This must happen before user settings, PluginManager will delete the deadman file
-        // when restoring user plugins
-        PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
-            pluginList, plugins->getDeadAudioPluginsFile());
 
         logger->logMessage ("[scanner] setting up formats");
         auto& nf = plugins->getNodeFactory();
         nf.add (new LV2NodeProvider());
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
-        logger->logMessage ("[scanner] restoring plugin list");
-        {
-            juce::MessageManagerLock mml;
-            plugins->restoreUserPlugins (*settings);
-        }
-
-        logger->logMessage ("[scanner] scanner notify read!");
-        if (! sendState (EL_PLUGIN_SCANNER_READY_ID))
-            logger->logMessage ("[scanner] plugin scanner failed to send 'ready' message");
     }
 
     void handleConnectionLost() override
     {
-        cancelPendingUpdate();
         logger->logMessage ("[scanner] connection lost");
         logger.reset();
         settings = nullptr;
         plugins = nullptr;
-        scanner = nullptr;
-        Process::terminate();
+        JUCEApplication::quit();
     }
 
 private:
     std::unique_ptr<Settings> settings;
     std::unique_ptr<PluginManager> plugins;
-    std::unique_ptr<PluginDirectoryScanner> scanner;
-    String fileOrIdentifier;
-    KnownPluginList pluginList;
-    StringArray filesToSkip;
-    File scanFile;
-    StringArray formatsToScan;
-
+    std::mutex mutex;
+    std::queue<MemoryBlock> pendingBlocks;
     std::unique_ptr<juce::FileLogger> logger;
-
-    void applyDeadPlugins()
-    {
-        PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
-            pluginList, plugins->getDeadAudioPluginsFile());
-    }
-
-    bool writePluginListNow()
-    {
-        applyDeadPlugins();
-        if (auto xml = pluginList.createXml())
-        {
-            return xml->writeTo (scanFile);
-        }
-        return false;
-    }
-
-    bool sendState (const String& state)
-    {
-        return sendString ("state", state);
-    }
-
-    bool sendString (const String& type, const String& message)
-    {
-        String data = type;
-        data << ":" << message.trim();
-        MemoryBlock mb (data.toRawUTF8(), data.getNumBytesAsUTF8());
-        return sendMessageToCoordinator (mb);
-    }
-
-    bool doNextScan()
-    {
-        const auto nextFile = scanner->getNextPluginFileThatWillBeScanned();
-        sendString ("name", nextFile);
-        logger->logMessage (String ("[scanner] scan: ") + nextFile);
-
-        for (const auto& file : scanner->getFailedFiles())
-            pluginList.addToBlacklist (file);
-
-        if (scanner->scanNextFile (true, fileOrIdentifier))
-        {
-            writePluginListNow();
-            return true;
-        }
-
-        return false;
-    }
-
-    void scanFor (const String& formatName)
-    {
-        if (plugins == nullptr || settings == nullptr)
-            return;
-
-        if (formatName == "LV2")
-            scanLV2();
-        else if (auto* format = plugins->getAudioPluginFormat (formatName))
-            scanFor (*format);
-    }
-
-    void scanLV2()
-    {
-        if (plugins == nullptr || settings == nullptr)
-            return;
-        auto& nodes = plugins->getNodeFactory();
-
-        for (auto* p : nodes.providers())
-        {
-            if (p->format() != "LV2")
-                continue;
-            const auto types = p->findTypes();
-            float step = 1.f;
-            for (const auto& tp : types)
-            {
-                if (! pluginList.getBlacklistedFiles().contains (tp) && pluginList.getTypeForFile (tp) == nullptr)
-                {
-                    sendString ("name", tp.trim());
-                    logger->logMessage (String ("[scanner] scan: ") + tp);
-                    OwnedArray<PluginDescription> dc;
-                    pluginList.addToBlacklist (tp);
-                    writePluginListNow();
-
-                    if (auto inst = p->create (tp))
-                    {
-                        pluginList.removeFromBlacklist (tp);
-                        PluginDescription desc;
-                        inst->getPluginDescription (desc);
-                        pluginList.addType (desc);
-                        writePluginListNow();
-                    }
-                }
-
-                sendString ("progress", String (step / (float) types.size()));
-                step += 1.f;
-            }
-        }
-    }
-
-    void scanFor (AudioPluginFormat& format)
-    {
-        if (plugins == nullptr || settings == nullptr)
-            return;
-
-        const auto key = String (settings->lastPluginScanPathPrefix) + format.getName();
-        FileSearchPath path (settings->getUserSettings()->getValue (key));
-        scanner = std::make_unique<PluginDirectoryScanner> (pluginList, format, path, true, plugins->getDeadAudioPluginsFile(), false);
-
-        while (doNextScan())
-            sendString ("progress", String (scanner->getProgress()));
-
-        writePluginListNow();
-#if JUCE_LINUX
-        Thread::sleep (1000);
-#endif
-    }
 };
 
 //==============================================================================
-PluginScanner::PluginScanner (KnownPluginList& listToManage) : list (listToManage) {}
+
+namespace detail {
+static juce::StringArray readDeadMansPedalFile()
+{
+    const auto file = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
+    StringArray lines;
+    file.readLines (lines);
+    lines.removeEmptyStrings();
+    return lines;
+}
+
+static void setDeadMansPedalFile (const StringArray& newContents)
+{
+    auto deadMansPedalFile = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
+    if (deadMansPedalFile.getFullPathName().isNotEmpty())
+        deadMansPedalFile.replaceWithText (newContents.joinIntoString ("\n"), true, true);
+}
+
+static void applyBlacklistingsFromDeadMansPedal (KnownPluginList& list)
+{
+    // If any plugins have crashed recently when being loaded, move them to the
+    // end of the list to give the others a chance to load correctly..
+    for (auto& crashedPlugin : readDeadMansPedalFile())
+        list.addToBlacklist (crashedPlugin);
+}
+
+} // namespace detail
+
+PluginScanner::PluginScanner (PluginManager& manager)
+    : _manager (manager),
+      list (manager.getKnownPlugins()) {}
+
 PluginScanner::~PluginScanner()
 {
     listeners.clear();
-    master.reset();
+    superprocess.reset();
 }
 
 void PluginScanner::cancel()
 {
-    if (master)
+    cancelFlag = 1;
+}
+
+bool PluginScanner::isScanning() const { return superprocess != nullptr; }
+
+bool PluginScanner::retrieveDescriptions (const String& formatName,
+                                          const String& fileOrIdentifier,
+                                          OwnedArray<PluginDescription>& result)
+{
+    if (superprocess == nullptr)
+        superprocess = std::make_unique<PluginScannerCoordinator> (*this);
+
+    MemoryBlock block;
+    MemoryOutputStream stream { block, true };
+    stream.writeString (formatName);
+    stream.writeString (fileOrIdentifier);
+
+    if (! superprocess->sendMessageToWorker (block))
+        return false;
+
+    using State = PluginScannerCoordinator::State;
+
+    for (;;)
     {
-        master->handleUpdateNowIfNeeded();
-        master->sendQuitMessage();
-        master.reset();
+        if (cancelFlag.get() != 0)
+            return true;
+
+        const auto response = superprocess->getResponse();
+
+        if (response.state == State::timeout)
+            continue;
+
+        if (response.xml != nullptr)
+        {
+            for (const auto* item : response.xml->getChildIterator())
+            {
+                auto desc = std::make_unique<PluginDescription>();
+
+                if (desc->loadFromXml (*item))
+                    result.add (std::move (desc));
+            }
+        }
+
+        return (response.state == State::gotResult);
     }
 }
 
-bool PluginScanner::isScanning() const { return master && master->isRunning(); }
+void PluginScanner::scanAudioFormat (const String& formatName)
+{
+    detail::applyBlacklistingsFromDeadMansPedal (list);
+
+    StringArray identifiers;
+    std::function<String (const String&)> pluginName = [] (const String& ID) -> juce::String { return ID; };
+
+    if (auto* format = _manager.getAudioPluginFormat (formatName))
+    {
+        pluginName = [format] (const String& ID) {
+            return format->getNameOfPluginFromIdentifier (ID);
+        };
+
+        identifiers = format->searchPathsForPlugins (
+            format->getDefaultLocationsToSearch(),
+            true,
+            false);
+    }
+    else if (auto* provider = _manager.getProvider (formatName))
+    {
+        identifiers = provider->findTypes();
+    }
+
+    listeners.call (&Listener::audioPluginScanProgress, 0.0f);
+
+    float step = 1.f;
+    for (const auto& ID : identifiers)
+    {
+        if (cancelFlag.get() != 0)
+            return;
+
+        listeners.call (&Listener::audioPluginScanStarted, pluginName (ID));
+
+        if (list.getTypeForFile (ID) || list.getBlacklistedFiles().contains (ID))
+            continue;
+
+        OwnedArray<PluginDescription> descriptions;
+
+        auto crashed = detail::readDeadMansPedalFile();
+        crashed.removeString (ID);
+        crashed.add (ID);
+        detail::setDeadMansPedalFile (crashed);
+
+        if (retrieveDescriptions (formatName, ID, descriptions))
+        {
+            for (auto* desc : descriptions)
+                list.addType (*desc);
+
+            // Managed to load without crashing, so remove it from the dead-man's-pedal..
+            crashed.removeString (ID);
+            detail::setDeadMansPedalFile (crashed);
+        }
+
+        if (descriptions.size() == 0 && ! list.getBlacklistedFiles().contains (ID))
+            failedIdentifiers.add (ID);
+
+        listeners.call (&Listener::audioPluginScanProgress,
+                        step / static_cast<float> (identifiers.size()));
+        step += 1.f;
+    }
+}
 
 void PluginScanner::scanForAudioPlugins (const juce::String& formatName)
 {
-    scanForAudioPlugins (StringArray ({ formatName }));
+    const juce::StringArray identifiers { formatName };
+    scanForAudioPlugins (identifiers);
 }
 
 void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 {
-    cancel();
-    getWorkerPluginListFile().deleteFile();
-    if (master == nullptr)
-        master.reset (new PluginScannerCoordinator (*this));
-    if (master->isRunning())
-        return;
-    master->startScanning (formats);
-}
+    cancelFlag = 0;
 
-void PluginScanner::timerCallback()
-{
+    for (const auto& format : formats)
+    {
+        scanAudioFormat (format);
+        if (cancelFlag.get() != 0)
+            break;
+    }
+
+    superprocess.reset();
+    cancelFlag = 0;
+
+    auto crashed = detail::readDeadMansPedalFile();
+    for (const auto& c : failedIdentifiers)
+        crashed.add (c);
+    crashed.removeDuplicates (false);
+    crashed.removeEmptyStrings();
+    detail::setDeadMansPedalFile (crashed);
+    detail::applyBlacklistingsFromDeadMansPedal (list);
+    failedIdentifiers.clearQuick(); // FIXME: this is a workaround that
+        // prevents the UI from showing to
+        // many errors about known-crashed
+        // plugins
+    listeners.call (&Listener::audioPluginScanFinished);
 }
 
 //==============================================================================
@@ -756,7 +669,7 @@ private:
             formatsToScan.add ("LV2");
         }
 
-        scanner = std::make_unique<PluginScanner> (allPlugins);
+        scanner = std::make_unique<PluginScanner> (owner);
         scanner->addListener (this);
         scanner->scanForAudioPlugins (formatsToScan);
     }
@@ -875,7 +788,7 @@ juce::ChildProcessWorker* PluginManager::createAudioPluginScannerWorker()
 
 PluginScanner* PluginManager::createAudioPluginScanner()
 {
-    auto* scanner = new PluginScanner (getKnownPlugins());
+    auto* scanner = new PluginScanner (*this);
     return scanner;
 }
 
@@ -1094,8 +1007,6 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
 void PluginManager::scanFinished()
 {
     restoreAudioPlugins (PluginScanner::getWorkerPluginListFile());
-    if (auto* scanner = getBackgroundAudioPluginScanner())
-        scanner->cancel();
     jassert (! isScanningAudioPlugins());
     sendChangeMessage();
 }

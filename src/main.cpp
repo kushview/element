@@ -399,7 +399,6 @@ private:
                 {
 #if JUCE_MAC
                     Process::setDockIconVisible (false);
-                    juce::shutdownJuce_GUI();
 #endif
                     return true;
                 }

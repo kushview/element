@@ -135,9 +135,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager)
 };
 
-class PluginScanner : private juce::Timer {
+class PluginScanner final {
 public:
-    PluginScanner (juce::KnownPluginList&);
+    PluginScanner (PluginManager& manager);
     ~PluginScanner();
 
     class Listener {
@@ -158,7 +158,7 @@ public:
     /** Scan for plugins of multiple types */
     void scanForAudioPlugins (const juce::StringArray& formats);
 
-    /** Cancels the current scan operation */
+    /** Cancels the current scan operation if possible. */
     void cancel();
 
     /** is scanning */
@@ -175,12 +175,17 @@ public:
 
 private:
     friend class PluginScannerCoordinator;
-    friend class juce::Timer;
-    std::unique_ptr<PluginScannerCoordinator> master;
+    PluginManager& _manager;
+    std::unique_ptr<PluginScannerCoordinator> superprocess;
     juce::ListenerList<Listener> listeners;
-    juce::StringArray failedIdentifiers;
+    juce::StringArray identifiers, failedIdentifiers;
     juce::KnownPluginList& list;
-    void timerCallback() override;
+    juce::Atomic<int> cancelFlag { 0 };
+
+    void scanAudioFormat (const juce::String& formatName);
+    bool retrieveDescriptions (const juce::String& formatName,
+                               const juce::String& fileOrIdentifier,
+                               juce::OwnedArray<juce::PluginDescription>& result);
 };
 
 } // namespace element

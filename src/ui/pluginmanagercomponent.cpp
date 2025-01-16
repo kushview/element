@@ -73,8 +73,6 @@ public:
 
     ~Scanner()
     {
-        if (progressWindow.isCurrentlyModal())
-            progressWindow.exitModalState (2);
         stopTimer();
 
         if (scanner)
@@ -192,11 +190,18 @@ private:
         }
 
         progressWindow.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+        progressWindow.getButton (TRANS ("Cancel"))->onClick = [this] {
+            scanner->cancel();
+        };
         progressWindow.addProgressBarComponent (progress);
-        progress = -1.0;
-
+        progress = 0.0;
         scanner->addListener (this);
         finished = false;
+
+        startTimer (20);
+        progressWindow.setVisible (true);
+        progressWindow.addToDesktop (0);
+
         if (! scanner->isScanning())
         {
             if (formatsToScan.size() > 0)
@@ -205,21 +210,8 @@ private:
                 scanner->scanForAudioPlugins (formatToScan.getName());
         }
 
-        startTimer (20);
-        const int result = progressWindow.runModalLoop();
-        if (result == 0)
-        {
-            scanner->cancel();
-        }
-        else if (result == 1)
-        {
-        }
-        else if (result == 2)
-        {
-            // 2 is when exited in dtor
-            return;
-        }
-
+        progressWindow.getButton (TRANS ("Cancel"))->onClick = nullptr;
+        scanner->removeListener (this);
         progressWindow.setVisible (false);
         finishedScan();
         stopTimer();
@@ -244,15 +236,6 @@ private:
         {
             progressWindow.setMessage (pluginBeingScanned);
         }
-        else
-        {
-            progressWindow.exitModalState (1);
-        }
-    }
-
-    bool doNextScan()
-    {
-        return true;
     }
 
     void audioPluginScanFinished() override
@@ -262,7 +245,9 @@ private:
 
     void audioPluginScanStarted (const String& pluginName) override
     {
-        pluginBeingScanned = File::createFileWithoutCheckingPath (pluginName).getFileName();
+        pluginBeingScanned = File::createFileWithoutCheckingPath (pluginName.trim())
+                                 .getFileName();
+        MessageManager::getInstance()->runDispatchLoopUntil (14);
     }
 
     void audioPluginScanProgress (const float reportedProgress) override
@@ -851,13 +836,12 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
     }
     else
     {
-        // std::clog << "[element] scanning for " << format.getName().toStdString() << std::endl;
         if (auto* world = ViewHelpers::getGlobals (this))
             plugins.saveUserPlugins (world->settings());
         // clang-format off
-        currentScanner .reset (new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, 
+        currentScanner.reset (new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, 
             dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() 
-                                     ? dialogText : TRANS ("Searching for all possible plug-in files...")));
+                                     ? dialogText  : TRANS ("Searching for all possible plug-in files...")));
         // clang-format on
     }
 }
@@ -876,12 +860,6 @@ void PluginListComponent::saveListToSettings()
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
 {
     StringArray shortNames;
-
-    if (nullptr != ViewHelpers::getGlobals (this))
-    {
-        const auto file = PluginScanner::getWorkerPluginListFile();
-        plugins.restoreAudioPlugins (file);
-    }
 
     for (int i = 0; i < failedFiles.size(); ++i)
         shortNames.add (File::createFileWithoutCheckingPath (failedFiles[i]).getFileName());
