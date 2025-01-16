@@ -19,6 +19,22 @@
 
 namespace element {
 
+namespace detail {
+static void initializeRootGraphPorts (RootGraph* root, const Node& model)
+{
+    PortArray ins, outs;
+    model.getPorts (ins, outs, PortType::Audio);
+    root->setNumPorts (PortType::Audio, ins.size(), true, false);
+    root->setNumPorts (PortType::Audio, outs.size(), false, false);
+
+    ins.clearQuick();
+    outs.clearQuick();
+    model.getPorts (ins, outs, PortType::Midi);
+    root->setNumPorts (PortType::Midi, ins.size(), true, false);
+    root->setNumPorts (PortType::Midi, outs.size(), false, false);
+}
+} // namespace detail
+
 struct RootGraphHolder
 {
     RootGraphHolder (const Node& n, Context& world)
@@ -68,16 +84,7 @@ struct RootGraphHolder
             const auto program = (int) model.getProperty ("midiProgram", -1);
 
             // TODO: Uniform method for saving/restoring nodes with custom ports.
-            PortArray ins, outs;
-            model.getPorts (ins, outs, PortType::Audio);
-            root->setNumPorts (PortType::Audio, ins.size(), true, false);
-            root->setNumPorts (PortType::Audio, outs.size(), false, false);
-
-            ins.clearQuick();
-            outs.clearQuick();
-            model.getPorts (ins, outs, PortType::Midi);
-            root->setNumPorts (PortType::Midi, ins.size(), true, false);
-            root->setNumPorts (PortType::Midi, outs.size(), false, false);
+            detail::initializeRootGraphPorts (root, model);
 
             // root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
@@ -786,6 +793,9 @@ void EngineService::setRootNode (const Node& newRootNode)
         proc->setMidiChannels (newRootNode.getMidiChannels().get());
         proc->setVelocityCurveMode ((VelocityCurve::Mode) (int) newRootNode.getProperty (
             tags::velocityCurveMode, (int) VelocityCurve::Linear));
+
+        // TODO: Uniform method for saving/restoring nodes with custom ports.
+        detail::initializeRootGraphPorts (proc, newRootNode);
     }
     else
     {

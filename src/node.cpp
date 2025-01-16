@@ -1091,6 +1091,7 @@ static ValueTree migrateNode (const ValueTree& data, String& error)
         }
 
         Node newNode (newData, false);
+
         // version 0 nodes did not show control ports therefore
         // need to be set to the default block visibility = hidden
         for (int i = 0; i < newNode.getNumPorts(); ++i)
@@ -1101,14 +1102,37 @@ static ValueTree migrateNode (const ValueTree& data, String& error)
             port.setHiddenOnBlock (true);
         }
 
+        const bool isGraph = newNode.isGraph();
         auto oldNodes = data.getChildWithName (tags::nodes);
         auto newNodes = newData.getOrCreateChildWithName (tags::nodes, nullptr);
+        auto newPorts = newData.getOrCreateChildWithName (tags::ports, nullptr);
+        PortArray newGraphIO;
         for (const auto& child : oldNodes)
         {
             auto cm = detail::migrateNode (child, error);
             if (cm.hasType (types::Node) && error.isEmpty())
             {
+                const Node cmn (cm, false);
                 newNodes.addChild (cm.createCopy(), -1, nullptr);
+                if (isGraph && cmn.isDuplex())
+                {
+                    if (cmn.isAudioInputNode())
+                    {
+                        cmn.getPorts (newGraphIO, PortType::Audio, false);
+                    }
+                    else if (cmn.isAudioOutputNode())
+                    {
+                        cmn.getPorts (newGraphIO, PortType::Audio, true);
+                    }
+                    else if (cmn.isMidiInputNode())
+                    {
+                        cmn.getPorts (newGraphIO, PortType::Midi, false);
+                    }
+                    else if (cmn.isMidiOutputNode())
+                    {
+                        cmn.getPorts (newGraphIO, PortType::Midi, true);
+                    }
+                }
             }
             else
             {
@@ -1116,6 +1140,17 @@ static ValueTree migrateNode (const ValueTree& data, String& error)
                     error = "Unexpected node child error.";
                 return {};
             }
+        }
+
+        if (! newGraphIO.isEmpty())
+        {
+            for (auto& gport : newGraphIO)
+            {
+                // flip direction for sanity reason at the graph level.
+                gport.setProperty (tags::flow, gport.isInput() ? tags::output.toString() : tags::input.toString());
+                newPorts.addChild (gport.data(), -1, nullptr);
+            }
+            newGraphIO.clear();
         }
     }
     else
@@ -1144,6 +1179,11 @@ ValueTree Node::migrate (const ValueTree& data, String& error) noexcept
     if (error.isNotEmpty())
     {
         std::clog << newData.toXmlString().toStdString() << std::endl;
+    }
+
+    if (Node (newData, false).isGraph())
+    {
+        std::cout << "isAgraph() = true" << std::endl;
     }
     return newData;
 }
