@@ -946,12 +946,6 @@ void PluginManager::restoreUserPlugins (const XmlElement& xml)
     priv->updateBlacklistedAudioPlugins();
     if (props == nullptr)
         return;
-
-    // if (auto e = priv->allPlugins.createXml())
-    // {
-    //     props->setValue (pluginListKey(), e.get());
-    //     props->saveIfNeeded();
-    // }
 }
 
 void PluginManager::setPlayConfig (double sampleRate, int blockSize)
@@ -1016,8 +1010,9 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
 
 void PluginManager::scanFinished()
 {
-    restoreAudioPlugins (PluginScanner::getWorkerPluginListFile());
-    jassert (! isScanningAudioPlugins());
+    // this file is deprecated and should just be removed.
+    if (PluginScanner::getWorkerPluginListFile().existsAsFile())
+        PluginScanner::getWorkerPluginListFile().deleteFile();
     sendChangeMessage();
 }
 

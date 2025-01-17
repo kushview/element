@@ -53,7 +53,9 @@ else
     lilv_dep = dependency ('lilv-0', required : false)
     if not lilv_dep.found()
         lilv_proj = subproject ('lilv',
-            default_options: [])
+            default_options: [
+                'default_lv2_path=@0@'.format('~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2')
+            ])
         lilv_dep = lilv_proj.get_variable ('lilv_dep')
     endif
 
