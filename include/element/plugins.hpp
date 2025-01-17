@@ -173,6 +173,12 @@ public:
     /** Returns a list of plugins that failed to load */
     const juce::StringArray& getFailedFiles() const { return failedIdentifiers; }
 
+    /** Returns the scanner exe to use for out-of-process scanning. */
+    juce::File scannerExeFile() const noexcept;
+
+    /** Set a specific scanner exe. */
+    void setScannerExe (const juce::File& exe) { _scannerExe = exe; }
+
 private:
     friend class PluginScannerCoordinator;
     PluginManager& _manager;
@@ -181,6 +187,7 @@ private:
     juce::StringArray identifiers, failedIdentifiers;
     juce::KnownPluginList& list;
     juce::Atomic<int> cancelFlag { 0 };
+    juce::File _scannerExe;
 
     void scanAudioFormat (const juce::String& formatName);
     bool retrieveDescriptions (const juce::String& formatName,

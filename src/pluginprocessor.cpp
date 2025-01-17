@@ -439,6 +439,20 @@ void PluginProcessor::initialize()
     SessionPtr session = context->session();
     Settings& settings (context->settings());
     PluginManager& plugins (context->plugins());
+
+    if (auto scanner = plugins.getBackgroundAudioPluginScanner())
+    {
+#if JUCE_MAC
+        auto scannerExe = File ("/Applications/Element.app/Contents/MacOS/Element");
+#elif JUCE_WINDOWS
+        auto scannerExe = File ("c:\\Program Files\\Kushview\\Element\\bin\\element.exe");
+#else
+        auto scannerExe = File ("/usr/local/bin/element") if (! scannerExe.existsAsFile())
+            scannerExe = File ("/usr/bin/element");
+#endif
+        scanner->setScannerExe (scannerExe);
+    }
+
     engine->applySettings (settings);
 
     plugins.restoreUserPlugins (settings);

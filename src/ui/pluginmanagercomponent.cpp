@@ -367,8 +367,8 @@ public:
         if (ev.mods.isPopupMenu())
         {
             PopupMenu menu;
-            menu.addItem (1, "Clear list", ! owner.isPluginVersion());
-            menu.addItem (2, "Remove selected", ! owner.isPluginVersion());
+            menu.addItem (1, "Clear list");
+            menu.addItem (2, "Remove selected");
             cellPopup (menu.show());
         }
     }
@@ -460,7 +460,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     closeButton.addListener (this);
 
     addAndMakeVisible (scanButton);
-    scanButton.setButtonText (isPluginVersion() ? "Reload" : "Scan");
+    scanButton.setButtonText ("Scan");
     scanButton.addListener (this);
 
     setSize (400, 600);
@@ -703,7 +703,7 @@ void PluginListComponent::buttonClicked (Button* button)
     {
         PopupMenu menu;
 
-        menu.addItem (1, TRANS ("Clear list"), ! isPluginVersion());
+        menu.addItem (1, TRANS ("Clear list"));
         menu.addSeparator();
 
         PopupMenu paths;
@@ -717,9 +717,9 @@ void PluginListComponent::buttonClicked (Button* button)
             menu.addSeparator();
         }
 
-        menu.addItem (2, TRANS ("Remove selected plug-in from list"), ! isPluginVersion() && table.getNumSelectedRows() > 0);
-        menu.addItem (3, TRANS ("Show folder containing selected plug-in"), ! isPluginVersion() && canShowSelectedFolder());
-        menu.addItem (4, TRANS ("Remove any plug-ins whose files no longer exist"), ! isPluginVersion());
+        menu.addItem (2, TRANS ("Remove selected plug-in from list"), table.getNumSelectedRows() > 0);
+        menu.addItem (3, TRANS ("Show folder containing selected plug-in"), canShowSelectedFolder());
+        menu.addItem (4, TRANS ("Remove any plug-ins whose files no longer exist"));
         menu.addSeparator();
 
         menu.addItem (9, "Scan for new or updated LV2 plugins");
@@ -740,18 +740,7 @@ void PluginListComponent::buttonClicked (Button* button)
     }
     else if (button == &scanButton)
     {
-        if (! isPluginVersion())
-        {
-            scanAll();
-        }
-        else
-        {
-            if (auto* world = ViewHelpers::getGlobals (this))
-            {
-                world->settings().getUserSettings()->reload();
-                plugins.restoreUserPlugins (world->settings());
-            }
-        }
+        scanAll();
     }
 }
 
@@ -803,21 +792,13 @@ void PluginListComponent::scanAll()
 {
     plugins.scanInternalPlugins();
 
-    if (isPluginVersion())
-    {
-        ignoreUnused (scanAllFormats);
-        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Plugin Scanner", "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
-    }
-    else
-    {
-        if (auto* world = ViewHelpers::getGlobals (this))
-            plugins.saveUserPlugins (world->settings());
-        currentScanner.reset (new Scanner (*this,
-                                           plugins,
-                                           scanAllFormats (plugins),
-                                           TRANS ("Scanning for plug-ins..."),
-                                           TRANS ("Searching for all possible plug-in files...")));
-    }
+    if (auto* world = ViewHelpers::getGlobals (this))
+        plugins.saveUserPlugins (world->settings());
+    currentScanner.reset (new Scanner (*this,
+                                       plugins,
+                                       scanAllFormats (plugins),
+                                       TRANS ("Scanning for plug-ins..."),
+                                       TRANS ("Searching for all possible plug-in files...")));
 }
 
 void PluginListComponent::scanFor (AudioPluginFormat& format)
@@ -827,23 +808,13 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
         return;
     }
 
-    if (isPluginVersion())
-    {
-        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon,
-                                          "Plugin Scanner",
-                                          "Scanning for plugins is currently not possible in the plugin version.\n\n"
-                                          "Please scan plugins in the application first.");
-    }
-    else
-    {
-        if (auto* world = ViewHelpers::getGlobals (this))
-            plugins.saveUserPlugins (world->settings());
-        // clang-format off
+    if (auto* world = ViewHelpers::getGlobals (this))
+        plugins.saveUserPlugins (world->settings());
+    // clang-format off
         currentScanner.reset (new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, 
             dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() 
                                      ? dialogText  : TRANS ("Searching for all possible plug-in files...")));
-        // clang-format on
-    }
+    // clang-format on
 }
 
 bool PluginListComponent::isScanning() const noexcept

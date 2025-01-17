@@ -125,7 +125,7 @@ private:
 
     bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
-        auto scannerExe = detail::scannerExeFullPath();
+        auto scannerExe = owner.scannerExeFile();
         if (! scannerExe.existsAsFile())
         {
             Logger::writeToLog ("Failed to launch plugin scanner.");
@@ -372,6 +372,11 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
     }
 }
 
+File PluginScanner::scannerExeFile() const noexcept
+{
+    return _scannerExe != File() ? _scannerExe : detail::scannerExeFullPath();
+}
+
 void PluginScanner::scanAudioFormat (const String& formatName)
 {
     detail::applyBlacklistingsFromDeadMansPedal (list);
@@ -442,6 +447,9 @@ void PluginScanner::scanForAudioPlugins (const juce::String& formatName)
 
 void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 {
+    if (! scannerExeFile().existsAsFile())
+        return;
+
     cancelFlag = 0;
 
     for (const auto& format : formats)
