@@ -450,6 +450,7 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
     if (! scannerExeFile().existsAsFile())
         return;
 
+    detail::setDeadMansPedalFile ({});
     cancelFlag = 0;
 
     for (const auto& format : formats)
@@ -469,6 +470,7 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
     crashed.removeEmptyStrings();
     detail::setDeadMansPedalFile (crashed);
     detail::applyBlacklistingsFromDeadMansPedal (list);
+    detail::setDeadMansPedalFile ({});
     failedIdentifiers.clearQuick(); // FIXME: this is a workaround that
         // prevents the UI from showing to
         // many errors about known-crashed
