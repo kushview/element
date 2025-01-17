@@ -16,7 +16,8 @@
                 "HAVE_PYTHON=1",
                 "EL_USE_LOCAL_AUTH=1",
                 "EL_PRO=1",
-                "BOOST_ALL_NO_LIB"
+                "BOOST_ALL_NO_LIB",
+                "JUCE_MODAL_LOOPS_PERMITTED=1"
             ],
             "forcedInclude": [
                 "${workspaceFolder}/.vscode/vscode.h"

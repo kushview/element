@@ -27,8 +27,8 @@
             "type": "cppdbg",
             "request": "launch",
             "args": [],
-            "program": "${workspaceRoot}/build/element",
-            "cwd": "${workspaceFolder}/build",
+            "program": "${workspaceRoot}/build-public/Element",
+            "cwd": "${workspaceFolder}/build-public",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
                 { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },
@@ -58,7 +58,8 @@
             },
             "osx": {
                 "MIMode": "lldb",
-                "program": "${workspaceRoot}/build/deploy/osx/Element.app/Contents/MacOS/element",
+                "program": "${workspaceRoot}/build-public/deploy/osx/Element.app/Contents/MacOS/Element",
+                "targetArchitecture": "amd64",
                 "environment": [
                     { "name": "DYLD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }
                 ],
