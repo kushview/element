@@ -209,23 +209,29 @@ private:
             else
                 scanner->scanForAudioPlugins (formatToScan.getName());
         }
-
-        progressWindow.getButton (TRANS ("Cancel"))->onClick = nullptr;
-        scanner->removeListener (this);
-        progressWindow.setVisible (false);
-        finishedScan();
-        stopTimer();
+        else
+        {
+            finishedScan();
+        }
     }
 
     void finishedScan()
     {
-        StringArray failedFiles;
+        progressWindow.getButton (TRANS ("Cancel"))->onClick = nullptr;
+        stopTimer();
+
         if (scanner)
         {
-            // just in case
             scanner->removeListener (this);
-            failedFiles = scanner->getFailedFiles();
+            scanner.reset();
         }
+
+        progressWindow.exitModalState();
+        progressWindow.setVisible (false);
+        progressWindow.removeFromDesktop();
+        
+        MessageManager::getInstance()->runDispatchLoopUntil (14);
+        StringArray failedFiles; // TODO
 
         owner.scanFinished (failedFiles);
     }
@@ -241,6 +247,7 @@ private:
     void audioPluginScanFinished() override
     {
         finished = true;
+        finishedScan();
     }
 
     void audioPluginScanStarted (const String& pluginName) override
