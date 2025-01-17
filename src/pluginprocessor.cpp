@@ -447,7 +447,8 @@ void PluginProcessor::initialize()
 #elif JUCE_WINDOWS
         auto scannerExe = File ("c:\\Program Files\\Kushview\\Element\\bin\\element.exe");
 #else
-        auto scannerExe = File ("/usr/local/bin/element") if (! scannerExe.existsAsFile())
+        auto scannerExe = File ("/usr/local/bin/element");
+        if (! scannerExe.existsAsFile())
             scannerExe = File ("/usr/bin/element");
 #endif
         scanner->setScannerExe (scannerExe);
