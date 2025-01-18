@@ -8,7 +8,7 @@
 
 #include "engine/graphnode.hpp"
 #include "ui/guicommon.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 #include "ui/block.hpp"
 #include "./utils.hpp"
 

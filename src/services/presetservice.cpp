@@ -4,7 +4,7 @@
 #include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/session.hpp>
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 #include <element/context.hpp>
 
 #include "datapath.hpp"

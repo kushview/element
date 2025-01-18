@@ -12,7 +12,7 @@
 #include "engine/graphmanager.hpp"
 #include "nodes/baseprocessor.hpp"
 #include "nodes/audioprocessor.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 #include "ui/datapathbrowser.hpp"
 #include "ui/guicommon.hpp"
 #include "ui/block.hpp"

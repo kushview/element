@@ -10,7 +10,7 @@
 #include "ui/contextmenus.hpp"
 #include "ui/horizontallistbox.hpp"
 #include "ui/connectiongrid.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 
 #include "matrixstate.hpp"
 

@@ -16,7 +16,7 @@
 #include "sol_helpers.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/mappingengine.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 
 using namespace juce;
 namespace lua = element::lua;

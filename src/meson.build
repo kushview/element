@@ -7,6 +7,7 @@ libelement_sources = '''
     context.cpp
     controller.cpp
     datapath.cpp
+    devicemanager.cpp
     graph.cpp
     gzip.cpp
     lv2.cpp
@@ -15,18 +16,19 @@ libelement_sources = '''
     model.cpp
     module.cpp
     node.cpp
+    plugineditor.cpp
+    pluginprocessor.cpp
+    pluginmanager.cpp
     ringbuffer.cpp
     scripting.cpp
     semaphore.cpp
     settings.cpp
     services.cpp
+    session.cpp
     strings.cpp
     script.cpp
     timescale.cpp
     utils.cpp
-    
-    plugineditor.cpp
-    pluginprocessor.cpp
 
     services/deviceservice.cpp
     services/engineservice.cpp
@@ -100,10 +102,6 @@ libelement_sources = '''
     scripting/bindings.cpp
     scripting/scriptloader.cpp
     scripting/scriptmanager.cpp
-    
-    session/devicemanager.cpp
-    session/pluginmanager.cpp
-    session/session.cpp
 
     ui/aboutscreen.cpp
     ui/audiodeviceselector.cpp

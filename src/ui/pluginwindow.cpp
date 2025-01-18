@@ -9,7 +9,7 @@
 #include "ui/contextmenus.hpp"
 #include <element/ui/grapheditor.hpp>
 #include "nodes/volumeeditor.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 
 namespace element {
 static Array<PluginWindow*> activePluginWindows;

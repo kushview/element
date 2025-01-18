@@ -14,7 +14,7 @@
 #include "engine/internalformat.hpp"
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 
 #include "appinfo.hpp"
 #include "log.hpp"

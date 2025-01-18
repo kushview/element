@@ -10,7 +10,7 @@
 #include <element/ui.hpp>
 
 #include "engine/graphmanager.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 
 #include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"

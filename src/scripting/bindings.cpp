@@ -16,7 +16,7 @@
 
 #include "ui/systemtray.hpp"
 #include "scripting/scriptmanager.hpp"
-#include "session/presetmanager.hpp"
+#include "presetmanager.hpp"
 #include "datapath.hpp"
 #include "sol/sol.hpp"
 #include "el/sol_helpers.hpp"
