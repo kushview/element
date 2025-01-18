@@ -229,7 +229,7 @@ private:
         progressWindow.exitModalState();
         progressWindow.setVisible (false);
         progressWindow.removeFromDesktop();
-        
+
         MessageManager::getInstance()->runDispatchLoopUntil (14);
         StringArray failedFiles; // TODO
 

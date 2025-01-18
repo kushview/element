@@ -125,6 +125,7 @@ public:
     NodeProvider* getProvider (const juce::String& format) noexcept;
 
 private:
+    friend class PluginScanner;
     juce::PropertiesFile* props = nullptr;
     class Private;
     std::unique_ptr<Private> priv;

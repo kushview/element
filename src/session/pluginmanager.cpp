@@ -37,6 +37,12 @@ static const char* pluginListKey() { return Settings::pluginListKey; }
 static void pluginScannerCrashHandler (void*) {}
 static File pluginsXmlFile() { return DataPath::applicationDataDir().getChildFile ("plugins.xml"); }
 
+static FileSearchPath readSearchPath (const PropertiesFile& props, const String& f)
+{
+    const auto key = String (Settings::lastPluginScanPathPrefix) + f;
+    return FileSearchPath (props.getValue (key));
+}
+
 static File scannerExeFullPath()
 {
     auto scannerExe = File::getSpecialLocation (File::currentExecutableFile);
@@ -391,7 +397,7 @@ void PluginScanner::scanAudioFormat (const String& formatName)
         };
 
         identifiers = format->searchPathsForPlugins (
-            format->getDefaultLocationsToSearch(),
+            detail::readSearchPath (*_manager.props, formatName),
             true,
             false);
     }
