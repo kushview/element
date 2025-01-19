@@ -43,43 +43,13 @@ if get_option ('deploy')
     ])
     suil_dep = suil_proj.get_variable ('suil_dep')
 else
-    lv2_dep = dependency ('lv2', version: '>= 1.18.2' , required : false)
-    if not lv2_dep.found()
-        lv2_proj = subproject ('lv2',
-            default_options: [])
-        lv2_dep = lv2_proj.get_variable ('lv2_dep')
-    endif
-
-    lilv_dep = dependency ('lilv-0', required : false)
-    if not lilv_dep.found()
-        lilv_proj = subproject ('lilv',
-            default_options: [
-                'default_lv2_path=@0@'.format('~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2')
-            ])
-        lilv_dep = lilv_proj.get_variable ('lilv_dep')
-    endif
-
-    suil_dep = dependency ('suil-0', required : false)
-    if not suil_dep.found()
-        suil_proj = subproject ('suil',
-            default_options: [
-                'default_library=static',
-                'tests=disabled',
-                'docs=disabled',
-                'cocoa=disabled',
-                'gtk2=disabled',
-                'gtk3=disabled',
-                'qt5=disabled',
-                'x11=disabled'
-            ])
-        suil_dep = suil_proj.get_variable ('suil_dep')
-    endif
+    lv2_dep = dependency ('lv2', version: '>= 1.18.2' , required: true, fallback: [])
+    lilv_dep = dependency ('lilv-0', required : true, fallback: [])
+    suil_dep = dependency ('suil-0', required : true, fallback: [])
 endif
 
 # LVTK
-lvtk_proj = subproject ('lvtk', default_options: [
-    'default_library=static'
-])
+lvtk_proj = subproject ('lvtk', default_options: [ 'nobuild=true' ])
 lvtk_host_dep = lvtk_proj.get_variable ('lvtk_dep')
 add_project_arguments (['-DLVTK_STATIC=1', '-DPUGL_STATIC=1'], 
     language: ['c', 'cpp', 'objc', 'objcpp'])
