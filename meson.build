@@ -120,11 +120,6 @@ if host_machine.system() == 'linux'
 elif host_machine.system() == 'darwin'
     element_exe_install = false
     element_exe_name = 'Element'
-    if cpp.version().version_compare('>=15.0.0')
-        # in Xcode 15, warnings are generated for duplicate -lc++ linkage...
-        # Skip it....
-        element_app_link_args += [ '-Xlinker', '-no_warn_duplicate_libraries' ]
-    endif
 elif host_machine.system() == 'windows'
     element_exe_install_dir = packagedir_element / 'data' / 'bin'
     windows = import ('windows')
