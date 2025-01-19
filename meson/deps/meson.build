@@ -12,23 +12,38 @@ if get_option ('deploy')
     lv2_dep = lv2_proj.get_variable ('lv2_dep')
 
     zix_proj = subproject ('zix', default_options: [
-        'default_library=static' ])
+        'default_library=static',
+        'benchmarks=disabled',
+        'tests=disabled',
+        'docs=disabled' ])
     zix_dep = zix_proj.get_variable ('zix_dep')
 
     serd_proj = subproject ('serd', default_options: [
-        'default_library=static' ])
+        'default_library=static',
+        'tools=disabled',
+        'tests=disabled',
+        'docs=disabled'])
     serd_dep = serd_proj.get_variable ('serd_dep')
 
     sord_proj = subproject ('sord', default_options: [
-        'default_library=static' ])
+        'default_library=static',
+        'tools=disabled',
+        'tests=disabled',
+        'docs=disabled'])
     sord_dep = sord_proj.get_variable ('sord_dep')
     
     sratom_proj = subproject ('sratom', default_options: [
-        'default_library=static' ])
+        'default_library=static',
+        'tests=disabled',
+        'docs=disabled' ])
     sratom_dep = sratom_proj.get_variable ('sratom_dep')
 
     lilv_proj = subproject ('lilv', default_options: [
-        'default_library=static' ])
+        'default_library=static',
+        'tools=disabled',
+        'tests=disabled',
+        'docs=disabled',
+        'c_args=@0@'.format(host_machine.system() == 'windows' ? '/wd4090' : '') ])
     lilv_dep = lilv_proj.get_variable ('lilv_dep')
 
     suil_proj = subproject ('suil', default_options: [
@@ -44,12 +59,19 @@ if get_option ('deploy')
     suil_dep = suil_proj.get_variable ('suil_dep')
 else
     lv2_dep = dependency ('lv2', version: '>= 1.18.2' , required: true, fallback: [])
-    lilv_dep = dependency ('lilv-0', required : true, fallback: [])
-    suil_dep = dependency ('suil-0', required : true, fallback: [])
+    lilv_dep = dependency ('lilv-0', required: true, fallback: [])
+    suil_dep = dependency ('suil-0', required: true, fallback: [])
 endif
 
 # LVTK
-lvtk_proj = subproject ('lvtk', default_options: [ 'nobuild=true' ])
+lvtk_proj = subproject ('lvtk', default_options: [ 
+    'nobuild=true',
+    'demo=disabled',
+    'bindings=disabled',
+    'test=disabled',
+    'doc=disabled',
+    'plugins=disabled'
+])
 lvtk_host_dep = lvtk_proj.get_variable ('lvtk_dep')
 add_project_arguments (['-DLVTK_STATIC=1', '-DPUGL_STATIC=1'], 
     language: ['c', 'cpp', 'objc', 'objcpp'])
