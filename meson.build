@@ -6,6 +6,8 @@ project ('element', ['c', 'cpp' ],
         'cpp_std=c++20', 
         'buildtype=release' ])
 
+fs = import ('fs')
+cpp = meson.get_compiler ('cpp')
 pymod       = import ('python')
 python3     = pymod.find_installation ('python3', required : true)
 bundle_py   = files ('util/bundle.py').get(0)
@@ -29,6 +31,12 @@ if get_option('updater')
     endif
 endif
 
+## macos: avoid warnings about duplicate -lc++ options in Xcode 15+
+if host_machine.system() == 'darwin' and cpp.version().version_compare('>=15.0.0')
+    add_global_link_arguments([ '-Xlinker', '-no_warn_duplicate_libraries'],
+        language: ['c', 'cpp', 'objc', 'objcpp'])
+endif
+
 ## Installer Metadata
 net_kushview      = 'net.kushview'
 installerdir      = get_option('prefix')
@@ -45,9 +53,6 @@ element_bundles = []
 
 ## This collects app and plugin bundles needing code signing on Windows
 element_binaries = []
-
-fs = import ('fs')
-cpp = meson.get_compiler ('cpp')
 
 # GCC
 if cpp.get_id() == 'gcc'

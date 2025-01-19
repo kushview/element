@@ -3,7 +3,7 @@
 boost_dep = dependency ('boost', version: '>= 1.76.0', required : true)
 
 # LV2
-if get_option ('deploy')
+if get_option ('deploy') or host_machine.system() == 'darwin' or host_machine.system() == 'windows'
     lv2_proj = subproject ('lv2', default_options: [
         'default_library=static',
         'docs=disabled',
@@ -54,6 +54,7 @@ if get_option ('deploy')
         'gtk2=disabled',
         'gtk3=disabled',
         'qt5=disabled',
+        'qt6=disabled',
         'x11=disabled'
     ])
     suil_dep = suil_proj.get_variable ('suil_dep')

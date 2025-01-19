@@ -13,6 +13,7 @@ if host_machine.system() == 'windows' and cpp.get_id() == 'gcc' and cpp.get_argu
 endif
 
 bin2c_install_dir = get_option ('bindir')
+
 bin2c = executable ('element-bin2c', bin2c_sources,
     install : true,
     install_dir : bin2c_install_dir,
