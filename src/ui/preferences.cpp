@@ -1162,10 +1162,10 @@ public:
     {
         updateChannelLabel.setText ("Update channel", dontSendNotification);
         addAndMakeVisible (updateChannelLabel);
-        updateChannel.addItem ("Public", PublicChannel);
+        updateChannel.addItem ("Stable (public)", PublicChannel);
         updateChannel.addSeparator();
-        updateChannel.addItem ("Pro (stable)", StableChannel);
-        updateChannel.addItem ("Pro (nightly)", NightlyChannel);
+        updateChannel.addItem ("Stable (latest)", StableChannel);
+        updateChannel.addItem ("Nightly", NightlyChannel);
 
         updateChannel.setSelectedId (savedUpdateChannelId(), dontSendNotification);
         updateChannel.onChange = [this]() {
