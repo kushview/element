@@ -6,7 +6,7 @@ option ('updater', type: 'boolean', value: false, description: 'Build updater la
 option ('updater-host', type: 'string', value: '', description: 'Use a custom host for update checks.')
 
 option ('lv2dir', type : 'string',  value : '', description: 'LV2 install path')
-
+option ('lv2static', type : 'boolean', value : false, description : 'When true, force building static lv2 subprojects')
 option ('jack', type: 'feature', value: 'auto', description: 'JACK Audio support')
 
 option ('vst2sdk', type : 'string', value : 'auto', description : 'Path to VST2 SDK v2.4')

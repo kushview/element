@@ -3,7 +3,7 @@
 boost_dep = dependency ('boost', version: '>= 1.76.0', required : true)
 
 # LV2
-if get_option ('deploy') or host_machine.system() == 'darwin' or host_machine.system() == 'windows'
+if get_option('lv2static') or get_option ('deploy') or host_machine.system() == 'darwin' or host_machine.system() == 'windows'
     lv2_proj = subproject ('lv2', default_options: [
         'default_library=static',
         'docs=disabled',
@@ -38,11 +38,18 @@ if get_option ('deploy') or host_machine.system() == 'darwin' or host_machine.sy
         'docs=disabled' ])
     sratom_dep = sratom_proj.get_variable ('sratom_dep')
 
+    lilv_default_path = '~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2'
+    if host_machine.system() == 'darwin'
+        lilv_default_path = '~/.lv2:~/Library/Audio/Plug-Ins/LV2:/Library/Audio/Plug-Ins/LV2'
+    elif host_machine.system() == 'windows'
+        lilv_default_path = ';'.join(['%%APPDATA%%\\\\LV2', '%%COMMONPROGRAMFILES%%\\\\LV2'])
+    endif
     lilv_proj = subproject ('lilv', default_options: [
         'default_library=static',
         'tools=disabled',
         'tests=disabled',
         'docs=disabled',
+        'default_lv2_path=@0@'.format(lilv_default_path),
         'c_args=@0@'.format(host_machine.system() == 'windows' ? '/wd4090' : '') ])
     lilv_dep = lilv_proj.get_variable ('lilv_dep')
 
