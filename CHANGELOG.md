@@ -12,9 +12,9 @@
 - Root graph channel counts are now independent fromt he audio interface.
 - Improve multiple selection in graph editor.
 - Updated app icon.
-- Session, Graph and Node file formats.  Old files can be loaded in 1.0, but 1.0 can't be backported.
-- **Breaking** Final Script node Lua API has changed. v0.46.x scripts need updated.
-- **Breaking** Old 'Lua Node' removed & replaced with Script node instead.
+- Session, Graph and Node file formats.  Old files can be loaded in 1.0, but 1.0 can't be backported. Session backup is strongly encouraged.
+- Internal 'presets' are now called 'nodes.'
+- **Breaking** Final Script node Lua API has changed. v0.46.x scripts need updated and may not load.
 
 ### Added
 - Meter bridge view that displays audio interface signal present levels.
@@ -27,12 +27,17 @@
 - Drag and drop a plugin from the plugin list on placeholder loads it.
 - Bulk routing feature in the patch bay.
 - Online update features.
-- Better error handling and logging in Lua scripts.
 - MIDI Set List node with Tempo change.
+- Better out-of-process plugin scanning.
+- Repo selection built-in with installer.
+- Audio File Player - better transport controls.
+- Embedded plugin UI display inside graph editor.
+- Ability to scan plugins from Element plugins.
 
 ### Removed
 - Stop using juce BinaryData from old Projucer project. Resources are now generated with Meson.
-- **Breaking**: Controller view to be removed.
+- **Breaking**: Controller view was removed. Rewrite planned.
+- **Breaking**: Old 'Lua' and 'Script' nodes have been disabled. Rewrite planned.
 
 ### Fixed
 - Plugin UIs not filling the plugin window (WAVES and others)
@@ -55,3 +60,5 @@
 - Plugin not reporting latency to the host correctly. Especially during graph editing.
 - 7.1 and other bus configurations on third party plugins not saving/restoring with session.
 - Broken cubase render in place.
+- Problems loading copy protected plugins.
+- eVerb state not being applied on state restore.
