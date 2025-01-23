@@ -13,6 +13,7 @@
 #include "ui/buttons.hpp"
 #include "ui/contextmenus.hpp"
 #include "ui/grapheditorcomponent.hpp"
+#include "ui/ioconfigurationwindow.hpp"
 #include "ui/nodeioconfiguration.hpp"
 #include "ui/nodeeditorfactory.hpp"
 #include "ui/viewhelpers.hpp"
@@ -452,7 +453,7 @@ void BlockComponent::buttonClicked (Button* b)
     {
         auto* const cc = ViewHelpers::findContentComponent (this);
         CallOutBox::launchAsynchronously (
-            std::make_unique<NodeAudioBusesComponent> (node, proc, cc),
+            std::make_unique<IOConfigurationWindow> (*proc),
             configButton.getScreenBounds(),
             nullptr);
     }
