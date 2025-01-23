@@ -112,17 +112,6 @@ private:
 World::World (SymbolMap& s)
     : symbolMap (s)
 {
-#if JUCE_MAC
-    StringArray path;
-    path.add (File ("/Library/Audio/Plug-Ins/LV2").getFullPathName());
-    path.add (File::getSpecialLocation (File::userHomeDirectory)
-                  .getChildFile ("Library/Audio/Plug-Ins/LV2")
-                  .getFullPathName());
-    path.trim();
-    setenv ("LV2_PATH", path.joinIntoString (":").toRawUTF8(), 1);
-    DBG ("LV2_PATH = " << String (getenv ("LV2_PATH")));
-#endif
-
     world = lilv_world_new();
 
     lv2_InputPort = lilv_new_uri (world, LV2_CORE__InputPort);
