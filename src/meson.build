@@ -127,6 +127,7 @@ libelement_sources = '''
     ui/graphsettingsview.cpp
     ui/horizontallistbox.cpp
     ui/icons.cpp
+    ui/ioconfigurationwindow.cpp
     ui/keymapeditorview.cpp
     ui/luaconsole.cpp
     ui/luaconsoleview.cpp
