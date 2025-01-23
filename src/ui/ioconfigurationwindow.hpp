@@ -34,7 +34,7 @@ class MainWindow;
 class GraphEditorComponent;
 
 //==============================================================================
-class IOConfigurationWindow final : public  juce::AudioProcessorEditor
+class IOConfigurationWindow final : public juce::AudioProcessorEditor
 {
 public:
     IOConfigurationWindow (const Node&, juce::AudioProcessor&);
@@ -51,8 +51,8 @@ private:
     juce::Label title;
     std::unique_ptr<InputOutputConfig> inConfig, outConfig;
     Node _node;
-    
-    InputOutputConfig* getConfig (bool isInput) noexcept    { return isInput ? inConfig.get() : outConfig.get(); }
+
+    InputOutputConfig* getConfig (bool isInput) noexcept { return isInput ? inConfig.get() : outConfig.get(); }
     void update();
 
     MainWindow* getMainWindow() const;
@@ -63,4 +63,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IOConfigurationWindow)
 };
 
-}
+} // namespace element

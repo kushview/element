@@ -44,21 +44,21 @@ using namespace juce;
 
 //==============================================================================
 struct NumberedBoxes final : public TableListBox,
-                        private TableListBoxModel,
-                        private Button::Listener
+                             private TableListBoxModel,
+                             private Button::Listener
 {
     struct Listener
     {
         virtual ~Listener() {}
 
-        virtual void addColumn()    = 0;
+        virtual void addColumn() = 0;
         virtual void removeColumn() = 0;
         virtual void columnSelected (int columnId) = 0;
     };
 
     enum
     {
-        plusButtonColumnId  = 128,
+        plusButtonColumnId = 128,
         minusButtonColumnId = 129
     };
 
@@ -113,12 +113,11 @@ private:
     bool canAddColumn, canRemoveColumn;
 
     //==============================================================================
-    int getNumRows() override                                             { return 1; }
-    void paintCell (Graphics&, int, int, int, int, bool) override         {}
-    void paintRowBackground (Graphics& g, int, int, int, bool) override   { g.fillAll (Colours::grey); }
+    int getNumRows() override { return 1; }
+    void paintCell (Graphics&, int, int, int, int, bool) override {}
+    void paintRowBackground (Graphics& g, int, int, int, bool) override { g.fillAll (Colours::grey); }
 
-    Component* refreshComponentForCell (int, int columnId, bool,
-                                        Component* existingComponentToUpdate) override
+    Component* refreshComponentForCell (int, int columnId, bool, Component* existingComponentToUpdate) override
     {
         auto* textButton = dynamic_cast<TextButton*> (existingComponentToUpdate);
 
@@ -126,8 +125,7 @@ private:
             textButton = new TextButton();
 
         textButton->setButtonText (getButtonName (columnId));
-        textButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight |
-                                       Button::ConnectedOnTop  | Button::ConnectedOnBottom);
+        textButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
 
         const bool isPlusMinusButton = (columnId == plusButtonColumnId || columnId == minusButtonColumnId);
 
@@ -153,8 +151,10 @@ private:
     //==============================================================================
     String getButtonName (int columnId)
     {
-        if (columnId == plusButtonColumnId)  return "+";
-        if (columnId == minusButtonColumnId) return "-";
+        if (columnId == plusButtonColumnId)
+            return "+";
+        if (columnId == minusButtonColumnId)
+            return "-";
 
         return String (columnId);
     }
@@ -163,8 +163,10 @@ private:
     {
         auto text = btn->getButtonText();
 
-        if (text == "+") listener.addColumn();
-        if (text == "-") listener.removeColumn();
+        if (text == "+")
+            listener.addColumn();
+        if (text == "-")
+            listener.removeColumn();
     }
 
     void buttonStateChanged (Button* btn) override
@@ -254,10 +256,10 @@ private:
             for (int i = 0; i < n; ++i)
                 header.addColumn ("", i + 1, 40);
 
-            header.addColumn ("+", NumberedBoxes::plusButtonColumnId,  20);
+            header.addColumn ("+", NumberedBoxes::plusButtonColumnId, 20);
             header.addColumn ("-", NumberedBoxes::minusButtonColumnId, 20);
 
-            ioBuses.setCanAddColumn    (plugin->canAddBus    (isInput));
+            ioBuses.setCanAddColumn (plugin->canAddBus (isInput));
             ioBuses.setCanRemoveColumn (plugin->canRemoveBus (isInput));
         }
 
@@ -437,11 +439,10 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputOutputConfig)
 };
 
-
 IOConfigurationWindow::IOConfigurationWindow (const Node& n, AudioProcessor& p)
-   : AudioProcessorEditor (&p),
-     title ("title", p.getName()),
-     _node (n)
+    : AudioProcessorEditor (&p),
+      title ("title", p.getName()),
+      _node (n)
 {
     setOpaque (true);
 
@@ -454,7 +455,7 @@ IOConfigurationWindow::IOConfigurationWindow (const Node& n, AudioProcessor& p)
         p.releaseResources();
     }
 
-    if (p.getBusCount (true)  > 0 || p.canAddBus (true))
+    if (p.getBusCount (true) > 0 || p.canAddBus (true))
     {
         inConfig.reset (new InputOutputConfig (*this, true));
         addAndMakeVisible (inConfig.get());
@@ -492,7 +493,7 @@ IOConfigurationWindow::~IOConfigurationWindow()
 
 void IOConfigurationWindow::paint (Graphics& g)
 {
-     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 }
 
 void IOConfigurationWindow::resized()
@@ -565,4 +566,4 @@ AudioProcessorGraph* IOConfigurationWindow::getGraph() const
     return nullptr;
 }
 
-}
+} // namespace element
