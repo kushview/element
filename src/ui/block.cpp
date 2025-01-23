@@ -451,7 +451,6 @@ void BlockComponent::buttonClicked (Button* b)
     }
     else if (proc != nullptr && b == &configButton && ! configButton.getToggleState())
     {
-        auto* const cc = ViewHelpers::findContentComponent (this);
         CallOutBox::launchAsynchronously (
             std::make_unique<IOConfigurationWindow> (getNode(), *proc),
             configButton.getScreenBounds(),
