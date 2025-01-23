@@ -438,9 +438,10 @@ private:
 };
 
 
-IOConfigurationWindow::IOConfigurationWindow (AudioProcessor& p)
+IOConfigurationWindow::IOConfigurationWindow (const Node& n, AudioProcessor& p)
    : AudioProcessorEditor (&p),
-     title ("title", p.getName())
+     title ("title", p.getName()),
+     _node (n)
 {
     setOpaque (true);
 
@@ -510,6 +511,7 @@ void IOConfigurationWindow::resized()
 
 void IOConfigurationWindow::update()
 {
+    _node.resetPorts();
 #if 0
     auto nodeID = getNodeID();
 

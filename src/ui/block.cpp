@@ -453,7 +453,7 @@ void BlockComponent::buttonClicked (Button* b)
     {
         auto* const cc = ViewHelpers::findContentComponent (this);
         CallOutBox::launchAsynchronously (
-            std::make_unique<IOConfigurationWindow> (*proc),
+            std::make_unique<IOConfigurationWindow> (getNode(), *proc),
             configButton.getScreenBounds(),
             nullptr);
     }

@@ -26,6 +26,7 @@
 #pragma once
 
 #include <element/juce/audio_processors.hpp>
+#include <element/node.hpp>
 
 namespace element {
 
@@ -36,7 +37,7 @@ class GraphEditorComponent;
 class IOConfigurationWindow final : public  juce::AudioProcessorEditor
 {
 public:
-    IOConfigurationWindow (juce::AudioProcessor&);
+    IOConfigurationWindow (const Node&, juce::AudioProcessor&);
     ~IOConfigurationWindow() override;
 
     //==============================================================================
@@ -49,7 +50,8 @@ private:
     juce::AudioProcessor::BusesLayout currentLayout;
     juce::Label title;
     std::unique_ptr<InputOutputConfig> inConfig, outConfig;
-
+    Node _node;
+    
     InputOutputConfig* getConfig (bool isInput) noexcept    { return isInput ? inConfig.get() : outConfig.get(); }
     void update();
 
