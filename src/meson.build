@@ -78,6 +78,7 @@ libelement_sources = '''
     nodes/scriptnodeeditor.cpp
     nodes/volumeeditor.cpp
 
+    engine/clapprovider.cpp
     engine/graphnode.cpp
     engine/transport.cpp
     engine/graphbuilder.cpp
