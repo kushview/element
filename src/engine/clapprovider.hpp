@@ -8,12 +8,14 @@ namespace element {
 class Processor;
 
 /** A provider of CLAP plugins. */
-class CLAPProvider final : public NodeProvider {
+class CLAPProvider final : public NodeProvider
+{
 public:
     CLAPProvider();
     ~CLAPProvider();
     juce::String format() const override;
     Processor* create (const juce::String&) override;
+    juce::FileSearchPath defaultSearchPath();
     juce::StringArray findTypes() override;
     StringArray getHiddenTypes() { return {}; }
 
@@ -21,4 +23,4 @@ private:
     class Impl;
     std::unique_ptr<Impl> _impl;
 };
-}
+} // namespace element
