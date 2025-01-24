@@ -48,7 +48,7 @@ public:
 
     juce::String format() const override { return EL_NODE_FORMAT_NAME; }
     Processor* create (const String& ID) override;
-    juce::StringArray findTypes() override;
+    juce::StringArray findTypes (const juce::FileSearchPath&, bool, bool) override;
     juce::StringArray getHiddenTypes() override;
 
 private:

@@ -54,9 +54,9 @@ Processor* AudioProcessorFactory::create (const String& ID)
 }
 
 /** return a list of types contained in this provider. */
-StringArray AudioProcessorFactory::findTypes()
+StringArray AudioProcessorFactory::findTypes (const juce::FileSearchPath& f, bool r, bool a)
 {
-    return _format->searchPathsForPlugins ({}, true, true);
+    return _format->searchPathsForPlugins (f, r, a);
 }
 
 //==============================================================================
@@ -72,7 +72,7 @@ struct SingleNodeProvider : public NodeProvider
     ~SingleNodeProvider() = default;
 
     String format() const override { return EL_NODE_FORMAT_NAME; }
-    StringArray findTypes() override
+    StringArray findTypes (const juce::FileSearchPath&, bool, bool) override
     {
         return StringArray (ID);
     }
@@ -187,7 +187,7 @@ NodeFactory& NodeFactory::add (NodeProvider* f)
     denyIDs.removeEmptyStrings();
 
     auto& knownIDs (impl->knownIDs);
-    knownIDs.addArray (f->findTypes());
+    knownIDs.addArray (f->findTypes ({}, true, false));
     knownIDs.removeDuplicates (true);
     knownIDs.removeEmptyStrings();
     return *this;

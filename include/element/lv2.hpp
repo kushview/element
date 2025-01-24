@@ -18,7 +18,7 @@ public:
     ~LV2NodeProvider();
     juce::String format() const override { return "LV2"; }
     Processor* create (const juce::String&) override;
-    juce::StringArray findTypes() override;
+    juce::StringArray findTypes (const juce::FileSearchPath&, bool, bool) override;
 
     String nameForURI (const String& uri) const noexcept;
 

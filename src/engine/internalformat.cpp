@@ -275,7 +275,7 @@ Processor* InternalNodes::create (const String& ID)
     return nullptr;
 }
 
-StringArray InternalNodes::findTypes()
+StringArray InternalNodes::findTypes (const juce::FileSearchPath&, bool, bool)
 {
     return { EL_NODE_ID_GRAPH, EL_NODE_ID_MIDI_SET_LIST };
 }

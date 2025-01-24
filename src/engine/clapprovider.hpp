@@ -16,7 +16,9 @@ public:
     juce::String format() const override;
     Processor* create (const juce::String&) override;
     juce::FileSearchPath defaultSearchPath();
-    juce::StringArray findTypes() override;
+    juce::StringArray findTypes (const FileSearchPath& path,
+                                 bool recursive,
+                                 bool allowAsync) override;
     StringArray getHiddenTypes() { return {}; }
 
 private:

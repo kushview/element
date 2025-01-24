@@ -1222,7 +1222,7 @@ Processor* LV2NodeProvider::create (const String& uri)
     return lv2->instantiate (uri);
 }
 
-StringArray LV2NodeProvider::findTypes()
+StringArray LV2NodeProvider::findTypes (const juce::FileSearchPath&, bool, bool)
 {
     StringArray types;
     lv2->getTypes (types);

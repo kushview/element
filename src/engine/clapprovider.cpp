@@ -371,12 +371,12 @@ FileSearchPath CLAPProvider::defaultSearchPath()
     return sp;
 }
 
-StringArray CLAPProvider::findTypes()
+StringArray CLAPProvider::findTypes (const FileSearchPath& path, bool recursive, bool allowAsync)
 {
+    juce::ignoreUnused (allowAsync);
     StringArray r;
-    FileSearchPath path;
     for (int i = 0; i < path.getNumPaths(); ++i)
-        recursiveSearch (path[i], r, true);
+        recursiveSearch (path[i], r, recursive);
     return r;
 }
 

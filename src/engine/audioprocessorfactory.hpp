@@ -19,7 +19,7 @@ public:
     /** Create the instance by ID string. */
     Processor* create (const String&) override;
     /** return a list of types contained in this provider. */
-    StringArray findTypes() override;
+    StringArray findTypes (const juce::FileSearchPath&, bool, bool) override;
 
 private:
     class Format;
