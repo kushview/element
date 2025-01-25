@@ -24,6 +24,7 @@
             ],
             "includePath": [
                 "${workspaceFolder}/subprojects/juce/modules/*",
+                "${workspaceFolder}/subprojects/clap/include/*",
                 "${workspaceFolder}/build/libs/compat/*",
                 "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/libs/lua/src/*",
@@ -52,6 +53,7 @@
                 "${workspaceFolder}/subprojects/suil/include/*",
                 "${workspaceFolder}/subprojects/pugl/include/*",
                 "${workspaceFolder}/subprojects/sratom/include/*",
+                "${workspaceFolder}/subprojects/clap/include/*",
                 "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/lua/src/*",
@@ -100,6 +102,7 @@
                 "${workspaceFolder}/subprojects/lilv/include/*",
                 "${workspaceFolder}/subprojects/suil/include/*",
                 "${workspaceFolder}/subprojects/lua-5.4.6/src/*",
+                "${workspaceFolder}/subprojects/clap/include/*",
                 "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",

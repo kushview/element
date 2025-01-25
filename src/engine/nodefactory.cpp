@@ -254,6 +254,9 @@ Processor* NodeFactory::instantiate (const PluginDescription& desc)
     Processor* node = nullptr;
     for (const auto& f : providers)
     {
+        if (f->format() != desc.pluginFormatName)
+            continue;
+
         if (auto* const n = f->create (ID))
         {
             node = n;

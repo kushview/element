@@ -9,6 +9,7 @@
 #include <element/settings.hpp>
 #include <element/lv2.hpp>
 
+#include "engine/clapprovider.hpp"
 #include "nodes/nodetypes.hpp"
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
@@ -258,14 +259,20 @@ public:
 
         for (auto* p : nodes.providers())
         {
+            std::cout << "fmt: " << p->format() << std::endl;
             if (p->format() != format)
                 continue;
 
+#if 0
             if (auto inst = p->create (ID))
             {
                 auto d = results.add (new PluginDescription());
                 inst->getPluginDescription (*d);
             }
+#else
+            std::cout << "before scan: " << ID << std::endl;
+            p->scan (ID, results);
+#endif
 
             break;
         }
@@ -294,6 +301,7 @@ public:
         logger->logMessage ("[scanner] setting up formats");
         auto& nf = plugins->getNodeFactory();
         nf.add (new LV2NodeProvider());
+        nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
     }
@@ -401,7 +409,7 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     else if (auto* provider = _manager.getProvider (formatName))
     {
         identifiers = provider->findTypes (
-            detail::readSearchPath (*_manager.props, formatName),
+            provider->defaultSearchPath(), // detail::readSearchPath (*_manager.props, formatName),
             true,
             false);
     }
@@ -865,13 +873,8 @@ Processor* PluginManager::createGraphNode (const PluginDescription& desc, String
         }
     }
 
-    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_NODE_FORMAT_NAME && desc.pluginFormatName != "LV2")
-    {
-        return nullptr;
-    }
-
     errorMsg.clear();
-    if (desc.pluginFormatName != EL_NODE_FORMAT_NAME && desc.pluginFormatName != "LV2")
+    if (! isAudioPluginFormatSupported (desc.pluginFormatName))
     {
         errorMsg = desc.name;
         errorMsg << ": invalid format: " << desc.pluginFormatName;

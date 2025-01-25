@@ -2,6 +2,11 @@
 # Boost
 boost_dep = dependency ('boost', version: '>= 1.76.0', required : true)
 
+# CLAP
+cmake = import ('cmake')
+clap_proj = cmake.subproject ('clap')
+clap_dep = clap_proj.dependency ('clap')
+
 # LV2
 if get_option('lv2static') or get_option ('deploy') or host_machine.system() == 'darwin' or host_machine.system() == 'windows'
     lv2_proj = subproject ('lv2', default_options: [

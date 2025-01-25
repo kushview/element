@@ -1217,6 +1217,16 @@ LV2NodeProvider::~LV2NodeProvider()
     lv2.reset();
 }
 
+void LV2NodeProvider::scan (const String& uri, OwnedArray<PluginDescription>& out)
+{
+    if (auto i = create (uri))
+    {
+        auto d = out.add (new PluginDescription());
+        i->getPluginDescription (*d);
+        delete i;
+    }
+}
+
 Processor* LV2NodeProvider::create (const String& uri)
 {
     return lv2->instantiate (uri);

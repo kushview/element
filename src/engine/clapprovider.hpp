@@ -15,14 +15,15 @@ public:
     ~CLAPProvider();
     juce::String format() const override;
     Processor* create (const juce::String&) override;
-    juce::FileSearchPath defaultSearchPath();
+    juce::FileSearchPath defaultSearchPath() override;
     juce::StringArray findTypes (const FileSearchPath& path,
                                  bool recursive,
                                  bool allowAsync) override;
-    StringArray getHiddenTypes() { return {}; }
+    StringArray getHiddenTypes() override { return {}; }
+    void scan (const String& fileOrID, OwnedArray<PluginDescription>& out) override;
 
 private:
-    class Impl;
-    std::unique_ptr<Impl> _impl;
+    class Host;
+    std::unique_ptr<Host> _host;
 };
 } // namespace element

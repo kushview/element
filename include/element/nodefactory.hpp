@@ -26,6 +26,10 @@ public:
                                    bool allowAsync) = 0;
     /** Return a list of types that should be hidden in the UI by default. */
     virtual StringArray getHiddenTypes() { return {}; }
+
+    virtual FileSearchPath defaultSearchPath() { return {}; }
+
+    virtual void scan (const String& fileOrID, OwnedArray<PluginDescription>& out) {}
 };
 
 //==========================================================================

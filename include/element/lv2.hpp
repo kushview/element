@@ -19,8 +19,8 @@ public:
     juce::String format() const override { return "LV2"; }
     Processor* create (const juce::String&) override;
     juce::StringArray findTypes (const juce::FileSearchPath&, bool, bool) override;
-
     String nameForURI (const String& uri) const noexcept;
+    void scan (const String& URI, OwnedArray<PluginDescription>& out) override;
 
 private:
     class LV2;
