@@ -387,6 +387,194 @@ private:
 };
 
 //==============================================================================
+class CLAPParameter : public Parameter
+{
+    const clap_param_info_t _info;
+    const int _portIndex, _paramIndex;
+
+public:
+    explicit CLAPParameter (const clap_param_info_t* pi, int i1, int i2)
+        : _info (*pi), _portIndex (i1), _paramIndex (i2)
+    {
+    }
+    ~CLAPParameter() {}
+
+    //==========================================================================
+    /** Returns the port index of this parameter */
+    int getPortIndex() const noexcept override
+    {
+        return _portIndex;
+    }
+
+    /** Returns the index of this parameter in its parent nodes's parameter list. */
+    int getParameterIndex() const noexcept override
+    {
+        return _paramIndex;
+    }
+
+    /** Called by the host to find out the value of this parameter.
+
+        Hosts will expect the value returned to be between 0 and 1.0.
+
+        This could be called quite frequently, so try to make your code efficient.
+        It's also likely to be called by non-UI threads, so the code in here should
+        be thread-aware.
+    */
+    float getValue() const override
+    {
+        return 0.f;
+    }
+
+    /** The host will call this method to change the value of a parameter.
+
+        The host may call this at any time, including during the audio processing
+        callback, so your implementation has to process this very efficiently and
+        avoid any kind of locking.
+
+        If you want to set the value of a parameter internally, e.g. from your
+        editor component, then don't call this directly - instead, use the
+        setValueNotifyingHost() method, which will also send a message to
+        the host telling it about the change. If the message isn't sent, the host
+        won't be able to automate your parameters properly.
+
+        The value passed will be between 0 and 1.0.
+    */
+    void setValue (float newValue) override
+    {
+        juce::ignoreUnused (newValue);
+    }
+
+    /** This should return the default value for this parameter. */
+    float getDefaultValue() const
+    {
+        return 0.0f;
+    }
+
+    /** Should parse a string and return the appropriate value for it. */
+    float getValueForText (const juce::String& text) const override
+    {
+        return text.getFloatValue();
+    }
+
+    /** Returns the name to display for this parameter, which should be made
+        to fit within the given string length.
+    */
+    virtual juce::String getName (int maximumStringLength) const override
+    {
+        return "";
+    }
+
+    /** Some parameters may be able to return a label string for
+        their units. For example "Hz" or "%".
+    */
+    virtual juce::String getLabel() const override
+    {
+        return "";
+    }
+
+    /** Returns the number of steps that this parameter's range should be quantised into.
+
+        If you want a continuous range of values, don't override this method, and allow
+        the default implementation to return AudioProcessor::getDefaultNumParameterSteps().
+
+        If your parameter is boolean, then you may want to make this return 2.
+
+        The value that is returned may or may not be used, depending on the host. If you
+        want the host to display stepped automation values, rather than a continuous
+        interpolation between successive values, you should override isDiscrete to return true.
+
+        @see isDiscrete
+    */
+    int getNumSteps() const override
+    {
+        return Parameter::defaultNumSteps();
+    }
+
+    /** Returns whether the parameter uses discrete values, based on the result of
+        getNumSteps, or allows the host to select values continuously.
+
+        This information may or may not be used, depending on the host. If you
+        want the host to display stepped automation values, rather than a continuous
+        interpolation between successive values, override this method to return true.
+
+        @see getNumSteps
+    */
+    virtual bool isDiscrete() const override
+    {
+        return false;
+    }
+
+    /** Returns whether the parameter represents a boolean switch, typically with
+        "On" and "Off" states.
+
+        This information may or may not be used, depending on the host. If you
+        want the host to display a switch, rather than a two item dropdown menu,
+        override this method to return true. You also need to override
+        isDiscrete() to return `true` and getNumSteps() to return `2`.
+
+        @see isDiscrete getNumSteps
+    */
+    bool isBoolean() const override
+    {
+        return false;
+    }
+
+    /** Returns a textual version of the supplied normalised parameter value.
+        The default implementation just returns the floating point value
+        as a string, but this could do anything you need for a custom type
+        of value.
+    */
+    juce::String getText (float normalisedValue, int maxLen) const override
+    {
+        return Parameter::getText (normalisedValue, maxLen);
+    }
+
+    bool isOrientationInverted() const override
+    {
+        return Parameter::isOrientationInverted();
+    }
+
+    bool isAutomatable() const override
+    {
+        return true;
+    }
+
+    bool isMetaParameter() const override
+    {
+        return false;
+    }
+
+    Category getCategory() const override
+    {
+        return Parameter::getCategory();
+    }
+
+#if 0
+    //==============================================================================
+    /** Returns the current value of the parameter as a juce::String.
+
+        This function can be called when you are hosting plug-ins to get a
+        more specialsed textual represenation of the current value from the
+        plug-in, for example "On" rather than "1.0".
+
+        If you are implementing a plug-in then you should ignore this function
+        and instead override getText.
+    */
+    virtual juce::String getCurrentValueAsText() const;
+
+    /** Returns the set of strings which represent the possible states a parameter
+        can be in.
+
+        If you are hosting a plug-in you can use the result of this function to
+        populate a ComboBox listing the allowed values.
+
+        If you are implementing a plug-in then you do not need to override this.
+    */
+    virtual juce::StringArray getValueStrings() const;
+#endif
+};
+
+//==============================================================================
 class CLAPProcessor : public Processor
 {
 public:
@@ -508,15 +696,31 @@ public:
     bool hasEditor() override { return false; }
     Editor* createEditor() { return nullptr; }
 
-private:
-    virtual void initialize() {}
-    virtual ParameterPtr getParameter (const PortDescription& port) { return nullptr; }
+protected:
+    void initialize() override
+    {
+        Processor::initialize();
+    }
+
+    //==========================================================================
+    ParameterPtr getParameter (const PortDescription& port) override
+    {
+        if (port.type != PortType::Control || _params == nullptr)
+            return nullptr;
+        clap_param_info_t info;
+        _params->get_info (_plugin, (uint32_t) port.channel, &info);
+        return new CLAPParameter (&info, port.index, port.channel);
+    }
 
 private:
     const String ID;
     CLAPModule::Ptr _module { nullptr };
+
     clap_host_t _host;
     const clap_plugin_t* _plugin { nullptr };
+    const clap_plugin_audio_ports* _audio { nullptr };
+    const clap_plugin_note_ports_t* _notes { nullptr };
+    const clap_plugin_params_t* _params { nullptr };
 
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
@@ -545,23 +749,60 @@ private:
         if (! _plugin->init (_plugin))
             return false;
 
+        PortCount pc;
         if (auto audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS))
         {
-            juce::ignoreUnused (audio);
+            _audio = audio;
+            for (uint32_t i = 0; i < audio->count (_plugin, true); ++i)
+            {
+                clap_audio_port_info_t info;
+                audio->get (_plugin, i, true, &info);
+                pc.inputs[PortType::Audio] += info.channel_count;
+            }
+
+            for (uint32_t i = 0; i < audio->count (_plugin, false); ++i)
+            {
+                clap_audio_port_info_t info;
+                audio->get (_plugin, i, false, &info);
+                pc.outputs[PortType::Audio] += info.channel_count;
+            }
         }
 
         if (auto notes = (const clap_plugin_note_ports_t*) extension (CLAP_EXT_NOTE_PORTS))
         {
-            juce::ignoreUnused (notes);
+            _notes = notes;
+            for (uint32_t i = 0; i < notes->count (_plugin, true); ++i)
+            {
+                clap_note_port_info_t info;
+                notes->get (_plugin, i, true, &info);
+                ++pc.outputs[PortType::Midi];
+            }
+
+            for (uint32_t i = 0; i < notes->count (_plugin, false); ++i)
+            {
+                clap_note_port_info_t info;
+                notes->get (_plugin, i, false, &info);
+                ++pc.outputs[PortType::Midi];
+            }
         }
 
         if (auto params = (const clap_plugin_params_t*) extension (CLAP_EXT_PARAMS))
         {
-            juce::ignoreUnused (params);
+            _params = params;
+            for (uint32_t i = 0; i < params->count (_plugin); ++i)
+            {
+                clap_param_info_t info;
+                params->get_info (_plugin, i, &info);
+                ++pc.inputs[PortType::Control];
+            }
         }
+
+        auto list = pc.toPortList();
+        setPorts (list);
 
         return true;
     }
+
     //==========================================================================
     static const void* get_extension (const struct clap_host* host, const char* extensionID)
     {
