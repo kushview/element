@@ -400,9 +400,9 @@ public:
     explicit CLAPParameter (const clap_plugin_t* plugin,
                             const clap_plugin_params_t* params,
                             const clap_param_info_t* pi,
-                            int i1,
-                            int i2)
-        : _plugin (plugin), _params (params), _info (*pi), _portIndex (i1), _paramIndex (i2)
+                            int portIndex,
+                            int paramIndex)
+        : _plugin (plugin), _params (params), _info (*pi), _portIndex (portIndex), _paramIndex (paramIndex)
     {
         _range.start = _info.min_value;
         _range.end = _info.max_value;
