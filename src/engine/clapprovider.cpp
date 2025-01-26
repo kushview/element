@@ -507,6 +507,24 @@ public:
             _plugin->destroy (_plugin);
             _plugin = nullptr;
         }
+
+        for (auto& ib : _audioIns)
+        {
+            if (ib.data32 != nullptr)
+                std::free (ib.data32);
+            if (ib.data64 != nullptr)
+                std::free (ib.data64);
+        }
+        _audioIns.clear();
+
+        for (auto& ob : _audioOuts)
+        {
+            if (ob.data32 != nullptr)
+                std::free (ob.data32);
+            if (ob.data64 != nullptr)
+                std::free (ob.data64);
+        }
+        _audioOuts.clear();
     }
 
     static std::unique_ptr<CLAPProcessor> create (const String& pluginID, double r, int b)
@@ -545,6 +563,7 @@ public:
     {
         if (_plugin == nullptr)
             return;
+        _plugin->start_processing (_plugin);
         _plugin->activate (_plugin, sampleRate, 16U, (uint32_t) maxBufferSize);
     }
 
@@ -553,14 +572,53 @@ public:
         if (_plugin == nullptr)
             return;
         _plugin->deactivate (_plugin);
+        _plugin->stop_processing (_plugin);
     }
 
-    void render (RenderContext&) override
+    void render (RenderContext& rc) override
     {
-#if 0
-        clap_process_t _proc;
+        _proc.steady_time = -1;
+        _proc.frames_count = rc.audio.getNumSamples();
+        _proc.transport = nullptr;
+
+        clap_input_events_t iev;
+        iev.ctx = this;
+        iev.size = [] (const clap_input_events_t*) -> uint32_t { return 0; };
+        iev.get = [] (const clap_input_events_t* list, uint32_t index) -> const clap_event_header_t* {
+            return nullptr;
+        };
+
+        _proc.in_events = &iev;
+
+        clap_output_events_t oev;
+        oev.ctx = this;
+        oev.try_push = [] (const clap_output_events_t* list, const clap_event_header_t* event) -> bool {
+            return false;
+        };
+
+        _proc.out_events = &oev;
+
+        int rcc = 0;
+        for (uint32_t i = 0; i < _proc.audio_inputs_count; ++i)
+        {
+            auto b = &_proc.audio_inputs[i];
+            for (uint32_t j = 0; j < b->channel_count; ++j)
+            {
+                b->data32[j] = (float*) rc.audio.getReadPointer (rcc++);
+            }
+        }
+
+        rcc = 0;
+        for (uint32_t i = 0; i < _proc.audio_outputs_count; ++i)
+        {
+            auto b = &_proc.audio_outputs[i];
+            for (uint32_t j = 0; j < b->channel_count; ++j)
+            {
+                b->data32[j] = rc.audio.getWritePointer (rcc++);
+            }
+        }
+
         _plugin->process (_plugin, &_proc);
-#endif
     }
 
     void renderBypassed (RenderContext&) override {}
@@ -644,6 +702,9 @@ private:
     const clap_plugin_note_ports_t* _notes { nullptr };
     const clap_plugin_params_t* _params { nullptr };
 
+    clap_process_t _proc;
+    std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
+
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
     {
@@ -675,19 +736,39 @@ private:
         if (auto audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS))
         {
             _audio = audio;
-            for (uint32_t i = 0; i < audio->count (_plugin, true); ++i)
+
+            _proc.audio_inputs_count = _audio->count (_plugin, true);
+            for (uint32_t i = 0; i < _proc.audio_inputs_count; ++i)
             {
                 clap_audio_port_info_t info;
                 audio->get (_plugin, i, true, &info);
                 pc.inputs[PortType::Audio] += info.channel_count;
+                _audioIns.push_back ({});
+                auto& buf = _audioIns.back();
+                buf.channel_count = info.channel_count;
+                buf.data32 = (float**) calloc (buf.channel_count, sizeof (float*));
+                buf.data64 = nullptr;
+                buf.constant_mask = 0;
+                buf.latency = 0;
             }
+            _proc.audio_inputs = _audioIns.data();
 
+            _proc.audio_outputs_count = _audio->count (_plugin, false);
             for (uint32_t i = 0; i < audio->count (_plugin, false); ++i)
             {
                 clap_audio_port_info_t info;
                 audio->get (_plugin, i, false, &info);
                 pc.outputs[PortType::Audio] += info.channel_count;
+                _audioOuts.push_back ({});
+                auto& buf = _audioOuts.back();
+                buf.channel_count = info.channel_count;
+                buf.data32 = (float**) calloc (buf.channel_count, sizeof (float*));
+                buf.data64 = nullptr;
+                buf.constant_mask = 0;
+                buf.latency = 0;
             }
+
+            _proc.audio_outputs = _audioOuts.data();
         }
 
         if (auto notes = (const clap_plugin_note_ports_t*) extension (CLAP_EXT_NOTE_PORTS))
