@@ -389,145 +389,65 @@ private:
 //==============================================================================
 class CLAPParameter : public Parameter
 {
+    const clap_plugin_t* _plugin;
+    const clap_plugin_params_t* _params;
     const clap_param_info_t _info;
     const int _portIndex, _paramIndex;
+    std::atomic<float> _value;
+    juce::NormalisableRange<double> _range;
 
 public:
-    explicit CLAPParameter (const clap_param_info_t* pi, int i1, int i2)
-        : _info (*pi), _portIndex (i1), _paramIndex (i2)
+    explicit CLAPParameter (const clap_plugin_t* plugin,
+                            const clap_plugin_params_t* params,
+                            const clap_param_info_t* pi,
+                            int i1,
+                            int i2)
+        : _plugin (plugin), _params (params), _info (*pi), _portIndex (i1), _paramIndex (i2)
     {
+        _range.start = _info.min_value;
+        _range.end = _info.max_value;
     }
+
     ~CLAPParameter() {}
 
     //==========================================================================
-    /** Returns the port index of this parameter */
-    int getPortIndex() const noexcept override
-    {
-        return _portIndex;
-    }
+    int getPortIndex() const noexcept override { return _portIndex; }
+    int getParameterIndex() const noexcept override { return _paramIndex; }
+    float getValue() const override { return _value.load(); }
 
-    /** Returns the index of this parameter in its parent nodes's parameter list. */
-    int getParameterIndex() const noexcept override
-    {
-        return _paramIndex;
-    }
-
-    /** Called by the host to find out the value of this parameter.
-
-        Hosts will expect the value returned to be between 0 and 1.0.
-
-        This could be called quite frequently, so try to make your code efficient.
-        It's also likely to be called by non-UI threads, so the code in here should
-        be thread-aware.
-    */
-    float getValue() const override
-    {
-        return 0.f;
-    }
-
-    /** The host will call this method to change the value of a parameter.
-
-        The host may call this at any time, including during the audio processing
-        callback, so your implementation has to process this very efficiently and
-        avoid any kind of locking.
-
-        If you want to set the value of a parameter internally, e.g. from your
-        editor component, then don't call this directly - instead, use the
-        setValueNotifyingHost() method, which will also send a message to
-        the host telling it about the change. If the message isn't sent, the host
-        won't be able to automate your parameters properly.
-
-        The value passed will be between 0 and 1.0.
-    */
     void setValue (float newValue) override
     {
-        juce::ignoreUnused (newValue);
+        _value.store (newValue);
+        const auto clapVal = _range.convertFrom0to1 (newValue);
     }
 
-    /** This should return the default value for this parameter. */
-    float getDefaultValue() const
-    {
-        return 0.0f;
-    }
+    float getDefaultValue() const { return static_cast<float> (_info.default_value); }
 
-    /** Should parse a string and return the appropriate value for it. */
     float getValueForText (const juce::String& text) const override
     {
-        return text.getFloatValue();
+        double val { 0.0 };
+        _params->text_to_value (_plugin, _info.id, text.toRawUTF8(), &val);
+        return static_cast<float> (val);
     }
 
-    /** Returns the name to display for this parameter, which should be made
-        to fit within the given string length.
-    */
-    virtual juce::String getName (int maximumStringLength) const override
-    {
-        return "";
-    }
-
-    /** Some parameters may be able to return a label string for
-        their units. For example "Hz" or "%".
-    */
-    virtual juce::String getLabel() const override
-    {
-        return "";
-    }
-
-    /** Returns the number of steps that this parameter's range should be quantised into.
-
-        If you want a continuous range of values, don't override this method, and allow
-        the default implementation to return AudioProcessor::getDefaultNumParameterSteps().
-
-        If your parameter is boolean, then you may want to make this return 2.
-
-        The value that is returned may or may not be used, depending on the host. If you
-        want the host to display stepped automation values, rather than a continuous
-        interpolation between successive values, you should override isDiscrete to return true.
-
-        @see isDiscrete
-    */
-    int getNumSteps() const override
-    {
-        return Parameter::defaultNumSteps();
-    }
-
-    /** Returns whether the parameter uses discrete values, based on the result of
-        getNumSteps, or allows the host to select values continuously.
-
-        This information may or may not be used, depending on the host. If you
-        want the host to display stepped automation values, rather than a continuous
-        interpolation between successive values, override this method to return true.
-
-        @see getNumSteps
-    */
-    virtual bool isDiscrete() const override
-    {
-        return false;
-    }
-
-    /** Returns whether the parameter represents a boolean switch, typically with
-        "On" and "Off" states.
-
-        This information may or may not be used, depending on the host. If you
-        want the host to display a switch, rather than a two item dropdown menu,
-        override this method to return true. You also need to override
-        isDiscrete() to return `true` and getNumSteps() to return `2`.
-
-        @see isDiscrete getNumSteps
-    */
-    bool isBoolean() const override
-    {
-        return false;
-    }
-
-    /** Returns a textual version of the supplied normalised parameter value.
-        The default implementation just returns the floating point value
-        as a string, but this could do anything you need for a custom type
-        of value.
-    */
     juce::String getText (float normalisedValue, int maxLen) const override
     {
-        return Parameter::getText (normalisedValue, maxLen);
+        std::unique_ptr<char[]> _chars;
+        _chars.reset (new char[maxLen + 1]);
+        memset (_chars.get(), 0, (size_t) maxLen);
+
+        const auto value = _range.convertFrom0to1 (normalisedValue);
+        _params->value_to_text (_plugin, _info.id, value, _chars.get(), (uint32_t) maxLen);
+
+        return String::fromUTF8 (_chars.get());
     }
+
+    juce::String getName (int maximumStringLength) const override { return String::fromUTF8 (_info.name); }
+    juce::String getLabel() const override { return {}; }
+
+    int getNumSteps() const override { return Parameter::defaultNumSteps(); }
+    bool isDiscrete() const override { return false; }
+    bool isBoolean() const override { return false; }
 
     bool isOrientationInverted() const override
     {
@@ -705,11 +625,11 @@ protected:
     //==========================================================================
     ParameterPtr getParameter (const PortDescription& port) override
     {
-        if (port.type != PortType::Control || _params == nullptr)
+        if (port.type != PortType::Control || _plugin == nullptr || _params == nullptr)
             return nullptr;
         clap_param_info_t info;
         _params->get_info (_plugin, (uint32_t) port.channel, &info);
-        return new CLAPParameter (&info, port.index, port.channel);
+        return new CLAPParameter (_plugin, _params, &info, port.index, port.channel);
     }
 
 private:
