@@ -406,6 +406,8 @@ public:
     {
         _range.start = _info.min_value;
         _range.end = _info.max_value;
+        auto dv = _range.convertTo0to1 (_info.default_value);
+        _value.store (static_cast<float> (dv));
     }
 
     ~CLAPParameter() {}
