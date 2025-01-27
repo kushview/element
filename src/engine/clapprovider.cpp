@@ -127,6 +127,133 @@ static PluginDescription makeDescription (const clap_plugin_descriptor_t* d)
 
 } // namespace detail
 
+class CLAPEventBuffer
+{
+public:
+    using size_type = uint32_t;
+
+    CLAPEventBuffer()
+        : _data (8192),
+          _ptr ((uint8_t*) _data.data())
+    {
+        _ins.ctx = _outs.ctx = this;
+        _ins.get = &_get;
+        _ins.size = &_size;
+        _outs.try_push = &_tryPush;
+    }
+
+    ~CLAPEventBuffer() {}
+
+    clap_event_header_t* next() noexcept
+    {
+        return (clap_event_header_t*) (_ptr + _used);
+    }
+
+    bool push (const clap_event_header_t* ev)
+    {
+        if (ev->size + _used > _capacity)
+            return false;
+
+        const auto size_needed = ev->size;
+        auto dst = (clap_event_header_t*) (_ptr + _used);
+        bool dirty = false;
+#if 1
+        {
+            auto i = (clap_event_header_t*) _ptr;
+            uint32_t ib = 0;
+            while (i != nullptr)
+            {
+                if (i->time > ev->time)
+                {
+                    std::memmove (((uint8_t*) i) + size_needed,
+                                  i,
+                                  (uint8_t*) dst - (uint8_t*) i);
+                    dst = i;
+                    dirty = true;
+                    break;
+                }
+
+                ib += i->size;
+                i = ib < _used
+                        ? (clap_event_header_t*) ((uint8_t*) i + i->size)
+                        : nullptr;
+            }
+        }
+#endif
+
+        assert (dst != nullptr);
+        std::memcpy (dst, ev, ev->size);
+        _used += dst->size;
+        ++_count;
+        if (dirty)
+            remap();
+        return true;
+    }
+
+    uint32_t capacity() const noexcept { return _capacity; }
+
+    uint32_t size() const noexcept { return _count; }
+
+    const clap_event_header_t* get (uint32_t index) const noexcept
+    {
+        assert (index < _bytemap.size() && index < _count);
+        return (const clap_event_header_t*) (_ptr + _bytemap[index]);
+    }
+
+    const clap_input_events_t* inputs() const noexcept { return &_ins; }
+    const clap_output_events_t* outputs() const noexcept { return &_outs; }
+
+    void remap() noexcept
+    {
+        _bytemap.resize (_count);
+        auto i = (clap_event_header_t*) _ptr;
+        uint32_t idx = 0, ib = 0;
+        while (idx < _count && i != nullptr)
+        {
+            _bytemap[idx] = ib;
+
+            ++idx;
+            ib += i->size;
+            i = ib < _used
+                    ? (clap_event_header_t*) ((uint8_t*) i + i->size)
+                    : nullptr;
+        }
+    }
+
+    void clear() noexcept
+    {
+        _count = _used = 0;
+        _bytemap.resize (0);
+    }
+
+private:
+    AlignedData<8UL> _data;
+    uint8_t* _ptr { nullptr };
+    uint32_t _capacity { 0 },
+        _used { 0 },
+        _count { 0 };
+    std::vector<uint32_t> _bytemap;
+    clap_input_events_t _ins;
+    clap_output_events_t _outs;
+
+    static uint32_t _size (const clap_input_events_t* list)
+    {
+        return ((CLAPEventBuffer*) list->ctx)->_count;
+    }
+
+    static const clap_event_header_t* _get (const clap_input_events_t* list, uint32_t index)
+    {
+        auto self = (CLAPEventBuffer*) list->ctx;
+        return self->get (index);
+    }
+
+    static bool _tryPush (const clap_output_events_t* oe, const clap_event_header_t* ev)
+    {
+        auto self = (CLAPEventBuffer*) oe->ctx;
+        return self->push (ev);
+    }
+};
+
 //==============================================================================
 using CLAPEntry = const clap_plugin_entry_t*;
 
@@ -580,23 +707,13 @@ public:
         _proc.steady_time = -1;
         _proc.frames_count = rc.audio.getNumSamples();
         _proc.transport = nullptr;
-
-        clap_input_events_t iev;
-        iev.ctx = this;
-        iev.size = [] (const clap_input_events_t*) -> uint32_t { return 0; };
-        iev.get = [] (const clap_input_events_t* list, uint32_t index) -> const clap_event_header_t* {
-            return nullptr;
-        };
-
-        _proc.in_events = &iev;
-
-        clap_output_events_t oev;
-        oev.ctx = this;
-        oev.try_push = [] (const clap_output_events_t* list, const clap_event_header_t* event) -> bool {
-            return false;
-        };
-
-        _proc.out_events = &oev;
+        _eventIn.clear();
+        if (_notes != nullptr)
+        {
+        }
+        _proc.in_events = _eventIn.inputs();
+        _eventOut.clear();
+        _proc.out_events = _eventOut.outputs();
 
         int rcc = 0;
         for (uint32_t i = 0; i < _proc.audio_inputs_count; ++i)
@@ -666,7 +783,7 @@ public:
         {
             MemoryInputStream mi (data, (size_t) size, false);
             clap_istream_t stream;
-            stream.ctx = (void*) &data;
+            stream.ctx = (void*) &mi;
             stream.read = &readState;
             state->load (_plugin, &stream);
         }
@@ -704,6 +821,7 @@ private:
 
     clap_process_t _proc;
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
+    CLAPEventBuffer _eventIn, _eventOut;
 
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
