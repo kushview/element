@@ -133,6 +133,17 @@ static uint32_t totalChannels (const std::vector<clap_audio_buffer_t>& bufs)
     return c;
 }
 
+static void freeAudioBuffers (std::vector<clap_audio_buffer_t>& bufs)
+{
+    for (auto& b : bufs)
+    {
+        if (b.data32 != nullptr)
+            std::free (b.data32);
+        if (b.data64 != nullptr)
+            std::free (b.data64);
+    }
+    bufs.clear();
+}
 } // namespace detail
 
 class CLAPEventBuffer
@@ -643,23 +654,9 @@ public:
             _plugin = nullptr;
         }
 
-        for (auto& ib : _audioIns)
-        {
-            if (ib.data32 != nullptr)
-                std::free (ib.data32);
-            if (ib.data64 != nullptr)
-                std::free (ib.data64);
-        }
-        _audioIns.clear();
-
-        for (auto& ob : _audioOuts)
-        {
-            if (ob.data32 != nullptr)
-                std::free (ob.data32);
-            if (ob.data64 != nullptr)
-                std::free (ob.data64);
-        }
-        _audioOuts.clear();
+        detail::freeAudioBuffers (_audioIns);
+        detail::freeAudioBuffers (_audioOuts);
+        _tmpAudio.setSize (1, 1, false, false, false);
     }
 
     static std::unique_ptr<CLAPProcessor> create (const String& pluginID, double r, int b)
@@ -698,6 +695,9 @@ public:
     {
         if (_plugin == nullptr)
             return;
+        const auto maxChans = std::max ((int) detail::totalChannels (_audioIns),
+                                        (int) detail::totalChannels (_audioOuts));
+        _tmpAudio.setSize (maxChans, maxBufferSize);
         _plugin->activate (_plugin, sampleRate, 16U, (uint32_t) maxBufferSize);
     }
 
@@ -706,6 +706,7 @@ public:
         if (_plugin == nullptr)
             return;
         _plugin->deactivate (_plugin);
+        _tmpAudio.setSize (1, 1);
     }
 
     void render (RenderContext& rc) override
@@ -757,8 +758,6 @@ public:
             rc.audio.copyFrom (rcc, 0, _tmpAudio, rcc, 0, rc.audio.getNumSamples());
         }
     }
-
-    AudioBuffer<float> _tmpAudio;
 
     void renderBypassed (RenderContext&) override {}
 
@@ -844,8 +843,7 @@ private:
     clap_process_t _proc;
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
     CLAPEventBuffer _eventIn, _eventOut;
-
-    bool _started { false };
+    AudioBuffer<float> _tmpAudio;
 
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
@@ -966,13 +964,13 @@ private:
                 numChannels = info.channel_count;
             }
 
+#if 0
             std::cout << "[clap] audio port: " << (int) i << ": " << name
                       << "  nc=" << (int) numChannels
                       << "  inplace=" << (int) inplace
                       << "  kind=" << std::string (info.port_type != nullptr ? info.port_type : "nullptr")
                       << std::endl;
-
-            // pc.inputs[PortType::Audio] += (int) numChannels;
+#endif
 
             bufs.push_back ({});
             auto& buf = bufs.back();
@@ -982,22 +980,6 @@ private:
             buf.constant_mask = 0;
             buf.latency = 0;
         }
-    }
-    //==========================================================================
-    void startProcessing()
-    {
-        if (_started)
-            return;
-        _plugin->start_processing (_plugin);
-        _started = true;
-    }
-
-    void stopProcessing()
-    {
-        if (! _started)
-            return;
-        _plugin->stop_processing (_plugin);
-        _started = false;
     }
 
     //==========================================================================
