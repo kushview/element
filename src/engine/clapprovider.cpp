@@ -669,6 +669,20 @@ public:
         _eventIn.clear();
         if (_notes != nullptr)
         {
+            auto mb = rc.midi.getReadBuffer (0);
+            for (auto i : *mb) {
+                if (i.numBytes != 3)
+                    continue;
+                clap_event_midi_t ev;
+                ev.header.flags = CLAP_EVENT_IS_LIVE;
+                ev.header.size = sizeof(clap_event_midi_t);
+                ev.header.space_id = 0;
+                ev.header.time = static_cast<uint32_t> (i.samplePosition);
+                ev.header.type = CLAP_EVENT_MIDI;
+                ev.port_index = 0;
+                std::memcpy (ev.data, i.data, 3);
+                _eventIn.push ((const clap_event_header_t*) &ev);
+            }
         }
         _eventIn.remap();
         _proc.in_events = _eventIn.inputs();
