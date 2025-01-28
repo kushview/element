@@ -690,7 +690,6 @@ public:
     {
         if (_plugin == nullptr)
             return;
-        _plugin->start_processing (_plugin);
         _plugin->activate (_plugin, sampleRate, 16U, (uint32_t) maxBufferSize);
     }
 
@@ -699,13 +698,12 @@ public:
         if (_plugin == nullptr)
             return;
         _plugin->deactivate (_plugin);
-        _plugin->stop_processing (_plugin);
     }
 
     void render (RenderContext& rc) override
     {
         _proc.steady_time = -1;
-        _proc.frames_count = rc.audio.getNumSamples();
+        _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
         _eventIn.clear();
         if (_notes != nullptr)
@@ -726,18 +724,33 @@ public:
             }
         }
 
+        _tmpAudio.setSize (rc.audio.getNumChannels(),
+                           rc.audio.getNumSamples(),
+                           true,
+                           false,
+                           true);
+
         rcc = 0;
         for (uint32_t i = 0; i < _proc.audio_outputs_count; ++i)
         {
             auto b = &_proc.audio_outputs[i];
             for (uint32_t j = 0; j < b->channel_count; ++j)
             {
-                b->data32[j] = rc.audio.getWritePointer (rcc++);
+                b->data32[j] = _tmpAudio.getWritePointer (rcc++);
             }
         }
 
+        _plugin->start_processing (_plugin);
         _plugin->process (_plugin, &_proc);
+        _plugin->stop_processing (_plugin);
+
+        while (--rcc >= 0)
+        {
+            rc.audio.copyFrom (rcc, 0, _tmpAudio, rcc, 0, rc.audio.getNumSamples());
+        }
     }
+
+    AudioBuffer<float> _tmpAudio;
 
     void renderBypassed (RenderContext&) override {}
 
@@ -850,8 +863,6 @@ private:
     {
         if (_plugin == nullptr)
             return false;
-        if (! _plugin->init (_plugin))
-            return false;
 
         PortCount pc;
         if (auto audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS))
@@ -890,11 +901,16 @@ private:
                     jassertfalse;
                     numChannels = info.channel_count;
                 }
+                else
+                {
+                    jassertfalse;
+                    numChannels = info.channel_count;
+                }
 
                 std::cout << "[clap] audio port: " << (int) i << ": " << name
                           << "  nc=" << (int) numChannels
                           << "  inplace=" << (int) inplace
-                          << "  kind=" << (info.port_type != nullptr ? info.port_type : "nullptr")
+                          << "  kind=" << std::string (info.port_type != nullptr ? info.port_type : "nullptr")
                           << std::endl;
 
                 pc.inputs[PortType::Audio] += (int) numChannels;
@@ -933,6 +949,11 @@ private:
                     numChannels = info.channel_count;
                 }
                 else if (std::strcmp (info.port_type, CLAP_PORT_AMBISONIC) == 0)
+                {
+                    jassertfalse;
+                    numChannels = info.channel_count;
+                }
+                else
                 {
                     jassertfalse;
                     numChannels = info.channel_count;
