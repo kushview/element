@@ -711,6 +711,7 @@ public:
         if (_notes != nullptr)
         {
         }
+        _eventIn.remap();
         _proc.in_events = _eventIn.inputs();
         _eventOut.clear();
         _proc.out_events = _eventOut.outputs();
@@ -823,15 +824,17 @@ private:
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
     CLAPEventBuffer _eventIn, _eventOut;
 
+    bool _started { false };
+
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
     {
         _host = detail::makeHost();
         _host.host_data = this;
-        _host.get_extension = &get_extension;
-        _host.request_callback = &request_callback;
-        _host.request_process = &request_process;
-        _host.request_restart = &request_restart;
+        _host.get_extension = &getExtension;
+        _host.request_callback = &requestCallback;
+        _host.request_process = &requestProcess;
+        _host.request_restart = &requestRestart;
         if (auto plugin = (m != nullptr ? m->create (&_host, ID.toRawUTF8()) : nullptr))
             _plugin = plugin;
     }
@@ -858,12 +861,47 @@ private:
             _proc.audio_inputs_count = _audio->count (_plugin, true);
             for (uint32_t i = 0; i < _proc.audio_inputs_count; ++i)
             {
+                uint32_t numChannels = 0;
                 clap_audio_port_info_t info;
                 audio->get (_plugin, i, true, &info);
-                pc.inputs[PortType::Audio] += info.channel_count;
+
+                const auto name = std::string (info.name);
+                int ID = (int) info.id;
+                bool inplace = info.in_place_pair != CLAP_INVALID_ID;
+                if (info.port_type == nullptr)
+                {
+                    numChannels = info.channel_count;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_MONO) == 0)
+                {
+                    numChannels = 1;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_STEREO) == 0)
+                {
+                    numChannels = 2;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_SURROUND) == 0)
+                {
+                    jassertfalse;
+                    numChannels = info.channel_count;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_AMBISONIC) == 0)
+                {
+                    jassertfalse;
+                    numChannels = info.channel_count;
+                }
+
+                std::cout << "[clap] audio port: " << (int) i << ": " << name
+                          << "  nc=" << (int) numChannels
+                          << "  inplace=" << (int) inplace
+                          << "  kind=" << (info.port_type != nullptr ? info.port_type : "nullptr")
+                          << std::endl;
+
+                pc.inputs[PortType::Audio] += (int) numChannels;
+
                 _audioIns.push_back ({});
                 auto& buf = _audioIns.back();
-                buf.channel_count = info.channel_count;
+                buf.channel_count = numChannels;
                 buf.data32 = (float**) calloc (buf.channel_count, sizeof (float*));
                 buf.data64 = nullptr;
                 buf.constant_mask = 0;
@@ -876,10 +914,34 @@ private:
             {
                 clap_audio_port_info_t info;
                 audio->get (_plugin, i, false, &info);
-                pc.outputs[PortType::Audio] += info.channel_count;
+                uint32_t numChannels = 0;
+                if (info.port_type == nullptr)
+                {
+                    numChannels = info.channel_count;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_MONO) == 0)
+                {
+                    numChannels = 1;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_STEREO) == 0)
+                {
+                    numChannels = 2;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_SURROUND) == 0)
+                {
+                    jassertfalse;
+                    numChannels = info.channel_count;
+                }
+                else if (std::strcmp (info.port_type, CLAP_PORT_AMBISONIC) == 0)
+                {
+                    jassertfalse;
+                    numChannels = info.channel_count;
+                }
+
+                pc.outputs[PortType::Audio] += (int) numChannels;
                 _audioOuts.push_back ({});
                 auto& buf = _audioOuts.back();
-                buf.channel_count = info.channel_count;
+                buf.channel_count = numChannels;
                 buf.data32 = (float**) calloc (buf.channel_count, sizeof (float*));
                 buf.data64 = nullptr;
                 buf.constant_mask = 0;
@@ -896,7 +958,7 @@ private:
             {
                 clap_note_port_info_t info;
                 notes->get (_plugin, i, true, &info);
-                ++pc.outputs[PortType::Midi];
+                ++pc.inputs[PortType::Midi];
             }
 
             for (uint32_t i = 0; i < notes->count (_plugin, false); ++i)
@@ -925,23 +987,40 @@ private:
     }
 
     //==========================================================================
-    static const void* get_extension (const struct clap_host* host, const char* extensionID)
+    void startProcessing()
+    {
+        if (_started)
+            return;
+        _plugin->start_processing (_plugin);
+        _started = true;
+    }
+
+    void stopProcessing()
+    {
+        if (! _started)
+            return;
+        _plugin->stop_processing (_plugin);
+        _started = false;
+    }
+
+    //==========================================================================
+    static const void* getExtension (const struct clap_host* host, const char* extensionID)
     {
         juce::ignoreUnused (host, extensionID);
         return nullptr;
     }
 
-    static void request_restart (const struct clap_host* host)
+    static void requestRestart (const struct clap_host* host)
     {
         juce::ignoreUnused (host);
     }
 
-    static void request_process (const struct clap_host* host)
+    static void requestProcess (const struct clap_host* host)
     {
         juce::ignoreUnused (host);
     }
 
-    static void request_callback (const struct clap_host* host)
+    static void requestCallback (const struct clap_host* host)
     {
         juce::ignoreUnused (host);
     }
