@@ -21,54 +21,6 @@ static void _fpreset() {}
 #define CLAP_LOG(a)
 #endif
 
-//==============================================================================
-namespace {
-
-#if 0
-static double clapHostTimeNanoseconds() noexcept
-{
-#if JUCE_WINDOWS
-    return timeGetTime() * 1000000.0;
-#elif JUCE_LINUX || JUCE_BSD || JUCE_IOS || JUCE_ANDROID
-    timeval micro;
-    gettimeofday (&micro, nullptr);
-    return (double) micro.tv_usec * 1000.0;
-#elif JUCE_MAC
-    UnsignedWide micro;
-    Microseconds (&micro);
-    return micro.lo * 1000.0;
-#endif
-}
-#endif
-
-static int insideCLAPCallback = 0;
-
-struct IdleCallRecursionPreventer
-{
-    IdleCallRecursionPreventer() : isMessageThread (juce::MessageManager::getInstance()->isThisTheMessageThread())
-    {
-        if (isMessageThread)
-            ++insideCLAPCallback;
-    }
-
-    ~IdleCallRecursionPreventer()
-    {
-        if (isMessageThread)
-            --insideCLAPCallback;
-    }
-
-    const bool isMessageThread;
-    JUCE_DECLARE_NON_COPYABLE (IdleCallRecursionPreventer)
-};
-
-#if JUCE_MAC
-static bool makeFSRefFromPath (FSRef* destFSRef, const String& path)
-{
-    return FSPathMakeRef (reinterpret_cast<const UInt8*> (path.toRawUTF8()), destFSRef, nullptr) == noErr;
-}
-#endif
-} // namespace
-
 namespace element {
 namespace detail {
 static bool isCLAP (const File& f)
@@ -299,7 +251,6 @@ struct CLAPModule final : public ReferenceCountedObject
             if (module->file == file)
                 return module;
 
-        const IdleCallRecursionPreventer icrp;
         _fpreset();
 
         CLAP_LOG ("Attempting to load CLAP: " + file.getFullPathName());
@@ -567,6 +518,7 @@ public:
     {
         _value.store (newValue);
         const auto clapVal = _range.convertFrom0to1 (newValue);
+        juce::ignoreUnused (clapVal);
     }
 
     float getDefaultValue() const { return static_cast<float> (_info.default_value); }
@@ -936,6 +888,8 @@ private:
             const auto name = std::string (info.name);
             int ID = (int) info.id;
             bool inplace = info.in_place_pair != CLAP_INVALID_ID;
+            juce::ignoreUnused (ID, inplace);
+
             if (info.port_type == nullptr)
             {
                 numChannels = info.channel_count;
