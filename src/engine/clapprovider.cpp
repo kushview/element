@@ -3,6 +3,7 @@
 #include <element/processor.hpp>
 
 #include "clapprovider.hpp"
+#include "lv2/messages.hpp"
 
 #if ! JUCE_WINDOWS
 static void _fpreset() {}
@@ -98,6 +99,57 @@ static void freeAudioBuffers (std::vector<clap_audio_buffer_t>& bufs)
 }
 } // namespace detail
 
+//==============================================================================
+template <typename Locks>
+class CLAPEventQueue final
+{
+public:
+    CLAPEventQueue() { data.reserve (initialSize); }
+
+    template <typename Event>
+    void push (const Event* ev)
+    {
+        auto eh = (const clap_event_header_t*) ev;
+        write (mutex, [&] {
+            // const auto chars = lvtk::to_chars (uint32_t { ev->size });
+            // data.insert (data.end(), chars.begin(), chars.end());
+            const auto charbuf = (const char*) (eh);
+            data.insert (data.end(), charbuf, charbuf + eh->size);
+        });
+    }
+
+    template <typename Callback>
+    void readAll (Callback&& callback)
+    {
+        read (mutex, [&] {
+            if (data.empty())
+                return;
+
+            const auto end = data.data() + data.size();
+            for (auto ptr = data.data(); ptr < end;)
+            {
+                const auto ev = (const clap_event_header_t*) ptr;
+                callback (ev);
+                ptr += ev->size;
+            }
+
+            data.resize (0);
+        });
+    }
+
+private:
+    using Read = typename Locks::Read;
+    Read read;
+
+    using Write = typename Locks::Write;
+    Write write;
+
+    static constexpr auto initialSize = 8192;
+    lvtk::SpinLock mutex;
+    std::vector<char> data;
+};
+
+//==============================================================================
 class CLAPEventBuffer
 {
 public:
@@ -111,6 +163,7 @@ public:
         _ins.get = &_get;
         _ins.size = &_size;
         _outs.try_push = &_tryPush;
+        _capacity = _data.size();
     }
 
     ~CLAPEventBuffer() {}
@@ -197,6 +250,21 @@ public:
         _bytemap.resize (0);
     }
 
+    void dump()
+    {
+        for (uint32_t i = 0; i < size(); ++i)
+        {
+            auto ev = get (i);
+            if (ev->type == CLAP_EVENT_PARAM_VALUE)
+            {
+                auto pv = (const clap_event_param_value_t*) ev;
+                std::clog << "[param] event: "
+                          << (int64_t) pv->param_id << ": "
+                          << pv->value << std::endl;
+            }
+        }
+    }
+
 private:
     AlignedData<8UL> _data;
     uint8_t* _ptr { nullptr };
@@ -215,6 +283,13 @@ private:
     static const clap_event_header_t* _get (const clap_input_events_t* list, uint32_t index)
     {
         auto self = (CLAPEventBuffer*) list->ctx;
+        // auto ev = self->get (index);
+        // if (ev->type == CLAP_EVENT_PARAM_VALUE) {
+        //     std::cout << "clap::_get(): " << (int) index
+        //         << " value: " << ((const clap_event_param_value_t*)ev)->value << std::endl;
+
+        // }
+
         return self->get (index);
     }
 
@@ -486,6 +561,8 @@ private:
 //==============================================================================
 class CLAPParameter : public Parameter
 {
+    using Queue = CLAPEventQueue<lvtk::RealtimeReadTrait>;
+    Queue& _queue;
     const clap_plugin_t* _plugin;
     const clap_plugin_params_t* _params;
     const clap_param_info_t _info;
@@ -494,12 +571,18 @@ class CLAPParameter : public Parameter
     juce::NormalisableRange<double> _range;
 
 public:
-    explicit CLAPParameter (const clap_plugin_t* plugin,
+    explicit CLAPParameter (Queue& events,
+                            const clap_plugin_t* plugin,
                             const clap_plugin_params_t* params,
                             const clap_param_info_t* pi,
                             int portIndex,
                             int paramIndex)
-        : _plugin (plugin), _params (params), _info (*pi), _portIndex (portIndex), _paramIndex (paramIndex)
+        : _queue (events),
+          _plugin (plugin),
+          _params (params),
+          _info (*pi),
+          _portIndex (portIndex),
+          _paramIndex (paramIndex)
     {
         _range.start = _info.min_value;
         _range.end = _info.max_value;
@@ -517,8 +600,26 @@ public:
     void setValue (float newValue) override
     {
         _value.store (newValue);
-        const auto clapVal = _range.convertFrom0to1 (newValue);
-        juce::ignoreUnused (clapVal);
+
+        clap_event_param_value_t ev;
+        ev.header.type = CLAP_EVENT_PARAM_VALUE;
+        ev.header.flags = CLAP_EVENT_IS_LIVE;
+        ev.header.size = sizeof (clap_event_param_value_t);
+        ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+        ev.header.time = 1;
+
+        ev.cookie = _info.cookie;
+        ev.param_id = _info.id;
+        ev.value = _range.convertFrom0to1 (newValue);
+
+        ev.key = -1;
+        ev.note_id = -1;
+        ev.port_index = -1;
+        ev.channel = -1;
+
+        _queue.push (&ev);
+
+        // std::cout << "[param] send: " << ev.value << std::endl;
     }
 
     float getDefaultValue() const { return static_cast<float> (_info.default_value); }
@@ -666,16 +767,26 @@ public:
         _proc.steady_time = -1;
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
+
         _eventIn.clear();
+
+        _queueIn.readAll ([this] (const clap_event_header_t* ev) {
+            // std::cout << "[read] " << ((const clap_event_param_value_t*) ev)->value << std::endl;
+            _eventIn.push (ev);
+        });
+        _eventIn.remap();
+        _eventIn.dump();
+
         if (_notes != nullptr)
         {
             auto mb = rc.midi.getReadBuffer (0);
-            for (auto i : *mb) {
+            for (auto i : *mb)
+            {
                 if (i.numBytes != 3)
                     continue;
                 clap_event_midi_t ev;
                 ev.header.flags = CLAP_EVENT_IS_LIVE;
-                ev.header.size = sizeof(clap_event_midi_t);
+                ev.header.size = sizeof (clap_event_midi_t);
                 ev.header.space_id = 0;
                 ev.header.time = static_cast<uint32_t> (i.samplePosition);
                 ev.header.type = CLAP_EVENT_MIDI;
@@ -718,6 +829,7 @@ public:
         _plugin->start_processing (_plugin);
         _plugin->process (_plugin, &_proc);
         _plugin->stop_processing (_plugin);
+        _eventOut.remap();
 
         while (--rcc >= 0)
         {
@@ -793,7 +905,17 @@ protected:
             return nullptr;
         clap_param_info_t info;
         _params->get_info (_plugin, (uint32_t) port.channel, &info);
-        return new CLAPParameter (_plugin, _params, &info, port.index, port.channel);
+        return new CLAPParameter (_queueIn,
+                                  _plugin,
+                                  _params,
+                                  &info,
+                                  port.index,
+                                  port.channel);
+    }
+
+    bool write (const clap_event_header_t* ev) noexcept
+    {
+        return _eventIn.push (ev);
     }
 
 private:
@@ -810,6 +932,9 @@ private:
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
     CLAPEventBuffer _eventIn, _eventOut;
     AudioBuffer<float> _tmpAudio;
+
+    CLAPEventQueue<lvtk::RealtimeReadTrait> _queueIn;
+    CLAPEventQueue<lvtk::RealtimeWriteTrait> _queueOut;
 
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
