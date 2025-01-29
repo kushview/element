@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/mfisher31/clap-helpers.git
+revision = meson-and-host-ext
+depth = 1
+
+[provide]
+clap-helpers = clap_helpers_dep

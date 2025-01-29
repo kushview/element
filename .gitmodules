@@ -1,3 +1,0 @@
-[submodule "subprojects/clap"]
-	path = subprojects/clap
-	url = https://github.com/free-audio/clap.git

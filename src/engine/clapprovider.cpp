@@ -1,5 +1,5 @@
 #include <clap/clap.h>
-
+#include <clap/helpers/host.hh>
 #include <element/processor.hpp>
 
 #include "clapprovider.hpp"
@@ -614,7 +614,7 @@ public:
 
         ev.key = -1;
         ev.note_id = -1;
-        ev.port_index = -1;
+        ev.port_index = 0;
         ev.channel = -1;
 
         _queue.push (&ev);
@@ -1189,3 +1189,5 @@ void CLAPProvider::scan (const String& fileOrID, OwnedArray<PluginDescription>& 
 }
 
 } // namespace element
+
+#include <clap/helpers/host.hxx>

@@ -12,4 +12,7 @@
 !sord.wrap
 !sratom.wrap
 !zix.wrap
-!clap
+
+# !clap
+# !clap-*
+!clap*.wrap
