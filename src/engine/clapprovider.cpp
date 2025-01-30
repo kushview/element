@@ -1,3 +1,9 @@
+
+#if __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreServices/CoreServices.h>
+#endif
+
 #include <clap/clap.h>
 #include <clap/helpers/host.hh>
 #include <element/processor.hpp>
@@ -24,10 +30,17 @@ static void _fpreset() {}
 
 namespace element {
 namespace detail {
+#if JUCE_MAC
+static bool makeFSRefFromPath (FSRef* destFSRef, const String& path)
+{
+    return FSPathMakeRef (reinterpret_cast<const UInt8*> (path.toRawUTF8()), destFSRef, nullptr) == noErr;
+}
+#endif
+
 static bool isCLAP (const File& f)
 {
 #if JUCE_MAC
-    return f.isDirectory() && f.hasFileExtentsion ("clap") && f.exists();
+    return f.isDirectory() && f.hasFileExtension ("clap") && f.exists();
 #else
     return f.hasFileExtension ("clap") && f.existsAsFile();
 #endif
@@ -102,6 +115,22 @@ static void freeAudioBuffers (std::vector<clap_audio_buffer_t>& bufs)
 constexpr auto Misbehaviour = clap::helpers::MisbehaviourHandler::Terminate;
 constexpr auto Level = clap::helpers::CheckingLevel::Maximal;
 
+#if __APPLE__
+template <typename CFType>
+struct CFObjectDeleter
+{
+    void operator() (CFType object) const noexcept
+    {
+        if (object != nullptr)
+            CFRelease (object);
+    }
+};
+
+template <typename CFType>
+using CFUniquePtr = std::unique_ptr<std::remove_pointer_t<CFType>, CFObjectDeleter<CFType>>;
+#endif
+
+#if 1
 //==============================================================================
 using CLAPBaseHost = clap::helpers::Host<Misbehaviour, Level>;
 // extern template class clap::helpers::Host<Misbehaviour, Level>;
@@ -126,10 +155,19 @@ public:
     }
 
 protected:
-// clap_host
-      virtual void requestRestart() noexcept = 0;
-      virtual void requestProcess() noexcept = 0;
-      virtual void requestCallback() noexcept = 0;
+    // clap_host
+    void requestRestart() noexcept override
+    {
+        CLAP_LOG ("host:requestRestart()")
+    }
+    void requestProcess() noexcept override
+    {
+        CLAP_LOG ("host:requestProcess()")
+    }
+    void requestCallback() noexcept override
+    {
+        CLAP_LOG ("host:requestCallback()")
+    }
 
 #if 0
       virtual bool enableDraftExtensions() const noexcept { return false; }
@@ -189,8 +227,9 @@ protected:
       // clap_host_thread_pool
       virtual bool implementsThreadPool() const noexcept { return false; }
       virtual bool threadPoolRequestExec(uint32_t numTasks) noexcept { return false; }
-
+#endif
 };
+#endif
 
 //==============================================================================
 template <typename Locks>
@@ -402,7 +441,6 @@ struct CLAPModule final : public ReferenceCountedObject
     File file;
     CLAPEntry moduleMain;
     String pluginName;
-    std::unique_ptr<XmlElement> vstXml;
 
     using Ptr = ReferenceCountedObjectPtr<CLAPModule>;
 
@@ -460,7 +498,7 @@ struct CLAPModule final : public ReferenceCountedObject
         fullParentDirectoryPathName = f.getParentDirectory().getFullPathName();
 #elif JUCE_MAC
         FSRef ref;
-        makeFSRefFromPath (&ref, f.getParentDirectory().getFullPathName());
+        detail::makeFSRefFromPath (&ref, f.getParentDirectory().getFullPathName());
         FSGetCatalogInfo (&ref, kFSCatInfoNone, nullptr, nullptr, &parentDirFSSpec, nullptr);
 #endif
     }
@@ -542,6 +580,7 @@ struct CLAPModule final : public ReferenceCountedObject
     }
 
 #else
+    using Handle = void*;
     Handle resHandle = {};
     CFUniquePtr<CFBundleRef> bundleRef;
 
@@ -557,7 +596,7 @@ struct CLAPModule final : public ReferenceCountedObject
 
         bool ok = false;
 
-        if (file.hasFileExtension (".vst"))
+        if (file.hasFileExtension (".clap"))
         {
             auto* utf8 = file.getFullPathName().toRawUTF8();
 
@@ -569,12 +608,10 @@ struct CLAPModule final : public ReferenceCountedObject
                 {
                     if (CFBundleLoadExecutable (bundleRef.get()))
                     {
-                        moduleMain = (CLAPEntry) CFBundleGetFunctionPointerForName (bundleRef.get(), CFSTR ("main_macho"));
+                        moduleMain = (CLAPEntry) CFBundleGetDataPointerForName (bundleRef.get(), CFSTR ("clap_entry"));
 
                         if (moduleMain == nullptr)
                             moduleMain = (CLAPEntry) CFBundleGetFunctionPointerForName (bundleRef.get(), CFSTR ("VSTPluginMain"));
-
-                        JUCE_VST_WRAPPER_LOAD_CUSTOM_MAIN
 
                         if (moduleMain != nullptr)
                         {
@@ -595,18 +632,7 @@ struct CLAPModule final : public ReferenceCountedObject
 #if JUCE_MAC
                             resFileId = CFBundleOpenBundleResourceMap (bundleRef.get());
 #endif
-
                             ok = true;
-
-                            auto vstXmlFiles = file
-#if JUCE_MAC
-                                                   .getChildFile ("Contents")
-                                                   .getChildFile ("Resources")
-#endif
-                                                   .findChildFiles (File::findFiles, false, "*.vstxml");
-
-                            if (! vstXmlFiles.isEmpty())
-                                vstXml = parseXML (vstXmlFiles.getReference (0));
                         }
                     }
 
@@ -637,17 +663,11 @@ struct CLAPModule final : public ReferenceCountedObject
                 bundleRef = nullptr;
         }
     }
-
-    void closeEffect (Vst2::AEffect* eff)
-    {
-        eff->dispatcher (eff, Vst2::effClose, 0, 0, nullptr, 0);
-    }
-
 #endif
 
 private:
     bool _initialized { false };
-    const clap_plugin_factory* _factory;
+    const clap_plugin_factory* _factory { nullptr };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CLAPModule)
 };
 
@@ -826,7 +846,7 @@ public:
     }
 
     //==========================================================================
-    void setPlayHead (AudioPlayHead* playhead)
+    void setPlayHead (AudioPlayHead* playhead) override
     {
         Processor::setPlayHead (playhead);
     }
@@ -983,7 +1003,7 @@ public:
 
     //==========================================================================
     bool hasEditor() override { return false; }
-    Editor* createEditor() { return nullptr; }
+    Editor* createEditor() override { return nullptr; }
 
 protected:
     void initialize() override
@@ -1015,7 +1035,7 @@ private:
     const String ID;
     CLAPModule::Ptr _module { nullptr };
 
-    CLAPHost _host;
+    clap_host_t _host;
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_audio_ports* _audio { nullptr };
     const clap_plugin_note_ports_t* _notes { nullptr };
@@ -1237,8 +1257,8 @@ FileSearchPath CLAPProvider::defaultSearchPath()
     FileSearchPath sp;
 
 #if JUCE_MAC
-    sp.add ("~/Library/Audio/Plug-Ins/CLAP");
-    sp.add ("/Library/Audio/Plug-Ins/CLAP");
+    sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile ("Library/Audio/Plug-Ins/CLAP"));
+    sp.add (File ("/Library/Audio/Plug-Ins/CLAP"));
 #elif JUCE_WINDOWS
     auto programFiles = File::getSpecialLocation (File::globalApplicationsDirectory).getFullPathName();
     sp.addIfNotAlreadyThere (programFiles + "\\CLAP");
