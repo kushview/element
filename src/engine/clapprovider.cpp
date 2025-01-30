@@ -99,6 +99,99 @@ static void freeAudioBuffers (std::vector<clap_audio_buffer_t>& bufs)
 }
 } // namespace detail
 
+constexpr auto Misbehaviour = clap::helpers::MisbehaviourHandler::Terminate;
+constexpr auto Level = clap::helpers::CheckingLevel::Maximal;
+
+//==============================================================================
+using CLAPBaseHost = clap::helpers::Host<Misbehaviour, Level>;
+// extern template class clap::helpers::Host<Misbehaviour, Level>;
+class CLAPHost final : public CLAPBaseHost
+{
+public:
+    CLAPHost()
+        : CLAPBaseHost ("Element", "Kushview", "https://kushview.net/element", "1.0.0")
+    {
+    }
+    ~CLAPHost() {}
+
+    // clap_host_thread_check
+    bool threadCheckIsMainThread() const noexcept override
+    {
+        return juce::MessageManager::getInstance()->isThisTheMessageThread();
+    }
+
+    bool threadCheckIsAudioThread() const noexcept
+    {
+        return false;
+    }
+
+protected:
+// clap_host
+      virtual void requestRestart() noexcept = 0;
+      virtual void requestProcess() noexcept = 0;
+      virtual void requestCallback() noexcept = 0;
+
+#if 0
+      virtual bool enableDraftExtensions() const noexcept { return false; }
+      virtual const void* getExtension (std::string_view extensionId) const noexcept { return nullptr; }
+
+      // clap_host_audio_ports
+      virtual bool implementsAudioPorts() const noexcept { return false; }
+      virtual bool audioPortsIsRescanFlagSupported(uint32_t flag) noexcept { return false; }
+      virtual void audioPortsRescan(uint32_t flags) noexcept {}
+
+      // clap_host_gui
+      virtual bool implementsGui() const noexcept { return false; }
+      virtual void guiResizeHintsChanged() noexcept {}
+      virtual bool guiRequestResize(uint32_t width, uint32_t height) noexcept { return false; }
+      virtual bool guiRequestShow() noexcept { return false; }
+      virtual bool guiRequestHide() noexcept { return false; }
+      virtual void guiClosed(bool wasDestroyed) noexcept {}
+
+      // clap_host_latency
+      virtual bool implementsLatency() const noexcept { return false; }
+      virtual void latencyChanged() noexcept {}
+
+      // clap_host_log
+      virtual bool implementsLog() const noexcept { return false; }
+      virtual void logLog(clap_log_severity severity, const char *message) const noexcept {}
+
+      // clap_host_params
+      virtual bool implementsParams() const noexcept { return false; }
+      virtual void paramsRescan(clap_param_rescan_flags flags) noexcept {}
+      virtual void paramsClear(clap_id paramId, clap_param_clear_flags flags) noexcept {}
+      virtual void paramsRequestFlush() noexcept {}
+
+      // clap_host_posix_fd_support
+      virtual bool implementsPosixFdSupport() const noexcept { return false; }
+      virtual bool posixFdSupportRegisterFd(int fd, clap_posix_fd_flags_t flags) noexcept { return false; }
+      virtual bool posixFdSupportModifyFd(int fd, clap_posix_fd_flags_t flags) noexcept { return false; }
+      virtual bool posixFdSupportUnregisterFd(int fd) noexcept { return false; }
+
+      // clap_host_remote_controls
+      virtual bool implementsRemoteControls() const noexcept { return false; }
+      virtual void remoteControlsChanged() noexcept {}
+      virtual void remoteControlsSuggestPage(clap_id pageId) noexcept {}
+
+      // clap_host_state
+      virtual bool implementsState() const noexcept { return false; }
+      virtual void stateMarkDirty() noexcept {}
+
+      // clap_host_timer_support
+      virtual bool implementsTimerSupport() const noexcept { return false; }
+      virtual bool timerSupportRegisterTimer(uint32_t periodMs, clap_id *timerId) noexcept { return false; }
+      virtual bool timerSupportUnregisterTimer(clap_id timerId) noexcept { return false; }
+
+      // clap_host_tail
+      virtual bool implementsTail() const noexcept { return false; }
+      virtual void tailChanged() noexcept {}
+
+      // clap_host_thread_pool
+      virtual bool implementsThreadPool() const noexcept { return false; }
+      virtual bool threadPoolRequestExec(uint32_t numTasks) noexcept { return false; }
+
+};
+
 //==============================================================================
 template <typename Locks>
 class CLAPEventQueue final
@@ -922,7 +1015,7 @@ private:
     const String ID;
     CLAPModule::Ptr _module { nullptr };
 
-    clap_host_t _host;
+    CLAPHost _host;
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_audio_ports* _audio { nullptr };
     const clap_plugin_note_ports_t* _notes { nullptr };
