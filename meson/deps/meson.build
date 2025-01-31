@@ -45,9 +45,9 @@ if get_option('lv2static') or get_option ('deploy') or host_machine.system() == 
         'docs=disabled' ])
     sratom_dep = sratom_proj.get_variable ('sratom_dep')
 
-    lilv_default_path = '~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2'
+    lilv_default_path = fs.expanduser('~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2')
     if host_machine.system() == 'darwin'
-        lilv_default_path = '~/.lv2:~/Library/Audio/Plug-Ins/LV2:/Library/Audio/Plug-Ins/LV2'
+        lilv_default_path = fs.expanduser('~/.lv2:~/Library/Audio/Plug-Ins/LV2:/Library/Audio/Plug-Ins/LV2')
     elif host_machine.system() == 'windows'
         lilv_default_path = ';'.join(['%%APPDATA%%\\\\LV2', '%%COMMONPROGRAMFILES%%\\\\LV2'])
     endif
