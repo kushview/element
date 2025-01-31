@@ -296,7 +296,7 @@ protected:
 
 private:
     clap::helpers::EventList _evIn, _evOut;
-    
+
     MainToAudioQueue _appToEngineValueQueue;
     MainToAudioQueue _appToEngineModQueue;
     AudioToMainQueue _engineToAppValueQueue;
@@ -718,16 +718,17 @@ public:
 
     ~CLAPParameter() {}
 
-    void syncAndNotify() {
+    void syncAndNotify()
+    {
         double value = 0.0;
         if (! _params->get_value (_plugin, _info.id, &value))
             return;
-        
+
         value = _range.convertFrom0to1 (value);
-        if (value != _value.load()) {
+        if (value != _value.load())
+        {
             _value.store (static_cast<float> (value));
             sendValueChangedMessageToListeners (value);
-        
         }
     }
 
@@ -1013,7 +1014,8 @@ public:
         return mi.read (buffer, (int) size);
     }
 
-    void syncParams() {
+    void syncParams()
+    {
         for (auto param : getParameters (true))
             if (auto cp = dynamic_cast<CLAPParameter*> (param))
                 cp->syncAndNotify();
