@@ -6,9 +6,14 @@
 
 #include <clap/clap.h>
 #include <clap/helpers/host.hh>
-#include <element/processor.hpp>
+#include <clap/helpers/event-list.hh>
+#include <clap/helpers/reducing-param-queue.hh>
 
-#include "clapprovider.hpp"
+#include <element/processor.hpp>
+#include <element/version.hpp>
+
+#include "appinfo.hpp"
+#include "engine/clapprovider.hpp"
 #include "lv2/messages.hpp"
 
 #if ! JUCE_WINDOWS
@@ -64,22 +69,6 @@ static void recursiveSearch (const File& dir, StringArray& res, bool recursive)
     }
 }
 
-static clap_host_t makeHost()
-{
-    return {
-        .clap_version = CLAP_VERSION_INIT,
-        .host_data = nullptr,
-        .name = "Element",
-        .vendor = "Kushview",
-        .url = "https://kushview.net/element",
-        .version = "1.0.0",
-        .get_extension = nullptr,
-        .request_restart = nullptr,
-        .request_process = nullptr,
-        .request_callback = nullptr,
-    };
-}
-
 static PluginDescription makeDescription (const clap_plugin_descriptor_t* d)
 {
     PluginDescription desc;
@@ -115,6 +104,39 @@ static void freeAudioBuffers (std::vector<clap_audio_buffer_t>& bufs)
 constexpr auto Misbehaviour = clap::helpers::MisbehaviourHandler::Terminate;
 constexpr auto Level = clap::helpers::CheckingLevel::Maximal;
 
+struct MainToAudioParameterValue
+{
+    void* cookie;
+    double value;
+};
+
+struct AudioToMainParameterValue
+{
+    void update (const AudioToMainParameterValue& v) noexcept
+    {
+        if (v.hasValue)
+        {
+            hasValue = true;
+            value = v.value;
+        }
+
+        if (v.hasGesture)
+        {
+            hasGesture = true;
+            isBegin = v.isBegin;
+        }
+    }
+
+    bool hasValue = false;
+    bool hasGesture = false;
+    bool isBegin = false;
+    double value = 0;
+};
+
+using MainToAudioQueue = clap::helpers::ReducingParamQueue<clap_id, MainToAudioParameterValue>;
+using AudioToMainQueue = clap::helpers::ReducingParamQueue<clap_id, AudioToMainParameterValue>;
+
+//==============================================================================
 #if __APPLE__
 template <typename CFType>
 struct CFObjectDeleter
@@ -132,13 +154,23 @@ using CFUniquePtr = std::unique_ptr<std::remove_pointer_t<CFType>, CFObjectDelet
 
 #if 1
 //==============================================================================
+enum class ThreadType
+{
+    Unknown,
+    MainThread,
+    AudioThread,
+    AudioThreadPool,
+};
+
+static thread_local ThreadType gThreadType = ThreadType::Unknown;
+
 using CLAPBaseHost = clap::helpers::Host<Misbehaviour, Level>;
 // extern template class clap::helpers::Host<Misbehaviour, Level>;
 class CLAPHost final : public CLAPBaseHost
 {
 public:
     CLAPHost()
-        : CLAPBaseHost ("Element", "Kushview", "https://kushview.net/element", "1.0.0")
+        : CLAPBaseHost (EL_APP_NAME, EL_APP_AUTHOR, EL_APP_URL, EL_VERSION_STRING)
     {
     }
     ~CLAPHost() {}
@@ -146,12 +178,12 @@ public:
     // clap_host_thread_check
     bool threadCheckIsMainThread() const noexcept override
     {
-        return juce::MessageManager::getInstance()->isThisTheMessageThread();
+        return gThreadType == ThreadType::MainThread;
     }
 
     bool threadCheckIsAudioThread() const noexcept
     {
-        return false;
+        return gThreadType == ThreadType::AudioThread;
     }
 
 protected:
@@ -169,10 +201,13 @@ protected:
         CLAP_LOG ("host:requestCallback()")
     }
 
-#if 0
-      virtual bool enableDraftExtensions() const noexcept { return false; }
-      virtual const void* getExtension (std::string_view extensionId) const noexcept { return nullptr; }
+    bool enableDraftExtensions() const noexcept override { return false; }
+    const void* getExtension (std::string_view extensionId) const noexcept override
+    {
+        return nullptr;
+    }
 
+#if 0
       // clap_host_audio_ports
       virtual bool implementsAudioPorts() const noexcept { return false; }
       virtual bool audioPortsIsRescanFlagSupported(uint32_t flag) noexcept { return false; }
@@ -189,11 +224,41 @@ protected:
       // clap_host_latency
       virtual bool implementsLatency() const noexcept { return false; }
       virtual void latencyChanged() noexcept {}
+#endif
 
-      // clap_host_log
-      virtual bool implementsLog() const noexcept { return false; }
-      virtual void logLog(clap_log_severity severity, const char *message) const noexcept {}
+    // clap_host_log
+    bool implementsLog() const noexcept { return true; }
+    void logLog (clap_log_severity severity, const char* message) const noexcept override
+    {
+        switch (severity)
+        {
+            case CLAP_LOG_DEBUG:
+                std::cout << String::fromUTF8 (message) << std::endl;
+                break;
+            case CLAP_LOG_INFO:
+                Logger::writeToLog (String::fromUTF8 (message));
+                break;
+            case CLAP_LOG_WARNING:
+                Logger::writeToLog (String::fromUTF8 (message));
+                break;
+            case CLAP_LOG_ERROR:
+                Logger::writeToLog (String::fromUTF8 (message));
+                break;
+            case CLAP_LOG_FATAL:
+                Logger::writeToLog (String::fromUTF8 (message));
+                break;
 
+                // These severities should be used to report misbehaviour.
+                // The plugin one can be used by a layer between the plugin and the host.
+            case CLAP_LOG_HOST_MISBEHAVING:
+                Logger::writeToLog (String::fromUTF8 (message));
+                break;
+            case CLAP_LOG_PLUGIN_MISBEHAVING:
+                Logger::writeToLog (String::fromUTF8 (message));
+                break;
+        }
+    }
+#if 0
       // clap_host_params
       virtual bool implementsParams() const noexcept { return false; }
       virtual void paramsRescan(clap_param_rescan_flags flags) noexcept {}
@@ -228,6 +293,105 @@ protected:
       virtual bool implementsThreadPool() const noexcept { return false; }
       virtual bool threadPoolRequestExec(uint32_t numTasks) noexcept { return false; }
 #endif
+
+private:
+    clap::helpers::EventList _evIn, _evOut;
+    
+    MainToAudioQueue _appToEngineValueQueue;
+    MainToAudioQueue _appToEngineModQueue;
+    AudioToMainQueue _engineToAppValueQueue;
+    std::unordered_map<clap_id, bool> _isAdjustingParameter;
+
+    struct Settings
+    {
+        constexpr bool shouldProvideCookie() const noexcept { return true; }
+    } _settings;
+
+    void generatePluginInputEvents()
+    {
+        _appToEngineValueQueue.consume (
+            [this] (clap_id param_id, const MainToAudioParameterValue& value) {
+                clap_event_param_value ev;
+                ev.header.time = 0;
+                ev.header.type = CLAP_EVENT_PARAM_VALUE;
+                ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+                ev.header.flags = 0;
+                ev.header.size = sizeof (ev);
+                ev.param_id = param_id;
+                ev.cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr;
+                ev.port_index = 0;
+                ev.key = -1;
+                ev.channel = -1;
+                ev.note_id = -1;
+                ev.value = value.value;
+                _evIn.push (&ev.header);
+            });
+
+        _appToEngineModQueue.consume ([this] (clap_id param_id, const MainToAudioParameterValue& value) {
+            clap_event_param_mod ev;
+            ev.header.time = 0;
+            ev.header.type = CLAP_EVENT_PARAM_MOD;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.flags = 0;
+            ev.header.size = sizeof (ev);
+            ev.param_id = param_id;
+            ev.cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr;
+            ev.port_index = 0;
+            ev.key = -1;
+            ev.channel = -1;
+            ev.note_id = -1;
+            ev.amount = value.value;
+            _evIn.push (&ev.header);
+        });
+    }
+
+    void handlePluginOutputEvents()
+    {
+        for (uint32_t i = 0; i < _evOut.size(); ++i)
+        {
+            auto h = _evOut.get (i);
+            switch (h->type)
+            {
+                case CLAP_EVENT_PARAM_GESTURE_BEGIN: {
+                    auto ev = reinterpret_cast<const clap_event_param_gesture_t*> (h);
+                    bool& isAdj = _isAdjustingParameter[ev->param_id];
+
+                    if (isAdj)
+                        throw std::logic_error ("The plugin sent BEGIN_ADJUST twice");
+                    isAdj = true;
+
+                    AudioToMainParameterValue v;
+                    v.hasGesture = true;
+                    v.isBegin = true;
+                    _engineToAppValueQueue.setOrUpdate (ev->param_id, v);
+                    break;
+                }
+
+                case CLAP_EVENT_PARAM_GESTURE_END: {
+                    auto ev = reinterpret_cast<const clap_event_param_gesture*> (h);
+                    bool& isAdj = _isAdjustingParameter[ev->param_id];
+
+                    if (! isAdj)
+                        throw std::logic_error ("The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
+                    isAdj = false;
+                    AudioToMainParameterValue v;
+                    v.hasGesture = true;
+                    v.isBegin = false;
+                    _engineToAppValueQueue.setOrUpdate (ev->param_id, v);
+                    break;
+                }
+
+                case CLAP_EVENT_PARAM_VALUE: {
+                    auto ev = reinterpret_cast<const clap_event_param_value*> (h);
+                    AudioToMainParameterValue v;
+                    v.hasValue = true;
+                    v.value = ev->value;
+                    _engineToAppValueQueue.setOrUpdate (ev->param_id, v);
+                    break;
+                }
+            }
+        }
+    }
 };
 #endif
 
@@ -279,157 +443,6 @@ private:
     static constexpr auto initialSize = 8192;
     lvtk::SpinLock mutex;
     std::vector<char> data;
-};
-
-//==============================================================================
-class CLAPEventBuffer
-{
-public:
-    using size_type = uint32_t;
-
-    CLAPEventBuffer()
-        : _data (8192),
-          _ptr ((uint8_t*) _data.data())
-    {
-        _ins.ctx = _outs.ctx = this;
-        _ins.get = &_get;
-        _ins.size = &_size;
-        _outs.try_push = &_tryPush;
-        _capacity = _data.size();
-    }
-
-    ~CLAPEventBuffer() {}
-
-    clap_event_header_t* next() noexcept
-    {
-        return (clap_event_header_t*) (_ptr + _used);
-    }
-
-    bool push (const clap_event_header_t* ev)
-    {
-        if (ev->size + _used > _capacity)
-            return false;
-
-        const auto size_needed = ev->size;
-        auto dst = (clap_event_header_t*) (_ptr + _used);
-        bool dirty = false;
-#if 1
-        {
-            auto i = (clap_event_header_t*) _ptr;
-            uint32_t ib = 0;
-            while (i != nullptr)
-            {
-                if (i->time > ev->time)
-                {
-                    std::memmove (((uint8_t*) i) + size_needed,
-                                  i,
-                                  (uint8_t*) dst - (uint8_t*) i);
-                    dst = i;
-                    dirty = true;
-                    break;
-                }
-
-                ib += i->size;
-                i = ib < _used
-                        ? (clap_event_header_t*) ((uint8_t*) i + i->size)
-                        : nullptr;
-            }
-        }
-#endif
-
-        assert (dst != nullptr);
-        std::memcpy (dst, ev, ev->size);
-        _used += dst->size;
-        ++_count;
-        if (dirty)
-            remap();
-        return true;
-    }
-
-    uint32_t capacity() const noexcept { return _capacity; }
-
-    uint32_t size() const noexcept { return _count; }
-
-    const clap_event_header_t* get (uint32_t index) const noexcept
-    {
-        assert (index < _bytemap.size() && index < _count);
-        return (const clap_event_header_t*) (_ptr + _bytemap[index]);
-    }
-
-    const clap_input_events_t* inputs() const noexcept { return &_ins; }
-    const clap_output_events_t* outputs() const noexcept { return &_outs; }
-
-    void remap() noexcept
-    {
-        _bytemap.resize (_count);
-        auto i = (clap_event_header_t*) _ptr;
-        uint32_t idx = 0, ib = 0;
-        while (idx < _count && i != nullptr)
-        {
-            _bytemap[idx] = ib;
-
-            ++idx;
-            ib += i->size;
-            i = ib < _used
-                    ? (clap_event_header_t*) ((uint8_t*) i + i->size)
-                    : nullptr;
-        }
-    }
-
-    void clear() noexcept
-    {
-        _count = _used = 0;
-        _bytemap.resize (0);
-    }
-
-    void dump()
-    {
-        for (uint32_t i = 0; i < size(); ++i)
-        {
-            auto ev = get (i);
-            if (ev->type == CLAP_EVENT_PARAM_VALUE)
-            {
-                auto pv = (const clap_event_param_value_t*) ev;
-                std::clog << "[param] event: "
-                          << (int64_t) pv->param_id << ": "
-                          << pv->value << std::endl;
-            }
-        }
-    }
-
-private:
-    AlignedData<8UL> _data;
-    uint8_t* _ptr { nullptr };
-    uint32_t _capacity { 0 },
-        _used { 0 },
-        _count { 0 };
-    std::vector<uint32_t> _bytemap;
-    clap_input_events_t _ins;
-    clap_output_events_t _outs;
-
-    static uint32_t _size (const clap_input_events_t* list)
-    {
-        return ((CLAPEventBuffer*) list->ctx)->_count;
-    }
-
-    static const clap_event_header_t* _get (const clap_input_events_t* list, uint32_t index)
-    {
-        auto self = (CLAPEventBuffer*) list->ctx;
-        // auto ev = self->get (index);
-        // if (ev->type == CLAP_EVENT_PARAM_VALUE) {
-        //     std::cout << "clap::_get(): " << (int) index
-        //         << " value: " << ((const clap_event_param_value_t*)ev)->value << std::endl;
-
-        // }
-
-        return self->get (index);
-    }
-
-    static bool _tryPush (const clap_output_events_t* oe, const clap_event_header_t* ev)
-    {
-        auto self = (CLAPEventBuffer*) oe->ctx;
-        return self->push (ev);
-    }
 };
 
 //==============================================================================
@@ -519,7 +532,7 @@ struct CLAPModule final : public ReferenceCountedObject
         return _factory->get_plugin_descriptor (_factory, index);
     }
 
-    const clap_plugin_t* create (clap_host_t* host, std::string_view pluginID)
+    const clap_plugin_t* create (const clap_host_t* host, std::string_view pluginID)
     {
         if (auto plug = _factory->create_plugin (_factory, host, pluginID.data()))
         {
@@ -705,6 +718,19 @@ public:
 
     ~CLAPParameter() {}
 
+    void syncAndNotify() {
+        double value = 0.0;
+        if (! _params->get_value (_plugin, _info.id, &value))
+            return;
+        
+        value = _range.convertFrom0to1 (value);
+        if (value != _value.load()) {
+            _value.store (static_cast<float> (value));
+            sendValueChangedMessageToListeners (value);
+        
+        }
+    }
+
     //==========================================================================
     int getPortIndex() const noexcept override { return _portIndex; }
     int getParameterIndex() const noexcept override { return _paramIndex; }
@@ -716,21 +742,20 @@ public:
 
         clap_event_param_value_t ev;
         ev.header.type = CLAP_EVENT_PARAM_VALUE;
-        ev.header.flags = CLAP_EVENT_IS_LIVE;
-        ev.header.size = sizeof (clap_event_param_value_t);
+        ev.header.flags = 0; //CLAP_EVENT_IS_LIVE;
+        ev.header.size = sizeof (ev);
         ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-        ev.header.time = 1;
-
+        ev.header.time = 0;
+        ev.port_index = 0;
         ev.cookie = _info.cookie;
         ev.param_id = _info.id;
         ev.value = _range.convertFrom0to1 (newValue);
 
         ev.key = -1;
         ev.note_id = -1;
-        ev.port_index = 0;
         ev.channel = -1;
 
-        _queue.push (&ev);
+        _queue.push (&ev.header);
 
         // std::cout << "[param] send: " << ev.value << std::endl;
     }
@@ -827,6 +852,7 @@ public:
 
     static std::unique_ptr<CLAPProcessor> create (const String& pluginID, double r, int b)
     {
+        gThreadType = ThreadType::MainThread;
         std::unique_ptr<CLAPProcessor> ptr;
         auto ID = pluginID.upToFirstOccurrenceOf (":", false, false);
         auto path = pluginID.fromFirstOccurrenceOf (":", false, false);
@@ -877,18 +903,19 @@ public:
 
     void render (RenderContext& rc) override
     {
+        gThreadType = ThreadType::AudioThread;
+
         _proc.steady_time = -1;
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
+        _proc.in_events = _eventIn.clapInputEvents();
+        _proc.out_events = _eventOut.clapOutputEvents();
 
-        _eventIn.clear();
+        _eventOut.clear();
 
         _queueIn.readAll ([this] (const clap_event_header_t* ev) {
-            // std::cout << "[read] " << ((const clap_event_param_value_t*) ev)->value << std::endl;
             _eventIn.push (ev);
         });
-        _eventIn.remap();
-        _eventIn.dump();
 
         if (_notes != nullptr)
         {
@@ -905,13 +932,9 @@ public:
                 ev.header.type = CLAP_EVENT_MIDI;
                 ev.port_index = 0;
                 std::memcpy (ev.data, i.data, 3);
-                _eventIn.push ((const clap_event_header_t*) &ev);
+                _eventIn.push (&ev.header);
             }
         }
-        _eventIn.remap();
-        _proc.in_events = _eventIn.inputs();
-        _eventOut.clear();
-        _proc.out_events = _eventOut.outputs();
 
         int rcc = 0;
         for (uint32_t i = 0; i < _proc.audio_inputs_count; ++i)
@@ -942,12 +965,13 @@ public:
         _plugin->start_processing (_plugin);
         _plugin->process (_plugin, &_proc);
         _plugin->stop_processing (_plugin);
-        _eventOut.remap();
 
         while (--rcc >= 0)
         {
             rc.audio.copyFrom (rcc, 0, _tmpAudio, rcc, 0, rc.audio.getNumSamples());
         }
+
+        gThreadType = ThreadType::AudioThread;
     }
 
     void renderBypassed (RenderContext&) override {}
@@ -989,6 +1013,12 @@ public:
         return mi.read (buffer, (int) size);
     }
 
+    void syncParams() {
+        for (auto param : getParameters (true))
+            if (auto cp = dynamic_cast<CLAPParameter*> (param))
+                cp->syncAndNotify();
+    }
+
     void setState (const void* data, int size) override
     {
         if (auto state = (const clap_plugin_state_t*) _plugin->get_extension (_plugin, CLAP_EXT_STATE))
@@ -997,7 +1027,8 @@ public:
             clap_istream_t stream;
             stream.ctx = (void*) &mi;
             stream.read = &readState;
-            state->load (_plugin, &stream);
+            if (state->load (_plugin, &stream))
+                syncParams();
         }
     }
 
@@ -1028,14 +1059,15 @@ protected:
 
     bool write (const clap_event_header_t* ev) noexcept
     {
-        return _eventIn.push (ev);
+        _eventIn.push (ev);
+        return true;
     }
 
 private:
     const String ID;
     CLAPModule::Ptr _module { nullptr };
 
-    clap_host_t _host;
+    CLAPHost _host;
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_audio_ports* _audio { nullptr };
     const clap_plugin_note_ports_t* _notes { nullptr };
@@ -1043,22 +1075,16 @@ private:
 
     clap_process_t _proc;
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
-    CLAPEventBuffer _eventIn, _eventOut;
     AudioBuffer<float> _tmpAudio;
 
+    clap::helpers::EventList _eventIn, _eventOut;
     CLAPEventQueue<lvtk::RealtimeReadTrait> _queueIn;
     CLAPEventQueue<lvtk::RealtimeWriteTrait> _queueOut;
 
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
     {
-        _host = detail::makeHost();
-        _host.host_data = this;
-        _host.get_extension = &getExtension;
-        _host.request_callback = &requestCallback;
-        _host.request_process = &requestProcess;
-        _host.request_restart = &requestRestart;
-        if (auto plugin = (m != nullptr ? m->create (&_host, ID.toRawUTF8()) : nullptr))
+        if (auto plugin = (m != nullptr ? m->create (_host.clapHost(), ID.toRawUTF8()) : nullptr))
             _plugin = plugin;
     }
 
@@ -1304,3 +1330,4 @@ void CLAPProvider::scan (const String& fileOrID, OwnedArray<PluginDescription>& 
 } // namespace element
 
 #include <clap/helpers/host.hxx>
+#include <clap/helpers/reducing-param-queue.hxx>
