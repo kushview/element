@@ -9,12 +9,23 @@
 #include <clap/helpers/event-list.hh>
 #include <clap/helpers/reducing-param-queue.hh>
 
+#include <element/juce/gui_extra.hpp>
 #include <element/processor.hpp>
 #include <element/version.hpp>
+#include <element/ui/nodeeditor.hpp>
 
 #include "appinfo.hpp"
 #include "engine/clapprovider.hpp"
 #include "lv2/messages.hpp"
+#include "ui/resizelistener.hpp"
+
+#if __APPLE__
+#define EL_WINDOW_API CLAP_WINDOW_API_COCOA
+#elif defined(__WIN32__)
+#define EL_WINDOW_API CLAP_WINDOW_API_WIN32
+#else
+#define EL_WINDOW_API CLAP_WINDOW_API_X11
+#endif
 
 #if ! JUCE_WINDOWS
 static void _fpreset() {}
@@ -279,12 +290,79 @@ protected:
       // clap_host_state
       virtual bool implementsState() const noexcept { return false; }
       virtual void stateMarkDirty() noexcept {}
+#endif
 
-      // clap_host_timer_support
-      virtual bool implementsTimerSupport() const noexcept { return false; }
-      virtual bool timerSupportRegisterTimer(uint32_t periodMs, clap_id *timerId) noexcept { return false; }
-      virtual bool timerSupportUnregisterTimer(clap_id timerId) noexcept { return false; }
+    struct CLAPTimer : public juce::Timer
+    {
+        clap_id ID;
+        uint32_t periodMs { 0 };
+        const clap_plugin_t* plugin { nullptr };
+        const clap_plugin_timer_support_t* timer { nullptr };
 
+        void start()
+        {
+            startTimer (static_cast<int> (periodMs));
+        }
+
+        void timerCallback() override
+        {
+            if (plugin == nullptr || timer == nullptr || ID == CLAP_INVALID_ID)
+            {
+                stopTimer();
+                return;
+            }
+
+            timer->on_timer (plugin, ID);
+        }
+    };
+
+    std::unordered_map<clap_id, std::unique_ptr<CLAPTimer>> _timers;
+
+    // clap_host_timer_support
+    bool implementsTimerSupport() const noexcept override
+    {
+        return true;
+    }
+
+    friend class CLAPProcessor;
+
+    const clap_plugin_t* _plugin { nullptr };
+    const clap_plugin_timer_support_t* _timer { nullptr };
+
+    void setPlugin (const clap_plugin_t* plugin) { _plugin = plugin; }
+    void setTimer (const clap_plugin_timer_support_t* timers) { _timer = timers; }
+
+    bool timerSupportRegisterTimer (uint32_t periodMs, clap_id* timerId) noexcept override
+    {
+        if (_plugin == nullptr || _timer == nullptr)
+            return false;
+        static uint32_t nextId = 0;
+        auto ptr = std::make_unique<CLAPTimer>();
+        ptr->ID = ++nextId;
+        ptr->plugin = _plugin;
+        ptr->timer = _timer;
+        *timerId = ptr->ID;
+        ptr->start();
+
+        std::cout << "[clap] tiimer started: " << (int) periodMs << "ms \n";
+        _timers[ptr->ID] = std::move (ptr);
+        return true;
+    }
+
+    bool timerSupportUnregisterTimer (clap_id timerId) noexcept override
+    {
+        auto i = _timers.find (timerId);
+        if (i != _timers.end())
+        {
+            i->second->stopTimer();
+            i->second.reset();
+            _timers.erase (i);
+            return true;
+        }
+        return false;
+    }
+
+#if 0
       // clap_host_tail
       virtual bool implementsTail() const noexcept { return false; }
       virtual void tailChanged() noexcept {}
@@ -835,6 +913,234 @@ public:
 };
 
 //==============================================================================
+class CLAPEditor : public Editor,
+                   public PhysicalResizeListener
+{
+    bool _created = false;
+
+public:
+    CLAPEditor (const clap_plugin_t* plugin, const clap_plugin_gui_t* gui)
+        : Editor(),
+          _plugin (plugin),
+          _gui (gui)
+    {
+        setOpaque (true);
+        view = std::make_unique<ViewComponent> (*this);
+        addAndMakeVisible (view.get());
+
+        _created = _gui->create (_plugin, EL_WINDOW_API, false);
+
+        if (_created)
+        {
+            std::cout << "[clap] gui created" << std::endl;
+            uint32_t w = 0, h = 0;
+            if (_gui->get_size (_plugin, &w, &h))
+                setSize ((int) w, (int) h);
+            else
+                setSize (1, 1);
+
+            std::cout << "[clap] size: " << getWidth() << "x" << getHeight() << std::endl;
+            setResizable (false);
+
+            auto window = view->hostWindow();
+            _gui->set_parent (_plugin, &window);
+            nativeViewSetup = true;
+
+            setVisible (false);
+            setVisible (true);
+        }
+    }
+
+    ~CLAPEditor()
+    {
+        nativeViewSetup = false;
+
+        view->prepareForDestruction();
+        view.reset();
+
+        if (_created)
+        {
+            _gui->hide (_plugin);
+            _gui->destroy (_plugin);
+        }
+    }
+
+    void viewRequestedResizeInPhysicalPixels (int width, int height) override
+    {
+        std::cout << "[clap] viewRequestedResizeInPhysicalPixels(): " << width << "x" << height << std::endl;
+        view->setSize (width, height);
+        view->forceViewToSize();
+        resized();
+    }
+
+    void paint (Graphics& g) override
+    {
+        g.fillAll (Colours::black);
+    }
+
+    void resized() override
+    {
+        if (view != nullptr)
+            view->setBounds (getLocalBounds());
+    }
+
+    void visibilityChanged() override
+    {
+        std::cout << "vis: " << (int) isVisible() << std::endl;
+        if (isVisible())
+            _gui->show (_plugin);
+        else
+            _gui->hide (_plugin);
+    }
+
+private:
+    const clap_plugin_t* _plugin { nullptr };
+    const clap_plugin_gui_t* _gui { nullptr };
+    bool nativeViewSetup = false;
+
+#if JUCE_LINUX || JUCE_BSD
+    struct InnerHolder
+    {
+        struct Inner : public XEmbedComponent
+        {
+            Inner() : XEmbedComponent (true, true)
+            {
+                setOpaque (true);
+                addToDesktop (0);
+            }
+
+            void paint (Graphics& g) override
+            {
+                g.fillAll (Colours::black);
+            }
+        };
+
+        Inner inner;
+    };
+
+    struct ViewComponent : public InnerHolder,
+                           public XEmbedComponent,
+                           public ComponentMovementWatcher
+    {
+        explicit ViewComponent (PhysicalResizeListener& l)
+            : XEmbedComponent ((unsigned long) inner.getPeer()->getNativeHandle(), true, false),
+              ComponentMovementWatcher (&inner),
+              listener (inner, l)
+        {
+            setOpaque (true);
+        }
+
+        ~ViewComponent()
+        {
+            prepareForDestruction();
+            removeClient();
+        }
+
+        void prepareForDestruction()
+        {
+            inner.removeClient();
+        }
+
+        clap_window_t hostWindow()
+        {
+            clap_window_t win;
+            win.x11 = inner.getHostWindowID();
+            return win;
+        }
+
+        void forceViewToSize()
+        {
+            inner.setSize (getWidth(), getHeight());
+        }
+
+        void fitToView()
+        {
+        }
+
+        void paint (Graphics& g) override
+        {
+            g.fillAll (Colours::black);
+        }
+
+        //==============================================================================
+        void componentMovedOrResized (bool wasMoved, bool wasResized) override
+        {
+            if (wasResized)
+            {
+                if (auto pc = findParentComponentOfClass<CLAPEditor>())
+                    pc->setSize (inner.getWidth(), inner.getHeight());
+            }
+        }
+
+        void componentPeerChanged() override {}
+        void componentVisibilityChanged() override {};
+
+        ViewSizeListener listener;
+    };
+
+#elif JUCE_MAC
+
+    struct ViewComponent : public NSViewComponentWithParent
+    {
+        explicit ViewComponent (PhysicalResizeListener&)
+            : NSViewComponentWithParent (WantsNudge::no) {}
+        LV2UI_Widget getWidget() { return getView(); }
+        void forceViewToSize() {}
+        void fitToView() { resizeToFitView(); }
+        void prepareForDestruction() {}
+    };
+#elif JUCE_WINDOWS
+    struct ViewComponent : public HWNDComponent
+    {
+        explicit ViewComponent (PhysicalResizeListener&)
+        {
+            setOpaque (true);
+            inner.addToDesktop (0);
+
+            if (auto* peer = inner.getPeer())
+            {
+                setHWND (peer->getNativeHandle());
+            }
+        }
+
+        ~ViewComponent()
+        {
+            setHWND (nullptr);
+        }
+
+        void paint (Graphics& g) override { g.fillAll (Colours::black); }
+
+        LV2UI_Widget getWidget() { return getHWND(); }
+
+        void forceViewToSize() { updateHWNDBounds(); }
+        void fitToView() { resizeToFit(); }
+
+        void prepareForDestruction() {}
+
+    private:
+        struct Inner : public Component
+        {
+            Inner() { setOpaque (true); }
+            void paint (Graphics& g) override { g.fillAll (Colours::black); }
+        };
+
+        Inner inner;
+    };
+#else
+    struct ViewComponent : public Component
+    {
+        explicit ViewComponent (PhysicalResizeListener&) {}
+        void* getWidget() { return nullptr; }
+        void forceViewToSize() {}
+        void fitToView() {}
+        void prepareForDestruction() {}
+    };
+#endif
+
+    std::unique_ptr<ViewComponent> view;
+};
+
+//==============================================================================
 class CLAPProcessor : public Processor
 {
 public:
@@ -1035,8 +1341,11 @@ public:
     }
 
     //==========================================================================
-    bool hasEditor() override { return false; }
-    Editor* createEditor() override { return nullptr; }
+    bool hasEditor() override { return _gui != nullptr; }
+    Editor* createEditor() override
+    {
+        return hasEditor() ? new CLAPEditor (_plugin, _gui) : nullptr;
+    }
 
 protected:
     void initialize() override
@@ -1074,6 +1383,7 @@ private:
     const clap_plugin_audio_ports* _audio { nullptr };
     const clap_plugin_note_ports_t* _notes { nullptr };
     const clap_plugin_params_t* _params { nullptr };
+    const clap_plugin_gui_t* _gui { nullptr };
 
     clap_process_t _proc;
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
@@ -1101,6 +1411,8 @@ private:
     {
         if (_plugin == nullptr)
             return false;
+
+        _host.setPlugin (_plugin);
 
         PortCount pc;
         if (auto audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS))
@@ -1152,6 +1464,23 @@ private:
         auto list = pc.toPortList();
         setPorts (list);
 
+        if (auto gui = (const clap_plugin_gui_t*) extension (CLAP_EXT_GUI))
+        {
+            if (gui->is_api_supported (_plugin, EL_WINDOW_API, false))
+                _gui = gui;
+        }
+
+        if (auto timer = (const clap_plugin_timer_support_t*) extension (CLAP_EXT_TIMER_SUPPORT))
+        {
+            std::cout << "plugin wants timer\n";
+            _host.setTimer (timer);
+        }
+
+        if (auto fd = (const clap_plugin_posix_fd_support_t*) extension (CLAP_EXT_POSIX_FD_SUPPORT))
+        {
+            juce::ignoreUnused (fd);
+            std::cout << "plugin wants FD support.\n";
+        }
         return true;
     }
 
