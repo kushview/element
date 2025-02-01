@@ -19,6 +19,7 @@
 #include "engine/clapprovider.hpp"
 #include "lv2/messages.hpp"
 #include "ui/resizelistener.hpp"
+#include "ui/nsviewwithparent.hpp"
 
 #if __APPLE__
 #define EL_WINDOW_API CLAP_WINDOW_API_COCOA
@@ -198,7 +199,6 @@ public:
         return gThreadType == ThreadType::AudioThread;
     }
 
-    
 protected:
     // clap_host
     void requestRestart() noexcept override
@@ -333,16 +333,20 @@ protected:
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_timer_support_t* _timer { nullptr };
 
-    void setPlugin (const clap_plugin_t* plugin) {
-        if (plugin != nullptr) {
+    void setPlugin (const clap_plugin_t* plugin)
+    {
+        if (plugin != nullptr)
+        {
             _proxy = std::make_unique<PluginProxy> (*plugin, *this);
             _plugin = _proxy->clapPlugin();
-        } else {
+        }
+        else
+        {
             _plugin = nullptr;
             _proxy.reset();
         }
     }
-    
+
     void setTimer (const clap_plugin_timer_support_t* timers) { _timer = timers; }
 
     bool timerSupportRegisterTimer (uint32_t periodMs, clap_id* timerId) noexcept override
@@ -356,8 +360,11 @@ protected:
         ptr->timer = _timer;
         *timerId = ptr->ID;
         ptr->start();
-
-        std::cout << "[clap] tiimer started: " << (int) periodMs << "ms \n";
+#if 0
+        juce::String msg = "[clap] tiimer started: ";
+        msg << (int) periodMs << "ms";
+        CLAP_LOG (msg);
+#endif
         _timers[ptr->ID] = std::move (ptr);
         return true;
     }
@@ -570,6 +577,7 @@ struct CLAPModule final : public ReferenceCountedObject
         if (m->open())
         {
             _fpreset();
+            CLAP_LOG (" - opened")
             return m;
         }
 
@@ -659,12 +667,7 @@ struct CLAPModule final : public ReferenceCountedObject
         moduleMain = (CLAPEntry) module.getFunction ("clap_entry");
 
         if (moduleMain)
-        {
-            _initialized = moduleMain->init (file.getFullPathName().toRawUTF8());
-            _factory = (clap_plugin_factory*) (_initialized
-                                                   ? moduleMain->get_factory (CLAP_PLUGIN_FACTORY_ID)
-                                                   : nullptr);
-        }
+            initLibrary();
 
         return _initialized;
     }
@@ -712,10 +715,7 @@ struct CLAPModule final : public ReferenceCountedObject
                 {
                     if (CFBundleLoadExecutable (bundleRef.get()))
                     {
-                        moduleMain = (CLAPEntry) CFBundleGetDataPointerForName (bundleRef.get(), CFSTR ("clap_entry"));
-
-                        if (moduleMain == nullptr)
-                            moduleMain = (CLAPEntry) CFBundleGetFunctionPointerForName (bundleRef.get(), CFSTR ("VSTPluginMain"));
+                        moduleMain = (CLAPEntry) CFBundleGetFunctionPointerForName (bundleRef.get(), CFSTR ("clap_entry"));
 
                         if (moduleMain != nullptr)
                         {
@@ -749,6 +749,9 @@ struct CLAPModule final : public ReferenceCountedObject
             }
         }
 
+        if (ok)
+            initLibrary();
+
         return ok;
     }
 
@@ -770,9 +773,17 @@ struct CLAPModule final : public ReferenceCountedObject
 #endif
 
 private:
-    bool _initialized { false };
+    [[maybe_unused]] bool _initialized { false };
     const clap_plugin_factory* _factory { nullptr };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CLAPModule)
+
+    void initLibrary()
+    {
+        _initialized = moduleMain->init (file.getFullPathName().toRawUTF8());
+        _factory = (clap_plugin_factory*) (_initialized
+                                               ? moduleMain->get_factory (CLAP_PLUGIN_FACTORY_ID)
+                                               : nullptr);
+    }
 };
 
 //==============================================================================
@@ -852,7 +863,7 @@ public:
         // std::cout << "[param] send: " << ev.value << std::endl;
     }
 
-    float getDefaultValue() const { return static_cast<float> (_info.default_value); }
+    float getDefaultValue() const override { return static_cast<float> (_info.default_value); }
 
     float getValueForText (const juce::String& text) const override
     {
@@ -945,16 +956,14 @@ public:
         _created = _gui->create (_plugin, EL_WINDOW_API, false);
 
         if (_created)
-        {   
+        {
             _timer = (clap_plugin_timer_support_t*) _plugin->get_extension (_plugin, CLAP_EXT_TIMER_SUPPORT);
-            std::cout << "[clap] gui created" << std::endl;
             uint32_t w = 0, h = 0;
             if (_gui->get_size (_plugin, &w, &h))
                 setSize ((int) w, (int) h);
             else
                 setSize (1, 1);
 
-            std::cout << "[clap] size: " << getWidth() << "x" << getHeight() << std::endl;
             setResizable (false);
 
             auto window = view->hostWindow();
@@ -985,7 +994,6 @@ public:
 
     void viewRequestedResizeInPhysicalPixels (int width, int height) override
     {
-        std::cout << "[clap] viewRequestedResizeInPhysicalPixels(): " << width << "x" << height << std::endl;
         view->setSize (width, height);
         view->forceViewToSize();
         resized();
@@ -1004,14 +1012,14 @@ public:
 
     void visibilityChanged() override
     {
-        std::cout << "vis: " << (int) isVisible() << std::endl;
         if (isVisible())
             _gui->show (_plugin);
         else
             _gui->hide (_plugin);
     }
 
-    void timerCallback() override {
+    void timerCallback() override
+    {
         if (_timer)
             _timer->on_timer (_plugin, 0);
     }
@@ -1108,7 +1116,12 @@ private:
     {
         explicit ViewComponent (PhysicalResizeListener&)
             : NSViewComponentWithParent (WantsNudge::no) {}
-        LV2UI_Widget getWidget() { return getView(); }
+        clap_window_t hostWindow()
+        {
+            clap_window_t w;
+            w.cocoa = (clap_nsview) getView();
+            return w;
+        }
         void forceViewToSize() {}
         void fitToView() { resizeToFitView(); }
         void prepareForDestruction() {}
@@ -1194,7 +1207,9 @@ public:
 
         if (mod != nullptr)
         {
+            CLAP_LOG (" - module was created");
             ptr.reset (new CLAPProcessor (mod, ID));
+            CLAP_LOG (" - ptr was created");
             if (ptr->_plugin == nullptr || ! ptr->init())
                 ptr.reset();
         }
@@ -1420,7 +1435,8 @@ private:
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
     {
-        if (auto plugin = (m != nullptr ? m->create (_host.clapHost(), ID.toRawUTF8()) : nullptr)) {
+        if (auto plugin = (m != nullptr ? m->create (_host.clapHost(), ID.toRawUTF8()) : nullptr))
+        {
             _plugin = plugin;
             _host.setPlugin (_plugin);
         }
@@ -1599,6 +1615,7 @@ public:
     Host (CLAPProvider& o)
         : owner (o)
     {
+        juce::ignoreUnused (owner);
     }
 
 private:
@@ -1669,14 +1686,18 @@ void CLAPProvider::scan (const String& fileOrID, OwnedArray<PluginDescription>& 
     const bool isFile = File::isAbsolutePath (fileOrID);
     auto mod = isFile ? CLAPModule::findOrCreate (File (fileOrID))
                       : CLAPModule::findByID (fileOrID.toRawUTF8());
+    CLAP_LOG ("got the module");
     if (mod == nullptr)
+    {
+        CLAP_LOG ("is was null");
         return;
-
+    }
     for (uint32_t i = 0; i < mod->size(); ++i)
     {
         const auto d = mod->descriptor (i);
         auto pd = out.add (new PluginDescription());
         *pd = detail::makeDescription (d);
+        CLAP_LOG (pd->name);
         if (isFile)
             pd->fileOrIdentifier << ":" << fileOrID.trim();
     }

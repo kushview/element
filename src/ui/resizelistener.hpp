@@ -18,7 +18,7 @@ struct LogicalResizeListener
 
 struct ViewSizeListener : private juce::ComponentMovementWatcher
 {
-    ViewSizeListener (Component& c, PhysicalResizeListener& l)
+    ViewSizeListener (juce::Component& c, PhysicalResizeListener& l)
         : ComponentMovementWatcher (&c), listener (l)
     {
     }

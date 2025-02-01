@@ -182,10 +182,12 @@ public:
         auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
         logfile.create();
         logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
+        Logger::setCurrentLogger (logger.get());
     }
 
     ~PluginScannerWorker()
     {
+        Logger::setCurrentLogger (nullptr);
     }
 
     void handleMessageFromCoordinator (const MemoryBlock& mb) override
@@ -225,6 +227,9 @@ public:
         MemoryInputStream stream { block, false };
         const auto formatName = stream.readString();
         const auto identifier = stream.readString();
+        String msg = "scan: ";
+        msg << formatName << ": " << identifier;
+        logger->logMessage (msg);
         return nullptr == plugins->getAudioPluginFormat (formatName)
                    ? scanProvider (formatName, identifier)
                    : scanJuce (formatName, identifier);
@@ -259,7 +264,6 @@ public:
 
         for (auto* p : nodes.providers())
         {
-            std::cout << "fmt: " << p->format() << std::endl;
             if (p->format() != format)
                 continue;
 
@@ -270,7 +274,6 @@ public:
                 inst->getPluginDescription (*d);
             }
 #else
-            std::cout << "before scan: " << ID << std::endl;
             p->scan (ID, results);
 #endif
 
