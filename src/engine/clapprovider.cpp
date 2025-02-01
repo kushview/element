@@ -7,6 +7,7 @@
 #include <clap/clap.h>
 #include <clap/helpers/host.hh>
 #include <clap/helpers/event-list.hh>
+#include <clap/helpers/plugin-proxy.hh>
 #include <clap/helpers/reducing-param-queue.hh>
 
 #include <element/juce/gui_extra.hpp>
@@ -197,6 +198,7 @@ public:
         return gThreadType == ThreadType::AudioThread;
     }
 
+    
 protected:
     // clap_host
     void requestRestart() noexcept override
@@ -325,11 +327,22 @@ protected:
     }
 
     friend class CLAPProcessor;
-
+    using PluginProxy = clap::helpers::PluginProxy<Misbehaviour, Level>;
+    using ProxyPtr = std::unique_ptr<PluginProxy>;
+    ProxyPtr _proxy;
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_timer_support_t* _timer { nullptr };
 
-    void setPlugin (const clap_plugin_t* plugin) { _plugin = plugin; }
+    void setPlugin (const clap_plugin_t* plugin) {
+        if (plugin != nullptr) {
+            _proxy = std::make_unique<PluginProxy> (*plugin, *this);
+            _plugin = _proxy->clapPlugin();
+        } else {
+            _plugin = nullptr;
+            _proxy.reset();
+        }
+    }
+    
     void setTimer (const clap_plugin_timer_support_t* timers) { _timer = timers; }
 
     bool timerSupportRegisterTimer (uint32_t periodMs, clap_id* timerId) noexcept override
@@ -1407,8 +1420,10 @@ private:
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
     {
-        if (auto plugin = (m != nullptr ? m->create (_host.clapHost(), ID.toRawUTF8()) : nullptr))
+        if (auto plugin = (m != nullptr ? m->create (_host.clapHost(), ID.toRawUTF8()) : nullptr)) {
             _plugin = plugin;
+            _host.setPlugin (_plugin);
+        }
     }
 
     const void* extension (const char* ext) const noexcept
@@ -1422,8 +1437,6 @@ private:
     {
         if (_plugin == nullptr)
             return false;
-
-        _host.setPlugin (_plugin);
 
         PortCount pc;
         if (auto audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS))
@@ -1673,3 +1686,4 @@ void CLAPProvider::scan (const String& fileOrID, OwnedArray<PluginDescription>& 
 
 #include <clap/helpers/host.hxx>
 #include <clap/helpers/reducing-param-queue.hxx>
+#include <clap/helpers/plugin-proxy.hxx>
