@@ -1,7 +1,9 @@
 [wrap-git]
 url = https://github.com/lvtk/lvtk.git
 push-url = git@github.com:lvtk/lvtk.git
-revision = 7316c51a08609bcb7cb0bc33105dfe6319e6ff9f
+revision = main
 
 [provide]
-dependency_names = lvtk-3.0, lvtk-widgets-3.0, lvtk-opengl-3.0, lvtk-host-3.0
+lvtk-3.0=lvtk_dep
+lvtk-3=lvtk_dep
+lvtk=lvtk_dep

@@ -1,6 +1,7 @@
 *
 !juce.wrap
 !lvtk.wrap
+!lvtk-host.wrap
 !.ignore
 !.gitignore
 !evg.wrap

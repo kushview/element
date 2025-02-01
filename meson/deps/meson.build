@@ -1,15 +1,15 @@
 
-# Boost
+### Boost
 boost_dep = dependency ('boost', version: '>= 1.76.0', required : true)
 
-# CLAP
+### CLAP
 cmake = import ('cmake')
 clap_proj = cmake.subproject ('clap')
 clap_helpers_proj = subproject ('clap-helpers')
 clap_dep = [ clap_proj.dependency ('clap'), 
              clap_helpers_proj.get_variable ('clap_helpers_dep') ]
 
-# LV2
+### LV2
 if get_option('lv2static') or get_option ('deploy') or host_machine.system() == 'darwin' or host_machine.system() == 'windows'
     lv2_proj = subproject ('lv2', default_options: [
         'default_library=static',
@@ -78,20 +78,15 @@ else
     suil_dep = dependency ('suil-0', required: true, fallback: [])
 endif
 
-# LVTK
-lvtk_proj = subproject ('lvtk', default_options: [ 
-    'nobuild=true',
-    'demo=disabled',
-    'bindings=disabled',
+### LVTK
+lvtk_proj = subproject ('lvtk', default_options: [
     'test=disabled',
-    'doc=disabled',
-    'plugins=disabled'
-])
-lvtk_host_dep = lvtk_proj.get_variable ('lvtk_dep')
-add_project_arguments (['-DLVTK_STATIC=1', '-DPUGL_STATIC=1'], 
-    language: ['c', 'cpp', 'objc', 'objcpp'])
+    'doc=disabled' ])
+lvtk_dep = lvtk_proj.get_variable ('lvtk_dep')
+lvtk_host_proj = subproject ('lvtk-host', default_options: [])
+lvtk_host_dep = lvtk_host_proj.get_variable ('lvtk_host_dep')
 
-# JACK
+### JACK
 jack_enabled = false
 jack_includes = include_directories()
 
@@ -105,7 +100,7 @@ if jack_enabled
         language : [ 'c', 'objc', 'cpp', 'objcpp' ])
 endif
 
-# Sol3
+### Sol3
 if cpp.get_argument_syntax() == 'gcc'
     # silence warnings from sol3
     add_project_arguments (['-Wno-array-bounds'], language : ['cpp'])
