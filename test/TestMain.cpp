@@ -4,6 +4,7 @@
 using namespace juce;
 
 #include <element/context.hpp>
+#include <element/services.hpp>
 
 namespace element {
 namespace test {
@@ -12,6 +13,8 @@ Context* context()
 {
     if (_context == nullptr) {
         _context = std::make_unique<Context> (RunMode::Standalone);
+        _context->services().initialize();
+        _context->services().activate();
     }
     return _context.get();
 }

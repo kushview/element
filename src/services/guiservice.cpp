@@ -347,8 +347,6 @@ GuiService::GuiService (Context& w, Services& a)
     if (sGlobalLookAndFeel == nullptr)
         sGlobalLookAndFeel = std::make_unique<GlobalLookAndFeel>();
     sGuiControllerInstances.add (this);
-
-    SystemTray::init (*this);
 }
 
 GuiService::~GuiService()
@@ -388,6 +386,7 @@ void GuiService::saveProperties (PropertiesFile* props)
 
 void GuiService::activate()
 {
+    SystemTray::init (*this);
     context().devices().addChangeListener (this);
     impl->restoreRecents();
 }
