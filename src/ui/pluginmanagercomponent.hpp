@@ -10,6 +10,7 @@
 
 namespace element {
 
+class NodeProvider;
 class PluginManager;
 class Settings;
 
@@ -53,8 +54,14 @@ public:
     /** Returns the last search path stored in a given properties file for the specified format. */
     static FileSearchPath getLastSearchPath (PropertiesFile&, AudioPluginFormat&);
 
+    /** Returns the last search path stored in a given properties file for the specified format. */
+    static FileSearchPath getLastSearchPath (PropertiesFile&, NodeProvider&);
+
     /** Stores a search path in a properties file for the given format. */
     static void setLastSearchPath (PropertiesFile&, AudioPluginFormat&, const FileSearchPath&);
+
+    /** Stores a search path in a properties file for the given format. */
+    static void setLastSearchPath (PropertiesFile&, NodeProvider&, const FileSearchPath&);
 
     /** Triggers an asynchronous scan for the given format. */
     void scanFor (AudioPluginFormat&);

@@ -4,6 +4,7 @@
 #include <element/plugins.hpp>
 #include <element/context.hpp>
 #include <element/settings.hpp>
+#include <element/nodefactory.hpp>
 
 #include "ui/guicommon.hpp"
 #include "ui/pluginmanagercomponent.hpp"
@@ -19,7 +20,16 @@ class PluginListComponent::Scanner : private Timer,
 {
 public:
     Scanner (PluginListComponent& plc, AudioPluginFormat& format, PropertiesFile* properties, bool allowPluginsWhichRequireAsynchronousInstantiation, int threads, const String& title, const String& text)
-        : owner (plc), formatToScan (format), propertiesToUse (properties), pathChooserWindow (TRANS ("Select folders to scan..."), String(), AlertWindow::NoIcon), progressWindow (title, text, AlertWindow::NoIcon), progress (0.0), numThreads (threads), allowAsync (allowPluginsWhichRequireAsynchronousInstantiation), finished (false), useBackgroundScanner (true)
+        : owner (plc),
+          formatToScan (format),
+          propertiesToUse (properties),
+          pathChooserWindow (TRANS ("Select folders to scan..."), String(), AlertWindow::NoIcon),
+          progressWindow (title, text, AlertWindow::NoIcon),
+          progress (0.0),
+          numThreads (threads),
+          allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
+          finished (false),
+          useBackgroundScanner (true)
     {
         jassert (properties != nullptr);
 
@@ -27,8 +37,8 @@ public:
         pathList.setPath (path); // set this so it is ALWAYS up-to-date in ::startScan()
         scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
 
-        const bool wantsPath = formatToScan.getName() == "VST" || formatToScan.getName() == "VST3";
-        if (path.getNumPaths() <= 0 && wantsPath)
+        const StringArray withPath { "VST", "VST3", "CLAP" };
+        if (path.getNumPaths() <= 0 && withPath.contains (formatToScan.getName()))
         {
             pathList.setSize (500, 300);
             pathList.setPath (path);
@@ -47,8 +57,20 @@ public:
         }
     }
 
-    Scanner (PluginListComponent& plc, PluginManager& plugins, const String& title, const String& text)
-        : owner (plc), formatToScan (*plugins.getAudioPluginFormat ("Element")), propertiesToUse (nullptr), pathChooserWindow (TRANS ("Select folders to scan..."), String(), AlertWindow::NoIcon), progressWindow (title, text, AlertWindow::NoIcon), progress (0.0), numThreads (0), allowAsync (false), finished (false), useBackgroundScanner (true)
+    Scanner (PluginListComponent& plc,
+             PluginManager& plugins,
+             const String& title,
+             const String& text)
+        : owner (plc),
+          formatToScan (*plugins.getAudioPluginFormat ("Element")),
+          propertiesToUse (nullptr),
+          pathChooserWindow (TRANS ("Select folders to scan..."), String(), AlertWindow::NoIcon),
+          progressWindow (title, text, AlertWindow::NoIcon),
+          progress (0.0),
+          numThreads (0),
+          allowAsync (false),
+          finished (false),
+          useBackgroundScanner (true)
     {
         scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
         startScan();
@@ -631,24 +653,36 @@ static void saveSettings (Component* c, const bool saveUserPlugins = true)
 
 void PluginListComponent::editPluginPath (const String& f)
 {
+    jassert (propertiesToUse);
+
+    FileSearchPathListComponent pathList;
+    pathList.setSize (400, 260);
+
     if (auto* const fmt = plugins.getAudioPluginFormat (f))
     {
-        jassert (propertiesToUse);
-        String message (f);
-        message << TRANS (" plugin path");
-        AlertWindow window (message, String(), AlertWindow::NoIcon);
-        FileSearchPathListComponent pathList;
-        pathList.setSize (400, 260);
         pathList.setPath (getLastSearchPath (*propertiesToUse, *fmt));
-        window.addCustomComponent (&pathList);
-        window.addButton (TRANS ("Save"), 1, KeyPress (KeyPress::returnKey));
-        window.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+    }
+    else if (auto format = plugins.getProvider (f))
+    {
+        pathList.setPath (getLastSearchPath (*propertiesToUse, *format));
+    }
 
-        const int result = window.runModalLoop();
-        if (1 == result)
-        {
+    String message (f);
+    message << TRANS (" plugin path");
+    AlertWindow window (message, String(), AlertWindow::NoIcon);
+
+    window.addCustomComponent (&pathList);
+    window.addButton (TRANS ("Save"), 1, KeyPress (KeyPress::returnKey));
+    window.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+
+    const int result = window.runModalLoop();
+
+    if (1 == result)
+    {
+        if (auto* const fmt = plugins.getAudioPluginFormat (f))
             setLastSearchPath (*propertiesToUse, *fmt, pathList.getPath());
-        }
+        else if (auto format = plugins.getProvider (f))
+            setLastSearchPath (*propertiesToUse, *format, pathList.getPath());
     }
 }
 
@@ -674,6 +708,10 @@ void PluginListComponent::optionsMenuCallback (int result)
             saveSettings (this);
             break;
 
+        case 99:
+            editPluginPath ("CLAP");
+            saveSettings (this, true);
+            break;
         case 100:
             editPluginPath ("VST");
             saveSettings (this, true);
@@ -727,6 +765,8 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addSeparator();
 
         PopupMenu paths;
+        if (plugins.isAudioPluginFormatSupported ("CLAP"))
+            paths.addItem (99, TRANS ("CLAP Path"));
         if (plugins.isAudioPluginFormatSupported ("VST"))
             paths.addItem (100, TRANS ("VST Path"));
         if (plugins.isAudioPluginFormatSupported ("VST3"))
@@ -783,9 +823,22 @@ FileSearchPath PluginListComponent::getLastSearchPath (PropertiesFile& propertie
                                                 format.getDefaultLocationsToSearch().toString()));
 }
 
+FileSearchPath PluginListComponent::getLastSearchPath (PropertiesFile& properties, NodeProvider& format)
+{
+    return FileSearchPath (properties.getValue (Settings::lastPluginScanPathPrefix + format.format(),
+                                                format.defaultSearchPath().toString()));
+}
+
 void PluginListComponent::setLastSearchPath (PropertiesFile& properties, AudioPluginFormat& format, const FileSearchPath& newPath)
 {
     properties.setValue (Settings::lastPluginScanPathPrefix + format.getName(),
+                         newPath.toString());
+    properties.saveIfNeeded();
+}
+
+void PluginListComponent::setLastSearchPath (PropertiesFile& properties, NodeProvider& format, const FileSearchPath& newPath)
+{
+    properties.setValue (Settings::lastPluginScanPathPrefix + format.format(),
                          newPath.toString());
     properties.saveIfNeeded();
 }
@@ -796,6 +849,7 @@ static StringArray scanAllFormats (PluginManager& p)
     const StringArray supported (Util::getSupportedAudioPluginFormats());
     StringArray filtered;
     filtered.add ("LV2");
+    filtered.add ("CLAP");
     for (int i = 0; i < p.getAudioPluginFormats().getNumFormats(); ++i)
     {
         auto* f = p.getAudioPluginFormats().getFormat (i);

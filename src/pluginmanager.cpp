@@ -411,9 +411,8 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     }
     else if (auto* provider = _manager.getProvider (formatName))
     {
-        auto paths = provider->defaultSearchPath();
         identifiers = provider->findTypes (
-            paths,
+            detail::readSearchPath (*_manager.props, formatName),
             true,
             false);
     }

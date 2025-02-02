@@ -60,7 +60,7 @@ static bool isCLAP (const File& f)
 #if JUCE_MAC
     return f.isDirectory() && f.hasFileExtension ("clap") && f.exists();
 #else
-    return f.hasFileExtension ("clap") && !f.isDirectory() && f.existsAsFile();
+    return f.hasFileExtension ("clap") && ! f.isDirectory() && f.existsAsFile();
 #endif
 }
 
@@ -347,7 +347,8 @@ protected:
         }
     }
 
-    void setTimer (const clap_plugin_timer_support_t* timers) { _timer = timers; }
+    const clap_plugin_t* clapPlugin() const noexcept { return _plugin; }
+    void setPluginTimer (const clap_plugin_timer_support_t* timers) { _timer = timers; }
 
     bool timerSupportRegisterTimer (uint32_t periodMs, clap_id* timerId) noexcept override
     {
@@ -1147,7 +1148,8 @@ private:
 
         void paint (Graphics& g) override { g.fillAll (Colours::black); }
 
-        clap_window_t hostWindow() { 
+        clap_window_t hostWindow()
+        {
             clap_window_t w;
             w.win32 = getHWND();
             return w;
@@ -1441,8 +1443,8 @@ private:
     {
         if (auto plugin = (m != nullptr ? m->create (_host.clapHost(), ID.toRawUTF8()) : nullptr))
         {
-            _plugin = plugin;
-            _host.setPlugin (_plugin);
+            _host.setPlugin (plugin);
+            _plugin = _host.clapPlugin();
         }
     }
 
@@ -1516,14 +1518,13 @@ private:
 
         if (auto timer = (const clap_plugin_timer_support_t*) extension (CLAP_EXT_TIMER_SUPPORT))
         {
-            std::cout << "plugin wants timer\n";
-            _host.setTimer (timer);
+            _host.setPluginTimer (timer);
         }
 
         if (auto fd = (const clap_plugin_posix_fd_support_t*) extension (CLAP_EXT_POSIX_FD_SUPPORT))
         {
             juce::ignoreUnused (fd);
-            std::cout << "plugin wants FD support.\n";
+            CLAP_LOG ("plugin wants FD support.");
         }
         return true;
     }
@@ -1664,7 +1665,7 @@ FileSearchPath CLAPProvider::defaultSearchPath()
 #elif JUCE_WINDOWS
     auto programFiles = File::getSpecialLocation (File::globalApplicationsDirectory);
     sp.add (programFiles.getChildFile ("Common Files/CLAP"));
-    sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile("AppData/Local/Programs/Common/CLAP"));
+    sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile ("AppData/Local/Programs/Common/CLAP"));
     sp.removeRedundantPaths();
 #else
     sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile (".clap"));
