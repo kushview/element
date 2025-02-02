@@ -27,7 +27,7 @@ class World
 {
 public:
     World() = delete;
-    World (SymbolMap&);
+    World (SymbolMap&, const juce::FileSearchPath& lv2Path);
     ~World();
 
     const LilvNode* lv2_InputPort;

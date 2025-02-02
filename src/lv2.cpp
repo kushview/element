@@ -1143,7 +1143,7 @@ public:
           _symbols (&s),
           provider (p)
     {
-        world = std::make_unique<World> (*_symbols);
+        init();
     }
 
     LV2 (LV2NodeProvider& p)
@@ -1151,7 +1151,7 @@ public:
           _symbols (new SymbolMap()),
           provider (p)
     {
-        world = std::make_unique<World> (*_symbols);
+        init();
     }
 
     ~LV2()
@@ -1200,6 +1200,10 @@ private:
     SymbolMap* _symbols { nullptr };
     [[maybe_unused]] LV2NodeProvider& provider;
     std::unique_ptr<World> world;
+    void init() {
+        auto path = provider.defaultSearchPath();
+        world = std::make_unique<World> (*_symbols, path);
+    }
 };
 
 LV2NodeProvider::LV2NodeProvider (SymbolMap& s)
@@ -1230,6 +1234,29 @@ void LV2NodeProvider::scan (const String& uri, OwnedArray<PluginDescription>& ou
 Processor* LV2NodeProvider::create (const String& uri)
 {
     return lv2->instantiate (uri);
+}
+
+FileSearchPath LV2NodeProvider::defaultSearchPath()
+{
+    FileSearchPath paths;
+    [[maybe_unused]] const auto userHome = File::getSpecialLocation (File::userHomeDirectory);
+
+#if JUCE_MAC
+    paths.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile ("Library/Audio/Plug-Ins/LV2"));
+    paths.add (File ("/Library/Audio/Plug-Ins/LV2"));
+#elif JUCE_WINDOWS
+    auto programFiles = File::getSpecialLocation (File::globalApplicationsDirectory);
+    paths.add (programFiles.getChildFile ("Common Files/LV2"));
+    paths.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile ("AppData/Local/LV2"));
+#elif JUCE_LINUX || JUCE_BSD
+    paths.add(userHome.getChildFile(".lv2"));
+    paths.add(File ("/usr/local/lib/lv2"));
+    paths.add(File ("/usr/lib/lv2"));
+#endif
+
+    paths.removeRedundantPaths();
+
+    return paths;
 }
 
 StringArray LV2NodeProvider::findTypes (const juce::FileSearchPath&, bool, bool)

@@ -109,7 +109,7 @@ private:
 };
 
 //=============================================================================
-World::World (SymbolMap& s)
+World::World (SymbolMap& s, const juce::FileSearchPath& lv2Path)
     : symbolMap (s)
 {
     world = lilv_world_new();
@@ -144,6 +144,12 @@ World::World (SymbolMap& s)
     falseNode = lilv_new_bool (world, false);
 
     lilv_world_set_option (world, LILV_OPTION_DYN_MANIFEST, trueNode);
+    if (lv2Path.getNumPaths() > 0)
+    {
+        const auto jstr = lv2Path.toStringWithSeparator (":");
+        lvtk::Node nodeLv2Path (lilv_new_string (world, jstr.toRawUTF8()));
+        lilv_world_set_option (world, LILV_OPTION_LV2_PATH, nodeLv2Path);
+    }
 
     lilv_world_load_all (world);
 #if JLV2_SUIL_INIT
