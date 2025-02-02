@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL3-or-later
 
 #include "utils.hpp"
-#include "nodes/baseprocessor.hpp"
 
 #if JUCE_WINDOWS
 #include <windows.h>
@@ -29,6 +28,8 @@ StringArray getSupportedAudioPluginFormats()
 #endif
 
     fmts.add ("LV2");
+    fmts.add ("CLAP");
+    fmts.sort (false);
     return fmts;
 }
 

@@ -683,6 +683,19 @@ void PluginListComponent::optionsMenuCallback (int result)
             saveSettings (this, true);
             break;
 
+        case 8: {
+            if (auto* world = ViewHelpers::getGlobals (this))
+                plugins.saveUserPlugins (world->settings());
+
+            currentScanner.reset (new Scanner (*this,
+                                               plugins,
+                                               StringArray ("CLAP"),
+                                               TRANS ("Scanning for CLAP plug-ins..."),
+                                               TRANS ("Searching for all possible plug-in files...")));
+
+            break;
+        }
+
         case 9: {
             if (auto* world = ViewHelpers::getGlobals (this))
                 plugins.saveUserPlugins (world->settings());
@@ -691,7 +704,7 @@ void PluginListComponent::optionsMenuCallback (int result)
                                                plugins,
                                                StringArray ("LV2"),
                                                TRANS ("Scanning for LV2 plug-ins..."),
-                                               TRANS ("Searching for all possible plug-in files...")));
+                                               TRANS ("Searching for all possible plug-in URIs...")));
 
             break;
         }
@@ -728,7 +741,7 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addItem (3, TRANS ("Show folder containing selected plug-in"), canShowSelectedFolder());
         menu.addItem (4, TRANS ("Remove any plug-ins whose files no longer exist"));
         menu.addSeparator();
-
+        menu.addItem (8, "Scan for new or updated CLAP plugins");
         menu.addItem (9, "Scan for new or updated LV2 plugins");
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
         {

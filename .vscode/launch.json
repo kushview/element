@@ -27,8 +27,8 @@
             "type": "cppdbg",
             "request": "launch",
             "args": [],
-            "program": "${workspaceRoot}/build-public/Element",
-            "cwd": "${workspaceFolder}/build-public",
+            "program": "${workspaceRoot}/build/element",
+            "cwd": "${workspaceFolder}/build",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
                 { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },

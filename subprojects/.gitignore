@@ -1,6 +1,7 @@
 *
 !juce.wrap
 !lvtk.wrap
+!lvtk-host.wrap
 !.ignore
 !.gitignore
 !evg.wrap
@@ -12,3 +13,7 @@
 !sord.wrap
 !sratom.wrap
 !zix.wrap
+
+# !clap
+# !clap-*
+!clap*.wrap

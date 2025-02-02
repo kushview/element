@@ -21,9 +21,15 @@ public:
     /** Create the instance by ID string. */
     virtual Processor* create (const String&) = 0;
     /** return a list of types contained in this provider. */
-    virtual StringArray findTypes() = 0;
+    virtual StringArray findTypes (const FileSearchPath& path,
+                                   bool recursive,
+                                   bool allowAsync) = 0;
     /** Return a list of types that should be hidden in the UI by default. */
     virtual StringArray getHiddenTypes() { return {}; }
+
+    virtual FileSearchPath defaultSearchPath() { return {}; }
+
+    virtual void scan (const String& fileOrID, OwnedArray<PluginDescription>& out) {}
 };
 
 //==========================================================================

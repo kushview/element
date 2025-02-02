@@ -9,6 +9,7 @@
 #include <element/settings.hpp>
 #include <element/lv2.hpp>
 
+#include "engine/clapprovider.hpp"
 #include "nodes/nodetypes.hpp"
 #include "engine/ionode.hpp"
 #include "datapath.hpp"
@@ -61,6 +62,30 @@ static File scannerExeFullPath()
 #endif
 
     return scannerExe;
+}
+
+static juce::StringArray readDeadMansPedalFile()
+{
+    const auto file = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
+    StringArray lines;
+    file.readLines (lines);
+    lines.removeEmptyStrings();
+    return lines;
+}
+
+static void setDeadMansPedalFile (const StringArray& newContents)
+{
+    auto deadMansPedalFile = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
+    if (deadMansPedalFile.getFullPathName().isNotEmpty())
+        deadMansPedalFile.replaceWithText (newContents.joinIntoString ("\n"), true, true);
+}
+
+static void applyBlacklistingsFromDeadMansPedal (KnownPluginList& list)
+{
+    // If any plugins have crashed recently when being loaded, move them to the
+    // end of the list to give the others a chance to load correctly..
+    for (auto& crashedPlugin : readDeadMansPedalFile())
+        list.addToBlacklist (crashedPlugin);
 }
 
 } // namespace detail
@@ -157,10 +182,12 @@ public:
         auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
         logfile.create();
         logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
+        Logger::setCurrentLogger (logger.get());
     }
 
     ~PluginScannerWorker()
     {
+        Logger::setCurrentLogger (nullptr);
     }
 
     void handleMessageFromCoordinator (const MemoryBlock& mb) override
@@ -200,8 +227,12 @@ public:
         MemoryInputStream stream { block, false };
         const auto formatName = stream.readString();
         const auto identifier = stream.readString();
-        return formatName == "LV2" ? scanLV2 (identifier)
-                                   : scanJuce (formatName, identifier);
+        String msg = "scan: ";
+        msg << formatName << ": " << identifier;
+        logger->logMessage (msg);
+        return nullptr == plugins->getAudioPluginFormat (formatName)
+                   ? scanProvider (formatName, identifier)
+                   : scanJuce (formatName, identifier);
     }
 
     OwnedArray<PluginDescription> scanJuce (const String& formatName, const String& identifier)
@@ -225,7 +256,7 @@ public:
         return results;
     }
 
-    OwnedArray<PluginDescription> scanLV2 (const String& uri)
+    OwnedArray<PluginDescription> scanProvider (const String& format, const String& ID)
     {
         auto& nodes = plugins->getNodeFactory();
 
@@ -233,14 +264,18 @@ public:
 
         for (auto* p : nodes.providers())
         {
-            if (p->format() != "LV2")
+            if (p->format() != format)
                 continue;
 
-            if (auto inst = p->create (uri))
+#if 0
+            if (auto inst = p->create (ID))
             {
                 auto d = results.add (new PluginDescription());
                 inst->getPluginDescription (*d);
             }
+#else
+            p->scan (ID, results);
+#endif
 
             break;
         }
@@ -269,6 +304,7 @@ public:
         logger->logMessage ("[scanner] setting up formats");
         auto& nf = plugins->getNodeFactory();
         nf.add (new LV2NodeProvider());
+        nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
     }
@@ -291,34 +327,6 @@ private:
 };
 
 //==============================================================================
-
-namespace detail {
-static juce::StringArray readDeadMansPedalFile()
-{
-    const auto file = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
-    StringArray lines;
-    file.readLines (lines);
-    lines.removeEmptyStrings();
-    return lines;
-}
-
-static void setDeadMansPedalFile (const StringArray& newContents)
-{
-    auto deadMansPedalFile = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
-    if (deadMansPedalFile.getFullPathName().isNotEmpty())
-        deadMansPedalFile.replaceWithText (newContents.joinIntoString ("\n"), true, true);
-}
-
-static void applyBlacklistingsFromDeadMansPedal (KnownPluginList& list)
-{
-    // If any plugins have crashed recently when being loaded, move them to the
-    // end of the list to give the others a chance to load correctly..
-    for (auto& crashedPlugin : readDeadMansPedalFile())
-        list.addToBlacklist (crashedPlugin);
-}
-
-} // namespace detail
-
 PluginScanner::PluginScanner (PluginManager& manager)
     : _manager (manager),
       list (manager.getKnownPlugins()) {}
@@ -403,7 +411,17 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     }
     else if (auto* provider = _manager.getProvider (formatName))
     {
-        identifiers = provider->findTypes();
+        auto paths = provider->defaultSearchPath();
+
+        for (int i = 0; i < paths.getNumPaths(); ++i) {
+            std::cout << paths[i].getFullPathName() << std::endl;
+        }
+           
+
+        identifiers = provider->findTypes (
+            provider->defaultSearchPath(), // detail::readSearchPath (*_manager.props, formatName),
+            true,
+            false);
     }
 
     listeners.call (&Listener::audioPluginScanProgress, 0.0f);
@@ -411,6 +429,7 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     float step = 1.f;
     for (const auto& ID : identifiers)
     {
+        std::cout << "identifier=" << ID << std::endl;
         if (cancelFlag.get() != 0)
             return;
 
@@ -598,7 +617,8 @@ private:
         {
             if (auto* lv2 = dynamic_cast<LV2NodeProvider*> (provider))
             {
-                const auto types = lv2->findTypes();
+                FileSearchPath fp;
+                const auto types = lv2->findTypes (fp, false, false);
                 lv2Items.clear();
                 lv2Items.reserve ((size_t) types.size());
                 for (const auto& uri : types)
@@ -864,13 +884,8 @@ Processor* PluginManager::createGraphNode (const PluginDescription& desc, String
         }
     }
 
-    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_NODE_FORMAT_NAME && desc.pluginFormatName != "LV2")
-    {
-        return nullptr;
-    }
-
     errorMsg.clear();
-    if (desc.pluginFormatName != EL_NODE_FORMAT_NAME && desc.pluginFormatName != "LV2")
+    if (! isAudioPluginFormatSupported (desc.pluginFormatName))
     {
         errorMsg = desc.name;
         errorMsg << ": invalid format: " << desc.pluginFormatName;

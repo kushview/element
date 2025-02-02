@@ -12,7 +12,7 @@
 namespace element {
 
 //==============================================================================
-class Editor : public Component {
+class Editor : public juce::Component {
 public:
     Editor();
     virtual ~Editor();

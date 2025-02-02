@@ -14,6 +14,7 @@
 #include "engine/internalformat.hpp"
 #include "engine/mappingengine.hpp"
 #include "engine/midiengine.hpp"
+#include "engine/clapprovider.hpp"
 #include "presetmanager.hpp"
 
 #include "appinfo.hpp"
@@ -93,6 +94,7 @@ private:
         nf.add (new InternalNodes (owner));
         nf.add (new AudioProcessorFactory (owner));
         nf.add (new LV2NodeProvider (*symbols));
+        nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
     }
 

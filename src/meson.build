@@ -78,6 +78,7 @@ libelement_sources = '''
     nodes/scriptnodeeditor.cpp
     nodes/volumeeditor.cpp
 
+    engine/clapprovider.cpp
     engine/graphnode.cpp
     engine/transport.cpp
     engine/graphbuilder.cpp
@@ -267,7 +268,7 @@ libelement = static_library ('element',
     libelement_sources,
     include_directories : libelement_includes,
     gnu_symbol_visibility : 'hidden',
-    dependencies : [ deps, juce_dep, lvtk_host_dep ],
+    dependencies : [ deps, juce_dep, lvtk_host_dep, clap_dep ],
     cpp_args : libelement_cpp_args,
     link_args : [nodelete_cpp_link_args],
     install : false,
@@ -277,4 +278,4 @@ libelement = static_library ('element',
 element_dep = declare_dependency (
     include_directories : libelement_includes,
     link_with : libelement,
-    dependencies : [ deps, juce_dep ])
+    dependencies : [ deps, juce_dep, lvtk_host_dep, clap_dep ])

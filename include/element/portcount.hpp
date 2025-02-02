@@ -18,14 +18,14 @@ struct PortCount {
         operator= (o);
     }
 
-    PortCount& operator= (const PortCount& o)
+    PortCount& operator= (const PortCount& o) noexcept
     {
         memcpy (inputs, o.inputs, PortType::Unknown * sizeof (int));
         memcpy (outputs, o.outputs, PortType::Unknown * sizeof (int));
         return *this;
     }
 
-    bool operator== (const PortCount& o)
+    bool operator== (const PortCount& o) noexcept
     {
         for (int i = 0; i < PortType::Unknown; ++i)
             if (inputs[i] != o.inputs[i] || outputs[i] != o.outputs[i])
@@ -33,51 +33,51 @@ struct PortCount {
         return true;
     }
 
-    void clear()
+    void clear() noexcept
     {
         memset (inputs, 0, PortType::Unknown * sizeof (int));
         memset (outputs, 0, PortType::Unknown * sizeof (int));
     }
 
-    int get (PortType type, bool isInput) const
+    int get (PortType type, bool isInput) const noexcept
     {
         return isInput ? inputs[type.id()] : outputs[type.id()];
     }
 
-    void set (PortType type, int count, bool input)
+    void set (PortType type, int count, bool input) noexcept
     {
         auto& counts = input ? inputs : outputs;
         counts[type.id()] = count;
     }
 
-    void set (PortType type, int numIns, int numOuts)
+    void set (PortType type, int numIns, int numOuts) noexcept
     {
         set (type, numIns, true);
         set (type, numOuts, false);
     }
 
-    PortCount with (PortType type, int count, bool isInput)
+    PortCount with (PortType type, int count, bool isInput) noexcept
     {
         auto ret = *this;
         ret.set (type, count, isInput);
         return ret;
     }
 
-    PortCount with (PortType type, int numIns, int numOuts)
+    PortCount with (PortType type, int numIns, int numOuts) noexcept
     {
         auto ret = *this;
         ret.set (type, numIns, numOuts);
         return ret;
     }
 
-    PortList toPortList() const
+    PortList toPortList() const noexcept
     {
         PortList ports;
         getPorts (ports);
         return ports;
     }
 
-    void getPorts (PortList& ports) const
+    void getPorts (PortList& ports) const noexcept
     {
         uint32_t index = 0;
         for (int i = 0; i < PortType::Unknown; ++i) {
@@ -105,7 +105,6 @@ struct PortCount {
         }
     }
 
-private:
     int inputs[PortType::Unknown];
     int outputs[PortType::Unknown];
 };
