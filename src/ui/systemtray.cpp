@@ -36,6 +36,9 @@ static MainWindow* getMainWindow()
 }
 
 SystemTray* SystemTray::instance = nullptr;
+bool SystemTray::initialized = false;
+static bool canUseSystemTray = true;
+
 SystemTray::SystemTray()
 {
 #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
@@ -58,9 +61,18 @@ SystemTray::SystemTray()
 #endif
 }
 
+void SystemTray::init (GuiService& gui)
+{
+    if (initialized)
+        return;
+
+    initialized = true;
+    canUseSystemTray = gui.getRunMode() == RunMode::Standalone;
+}
+
 void SystemTray::setEnabled (bool enabled)
 {
-    if (element::Util::isRunningInWine())
+    if (element::Util::isRunningInWine() || ! initialized || ! canUseSystemTray)
         return;
 
     if (enabled)

@@ -19,8 +19,12 @@ public:
 private:
     SystemTray();
     static SystemTray* instance;
+    static bool initialized;
     int mouseUpAction = -1;
     void runMenu();
+
+    friend class GuiService;
+    static void init (GuiService&);
 };
 
 } // namespace element
