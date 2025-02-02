@@ -139,7 +139,6 @@ World::World (SymbolMap& s)
     ui_Gtk3UI = lilv_new_uri (world, LV2_UI__Gtk3UI);
     ui_Qt4UI = lilv_new_uri (world, LV2_UI__Qt4UI);
     ui_Qt5UI = lilv_new_uri (world, LV2_UI__Qt5UI);
-    ui_JUCEUI = lilv_new_uri (world, ELEMENT__JUCEUI);
     ui_UI = lilv_new_uri (world, LV2_UI__UI);
     trueNode = lilv_new_bool (world, true);
     falseNode = lilv_new_bool (world, false);
@@ -194,7 +193,6 @@ World::~World()
     _node_free (ui_Qt4UI);
     _node_free (ui_Qt5UI);
     _node_free (ui_X11UI);
-    _node_free (ui_JUCEUI);
 
     lilv_world_free (world);
     world = nullptr;

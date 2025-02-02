@@ -13,7 +13,6 @@
 
 #ifndef ELEMENT_PREFIX
 #define ELEMENT_PREFIX "https://lvtk.org/ns/jlv2#"
-#define ELEMENT__JUCEUI ELEMENT_PREFIX "JUCEUI"
 #endif
 
 namespace element {
@@ -60,7 +59,6 @@ public:
     const LilvNode* ui_Gtk3UI;
     const LilvNode* ui_Qt4UI;
     const LilvNode* ui_Qt5UI;
-    const LilvNode* ui_JUCEUI;
     const LilvNode* ui_UI;
     const LilvNode* trueNode;
     const LilvNode* falseNode;

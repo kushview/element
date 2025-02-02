@@ -146,15 +146,8 @@ namespace Callbacks {
 
 inline unsigned uiSupported (const char* hostType, const char* uiType)
 {
-    if (strcmp (hostType, ELEMENT__JUCEUI) == 0)
-    {
-        if (strcmp (uiType, ELEMENT__JUCEUI) == 0)
-            return UI_FULL_SUPPORT;
-        else if (strcmp (uiType, LVTK_UI__NativeUI))
-            return UI_NATIVE_EMBED;
-        return 0;
-    }
-
+    if (strcmp (uiType, LVTK_UI__NativeUI))
+        return UI_NATIVE_EMBED;
     return suil_ui_supported (hostType, uiType);
 }
 
@@ -854,15 +847,6 @@ bool LV2Module::hasEditor() const
             lilv_node_free (extDataNode);
             lilv_node_free (showNode);
             lilv_node_free (idleNode);
-        }
-
-        // Check JUCE UI
-        if (lilv_ui_is_a (lui, world.ui_JUCEUI))
-        {
-            auto* const s = suplist.add (createSupportedUI (plugin, lui));
-            s->container = ELEMENT__JUCEUI;
-            s->widget = ELEMENT__JUCEUI;
-            continue;
         }
 
         const LilvNode* uitype = nullptr;
