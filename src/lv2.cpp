@@ -1200,7 +1200,8 @@ private:
     SymbolMap* _symbols { nullptr };
     [[maybe_unused]] LV2NodeProvider& provider;
     std::unique_ptr<World> world;
-    void init() {
+    void init()
+    {
         auto path = provider.defaultSearchPath();
         world = std::make_unique<World> (*_symbols, path);
     }
@@ -1249,9 +1250,9 @@ FileSearchPath LV2NodeProvider::defaultSearchPath()
     paths.add (programFiles.getChildFile ("Common Files/LV2"));
     paths.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile ("AppData/Local/LV2"));
 #elif JUCE_LINUX || JUCE_BSD
-    paths.add(userHome.getChildFile(".lv2"));
-    paths.add(File ("/usr/local/lib/lv2"));
-    paths.add(File ("/usr/lib/lv2"));
+    paths.add (userHome.getChildFile (".lv2"));
+    paths.add (File ("/usr/local/lib/lv2"));
+    paths.add (File ("/usr/lib/lv2"));
 #endif
 
     paths.removeRedundantPaths();
