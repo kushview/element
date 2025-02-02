@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0~develop] - 2024-MM-DD
+## [1.0.0_beta1] - 2025-MM-DD
 
 ### Changed
 - Migrate to Meson build system.  Projucer no longer needed.
@@ -14,7 +14,7 @@
 - Updated app icon.
 - Session, Graph and Node file formats.  Old files can be loaded in 1.0, but 1.0 can't be backported. Session backup is strongly encouraged.
 - Internal 'presets' are now called 'nodes.'
-- **Breaking** Final Script node Lua API has changed. v0.46.x scripts need updated and may not load.
+- **Breaking** The Script node Lua API has changed. v0.46.x scripts need updated and may not load.
 
 ### Added
 - Meter bridge view that displays audio interface signal present levels.
@@ -23,6 +23,7 @@
 - Block display modes added: compact and small.
 - JACK audio support for Linux, macOS & Windows.
 - LV2 plugin support for Linux, macOS & Windows.
+- CLAP plugin support for Linux, macOS & Windows.
 - jBridge 32bit bridge direct integration (Windows)
 - Drag and drop a plugin from the plugin list on placeholder loads it.
 - Bulk routing feature in the patch bay.
@@ -36,8 +37,8 @@
 
 ### Removed
 - Stop using juce BinaryData from old Projucer project. Resources are now generated with Meson.
-- **Breaking**: Controller view was removed. Rewrite planned.
-- **Breaking**: Old 'Lua' and 'Script' nodes have been disabled. Rewrite planned.
+- **Breaking**: Controller view are hidden by default. MIDI Mapping is to be re-written.
+- **Breaking**: Old 'Lua' and 'Script' nodes have been deprecated. Rewrite planned.
 
 ### Fixed
 - Plugin UIs not filling the plugin window (WAVES and others)
