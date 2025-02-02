@@ -60,7 +60,7 @@ static bool isCLAP (const File& f)
 #if JUCE_MAC
     return f.isDirectory() && f.hasFileExtension ("clap") && f.exists();
 #else
-    return f.hasFileExtension ("clap") && f.existsAsFile();
+    return f.hasFileExtension ("clap") && !f.isDirectory() && f.existsAsFile();
 #endif
 }
 
@@ -1147,7 +1147,11 @@ private:
 
         void paint (Graphics& g) override { g.fillAll (Colours::black); }
 
-        LV2UI_Widget getWidget() { return getHWND(); }
+        clap_window_t hostWindow() { 
+            clap_window_t w;
+            w.win32 = getHWND();
+            return w;
+        }
 
         void forceViewToSize() { updateHWNDBounds(); }
         void fitToView() { resizeToFit(); }
@@ -1658,8 +1662,9 @@ FileSearchPath CLAPProvider::defaultSearchPath()
     sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile ("Library/Audio/Plug-Ins/CLAP"));
     sp.add (File ("/Library/Audio/Plug-Ins/CLAP"));
 #elif JUCE_WINDOWS
-    auto programFiles = File::getSpecialLocation (File::globalApplicationsDirectory).getFullPathName();
-    sp.addIfNotAlreadyThere (programFiles + "\\CLAP");
+    auto programFiles = File::getSpecialLocation (File::globalApplicationsDirectory);
+    sp.add (programFiles.getChildFile ("Common Files/CLAP"));
+    sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile("AppData/Local/Programs/Common/CLAP"));
     sp.removeRedundantPaths();
 #else
     sp.add (File::getSpecialLocation (File::userHomeDirectory).getChildFile (".clap"));

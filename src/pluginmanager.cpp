@@ -411,6 +411,13 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     }
     else if (auto* provider = _manager.getProvider (formatName))
     {
+        auto paths = provider->defaultSearchPath();
+
+        for (int i = 0; i < paths.getNumPaths(); ++i) {
+            std::cout << paths[i].getFullPathName() << std::endl;
+        }
+           
+
         identifiers = provider->findTypes (
             provider->defaultSearchPath(), // detail::readSearchPath (*_manager.props, formatName),
             true,
@@ -422,6 +429,7 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     float step = 1.f;
     for (const auto& ID : identifiers)
     {
+        std::cout << "identifier=" << ID << std::endl;
         if (cancelFlag.get() != 0)
             return;
 
