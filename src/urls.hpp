@@ -6,10 +6,12 @@
 // clang-format off
 //==============================================================================
 #define EL_URL_HOME "https://kushview.net"
+#define EL_URL_DONATE EL_URL_HOME "/donate/"
 
 //==============================================================================
 #define EL_URL_BUG_TRACKER "https://github.com/kushview/element/issues/new/choose"
-#define EL_URL_DONATE EL_URL_HOME "/donate/"
+#define EL_URL_DISCUSSIONS "https://github.com/orgs/kushview/discussions"
+#define EL_URL_CHANGELOG   "https://github.com/kushview/element/blob/main/CHANGELOG.md"
 
 //==============================================================================
 #define EL_URL_API_HOME "https://kushview.net/api"

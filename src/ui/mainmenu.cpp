@@ -116,6 +116,10 @@ void MainMenu::menuItemSelected (int index, int menu)
         URL (EL_URL_API_LUA_EL).launchInDefaultBrowser();
 #endif
     }
+    else if (index == 6002 && menu == Help)
+    {
+        URL (EL_URL_DISCUSSIONS).launchInDefaultBrowser();
+    }
     else if (index == 7000 && menu == Help)
     {
         URL (EL_URL_BUG_TRACKER).launchInDefaultBrowser();
@@ -130,6 +134,10 @@ void MainMenu::menuItemSelected (int index, int menu)
         dir = dir.getChildFile ("log");
         Logger::writeToLog (String ("opening log folder ") + dir.getFullPathName());
         dir.startAsProcess();
+    }
+    else if (index == 7003)
+    {
+        URL (EL_URL_CHANGELOG).launchInDefaultBrowser();
     }
 
     else if (index == 2000 && menu == Window)
@@ -313,10 +321,12 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showAbout, TRANS ("About Element"));
     menu.addSeparator();
 #endif
-    menu.addItem (6000, TRANS ("User's Manual"));
+    menu.addItem (6000, TRANS ("User's manual..."));
+    menu.addItem (6002, TRANS ("Discussion forum..."));
     menu.addSeparator();
     menu.addItem (7002, TRANS ("Log files..."));
     menu.addItem (7000, TRANS ("Issue tracking..."));
+    menu.addItem (7003, TRANS ("Change log..."));
 #if ! EL_UPDATER
     menu.addSeparator();
     menu.addItem (7001, TRANS ("Donate..."));
