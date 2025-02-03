@@ -885,9 +885,9 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
     if (auto* world = ViewHelpers::getGlobals (this))
         plugins.saveUserPlugins (world->settings());
     // clang-format off
-        currentScanner.reset (new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, 
-            dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() 
-                                     ? dialogText  : TRANS ("Searching for all possible plug-in files...")));
+    currentScanner.reset (new Scanner (*this, format, propertiesToUse, allowAsync, numThreads, 
+        dialogTitle.isNotEmpty() ? dialogTitle : TRANS ("Scanning for plug-ins..."), dialogText.isNotEmpty() 
+                                    ? dialogText  : TRANS ("Searching for all possible plug-in files...")));
     // clang-format on
 }
 
