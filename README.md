@@ -2,7 +2,7 @@
 ![Element Screenshot](data/screenshot.png)
 
 ### ADVANCED AUDIO PLUGIN HOST
-This is the community version of Element, a modular AU/LV2/VST/VST3 audio plugin host. Create powerful effects, racks and instruments by connecting nodes to one another. Integrates with your existing hardware via standard protocols such as MIDI. See [kushview.net](https://kushview.net/element/) for more information and [pre-built binaries](https://kushview.net/element/download/). 
+This is the community version of Element, a modular AU/LV2/VST/VST3/CLAP audio plugin host. Create powerful effects, racks and instruments by connecting nodes to one another. Integrates with your existing hardware via standard protocols such as MIDI. See [kushview.net](https://kushview.net/element/) for more information and [pre-built binaries](https://kushview.net/element/download/). 
 
 _See also:_ [Element User Manual](https://element.readthedocs.io)
 
@@ -11,9 +11,9 @@ Element currently loads most major plugin formats.
 
 | OS       | Version       | Formats         |
 | -------- |:-------------:| ---------------:|
-| Linux*   |       -       | LADSPA/LV2/VST3 |
-| Mac OSX  | 10.8 and up   | AU/VST/VST3/LV2 |
-| Windows  | XP and up     | VST/VST3/LV2    |
+| Linux*   |       -       | LADSPA/LV2/VST3/CLAP |
+| Mac OSX  | 10.8 and up   | AU/VST/VST3/LV2/CLAP |
+| Windows  | XP and up     | VST/VST3/LV2/CLAP    |
 
 _*Ubuntu is the most tested, but should run on any major distribution_
 
