@@ -10,7 +10,7 @@
 namespace element {
 namespace Util {
 
-StringArray getSupportedAudioPluginFormats()
+StringArray compiledAudioPluginFormats()
 {
     StringArray fmts;
 

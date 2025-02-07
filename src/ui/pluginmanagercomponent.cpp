@@ -846,7 +846,7 @@ void PluginListComponent::setLastSearchPath (PropertiesFile& properties, NodePro
 // MARK: Scanner
 static StringArray scanAllFormats (PluginManager& p)
 {
-    const StringArray supported (Util::getSupportedAudioPluginFormats());
+    const StringArray supported (Util::compiledAudioPluginFormats());
     StringArray filtered;
     filtered.add ("LV2");
     filtered.add ("CLAP");

@@ -22,6 +22,10 @@
 #include "messages.hpp"
 #include "utils.hpp"
 
+#ifndef EL_FIRST_RUN
+#define EL_FIRST_RUN 0
+#endif
+
 namespace element {
 
 class Startup : public ActionBroadcaster
@@ -35,9 +39,12 @@ public:
     {
         DataPath::initializeDefaultLocation();
 
-        Settings& settings (world.settings());
+        [[maybe_unused]] Settings& settings (world.settings());
+#if EL_FIRST_RUN
+        isFirstRun = true;
+#else
         isFirstRun = ! settings.getUserSettings()->getFile().existsAsFile();
-
+#endif
         setupLogging();
         setupKeyMappings();
         setupAudioEngine();
@@ -123,8 +130,15 @@ private:
         auto& plugins (world.plugins());
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
-        auto& factory = plugins.getNodeFactory();
-        // factory.hideType (EL_NODE_ID_SCRIPT);
+
+        if (isFirstRun)
+        {
+            auto props = settings.getUserSettings();
+            for (const auto& formatName : Util::compiledAudioPluginFormats())
+                props->setValue (Settings::lastPluginScanPathPrefix + formatName,
+                                 plugins.defaultSearchPath (formatName).toString());
+        }
+
         plugins.scanInternalPlugins();
         plugins.searchUnverifiedPlugins();
     }

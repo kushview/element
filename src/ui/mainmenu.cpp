@@ -323,7 +323,7 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
 #endif
     menu.addItem (6000, TRANS ("User's manual..."));
     menu.addItem (6002, TRANS ("Discussion forum..."));
-    menu.addItem (6001, TRANS("Scripting API..."));
+    menu.addItem (6001, TRANS ("Scripting API..."));
     menu.addSeparator();
     menu.addItem (7002, TRANS ("Log files..."));
     menu.addItem (7000, TRANS ("Issue tracking..."));

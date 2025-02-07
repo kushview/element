@@ -518,7 +518,7 @@ public:
 
         if (props)
         {
-            for (const auto& f : Util::getSupportedAudioPluginFormats())
+            for (const auto& f : Util::compiledAudioPluginFormats())
             {
                 const auto key = String (Settings::lastPluginScanPathPrefix) + f;
                 paths.set (f, FileSearchPath (props->getValue (key)));
@@ -754,7 +754,7 @@ void PluginManager::addDefaultFormats()
         return;
 
     auto& audioPlugs = getAudioPluginFormats();
-    for (const auto& fmt : Util::getSupportedAudioPluginFormats())
+    for (const auto& fmt : Util::compiledAudioPluginFormats())
     {
         if (fmt == "")
             continue;
@@ -789,6 +789,18 @@ void PluginManager::addFormat (AudioPluginFormat* fmt)
 }
 
 NodeFactory& PluginManager::getNodeFactory() { return priv->nodes; }
+
+FileSearchPath PluginManager::defaultSearchPath (juce::StringRef formatName) const noexcept
+{
+    if (auto apf = getAudioPluginFormat (formatName))
+        return apf->getDefaultLocationsToSearch();
+
+    for (auto provider : priv->nodes.providers())
+        if (provider->format() == formatName)
+            return provider->defaultSearchPath();
+
+    return {};
+}
 
 void PluginManager::addToKnownPlugins (const PluginDescription& desc)
 {
