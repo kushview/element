@@ -14,13 +14,13 @@ BOOST_AUTO_TEST_SUITE (PluginManagerTests)
 BOOST_AUTO_TEST_CASE (SupportedFormats)
 {
     PluginManager manager;
-    for (const auto& supported : Util::getSupportedAudioPluginFormats())
+    for (const auto& supported : Util::compiledAudioPluginFormats())
         BOOST_REQUIRE (! manager.isAudioPluginFormatSupported (supported));
 
     manager.getNodeFactory().add (new LV2NodeProvider());
     manager.getNodeFactory().add (new CLAPProvider());
     manager.addDefaultFormats();
-    for (const auto& supported : Util::getSupportedAudioPluginFormats())
+    for (const auto& supported : Util::compiledAudioPluginFormats())
         BOOST_REQUIRE_MESSAGE (manager.isAudioPluginFormatSupported (supported), supported.toStdString());
 }
 

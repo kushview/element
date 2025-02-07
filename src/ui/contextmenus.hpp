@@ -61,7 +61,7 @@ public:
 
         PopupMenu unvMenu;
         unverified.clearQuick (true);
-        for (const auto& name : Util::getSupportedAudioPluginFormats())
+        for (const auto& name : Util::compiledAudioPluginFormats())
         {
             PopupMenu menu;
             const int lastSize = unverified.size();

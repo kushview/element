@@ -446,7 +446,7 @@ inline static String fromBase64 (const String& input)
     return mo.toString();
 }
 
-StringArray getSupportedAudioPluginFormats();
+StringArray compiledAudioPluginFormats();
 bool isRunningInWine();
 
 } // namespace Util

@@ -61,6 +61,9 @@ public:
     /** Returns the node factory. */
     NodeFactory& getNodeFactory();
 
+    /** Returns the default search path for a given format. */
+    juce::FileSearchPath defaultSearchPath (juce::StringRef format) const noexcept;
+
     /** creates a child process slave used in start up */
     juce::ChildProcessWorker* createAudioPluginScannerWorker();
 
