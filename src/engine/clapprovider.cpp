@@ -939,8 +939,7 @@ public:
 
 //==============================================================================
 class CLAPEditor : public Editor,
-                   public PhysicalResizeListener,
-                   public juce::Timer
+                   public PhysicalResizeListener
 {
     bool _created = false;
 
@@ -958,7 +957,6 @@ public:
 
         if (_created)
         {
-            _timer = (clap_plugin_timer_support_t*) _plugin->get_extension (_plugin, CLAP_EXT_TIMER_SUPPORT);
             uint32_t w = 0, h = 0;
             if (_gui->get_size (_plugin, &w, &h))
                 setSize ((int) w, (int) h);
@@ -970,9 +968,6 @@ public:
             auto window = view->hostWindow();
             _gui->set_parent (_plugin, &window);
             nativeViewSetup = true;
-
-            if (_timer != nullptr)
-                startTimerHz (60);
 
             setVisible (false);
             setVisible (true);
@@ -1019,17 +1014,10 @@ public:
             _gui->hide (_plugin);
     }
 
-    void timerCallback() override
-    {
-        if (_timer)
-            _timer->on_timer (_plugin, 0);
-    }
-
 private:
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_gui_t* _gui { nullptr };
     bool nativeViewSetup = false;
-    const clap_plugin_timer_support_t* _timer { nullptr };
 
 #if JUCE_LINUX || JUCE_BSD
     struct InnerHolder
