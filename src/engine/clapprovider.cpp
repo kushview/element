@@ -215,7 +215,7 @@ protected:
     }
 
     bool enableDraftExtensions() const noexcept override { return false; }
-    const void* getExtension (std::string_view extensionId) const noexcept override
+    const void* getExtension (const char* extensionId) const noexcept override
     {
         return nullptr;
     }
