@@ -1247,7 +1247,55 @@ public:
 
         _proc.steady_time = -1;
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
-        _proc.transport = nullptr;
+
+        clap_event_transport_t _transport = {};
+        if (auto pos = getPlayHead()->getPosition())
+        {
+            _transport.header.flags = 0;
+            _transport.header.size = sizeof (clap_event_transport_t);
+            _transport.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            _transport.header.time = 0;
+            _transport.header.type = CLAP_EVENT_TRANSPORT;
+
+            _transport.flags = 0;
+            if (pos->getIsPlaying())
+                _transport.flags |= CLAP_TRANSPORT_IS_PLAYING;
+            if (pos->getIsLooping())
+                _transport.flags |= CLAP_TRANSPORT_IS_LOOP_ACTIVE;
+            if (pos->getIsRecording())
+                _transport.flags |= CLAP_TRANSPORT_IS_RECORDING;
+            _transport.flags |= CLAP_TRANSPORT_HAS_TEMPO | CLAP_TRANSPORT_HAS_TIME_SIGNATURE;
+
+            _transport.song_pos_beats = juce::roundToInt (*pos->getPpqPosition() * CLAP_BEATTIME_FACTOR);
+
+            // position in seconds
+            _transport.song_pos_seconds = juce::roundToInt (
+                CLAP_SECTIME_FACTOR * *pos->getTimeInSeconds());
+
+            // in bpm
+            _transport.tempo = *pos->getBpm();
+            _transport.tempo_inc = 0; // tempo increment for each sample and until the next
+                // time info event
+
+            // Looping
+            _transport.loop_start_beats = 0;
+            _transport.loop_end_beats = 0;
+            _transport.loop_start_seconds = 0;
+            _transport.loop_end_seconds = 0;
+
+            // start pos of the current bar
+            _transport.bar_start = juce::roundToInt (
+                CLAP_BEATTIME_FACTOR * *pos->getPpqPositionOfLastBarStart());
+            // bar at song pos 0 has the number 0
+            _transport.bar_number = static_cast<int32_t> (*pos->getBarCount());
+
+            auto sig = pos->getTimeSignature();
+            _transport.tsig_num = static_cast<uint16_t> (sig->numerator); // time signature numerator
+            _transport.tsig_denom = static_cast<uint16_t> (sig->denominator); // time signature denominator
+
+            _proc.transport = &_transport;
+        }
+
         _proc.in_events = _eventIn.clapInputEvents();
         _proc.out_events = _eventOut.clapOutputEvents();
 
