@@ -61,3 +61,4 @@ docs/_build/
 /configure
 
 Cardinal
+.meson-subproject*.txt

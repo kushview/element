@@ -32,7 +32,7 @@ if get_option('updater')
 endif
 
 ## macos: avoid warnings about duplicate -lc++ options in Xcode 15+
-if host_machine.system() == 'darwin' and cpp.version().version_compare('>=15.0.0')
+if not meson.is_subproject() and host_machine.system() == 'darwin' and cpp.version().version_compare('>=15.0.0')
     add_global_link_arguments([ '-Xlinker', '-no_warn_duplicate_libraries'],
         language: ['c', 'cpp', 'objc', 'objcpp'])
 endif
