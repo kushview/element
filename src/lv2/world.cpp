@@ -146,7 +146,11 @@ World::World (SymbolMap& s, const juce::FileSearchPath& lv2Path)
     lilv_world_set_option (world, LILV_OPTION_DYN_MANIFEST, trueNode);
     if (lv2Path.getNumPaths() > 0)
     {
+#if JUCE_WINDOWS
+        const auto jstr = lv2Path.toStringWithSeparator (";");
+#else
         const auto jstr = lv2Path.toStringWithSeparator (":");
+#endif
         lvtk::Node nodeLv2Path (lilv_new_string (world, jstr.toRawUTF8()));
         lilv_world_set_option (world, LILV_OPTION_LV2_PATH, nodeLv2Path);
     }
