@@ -1,6 +1,6 @@
 [wrap-git]
-url = https://github.com/mfisher31/clap-helpers.git
-revision = meson-and-host-ext
+url = https://github.com/free-audio/clap-helpers.git
+revision = next
 depth = 1
 
 [provide]
