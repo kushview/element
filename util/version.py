@@ -53,15 +53,17 @@ def exists():
     '''Returns true if the current directory is a git repository'''
     return os.path.exists ('.git')
 
-def ncommits (revision):
-    args = 'rev-list %s..%s' % (revision, CURRENT_REVISION)
+def ncommits (revision, current_revision):
+    if not isinstance (current_revision, str):
+        current_revision = CURRENT_REVISION
+    args = 'rev-list %s..%s' % (revision, current_revision)
     (n, err) = call_git (None, args.split())
     if None == err:
         return len (n.split())
     return 0
 
-def build_number (revision):
-    bn = ncommits (revision) - 1
+def build_number (revision, r2):
+    bn = ncommits (revision, r2) - 1
     if bn < 0: bn = 0
     return bn
 
@@ -108,13 +110,13 @@ def version():
     if exists():
         if opts.build:
             if opts.build_style == 'dotted':
-                vers += '.%s' % build_number (opts.last_version)
+                vers += '.%s' % build_number (opts.last_version, opts.current_revision)
             elif opts.build_style == 'dashed':
-                vers += '-%s' % build_number (opts.last_version)
+                vers += '-%s' % build_number (opts.last_version, opts.current_revision)
             elif opts.build_style == 'revision':
-                vers += '_r%s' % build_number (opts.last_version)
+                vers += '_r%s' % build_number (opts.last_version, opts.current_revision)
             elif opts.build_style == 'onlybuild':
-                vers = '%s' % build_number (opts.last_version)
+                vers = '%s' % build_number (opts.last_version, opts.current_revision)
         if show_dirty:
             vers += "-dirty"
 
