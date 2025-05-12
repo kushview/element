@@ -222,7 +222,6 @@ private:
 
         startTimer (20);
         progressWindow.setVisible (true);
-        progressWindow.addToDesktop (0);
 
         if (! scanner->isScanning())
         {

@@ -76,7 +76,9 @@ static juce::StringArray readDeadMansPedalFile()
 static void setDeadMansPedalFile (const StringArray& newContents)
 {
     auto deadMansPedalFile = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
-    if (deadMansPedalFile.getFullPathName().isNotEmpty())
+    if (! deadMansPedalFile.exists())
+        deadMansPedalFile.createDirectory();
+    if (deadMansPedalFile.existsAsFile() && deadMansPedalFile.getFullPathName().isNotEmpty())
         deadMansPedalFile.replaceWithText (newContents.joinIntoString ("\n"), true, true);
 }
 
@@ -329,7 +331,8 @@ private:
 //==============================================================================
 PluginScanner::PluginScanner (PluginManager& manager)
     : _manager (manager),
-      list (manager.getKnownPlugins()) {}
+      list (manager.getKnownPlugins()),
+      _scannerExe (detail::scannerExeFullPath()) {}
 
 PluginScanner::~PluginScanner()
 {
@@ -386,10 +389,7 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
     }
 }
 
-File PluginScanner::scannerExeFile() const noexcept
-{
-    return _scannerExe != File() ? _scannerExe : detail::scannerExeFullPath();
-}
+File PluginScanner::scannerExeFile() const noexcept { return _scannerExe; }
 
 void PluginScanner::scanAudioFormat (const String& formatName)
 {
