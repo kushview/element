@@ -14,7 +14,7 @@
             "program": "${workspaceFolder}/build/element.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/build/",
             "environment": [
                 { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" },
                 { "name": "LUA_PATH", "value": "${workspaceRoot}/libs/lua/?.lua" },

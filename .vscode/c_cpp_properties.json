@@ -95,13 +95,12 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\SDKs\\boost_1_71_0\\*",
+                "C:/SDKs/boost_1_81_0/*",
                 "${workspaceFolder}/subprojects/juce/modules/*",
                 "${workspaceFolder}/subprojects/lv2/include/*",
                 "${workspaceFolder}/subprojects/lvtk/include/*",
                 "${workspaceFolder}/subprojects/lilv/include/*",
                 "${workspaceFolder}/subprojects/suil/include/*",
-                "${workspaceFolder}/subprojects/lua-5.4.6/src/*",
                 "${workspaceFolder}/subprojects/clap/include/*",
                 "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/include/*",
