@@ -651,6 +651,9 @@ void GuiService::run()
     auto& settings = context().settings();
     PropertiesFile* const pf = settings.getUserSettings();
 
+    Desktop::getInstance().setGlobalScaleFactor (
+        context().settings().getDesktopScale());
+
     mainWindow = factory->createMainWindow();
     if (mainWindow == nullptr)
         mainWindow = std::make_unique<MainWindow> (world);
@@ -680,9 +683,6 @@ void GuiService::run()
     refreshSystemTray();
     stabilizeViews();
     refreshMainMenu();
-
-    Desktop::getInstance().setGlobalScaleFactor (
-        context().settings().getDesktopScale());
 }
 
 SessionRef GuiService::session()
