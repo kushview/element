@@ -21,6 +21,8 @@
 #include "ui/resizelistener.hpp"
 #include "ui/nsviewwithparent.hpp"
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
+
 #if __APPLE__
 #define EL_WINDOW_API CLAP_WINDOW_API_COCOA
 #elif defined(__WIN32__)
@@ -30,7 +32,9 @@
 #endif
 
 #if ! JUCE_WINDOWS
-static void _fpreset() {}
+static void _fpreset()
+{
+}
 // static void _clearfp() {}
 #endif
 
@@ -194,7 +198,7 @@ public:
         return gThreadType == ThreadType::MainThread;
     }
 
-    bool threadCheckIsAudioThread() const noexcept
+    bool threadCheckIsAudioThread() const noexcept override
     {
         return gThreadType == ThreadType::AudioThread;
     }
@@ -240,7 +244,7 @@ protected:
 #endif
 
     // clap_host_log
-    bool implementsLog() const noexcept { return true; }
+    bool implementsLog() const noexcept override { return true; }
     void logLog (clap_log_severity severity, const char* message) const noexcept override
     {
         switch (severity)
