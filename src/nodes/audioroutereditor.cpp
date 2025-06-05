@@ -84,7 +84,7 @@ public:
             menu.addItem (4, "4x4", true, false);
             menu.addItem (8, "8x8", true, false);
             menu.addItem (10, "10x10", true, false);
-            menu.addItem (10, "12x12", true, false);
+            menu.addItem (12, "12x12", true, false);
             menu.addItem (16, "16x16", true, false);
             menu.showMenuAsync (PopupMenu::Options()
                                     .withTargetComponent (this),
