@@ -943,7 +943,8 @@ public:
 
 //==============================================================================
 class CLAPEditor : public Editor,
-                   public PhysicalResizeListener
+                   public PhysicalResizeListener,
+                   private Timer
 {
     bool _created = false;
 
@@ -951,7 +952,8 @@ public:
     CLAPEditor (const clap_plugin_t* plugin, const clap_plugin_gui_t* gui)
         : Editor(),
           _plugin (plugin),
-          _gui (gui)
+          _gui (gui),
+          _timer ((const clap_plugin_timer_support_t*) plugin->get_extension (plugin, CLAP_EXT_TIMER_SUPPORT))
     {
         setOpaque (true);
         view = std::make_unique<ViewComponent> (*this);
@@ -976,6 +978,11 @@ public:
             setVisible (false);
             setVisible (true);
         }
+
+#if JUCE_LINUX
+        if (_timer != nullptr)
+            startTimerHz (60);
+#endif
     }
 
     ~CLAPEditor()
@@ -1021,7 +1028,17 @@ public:
 private:
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_gui_t* _gui { nullptr };
+    const clap_plugin_timer_support_t* _timer { nullptr };
     bool nativeViewSetup = false;
+
+    void timerCallback() override
+    {
+#if JUCE_LINUX
+        _timer->on_timer (_plugin, 0);
+#else
+        stopTimer();
+#endif
+    }
 
 #if JUCE_LINUX || JUCE_BSD
     struct InnerHolder
@@ -1279,7 +1296,7 @@ public:
             // in bpm
             _transport.tempo = *pos->getBpm();
             _transport.tempo_inc = 0; // tempo increment for each sample and until the next
-                // time info event
+            // time info event
 
             // Looping
             _transport.loop_start_beats = 0;
