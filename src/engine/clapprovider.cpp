@@ -956,8 +956,8 @@ public:
           _timer ((const clap_plugin_timer_support_t*) plugin->get_extension (plugin, CLAP_EXT_TIMER_SUPPORT))
     {
         setOpaque (true);
-        view = std::make_unique<ViewComponent> (*this);
-        addAndMakeVisible (view.get());
+        _view = std::make_unique<ViewComponent> (*this);
+        addAndMakeVisible (_view.get());
 
         _created = _gui->create (_plugin, EL_WINDOW_API, false);
 
@@ -971,9 +971,8 @@ public:
 
             setResizable (false);
 
-            auto window = view->hostWindow();
+            auto window = _view->hostWindow();
             _gui->set_parent (_plugin, &window);
-            nativeViewSetup = true;
 
             setVisible (false);
             setVisible (true);
@@ -987,10 +986,8 @@ public:
 
     ~CLAPEditor()
     {
-        nativeViewSetup = false;
-
-        view->prepareForDestruction();
-        view.reset();
+        _view->prepareForDestruction();
+        _view.reset();
 
         if (_created)
         {
@@ -1001,8 +998,8 @@ public:
 
     void viewRequestedResizeInPhysicalPixels (int width, int height) override
     {
-        view->setSize (width, height);
-        view->forceViewToSize();
+        _view->setSize (width, height);
+        _view->forceViewToSize();
         resized();
     }
 
@@ -1013,8 +1010,8 @@ public:
 
     void resized() override
     {
-        if (view != nullptr)
-            view->setBounds (getLocalBounds());
+        if (_view != nullptr)
+            _view->setBounds (getLocalBounds());
     }
 
     void visibilityChanged() override
@@ -1029,7 +1026,6 @@ private:
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_gui_t* _gui { nullptr };
     const clap_plugin_timer_support_t* _timer { nullptr };
-    bool nativeViewSetup = false;
 
     void timerCallback() override
     {
@@ -1189,7 +1185,7 @@ private:
     };
 #endif
 
-    std::unique_ptr<ViewComponent> view;
+    std::unique_ptr<ViewComponent> _view;
 };
 
 //==============================================================================
