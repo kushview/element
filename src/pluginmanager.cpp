@@ -76,8 +76,10 @@ static juce::StringArray readDeadMansPedalFile()
 static void setDeadMansPedalFile (const StringArray& newContents)
 {
     auto deadMansPedalFile = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
+    if (deadMansPedalFile.isDirectory())
+        deadMansPedalFile.deleteRecursively();
     if (! deadMansPedalFile.exists())
-        deadMansPedalFile.createDirectory();
+        deadMansPedalFile.create();
     if (deadMansPedalFile.existsAsFile() && deadMansPedalFile.getFullPathName().isNotEmpty())
         deadMansPedalFile.replaceWithText (newContents.joinIntoString ("\n"), true, true);
 }
