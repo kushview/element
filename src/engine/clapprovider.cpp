@@ -209,13 +209,33 @@ protected:
     {
         CLAP_LOG ("host:requestRestart()")
     }
+
     void requestProcess() noexcept override
     {
         CLAP_LOG ("host:requestProcess()")
     }
+
     void requestCallback() noexcept override
     {
-        CLAP_LOG ("host:requestCallback()")
+        if (threadCheckIsMainThread()) {
+            _plugin->on_main_thread (_plugin);
+            return;
+        }
+
+        struct RequestCallback : public juce::MessageManager::MessageBase {
+            RequestCallback (CLAPHost& h) : _host (h) {}
+            ~RequestCallback() override {
+                CLAP_LOG ("host:msg:reqeuestCallback()")
+            }
+            void messageCallback() override {
+                _host._plugin->on_main_thread (_host._plugin);
+            }
+        
+        private:
+            CLAPHost& _host;
+        };
+
+        (new RequestCallback(*this))->post();
     }
 
     bool enableDraftExtensions() const noexcept override { return false; }
@@ -1258,9 +1278,16 @@ public:
         _tmpAudio.setSize (1, 1);
     }
 
+    bool _isFirstCycle = true;
+
     void render (RenderContext& rc) override
     {
         gThreadType = ThreadType::AudioThread;
+
+        if (_isFirstCycle) {
+            _plugin->reset (_plugin);
+            _isFirstCycle = false;
+        }
 
         _proc.steady_time = -1;
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
@@ -1319,6 +1346,7 @@ public:
         _eventOut.clear();
 
         _queueIn.readAll ([this] (const clap_event_header_t* ev) {
+            
             _eventIn.push (ev);
         });
 
@@ -1327,17 +1355,43 @@ public:
             auto mb = rc.midi.getReadBuffer (0);
             for (auto i : *mb)
             {
-                if (i.numBytes != 3)
-                    continue;
-                clap_event_midi_t ev;
-                ev.header.flags = CLAP_EVENT_IS_LIVE;
-                ev.header.size = sizeof (clap_event_midi_t);
-                ev.header.space_id = 0;
-                ev.header.time = static_cast<uint32_t> (i.samplePosition);
-                ev.header.type = CLAP_EVENT_MIDI;
-                ev.port_index = 0;
-                std::memcpy (ev.data, i.data, 3);
-                _eventIn.push (&ev.header);
+                const auto msg (i.getMessage());
+
+                if (msg.isNoteOnOrOff())
+                {
+                    clap_event_note_t note;
+                    note.channel = msg.getChannel() - 1;
+                    note.key = msg.getNoteNumber();
+                    note.note_id = -1;
+                    note.port_index = 0;
+                    note.velocity = msg.isNoteOn() ? msg.getFloatVelocity() : 0.f;
+                    note.header.size = sizeof (clap_event_note_t);
+                    note.header.flags = CLAP_EVENT_IS_LIVE;
+                    note.header.type = msg.isNoteOn() ? CLAP_EVENT_NOTE_ON : CLAP_EVENT_NOTE_OFF;
+                    note.header.space_id =  0;
+                    note.header.time = static_cast<uint32_t> (i.samplePosition);
+                    _eventIn.push (&note.header);
+                    if (msg.isNoteOff())
+                        {
+                            CLAP_LOG("send note off");
+                        }
+                }
+                else if (i.numBytes != 3)
+                {
+                    // sysex
+                }
+                else
+                {
+                    clap_event_midi_t ev;
+                    ev.header.flags = CLAP_EVENT_IS_LIVE;
+                    ev.header.size = sizeof (clap_event_midi_t);
+                    ev.header.space_id = 0;
+                    ev.header.time = static_cast<uint32_t> (i.samplePosition);
+                    ev.header.type = CLAP_EVENT_MIDI;
+                    ev.port_index = 0;
+                    std::memcpy (ev.data, i.data, static_cast<size_t> (i.numBytes));
+                    _eventIn.push (&ev.header);
+                }
             }
         }
 
@@ -1356,6 +1410,7 @@ public:
                            true,
                            false,
                            true);
+        _tmpAudio.clear();
 
         rcc = 0;
         for (uint32_t i = 0; i < _proc.audio_outputs_count; ++i)
