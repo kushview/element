@@ -441,6 +441,8 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
 
     auto output (getBusBuffer<float> (audio, false, 0));
     const int numSamples = audio.getNumSamples();
+    const int numChannels = audio.getNumChannels();
+    tempBuffer.setSize (numChannels, numSamples, false, false, true);
     tempBuffer.clear (0, numSamples);
 
     for (int i = 0; i < tracks.size(); ++i)
