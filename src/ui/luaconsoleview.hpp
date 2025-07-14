@@ -28,7 +28,8 @@ public:
     void initializeView (Services&) override;
     void didBecomeActive() override
     {
-        console.grabKeyboardFocus();
+        if (isShowing() || isOnDesktop())
+            console.grabKeyboardFocus();
     }
 
     void resized() override

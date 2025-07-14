@@ -31,6 +31,7 @@
 namespace element {
 
 class MainWindow;
+class GraphNode;
 class GraphEditorComponent;
 
 //==============================================================================
@@ -57,8 +58,8 @@ private:
 
     MainWindow* getMainWindow() const;
     GraphEditorComponent* getGraphEditor() const;
-    juce::AudioProcessorGraph* getGraph() const;
-    juce::AudioProcessorGraph::NodeID getNodeID() const;
+    GraphNode* getGraph() const;
+    uint32_t getNodeID() const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IOConfigurationWindow)
 };

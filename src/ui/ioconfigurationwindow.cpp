@@ -29,6 +29,7 @@
 
 #include "ui/grapheditorcomponent.hpp"
 #include "ioconfigurationwindow.hpp"
+#include "engine/graphnode.hpp"
 
 #if 0
 #include <JuceHeader.h>
@@ -477,7 +478,7 @@ IOConfigurationWindow::~IOConfigurationWindow()
     {
         if (auto* p = getAudioProcessor())
         {
-            ScopedLock renderLock (graph->getCallbackLock());
+            ScopedLock renderLock (graph->getPropertyLock());
 
             graph->suspendProcessing (true);
             graph->releaseResources();
@@ -485,7 +486,7 @@ IOConfigurationWindow::~IOConfigurationWindow()
             p->prepareToPlay (graph->getSampleRate(), graph->getBlockSize());
             p->suspendProcessing (false);
 
-            graph->prepareToPlay (graph->getSampleRate(), graph->getBlockSize());
+            graph->prepareToRender (graph->getSampleRate(), graph->getBlockSize());
             graph->suspendProcessing (false);
         }
     }
@@ -528,12 +529,17 @@ void IOConfigurationWindow::update()
 #endif
 }
 
-AudioProcessorGraph::NodeID IOConfigurationWindow::getNodeID() const
+uint32_t IOConfigurationWindow::getNodeID() const
 {
     if (auto* graph = getGraph())
-        for (auto* node : graph->getNodes())
-            if (node->getProcessor() == getAudioProcessor())
-                return node->nodeID;
+    {
+        for (int i = 0; i < graph->getNumNodes(); ++i)
+        {
+            auto* n = graph->getNode (i);
+            if (n->getAudioProcessor() == getAudioProcessor())
+                return n->nodeId;
+        }
+    }
 
     return {};
 }
@@ -555,15 +561,10 @@ GraphEditorComponent* IOConfigurationWindow::getGraphEditor() const
     return nullptr;
 }
 
-AudioProcessorGraph* IOConfigurationWindow::getGraph() const
+GraphNode* IOConfigurationWindow::getGraph() const
 {
-#if 0
-    // FIXME:
-    if (auto* mw = getMainWindow())
-        if (auto e = mw->context().audio())
-            e->getGraph (e->getActiveGraph());
-#endif
-    return nullptr;
+    const auto graph = _node.getParentGraph();
+    return dynamic_cast<GraphNode*> (graph.getObject());
 }
 
 } // namespace element
