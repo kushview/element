@@ -164,10 +164,10 @@ public:
     inline bool isBusesLayoutSupported (const BusesLayout& layout) const override
     {
         for (const auto& bus : layout.inputBuses)
-            if (bus != layout.getMainOutputChannelSet())
+            if (bus != AudioChannelSet::stereo())
                 return false;
         for (const auto& bus : layout.outputBuses)
-            if (bus != layout.getMainOutputChannelSet())
+            if (bus != AudioChannelSet::stereo())
                 return false;
         return true;
     }
