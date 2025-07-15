@@ -492,6 +492,11 @@ private:
                     _engineToAppValueQueue.setOrUpdate (ev->param_id, v);
                     break;
                 }
+
+                case CLAP_EVENT_NOTE_END:
+                case CLAP_EVENT_NOTE_OFF:
+                    std::cout << "CLAP_EVENT_NOTE_END\n";
+                    break;
             }
         }
     }
@@ -1247,7 +1252,7 @@ public:
         const auto maxChans = std::max ((int) detail::totalChannels (_audioIns),
                                         (int) detail::totalChannels (_audioOuts));
         _tmpAudio.setSize (maxChans, maxBufferSize);
-        _plugin->activate (_plugin, sampleRate, 16U, (uint32_t) maxBufferSize);
+        _plugin->activate (_plugin, sampleRate, 1U, (uint32_t) maxBufferSize);
     }
 
     void releaseResources() override
@@ -1262,10 +1267,15 @@ public:
     {
         gThreadType = ThreadType::AudioThread;
 
-        _proc.steady_time = -1;
-        _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
+        if (_proc.steady_time < 0)
+            _proc.steady_time = 0;
+        else
+            _proc.steady_time += rc.audio.getNumSamples();
 
+        _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
+        _proc.transport = nullptr;
         clap_event_transport_t _transport = {};
+
         if (auto pos = getPlayHead()->getPosition())
         {
             _transport.header.flags = 0;
@@ -1327,17 +1337,34 @@ public:
             auto mb = rc.midi.getReadBuffer (0);
             for (auto i : *mb)
             {
-                if (i.numBytes != 3)
-                    continue;
-                clap_event_midi_t ev;
-                ev.header.flags = CLAP_EVENT_IS_LIVE;
-                ev.header.size = sizeof (clap_event_midi_t);
-                ev.header.space_id = 0;
-                ev.header.time = static_cast<uint32_t> (i.samplePosition);
-                ev.header.type = CLAP_EVENT_MIDI;
-                ev.port_index = 0;
-                std::memcpy (ev.data, i.data, 3);
-                _eventIn.push (&ev.header);
+                auto msg = i.getMessage();
+                if (msg.isNoteOnOrOff())
+                {
+                    clap_event_note_t ne;
+                    ne.header.flags = CLAP_EVENT_IS_LIVE;
+                    ne.header.size = sizeof (clap_event_note_t);
+                    ne.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+                    ne.header.time = static_cast<uint32_t> (i.samplePosition);
+                    ne.header.type = msg.isNoteOn() ? CLAP_EVENT_NOTE_ON : CLAP_EVENT_NOTE_OFF;
+                    ne.channel = msg.getChannel() - 1;
+                    ne.key = msg.getNoteNumber();
+                    ne.note_id = ne.key;
+                    ne.port_index = 1;
+                    ne.velocity = msg.getFloatVelocity();
+                    _eventIn.push (&ne.header);
+                }
+                else if (i.numBytes >= 0 && i.numBytes <= 3)
+                {
+                    clap_event_midi_t ev;
+                    ev.header.flags = CLAP_EVENT_IS_LIVE;
+                    ev.header.size = sizeof (clap_event_midi_t);
+                    ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+                    ev.header.time = static_cast<uint32_t> (i.samplePosition);
+                    ev.header.type = CLAP_EVENT_MIDI;
+                    ev.port_index = 0;
+                    std::memcpy (ev.data, i.data, static_cast<size_t> (i.numBytes));
+                    _eventIn.push (&ev.header);
+                }
             }
         }
 
@@ -1353,10 +1380,10 @@ public:
 
         _tmpAudio.setSize (rc.audio.getNumChannels(),
                            rc.audio.getNumSamples(),
-                           true,
+                           false,
                            false,
                            true);
-
+        _tmpAudio.clear (0, rc.audio.getNumSamples());
         rcc = 0;
         for (uint32_t i = 0; i < _proc.audio_outputs_count; ++i)
         {
@@ -1366,6 +1393,8 @@ public:
                 b->data32[j] = _tmpAudio.getWritePointer (rcc++);
             }
         }
+
+        jassert (_tmpAudio.getNumChannels() == rcc);
 
         _plugin->start_processing (_plugin);
         _plugin->process (_plugin, &_proc);
