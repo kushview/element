@@ -1267,10 +1267,7 @@ public:
     {
         gThreadType = ThreadType::AudioThread;
 
-        if (_proc.steady_time < 0)
-            _proc.steady_time = 0;
-        else
-            _proc.steady_time += rc.audio.getNumSamples();
+        _proc.steady_time = -1;
 
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
@@ -1348,9 +1345,9 @@ public:
                     ne.header.type = msg.isNoteOn() ? CLAP_EVENT_NOTE_ON : CLAP_EVENT_NOTE_OFF;
                     ne.channel = msg.getChannel() - 1;
                     ne.key = msg.getNoteNumber();
-                    ne.note_id = ne.key;
-                    ne.port_index = 1;
-                    ne.velocity = msg.getFloatVelocity();
+                    ne.note_id = -1;
+                    ne.port_index = 0;
+                    ne.velocity = msg.isNoteOn() ? msg.getFloatVelocity() : 1.f;
                     _eventIn.push (&ne.header);
                 }
                 else if (i.numBytes >= 0 && i.numBytes <= 3)
