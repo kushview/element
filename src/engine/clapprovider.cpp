@@ -1324,6 +1324,7 @@ public:
         _proc.out_events = _eventOut.clapOutputEvents();
 
         _eventOut.clear();
+        _eventIn.clear();
 
         _queueIn.readAll ([this] (const clap_event_header_t* ev) {
             _eventIn.push (ev);
@@ -1396,6 +1397,25 @@ public:
         _plugin->start_processing (_plugin);
         _plugin->process (_plugin, &_proc);
         _plugin->stop_processing (_plugin);
+
+        // Process any output events from the plugin
+        for (uint32_t i = 0; i < _eventOut.size(); ++i)
+        {
+            auto h = _eventOut.get (i);
+            // For now, just log note events to help with debugging
+            switch (h->type)
+            {
+                case CLAP_EVENT_NOTE_END:
+                case CLAP_EVENT_NOTE_OFF:
+                    CLAP_LOG ("Plugin generated NOTE_OFF/END event");
+                    break;
+                case CLAP_EVENT_NOTE_ON:
+                    CLAP_LOG ("Plugin generated NOTE_ON event");
+                    break;
+                default:
+                    break;
+            }
+        }
 
         while (--rcc >= 0)
         {
