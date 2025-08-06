@@ -60,6 +60,45 @@ PortBuffer::~PortBuffer()
     data.reset();
 }
 
+void PortBuffer::resize (uint32_t newSize)
+{
+    // Ensure minimum size
+    newSize = std::max (sizeof (float), (size_t) newSize);
+
+    // If the size hasn't changed, nothing to do
+    if (referenced || type != PortType::Atom || newSize == capacity || buffer.atom == nullptr)
+    {
+        return;
+    }
+
+    // Store the current atom size and data
+    const uint32_t currentAtomSize = buffer.atom->size;
+    const uint32_t atomHeaderSize = sizeof (LV2_Atom);
+    const uint32_t totalCurrentSize = atomHeaderSize + currentAtomSize;
+
+    // Allocate new buffer
+    std::unique_ptr<uint8[]> newData (new uint8[newSize]);
+    memset (newData.get(), 0, newSize);
+
+    // Copy existing data, but don't exceed the new buffer size
+    const uint32_t copySize = std::min (totalCurrentSize, newSize);
+    memcpy (newData.get(), data.get(), copySize);
+
+    // Update capacity and swap buffers
+    capacity = newSize;
+    data = std::move (newData);
+
+    // Update buffer pointer to new location
+    buffer.atom = (LV2_Atom*) data.get();
+
+    // If the new size is smaller than the current atom data,
+    // we need to truncate the atom size
+    if (newSize < totalCurrentSize)
+    {
+        buffer.atom->size = newSize - atomHeaderSize;
+    }
+}
+
 float PortBuffer::getValue() const
 {
     jassert (type == PortType::Control);

@@ -7,6 +7,7 @@
 #include <lv2/patch/patch.h>
 #include <lv2/time/time.h>
 #include <lv2/midi/midi.h>
+#include <lv2/resize-port/resize-port.h>
 
 #include <lvtk/ext/idle.hpp>
 #include <lvtk/ext/state.hpp>
@@ -157,7 +158,13 @@ class LV2Module::Private
 {
 public:
     Private (LV2Module& module)
-        : owner (module) {}
+        : owner (module)
+    {
+        resizePortFeature.URI = LV2_RESIZE_PORT__resize;
+        resizePortFeature.data = (void*) &resizePortData;
+        resizePortData.data = this;
+        resizePortData.resize = &resizePort;
+    }
 
     ~Private() {}
 
@@ -257,6 +264,16 @@ public:
         }
     }
 
+    static LV2_Resize_Port_Status resizePort (LV2_Resize_Port_Feature_Data data,
+                                              uint32_t index,
+                                              size_t size)
+    {
+        auto& me = *static_cast<Private*> (data);
+        auto* buf = me.buffers.getUnchecked (index);
+        buf->resize (size);
+        return LV2_RESIZE_PORT_SUCCESS;
+    }
+
 private:
     friend class LV2Module;
     LV2Module& owner;
@@ -285,6 +302,9 @@ private:
     const uint32_t atom_eventTransfer = [&] { return owner.map (LV2_ATOM__eventTransfer); }();
     const uint32_t atom_atomTransfer = [&] { return owner.map (LV2_ATOM__atomTransfer); }();
     const uint32_t ui_floatProtocol = [&] { return owner.map (LV2_UI__floatProtocol); }();
+
+    LV2_Feature resizePortFeature;
+    LV2_Resize_Port_Resize resizePortData;
 };
 
 LV2Module::LV2Module (World& world_, const void* plugin_)
@@ -501,6 +521,8 @@ Result LV2Module::instantiate (double samplerate)
 
     features.clearQuick();
     world.getFeatures (features);
+
+    features.add (&priv->resizePortFeature);
 
     // check for a worker interface
     LilvNodes* nodes = lilv_plugin_get_extension_data (plugin);

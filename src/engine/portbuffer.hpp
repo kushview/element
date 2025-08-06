@@ -23,7 +23,8 @@ public:
 
     void clear();
     void reset();
-
+    void resize (uint32_t newSize);
+    
     bool addEvent (int64 frames, uint32 size, uint32 type, const uint8* data);
 
     inline uint32 getCapacity() const { return capacity; }
