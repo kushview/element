@@ -587,7 +587,6 @@ struct CLAPModule final : public ReferenceCountedObject
         if (m->open())
         {
             _fpreset();
-            CLAP_LOG (" - opened")
             return m;
         }
 
@@ -1223,9 +1222,7 @@ public:
 
         if (mod != nullptr)
         {
-            CLAP_LOG (" - module was created");
             ptr.reset (new CLAPProcessor (mod, ID));
-            CLAP_LOG (" - ptr was created");
             if (ptr->_plugin == nullptr || ! ptr->init())
                 ptr.reset();
         }
