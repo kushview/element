@@ -41,7 +41,7 @@ static void _fpreset()
 //==============================================================================
 // Change this to disable logging of various VST activities
 #ifndef CLAP_LOGGING
-#define CLAP_LOGGING 1
+#define CLAP_LOGGING JUCE_DEBUG
 #endif
 
 #if CLAP_LOGGING
@@ -1392,7 +1392,7 @@ public:
             }
         }
 
-        jassert (_tmpAudio.getNumChannels() == rcc);
+        jassert (_tmpAudio.getNumChannels() >= rcc);
 
         _plugin->start_processing (_plugin);
         _plugin->process (_plugin, &_proc);
