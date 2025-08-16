@@ -286,9 +286,15 @@ void Settings::setDefaultNewSessionFile (const File& file)
 
 bool Settings::hidePluginWindowsWhenFocusLost() const
 {
+#if JUCE_LINUX
+    const bool fallback = false;
+#else
+    const bool fallback = true;
+#endif
+
     if (auto* p = getProps())
-        return p->getBoolValue (hidePluginWindowsWhenFocusLostKey, true);
-    return true;
+        return p->getBoolValue (hidePluginWindowsWhenFocusLostKey, fallback);
+    return fallback;
 }
 
 void Settings::setHidePluginWindowsWhenFocusLost (const bool hideThem)
