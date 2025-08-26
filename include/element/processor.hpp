@@ -16,6 +16,12 @@
 #include <element/midichannels.hpp>
 #include <element/signals.hpp>
 
+namespace juce {
+
+class PopupMenu;
+
+}
+
 namespace element {
 
 using namespace juce;
@@ -37,9 +43,9 @@ struct RenderContext {
     AtomPipe atom;
 
     // clang-format off
-    RenderContext (float* const *audioData, 
+    RenderContext (float* const *audioData,
                    int numAudio,
-                   float* const *cvData, 
+                   float* const *cvData,
                    int numCV,
                    const juce::OwnedArray<juce::MidiBuffer>& sharedMidi,
                    const juce::Array<int>& midiIndexes,
@@ -52,9 +58,9 @@ struct RenderContext {
           atom (sharedAtom, atomIndexes)
     {}
 
-    RenderContext (float* const *audioData, 
+    RenderContext (float* const *audioData,
                    int numAudio,
-                   float* const *cvData, 
+                   float* const *cvData,
                    int numCV,
                    const juce::OwnedArray<juce::MidiBuffer>& sharedMidi,
                    const juce::Array<int>& midiIndexes,
@@ -69,7 +75,7 @@ struct RenderContext {
                    MidiBuffer& midiRef,
                    AtomBuffer& atomRef,
                    int numSamples)
-        : audio (audioRef.getArrayOfWritePointers(), audioRef.getNumChannels(), numSamples), 
+        : audio (audioRef.getArrayOfWritePointers(), audioRef.getNumChannels(), numSamples),
           cv (cvRef.getArrayOfWritePointers(), cvRef.getNumChannels(), numSamples),
           midi (midiRef),
           atom (atomRef)
@@ -175,7 +181,7 @@ public:
 
     //=========================================================================
     /** Returns the type of port
-        
+
         @param port The port to check
      */
     PortType getPortType (const uint32 port) const;
@@ -196,13 +202,13 @@ public:
     uint32 getMidiOutputPort() const;
 
     /** Returns a channel index for a port
-     
+
         @param port The port to find.
     */
     int getChannelPort (const uint32 port) const;
 
     /** Returns a port index for a channel of given type
-     
+
         @param type The port type to find
         @param channel The channel to find
         @param isInput True if for an input port
@@ -366,7 +372,7 @@ public:
     void getMidiProgramsState (String& state) const;
 
     /** Load all MIDI program states to be stored on the node.
-        
+
         @param state    The state to set. If this is empty, the midi programs
                         on the node will be cleared.
      */
@@ -408,6 +414,9 @@ public:
         if (auto* const proc = getAudioProcessor())
             return proc->setCurrentProgram (index);
     }
+
+    /** Callback invoked during popup menu construction to allow node-specific changes to the preset menu */
+    virtual void customizePresetsPopupMenu (PopupMenu& menuToAddTo) {}
 
     //==========================================================================
     void setMuted (bool muted);

@@ -30,8 +30,8 @@ public:
     bool isPluginResultCode (const int resultCode)
     {
         // clang-format off
-        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) || 
-               (isPositiveAndBelow (int (resultCode - 20000), unverified.size()));
+        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) ||
+               (isPositiveAndBelow (int (resultCode - SelectPresetMin), unverified.size()));
         // clang-format on
     }
 
@@ -46,7 +46,7 @@ public:
         }
 
         verified = false;
-        index = resultCode - 20000;
+        index = resultCode - SelectPresetMin;
         return isPositiveAndBelow (index, unverified.size())
                    ? *unverified.getUnchecked (index)
                    : PluginDescription();
@@ -69,12 +69,12 @@ public:
             if (auto* format = plugins->getAudioPluginFormat (name))
             {
                 for (int i = lastSize; i < unverified.size(); ++i)
-                    menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (unverified.getUnchecked (i)->fileOrIdentifier));
+                    menu.addItem (i + SelectPresetMin, format->getNameOfPluginFromIdentifier (unverified.getUnchecked (i)->fileOrIdentifier));
             }
             else if (name == "LV2")
             {
                 for (int i = lastSize; i < unverified.size(); ++i)
-                    menu.addItem (i + 20000, unverified[i]->name);
+                    menu.addItem (i + SelectPresetMin, unverified[i]->name);
             }
 
             if (menu.getNumItems() > 0)
@@ -107,7 +107,15 @@ public:
         DisconnectInputs,
         DisconnectOutputs,
         DisconnectMidi,
-        LastItem
+        LastItem,
+        SetCurrentProgramMin = 10000,
+        SetCurrentProgramMax = 19999,
+        SelectPresetMin = 20000,
+        SelectPresetMax = 29999,
+        SetNodeParametersMin = 30000,
+        SetNodeParametersMax = 39999,
+        SetOversamplingFactorMin = 40000,
+        SetOversamplingFactorMax = 49999,
     };
 
     typedef std::initializer_list<ItemIds> ItemList;
@@ -179,7 +187,7 @@ public:
     {
 #if ! ELEMENT_SE
         PopupMenu menu;
-        int index = 30000;
+        int index = SetNodeParametersMin;
         ProcessorPtr ptr = node.getObject();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
         addOversamplingSubmenu (menu);
@@ -202,7 +210,7 @@ public:
     inline void addOversamplingSubmenu (PopupMenu& menuToAddTo)
     {
         PopupMenu osMenu;
-        int index = 40000;
+        int index = SetOversamplingFactorMin;
         ProcessorPtr ptr = node.getObject();
 
         if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
@@ -245,7 +253,7 @@ public:
 
     inline void getPresetsMenu (PresetManager& collection, PopupMenu& menu)
     {
-        const int offset = 20000;
+        const int offset = SelectPresetMin;
         if (node.isDuplex())
             return;
 
@@ -268,6 +276,9 @@ public:
             addItemInternal (native, "Load FXB/FXP", new FXBPresetOp (node, true));
             menu.addSubMenu (TRANS ("Native Presets"), native);
         }
+
+        node.customizePresetsPopupMenu (menu);
+
 #if ! ELEMENT_SE
         auto identifier = node.getProperty (tags::identifier).toString();
         if (identifier.isEmpty())
@@ -290,7 +301,7 @@ public:
 
     inline void getProgramsMenu (PopupMenu& menu)
     {
-        const int offset = 10000;
+        const int offset = SetCurrentProgramMin;
         const int current = node.getCurrentProgram();
         for (int i = 0; i < node.getNumPrograms(); ++i)
         {
@@ -318,14 +329,14 @@ public:
                 return msg;
             op->perform();
         }
-        else if (result >= 10000 && result < 20000)
+        else if (result >= SetCurrentProgramMin && result <= SetCurrentProgramMax)
         {
-            Node (node).setCurrentProgram (result - 10000);
+            Node (node).setCurrentProgram (result - SetCurrentProgramMin);
         }
-        else if (result >= 20000 && result < 30000)
+        else if (result >= SelectPresetMin && result <= SelectPresetMax)
         {
             Node n (node);
-            const int index = result - 20000;
+            const int index = result - SelectPresetMin;
             if (auto* const item = presetItems[index])
             {
                 const auto data = File::isAbsolutePath (item->file)
@@ -347,9 +358,9 @@ public:
                 }
             }
         }
-        else if (result >= 30000 && result < 40000)
+        else if (result >= SetNodeParametersMin && result <= SetNodeParametersMax)
         {
-            const int index = result - 30000;
+            const int index = result - SetNodeParametersMin;
             switch (index)
             {
                 case 0:
@@ -357,9 +368,9 @@ public:
                     break;
             }
         }
-        else if (result >= 40000 && result < 50000)
+        else if (result >= SetOversamplingFactorMin && result <= SetOversamplingFactorMax)
         {
-            const int osFactor = (int) powf (2, float (result - 40000));
+            const int osFactor = (int) powf (2, float (result - SetOversamplingFactorMin));
             if (auto gNode = node.getObject())
                 gNode->setOversamplingFactor (osFactor);
         }

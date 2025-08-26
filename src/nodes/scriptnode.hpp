@@ -45,14 +45,17 @@ public:
     void setPlayHead (juce::AudioPlayHead*) override;
 
     //==========================================================================
-    int getNumPrograms() const override { return 3; }
+    int getNumPrograms() const override { return 2; }
     int getCurrentProgram() const override { return _program; }
     const String getProgramName (int index) const override;
     void setCurrentProgram (int index) override;
+    void customizePresetsPopupMenu (PopupMenu& menuToAddTo) override;
 
 protected:
     inline bool wantsContext() const noexcept override { return true; }
     ParameterPtr getParameter (const PortDescription& port) override;
+
+    void openLoadScriptDialog ();
 
 private:
     CriticalSection lock;

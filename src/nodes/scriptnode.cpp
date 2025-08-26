@@ -21,6 +21,7 @@
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
 #include "scripting/scriptmanager.hpp"
+#include "ui/guicommon.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -284,9 +285,6 @@ const String ScriptNode::getProgramName (int index) const
         case 1:
             return "Channelizer";
             break;
-        case 2:
-            return "Load script...";
-            break;
         case -1:
             return userScriptName;
             break;
@@ -315,26 +313,37 @@ void ScriptNode::setCurrentProgram (int index)
             newDspCode = String::fromUTF8 (scripts::channelize_lua, scripts::channelize_luaSize);
             newUiCode.clear();
             break;
-        case 2:
-            {
-                FileChooser chooser ("Load Script", ScriptManager::getUserScriptsDir(), "*.lua");
-                if (chooser.browseForFileToOpen()) {
-                    juce::File dspFile(chooser.getResult());
-                    newDspCode = dspFile.loadFileAsString();
-                    newUiCode.clear();
-                    userScriptName = dspFile.getFileName();
-                    _program = -1;
-                }
-            }
-            break;
     }
 
     dspCode.replaceAllContent (newDspCode);
     Result result = loadScript (dspCode.getAllContent());
-    if (result.failed()) {
-        userScriptName = "(invalid)";
-    }
     edCode.replaceAllContent (newUiCode);
+}
+
+void ScriptNode::openLoadScriptDialog ()
+{
+    FileChooser chooser (TRANS ("Load Script"), ScriptManager::getUserScriptsDir(), "*.lua");
+    if (chooser.browseForFileToOpen()) {
+        juce::File dspFile(chooser.getResult());
+        String newDspCode = dspFile.loadFileAsString();
+        userScriptName = dspFile.getFileName();
+        _program = -1;
+
+        Result result = loadScript (newDspCode, true);
+        if (result.failed()) {
+            userScriptName = "(invalid)";
+            return;
+        }
+    }
+}
+
+void ScriptNode::customizePresetsPopupMenu (PopupMenu& menuToAddTo)
+{
+    menuToAddTo.addItem (TRANS ("Load script..."), [this]{ openLoadScriptDialog (); });
+    menuToAddTo.addSeparator ();
+    if (_program < 0) {
+        menuToAddTo.addItem (userScriptName, true, true, std::function<void()>());
+    }
 }
 
 } // namespace element
