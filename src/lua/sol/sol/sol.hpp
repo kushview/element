@@ -2481,9 +2481,9 @@ extern "C" {
 #ifndef COMPAT53_API
 #  if defined(COMPAT53_INCLUDE_SOURCE) && COMPAT53_INCLUDE_SOURCE
 #    if defined(__GNUC__) || defined(__clang__)
-#      define COMPAT53_API __attribute__((__unused__)) static inline 
+#      define COMPAT53_API __attribute__((__unused__)) static inline
 #    else
-#      define COMPAT53_API static inline 
+#      define COMPAT53_API static inline
 #    endif /* Clang/GCC */
 #  else /* COMPAT53_INCLUDE_SOURCE */
 /* we are not including source, so everything is extern */
@@ -6056,7 +6056,8 @@ namespace sol {
 			static_assert(std::is_constructible<T, Args&&...>::value, "T must be constructible with Args");
 
 			*this = nullopt;
-			this->construct(std::forward<Args>(args)...);
+			new (static_cast<void*>(this)) optional(std::in_place, std::forward<Args>(args)...);
+			return **this;
 		}
 
 		/// Swaps this optional with the other.
@@ -6263,7 +6264,7 @@ namespace sol {
 		struct tagged {
 		private:
 			T value_;
-		
+
 		public:
 			template <typename Arg, typename... Args, meta::disable<std::is_same<meta::unqualified_t<Arg>, tagged>> = meta::enabler>
 			tagged(Arg&& arg, Args&&... args)
@@ -8727,7 +8728,7 @@ namespace sol {
 	class stateless_stack_reference {
 	private:
 		friend class stack_reference;
-		
+
 		int index = 0;
 
 		int registry_index() const noexcept {
@@ -12100,7 +12101,7 @@ namespace sol {
 				dr.error = error_code::invalid_code_point;
 				return dr;
 			}
-			
+
 			// then everything is fine
 			dr.codepoint = decoded;
 			dr.error = error_code::ok;
@@ -12118,7 +12119,7 @@ namespace sol {
 			}
 
 			char16_t lead = static_cast<char16_t>(*it);
-			
+
 			if (!unicode_detail::is_surrogate(lead)) {
 				++it;
 				dr.codepoint = static_cast<char32_t>(lead);
@@ -12139,7 +12140,7 @@ namespace sol {
 				dr.next = it;
 				return dr;
 			}
-			
+
 			dr.codepoint = unicode_detail::combine_surrogates(lead, trail);
 			dr.next = ++it;
 			dr.error = error_code::ok;
@@ -15266,7 +15267,7 @@ namespace sol {
 	class basic_object_base : public ref_t {
 	private:
 		using base_t = ref_t;
-		
+
 		template <typename T>
 		decltype(auto) as_stack(std::true_type) const {
 			return stack::get<T>(base_t::lua_state(), base_t::stack_index());
@@ -19171,7 +19172,7 @@ namespace sol {
 #include <algorithm>
 
 namespace sol {
-	
+
 	namespace detail {
 		template <bool b, typename handler_t>
 		inline void handle_protected_exception(lua_State* L, optional<const std::exception&> maybe_ex, const char* error, detail::protected_handler<b, handler_t>& h) {
@@ -19264,7 +19265,7 @@ namespace sol {
 			}
 #if (!defined(SOL_EXCEPTIONS_SAFE_PROPAGATION) || !SOL_NO_EXCEPTIONS_SAFE_PROPAGATION)
 			// LuaJIT cannot have the catchall when the safe propagation is on
-			// but LuaJIT will swallow all C++ errors 
+			// but LuaJIT will swallow all C++ errors
 			// if we don't at least catch std::exception ones
 			catch (...) {
 				detail::handle_protected_exception(lua_state(), optional<const std::exception&>(nullopt), detail::protected_function_error, h);
@@ -19351,7 +19352,7 @@ namespace sol {
 			stack::check<basic_protected_function>(lua_state(), -1, handler);
 #endif // Safety
 		}
-		
+
 		basic_protected_function(lua_nil_t n)
 			: base_t(n), error_handler(n) {
 		}
@@ -21462,7 +21463,7 @@ namespace sol {
 						{ "erase", &meta_usertype_container::erase_call },
 						std::is_pointer<T>::value ? luaL_Reg{ nullptr, nullptr } : luaL_Reg{ "__gc", &detail::usertype_alloc_destruct<T> },
 						{ nullptr, nullptr }
-						// clang-format on 
+						// clang-format on
 					} };
 
 					if (luaL_newmetatable(L, metakey) == 1) {
@@ -24334,7 +24335,7 @@ namespace sol {
 		enrollments.default_constructor = !detail::any_is_constructor_v<Arg, Args...>;
 		enrollments.destructor = !detail::any_is_destructor_v<Arg, Args...>;
 		usertype<Class> ut = this->new_usertype<Class>(std::forward<Key>(key), std::move(enrollments));
-		static_assert(sizeof...(Args) % 2 == static_cast<std::size_t>(!detail::any_is_constructor_v<Arg>), 
+		static_assert(sizeof...(Args) % 2 == static_cast<std::size_t>(!detail::any_is_constructor_v<Arg>),
 			"you must pass an even number of arguments to new_usertype after first passing a constructor");
 		if constexpr (detail::any_is_constructor_v<Arg>) {
 			ut.set(meta_function::construct, std::forward<Arg>(arg));

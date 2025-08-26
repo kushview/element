@@ -19,6 +19,8 @@
 #include "services/presetservice.hpp"
 #include "messages.hpp"
 
+#include "nodes/scriptnode.hpp"
+
 namespace element {
 using namespace juce;
 
@@ -284,13 +286,22 @@ void Services::handleMessage (const Message& msg)
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
+        Node newNode;
         if (anm->target.isValid())
-            ec->addNode (anm->node, anm->target, anm->builder);
+            newNode = ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
 
-        if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension (".elg"))
-            find<UI>()->recentFiles().addFile (anm->sourceFile);
+        if (anm->sourceFile.existsAsFile()) {
+            if (anm->sourceFile.hasFileExtension (".elg")) {
+                find<UI>()->recentFiles().addFile (anm->sourceFile);
+            } else if (anm->sourceFile.hasFileExtension (".lua")) {
+                ScriptNode* script = dynamic_cast<ScriptNode*> (newNode.getObject());
+                if (script) {
+                    script->loadScript (anm->sourceFile.loadFileAsString(), true);
+                }
+            }
+        }
     }
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {

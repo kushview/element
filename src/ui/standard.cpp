@@ -720,6 +720,14 @@ void StandardContent::filesDropped (const StringArray& files, int x, int y)
             if (auto* sess = services().find<SessionService>())
                 sess->importGraph (file);
         }
+        else if (file.hasFileExtension ("lua"))
+        {
+            Node node (types::Node);
+            node.setProperty (tags::name, file.getFileNameWithoutExtension());
+            node.setProperty (tags::format, "Element");
+            node.setProperty (tags::identifier, EL_NODE_ID_SCRIPT);
+            this->post (new AddNodeMessage (node, session()->getActiveGraph(), file));
+        }
         else if (file.hasFileExtension ("elpreset;eln"))
         {
             const auto data = Node::parse (file);
@@ -865,10 +873,10 @@ void StandardContent::restoreState (PropertiesFile* props)
 void StandardContent::setCurrentNode (const Node& node)
 {
     // clang-format off
-    if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) || 
-        getMainViewName() == EL_VIEW_SESSION_SETTINGS || 
-        getMainViewName() == EL_VIEW_PLUGIN_MANAGER || 
-        getMainViewName() == EL_VIEW_CONTROLLERS) && 
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->primary.get()) ||
+        getMainViewName() == EL_VIEW_SESSION_SETTINGS ||
+        getMainViewName() == EL_VIEW_PLUGIN_MANAGER ||
+        getMainViewName() == EL_VIEW_CONTROLLERS) &&
         session()->getNumGraphs() > 0)
     {
         setMainView (EL_VIEW_GRAPH_EDITOR);

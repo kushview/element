@@ -117,8 +117,13 @@ ParameterPtr ScriptNode::getParameter (const PortDescription& port)
     return script ? script->getParameterObject (port.channel, port.input) : nullptr;
 }
 
-Result ScriptNode::loadScript (const String& newCode)
+Result ScriptNode::loadScript (const String& newCode, bool setDspCode)
 {
+    if (setDspCode) {
+      dspCode.replaceAllContent (newCode);
+      edCode.replaceAllContent ("");
+    }
+
     auto result = DSPScript::validate (newCode);
     if (result.failed())
         return result;
@@ -258,6 +263,12 @@ const String ScriptNode::getProgramName (int index) const
         case 1:
             return "Channelizer";
             break;
+        case 2:
+            return "Load script...";
+            break;
+        case -1:
+            return userScriptName;
+            break;
     }
 
     String name = TRANS ("Program");
@@ -283,10 +294,25 @@ void ScriptNode::setCurrentProgram (int index)
             newDspCode = String::fromUTF8 (scripts::channelize_lua, scripts::channelize_luaSize);
             newUiCode.clear();
             break;
+        case 2:
+            {
+                FileChooser chooser ("Load Script", ScriptManager::getUserScriptsDir(), "*.lua");
+                if (chooser.browseForFileToOpen()) {
+                    juce::File dspFile(chooser.getResult());
+                    newDspCode = dspFile.loadFileAsString();
+                    newUiCode.clear();
+                    userScriptName = dspFile.getFileName();
+                    _program = -1;
+                }
+            }
+            break;
     }
 
     dspCode.replaceAllContent (newDspCode);
-    loadScript (dspCode.getAllContent());
+    Result result = loadScript (dspCode.getAllContent());
+    if (result.failed()) {
+        userScriptName = "(invalid)";
+    }
     edCode.replaceAllContent (newUiCode);
 }
 

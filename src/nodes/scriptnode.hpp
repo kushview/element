@@ -29,12 +29,12 @@ public:
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 
-    Result loadScript (const String&);
+    Result loadScript (const String&, bool setDspCode = false);
 
     CodeDocument& getCodeDocument (bool forEditor = false) { return forEditor ? edCode : dspCode; }
 
     /** Set a parameter value by index
-     
+
         @param index    The parameter index to set
         @param value    The value to set
     */
@@ -45,7 +45,7 @@ public:
     void setPlayHead (juce::AudioPlayHead*) override;
 
     //==========================================================================
-    int getNumPrograms() const override { return 2; }
+    int getNumPrograms() const override { return 3; }
     int getCurrentProgram() const override { return _program; }
     const String getProgramName (int index) const override;
     void setCurrentProgram (int index) override;
@@ -67,6 +67,7 @@ private:
     int blockSize = 512;
     double sampleRate = 44100.0;
     bool prepared = false;
+    juce::String userScriptName;
 };
 
 } // namespace element
