@@ -50,6 +50,5 @@ end
 return {
     type        = 'DSP',
     layout      = amp_layout,
-    parameters  = amp_parameters,
     process     = amp_process
 }
