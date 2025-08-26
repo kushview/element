@@ -37,6 +37,21 @@ require ('el.MidiPipe')
 
 namespace element {
 
+namespace {
+
+class ScriptValidationError : public std::runtime_error {
+public:
+    ScriptValidationError(const Result& result)
+        : std::runtime_error("Script validation error")
+        , result(result)
+    {
+    }
+
+    Result result;
+};
+
+}
+
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
     : Processor (0)
@@ -119,28 +134,30 @@ ParameterPtr ScriptNode::getParameter (const PortDescription& port)
 
 Result ScriptNode::loadScript (const String& newCode, bool setDspCode)
 {
+    String oldDspCode = dspCode.getAllContent();
+    String oldEdCode = edCode.getAllContent();
+
     if (setDspCode) {
       dspCode.replaceAllContent (newCode);
       edCode.replaceAllContent ("");
     }
 
-    auto result = DSPScript::validate (newCode);
-    if (result.failed())
-        return result;
+    try {
+        auto result = DSPScript::validate (newCode);
+        if (result.failed())
+            throw ScriptValidationError (result);
 
-    ScriptLoader loader (lua);
-    loader.load (newCode);
-    if (loader.hasError())
-        return Result::fail (loader.getErrorMessage());
+        ScriptLoader loader (lua);
+        loader.load (newCode);
+        if (loader.hasError())
+            throw ScriptValidationError ( Result::fail (loader.getErrorMessage()));
 
-    auto dsp = loader();
-    if (! dsp.valid() || dsp.get_type() != sol::type::table)
-        return Result::fail ("Could not instantiate script");
+        auto dsp = loader();
+        if (! dsp.valid() || dsp.get_type() != sol::type::table)
+            throw ScriptValidationError ( Result::fail ("Could not instantiate script"));
 
-    auto newScript = std::make_unique<DSPScript> (dsp);
+        auto newScript = std::make_unique<DSPScript> (dsp);
 
-    if (true)
-    {
         newScript->setPlayHead (getPlayHead());
         if (prepared)
             newScript->prepare (sampleRate, blockSize);
@@ -149,16 +166,20 @@ Result ScriptNode::loadScript (const String& newCode, bool setDspCode)
         if (script != nullptr)
             newScript->copyParameterValues (*script);
         script.swap (newScript);
-    }
 
-    if (newScript != nullptr)
-    {
-        newScript->release();
-        newScript->cleanup();
-        newScript.reset();
-    }
+        if (newScript != nullptr)
+        {
+            newScript->release();
+            newScript->cleanup();
+            newScript.reset();
+        }
 
-    return Result::ok();
+        return Result::ok();
+    } catch (ScriptValidationError& e) {
+        dspCode.replaceAllContent (oldDspCode);
+        edCode.replaceAllContent (oldEdCode);
+        return e.result;
+    }
 }
 
 void ScriptNode::getPluginDescription (PluginDescription& desc) const
