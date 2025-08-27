@@ -17,6 +17,7 @@ namespace element {
 // An object of this type is passed to to a DSP Script's process function
 // conveying timing information.
 // @classmod el.DSPScriptPosition
+// @pragma nostrip
 struct DSPScriptPosition
 {
     using PositionType = juce::AudioPlayHead::PositionInfo;
