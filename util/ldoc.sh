@@ -3,10 +3,9 @@
 # This file executes ldoc to generate documentation for Lua source files.
 # It should be ran from the top level source directory.
 #
-# Usage: sh util/luadoc.sh
+# Usage: sh util/luadoc.sh [output_directory]
 
-outdir="$(pwd)/build/lua-html"
-rm -rf "${outdir}"
+outdir="${1:-$(pwd)/build/lua-html}"
 mkdir -p "${outdir}"
 
 ldoc -f markdown -q -X \
