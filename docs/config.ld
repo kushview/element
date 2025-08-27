@@ -4,6 +4,7 @@ description = "API reference to Element's scripting engine"
 file = {
     '../src/el',
     '../src/engine/midipipe.cpp',
+    '../src/scripting/dspscript.cpp',
     exclude = {
         '../src/el/midi_buffer.hpp',
         '../src/el/sol_helpers.hpp',

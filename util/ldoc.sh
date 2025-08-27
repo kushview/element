@@ -9,4 +9,7 @@ outdir="$(pwd)/build/lua-html"
 rm -rf "${outdir}"
 mkdir -p "${outdir}"
 
-ldoc -f markdown -q -c docs/config.ld -d "${outdir}" .
+ldoc -f markdown -q -X \
+    -c docs/config.ld \
+    --multimodule \
+    -d "${outdir}" .
