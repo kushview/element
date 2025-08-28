@@ -24,7 +24,7 @@
 #define EL_PLUGIN_SCANNER_START_ID "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT 20000 // 20 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT 24000 // 24 Seconds
 
 #include <errno.h>
 extern char* program_invocation_name;
@@ -101,7 +101,7 @@ public:
     explicit PluginScannerCoordinator (PluginScanner& o)
         : owner (o)
     {
-        launchScanner (0, 0);
+        launchScanner (EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, 0);
     }
 
     ~PluginScannerCoordinator() {}
