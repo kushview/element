@@ -5,6 +5,7 @@
 
 #include <element/juce/gui_basics.hpp>
 #include <element/ui/content.hpp>
+#include <element/nodefactory.hpp>
 
 #include "ui/filetreeview.hpp"
 #include "ui/viewhelpers.hpp"
@@ -104,6 +105,14 @@ public:
                 const Node node (Node::parse (file), false);
                 if (node.isValid())
                     cc->post (new AddNodeMessage (node, session->getActiveGraph()));
+            }
+            else if (file.hasFileExtension ("lua"))
+            {
+                Node node (types::Node);
+                node.setProperty (tags::name, file.getFileNameWithoutExtension());
+                node.setProperty (tags::format, "Element");
+                node.setProperty (tags::identifier, EL_NODE_ID_SCRIPT);
+                cc->post (new AddNodeMessage (node, session->getActiveGraph(), file));
             }
         }
     }

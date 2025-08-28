@@ -260,8 +260,8 @@ bool Node::isProbablyGraphNode (const ValueTree& data)
 {
     // clang-format off
     const var& tp = data.getProperty (tags::type);
-    return (data.hasType (types::Node) || data.hasType (tags::node)) && 
-        (tags::graph.toString() == tp.toString() || 
+    return (data.hasType (types::Node) || data.hasType (tags::node)) &&
+        (tags::graph.toString() == tp.toString() ||
          types::Graph.toString() == tp.toString() ||
          String ("default") == tp.toString());
     // clang-format on
@@ -560,34 +560,34 @@ bool Node::isAudioIONode() const
 
 bool Node::isAudioInputNode() const
 {
-    return objectData.getProperty (tags::format) == "Internal" && 
+    return objectData.getProperty (tags::format) == "Internal" &&
         objectData.getProperty (tags::identifier) == "audio.input";
 }
 
 bool Node::isAudioOutputNode() const
 {
-    return objectData.getProperty (tags::format) == "Internal" && 
+    return objectData.getProperty (tags::format) == "Internal" &&
         objectData.getProperty (tags::identifier) == "audio.output";
 }
 
 bool Node::isMidiIONode() const
 {
-    return objectData.getProperty (tags::format) == "Internal" && 
-        (objectData.getProperty (tags::identifier) == "midi.input" || 
+    return objectData.getProperty (tags::format) == "Internal" &&
+        (objectData.getProperty (tags::identifier) == "midi.input" ||
          objectData.getProperty (tags::identifier) == "midi.output");
 }
 
 /** Returns true if a global MIDI input node. e.g */
 bool Node::isMidiInputNode() const
 {
-    return objectData.getProperty (tags::format) == "Internal" && 
+    return objectData.getProperty (tags::format) == "Internal" &&
         objectData.getProperty (tags::identifier) == "midi.input";
 }
 
 /** Returns true if a global MIDI output node. e.g */
 bool Node::isMidiOutputNode() const
 {
-    return objectData.getProperty (tags::format) == "Internal" && 
+    return objectData.getProperty (tags::format) == "Internal" &&
         objectData.getProperty (tags::identifier) == "midi.output";
 }
 // clang-format on
@@ -1210,6 +1210,12 @@ int Node::getCurrentProgram() const
     if (auto* obj = getObject())
         return obj->getCurrentProgram();
     return -1;
+}
+
+void Node::customizePresetsPopupMenu (juce::PopupMenu& menuToAddTo)
+{
+    if (auto* obj = getObject())
+        obj->customizePresetsPopupMenu (menuToAddTo);
 }
 
 String Node::getProgramName (const int index) const

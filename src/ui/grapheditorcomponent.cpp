@@ -1050,7 +1050,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
 bool GraphEditorComponent::isInterestedInFileDrag (const StringArray& files)
 {
     for (const auto& path : files)
-        if (File (path).hasFileExtension ("elg;elpreset;eln"))
+        if (File (path).hasFileExtension ("elg;elpreset;eln;lua"))
             return true;
     return false;
 }
@@ -1066,6 +1066,17 @@ void GraphEditorComponent::filesDropped (const StringArray& files, int x, int y)
     for (const auto& path : files)
     {
         const auto file = File (path);
+
+        if (file.hasFileExtension ("lua"))
+        {
+            Node node (types::Node);
+            node.setProperty (tags::name, file.getFileNameWithoutExtension());
+            node.setProperty (tags::format, "Element");
+            node.setProperty (tags::identifier, EL_NODE_ID_SCRIPT);
+            postMessage (new AddNodeMessage (node, graph, file));
+            continue;
+        }
+
         const Node node (Node::parse (file));
         bool wasHandled = false;
 

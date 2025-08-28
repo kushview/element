@@ -16,6 +16,12 @@
 #define EL_PORT_VERSION  1
 #define EL_GRAPH_VERSION 1
 
+namespace juce {
+
+class PopupMenu;
+
+}
+
 namespace element {
 
 class DataPath;
@@ -43,7 +49,7 @@ public:
     ~Port() {}
 
     /** Returns the ValueTree of the Node containing this port
-        will not always be valid 
+        will not always be valid
      */
     inline ValueTree getNodeValueTree() const { return objectData.getParent().getParent(); }
 
@@ -398,6 +404,9 @@ public:
 
     /** Get the currently loaded factory preset */
     int getCurrentProgram() const;
+
+    /** Callback invoked during popup menu construction to allow node-specific changes to the preset menu */
+    void customizePresetsPopupMenu (juce::PopupMenu& menuToAddTo);
 
     //=========================================================================
     /** True if global MIDI programs should be loaded/saved */

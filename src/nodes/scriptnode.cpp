@@ -21,6 +21,7 @@
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
 #include "scripting/scriptmanager.hpp"
+#include "ui/guicommon.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -36,6 +37,21 @@ require ('el.MidiPipe')
 )";
 
 namespace element {
+
+namespace {
+
+class ScriptValidationError : public std::runtime_error {
+public:
+    ScriptValidationError(const Result& result)
+        : std::runtime_error("Script validation error")
+        , result(result)
+    {
+    }
+
+    Result result;
+};
+
+}
 
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
@@ -117,25 +133,32 @@ ParameterPtr ScriptNode::getParameter (const PortDescription& port)
     return script ? script->getParameterObject (port.channel, port.input) : nullptr;
 }
 
-Result ScriptNode::loadScript (const String& newCode)
+Result ScriptNode::loadScript (const String& newCode, bool setDspCode)
 {
-    auto result = DSPScript::validate (newCode);
-    if (result.failed())
-        return result;
+    String oldDspCode = dspCode.getAllContent();
+    String oldEdCode = edCode.getAllContent();
 
-    ScriptLoader loader (lua);
-    loader.load (newCode);
-    if (loader.hasError())
-        return Result::fail (loader.getErrorMessage());
+    if (setDspCode) {
+      dspCode.replaceAllContent (newCode);
+      edCode.replaceAllContent ("");
+    }
 
-    auto dsp = loader();
-    if (! dsp.valid() || dsp.get_type() != sol::type::table)
-        return Result::fail ("Could not instantiate script");
+    try {
+        auto result = DSPScript::validate (newCode);
+        if (result.failed())
+            throw ScriptValidationError (result);
 
-    auto newScript = std::make_unique<DSPScript> (dsp);
+        ScriptLoader loader (lua);
+        loader.load (newCode);
+        if (loader.hasError())
+            throw ScriptValidationError ( Result::fail (loader.getErrorMessage()));
 
-    if (true)
-    {
+        auto dsp = loader();
+        if (! dsp.valid() || dsp.get_type() != sol::type::table)
+            throw ScriptValidationError ( Result::fail ("Could not instantiate script"));
+
+        auto newScript = std::make_unique<DSPScript> (dsp);
+
         newScript->setPlayHead (getPlayHead());
         if (prepared)
             newScript->prepare (sampleRate, blockSize);
@@ -144,16 +167,20 @@ Result ScriptNode::loadScript (const String& newCode)
         if (script != nullptr)
             newScript->copyParameterValues (*script);
         script.swap (newScript);
-    }
 
-    if (newScript != nullptr)
-    {
-        newScript->release();
-        newScript->cleanup();
-        newScript.reset();
-    }
+        if (newScript != nullptr)
+        {
+            newScript->release();
+            newScript->cleanup();
+            newScript.reset();
+        }
 
-    return Result::ok();
+        return Result::ok();
+    } catch (ScriptValidationError& e) {
+        dspCode.replaceAllContent (oldDspCode);
+        edCode.replaceAllContent (oldEdCode);
+        return e.result;
+    }
 }
 
 void ScriptNode::getPluginDescription (PluginDescription& desc) const
@@ -258,6 +285,9 @@ const String ScriptNode::getProgramName (int index) const
         case 1:
             return "Channelizer";
             break;
+        case -1:
+            return userScriptName;
+            break;
     }
 
     String name = TRANS ("Program");
@@ -286,8 +316,34 @@ void ScriptNode::setCurrentProgram (int index)
     }
 
     dspCode.replaceAllContent (newDspCode);
-    loadScript (dspCode.getAllContent());
+    Result result = loadScript (dspCode.getAllContent());
     edCode.replaceAllContent (newUiCode);
+}
+
+void ScriptNode::openLoadScriptDialog ()
+{
+    FileChooser chooser (TRANS ("Load Script"), ScriptManager::getUserScriptsDir(), "*.lua");
+    if (chooser.browseForFileToOpen()) {
+        juce::File dspFile(chooser.getResult());
+        String newDspCode = dspFile.loadFileAsString();
+        userScriptName = dspFile.getFileName();
+        _program = -1;
+
+        Result result = loadScript (newDspCode, true);
+        if (result.failed()) {
+            userScriptName = "(invalid)";
+            return;
+        }
+    }
+}
+
+void ScriptNode::customizePresetsPopupMenu (PopupMenu& menuToAddTo)
+{
+    menuToAddTo.addItem (TRANS ("Load script..."), [this]{ openLoadScriptDialog (); });
+    menuToAddTo.addSeparator ();
+    if (_program < 0) {
+        menuToAddTo.addItem (userScriptName, true, true, std::function<void()>());
+    }
 }
 
 } // namespace element

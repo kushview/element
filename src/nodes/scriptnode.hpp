@@ -29,12 +29,12 @@ public:
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 
-    Result loadScript (const String&);
+    Result loadScript (const String&, bool setDspCode = false);
 
     CodeDocument& getCodeDocument (bool forEditor = false) { return forEditor ? edCode : dspCode; }
 
     /** Set a parameter value by index
-     
+
         @param index    The parameter index to set
         @param value    The value to set
     */
@@ -49,10 +49,13 @@ public:
     int getCurrentProgram() const override { return _program; }
     const String getProgramName (int index) const override;
     void setCurrentProgram (int index) override;
+    void customizePresetsPopupMenu (PopupMenu& menuToAddTo) override;
 
 protected:
     inline bool wantsContext() const noexcept override { return true; }
     ParameterPtr getParameter (const PortDescription& port) override;
+
+    void openLoadScriptDialog ();
 
 private:
     CriticalSection lock;
@@ -67,6 +70,7 @@ private:
     int blockSize = 512;
     double sampleRate = 44100.0;
     bool prepared = false;
+    juce::String userScriptName;
 };
 
 } // namespace element
