@@ -18,6 +18,7 @@ fi
 mkdir -p "${outdir}"
 
 cd "${srcdir}" && ldoc -f markdown -q -X \
-    -c docs/config.ld \
+    -c "${srcdir}/docs/config.ld" \
+    -s "${srcdir}/docs" \
     --multimodule \
     -d "${outdir}" .
