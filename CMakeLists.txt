@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(element VERSION 1.0.0)
 
-add_subdirectory(subprojects/juce EXLUDE_ALL)
+add_subdirectory(subprojects/juce EXLUDE_FROM_ALL)
 
 juce_add_gui_app(element
     # VERSION ...                       # Set this if the app version is different to the project version
