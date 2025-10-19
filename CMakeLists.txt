@@ -39,6 +39,8 @@ target_include_directories(element
         src/lua/src
         ${SUIL_INCLUDE_DIRS}
 )
+add_subdirectory(scripts)
+add_subdirectory(src/el)
 
 file(GLOB_RECURSE ELEMENT_SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" 
@@ -67,6 +69,8 @@ target_link_libraries(element
         juce::juce_gui_basics
         juce::juce_data_structures
         ${SUIL_LIBRARIES}
+        element-luascripts
+        element-luamods
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags)
