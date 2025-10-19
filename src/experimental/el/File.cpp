@@ -5,6 +5,7 @@
 // @classmod el.File
 // @pragma nostrip
 
+#if 0
 #include <element/element.h>
 #include "sol_helpers.hpp"
 #define EL_TYPE_NAME_FILE "File"
@@ -52,3 +53,5 @@ int luaopen_el_File (lua_State* L)
     sol::stack::push (L, M);
     return 1;
 }
+
+#endif

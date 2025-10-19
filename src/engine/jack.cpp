@@ -20,6 +20,8 @@
   ==============================================================================
 */
 
+#if EL_USE_JACK
+
 #include <jack/weakjack.h>
 #include <jack/jack.h>
 
@@ -883,3 +885,5 @@ AudioIODeviceType* Jack::createAudioIODeviceType (JackClient& client)
 }
 
 } // namespace element
+
+#endif

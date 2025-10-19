@@ -25,6 +25,8 @@
  * THE SOFTWARE.
  */
 
+#ifdef WIN32
+
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -785,3 +787,5 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 }
 #endif
 // clang-format on
+
+#endif
