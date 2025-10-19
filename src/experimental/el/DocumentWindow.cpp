@@ -7,7 +7,9 @@
 // @classmod el.DocumentWindow
 // @pragma nostrip
 
-#include "object.hpp"
+#if 0
+
+#include "./object.hpp"
 #include "widget.hpp"
 #include "sol_helpers.hpp"
 
@@ -153,3 +155,5 @@ int luaopen_el_DocumentWindow (lua_State* L)
     return 1;
     // clang-format on
 }
+
+#endif

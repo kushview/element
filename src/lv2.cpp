@@ -9,7 +9,6 @@
 #include <lvtk/ext/atom.hpp>
 #include <lvtk/host/world.hpp>
 #include <lvtk/host/instance.hpp>
-
 #include <element/juce/core.hpp>
 #include <element/juce/gui_basics.hpp>
 #include <element/juce/gui_extra.hpp>
