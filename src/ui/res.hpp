@@ -3,8 +3,12 @@
 
 #pragma once
 
+#if ELEMENT_CMAKE
+#include "binarydata.hpp"
+#else
 #include "acknowledgements.txt.h"
 #include "developers.txt.h"
 #include "icon.png.h"
 #include "icon-template.png.h"
 #include "Roboto-Regular.ttf.h"
+#endif
