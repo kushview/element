@@ -5,6 +5,8 @@
 */
 
 #define luac_c
+
+#if 0
 #define LUA_CORE
 
 #include "lprefix.h"
@@ -722,3 +724,4 @@ static void PrintFunction(const Proto* f, int full)
  if (full) PrintDebug(f);
  for (i=0; i<n; i++) PrintFunction(f->p[i],full);
 }
+#endif

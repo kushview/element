@@ -63,13 +63,26 @@ target_compile_definitions(element
     PRIVATE
         ELEMENT_CMAKE=1
         DONT_SET_USING_JUCE_NAMESPACE=1
-        JUCE_MODAL_LOOPS_PERMITTED=1)
+        JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=1
+        JUCE_LOAD_CURL_SYMBOLS_LAZILY=1
+        JUCE_PLUGINHOST_LV2=1
+        JUCE_VST3_CAN_REPLACE_VST2=0)
 
 target_link_libraries(element
     PRIVATE
         juce::juce_core
         juce::juce_gui_basics
+        juce::juce_gui_extra
+        juce::juce_osc
+        juce::juce_dsp
         juce::juce_data_structures
+        juce::juce_audio_basics
+        juce::juce_audio_devices
+        juce::juce_audio_processors
+        juce::juce_audio_formats
+        juce::juce_audio_utils
         ${SUIL_LIBRARIES}
         element-binarydata
         element-luascripts
