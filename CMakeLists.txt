@@ -39,6 +39,8 @@ target_include_directories(element
         src/lua/src
         ${SUIL_INCLUDE_DIRS}
 )
+
+add_subdirectory(data)
 add_subdirectory(scripts)
 add_subdirectory(src/el)
 
@@ -69,6 +71,7 @@ target_link_libraries(element
         juce::juce_gui_basics
         juce::juce_data_structures
         ${SUIL_LIBRARIES}
+        element-binarydata
         element-luascripts
         element-luamods
     PUBLIC
