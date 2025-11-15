@@ -485,8 +485,15 @@ void GraphNode::handleAsyncUpdate()
 
 void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock)
 {
-    if (prepared())
+    const bool paramsChanged = (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock);
+
+    if (prepared() && ! paramsChanged)
         return;
+
+    if (prepared() && paramsChanged)
+    {
+        releaseResources();
+    }
 
     currentAudioInputBuffer = nullptr;
     currentAudioOutputBuffer.setSize (jmax (1, getNumAudioOutputs()), estimatedSamplesPerBlock);
@@ -495,7 +502,7 @@ void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock
     clearRenderingSequence();
 
     _prepared = true;
-    if (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock)
+    if (paramsChanged)
         setRenderDetails (sampleRate, estimatedSamplesPerBlock);
 
     for (int i = 0; i < nodes.size(); ++i)
