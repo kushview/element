@@ -770,10 +770,16 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
     {
         const uint32 numOuts = node->getNumPorts (PortType::Audio, false);
         if (IONode::audioInputNode == ioproc->getType() && numOuts <= 0)
+        {
+            markUnusedBuffersFree (ourRenderingIndex);
             return;
+        }
         const uint32 numIns = node->getNumPorts (PortType::Audio, true);
         if (IONode::audioOutputNode == ioproc->getType() && numIns <= 0)
+        {
+            markUnusedBuffersFree (ourRenderingIndex);
             return;
+        }
     }
 
     Array<int> channelsToUse[PortType::Unknown];
