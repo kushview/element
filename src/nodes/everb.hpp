@@ -93,13 +93,28 @@ public:
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
 
-    int getNumPrograms() override { return 1; };
-    int getCurrentProgram() override { return 1; };
-    void setCurrentProgram (int index) override { ignoreUnused (index); };
+    int getNumPrograms() override { return static_cast<int> (presets().size()); };
+    int getCurrentProgram() override { return currentProgram; };
+    void setCurrentProgram (int index) override
+    {
+        if (index >= 0 && index < static_cast<int> (presets().size()))
+        {
+            currentProgram = index;
+            const auto& preset = presets()[index];
+            *roomSize = preset.params.roomSize;
+            *damping = preset.params.damping;
+            *wetLevel = preset.params.wetLevel;
+            *dryLevel = preset.params.dryLevel;
+            *width = preset.params.width;
+        }
+    }
     const String getProgramName (int index) override
     {
-        ignoreUnused (index);
-        return "Default";
+        if (index >= 0 && index < static_cast<int> (presets().size()))
+        {
+            return presets()[index].name;
+        }
+        return "Unknown";
     }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
@@ -135,6 +150,72 @@ public:
 private:
     Reverb verb;
     Reverb::Parameters params, lastParams;
+    int currentProgram = 0;
+
+    struct Preset
+    {
+        juce::String name;
+        Reverb::Parameters params;
+    };
+
+    const std::vector<Preset>& presets()
+    {
+        static std::vector<Preset> _presets;
+        if (_presets.empty())
+        {
+            // Default
+            _presets.push_back ({ "Default", {} });
+
+            // Small Rooms
+            _presets.push_back ({ "Small Room", { 0.3f, 0.5f, 0.33f, 0.4f, 0.5f } });
+            _presets.push_back ({ "Bright Room", { 0.35f, 0.2f, 0.4f, 0.3f, 0.6f } });
+            _presets.push_back ({ "Dark Room", { 0.4f, 0.8f, 0.35f, 0.35f, 0.5f } });
+
+            // Medium Spaces
+            _presets.push_back ({ "Studio", { 0.5f, 0.5f, 0.4f, 0.3f, 0.7f } });
+            _presets.push_back ({ "Live Stage", { 0.55f, 0.4f, 0.45f, 0.25f, 0.8f } });
+            _presets.push_back ({ "Club", { 0.6f, 0.6f, 0.5f, 0.2f, 0.75f } });
+
+            // Large Halls
+            _presets.push_back ({ "Small Hall", { 0.7f, 0.5f, 0.5f, 0.2f, 0.85f } });
+            _presets.push_back ({ "Concert Hall", { 0.8f, 0.4f, 0.6f, 0.15f, 0.9f } });
+            _presets.push_back ({ "Large Hall", { 0.85f, 0.5f, 0.65f, 0.1f, 0.95f } });
+            _presets.push_back ({ "Cathedral", { 0.95f, 0.3f, 0.7f, 0.05f, 1.0f } });
+
+            // Special Effects
+            _presets.push_back ({ "Ambient", { 0.75f, 0.7f, 0.8f, 0.1f, 1.0f } });
+            _presets.push_back ({ "Ethereal", { 0.9f, 0.2f, 0.85f, 0.05f, 1.0f } });
+            _presets.push_back ({ "Plate", { 0.6f, 0.3f, 0.5f, 0.2f, 0.6f } });
+            _presets.push_back ({ "Spring", { 0.4f, 0.6f, 0.4f, 0.3f, 0.4f } });
+
+            // Creative
+            _presets.push_back ({ "Tight", { 0.25f, 0.7f, 0.3f, 0.5f, 0.3f } });
+            _presets.push_back ({ "Spacious", { 0.8f, 0.5f, 0.7f, 0.1f, 1.0f } });
+            _presets.push_back ({ "Warm", { 0.65f, 0.75f, 0.5f, 0.25f, 0.7f } });
+            _presets.push_back ({ "Shimmer", { 0.7f, 0.15f, 0.7f, 0.15f, 0.95f } });
+            _presets.push_back ({ "Gated", { 0.35f, 0.9f, 0.4f, 0.4f, 0.5f } });
+            _presets.push_back ({ "Reverse", { 0.5f, 0.1f, 0.6f, 0.2f, 0.8f } });
+
+            // Instrument Specific
+            _presets.push_back ({ "Vocal Booth", { 0.3f, 0.6f, 0.25f, 0.5f, 0.4f } });
+            _presets.push_back ({ "Drum Room", { 0.45f, 0.5f, 0.35f, 0.4f, 0.65f } });
+            _presets.push_back ({ "Piano Hall", { 0.75f, 0.4f, 0.55f, 0.2f, 0.85f } });
+            _presets.push_back ({ "Guitar Cab", { 0.2f, 0.8f, 0.2f, 0.6f, 0.3f } });
+
+            // Genre/Style
+            _presets.push_back ({ "Jazz Club", { 0.5f, 0.55f, 0.45f, 0.3f, 0.7f } });
+            _presets.push_back ({ "Rock Arena", { 0.7f, 0.6f, 0.6f, 0.15f, 0.9f } });
+            _presets.push_back ({ "Electronic Space", { 0.85f, 0.25f, 0.75f, 0.1f, 1.0f } });
+            _presets.push_back ({ "Orchestral", { 0.9f, 0.45f, 0.65f, 0.15f, 0.95f } });
+
+            // Mixing Tools
+            _presets.push_back ({ "Subtle Room", { 0.25f, 0.5f, 0.15f, 0.7f, 0.5f } });
+            _presets.push_back ({ "Wide Stereo", { 0.6f, 0.4f, 0.5f, 0.25f, 1.0f } });
+            _presets.push_back ({ "Mono Compatible", { 0.4f, 0.5f, 0.3f, 0.4f, 0.2f } });
+            _presets.push_back ({ "Dense Tail", { 0.8f, 0.7f, 0.6f, 0.2f, 0.75f } });
+        }
+        return _presets;
+    }
 
     bool paramsChanged() const noexcept
     {
