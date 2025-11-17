@@ -241,4 +241,465 @@ BOOST_AUTO_TEST_CASE (pipe)
     array.clear (true);
 }
 
+BOOST_AUTO_TEST_CASE (capacity_checking)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    buffer.setTypes (map);
+
+    const auto initial_capacity = buffer.capacity();
+    BOOST_REQUIRE_GT (initial_capacity, 8000U); // Should be ~8192, but aligned
+
+    // Fill buffer near capacity with large events
+    const size_t large_event_size = 1024;
+    uint8_t large_data[large_event_size];
+    memset (large_data, 0xAB, large_event_size);
+
+    int events_inserted = 0;
+    for (int frame = 0; frame < 1000; ++frame) {
+        const auto size_before = buffer.sequence()->atom.size;
+        buffer.insert (frame, large_event_size, urids::atom_Object, large_data);
+        const auto size_after = buffer.sequence()->atom.size;
+
+        if (size_after > size_before)
+            ++events_inserted;
+        else
+            break; // Buffer full, insert silently failed
+    }
+
+    BOOST_REQUIRE_GT (events_inserted, 0);
+    BOOST_REQUIRE_LT (events_inserted, 1000); // Should hit capacity before 1000 events
+
+    // Verify silent failure on overflow
+    const auto size_at_capacity = buffer.sequence()->atom.size;
+    buffer.insert (9999, large_event_size, urids::atom_Object, large_data);
+    BOOST_REQUIRE_EQUAL (buffer.sequence()->atom.size, size_at_capacity); // No change
+}
+
+BOOST_AUTO_TEST_CASE (clear_functionality)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    buffer.setTypes (map);
+
+    // Add some events
+    auto msg = MidiMessage::noteOn (1, 60, 0.8f);
+    buffer.insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    buffer.insert (100, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+
+    int count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 2);
+
+    // Clear and verify empty
+    buffer.clear();
+    BOOST_REQUIRE_EQUAL (buffer.sequence()->atom.size, sizeof (LV2_Atom_Sequence_Body));
+
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+
+    // Test clear(int, int) signature
+    buffer.insert (50, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    buffer.clear (0, 512); // Should behave same as clear()
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+}
+
+BOOST_AUTO_TEST_CASE (prepare_for_output)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    buffer.setTypes (map);
+
+    // prepare() sets size to capacity - header
+    buffer.prepare();
+    const auto prepared_size = buffer.sequence()->atom.size;
+    BOOST_REQUIRE_EQUAL (prepared_size, buffer.capacity() - sizeof (LV2_Atom_Sequence_Body));
+
+    // After clear, size should be minimal
+    buffer.clear();
+    BOOST_REQUIRE_EQUAL (buffer.sequence()->atom.size, sizeof (LV2_Atom_Sequence_Body));
+}
+
+BOOST_AUTO_TEST_CASE (add_from_midi_buffer)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    buffer.setTypes (map);
+
+    // Create JUCE MidiBuffer with events
+    MidiBuffer midi;
+    midi.addEvent (MidiMessage::noteOn (1, 60, 0.5f), 0);
+    midi.addEvent (MidiMessage::noteOn (1, 64, 0.6f), 50);
+    midi.addEvent (MidiMessage::noteOff (1, 60), 100);
+    midi.addEvent (MidiMessage::noteOff (1, 64), 150);
+
+    buffer.add (midi);
+
+    int count = 0;
+    int64_t prev_frame = -1;
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        BOOST_REQUIRE_EQUAL (ev->body.type, urids::midi_MidiEvent);
+        BOOST_REQUIRE_EQUAL (ev->body.size, 3U);
+        BOOST_REQUIRE_GT (ev->time.frames, prev_frame); // Verify ordering
+        prev_frame = ev->time.frames;
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 4);
+}
+
+BOOST_AUTO_TEST_CASE (add_from_atom_buffer)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer src, dst;
+    src.setTypes (map);
+    dst.setTypes (map);
+
+    // Add events to source
+    auto msg1 = MidiMessage::noteOn (1, 60, 0.7f);
+    auto msg2 = MidiMessage::noteOff (1, 60);
+    src.insert (10, msg1.getRawDataSize(), urids::midi_MidiEvent, msg1.getRawData());
+    src.insert (50, msg2.getRawDataSize(), urids::midi_MidiEvent, msg2.getRawData());
+
+    // Add source to destination
+    dst.add (src);
+
+    int count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (dst.sequence(), ev)
+    {
+        BOOST_REQUIRE_EQUAL (ev->body.type, urids::midi_MidiEvent);
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 2);
+
+    // Add again to test merging
+    dst.add (src);
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (dst.sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 4);
+}
+
+BOOST_AUTO_TEST_CASE (insert_midi_message_convenience)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    buffer.setTypes (map);
+
+    auto msg1 = MidiMessage::noteOn (2, 72, 0.9f);
+    auto msg2 = MidiMessage::controllerEvent (2, 7, 100);
+
+    buffer.insert (msg1, 25);
+    buffer.insert (msg2, 75);
+
+    int count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        BOOST_REQUIRE_EQUAL (ev->body.type, urids::midi_MidiEvent);
+
+        if (count == 0) {
+            BOOST_REQUIRE_EQUAL (ev->time.frames, 25);
+            MidiMessage decoded (LV2_ATOM_BODY (&ev->body), ev->body.size);
+            BOOST_REQUIRE (decoded.isNoteOn());
+            BOOST_REQUIRE_EQUAL (decoded.getNoteNumber(), 72);
+        } else if (count == 1) {
+            BOOST_REQUIRE_EQUAL (ev->time.frames, 75);
+            MidiMessage decoded (LV2_ATOM_BODY (&ev->body), ev->body.size);
+            BOOST_REQUIRE (decoded.isController());
+            BOOST_REQUIRE_EQUAL (decoded.getControllerNumber(), 7);
+            BOOST_REQUIRE_EQUAL (decoded.getControllerValue(), 100);
+        }
+
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 2);
+}
+
+BOOST_AUTO_TEST_CASE (move_semantics)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer src;
+    src.setTypes (map);
+
+    auto msg = MidiMessage::noteOn (1, 60, 0.5f);
+    src.insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+
+    const auto src_data_ptr = src.data();
+    const auto src_capacity = src.capacity();
+
+    // Move construct
+    AtomBuffer moved (std::move (src));
+    BOOST_REQUIRE_EQUAL (moved.data(), src_data_ptr);
+    BOOST_REQUIRE_EQUAL (moved.capacity(), src_capacity);
+
+    int count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (moved.sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 1);
+
+    // Move assign
+    AtomBuffer assigned;
+    const auto moved_data = moved.data();
+    assigned = std::move (moved);
+    BOOST_REQUIRE_EQUAL (assigned.data(), moved_data);
+
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (assigned.sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 1);
+}
+
+BOOST_AUTO_TEST_CASE (data_accessors)
+{
+    AtomBuffer buffer;
+
+    const auto raw_ptr = buffer.data();
+    const auto atom_ptr = buffer.atom();
+    const auto seq_ptr = buffer.sequence();
+
+    BOOST_REQUIRE_NE (raw_ptr, nullptr);
+    BOOST_REQUIRE_NE (atom_ptr, nullptr);
+    BOOST_REQUIRE_NE (seq_ptr, nullptr);
+    BOOST_REQUIRE_EQUAL (raw_ptr, (const void*) atom_ptr);
+    BOOST_REQUIRE_EQUAL (raw_ptr, (const void*) seq_ptr);
+
+    // Test const version
+    const AtomBuffer& const_ref = buffer;
+    BOOST_REQUIRE_EQUAL (const_ref.data(), raw_ptr);
+}
+
+BOOST_AUTO_TEST_CASE (event_ordering)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    buffer.setTypes (map);
+
+    // Insert events out of order
+    auto msg = MidiMessage::noteOn (1, 60, 0.5f);
+    buffer.insert (100, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    buffer.insert (200, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    buffer.insert (50, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    buffer.insert (150, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    buffer.insert (25, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+
+    // Verify events are time-ordered
+    int count = 0;
+    int64_t expected_frames[] = { 25, 50, 100, 150, 200 };
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        BOOST_REQUIRE_EQUAL (ev->time.frames, expected_frames[count]);
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 5);
+}
+
+BOOST_AUTO_TEST_CASE (mixed_event_types)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    AtomBuffer buffer;
+    LV2_Atom_Forge forge;
+    lv2_atom_forge_init (&forge, map);
+    buffer.setTypes (map);
+
+    // Insert MIDI
+    auto midi_msg = MidiMessage::noteOn (1, 60, 0.5f);
+    buffer.insert (0, midi_msg.getRawDataSize(), urids::midi_MidiEvent, midi_msg.getRawData());
+
+    // Insert Object (time position)
+    writeTime (forge, buffer);
+
+    // Insert more MIDI
+    auto midi_msg2 = MidiMessage::noteOff (1, 60);
+    buffer.insert (100, midi_msg2.getRawDataSize(), urids::midi_MidiEvent, midi_msg2.getRawData());
+
+    // Insert Float atom
+    float float_value = 3.14159f;
+    buffer.insert (50, sizeof (float), urids::atom_Float, &float_value);
+
+    int midi_count = 0, object_count = 0, float_count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (buffer.sequence(), ev)
+    {
+        if (ev->body.type == urids::midi_MidiEvent)
+            ++midi_count;
+        else if (ev->body.type == urids::atom_Object)
+            ++object_count;
+        else if (ev->body.type == urids::atom_Float)
+            ++float_count;
+    }
+
+    BOOST_REQUIRE_EQUAL (midi_count, 2);
+    BOOST_REQUIRE_EQUAL (object_count, 1);
+    BOOST_REQUIRE_EQUAL (float_count, 1);
+}
+
+BOOST_AUTO_TEST_CASE (pipe_single_buffer)
+{
+    AtomBuffer buffer;
+    element::AtomPipe pipe (buffer);
+
+    BOOST_REQUIRE_EQUAL (pipe.size(), 1);
+    BOOST_REQUIRE_EQUAL (pipe.writeBuffer (0), &buffer);
+    BOOST_REQUIRE_EQUAL (pipe.readBuffer (0), &buffer);
+}
+
+BOOST_AUTO_TEST_CASE (pipe_array_constructor)
+{
+    AtomBuffer b1, b2, b3;
+    AtomBuffer* buffers[] = { &b1, &b2, &b3 };
+
+    element::AtomPipe pipe (buffers, 3);
+
+    BOOST_REQUIRE_EQUAL (pipe.size(), 3);
+    BOOST_REQUIRE_EQUAL (pipe.writeBuffer (0), &b1);
+    BOOST_REQUIRE_EQUAL (pipe.writeBuffer (1), &b2);
+    BOOST_REQUIRE_EQUAL (pipe.writeBuffer (2), &b3);
+    BOOST_REQUIRE_EQUAL (pipe.readBuffer (0), &b1);
+    BOOST_REQUIRE_EQUAL (pipe.readBuffer (1), &b2);
+    BOOST_REQUIRE_EQUAL (pipe.readBuffer (2), &b3);
+}
+
+BOOST_AUTO_TEST_CASE (pipe_clear)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    juce::OwnedArray<AtomBuffer> array;
+    auto b1 = array.add (new AtomBuffer());
+    auto b2 = array.add (new AtomBuffer());
+
+    b1->setTypes (map);
+    b2->setTypes (map);
+
+    auto msg = MidiMessage::noteOn (1, 60, 0.5f);
+    b1->insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    b2->insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+
+    juce::Array<int> channels = { 0, 1 };
+    element::AtomPipe pipe (array, channels);
+
+    // Clear all buffers
+    pipe.clear();
+
+    int count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (b1->sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (b2->sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+
+    // Test clear with range (should behave same as clear())
+    b1->insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    b2->insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    pipe.clear (0, 512);
+
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (b1->sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (b2->sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+
+    array.clear (true);
+}
+
+BOOST_AUTO_TEST_CASE (pipe_clear_single_channel)
+{
+    auto init = urids::makeMap();
+    lvtk::Symbols sym (init);
+    auto map = (LV2_URID_Map*) sym.map_feature()->data;
+
+    juce::OwnedArray<AtomBuffer> array;
+    auto b1 = array.add (new AtomBuffer());
+    auto b2 = array.add (new AtomBuffer());
+
+    b1->setTypes (map);
+    b2->setTypes (map);
+
+    auto msg = MidiMessage::noteOn (1, 60, 0.5f);
+    b1->insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+    b2->insert (0, msg.getRawDataSize(), urids::midi_MidiEvent, msg.getRawData());
+
+    juce::Array<int> channels = { 0, 1 };
+    element::AtomPipe pipe (array, channels);
+
+    // Clear only channel 0
+    pipe.clear (0, 0, 512);
+
+    int count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (b1->sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 0);
+
+    count = 0;
+    LV2_ATOM_SEQUENCE_FOREACH (b2->sequence(), ev)
+    {
+        ++count;
+    }
+    BOOST_REQUIRE_EQUAL (count, 1); // b2 should still have event
+
+    array.clear (true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
