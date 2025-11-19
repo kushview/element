@@ -186,6 +186,7 @@ public:
     AudioMixerNode (int numInputs, int numOutputs)
         : TestNode (numInputs, numOutputs, 0, 0) // audioIns, audioOuts, midiIns, midiOuts
     {
+        tempBuffer.setSize (1, 8192); // Max buffer size for mixing
     }
 
     void render (RenderContext& rc) override
@@ -199,24 +200,31 @@ public:
         if (totalChans < 1 || numSamples < 1)
             return;
 
-        // For mixing: sum all available input channels to first available output channel
-        // Note: This simplified approach doesn't work correctly with GraphNode's
-        // complex channel mapping (via audioChannelsToUse array in ProcessBufferOp)
-        // Real mixer nodes would need to understand that mapping system.
+        // Ensure temp buffer is large enough
+        if (tempBuffer.getNumSamples() < numSamples)
+            tempBuffer.setSize (1, numSamples, false, false, false);
 
-        const int maxInputs = jmin (numIns, totalChans - 1); // Leave at least 1 for output
-        const int outputChan = totalChans - 1;               // Use last channel as output
+        // For mixing with replace-processing: sum all inputs into temp buffer
+        const int maxInputs = jmin(numIns, totalChans);
+        const int outputChan = 0; // Write result to first channel (replace-processing)
 
-        // Clear output
-        float* output = rc.audio.getWritePointer (outputChan);
-        FloatVectorOperations::clear (output, numSamples);
-
-        // Sum all inputs to output
+        // Clear temp buffer
+        float* temp = tempBuffer.getWritePointer(0);
+        FloatVectorOperations::clear(temp, numSamples);
+        
+        // Sum all inputs into temp buffer
         for (int inCh = 0; inCh < maxInputs; ++inCh) {
             const float* input = rc.audio.getReadPointer (inCh);
-            FloatVectorOperations::add (output, input, numSamples);
+            FloatVectorOperations::add (temp, input, numSamples);
         }
+        
+        // Copy result to output channel
+        float* output = rc.audio.getWritePointer (outputChan);
+        FloatVectorOperations::copy (output, temp, numSamples);
     }
+
+private:
+    AudioSampleBuffer tempBuffer;
 };
 
 } // anonymous namespace
@@ -950,10 +958,7 @@ BOOST_AUTO_TEST_CASE (AudioChannelCrossover)
     BOOST_REQUIRE_CLOSE (peak1, 1.0f, 0.05f); // Received swapped gen channel 0
 }
 
-#if 0 // AudioMixerNode test disabled - requires understanding GraphNode's complex channel mapping \
-      // The mixer receives only 3 buffer channels for 3 inputs + 1 output (needs 4)               \
-      // GraphNode uses audioChannelsToUse array mapping, not simple sequential layout             \
-      // A proper mixer would need to be a real production node, not a simplified test node
+#if 1
 BOOST_AUTO_TEST_CASE (AudioMixerNodeTest)
 {
     // Test dedicated mixer node summing multiple inputs
