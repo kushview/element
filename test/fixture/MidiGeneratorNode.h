@@ -11,8 +11,7 @@ public:
 
     void render (RenderContext& rc) override
     {
-        if (rc.midi.getNumBuffers() > 0)
-        {
+        if (rc.midi.getNumBuffers() > 0) {
             auto* midi = rc.midi.getWriteBuffer (0);
             for (const auto& ev : eventsToGenerate)
                 midi->addEvent (ev.message, ev.timestamp);

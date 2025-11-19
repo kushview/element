@@ -1,5 +1,6 @@
 test_element_sources = '''
     atomtests.cpp
+    audioroutingtests.cpp
     datapathtests.cpp
     GraphNodeTests.cpp  
     NodeFactoryTests.cpp  
@@ -51,6 +52,7 @@ test_element_app = executable ('test_element',
 )
 
 test ('Atoms',          test_element_app, args: [ '-t', 'AtomTests' ])
+test ('AudioRouting',   test_element_app, args: [ '-t', 'AudioRoutingTests' ])
 test ('DataPath',       test_element_app, args: [ '-t', 'DataPathTests' ])
 test ('GraphNode',      test_element_app, args: [ '-t', 'GraphNodeTests' ])
 test ('RootGraph',      test_element_app, args: [ '-t', 'RootGraphTests' ])

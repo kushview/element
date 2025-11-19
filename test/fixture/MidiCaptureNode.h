@@ -12,9 +12,8 @@ public:
     void render (RenderContext& rc) override
     {
         eventCount = 0;
-        
-        if (rc.midi.getNumBuffers() > 0)
-        {
+
+        if (rc.midi.getNumBuffers() > 0) {
             auto* midiBuf = rc.midi.getWriteBuffer (0);
             eventCount = midiBuf->getNumEvents();
         }

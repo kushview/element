@@ -15,12 +15,11 @@ public:
     void render (RenderContext& rc) override
     {
         eventCount = 0;
-        
-        if (rc.atom.size() > 0)
-        {
+
+        if (rc.atom.size() > 0) {
             auto* atomBuf = rc.atom.readBuffer (0);
             auto seq = atomBuf->sequence();
-            
+
             LV2_ATOM_SEQUENCE_FOREACH (seq, ev)
             {
                 eventCount++;
