@@ -68,6 +68,7 @@ target_compile_definitions(element
         JUCE_USE_CURL=1
         JUCE_LOAD_CURL_SYMBOLS_LAZILY=1
         JUCE_PLUGINHOST_LV2=1
+        JUCE_PLUGINHOST_VST3=1
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
 target_link_libraries(element
