@@ -5,7 +5,7 @@
 
 #include "element/element.hpp"
 #include "element/lua.hpp"
-#include "sol/sol.hpp"
+#include <sol/sol.hpp>
 
 #define EL_USE_LIBRARY_BUILT_INS 0
 

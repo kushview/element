@@ -9,7 +9,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_subdirectory(subprojects/juce EXLUDE_FROM_ALL)
+add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
+add_subdirectory(subprojects/juce EXCLUDE_FROM_ALL)
+
+cmake_policy(SET CMP0167 OLD)
+set(Boost_ROOT "~/SDKs/include")
+find_package(Boost REQUIRED)
 
 juce_add_gui_app(element
     # VERSION ...                       # Set this if the app version is different to the project version
@@ -19,8 +24,7 @@ juce_add_gui_app(element
     COMPANY_NAME "Kushview"             # Specify the name of the app's author
     PRODUCT_NAME "Element")             # The name of the final executable, which can differ from the target name
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SUIL REQUIRED suil-0)
+
 
 juce_generate_juce_header(element)
 
@@ -37,7 +41,7 @@ target_include_directories(element
         src
         src/lua/sol
         src/lua/src
-        ${SUIL_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
 )
 
 add_subdirectory(data)
@@ -84,10 +88,10 @@ target_link_libraries(element
         juce::juce_audio_processors
         juce::juce_audio_formats
         juce::juce_audio_utils
-        ${SUIL_LIBRARIES}
         element-binarydata
         element-luascripts
         element-luamods
+        sol2::sol2
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags)
