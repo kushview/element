@@ -121,7 +121,9 @@ int luaopen_el_Point (lua_State* L)
         /// Get a rotated copy.
         // @function Point:rotated
         // @treturn el.Point
-        "rotated", &PTF::rotatedAboutOrigin,
+        "rotated", [](PTF& self, lua_Number angle) -> PTF {
+            return self.rotatedAboutOrigin(angle);
+        },
 
         /// Returns the dot product.
         // @function Point:dotProduct
@@ -131,7 +133,8 @@ int luaopen_el_Point (lua_State* L)
         /// Convert to integer values.
         // @function Point:toInt
         // @treturn int
-        "toInt", &PTF::toInt);
+        "toInt", &PTF::toInt
+    );
 
     sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_POINT));
     return 1;
