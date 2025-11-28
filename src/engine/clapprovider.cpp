@@ -220,8 +220,9 @@ protected:
     }
 
     bool enableDraftExtensions() const noexcept override { return false; }
-    const void* getExtension (const char* extensionId) const noexcept override
+    const void* getExtension (const char* extensionId) const noexcept
     {
+        juce::ignoreUnused (extensionId);
         return nullptr;
     }
 

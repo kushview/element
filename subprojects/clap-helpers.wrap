@@ -1,7 +1,0 @@
-[wrap-git]
-url = https://github.com/free-audio/clap-helpers.git
-revision = a61bcdf0ecc2c8db1e80bfe8bf9cb7e8d9fd2bbc
-method = cmake
-
-[provide]
-clap-helpers = clap_helpers_dep

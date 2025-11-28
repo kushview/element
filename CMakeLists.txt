@@ -14,21 +14,20 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
-add_subdirectory(subprojects/juce EXCLUDE_FROM_ALL)
+add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
 
 cmake_policy(SET CMP0167 OLD)
 set(Boost_ROOT "~/SDKs/include")
 find_package(Boost REQUIRED)
 
 juce_add_gui_app(element
-    # VERSION ...                       # Set this if the app version is different to the project version
-    # ICON_BIG ...                      # ICON_* arguments specify a path to an image file to use as an icon
-    # ICON_SMALL ...
-    # DOCUMENT_EXTENSIONS ...           # Specify file extensions that should be associated with this app
-    COMPANY_NAME "Kushview"             # Specify the name of the app's author
-    PRODUCT_NAME "Element")             # The name of the final executable, which can differ from the target name
-
-
+    COMPANY_NAME            "Kushview"             
+    COMPANY_WEBSITE         "https://kushview.net"
+    PRODUCT_NAME            "Element"
+    DOCUMENT_EXTENSIONS     els elg
+    ICON_BIG                data/images/icon.png
+    ICON_SMALL              data/images/icon.png
+)  
 
 juce_generate_juce_header(element)
 
@@ -36,12 +35,9 @@ target_include_directories(element
     PUBLIC
         include
     PRIVATE
-        subprojects/clap/include
-        subprojects/clap-helpers/include
-        subprojects/juce/modules/juce_audio_processors/format_types/LV2_SDK
-        subprojects/juce/modules/juce_audio_processors/format_types/LV2_SDK/lilv
-        subprojects/lvtk/include
-        subprojects/lvtk-host/include
+        deps/clap/include
+        deps/clap-helpers/include
+        deps/lvtk/include
         src
         src/lua/sol
         src/lua/src
@@ -81,6 +77,7 @@ target_compile_definitions(element
         JUCE_LOAD_CURL_SYMBOLS_LAZILY=1
         JUCE_PLUGINHOST_LV2=1
         JUCE_PLUGINHOST_VST3=1
+        JUCE_PLUGINHOST_AU=1
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
 target_link_libraries(element

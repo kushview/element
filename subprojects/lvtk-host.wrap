@@ -1,9 +1,0 @@
-[wrap-git]
-url = https://github.com/lvtk/lvtk-host.git
-push-url = git@github.com:lvtk/lvtk-host.git
-revision = main
-
-[provide]
-lvtk-host-3.0=lvtk_host_dep
-lvtk-host-3=lvtk_host_dep
-lvtk-host=lvtk_host_dep

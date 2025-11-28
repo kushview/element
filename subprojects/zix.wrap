@@ -1,6 +1,0 @@
-[wrap-git]
-url = https://gitlab.com/drobilla/zix.git
-revision = main
-
-[provide]
-dependency_names = zix-0

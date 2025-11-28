@@ -1,3 +1,15 @@
 [submodule "deps/sol2"]
 	path = deps/sol2
 	url = https://github.com/ThePhD/sol2.git
+[submodule "deps/juce"]
+	path = deps/juce
+	url = https://github.com/juce-framework/JUCE.git
+[submodule "deps/clap"]
+	path = deps/clap
+	url = https://github.com/free-audio/clap
+[submodule "deps/clap-helpers"]
+	path = deps/clap-helpers
+	url = https://github.com/free-audio/clap-helpers
+[submodule "deps/lvtk"]
+	path = deps/lvtk
+	url = https://github.com/lvtk/lvtk
