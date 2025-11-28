@@ -19,6 +19,12 @@ For more information visit www.rabiensoftware.com
 #include <element/juce/events.hpp>
 #include "filesystemwatcher.hpp"
 
+#if JUCE_MAC
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreServices/CoreServices.h>
+#include <dispatch/dispatch.h>
+#endif
+
 namespace element {
 
 //==============================================================================
@@ -29,20 +35,30 @@ class FileSystemWatcher::Impl
 public:
     Impl (FileSystemWatcher& o, juce::File f) : owner (o), folder (f)
     {
-        NSString* newPath = [NSString stringWithUTF8String:folder.getFullPathName().toRawUTF8()];
+        const auto* utf8Path = folder.getFullPathName().toRawUTF8();
+        const auto pathString = CFStringCreateWithCString (kCFAllocatorDefault, utf8Path, kCFStringEncodingUTF8);
 
-        paths = [[NSArray arrayWithObject:newPath] retain];
-        context.version = 0L;
-        context.info = this;
-        context.retain = nil;
-        context.release = nil;
-        context.copyDescription = nil;
-
-        dispatch_queue_t queue = dispatch_queue_create ("com.gin.filesystemwatcher", DISPATCH_QUEUE_SERIAL);
-        stream = FSEventStreamCreate (kCFAllocatorDefault, callback, &context, (CFArrayRef) paths, kFSEventStreamEventIdSinceNow, 0.05, kFSEventStreamCreateFlagNoDefer | kFSEventStreamCreateFlagFileEvents);
-        if (stream)
+        if (pathString != nullptr)
         {
-            FSEventStreamSetDispatchQueue (stream, queue);
+            const void* values[] = { pathString };
+            paths = CFArrayCreate (kCFAllocatorDefault, values, 1, &kCFTypeArrayCallBacks);
+            CFRelease (pathString);
+        }
+
+        context.version = 0;
+        context.info = this;
+        context.retain = nullptr;
+        context.release = nullptr;
+        context.copyDescription = nullptr;
+
+        queue = dispatch_queue_create ("com.gin.filesystemwatcher", DISPATCH_QUEUE_SERIAL);
+        stream = FSEventStreamCreate (kCFAllocatorDefault, callback, &context, paths, kFSEventStreamEventIdSinceNow, 0.05, kFSEventStreamCreateFlagNoDefer | kFSEventStreamCreateFlagFileEvents);
+
+        if (stream != nullptr)
+        {
+            if (queue != nullptr)
+                FSEventStreamSetDispatchQueue (stream, queue);
+
             FSEventStreamStart (stream);
         }
     }
@@ -55,6 +71,20 @@ public:
             FSEventStreamSetDispatchQueue (stream, nullptr);
             FSEventStreamInvalidate (stream);
             FSEventStreamRelease (stream);
+        }
+
+        if (queue != nullptr)
+        {
+#if !(defined(OS_OBJECT_USE_OBJC) && OS_OBJECT_USE_OBJC)
+            dispatch_release (queue);
+#endif
+            queue = nullptr;
+        }
+
+        if (paths != nullptr)
+        {
+            CFRelease (paths);
+            paths = nullptr;
         }
     }
 
@@ -104,9 +134,10 @@ public:
     FileSystemWatcher& owner;
     const juce::File folder;
 
-    NSArray* paths;
-    FSEventStreamRef stream;
-    struct FSEventStreamContext context;
+    CFArrayRef paths { nullptr };
+    dispatch_queue_t queue { nullptr };
+    FSEventStreamRef stream { nullptr };
+    struct FSEventStreamContext context {};
 };
 #endif
 
