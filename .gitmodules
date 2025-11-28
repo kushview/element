@@ -13,3 +13,6 @@
 [submodule "deps/lvtk"]
 	path = deps/lvtk
 	url = https://github.com/lvtk/lvtk
+[submodule "deps/clap-juce-extensions"]
+	path = deps/clap-juce-extensions
+	url = https://github.com/free-audio/clap-juce-extensions

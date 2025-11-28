@@ -15,26 +15,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
+add_subdirectory(deps/clap EXCLUDE_FROM_ALL)
+add_subdirectory(deps/clap-helpers EXCLUDE_FROM_ALL)
+# add_subdirectory(deps/clap-juce-extensions EXCLUDE_FROM_ALL)
 
 cmake_policy(SET CMP0167 OLD)
 set(Boost_ROOT "~/SDKs/include")
 find_package(Boost REQUIRED)
 
-juce_add_gui_app(element
-    COMPANY_NAME            "Kushview"             
-    COMPANY_WEBSITE         "https://kushview.net"
-    PRODUCT_NAME            "Element"
-    DOCUMENT_EXTENSIONS     els elg
-    ICON_BIG                data/images/icon.png
-    ICON_SMALL              data/images/icon.png
-)  
-
-juce_generate_juce_header(element)
+add_library(element STATIC)
+add_library(kv::element ALIAS element)
 
 target_include_directories(element
     PUBLIC
         include
-    PRIVATE
+    PUBLIC
         deps/clap/include
         deps/clap-helpers/include
         deps/lvtk/include
@@ -68,7 +63,7 @@ elseif(MSVC)
 endif()
 
 target_compile_definitions(element
-    PRIVATE
+    PUBLIC
         ELEMENT_CMAKE=1
         DONT_SET_USING_JUCE_NAMESPACE=1
         JUCE_MODAL_LOOPS_PERMITTED=1
@@ -81,7 +76,7 @@ target_compile_definitions(element
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
 target_link_libraries(element
-    PRIVATE
+    PUBLIC
         juce::juce_core
         juce::juce_gui_basics
         juce::juce_gui_extra
@@ -100,3 +95,67 @@ target_link_libraries(element
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags)
+
+## Standalone Application
+juce_add_gui_app(element_app
+    COMPANY_NAME            "Kushview"             
+    COMPANY_WEBSITE         "https://kushview.net"
+    PRODUCT_NAME            "Element"
+    DOCUMENT_EXTENSIONS     els elg
+    ICON_BIG                data/images/icon.png
+    ICON_SMALL              data/images/icon.png
+)
+
+target_sources(element_app PRIVATE src/main.cc)
+target_link_libraries(element_app PRIVATE kv::element)
+
+## Instrument Plugin
+juce_add_plugin(element_instrument
+    COMPANY_NAME            "Kushview"
+    COMPANY_WEBSITE         "https://kushview.net"
+    PLUGIN_NAME             "Element"
+    PRODUCT_NAME            "KV-Element"
+    PLUGIN_CODE             Elmt
+    IS_SYNTH                OFF
+    NEEDS_MIDI_INPUT        ON
+    NEEDS_MIDI_OUTPUT       OFF
+    EDITOR_WANTS_KEYBOARD_FOCUS ON
+    FORMATS               AU LV2 VST3
+)
+
+target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
+target_link_libraries(element_instrument PRIVATE kv::element)
+
+## Effect Plugin
+juce_add_plugin(element_effect
+    COMPANY_NAME            "Kushview"
+    COMPANY_WEBSITE         "https://kushview.net"
+    PLUGIN_NAME             "Element Effect"
+    PRODUCT_NAME            "KV-Element-FX"
+    PLUGIN_CODE             ElFX
+    IS_SYNTH                OFF
+    NEEDS_MIDI_INPUT        ON
+    NEEDS_MIDI_OUTPUT       OFF
+    EDITOR_WANTS_KEYBOARD_FOCUS ON
+    FORMATS               AU LV2 VST3
+)
+
+target_sources(element_effect PRIVATE plugins/effect/plugin.cpp)
+target_link_libraries(element_effect PRIVATE kv::element)
+
+## MIDI Effect Plugin
+juce_add_plugin(element_midi_effect
+    COMPANY_NAME            "Kushview"
+    COMPANY_WEBSITE         "https://kushview.net"
+    PLUGIN_NAME             "Element MIDI Effect"
+    PRODUCT_NAME            "KV-Element-MFX"
+    PLUGIN_CODE             ElMX
+    IS_SYNTH                OFF
+    NEEDS_MIDI_INPUT        ON
+    NEEDS_MIDI_OUTPUT       ON
+    EDITOR_WANTS_KEYBOARD_FOCUS ON
+    FORMATS               AU
+)
+
+target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
+target_link_libraries(element_midi_effect PRIVATE kv::element)
