@@ -3,6 +3,10 @@
 cmake_minimum_required(VERSION 3.22)
 project(element VERSION 1.0.0)
 
+if(APPLE)
+    enable_language(OBJCXX)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,6 +57,10 @@ file(GLOB_RECURSE ELEMENT_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 
 target_sources(element PRIVATE ${ELEMENT_SOURCES})
+
+if(APPLE)
+    target_sources(element PRIVATE src/ui/nsviewwithparent.mm)
+endif()
 
 target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")

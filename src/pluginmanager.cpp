@@ -7,7 +7,6 @@
 #include <element/node.hpp>
 #include <element/plugins.hpp>
 #include <element/settings.hpp>
-#include <element/lv2.hpp>
 
 #include "engine/clapprovider.hpp"
 #include "nodes/nodetypes.hpp"
@@ -307,7 +306,6 @@ public:
 
         logger->logMessage ("[scanner] setting up formats");
         auto& nf = plugins->getNodeFactory();
-        nf.add (new LV2NodeProvider());
         nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
@@ -539,19 +537,7 @@ public:
                      KnownPluginList& list)
     {
         ScopedLock sl (lock);
-        if (format == "LV2")
-        {
-            for (const auto& item : lv2Items)
-            {
-                if (nullptr != list.getTypeForFile (item.identifier))
-                    continue;
-                auto desc = plugs.add (new PluginDescription());
-                desc->pluginFormatName = "LV2";
-                desc->fileOrIdentifier = item.identifier;
-                desc->name = item.name;
-            }
-        }
-        else if (plugins.contains (format))
+        if (plugins.contains (format))
         {
             for (const auto& file : plugins.getReference (format))
             {
@@ -576,8 +562,6 @@ private:
         String identifier;
     };
 
-    std::vector<Item> lv2Items;
-
     Atomic<int> cancelFlag;
 
     void run() override
@@ -586,7 +570,6 @@ private:
 
         PluginManager pluginManager;
         pluginManager.addDefaultFormats();
-        pluginManager.getNodeFactory().add (new LV2NodeProvider());
         auto& manager (pluginManager.getAudioPluginFormats());
 
         // JUCE Formats.
@@ -605,25 +588,10 @@ private:
         }
 
         // Element Node Providers
-        lv2Items.clear();
         auto& factory = pluginManager.getNodeFactory();
         for (auto provider : factory.providers())
         {
-            if (auto* lv2 = dynamic_cast<LV2NodeProvider*> (provider))
-            {
-                FileSearchPath fp;
-                const auto types = lv2->findTypes (fp, false, false);
-                lv2Items.clear();
-                lv2Items.reserve ((size_t) types.size());
-                for (const auto& uri : types)
-                {
-                    const auto name = lv2->nameForURI (uri);
-                    lv2Items.push_back ({ name, uri });
-                }
-
-                lv2Items.shrink_to_fit();
-                break;
-            }
+            // FIXME: CLAP and other unverified support.
         }
 
         cancelFlag.set (0);

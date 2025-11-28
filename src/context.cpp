@@ -8,7 +8,6 @@
 #include <element/services.hpp>
 #include <element/symbolmap.hpp>
 #include <element/context.hpp>
-#include <element/lv2.hpp>
 
 #include "engine/audioprocessorfactory.hpp"
 #include "engine/internalformat.hpp"
@@ -93,7 +92,6 @@ private:
         auto& nf = plugins->getNodeFactory();
         nf.add (new InternalNodes (owner));
         nf.add (new AudioProcessorFactory (owner));
-        nf.add (new LV2NodeProvider (*symbols));
         nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
     }

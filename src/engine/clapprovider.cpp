@@ -15,9 +15,10 @@
 #include <element/version.hpp>
 #include <element/ui/nodeeditor.hpp>
 
+#include "lv2/messages.hpp"
+
 #include "appinfo.hpp"
 #include "engine/clapprovider.hpp"
-#include "lv2/messages.hpp"
 #include "ui/resizelistener.hpp"
 #include "ui/nsviewwithparent.hpp"
 

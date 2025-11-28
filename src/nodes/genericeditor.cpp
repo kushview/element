@@ -241,7 +241,7 @@ public:
         slider.setScrollWheelEnabled (false);
         addAndMakeVisible (slider);
 
-        valueLabel.setFont (Font (12.f));
+        valueLabel.setFont (Font (FontOptions (12.f)));
         valueLabel.setColour (Label::outlineColourId, slider.findColour (Slider::textBoxOutlineColourId));
         valueLabel.setBorderSize ({ 1, 1, 1, 1 });
         valueLabel.setJustificationType (Justification::centred);
@@ -388,7 +388,7 @@ public:
     {
         auto patch = dynamic_cast<PatchParameter*> (param);
 
-        parameterName.setFont (Font (12.f));
+        parameterName.setFont (Font (FontOptions (12.f)));
         parameterName.setText (param->getName (128), dontSendNotification);
         parameterName.setJustificationType (Justification::centredRight);
         addAndMakeVisible (parameterName);

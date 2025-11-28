@@ -30,7 +30,7 @@ public:
         {
             addAndMakeVisible (midiOutLatencyLabel);
             midiOutLatencyLabel.setText ("Output latency (ms)", dontSendNotification);
-            midiOutLatencyLabel.setFont (Font (12.f));
+            midiOutLatencyLabel.setFont (Font (FontOptions (12.f)));
             addAndMakeVisible (midiOutLatency);
             midiOutLatency.setRange (-1000.0, 1000.0, 1.0);
             midiOutLatency.setValue (proc.getLatency(), dontSendNotification);

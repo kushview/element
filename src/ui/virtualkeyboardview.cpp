@@ -151,7 +151,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     };
 
     addAndMakeVisible (widthLabel);
-    widthLabel.setFont (Font (12.f));
+    widthLabel.setFont (Font (FontOptions (12.f)));
     widthLabel.setJustificationType (Justification::centredRight);
     widthLabel.setText ("Width:", dontSendNotification);
     addAndMakeVisible (widthDown);

@@ -180,7 +180,7 @@ public:
     juce::Label* createSliderTextBox (juce::Slider& slider) override
     {
         auto l = juce::LookAndFeel_V2::createSliderTextBox (slider);
-        l->setFont (juce::Font (FontOptions (13.f)));
+        l->setFont (juce::Font (juce::FontOptions (13.f)));
         return l;
     }
 

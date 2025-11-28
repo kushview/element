@@ -310,7 +310,7 @@ public:
         if (model->getNumRows() <= 0)
         {
             g.setColour (Colors::textColor);
-            g.setFont (Font (15.f));
+            g.setFont (Font (FontOptions (15.f)));
             g.drawText (TRANS ("No channels to display"),
                         getLocalBounds().toFloat(),
                         Justification::centred);
