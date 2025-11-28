@@ -100,5 +100,3 @@ target_link_libraries(element
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags)
-
-target_link_options(element PRIVATE ${SUIL_LDFLAGS_OTHER})
