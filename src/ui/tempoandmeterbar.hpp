@@ -43,7 +43,7 @@ public:
 
         if (extButton.isVisible())
         {
-            int w = Font (18).getStringWidth ("EXT");
+            int w = Font (FontOptions (18)).getStringWidth ("EXT");
             extButton.setBounds (r.removeFromLeft (w + 4));
             r.removeFromLeft (2);
         }
@@ -51,7 +51,7 @@ public:
         tempoLabel.setBounds (r.removeFromLeft (46));
         r.removeFromLeft (2);
 
-        int w = Font (18).getStringWidth ("TAP");
+        int w = Font (FontOptions (18)).getStringWidth ("TAP");
         tapTempoButton.setBounds (r.removeFromLeft (w + 4));
         r.removeFromLeft (2);
 
@@ -193,7 +193,7 @@ private:
 
             if (getButtonText().isNotEmpty())
             {
-                g.setFont (12.f);
+                g.setFont (Font (FontOptions (12.f)));
                 g.setColour (Colours::black);
                 g.drawText (getButtonText(), getLocalBounds(), Justification::centred);
             }
@@ -263,7 +263,7 @@ private:
 
             if (text.isNotEmpty())
             {
-                g.setFont (12.f);
+                g.setFont (Font (FontOptions (12.f)));
                 g.setColour (isEnabled() ? Colours::black : Colours::darkgrey);
                 g.drawText (text, getLocalBounds(), Justification::centred);
             }
@@ -350,7 +350,7 @@ private:
 
             if (getButtonText().isNotEmpty())
             {
-                g.setFont (12.f);
+                g.setFont (Font (FontOptions (12.f)));
                 g.setColour (Colours::black);
                 g.drawText (getButtonText(), getLocalBounds(), Justification::centred);
             }

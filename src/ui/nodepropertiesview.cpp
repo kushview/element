@@ -169,7 +169,7 @@ void NodePropertiesView::paintOverChildren (Graphics& g)
 {
     if (! _node.isIONode())
         return;
-    g.setFont (Font (20.f));
+    g.setFont (Font (FontOptions (20.f)));
     g.setColour (findColour (Label::textColourId));
     g.drawText (detail::ioNodeMessage (_node),
                 getLocalBounds().toFloat(),

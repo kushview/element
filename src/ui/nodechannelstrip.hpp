@@ -28,7 +28,7 @@ public:
         nodeName.setText ("", dontSendNotification);
         nodeName.setJustificationType (Justification::centredBottom);
         nodeName.setEditable (false, true, false);
-        nodeName.setFont (10.f);
+        nodeName.setFont (Font (FontOptions (10.f)));
         nodeName.onTextChange = [this] {
             if (node.isValid())
                 node.setProperty (tags::name, nodeName.getText());

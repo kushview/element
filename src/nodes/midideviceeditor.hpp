@@ -50,7 +50,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setFont (13.f);
+        g.setFont (Font (FontOptions (13.f)));
         g.setColour (Colors::textColor);
         String text = "Host MIDI ";
         if (getNode().isMidiInputNode())
@@ -110,7 +110,7 @@ private:
                 addAndMakeVisible (midiOutputLabel);
                 midiOutputLabel.setText ("MIDI Output", dontSendNotification);
                 midiOutputLabel.setJustificationType (Justification::centredLeft);
-                midiOutputLabel.setFont (Font (12.f));
+                midiOutputLabel.setFont (Font (FontOptions (12.f)));
                 addAndMakeVisible (midiOutputs);
                 midiOutputs.onChange = [this]() {
                     auto index = midiOutputs.getSelectedItemIndex();
@@ -131,7 +131,7 @@ private:
                 addAndMakeVisible (midiInputLabel);
                 midiInputLabel.setText ("MIDI Inputs", dontSendNotification);
                 midiInputLabel.setJustificationType (Justification::centredLeft);
-                midiInputLabel.setFont (Font (12.f));
+                midiInputLabel.setFont (Font (FontOptions (12.f)));
             }
 
             updateDevices();

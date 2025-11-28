@@ -50,7 +50,7 @@ static void setupMonoEditor (TextEditor& text)
 {
     text.setCaretVisible (false);
     text.setMultiLine (true, false);
-    text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
+    text.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 13.f, 0));
     text.setReadOnly (true);
 }
 
@@ -72,7 +72,7 @@ public:
         for (const auto& name : names)
         {
             auto* nameLabel = section->names.add (new Label (name, name));
-            nameLabel->setFont (13.f);
+            nameLabel->setFont (Font (FontOptions (13.f)));
             addAndMakeVisible (nameLabel);
         }
 
@@ -198,7 +198,7 @@ AboutScreen::AboutScreen()
 
     addAndMakeVisible (titleLabel);
     titleLabel.setJustificationType (Justification::centred);
-    titleLabel.setFont (Font (34.0f, Font::FontStyleFlags::bold));
+    titleLabel.setFont (Font (FontOptions (34.0f).withStyle ("Bold")));
 
     auto buildDate = Time::getCompilationDate();
     addAndMakeVisible (versionLabel);
@@ -209,11 +209,11 @@ AboutScreen::AboutScreen()
                           dontSendNotification);
 
     versionLabel.setJustificationType (Justification::centred);
-    versionLabel.setFont (Font (13.f));
+    versionLabel.setFont (Font (FontOptions (13.f)));
 
     addAndMakeVisible (copyrightLabel);
     copyrightLabel.setJustificationType (Justification::centred);
-    copyrightLabel.setFont (Font (13.f));
+    copyrightLabel.setFont (Font (FontOptions (13.f)));
     String copyrightText = "Copyright ";
     copyrightText << String (CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
     copyrightLabel.setText (copyrightText.replace ("XXX", String (buildDate.getYear())),

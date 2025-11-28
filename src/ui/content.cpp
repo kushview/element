@@ -242,7 +242,7 @@ public:
         addAndMakeVisible (streamingStatusLabel);
         addAndMakeVisible (statusLabel);
 
-        const Font font (12.0f);
+        const Font font (FontOptions (12.0f));
 
         for (int i = 0; i < getNumChildComponents(); ++i)
         {

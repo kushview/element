@@ -573,14 +573,14 @@ void LookAndFeel_E1::drawLinearSliderBackground (Graphics& g, int x, int y, int 
 //==============================================================================
 Font LookAndFeel_E1::getComboBoxFont (ComboBox& box)
 {
-    return Font (jmin (12.0f, box.getHeight() * 0.85f));
+    return Font (FontOptions (jmin (12.0f, box.getHeight() * 0.85f)));
 }
 
 // Label
 Font LookAndFeel_E1::getLabelFont (Label& label)
 {
     if (nullptr != dynamic_cast<PropertyComponent*> (label.getParentComponent()))
-        label.setFont (Font (13.f));
+        label.setFont (Font (FontOptions (13.f)));
     return label.getFont();
 }
 
@@ -648,7 +648,7 @@ void LookAndFeel_E1::changeToggleButtonWidthToFitText (ToggleButton& button)
     auto fontSize = jmin (15.0f, button.getHeight() * 0.75f);
     auto tickWidth = fontSize * 1.1f;
 
-    Font font (fontSize);
+    const Font font { FontOptions (fontSize) };
 
     button.setSize (font.getStringWidth (button.getButtonText()) + roundToInt (tickWidth) + 14, button.getHeight());
 }
@@ -689,7 +689,7 @@ void LookAndFeel_E1::drawPropertyComponentLabel (Graphics& g, int width, int hei
                     .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
 
     // g.setFont (jmin (height, 24) * 0.55f);
-    g.setFont (12.f);
+    g.setFont (Font (FontOptions (12.f)));
 
     auto r = getPropertyComponentContentPosition (component);
 
@@ -731,7 +731,7 @@ void LookAndFeel_E1::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int
     g.fillRect (area.withTop (area.getBottom() - 1));
 
     g.setColour (findColour (Label::textColourId));
-    g.setFont (Font (area.getHeight() * 0.62f).boldened());
+    g.setFont (Font (FontOptions (area.getHeight() * 0.62f).withStyle ("Bold")));
     g.drawFittedText (panel.getName().toUpperCase(), 8, 0, area.getWidth() - 6, area.getHeight(), Justification::centredLeft, 1);
 }
 
@@ -842,7 +842,7 @@ int LookAndFeel_E1::getTabButtonSpaceAroundImage() { return 1; }
 
 void LookAndFeel_E1::createTabTextLayout (const TabBarButton& button, float length, float depth, Colour colour, TextLayout& textLayout)
 {
-    Font font (depth * 0.5f);
+    Font font (FontOptions (depth * 0.5f));
     font.setUnderline (button.hasKeyboardFocus (false));
 
     AttributedString s;
@@ -1048,7 +1048,7 @@ void LookAndFeel_E1::getIdealPopupMenuItemSize (const String& text,
 //==============================================================================
 Font LookAndFeel_E1::getMenuBarFont (MenuBarComponent&, int, const String&)
 {
-    return Font (16.f);
+    return Font (FontOptions (16.f));
 }
 
 void LookAndFeel_E1::drawMenuBarBackground (Graphics& g, int width, int height, bool isMouseOverBar, MenuBarComponent& mbc)

@@ -271,7 +271,7 @@ public:
         if (label == nullptr)
             return nullptr;
 
-        label->setFont (Font (editor.getFontSize()));
+        label->setFont (Font (FontOptions (editor.getFontSize())));
 
         return label;
     }
@@ -546,7 +546,7 @@ void MidiSetListEditor::setStoreSize (const bool storeSize)
 void MidiSetListEditor::updateTableHeaderSizes()
 {
     auto& header = table.getHeader();
-    const auto tempoSize = Font (getFontSize()).getStringWidth ("120.00 bpm") + 4;
+    const auto tempoSize = Font (FontOptions (getFontSize())).getStringWidth ("120.00 bpm") + 4;
     header.setColumnWidth (TableModel::Tempo, tempoSize);
 
     // clang-format on

@@ -296,12 +296,12 @@ public:
 
         auto refreshIOLabel = [this] (Label& lab, bool vis) {
             lab.setVisible (vis);
-            lab.setFont (juce::Font (meterSize > 14 ? 10.f : 9.4f));
+            lab.setFont (juce::Font (FontOptions (meterSize > 14 ? 10.f : 9.4f)));
             lab.setJustificationType (juce::Justification::centred);
         };
 
         auto refreshMeterLabel = [this] (Label& lab) {
-            lab.setFont (juce::Font (12.f));
+            lab.setFont (juce::Font (FontOptions (12.f)));
             lab.setJustificationType (juce::Justification::centred);
             lab.setVisible (showChannelLabels());
         };

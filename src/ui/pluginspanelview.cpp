@@ -45,7 +45,7 @@ public:
         {
             g.setColour (element::Colors::textColor.withAlpha (0.8f));
             extra = String ("(") + extra + String (")");
-            g.setFont (Font (12.f));
+            g.setFont (Font (FontOptions (12.f)));
             g.drawText (extra, leftSide, 0, width - leftSide - 3, height, Justification::centredRight);
         }
     }

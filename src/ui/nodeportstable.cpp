@@ -71,7 +71,7 @@ public:
         if (text.isNotEmpty())
         {
             g.setColour (Colours::grey);
-            g.setFont (Font (height * 0.7f));
+            g.setFont (Font (FontOptions (height * 0.7f)));
             g.drawFittedText (text, 4, 0, width - 6, height, Justification::centredLeft, 1, 0.9f);
         }
     }

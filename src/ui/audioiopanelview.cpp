@@ -34,7 +34,7 @@ AudioIOPanelView::AudioIOPanelView()
     inputGainLabel = std::make_unique<Label> ("inputGainLabel",
                                               TRANS ("Input Gain"));
     addAndMakeVisible (inputGainLabel.get());
-    inputGainLabel->setFont (Font (12.00f, Font::plain).withTypefaceStyle ("Regular"));
+    inputGainLabel->setFont (Font (FontOptions (12.00f)));
     inputGainLabel->setJustificationType (Justification::centredLeft);
     inputGainLabel->setEditable (false, false, false);
     inputGainLabel->setColour (Label::textColourId, Colours::white);
@@ -44,7 +44,7 @@ AudioIOPanelView::AudioIOPanelView()
     outputGainLabel = std::make_unique<Label> ("outputGainLabel",
                                                TRANS ("Output Gain"));
     addAndMakeVisible (outputGainLabel.get());
-    outputGainLabel->setFont (Font (12.00f, Font::plain).withTypefaceStyle ("Regular"));
+    outputGainLabel->setFont (Font (FontOptions (12.00f)));
     outputGainLabel->setJustificationType (Justification::centredLeft);
     outputGainLabel->setEditable (false, false, false);
     outputGainLabel->setColour (Label::textColourId, Colours::white);
@@ -54,7 +54,7 @@ AudioIOPanelView::AudioIOPanelView()
     inputGainDbLabel = std::make_unique<Label> ("inputGainDbLabel",
                                                 TRANS ("0.00 dB"));
     addAndMakeVisible (inputGainDbLabel.get());
-    inputGainDbLabel->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
+    inputGainDbLabel->setFont (Font (FontOptions (14.00f)));
     inputGainDbLabel->setJustificationType (Justification::centredLeft);
     inputGainDbLabel->setEditable (false, false, false);
     inputGainDbLabel->setColour (Label::textColourId, Colours::white);
@@ -63,7 +63,7 @@ AudioIOPanelView::AudioIOPanelView()
 
     outputGainDbLabel = std::make_unique<Label> ("outputGainDbLabel", TRANS ("0.00 dB"));
     addAndMakeVisible (outputGainDbLabel.get());
-    outputGainDbLabel->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
+    outputGainDbLabel->setFont (Font (FontOptions (14.00f)));
     outputGainDbLabel->setJustificationType (Justification::centredLeft);
     outputGainDbLabel->setEditable (false, false, false);
     outputGainDbLabel->setColour (Label::textColourId, Colours::white);
@@ -73,7 +73,7 @@ AudioIOPanelView::AudioIOPanelView()
     nodeNameLabel = std::make_unique<Label> ("nodeNameLabel",
                                              String());
     addAndMakeVisible (nodeNameLabel.get());
-    nodeNameLabel->setFont (Font (18.00f, Font::plain).withTypefaceStyle ("Regular"));
+    nodeNameLabel->setFont (Font (FontOptions (18.00f)));
     nodeNameLabel->setJustificationType (Justification::centredLeft);
     nodeNameLabel->setEditable (false, true, false);
     nodeNameLabel->setColour (TextEditor::textColourId, Colours::black);

@@ -167,7 +167,7 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     : filterID (node_.getNodeId()),
       graph (graph_),
       node (node_),
-      font (11.0f),
+      font (FontOptions (11.0f)),
       embedInit (*this)
 {
     nodeObject = node.getPropertyAsValue (tags::object, true);
@@ -848,7 +848,7 @@ void BlockComponent::paint (Graphics& g)
         normalTextColor = Colours::white.overlaidWith (color).contrasting();
 
     g.setColour (normalTextColor);
-    g.setFont (Font (12.f, node.isMissing() ? Font::bold : 0));
+    g.setFont (Font (FontOptions (12.f).withStyle (node.isMissing() ? "Bold" : "Regular")));
 
     if (vertical)
     {
@@ -863,7 +863,7 @@ void BlockComponent::paint (Graphics& g)
                 if (subName.isNotEmpty())
                 {
                     g.setColour (Colours::black);
-                    g.setFont (Font (9.f));
+                    g.setFont (Font (FontOptions (9.f)));
                     y += colorBarHeight;
                     g.drawFittedText (subName, box.getX(), y, box.getWidth(), 9, Justification::centred, 2);
                 }
@@ -887,7 +887,7 @@ void BlockComponent::paint (Graphics& g)
                 if (subName.isNotEmpty())
                 {
                     g.setColour (Colours::black);
-                    g.setFont (Font (9.f));
+                    g.setFont (Font (FontOptions (9.f)));
                     y += colorBarHeight;
                     g.drawFittedText (subName, box.getX(), y, box.getWidth(), 13, Justification::centred, 2);
                 }

@@ -8,7 +8,7 @@ namespace element {
 
 static void setupEditor (TextEditor& editor)
 {
-    editor.setFont (Font (Font::getDefaultMonospacedFontName(), 15.0f, juce::Font::plain));
+    editor.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 15.0f, 0));
 }
 
 //=============================================================================

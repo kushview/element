@@ -69,7 +69,7 @@ void TreeItemBase::refreshSubItems()
 
 Font TreeItemBase::getFont() const
 {
-    return Font (getItemHeight() * 0.7f);
+    return Font (FontOptions (getItemHeight() * 0.7f));
 }
 
 void TreeItemBase::paintItem (Graphics& g, int w, int h)

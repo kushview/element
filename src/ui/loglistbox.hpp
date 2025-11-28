@@ -29,9 +29,7 @@ public:
     void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
     {
         ignoreUnused (rowIsSelected);
-        g.setFont (Font (Font::getDefaultMonospacedFontName(),
-                         g.getCurrentFont().getHeight(),
-                         Font::plain));
+        g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), g.getCurrentFont().getHeight(), 0));
         if (isPositiveAndBelow (row, logList.size()))
             ViewHelpers::drawBasicTextRow (logList[row], g, width, height, false);
     }

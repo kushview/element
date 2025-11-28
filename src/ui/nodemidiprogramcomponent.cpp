@@ -10,7 +10,7 @@ NodeMidiProgramComponent::NodeMidiProgramComponent()
     addAndMakeVisible (name);
     name.setText ("Program name...", dontSendNotification);
     name.setTooltip ("MIDI Program name");
-    name.setFont (Font (12.f));
+    name.setFont (Font (FontOptions (12.f)));
     name.setEditable (false, true, false);
 
     addAndMakeVisible (slider);

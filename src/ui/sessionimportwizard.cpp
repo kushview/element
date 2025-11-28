@@ -73,7 +73,7 @@ public:
     {
         setOpaque (true);
         addAndMakeVisible (instructions);
-        instructions.setFont (Font (12.f));
+        instructions.setFont (Font (FontOptions (12.f)));
         instructions.setColour (Label::textColourId, Colors::textColor);
         instructions.setText ("Chose a graph to import", dontSendNotification);
         instructions.setJustificationType (Justification::centred);
