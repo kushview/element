@@ -88,7 +88,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     setWantsKeyboardFocus (true);
 
     addAndMakeVisible (midiChannelLabel);
-    midiChannelLabel.setFont (Font (12.f));
+    midiChannelLabel.setFont (Font (FontOptions (12.f)));
     midiChannelLabel.setJustificationType (Justification::centredRight);
     midiChannelLabel.setText ("Channel:", dontSendNotification);
     addAndMakeVisible (midiChannel);
@@ -101,7 +101,7 @@ VirtualKeyboardView::VirtualKeyboardView()
     };
 
     addAndMakeVisible (midiProgramLabel);
-    midiProgramLabel.setFont (Font (12.f));
+    midiProgramLabel.setFont (Font (FontOptions (12.f)));
     midiProgramLabel.setJustificationType (Justification::centredRight);
     midiProgramLabel.setText ("Program:", dontSendNotification);
     addAndMakeVisible (midiProgram);

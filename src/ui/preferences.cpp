@@ -27,7 +27,7 @@ public:
     PageList (Preferences& prefs)
         : owner (prefs)
     {
-        font.setHeight (16);
+        font = Font (FontOptions (16.0f));
         setModel (this);
     }
 
@@ -125,7 +125,7 @@ public:
     {
         auto& settings = world.settings();
         addAndMakeVisible (enabledLabel);
-        enabledLabel.setFont (Font (12.0, Font::bold));
+        enabledLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         enabledLabel.setText ("OSC Host Enabled?", dontSendNotification);
         addAndMakeVisible (enabledButton);
         enabledButton.setYesNoText ("Yes", "No");
@@ -137,14 +137,14 @@ public:
         };
 
         addAndMakeVisible (hostLabel);
-        hostLabel.setFont (Font (12.0, Font::bold));
+        hostLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         hostLabel.setText ("OSC Host", dontSendNotification);
         addAndMakeVisible (hostField);
         hostField.setReadOnly (true);
         hostField.setText (IPAddress::getLocalAddress().toString());
 
         addAndMakeVisible (portLabel);
-        portLabel.setFont (Font (12.0, Font::bold));
+        portLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         portLabel.setText ("OSC Host Port", dontSendNotification);
         addAndMakeVisible (portSlider);
         portSlider.textFromValueFunction = [] (double value) -> String {
@@ -207,14 +207,13 @@ public:
     PluginSettingsComponent (Context& w)
         : plugins (w.plugins()),
           settings (w.settings())
-
     {
         addAndMakeVisible (activeFormats);
         activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
-        activeFormats.setFont (Font (18.0, Font::bold));
+        activeFormats.setFont (Font (FontOptions (18.0, Font::bold)));
         addAndMakeVisible (formatNotice);
         formatNotice.setText ("Note: enabled format changes take effect upon restart", dontSendNotification);
-        formatNotice.setFont (Font (12.0, Font::italic));
+        formatNotice.setFont (Font (FontOptions (12.0, Font::italic)));
 #if JUCE_MAC
         availableFormats.addArray ({ "AudioUnit", "VST", "VST3" });
 #else
@@ -240,7 +239,7 @@ public:
         const int toggleInset = 4;
 
         Rectangle<int> r (getLocalBounds());
-        activeFormats.setFont (Font (15, Font::bold));
+        activeFormats.setFont (Font (FontOptions (15.0f).withStyle ("Bold")));
         activeFormats.setBounds (r.removeFromTop (18));
         formatNotice.setBounds (r.removeFromTop (14));
 
@@ -337,7 +336,7 @@ public:
     {
         addAndMakeVisible (clockSourceLabel);
         clockSourceLabel.setText ("Clock Source", dontSendNotification);
-        clockSourceLabel.setFont (Font (12.0, Font::bold));
+        clockSourceLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (clockSourceBox);
         clockSourceBox.addItem ("Internal", ClockSourceInternal);
         clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
@@ -345,7 +344,7 @@ public:
 
         addAndMakeVisible (checkForUpdatesLabel);
         checkForUpdatesLabel.setText ("Check for updates on startup", dontSendNotification);
-        checkForUpdatesLabel.setFont (Font (12.0, Font::bold));
+        checkForUpdatesLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (checkForUpdates);
         checkForUpdates.setClickingTogglesState (true);
         checkForUpdates.setToggleState (settings.checkForUpdates(), dontSendNotification);
@@ -353,7 +352,7 @@ public:
 
         addAndMakeVisible (scanForPlugsLabel);
         scanForPlugsLabel.setText ("Scan plugins on startup", dontSendNotification);
-        scanForPlugsLabel.setFont (Font (12.0, Font::bold));
+        scanForPlugsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (scanForPlugins);
         scanForPlugins.setClickingTogglesState (true);
         scanForPlugins.setToggleState (settings.scanForPluginsOnStartup(), dontSendNotification);
@@ -361,7 +360,7 @@ public:
 
         addAndMakeVisible (showPluginWindowsLabel);
         showPluginWindowsLabel.setText ("Automatically show plugin windows", dontSendNotification);
-        showPluginWindowsLabel.setFont (Font (12.0, Font::bold));
+        showPluginWindowsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (showPluginWindows);
         showPluginWindows.setClickingTogglesState (true);
         showPluginWindows.setToggleState (settings.showPluginWindowsWhenAdded(), dontSendNotification);
@@ -369,7 +368,7 @@ public:
 
         addAndMakeVisible (pluginWindowsOnTopLabel);
         pluginWindowsOnTopLabel.setText ("Plugin windows on top by default", dontSendNotification);
-        pluginWindowsOnTopLabel.setFont (Font (12.0, Font::bold));
+        pluginWindowsOnTopLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (pluginWindowsOnTop);
         pluginWindowsOnTop.setClickingTogglesState (true);
         pluginWindowsOnTop.setToggleState (settings.pluginWindowsOnTop(), dontSendNotification);
@@ -377,7 +376,7 @@ public:
 
         addAndMakeVisible (hidePluginWindowsLabel);
         hidePluginWindowsLabel.setText ("Hide plugin windows when app inactive", dontSendNotification);
-        hidePluginWindowsLabel.setFont (Font (12.0, Font::bold));
+        hidePluginWindowsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (hidePluginWindows);
         hidePluginWindows.setClickingTogglesState (true);
         hidePluginWindows.setToggleState (settings.hidePluginWindowsWhenFocusLost(), dontSendNotification);
@@ -393,7 +392,7 @@ public:
 
         openLastSessionLabel.setText (String ("Open last used XXX").replace ("XXX", sessionStr),
                                       dontSendNotification);
-        openLastSessionLabel.setFont (Font (12.0, Font::bold));
+        openLastSessionLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (openLastSession);
         openLastSession.setClickingTogglesState (true);
         openLastSession.setToggleState (settings.openLastUsedSession(), dontSendNotification);
@@ -402,7 +401,7 @@ public:
         addAndMakeVisible (askToSaveSessionLabel);
         askToSaveSessionLabel.setText (String ("Ask to save XXXs on exit").replace ("XXX", sessionStr),
                                        dontSendNotification);
-        askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
+        askToSaveSessionLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (askToSaveSession);
         askToSaveSession.setClickingTogglesState (true);
         askToSaveSession.setToggleState (settings.askToSaveSession(), dontSendNotification);
@@ -410,7 +409,7 @@ public:
 
         addAndMakeVisible (systrayLabel);
         systrayLabel.setText ("Show system tray", dontSendNotification);
-        systrayLabel.setFont (Font (12.0, Font::bold));
+        systrayLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (systray);
         systray.setClickingTogglesState (true);
         systray.setToggleState (settings.isSystrayEnabled(), dontSendNotification);
@@ -418,7 +417,7 @@ public:
 
         addAndMakeVisible (desktopScaleLabel);
         desktopScaleLabel.setText ("Desktop scale", dontSendNotification);
-        desktopScaleLabel.setFont (Font (12.0, Font::bold));
+        desktopScaleLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (desktopScale);
         desktopScale.textFromValueFunction = [] (double value) -> String {
             return String (value, 2);
@@ -447,7 +446,7 @@ public:
 
         addAndMakeVisible (defaultSessionFileLabel);
         defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
-        defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
+        defaultSessionFileLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (defaultSessionFile);
         defaultSessionFile.setCurrentFile (settings.getDefaultNewSessionFile(), dontSendNotification);
         defaultSessionFile.addListener (this);
@@ -468,7 +467,7 @@ public:
 
         addAndMakeVisible (mainContentLabel);
         mainContentLabel.setText ("UI Type", dontSendNotification);
-        mainContentLabel.setFont (Font (12.0, Font::bold));
+        mainContentLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (mainContentBox);
         mainContentBox.addItem ("Standard", 1);
         // mainContentBox.addItem ("Workspace", 2);
@@ -726,14 +725,14 @@ public:
           panic (*this)
     {
         addAndMakeVisible (midiOutputLabel);
-        midiOutputLabel.setFont (Font (12.0, Font::bold));
+        midiOutputLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         midiOutputLabel.setText ("MIDI Output Device", dontSendNotification);
 
         addAndMakeVisible (midiOutput);
         midiOutput.addListener (this);
 
         addAndMakeVisible (midiOutLatencyLabel);
-        midiOutLatencyLabel.setFont (Font (12.0, Font::bold));
+        midiOutLatencyLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         midiOutLatencyLabel.setText ("Output latency (ms)", dontSendNotification);
         addAndMakeVisible (midiOutLatencyLabel);
 
@@ -756,7 +755,7 @@ public:
 #endif
 
         addAndMakeVisible (generateClockLabel);
-        generateClockLabel.setFont (Font (12.0, Font::bold));
+        generateClockLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
         addAndMakeVisible (generateClock);
         generateClock.setYesNoText ("Yes", "No");
@@ -765,7 +764,7 @@ public:
         generateClock.addListener (this);
 
         addAndMakeVisible (sendClockToInputLabel);
-        sendClockToInputLabel.setFont (Font (12.0, Font::bold));
+        sendClockToInputLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         sendClockToInputLabel.setText ("Send Clock to MIDI Input?", dontSendNotification);
         addAndMakeVisible (sendClockToInput);
         sendClockToInput.setYesNoText ("Yes", "No");
@@ -774,13 +773,13 @@ public:
         sendClockToInput.addListener (this);
 
         addAndMakeVisible (panicLabel);
-        panicLabel.setFont (Font (12.0, Font::bold));
+        panicLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         panicLabel.setText ("MIDI Panic CC", juce::dontSendNotification);
         addAndMakeVisible (panic);
         panic.stabilize();
 
         addAndMakeVisible (startStopContLabel);
-        startStopContLabel.setFont (Font (12.0, Font::bold));
+        startStopContLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         startStopContLabel.setText (TRANS ("Transport: MIDI Start/Stop"),
                                     juce::dontSendNotification);
         addAndMakeVisible (startStopCont);
@@ -792,7 +791,7 @@ public:
 
         addAndMakeVisible (midiInputHeader);
         midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
-        midiInputHeader.setFont (Font (12, Font::bold));
+        midiInputHeader.setFont (Font (FontOptions (12.0f).withStyle ("Bold")));
 
         midiInputs = std::make_unique<MidiInputs> (*this);
         midiInputView.setViewedComponent (midiInputs.get(), false);
@@ -1004,7 +1003,7 @@ private:
             for (const auto& d : inputs)
             {
                 auto* label = midiInputLabels.add (new Label());
-                label->setFont (Font (12));
+                label->setFont (Font (FontOptions (12.0f)));
                 label->setText (d.name, dontSendNotification);
                 addAndMakeVisible (label);
 
@@ -1214,7 +1213,7 @@ public:
         addAndMakeVisible (updateKey);
 
         mirrorsHeading.setJustificationType (juce::Justification::centredLeft);
-        mirrorsHeading.setFont (Font (15.f));
+        mirrorsHeading.setFont (Font (FontOptions (15.f)));
         addAndMakeVisible (mirrorsHeading);
 
         addAndMakeVisible (_table);

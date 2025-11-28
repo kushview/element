@@ -191,7 +191,7 @@ public:
         if (label == nullptr)
             return nullptr;
 
-        label->setFont (Font (editor.getFontSize()));
+        label->setFont (Font (FontOptions (editor.getFontSize())));
 
         return label;
     }
