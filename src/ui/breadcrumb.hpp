@@ -45,14 +45,18 @@ public:
         {
             auto* seg = segments.add (new Label());
             seg->getTextValue().referTo (node.getPropertyAsValue (tags::name));
-            seg->setSize (2 + seg->getFont().getStringWidth (node.getName()), getHeight());
+            GlyphArrangement glyphs;
+            glyphs.addLineOfText (seg->getFont(), node.getName(), 0, 0);
+            seg->setSize (2 + (int) glyphs.getBoundingBox (0, -1, true).getWidth(), getHeight());
             seg->setJustificationType (Justification::centred);
             addAndMakeVisible (seg);
             if (++i != nodes.size())
             {
                 auto* div = dividers.add (new Label());
                 div->setText ("/", dontSendNotification);
-                div->setSize (10 + seg->getFont().getStringWidth ("/"), getHeight());
+                GlyphArrangement divGlyphs;
+                divGlyphs.addLineOfText (seg->getFont(), "/", 0, 0);
+                div->setSize (10 + (int) divGlyphs.getBoundingBox (0, -1, true).getWidth(), getHeight());
 
                 div->setJustificationType (Justification::centred);
                 addAndMakeVisible (div);

@@ -43,7 +43,9 @@ public:
 
         if (extButton.isVisible())
         {
-            int w = Font (FontOptions (18)).getStringWidth ("EXT");
+            GlyphArrangement glyphs;
+            glyphs.addLineOfText (Font (FontOptions (18)), "EXT", 0, 0);
+            int w = (int) glyphs.getBoundingBox (0, -1, true).getWidth();
             extButton.setBounds (r.removeFromLeft (w + 4));
             r.removeFromLeft (2);
         }
@@ -51,7 +53,9 @@ public:
         tempoLabel.setBounds (r.removeFromLeft (46));
         r.removeFromLeft (2);
 
-        int w = Font (FontOptions (18)).getStringWidth ("TAP");
+        GlyphArrangement glyphs;
+        glyphs.addLineOfText (Font (FontOptions (18)), "TAP", 0, 0);
+        int w = (int) glyphs.getBoundingBox (0, -1, true).getWidth();
         tapTempoButton.setBounds (r.removeFromLeft (w + 4));
         r.removeFromLeft (2);
 

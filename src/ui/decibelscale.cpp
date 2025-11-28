@@ -51,7 +51,9 @@ void DecibelScale::drawLabel (Graphics& g, const int y, const String& label)
 
     int iMidHeight = (int) (font.getHeight() * 0.5f);
 
-    if (font.getStringWidth (label) < iWidth - 5)
+    GlyphArrangement glyphs;
+    glyphs.addLineOfText (font, label, 0, 0);
+    if (glyphs.getBoundingBox (0, -1, true).getWidth() < iWidth - 5)
     {
         g.drawLine (0, iCurrY, 2, iCurrY);
         g.drawLine (iWidth - 3, iCurrY, iWidth - 1, iCurrY);

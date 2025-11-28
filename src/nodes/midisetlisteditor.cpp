@@ -546,7 +546,9 @@ void MidiSetListEditor::setStoreSize (const bool storeSize)
 void MidiSetListEditor::updateTableHeaderSizes()
 {
     auto& header = table.getHeader();
-    const auto tempoSize = Font (FontOptions (getFontSize())).getStringWidth ("120.00 bpm") + 4;
+    GlyphArrangement glyphs;
+    glyphs.addLineOfText (Font (FontOptions (getFontSize())), "120.00 bpm", 0, 0);
+    const auto tempoSize = (int) glyphs.getBoundingBox (0, -1, true).getWidth() + 4;
     header.setColumnWidth (TableModel::Tempo, tempoSize);
 
     // clang-format on

@@ -650,7 +650,9 @@ void LookAndFeel_E1::changeToggleButtonWidthToFitText (ToggleButton& button)
 
     const Font font { FontOptions (fontSize) };
 
-    button.setSize (font.getStringWidth (button.getButtonText()) + roundToInt (tickWidth) + 14, button.getHeight());
+    GlyphArrangement glyphs;
+    glyphs.addLineOfText (font, button.getButtonText(), 0, 0);
+    button.setSize ((int) glyphs.getBoundingBox (0, -1, true).getWidth() + roundToInt (tickWidth) + 14, button.getHeight());
 }
 
 // MARK: Property Panel

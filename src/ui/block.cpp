@@ -1097,7 +1097,9 @@ void BlockComponent::getMinimumSize (int& width, int& height)
     int h = roundToInt (46.0 * ged->getZoomScale());
     const int maxPorts = jmax (numIns, numOuts) + 1;
     font.setHeight (11.f * ged->getZoomScale());
-    int textWidth = font.getStringWidth (node.getDisplayName());
+    GlyphArrangement glyphs;
+    glyphs.addLineOfText (font, node.getDisplayName(), 0, 0);
+    int textWidth = (int) glyphs.getBoundingBox (0, -1, true).getWidth();
     textWidth += (vertical) ? 20 : 36;
     pinSpacing = int (pinSize * (displayMode == Compact || displayMode == Small ? 0.5f : 0.9f));
     int pinSpaceNeeded = int (maxPorts * pinSize) + int (maxPorts * pinSpacing);

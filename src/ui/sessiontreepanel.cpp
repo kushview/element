@@ -690,7 +690,9 @@ public:
         if (p >= 0)
         {
             const auto txt = String (1 + p);
-            const auto txtW = g.getCurrentFont().getStringWidth (txt) + 2;
+            GlyphArrangement glyphs;
+            glyphs.addLineOfText (g.getCurrentFont(), txt, 0, 0);
+            const auto txtW = (int) glyphs.getBoundingBox (0, -1, true).getWidth() + 2;
             g.drawText (txt, area.getWidth() - txtW, 0, txtW, h, Justification::centredRight);
         }
     }

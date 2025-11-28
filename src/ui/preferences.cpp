@@ -25,9 +25,9 @@ class Preferences::PageList : public ListBox,
 {
 public:
     PageList (Preferences& prefs)
-        : owner (prefs)
+        : owner (prefs),
+          font (FontOptions (16.0f))
     {
-        font = Font { FontOptions (16.0f) };
         setModel (this);
     }
 
