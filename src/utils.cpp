@@ -26,8 +26,9 @@ StringArray compiledAudioPluginFormats()
 #if JUCE_PLUGINHOST_LADSPA
     fmts.add ("LADSPA");
 #endif
-
+#if JUCE_PLUGINHOST_LV2
     fmts.add ("LV2");
+#endif
     fmts.add ("CLAP");
     fmts.sort (false);
     return fmts;

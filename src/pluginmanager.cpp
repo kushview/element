@@ -744,6 +744,11 @@ void PluginManager::addDefaultFormats()
             audioPlugs.addFormat (new VST3PluginFormat());
 #endif
 
+#if JUCE_PLUGINHOST_LV2
+        else if (fmt == "LV2")
+            audioPlugs.addFormat (new LV2PluginFormat());
+#endif
+
 #if JUCE_PLUGINHOST_LADSPA
         else if (fmt == "LADSPA")
             audioPlugs.addFormat (new LADSPAPluginFormat());

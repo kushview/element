@@ -781,7 +781,6 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addItem (4, TRANS ("Remove any plug-ins whose files no longer exist"));
         menu.addSeparator();
         menu.addItem (8, "Scan for new or updated CLAP plugins");
-        menu.addItem (9, "Scan for new or updated LV2 plugins");
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
         {
             auto* const format = formatManager.getFormat (i);
