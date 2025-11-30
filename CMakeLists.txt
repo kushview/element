@@ -154,7 +154,7 @@ juce_add_plugin(element_midi_effect
     NEEDS_MIDI_INPUT        ON
     NEEDS_MIDI_OUTPUT       ON
     EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS               AU
+    FORMATS                 AU
 )
 
 target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)

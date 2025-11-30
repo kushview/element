@@ -21,18 +21,8 @@
 #include "sol/sol.hpp"
 #include "el/sol_helpers.hpp"
 
-#if ELEMENT_CMAKE
 #include "luascripts.hpp"
 #include "luamods.hpp"
-#else
-#include "AudioBuffer.lua.h"
-#include "color.lua.h"
-#include "command.lua.h"
-#include "object.lua.h"
-#include "script.lua.h"
-#include "session.lua.h"
-#include "strings.lua.h"
-#endif
 
 extern "C" {
 extern int luaopen_el_audio (lua_State* L);

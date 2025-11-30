@@ -8,11 +8,7 @@
 
 #include "ElementApp.h"
 
-#if ! ELEMENT_CMAKE
-#include "amp.lua.h"
-#include "ampui.lua.h"
-#include "channelize.lua.h"
-#endif
+#include "luascripts.hpp"
 
 #include "sol/sol.hpp"
 #include "element/element.h"
@@ -82,13 +78,12 @@ ScriptNode::ScriptNode() noexcept
     });
 
     script.reset (new DSPScript (lua.create_table()));
-#if ! ELEMENT_CMAKE
+
     dspCode.replaceAllContent (String::fromUTF8 (
         scripts::amp_lua, scripts::amp_luaSize));
     loadScript (dspCode.getAllContent());
     edCode.replaceAllContent (String::fromUTF8 (
         scripts::ampui_lua, scripts::ampui_luaSize));
-#endif
 
     refreshPorts();
 }
@@ -278,7 +273,6 @@ void ScriptNode::setCurrentProgram (int index)
 
     String newDspCode, newUiCode;
 
-#if ! ELEMENT_CMAKE
     switch (index)
     {
         case 0:
@@ -290,7 +284,6 @@ void ScriptNode::setCurrentProgram (int index)
             newUiCode.clear();
             break;
     }
-#endif
 
     dspCode.replaceAllContent (newDspCode);
     loadScript (dspCode.getAllContent());
