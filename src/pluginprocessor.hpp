@@ -15,14 +15,15 @@ namespace element {
 using namespace juce;
 
 //=============================================================================
-class PerformanceParameter : public AudioProcessorParameter,
+class PerformanceParameter : public HostedAudioProcessorParameter,
                              public element::Parameter::Listener
 {
 public:
     std::function<void()> onCleared;
 
     explicit PerformanceParameter (int paramIdx)
-        : index (paramIdx)
+        : HostedAudioProcessorParameter (1),
+          index (paramIdx)
     {
         clearNode();
     }
@@ -163,6 +164,11 @@ public:
         }
 
         return 0.f;
+    }
+
+    String getParameterID() const override
+    {
+        return getName (32).toLowerCase().replace (" ", "-");
     }
 
     String getName (int maximumStringLength) const override
