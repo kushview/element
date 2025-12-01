@@ -937,11 +937,14 @@ void EngineService::sessionReloaded()
 
     if (session->getNumGraphs() != graphs->getGraphs().size())
     {
-        std::clog << "[element] model and engine graph counts do not match\n";
+        Logger::writeToLog ("[element] model and engine graph counts do not match");
     }
     else
     {
-        DBG ("[element] session reloaded: " << session->getName());
+        String msg ("[element] session reloaded");
+        if (session->getName().isNotEmpty())
+            msg << ": " << session->getName();
+        Logger::writeToLog (msg);
     }
 }
 
