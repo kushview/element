@@ -410,7 +410,7 @@ public:
             // Most hosts display any parameter with just two steps as a switch.
             parameterComp.reset (new SwitchParameterComponent (param));
         }
-        else if (! param->getValueStrings().isEmpty())
+        else if (param->isDiscrete() && ! param->getValueStrings().isEmpty())
         {
             // If we have a list of strings to represent the different states a
             // parameter can be in then we should present a dropdown allowing a
