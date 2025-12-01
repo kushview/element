@@ -238,7 +238,8 @@ public:
         }
 
         AudioSampleBuffer buffer (channels, totalChans, numSamples);
-        MidiPipe midiPipe (sharedMidiBuffers, midiChannelsToUse);
+        RenderContext rc (buffer.getArrayOfWritePointers(), totalChans, dummyCV.getArrayOfWritePointers(), 0, sharedMidiBuffers, midiChannelsToUse, numSamples);
+        MidiPipe& midiPipe (rc.midi);
 
         if (! node->isEnabled())
         {
@@ -332,10 +333,9 @@ public:
         tempMidi.clear();
         // End MIDI filters
 
-        auto pluginProcessBlock = [=] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended) {
+        auto pluginProcessBlock = [&] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended) {
             if (node->wantsContext())
             {
-                RenderContext rc (buffer, dummyCV, midiPipe, dummyAtom, numSamples);
                 if (! node->isSuspended())
                     node->render (rc);
                 else
@@ -362,17 +362,17 @@ public:
         {
             auto osProcessor = node->getOversamplingProcessor();
 
-            dsp::AudioBlock<float> block (buffer);
+            dsp::AudioBlock<float> block (channels, static_cast<size_t> (totalChans), static_cast<size_t> (numSamples));
             dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
 
-            if (buffer.getNumChannels() > osChanSize)
+            if (totalChans > osChanSize)
             {
                 osChanSize = buffer.getNumChannels();
                 osChans.reset (new float*[osChanSize]);
             }
 
             float** osData = osChans.get();
-            for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+            for (int ch = 0; ch < totalChans; ++ch)
                 osData[ch] = osBlock.getChannelPointer (ch);
 
             AudioSampleBuffer osBuffer (osData,

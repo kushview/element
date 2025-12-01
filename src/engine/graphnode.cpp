@@ -582,7 +582,7 @@ void GraphNode::render (RenderContext& rc)
         for (auto ptr : renderingOps)
         {
             GraphOp* const op = static_cast<GraphOp*> (ptr);
-            op->perform (renderingBuffers, midiBuffers, atomBuffers, numSamples);
+            op->perform (renderingBuffers, midiBuffers, numSamples);
         }
     }
 
