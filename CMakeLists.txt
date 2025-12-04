@@ -53,6 +53,8 @@ if(APPLE)
     target_sources(element PRIVATE src/ui/nsviewwithparent.mm)
 endif()
 
+target_compile_definitions(element PUBLIC BOOST_ALL_NO_LIB=1)
+
 target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
     target_compile_options(element PRIVATE -Wno-sign-conversion -Wno-switch-enum -Wno-attributes)
