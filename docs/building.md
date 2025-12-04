@@ -1,12 +1,16 @@
 # Building Element
-A simple guide on building Element with meson.  Pease see [mesonbuild.com](https://mesonbuild.com/Getting-meson.html) for how to install meson on your platform.
+A simple guide on building Element with CMake.  Pease see [cmake.org](https://cmake.org/install/) for how to install CMake on your platform.
+
+## Submodules
+This project uses git submodules. To get them, run:
+`git submodule update --init --recursive`
 
 ## Debian/Ubuntu
 __Dependencies__
 
 The following packages are needed...
 ```
-sudo apt-get install python git build-essential pkg-config libboost-dev \
+sudo apt-get install git build-essential pkg-config libboost-dev \
     libfreetype-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev \
     libxinerama-dev libxcursor-dev libjack-dev libasound2-dev lv2-dev liblilv-dev \
     libsuil-dev ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
@@ -14,24 +18,18 @@ sudo apt-get install python git build-essential pkg-config libboost-dev \
 
 __Compiling__
 ```
-meson setup build
-meson compile -C build
-```
-
-If meson gives errors about missing packages, then you might need to also setup subprojects.
-
-```
-meson subprojects update --reset
+cmake -B build
+cmake --build build
 ```
 
 __Installing__
 ```
-sudo meson install -C build
+sudo cmake --install build
 sudo ldconfig
 ```
 
 ## Arch Linux
-Install these packages, then run the `meson` commands described above.
+Install these packages, then run the `cmake` commands described above.
 
 ```
 sudo pacman -S git lilv suil lv2 ladspa boost ttf-mswin10
@@ -47,11 +45,8 @@ brew install boost
 
 __Build__
 ```
-BOOST_ROOT="/usr/local/include" meson setup \
-    --native-file="meson/subs.ini" \
-    --native-file="meson/osx.ini" \
-    build
-meson compile -C build
+cmake -B build
+cmake --build build
 ```
 
 This will make an app bundle somwhere in the `build` dir.  Run it...
@@ -62,9 +57,8 @@ open $(find build -name "Element.app")
 ## Windows (MSVC)
 
 ```
-meson setup --native-file="meson/subs.ini" --native-file="meson/msvc.ini" build
-meson compile -C build
+cmake -B build
+cmake --build build
 ```
 
-After this, you should have `build/element.exe`.  If it complains about missing boost
-and vstsdk paths, copy the `msvc.ini`, edit the paths, then use it in `meson setup`.
+After this, you should have an `Element.exe` inside the `build` directory.
