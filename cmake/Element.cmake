@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-option(ELEMENT_USE_VST2 "Build with VST2 support" OFF)
+option(ELEMENT_ENABLE_VST2 "Build with VST2 support" OFF)
 
 if(APPLE)
+    enable_language(OBJC)
     enable_language(OBJCXX)
 endif()
 

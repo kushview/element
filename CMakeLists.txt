@@ -9,7 +9,7 @@ include(cmake/Element.cmake)
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
 
 # VST2 SDK setup
-if(ELEMENT_USE_VST2)
+if(ELEMENT_ENABLE_VST2)
     set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
 endif()
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
@@ -101,7 +101,7 @@ target_link_libraries(element
         juce::juce_recommended_lto_flags)
 
 # VST2 enable host support
-if(ELEMENT_USE_VST2)
+if(ELEMENT_ENABLE_VST2)
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
     target_link_libraries(element PUBLIC juce_vst2_sdk)
 endif()
@@ -120,7 +120,7 @@ target_sources(element_app PRIVATE src/main.cc)
 target_link_libraries(element_app PRIVATE kv::element)
 
 set(ELEMENT_PLUGIN_FORMATS "AU;LV2;VST3")
-if(ELEMENT_USE_VST2)
+if(ELEMENT_ENABLE_VST2)
     list(APPEND ELEMENT_PLUGIN_FORMATS "VST")
 endif()
 
