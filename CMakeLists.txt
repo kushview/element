@@ -1,28 +1,30 @@
 # Element CMakeLists.txt
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 cmake_minimum_required(VERSION 3.22)
 project(element VERSION 1.0.0)
 
-if(APPLE)
-    enable_language(OBJCXX)
-endif()
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+include(cmake/Element.cmake)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
+
+# VST2 SDK setup
+if(ELEMENT_USE_VST2)
+    set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
+endif()
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
+
+# CLAP Setup
 add_subdirectory(deps/clap EXCLUDE_FROM_ALL)
 add_subdirectory(deps/clap-helpers EXCLUDE_FROM_ALL)
 # add_subdirectory(deps/clap-juce-extensions EXCLUDE_FROM_ALL)
 
+# BOOST Setup
 cmake_policy(SET CMP0167 OLD)
-set(Boost_ROOT "~/SDKs/include")
+set(Boost_ROOT "${USER_HOME_DIRECTORY}/SDKs/include")
 find_package(Boost REQUIRED)
 
+# Element static library
 add_library(element STATIC)
 add_library(kv::element ALIAS element)
 
@@ -98,6 +100,12 @@ target_link_libraries(element
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags)
 
+# VST2 enable host support
+if(ELEMENT_USE_VST2)
+    target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
+    target_link_libraries(element PUBLIC juce_vst2_sdk)
+endif()
+
 ## Standalone Application
 juce_add_gui_app(element_app
     COMPANY_NAME            "Kushview"             
@@ -111,6 +119,11 @@ juce_add_gui_app(element_app
 target_sources(element_app PRIVATE src/main.cc)
 target_link_libraries(element_app PRIVATE kv::element)
 
+set(ELEMENT_PLUGIN_FORMATS "AU;LV2;VST3")
+if(ELEMENT_USE_VST2)
+    list(APPEND ELEMENT_PLUGIN_FORMATS "VST")
+endif()
+
 ## Instrument Plugin
 juce_add_plugin(element_instrument
     COMPANY_NAME            "Kushview"
@@ -122,7 +135,7 @@ juce_add_plugin(element_instrument
     NEEDS_MIDI_INPUT        ON
     NEEDS_MIDI_OUTPUT       OFF
     EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS               AU LV2 VST3
+    FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
 )
 
 target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
@@ -139,7 +152,7 @@ juce_add_plugin(element_effect
     NEEDS_MIDI_INPUT        ON
     NEEDS_MIDI_OUTPUT       OFF
     EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS               AU LV2 VST3
+    FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
 )
 
 target_sources(element_effect PRIVATE plugins/effect/plugin.cpp)
@@ -156,7 +169,7 @@ juce_add_plugin(element_midi_effect
     NEEDS_MIDI_INPUT        ON
     NEEDS_MIDI_OUTPUT       ON
     EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS                 AU
+    FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
 )
 
 target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
