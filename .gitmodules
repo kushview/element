@@ -4,9 +4,6 @@
 [submodule "deps/juce"]
 	path = deps/juce
 	url = https://github.com/juce-framework/JUCE.git
-[submodule "deps/clap"]
-	path = deps/clap
-	url = https://github.com/free-audio/clap
 [submodule "deps/clap-helpers"]
 	path = deps/clap-helpers
 	url = https://github.com/free-audio/clap-helpers
