@@ -15,9 +15,8 @@ endif()
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
 
 # CLAP Setup
-add_subdirectory(deps/clap EXCLUDE_FROM_ALL)
-add_subdirectory(deps/clap-helpers EXCLUDE_FROM_ALL)
-# add_subdirectory(deps/clap-juce-extensions EXCLUDE_FROM_ALL)
+set(CMAKE_POLICY_DEFAULT_CMP0177 OLD)
+add_subdirectory(deps/clap-juce-extensions EXCLUDE_FROM_ALL)
 
 # BOOST Setup
 cmake_policy(SET CMP0167 OLD)
@@ -32,8 +31,8 @@ target_include_directories(element
     PUBLIC
         include
     PUBLIC
-        deps/clap/include
-        deps/clap-helpers/include
+        deps/clap-juce-extensions/clap-libs/clap/include
+        deps/clap-juce-extensions/clap-libs/clap-helpers/include
         deps/lvtk/include
         src
         src/lua/sol
@@ -137,7 +136,9 @@ juce_add_plugin(element_instrument
     EDITOR_WANTS_KEYBOARD_FOCUS ON
     FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
 )
-
+clap_juce_extensions_plugin(TARGET element_instrument
+    CLAP_ID "net.kushview.Element"
+    CLAP_FEATURES instrument)
 target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
 target_link_libraries(element_instrument PRIVATE kv::element)
 
@@ -154,6 +155,9 @@ juce_add_plugin(element_effect
     EDITOR_WANTS_KEYBOARD_FOCUS ON
     FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
 )
+clap_juce_extensions_plugin(TARGET element_effect
+    CLAP_ID "net.kushview.ElementFX"
+    CLAP_FEATURES audio-effect)
 
 target_sources(element_effect PRIVATE plugins/effect/plugin.cpp)
 target_link_libraries(element_effect PRIVATE kv::element)
