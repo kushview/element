@@ -100,7 +100,8 @@ target_link_libraries(element
         sol2::sol2
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags)
+        # juce::juce_recommended_lto_flags
+    )
 
 # VST2 enable host support
 if(ELEMENT_ENABLE_VST2)
