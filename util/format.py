@@ -74,8 +74,7 @@ def main():
         if args.check:
             result = subprocess.run(cmd, capture_output=True, text=True)
             if result.stdout and '<?xml' in result.stdout:
-                print("Error: Files need formatting")
-                print(result.stdout)
+                print("Code base has not been formatted")
                 sys.exit(1)
             else:
                 print("All files are properly formatted")

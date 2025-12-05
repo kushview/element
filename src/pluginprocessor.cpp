@@ -67,6 +67,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     for (int i = 0; i < 8; ++i)
     {
         auto* param = new PerformanceParameter (i);
+        jassert(param->getVersionHint() > 0);
         addParameter (param);
         perfparams.add (param);
     }
