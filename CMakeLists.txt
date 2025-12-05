@@ -103,7 +103,7 @@ target_link_libraries(element
         # juce::juce_recommended_lto_flags
     )
 
-if(WIN32)
+if(WIN32 AND ELEMENT_ENABLE_ASIO)
     target_include_directories(element PUBLIC "${USER_HOME_DIRECTORY}/SDKs/ASIOSDK2.3/common")
     target_compile_definitions(element PUBLIC JUCE_ASIO=1)
 endif()
@@ -127,63 +127,65 @@ juce_add_gui_app(element_app
 target_sources(element_app PRIVATE src/main.cc)
 target_link_libraries(element_app PRIVATE kv::element)
 
-set(ELEMENT_PLUGIN_FORMATS "AU;LV2;VST3")
-if(ELEMENT_ENABLE_VST2)
-    list(APPEND ELEMENT_PLUGIN_FORMATS "VST")
+if(ELEMENT_BUILD_PLUGINS)
+    set(ELEMENT_PLUGIN_FORMATS "AU;LV2;VST3")
+    if(ELEMENT_ENABLE_VST2)
+        list(APPEND ELEMENT_PLUGIN_FORMATS "VST")
+    endif()
+
+    ## Instrument Plugin
+    juce_add_plugin(element_instrument
+        COMPANY_NAME            "Kushview"
+        COMPANY_WEBSITE         "https://kushview.net"
+        PLUGIN_NAME             "Element"
+        PRODUCT_NAME            "KV-Element"
+        PLUGIN_CODE             Elmt
+        IS_SYNTH                OFF
+        NEEDS_MIDI_INPUT        ON
+        NEEDS_MIDI_OUTPUT       OFF
+        EDITOR_WANTS_KEYBOARD_FOCUS ON
+        FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
+    )
+    clap_juce_extensions_plugin(TARGET element_instrument
+        CLAP_ID "net.kushview.Element"
+        CLAP_FEATURES instrument)
+    target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
+    target_link_libraries(element_instrument PRIVATE kv::element)
+
+    ## Effect Plugin
+    juce_add_plugin(element_effect
+        COMPANY_NAME            "Kushview"
+        COMPANY_WEBSITE         "https://kushview.net"
+        PLUGIN_NAME             "Element Effect"
+        PRODUCT_NAME            "KV-Element-FX"
+        PLUGIN_CODE             ElFX
+        IS_SYNTH                OFF
+        NEEDS_MIDI_INPUT        ON
+        NEEDS_MIDI_OUTPUT       OFF
+        EDITOR_WANTS_KEYBOARD_FOCUS ON
+        FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
+    )
+    clap_juce_extensions_plugin(TARGET element_effect
+        CLAP_ID "net.kushview.ElementFX"
+        CLAP_FEATURES audio-effect)
+
+    target_sources(element_effect PRIVATE plugins/effect/plugin.cpp)
+    target_link_libraries(element_effect PRIVATE kv::element)
+
+    ## MIDI Effect Plugin
+    juce_add_plugin(element_midi_effect
+        COMPANY_NAME            "Kushview"
+        COMPANY_WEBSITE         "https://kushview.net"
+        PLUGIN_NAME             "Element MIDI Effect"
+        PRODUCT_NAME            "KV-Element-MFX"
+        PLUGIN_CODE             ElMX
+        IS_SYNTH                OFF
+        NEEDS_MIDI_INPUT        ON
+        NEEDS_MIDI_OUTPUT       ON
+        EDITOR_WANTS_KEYBOARD_FOCUS ON
+        FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
+    )
+
+    target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
+    target_link_libraries(element_midi_effect PRIVATE kv::element)
 endif()
-
-## Instrument Plugin
-juce_add_plugin(element_instrument
-    COMPANY_NAME            "Kushview"
-    COMPANY_WEBSITE         "https://kushview.net"
-    PLUGIN_NAME             "Element"
-    PRODUCT_NAME            "KV-Element"
-    PLUGIN_CODE             Elmt
-    IS_SYNTH                OFF
-    NEEDS_MIDI_INPUT        ON
-    NEEDS_MIDI_OUTPUT       OFF
-    EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
-)
-clap_juce_extensions_plugin(TARGET element_instrument
-    CLAP_ID "net.kushview.Element"
-    CLAP_FEATURES instrument)
-target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
-target_link_libraries(element_instrument PRIVATE kv::element)
-
-## Effect Plugin
-juce_add_plugin(element_effect
-    COMPANY_NAME            "Kushview"
-    COMPANY_WEBSITE         "https://kushview.net"
-    PLUGIN_NAME             "Element Effect"
-    PRODUCT_NAME            "KV-Element-FX"
-    PLUGIN_CODE             ElFX
-    IS_SYNTH                OFF
-    NEEDS_MIDI_INPUT        ON
-    NEEDS_MIDI_OUTPUT       OFF
-    EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
-)
-clap_juce_extensions_plugin(TARGET element_effect
-    CLAP_ID "net.kushview.ElementFX"
-    CLAP_FEATURES audio-effect)
-
-target_sources(element_effect PRIVATE plugins/effect/plugin.cpp)
-target_link_libraries(element_effect PRIVATE kv::element)
-
-## MIDI Effect Plugin
-juce_add_plugin(element_midi_effect
-    COMPANY_NAME            "Kushview"
-    COMPANY_WEBSITE         "https://kushview.net"
-    PLUGIN_NAME             "Element MIDI Effect"
-    PRODUCT_NAME            "KV-Element-MFX"
-    PLUGIN_CODE             ElMX
-    IS_SYNTH                OFF
-    NEEDS_MIDI_INPUT        ON
-    NEEDS_MIDI_OUTPUT       ON
-    EDITOR_WANTS_KEYBOARD_FOCUS ON
-    FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
-)
-
-target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
-target_link_libraries(element_midi_effect PRIVATE kv::element)
