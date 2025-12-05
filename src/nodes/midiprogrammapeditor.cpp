@@ -254,8 +254,8 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
             std::bind (&MidiProgramMapEditor::selectLastProgram, this));
         node->addChangeListener (this);
         node->sendChangeMessage(); // Workaround to get font size right.
-            // setFontSize needs to know if this is in a plugin window
-            // and doesn't know until after the ctor has returned
+        // setFontSize needs to know if this is in a plugin window
+        // and doesn't know until after the ctor has returned
     }
     else
     {

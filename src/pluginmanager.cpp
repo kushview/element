@@ -489,9 +489,9 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
     detail::applyBlacklistingsFromDeadMansPedal (list);
     detail::setDeadMansPedalFile ({});
     failedIdentifiers.clearQuick(); // FIXME: this is a workaround that
-        // prevents the UI from showing to
-        // many errors about known-crashed
-        // plugins
+    // prevents the UI from showing to
+    // many errors about known-crashed
+    // plugins
     listeners.call (&Listener::audioPluginScanFinished);
 }
 

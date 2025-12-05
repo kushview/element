@@ -75,7 +75,7 @@ public:
 
         if (queue != nullptr)
         {
-#if !(defined(OS_OBJECT_USE_OBJC) && OS_OBJECT_USE_OBJC)
+#if ! (defined(OS_OBJECT_USE_OBJC) && OS_OBJECT_USE_OBJC)
             dispatch_release (queue);
 #endif
             queue = nullptr;

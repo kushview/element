@@ -12,4 +12,3 @@
 #define EL_GIT_SHORT_HASH "e9c54ab2"
 
 #define EL_VERSION_STRING "1.0.0"
-

@@ -86,7 +86,7 @@ private:
 Services& Service::services() const
 {
     jassert (owner != nullptr); // if you hit this then you're probably calling
-        // services() before controller initialization
+    // services() before controller initialization
     return *owner;
 }
 

@@ -7,12 +7,15 @@
 // #define JUCE_GUI_BASICS_INCLUDE_SCOPED_THREAD_DPI_AWARENESS_SETTER 1
 // #define JUCE_GRAPHICS_INCLUDE_COREGRAPHICS_HELPERS 1
 
+// clang-format off
 #include <element/juce/audio_processors.hpp>
 #include "nsviewwithparent.hpp"
+// clang-format on
 
 using namespace juce;
 
-namespace element {
+namespace element
+{
 
 struct NSViewComponentWithParent::InnerNSView : public juce::ObjCClass<NSView>
 {

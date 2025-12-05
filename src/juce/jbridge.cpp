@@ -5,7 +5,8 @@
 // Thread: https://forum.juce.com/t/jbridge-x64-bridge-for-x86-vst-support-in-juce-vst-host-windows/11608
 // SPDX-License-Identifier: GPL3-or-later
 
-// JBridge 
+// JBridge
+// clang-format off
 #ifdef _WIN32
 
 #define JUCE_VST_WRAPPER_LOAD_CUSTOM_MAIN if (moduleMain == nullptr) \
@@ -38,3 +39,4 @@ else if ((unsigned __int64)(module->customMain) == 0xfffffffffffffffe) \
         effect = (Vst2::AEffect*)(jBridgeMain (&audioMaster, plug32bitPath));\
 }
 #endif
+// clang-format on
