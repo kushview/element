@@ -19,7 +19,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0177 OLD)
 add_subdirectory(deps/clap-juce-extensions EXCLUDE_FROM_ALL)
 
 # BOOST Setup
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.0.0")
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
     cmake_policy(SET CMP0167 OLD)
 endif()
 
