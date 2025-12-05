@@ -8,11 +8,17 @@ include(cmake/Element.cmake)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
 
-# VST2 SDK setup
+# JUCE VST2 SDK setup
 if(ELEMENT_ENABLE_VST2)
     set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
 endif()
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
+
+# Global JUCE properties
+set_directory_properties(PROPERTIES JUCE_COMPANY_NAME "Kushview")
+set_directory_properties(PROPERTIES JUCE_COMPANY_COPYRIGHT "Kushview, LLC")
+set_directory_properties(PROPERTIES JUCE_COMPANY_WEBSITE "https://kushview.net")
+set_directory_properties(PROPERTIES JUCE_COMPANY_EMAIL "support@kushview.net")
 
 # CLAP Setup
 set(CMAKE_POLICY_DEFAULT_CMP0177 OLD)
@@ -121,12 +127,13 @@ endif()
 
 ## Standalone Application
 juce_add_gui_app(element_app
-    COMPANY_NAME            "Kushview"             
-    COMPANY_WEBSITE         "https://kushview.net"
     PRODUCT_NAME            "Element"
     DOCUMENT_EXTENSIONS     els elg
     ICON_BIG                data/images/icon.png
     ICON_SMALL              data/images/icon.png
+
+    BUNDLE_ID               "net.kushview.Element"
+    MICROPHONE_PERMISSION_ENABLED TRUE
 )
 
 target_sources(element_app PRIVATE src/main.cc)
@@ -140,35 +147,45 @@ if(ELEMENT_BUILD_PLUGINS)
 
     ## Instrument Plugin
     juce_add_plugin(element_instrument
-        COMPANY_NAME            "Kushview"
-        COMPANY_WEBSITE         "https://kushview.net"
-        PLUGIN_NAME             "Element"
-        PRODUCT_NAME            "KV-Element"
-        PLUGIN_CODE             Elmt
-        IS_SYNTH                OFF
+        PLUGIN_NAME                 "Element"
+        PRODUCT_NAME                "KV-Element"
+        PLUGIN_MANUFACTURER_CODE    KshV
+        PLUGIN_CODE                 Elmt
+
+        BUNDLE_ID                   "net.kushview.plugins.Element"
+        AU_MAIN_TYPE                kAudioUnitType_MusicDevice
+
+        LV2URI                      "https://kushview.net/plugins/element"
+
+        IS_SYNTH                ON
         NEEDS_MIDI_INPUT        ON
         NEEDS_MIDI_OUTPUT       OFF
         EDITOR_WANTS_KEYBOARD_FOCUS ON
         FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
     )
     clap_juce_extensions_plugin(TARGET element_instrument
-        CLAP_ID "net.kushview.Element"
+        CLAP_ID "net.kushview.plugins.Element"
         CLAP_FEATURES instrument)
     target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
     target_link_libraries(element_instrument PRIVATE kv::element)
 
     ## Effect Plugin
     juce_add_plugin(element_effect
-        COMPANY_NAME            "Kushview"
-        COMPANY_WEBSITE         "https://kushview.net"
-        PLUGIN_NAME             "Element Effect"
-        PRODUCT_NAME            "KV-Element-FX"
-        PLUGIN_CODE             ElFX
-        IS_SYNTH                OFF
-        NEEDS_MIDI_INPUT        ON
-        NEEDS_MIDI_OUTPUT       OFF
+        PLUGIN_NAME                 "Element Effect"
+        PRODUCT_NAME                "KV-Element-FX"
+        PLUGIN_MANUFACTURER_CODE    KshV
+        PLUGIN_CODE                 ElFX
+
+        BUNDLE_ID                   "net.kushview.plugins.ElementFX"
+        AU_MAIN_TYPE                kAudioUnitType_Effect
+
+        LV2URI                      "https://kushview.net/plugins/element-fx"
+        
+        IS_SYNTH                    OFF
+        NEEDS_MIDI_INPUT            ON
+        NEEDS_MIDI_OUTPUT           OFF
         EDITOR_WANTS_KEYBOARD_FOCUS ON
-        FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
+        FORMATS                     ${ELEMENT_PLUGIN_FORMATS}
     )
     clap_juce_extensions_plugin(TARGET element_effect
         CLAP_ID "net.kushview.ElementFX"
@@ -179,16 +196,21 @@ if(ELEMENT_BUILD_PLUGINS)
 
     ## MIDI Effect Plugin
     juce_add_plugin(element_midi_effect
-        COMPANY_NAME            "Kushview"
-        COMPANY_WEBSITE         "https://kushview.net"
-        PLUGIN_NAME             "Element MIDI Effect"
-        PRODUCT_NAME            "KV-Element-MFX"
-        PLUGIN_CODE             ElMX
-        IS_SYNTH                OFF
-        NEEDS_MIDI_INPUT        ON
-        NEEDS_MIDI_OUTPUT       ON
+        COMPANY_NAME                "Kushview"
+        COMPANY_WEBSITE             "https://kushview.net"
+        PLUGIN_NAME                 "Element MIDI Effect"
+        PRODUCT_NAME                "KV-Element-MFX"
+        PLUGIN_MANUFACTURER_CODE    KshV
+        PLUGIN_CODE                 ElMX
+        
+        BUNDLE_ID                   "net.kushview.plugins.ElementMFX"
+        AU_MAIN_TYPE                kAudioUnitType_MIDIProcessor
+
+        IS_SYNTH                    OFF
+        NEEDS_MIDI_INPUT            ON
+        NEEDS_MIDI_OUTPUT           ON
         EDITOR_WANTS_KEYBOARD_FOCUS ON
-        FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
+        FORMATS                     AU
     )
 
     target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
