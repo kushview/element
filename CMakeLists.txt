@@ -103,6 +103,11 @@ target_link_libraries(element
         # juce::juce_recommended_lto_flags
     )
 
+if(WIN32)
+    target_include_directories(element PUBLIC "${USER_HOME_DIRECTORY}/SDKs/ASIOSDK2.3/common")
+    target_compile_definitions(element PUBLIC JUCE_ASIO=1)
+endif()
+
 # VST2 enable host support
 if(ELEMENT_ENABLE_VST2)
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
