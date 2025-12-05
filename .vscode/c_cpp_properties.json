@@ -23,19 +23,15 @@
                 "${workspaceFolder}/.vscode/vscode.h"
             ],
             "includePath": [
-                "${workspaceFolder}/subprojects/juce/modules/*",
-                "${workspaceFolder}/subprojects/clap/include/*",
-                "${workspaceFolder}/build/libs/compat/*",
-                "${workspaceFolder}/build/include/*",
-                "${workspaceFolder}/libs/lua/src/*",
-                "${workspaceFolder}/libs/sol/*",
-                "${workspaceFolder}/libs/compat/*",
+                "${workspaceFolder}/deps/juce/modules/*",
+                "${workspaceFolder}/deps/clap-juce-extensions/clap-libs/clap/include/*",
+                "${workspaceFolder}/deps/clap-juce-extensions/clap-libs/clap-helpers/include/*",
+                "${workspaceFolder}/src/lua/src/*",
+                "${workspaceFolder}/deps/sol2/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/*",
                 "${workspaceFolder}/test/*",
                 "/opt/homebrew/include/*",
-                "/usr/local/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
             ]
