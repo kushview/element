@@ -125,6 +125,12 @@ if(ELEMENT_ENABLE_VST2)
     target_link_libraries(element PUBLIC juce_vst2_sdk)
 endif()
 
+if (ELEMENT_BUILD_TESTS)
+    ## Unit tests
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
 ## Standalone Application
 juce_add_gui_app(element_app
     PRODUCT_NAME            "Element"

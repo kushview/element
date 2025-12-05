@@ -30,7 +30,7 @@ static const String sAnonymous = R"(
 #include "luatest.hpp"
 
 #include "scripting/dspscript.hpp"
-#include "../../src/libelement.a.p/amp.lua.h"
+#include "luascripts.hpp"
 
 static auto ampScript()
 {

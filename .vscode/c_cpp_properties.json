@@ -2,7 +2,7 @@
     "version": 4,
     "configurations": [
         {
-            "name": "OSX",
+            "name": "macOS",
             "intelliSenseMode": "${default}",
             "cStandard": "c11",
             "cppStandard": "c++17",
@@ -19,6 +19,7 @@
                 "BOOST_ALL_NO_LIB",
                 "JUCE_MODAL_LOOPS_PERMITTED=1"
             ],
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
             "forcedInclude": [
                 "${workspaceFolder}/.vscode/vscode.h"
             ],
