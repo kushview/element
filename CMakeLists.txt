@@ -98,18 +98,23 @@ target_link_libraries(element
         element-luascripts
         element-luamods
         sol2::sol2
-    PUBLIC
         juce::juce_recommended_config_flags
-        # juce::juce_recommended_lto_flags
     )
 
+if(ELEMENT_ENABLE_LTO)
+    message("Link Time Optimization enabled")
+    target_link_libraries(element PUBLIC juce::juce_recommended_lto_flags)
+endif()
+
 if(WIN32 AND ELEMENT_ENABLE_ASIO)
+    message("ASIO audio device support enabled")
     target_include_directories(element PUBLIC "${USER_HOME_DIRECTORY}/SDKs/ASIOSDK2.3/common")
     target_compile_definitions(element PUBLIC JUCE_ASIO=1)
 endif()
 
 # VST2 enable host support
 if(ELEMENT_ENABLE_VST2)
+    message("VST2 Plugin support enabled")
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
     target_link_libraries(element PUBLIC juce_vst2_sdk)
 endif()

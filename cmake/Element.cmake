@@ -3,6 +3,7 @@
 option(ELEMENT_BUILD_PLUGINS "Build the plugin versions of Element" OFF)
 option(ELEMENT_ENABLE_ASIO "Build with ASIO support" OFF)
 option(ELEMENT_ENABLE_VST2 "Build with VST2 support" OFF)
+option(ELEMENT_ENABLE_LTO "Build with Link Time Optimization" OFF)
 
 if(APPLE)
     enable_language(OBJC)
