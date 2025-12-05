@@ -19,7 +19,10 @@ set(CMAKE_POLICY_DEFAULT_CMP0177 OLD)
 add_subdirectory(deps/clap-juce-extensions EXCLUDE_FROM_ALL)
 
 # BOOST Setup
-cmake_policy(SET CMP0167 OLD)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.0.0")
+    cmake_policy(SET CMP0167 OLD)
+endif()
+
 set(Boost_ROOT "${USER_HOME_DIRECTORY}/SDKs/include")
 find_package(Boost REQUIRED)
 
