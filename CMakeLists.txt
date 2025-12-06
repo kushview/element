@@ -43,13 +43,12 @@ add_library(kv::element ALIAS element)
 target_include_directories(element
     PUBLIC
         include
-    PUBLIC
-        deps/clap-juce-extensions/clap-libs/clap/include
-        deps/clap-juce-extensions/clap-libs/clap-helpers/include
-        deps/lvtk/include
         src
         src/lua/sol
         src/lua/src
+        deps/clap-juce-extensions/clap-libs/clap/include
+        deps/clap-juce-extensions/clap-libs/clap-helpers/include
+        deps/lvtk/include
         ${Boost_INCLUDE_DIRS}
 )
 
