@@ -206,22 +206,21 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 {
     setOpaque (true);
 
-    auto M = env.new_usertype<ScriptNodeControlPort> (
-        // clang format-off
-        "ControlPort",
-        sol::no_constructor,
-        "get",
-        [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
-        "set",
-        [] (ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
-        "min",
-        [] (ScriptNodeControlPort& self) -> double { return self.getMin(); },
-        "max",
-        [] (ScriptNodeControlPort& self) -> double { return self.getMax(); },
-        "changed",
-        sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction)
-        // clang-format on
-    );
+    // FIXME: this should happen once with the rest of Lua Bindings
+    static std::once_flag bindControlPortFlag{};
+    std::call_once(bindControlPortFlag, [this]() {
+        auto M = state.new_usertype<ScriptNodeControlPort> (
+            // clang-format off
+            "ControlPort",
+            sol::no_constructor,
+            "get", &ScriptNodeControlPort::getControl,
+            "set", &ScriptNodeControlPort::setControl,
+            "min", &ScriptNodeControlPort::getMin,
+            "max", &ScriptNodeControlPort::getMax,
+            "changed", sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction)
+            // clang-format on
+        );
+    });
 
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
@@ -281,14 +280,15 @@ void ScriptNodeEditor::setToolbarVisible (bool visible)
 //==============================================================================
 sol::table ScriptNodeEditor::createContext()
 {
-    sol::state_view view (state.lua_state());
+    sol::state_view view (env.lua_state());
     sol::table ctx = view.create_table();
     ctx["params"] = view.create_table();
     for (auto* param : lua->getParameters (true))
     {
         auto obj = std::make_shared<ScriptNodeControlPort> (param);
         ctx["params"][1 + param->getParameterIndex()] = obj;
-        if (auto rp = dynamic_cast<RangedParameter*> (param)) {
+        if (auto rp = dynamic_cast<RangedParameter*> (param))
+        {
             const auto port (rp->getPort());
             ctx.set (rp->getPort().symbol.trim().toStdString(), obj);
         }
@@ -393,11 +393,13 @@ void ScriptNodeEditor::updatePreview()
 
     try
     {
-        ScriptLoader loader (state);
+        sol::state_view view (env.lua_state());
+        ;
+        ScriptLoader loader (view);
         if (loader.load (code))
         {
             auto f = loader.caller();
-            env.set_on (f);
+            sol::set_environment (env, f);
             auto ctx = createContext();
             sol::protected_function_result instance = f (ctx);
 
@@ -412,6 +414,7 @@ void ScriptNodeEditor::updatePreview()
             if (instance.get_type() == sol::type::table)
             {
                 sol::table DSPUI = instance;
+                sol::set_environment (env, DSPUI);
                 sol::table editor;
                 const bool canResize = DSPUI.get_or ("resizable", false);
 
