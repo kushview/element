@@ -206,30 +206,10 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 {
     setOpaque (true);
 
-    auto M = state.create_table();
-    M.new_usertype<ScriptNodeControlPort> (
+    auto M = env.new_usertype<ScriptNodeControlPort> (
         // clang format-off
         "ControlPort",
         sol::no_constructor,
-#if 0
-        "value",        sol::overload (
-            [](ScriptNodeControlPort& self) -> double {
-                return self.getValue();
-            },
-            [](ScriptNodeControlPort& self, bool normal) -> double {
-                return normal ? self.getValue() : self.getControl();
-            },
-            [](ScriptNodeControlPort& self, double value) -> double {
-                self.setValue (static_cast<float> (value));
-                return self.getValue();
-            },
-            [](ScriptNodeControlPort& self, double value, bool normal) -> double {
-                if (normal) self.setValue (static_cast<float> (value));
-                else        self.setControl (static_cast<float> (value));
-                return normal ? self.getValue() : self.getControl();
-            }
-        ),
-#endif
         "get",
         [] (ScriptNodeControlPort& self) -> double { return self.getControl(); },
         "set",
@@ -242,7 +222,6 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
         sol::property (&ScriptNodeControlPort::getChangedFunction, &ScriptNodeControlPort::setChangedFunction)
         // clang-format on
     );
-    env["ScriptNodeEditor.ControlPort"] = M;
 
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
@@ -304,14 +283,15 @@ sol::table ScriptNodeEditor::createContext()
 {
     sol::state_view view (state.lua_state());
     sol::table ctx = view.create_table();
-
     ctx["params"] = view.create_table();
     for (auto* param : lua->getParameters (true))
     {
         auto obj = std::make_shared<ScriptNodeControlPort> (param);
         ctx["params"][1 + param->getParameterIndex()] = obj;
-        if (auto rp = dynamic_cast<RangedParameter*> (param))
+        if (auto rp = dynamic_cast<RangedParameter*> (param)) {
+            const auto port (rp->getPort());
             ctx.set (rp->getPort().symbol.trim().toStdString(), obj);
+        }
     }
 
     ctx["controls"] = view.create_table();
