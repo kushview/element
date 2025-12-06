@@ -207,8 +207,8 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     setOpaque (true);
 
     // FIXME: this should happen once with the rest of Lua Bindings
-    static std::once_flag bindControlPortFlag{};
-    std::call_once(bindControlPortFlag, [this]() {
+    static std::once_flag bindControlPortFlag {};
+    std::call_once (bindControlPortFlag, [this]() {
         auto M = state.new_usertype<ScriptNodeControlPort> (
             // clang-format off
             "ControlPort",
