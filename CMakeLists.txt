@@ -143,6 +143,12 @@ juce_add_gui_app(element_app
 
     BUNDLE_ID               "net.kushview.Element"
     MICROPHONE_PERMISSION_ENABLED TRUE
+
+    HARDENED_RUNTIME_ENABLED TRUE
+    HARDENED_RUNTIME_OPTIONS
+        "com.apple.security.cs.allow-jit"
+	    "com.apple.security.cs.disable-library-validation"
+	    "com.apple.security.device.audio-input"
 )
 
 target_sources(element_app PRIVATE src/main.cc)
@@ -171,6 +177,12 @@ if(ELEMENT_BUILD_PLUGINS)
         NEEDS_MIDI_OUTPUT       OFF
         EDITOR_WANTS_KEYBOARD_FOCUS ON
         FORMATS                 ${ELEMENT_PLUGIN_FORMATS}
+
+        HARDENED_RUNTIME_ENABLED TRUE
+        HARDENED_RUNTIME_OPTIONS
+            "com.apple.security.cs.allow-jit"
+            "com.apple.security.cs.disable-library-validation"
+            "com.apple.security.device.audio-input"
     )
     clap_juce_extensions_plugin(TARGET element_instrument
         CLAP_ID "net.kushview.plugins.Element"
@@ -195,6 +207,12 @@ if(ELEMENT_BUILD_PLUGINS)
         NEEDS_MIDI_OUTPUT           OFF
         EDITOR_WANTS_KEYBOARD_FOCUS ON
         FORMATS                     ${ELEMENT_PLUGIN_FORMATS}
+
+        HARDENED_RUNTIME_ENABLED TRUE
+        HARDENED_RUNTIME_OPTIONS
+            "com.apple.security.cs.allow-jit"
+            "com.apple.security.cs.disable-library-validation"
+            "com.apple.security.device.audio-input"
     )
     clap_juce_extensions_plugin(TARGET element_effect
         CLAP_ID "net.kushview.ElementFX"
@@ -220,6 +238,12 @@ if(ELEMENT_BUILD_PLUGINS)
         NEEDS_MIDI_OUTPUT           ON
         EDITOR_WANTS_KEYBOARD_FOCUS ON
         FORMATS                     AU
+
+        HARDENED_RUNTIME_ENABLED TRUE
+        HARDENED_RUNTIME_OPTIONS
+            "com.apple.security.cs.allow-jit"
+            "com.apple.security.cs.disable-library-validation"
+            "com.apple.security.device.audio-input"
     )
 
     target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
