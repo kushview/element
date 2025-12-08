@@ -46,16 +46,24 @@ PortType IONode::getPortType() const noexcept
 
 void IONode::refreshPorts()
 {
-    PortCount count;
-
+    PortList list;
     if (auto* const graph = getParentGraph())
     {
-        count.set (getPortType(),
-                   graph->getNumPorts (getPortType(), isInput()),
-                   ! isInput());
+        const auto portType = getPortType();
+        int index = 0, channel = 0;
+
+        for (int i = 0; i < graph->getNumPorts (getPortType(), isInput()); ++i)
+        {
+            String symbol = portType.getSlug(),
+                   name = portType.getName();
+
+            symbol << "_" << String (isInput() ? "in" : "out") << "_" << String (channel + 1);
+            name << " " << String (isInput() ? "In" : "Out") << " " << String (channel + 1);
+            list.add (portType, index++, channel++, symbol, name, ! isInput());
+        }
     }
 
-    setPorts (count.toPortList());
+    setPorts (list);
 }
 
 void IONode::fillInPluginDescription (PluginDescription& d) const
