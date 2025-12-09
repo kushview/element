@@ -7,7 +7,7 @@
 // @classmod el.DocumentWindow
 // @pragma nostrip
 
-#if 0
+#if ELEMENT_EXPERIMENTAL
 
 #include "./object.hpp"
 #include "widget.hpp"

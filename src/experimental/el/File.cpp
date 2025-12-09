@@ -5,7 +5,8 @@
 // @classmod el.File
 // @pragma nostrip
 
-#if 0
+#if ELEMENT_EXPERIMENTAL
+
 #include <element/element.h>
 #include "sol_helpers.hpp"
 #define EL_TYPE_NAME_FILE "File"
