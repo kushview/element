@@ -394,7 +394,6 @@ void ScriptNodeEditor::updatePreview()
     try
     {
         sol::state_view view (env.lua_state());
-        ;
         ScriptLoader loader (view);
         if (loader.load (code))
         {
