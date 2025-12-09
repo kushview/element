@@ -453,13 +453,17 @@ private:
 class ParametersPanel : public Component
 {
 public:
-    ParametersPanel (const ParameterArray& params, const PatchParameterArray& patches)
+    ParametersPanel (Processor& proc)
     {
-        for (auto* param : params)
+        for (auto* param : proc.getParameters (true))
             if (param->isAutomatable())
                 addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (param)));
 
-        for (auto* patch : patches)
+        for (auto* param : proc.getParameters (false))
+            if (param->isAutomatable())
+                addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (param)));
+
+        for (auto* patch : proc.getPatches())
             if (patch->range() == PatchParameter::RangePath)
                 addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (patch)));
 
@@ -493,7 +497,7 @@ struct GenericNodeEditor::Pimpl
         ProcessorPtr ptr = parent.getNodeObject();
         jassert (ptr != nullptr);
         owner.setOpaque (true);
-        view.setViewedComponent (new ParametersPanel (ptr->getParameters(), ptr->getPatches()));
+        view.setViewedComponent (new ParametersPanel (*ptr));
         owner.addAndMakeVisible (view);
         view.setScrollBarsShown (true, false);
     }
