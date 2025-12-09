@@ -79,7 +79,6 @@ endif()
 
 target_compile_definitions(element
     PUBLIC
-        ELEMENT_CMAKE=1
         DONT_SET_USING_JUCE_NAMESPACE=1
         JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_WEB_BROWSER=0
