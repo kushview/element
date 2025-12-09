@@ -1,7 +1,6 @@
 [wrap-git]
 url = https://github.com/free-audio/clap.git
-revision = 1.2.5
-depth = 1
+revision = 29ffcc273be7c7c651f6c9953b99e69700e2387a
 method = cmake
 
 [provide]
