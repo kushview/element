@@ -187,7 +187,7 @@ if(ELEMENT_BUILD_PLUGINS)
     clap_juce_extensions_plugin(TARGET element_instrument
         CLAP_ID "net.kushview.plugins.Element"
         CLAP_FEATURES instrument)
-    target_sources(element_instrument PRIVATE plugins/instrument/plugin.cpp)
+    target_sources(element_instrument PRIVATE src/plugins/instrument.cc)
     target_link_libraries(element_instrument PRIVATE kv::element)
 
     ## Effect Plugin
@@ -218,7 +218,7 @@ if(ELEMENT_BUILD_PLUGINS)
         CLAP_ID "net.kushview.ElementFX"
         CLAP_FEATURES audio-effect)
 
-    target_sources(element_effect PRIVATE plugins/effect/plugin.cpp)
+    target_sources(element_effect PRIVATE src/plugins/effect.cc)
     target_link_libraries(element_effect PRIVATE kv::element)
 
     ## MIDI Effect Plugin
@@ -246,6 +246,6 @@ if(ELEMENT_BUILD_PLUGINS)
             "com.apple.security.device.audio-input"
     )
 
-    target_sources(element_midi_effect PRIVATE plugins/midieffect/plugin.cpp)
+    target_sources(element_midi_effect PRIVATE src/plugins/midieffect.cc)
     target_link_libraries(element_midi_effect PRIVATE kv::element)
 endif()
