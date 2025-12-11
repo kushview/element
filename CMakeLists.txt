@@ -191,7 +191,7 @@ if(ELEMENT_BUILD_PLUGINS)
 
     ## Effect Plugin
     juce_add_plugin(element_effect
-        PLUGIN_NAME                 "Element Effect"
+        PLUGIN_NAME                 "Element FX"
         PRODUCT_NAME                "KV-Element-FX"
         PLUGIN_MANUFACTURER_CODE    KshV
         PLUGIN_CODE                 ElFX
@@ -224,7 +224,7 @@ if(ELEMENT_BUILD_PLUGINS)
     juce_add_plugin(element_midi_effect
         COMPANY_NAME                "Kushview"
         COMPANY_WEBSITE             "https://kushview.net"
-        PLUGIN_NAME                 "Element MIDI Effect"
+        PLUGIN_NAME                 "Element MFX"
         PRODUCT_NAME                "KV-Element-MFX"
         PLUGIN_MANUFACTURER_CODE    KshV
         PLUGIN_CODE                 ElMX
