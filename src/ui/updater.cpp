@@ -290,7 +290,7 @@ Updater::Updater()
 {
     updates = std::make_unique<Updates> (*this);
     setExeFile (Updater::findExe (EL_UPDATER_EXE_NAME));
-    setInfo (EL_PACKAGE_ID, EL_VERSION_STRING, EL_UPDATE_REPOSITORY_URL);
+    setInfo (EL_PACKAGE_ID, ELEMENT_VERSION_STRING, EL_UPDATE_REPOSITORY_URL);
 }
 
 Updater::Updater (const std::string& package, const std::string& version, const std::string& repo)

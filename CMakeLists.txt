@@ -55,6 +55,7 @@ target_include_directories(element
 add_subdirectory(data)
 add_subdirectory(scripts)
 add_subdirectory(src/el)
+add_subdirectory(include/element)
 
 file(GLOB_RECURSE ELEMENT_SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" 

@@ -231,7 +231,7 @@ public:
     virtual ~Application() {}
 
     const String getApplicationName() override { return "Element"; }
-    const String getApplicationVersion() override { return EL_VERSION_STRING; }
+    const String getApplicationVersion() override { return ELEMENT_VERSION_STRING; }
     bool moreThanOneInstanceAllowed() override { return true; }
 
     void initialise (const String& commandLine) override

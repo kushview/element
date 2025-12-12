@@ -184,8 +184,8 @@ private:
     friend class GuiService;
     void setupUpdater()
     {
-        juce::String ver (EL_VERSION_STRING);
-        ver << "-" << EL_BUILD_NUMBER;
+        juce::String ver (ELEMENT_VERSION_STRING);
+        ver << "-" << ELEMENT_BUILD_NUMBER;
         // ver = "0.20.0.0";
         updater.setInfo ("net.kushview.element", ver.toStdString());
         updater.setRepository (EL_UPDATE_REPOSITORY_URL);

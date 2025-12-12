@@ -188,7 +188,7 @@ class CLAPHost final : public CLAPBaseHost
 {
 public:
     CLAPHost()
-        : CLAPBaseHost (EL_APP_NAME, EL_APP_AUTHOR, EL_APP_URL, EL_VERSION_STRING)
+        : CLAPBaseHost (EL_APP_NAME, EL_APP_AUTHOR, EL_APP_URL, ELEMENT_VERSION_STRING)
     {
     }
     ~CLAPHost() {}

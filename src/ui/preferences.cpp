@@ -1575,7 +1575,7 @@ private:
 
     std::string makeRepoUrl (const std::string& pkg)
     {
-        const auto major = Version::segments (EL_VERSION_STRING)[0];
+        const auto major = Version::segments (ELEMENT_VERSION_STRING)[0];
         std::stringstream host;
         host << EL_UPDATE_REPOSITORY_HOST << "/" << pkg << "/" << major;
         host << "/" << updateChannelSlug();

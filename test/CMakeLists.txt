@@ -8,6 +8,7 @@ target_link_libraries(test_element PRIVATE kv::element)
 target_include_directories(test_element 
     PRIVATE 
         "${CMAKE_CURRENT_SOURCE_DIR}"
+        ${GENERATED_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS})
 target_compile_definitions(test_element
     PRIVATE
