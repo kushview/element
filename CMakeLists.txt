@@ -3,6 +3,8 @@
 
 cmake_minimum_required(VERSION 3.22)
 project(element VERSION 1.0.0)
+set(PROJECT_VERSION_SUFFIX "b2")
+set(PROJECT_VERSION_FULL "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
 
 include(cmake/Element.cmake)
 
@@ -137,6 +139,7 @@ endif()
 ## Standalone Application
 juce_add_gui_app(element_app
     PRODUCT_NAME            "Element"
+    BUILD_VERSION           "${ELEMENT_BUILD_NUMBER}"
     DOCUMENT_EXTENSIONS     els elg
     ICON_BIG                data/images/icon.png
     ICON_SMALL              data/images/icon.png
@@ -164,6 +167,7 @@ if(ELEMENT_BUILD_PLUGINS)
     juce_add_plugin(element_instrument
         PLUGIN_NAME                 "Element"
         PRODUCT_NAME                "KV-Element"
+        BUILD_VERSION               "${ELEMENT_BUILD_NUMBER}"
         PLUGIN_MANUFACTURER_CODE    KshV
         PLUGIN_CODE                 Elmt
 
@@ -194,6 +198,7 @@ if(ELEMENT_BUILD_PLUGINS)
     juce_add_plugin(element_effect
         PLUGIN_NAME                 "Element FX"
         PRODUCT_NAME                "KV-Element-FX"
+        BUILD_VERSION               "${ELEMENT_BUILD_NUMBER}"
         PLUGIN_MANUFACTURER_CODE    KshV
         PLUGIN_CODE                 ElFX
 
@@ -221,13 +226,12 @@ if(ELEMENT_BUILD_PLUGINS)
     target_sources(element_effect PRIVATE src/plugins/effect.cc)
     target_link_libraries(element_effect PRIVATE kv::element)
 
-    ## MIDI Effect Plugin (Apple only)
     if(APPLE)
+        ## MIDI Effect Plugin
         juce_add_plugin(element_midi_effect
-            COMPANY_NAME                "Kushview"
-            COMPANY_WEBSITE             "https://kushview.net"
             PLUGIN_NAME                 "Element MFX"
             PRODUCT_NAME                "KV-Element-MFX"
+            BUILD_VERSION               "${ELEMENT_BUILD_NUMBER}"
             PLUGIN_MANUFACTURER_CODE    KshV
             PLUGIN_CODE                 ElMX
             
