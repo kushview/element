@@ -221,31 +221,33 @@ if(ELEMENT_BUILD_PLUGINS)
     target_sources(element_effect PRIVATE src/plugins/effect.cc)
     target_link_libraries(element_effect PRIVATE kv::element)
 
-    ## MIDI Effect Plugin
-    juce_add_plugin(element_midi_effect
-        COMPANY_NAME                "Kushview"
-        COMPANY_WEBSITE             "https://kushview.net"
-        PLUGIN_NAME                 "Element MFX"
-        PRODUCT_NAME                "KV-Element-MFX"
-        PLUGIN_MANUFACTURER_CODE    KshV
-        PLUGIN_CODE                 ElMX
-        
-        BUNDLE_ID                   "net.kushview.plugins.ElementMFX"
-        AU_MAIN_TYPE                kAudioUnitType_MIDIProcessor
+    ## MIDI Effect Plugin (Apple only)
+    if(APPLE)
+        juce_add_plugin(element_midi_effect
+            COMPANY_NAME                "Kushview"
+            COMPANY_WEBSITE             "https://kushview.net"
+            PLUGIN_NAME                 "Element MFX"
+            PRODUCT_NAME                "KV-Element-MFX"
+            PLUGIN_MANUFACTURER_CODE    KshV
+            PLUGIN_CODE                 ElMX
+            
+            BUNDLE_ID                   "net.kushview.plugins.ElementMFX"
+            AU_MAIN_TYPE                kAudioUnitType_MIDIProcessor
 
-        IS_SYNTH                    OFF
-        NEEDS_MIDI_INPUT            ON
-        NEEDS_MIDI_OUTPUT           ON
-        EDITOR_WANTS_KEYBOARD_FOCUS ON
-        FORMATS                     AU
+            IS_SYNTH                    OFF
+            NEEDS_MIDI_INPUT            ON
+            NEEDS_MIDI_OUTPUT           ON
+            EDITOR_WANTS_KEYBOARD_FOCUS ON
+            FORMATS                     AU
 
-        HARDENED_RUNTIME_ENABLED TRUE
-        HARDENED_RUNTIME_OPTIONS
-            "com.apple.security.cs.allow-jit"
-            "com.apple.security.cs.disable-library-validation"
-            "com.apple.security.device.audio-input"
-    )
+            HARDENED_RUNTIME_ENABLED TRUE
+            HARDENED_RUNTIME_OPTIONS
+                "com.apple.security.cs.allow-jit"
+                "com.apple.security.cs.disable-library-validation"
+                "com.apple.security.device.audio-input"
+        )
 
-    target_sources(element_midi_effect PRIVATE src/plugins/midieffect.cc)
-    target_link_libraries(element_midi_effect PRIVATE kv::element)
+        target_sources(element_midi_effect PRIVATE src/plugins/midieffect.cc)
+        target_link_libraries(element_midi_effect PRIVATE kv::element)
+    endif()
 endif()
