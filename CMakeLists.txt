@@ -14,6 +14,16 @@ add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
 if(ELEMENT_ENABLE_VST2)
     set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
 endif()
+
+find_package(PkgConfig)
+if(PkgConfig_FOUND)
+    message(STATUS "Checking for jack audio")
+    pkg_check_modules(JACK jack)
+    if(JACK_FOUND)
+        message(STATUS "Found jack")
+    endif()
+endif()
+
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
 
 # Global JUCE properties
@@ -74,6 +84,12 @@ endif()
 target_compile_definitions(element PUBLIC BOOST_ALL_NO_LIB=1)
 
 target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
+
+if(JACK_FOUND)
+    target_compile_definitions(element PUBLIC EL_USE_JACK=1)
+    target_include_directories(element PUBLIC ${JACK_INCLUDE_DIRS})
+endif()
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
     target_compile_options(element PRIVATE -Wno-sign-conversion -Wno-switch-enum -Wno-attributes)
 elseif(MSVC)
