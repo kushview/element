@@ -43,32 +43,13 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/subprojects/juce/modules/*",
-                "${workspaceFolder}/subprojects/juce/modules/juce_audio_processors/format_types/*",
-                "${workspaceFolder}/subprojects/lvtk/include/*",
-                "${workspaceFolder}/subprojects/serd/include/*",
-                "${workspaceFolder}/subprojects/sord/include/*",
-                "${workspaceFolder}/subprojects/lilv/include/*",
-                "${workspaceFolder}/subprojects/suil/include/*",
-                "${workspaceFolder}/subprojects/pugl/include/*",
-                "${workspaceFolder}/subprojects/sratom/include/*",
-                "${workspaceFolder}/subprojects/clap/include/*",
-                "${workspaceFolder}/build/include/*",
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/src/lua/src/*",
                 "${workspaceFolder}/src/lua/sol/*",
                 "${workspaceFolder}/src/*",
                 "${workspaceFolder}/test/*",
                 "/usr/local/include/*",
-                "/usr/include/*",
-                "/usr/include/lilv-0/*",
-                "/usr/include/suil-0/*",
-                "/usr/include/serd-0/*",
-                "/usr/include/sord-0/*",
-                "/usr/include/sratom-0/*",
-                "${workspaceFolder}/include/*",
-                "${workspaceFolder}/src/*",
-                "${workspaceFolder}/test/*"
+                "/usr/include/*"
             ],
             "defines": [
                 "LUA_USE_READLINE=1",
@@ -85,9 +66,9 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
             },
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "compileCommands": "${workspaceRoot}/build/compile_commands.json",
             "mergeConfigurations": true
         },
