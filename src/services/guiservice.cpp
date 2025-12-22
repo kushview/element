@@ -1115,6 +1115,7 @@ MainWindow* GuiService::getMainWindow() const noexcept { return mainWindow.get()
 
 void GuiService::refreshMainMenu()
 {
+    commands().commandStatusChanged();
     if (auto* win = mainWindow.get())
         win->refreshMenu();
 }
