@@ -3,3 +3,6 @@ juce_add_binary_data(element-luamods
     HEADER_NAME luamods.hpp 
     NAMESPACE mods
     SOURCES ${ELEMENT_LUA_MODS})
+
+install(FILES ${ELEMENT_LUA_MODS} 
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/element/lua)

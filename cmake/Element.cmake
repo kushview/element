@@ -37,3 +37,5 @@ if(CCACHE_PROGRAM)
 else()
     message(STATUS "ccache not found")
 endif()
+
+include(GNUInstallDirs)

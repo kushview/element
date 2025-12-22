@@ -31,7 +31,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
     cmake_policy(SET CMP0167 OLD)
 endif()
 
-find_package(Boost 1.80.0)
+find_package(Boost 1.74.0)
 if(NOT Boost_FOUND)
     message(" -- Checking user SDK's for boost")
     set(Boost_ROOT "${USER_HOME_DIRECTORY}/SDKs/include")
@@ -41,6 +41,8 @@ endif()
 # Element static library
 add_library(element STATIC)
 add_library(kv::element ALIAS element)
+
+set_target_properties(element PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(element
     PUBLIC
@@ -136,9 +138,17 @@ if (ELEMENT_BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
+if(NOT APPLE)
+    # For backward compatibility with the old meson build, not-Mac installs 
+    # expect the exe name to be all lower case.
+    set(ELEMENT_STANDALONE_PRODUCT_NAME "element")
+else()
+    set(ELEMENT_STANDALONE_PRODUCT_NAME "Element")
+endif()
+
 ## Standalone Application
 juce_add_gui_app(element_app
-    PRODUCT_NAME            "Element"
+    PRODUCT_NAME            "${ELEMENT_STANDALONE_PRODUCT_NAME}"
     BUILD_VERSION           "${ELEMENT_BUILD_NUMBER}"
     DOCUMENT_EXTENSIONS     els elg
     ICON_BIG                data/images/icon.png
@@ -150,12 +160,16 @@ juce_add_gui_app(element_app
     HARDENED_RUNTIME_ENABLED TRUE
     HARDENED_RUNTIME_OPTIONS
         "com.apple.security.cs.allow-jit"
-	    "com.apple.security.cs.disable-library-validation"
-	    "com.apple.security.device.audio-input"
+        "com.apple.security.cs.disable-library-validation"
+        "com.apple.security.device.audio-input"
 )
 
 target_sources(element_app PRIVATE src/main.cc)
 target_link_libraries(element_app PRIVATE kv::element)
+
+if(NOT APPLE)
+    install(TARGETS element_app DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
 
 if(ELEMENT_BUILD_PLUGINS)
     set(ELEMENT_PLUGIN_FORMATS "AU;LV2;VST3")
@@ -194,6 +208,14 @@ if(ELEMENT_BUILD_PLUGINS)
     target_sources(element_instrument PRIVATE src/plugins/instrument.cc)
     target_link_libraries(element_instrument PRIVATE kv::element)
 
+    if(LINUX)
+        install(TARGETS element_instrument_CLAP DESTINATION "${CMAKE_INSTALL_LIBDIR}/clap")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/element_instrument_artefacts/$<CONFIG>/LV2/"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/lv2")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/element_instrument_artefacts/$<CONFIG>/VST3/"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst3")
+    endif()
+
     ## Effect Plugin
     juce_add_plugin(element_effect
         PLUGIN_NAME                 "Element FX"
@@ -226,6 +248,14 @@ if(ELEMENT_BUILD_PLUGINS)
     target_sources(element_effect PRIVATE src/plugins/effect.cc)
     target_link_libraries(element_effect PRIVATE kv::element)
 
+    if(LINUX)
+        install(TARGETS element_effect_CLAP DESTINATION "${CMAKE_INSTALL_LIBDIR}/clap")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/element_effect_artefacts/$<CONFIG>/LV2/"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/lv2")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/element_effect_artefacts/$<CONFIG>/VST3/"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst3")
+    endif()
+
     if(APPLE)
         ## MIDI Effect Plugin
         juce_add_plugin(element_midi_effect
@@ -254,4 +284,29 @@ if(ELEMENT_BUILD_PLUGINS)
         target_sources(element_midi_effect PRIVATE src/plugins/midieffect.cc)
         target_link_libraries(element_midi_effect PRIVATE kv::element)
     endif()
+endif()
+
+if(LINUX)
+    # CPack configuration
+    set(CPACK_PACKAGE_NAME "Element")
+    set(CPACK_PACKAGE_VENDOR "Kushview")
+    set(CPACK_PACKAGE_CONTACT "Kushview Support <support@kushview.net>")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Element - Audio Plugin Host and Modular Instrument")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION_FULL}")
+    set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Element")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSES/GPL3.txt")
+    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+    set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libasound2;libfreetype6;libx11-6;libxext6;libxrandr2;libxinerama1;libxcursor1;libcurl4;libgl1;libstdc++6")
+
+    # Package file name
+    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+
+    include(CPack)
 endif()
