@@ -147,7 +147,8 @@ void SessionService::openFile (const File& file)
     if (didSomething)
     {
         if (auto* gc = sibling<GuiService>())
-            gc->stabilizeContent();
+            if (! file.hasFileExtension ("els"))
+                gc->stabilizeContent();
         changeResetter->triggerAsyncUpdate();
     }
 }
