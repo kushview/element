@@ -213,6 +213,7 @@ private:
     String wildcard, enforcedSuffix, browseButtonText;
     juce::ListenerList<FileComboBoxListener> listeners;
     File defaultBrowseFile;
+    std::unique_ptr<juce::FileChooser> chooser;
 
     void showChooser();
     void handleAsyncUpdate() override;
