@@ -15,14 +15,7 @@ if(ELEMENT_ENABLE_VST2)
     set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
 endif()
 
-find_package(PkgConfig)
-if(PkgConfig_FOUND)
-    message(STATUS "Checking for jack audio")
-    pkg_check_modules(JACK jack)
-    if(JACK_FOUND)
-        message(STATUS "Found jack")
-    endif()
-endif()
+include(cmake/FindJack.cmake)
 
 add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
 
@@ -86,6 +79,7 @@ target_compile_definitions(element PUBLIC BOOST_ALL_NO_LIB=1)
 target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
 
 if(JACK_FOUND)
+    message(STATUS "JACK audio driver enabled")
     target_compile_definitions(element PUBLIC EL_USE_JACK=1)
     target_include_directories(element PUBLIC ${JACK_INCLUDE_DIRS})
 endif()
