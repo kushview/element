@@ -19,7 +19,7 @@
 
 #pragma once
 
-#if EL_USE_JACK
+#if ELEMENT_USE_JACK
 
 #include <jack/jack.h>
 

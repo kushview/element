@@ -20,7 +20,7 @@
   ==============================================================================
 */
 
-#if EL_USE_JACK
+#if ELEMENT_USE_JACK
 
 #include <jack/weakjack.h>
 #include <jack/jack.h>

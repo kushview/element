@@ -80,7 +80,7 @@ target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
 
 if(JACK_FOUND)
     message(STATUS "JACK audio driver enabled")
-    target_compile_definitions(element PUBLIC EL_USE_JACK=1)
+    target_compile_definitions(element PUBLIC ELEMENT_USE_JACK=1)
     target_include_directories(element PUBLIC ${JACK_INCLUDE_DIRS})
 endif()
 

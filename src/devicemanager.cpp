@@ -18,7 +18,7 @@ public:
 
     DeviceManager& owner;
     AudioEnginePtr engine;
-#if EL_USE_JACK
+#if ELEMENT_USE_JACK
     JackClient jack { "Element", 2, "main_in_", 2, "main_out_" };
 #endif
 
@@ -71,7 +71,7 @@ void DeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list)
 #if JUCE_ALSA
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
 #endif
-#if EL_USE_JACK
+#if ELEMENT_USE_JACK
     addIfNotNull (list, Jack::createAudioIODeviceType (impl->jack));
 #endif
 
