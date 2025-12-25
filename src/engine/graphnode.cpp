@@ -404,9 +404,6 @@ void GraphNode::buildRenderingSequence()
     int numAtomBuffersNeeded = 1;
 
     {
-        //XXX:
-        //MessageManagerLock mml;
-
         Array<void*> orderedNodes;
 
         {
@@ -660,8 +657,6 @@ void GraphNode::setNumPorts (PortType type, int count, bool inputs, bool async)
         portsChanged();
     }
 }
-
-SymbolMap& GraphNode::symbols() noexcept { return _context.symbols(); }
 
 void GraphNode::rebuild() noexcept
 {

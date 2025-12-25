@@ -184,8 +184,6 @@ public:
     /** Returns true if the graph is prepared. */
     bool prepared() const noexcept { return _prepared; }
 
-    SymbolMap& symbols() noexcept;
-
     /** Rebuild rendering ops immediately. */
     void rebuild() noexcept;
 
