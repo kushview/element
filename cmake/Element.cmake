@@ -39,3 +39,38 @@ else()
 endif()
 
 include(GNUInstallDirs)
+
+# JUCE VST2 SDK path setup
+if(ELEMENT_ENABLE_VST2)
+    set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
+    message(STATUS "VST2 SDK Path: ${JUCE_GLOBAL_VST2_SDK_PATH}")
+endif()
+
+# Install a plugin by target name
+function(element_install_plugin tgt)
+    if(LINUX OR WIN32)
+        install(TARGETS ${tgt}_CLAP DESTINATION "${CMAKE_INSTALL_LIBDIR}/clap")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/LV2/"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/lv2")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST3/"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst3")
+    elseif(APPLE)
+        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/CLAP/"
+        #     DESTINATION "Library/Audio/Plug-Ins/CLAP")
+        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/LV2/"
+        #     DESTINATION "Library/Audio/Plug-Ins/LV2")
+        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST3/"
+        #     DESTINATION "Library/Audio/Plug-Ins/VST3")
+        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/AU/"
+        #     DESTINATION "Library/Audio/Plug-Ins/Components")
+    endif()
+
+    if(ELEMENT_ENABLE_VST2)
+        if(LINUX OR WIN32)
+            install(TARGETS ${tgt}_VST DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst")
+        elseif(APPLE)
+            # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST/"
+            #     DESTINATION "Library/Audio/Plug-Ins/VST")
+        endif()
+    endif()
+endfunction()
