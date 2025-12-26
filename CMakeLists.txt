@@ -277,8 +277,9 @@ if(ELEMENT_BUILD_PLUGINS)
         target_sources(element_midi_effect PRIVATE src/plugins/midieffect.cc)
         target_link_libraries(element_midi_effect PRIVATE kv::element)
         # MFX version is AU only so function helper won't work here.
-        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/element_midi_effect_artefacts/$<CONFIG>/AU/"
-        #     DESTINATION "Library/Audio/Plug-Ins/Components")
+        install(TARGETS element_midi_effect_AU
+            LIBRARY DESTINATION "Library/Audio/Plug-Ins/Components"
+            COMPONENT "Element MFX")
     endif()
 endif()
 
@@ -300,14 +301,15 @@ if(LINUX)
     set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
     set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libasound2;libfreetype6;libx11-6;libxext6;libxrandr2;libxinerama1;libxcursor1;libcurl4;libgl1;libstdc++6")
-elseif(APPLE AND FALSE) # disabled
-    set(CPACK_GENERATOR "ZIP;productbuild")
-    set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+elseif(APPLE)
+    set(CPACK_GENERATOR "ZIP")
+    set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
+    set(CPACK_SET_DESTDIR OFF)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 else()
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
-    set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif()
 
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")

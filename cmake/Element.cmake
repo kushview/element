@@ -55,22 +55,19 @@ function(element_install_plugin tgt)
         install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST3/"
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst3")
     elseif(APPLE)
-        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/CLAP/"
-        #     DESTINATION "Library/Audio/Plug-Ins/CLAP")
-        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/LV2/"
-        #     DESTINATION "Library/Audio/Plug-Ins/LV2")
-        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST3/"
-        #     DESTINATION "Library/Audio/Plug-Ins/VST3")
-        # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/AU/"
-        #     DESTINATION "Library/Audio/Plug-Ins/Components")
+        install(TARGETS "${tgt}_AU"   LIBRARY DESTINATION "Library/Audio/Plug-Ins/Components")
+        install(TARGETS "${tgt}_CLAP" LIBRARY DESTINATION "Library/Audio/Plug-Ins/CLAP")
+        install(TARGETS "${tgt}_VST3" LIBRARY DESTINATION "Library/Audio/Plug-Ins/VST3")
+        # LV2 on macOS isn't a real library bundle.
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/LV2/"
+            DESTINATION "Library/Audio/Plug-Ins/LV2")
     endif()
 
     if(ELEMENT_ENABLE_VST2)
         if(LINUX OR WIN32)
             install(TARGETS ${tgt}_VST DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst")
         elseif(APPLE)
-            # install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST/"
-            #     DESTINATION "Library/Audio/Plug-Ins/VST")
+            install(TARGETS "${tgt}_VST" LIBRARY DESTINATION "Library/Audio/Plug-Ins/VST")
         endif()
     endif()
 endfunction()
