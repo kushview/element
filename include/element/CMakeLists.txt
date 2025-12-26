@@ -57,11 +57,10 @@ endif()
 set(ELEMENT_VERSION_STRING ${PROJECT_VERSION_FULL})
 
 set(GENERATED_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
+set(GENERATED_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include PARENT_SCOPE)
 file(MAKE_DIRECTORY ${GENERATED_INCLUDE_DIR}/element)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.txt.in
     ${CMAKE_BINARY_DIR}/version.txt @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
     ${GENERATED_INCLUDE_DIR}/element/version.h @ONLY)
-
-target_include_directories(element PUBLIC ${GENERATED_INCLUDE_DIR})
