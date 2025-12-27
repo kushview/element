@@ -285,6 +285,7 @@ private:
     SignalConnection stateRestoredConnection;
 
     bool draggingPos = false;
+    std::unique_ptr<FileChooser> folderChooser;
 
     int _transportButtonSize = 32;
 
@@ -303,12 +304,19 @@ private:
 
         chooser->addListener (this);
         watchButton.onClick = [this]() {
-            FileChooser fc ("Select a folder to watch", File(), "*", true, false, nullptr);
-            if (fc.browseForDirectory())
+            folderChooser = std::make_unique<FileChooser> (
+                "Select a folder to watch", File(), "*");
+
+            auto safeThis = Component::SafePointer<AudioFilePlayerEditor> (this);
+            int flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
+            folderChooser->launchAsync (flags, [safeThis] (const FileChooser& fc)
             {
-                processor.setWatchDir (fc.getResult());
-                addRecentsFrom (processor.getWatchDir());
-            }
+                if (safeThis != nullptr && fc.getResults().size() > 0)
+                {
+                    safeThis->processor.setWatchDir (fc.getResult());
+                    safeThis->addRecentsFrom (safeThis->processor.getWatchDir());
+                }
+            });
         };
 
         transport.play.onClick = [this]() {
