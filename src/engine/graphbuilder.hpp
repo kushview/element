@@ -19,8 +19,8 @@ public:
     virtual void perform (AudioSampleBuffer& sharedBufferChans,
                           const OwnedArray<MidiBuffer>& sharedMidiBuffers,
                           const int numSamples) = 0;
-
-    JUCE_LEAK_DETECTOR (GraphOp);
+private:
+    JUCE_LEAK_DETECTOR (GraphOp)
 };
 
 /** Used to calculate the correct sequence of rendering ops needed, based on

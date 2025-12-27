@@ -12,7 +12,6 @@
 namespace element {
 
 class Context;
-class SymbolMap;
 
 class GraphNode : public Processor,
                   private AsyncUpdater

@@ -465,7 +465,6 @@ private:
     MidiBuffer tempMidi;
 
     AudioSampleBuffer dummyCV;
-    AtomBuffer dummyAtom;
 
     std::unique_ptr<float*> osChans;
     int osChanSize = 0;
