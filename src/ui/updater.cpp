@@ -13,68 +13,10 @@
 #endif
 
 #define EL_PACKAGE_ID "net.kushview.element"
-#if JUCE_MAC
-#define EL_UPDATER_EXE_NAME "manage"
-#else
-#define EL_UPDATER_EXE_NAME "updater"
-#endif
 
 using namespace juce;
 
 namespace element {
-
-namespace ui {
-
-//==============================================================================
-static File networkFile() noexcept
-{
-    return DataPath::applicationDataDir().getChildFile ("installer/network.xml");
-}
-
-static std::unique_ptr<XmlElement> readNetworkFile()
-{
-    auto file = networkFile();
-    if (! file.existsAsFile())
-        return nullptr;
-    return XmlDocument::parse (file);
-}
-
-#if 0
-static void saveRepos (const std::vector<UpdateRepo>& _repos)
-{
-    auto xml = readNetworkFile();
-    if (xml == nullptr)
-        return;
-
-    if (auto repos = xml->getChildByName ("Repositories"))
-    {
-        for (auto e : repos->getChildIterator())
-            repos->removeChildElement (e, true);
-
-        for (const auto& repo : _repos)
-        {
-            auto xml = repos->createNewChildElement ("Repository");
-            if (auto c = xml->createNewChildElement ("Host"))
-                c->addTextElement (repo.host);
-            if (auto c = xml->createNewChildElement ("Username"))
-                c->addTextElement (repo.username);
-            if (auto c = xml->createNewChildElement ("Password"))
-                c->addTextElement (repo.password);
-            if (auto c = xml->createNewChildElement ("Enabled"))
-                c->addTextElement (repo.enabled ? "1" : "0");
-        }
-    }
-
-    XmlElement::TextFormat format;
-    format.addDefaultHeader = true;
-    format.customEncoding = "UTF-8";
-    if (! xml->writeTo (networkFile(), format))
-    {
-        const auto fn = networkFile().getFileName().toStdString();
-        std::clog << "[element] failed to write " << fn << std::endl;
-    }
-}
-#endif
 
 //==============================================================================
 class Updater::Updates : public juce::Thread,
@@ -120,22 +62,12 @@ public:
         return {};
     }
 
-    std::vector<UpdatePackage> checkNow (std::string& xmlOut, const UpdateRepo& repoToCheck)
+    std::vector<UpdatePackage> checkNow (std::string& xmlOut)
     {
         std::vector<UpdatePackage> packages;
-        juce::URL url (repoToCheck.host);
+        juce::URL url (repo);
+        url = url.getChildURL ("latest.xml");
         String urlStr = url.toString (true);
-
-        if (updatesFilename != "latest.xml" && ! repoToCheck.username.empty() && ! repoToCheck.password.empty())
-        {
-            String creds = repoToCheck.username;
-            creds << ":" << repoToCheck.password << "@";
-            urlStr = urlStr.replace ("://", String ("://") + creds);
-        }
-
-        url = URL (urlStr);
-        url = url.getChildURL (updatesFilename);
-        urlStr = url.toString (true);
 
         int status = -1;
 #if EL_TRACE_UPDATER
@@ -169,32 +101,15 @@ public:
         return isThreadRunning();
     }
 
-    UpdateRepo fallbackRepo()
-    {
-        UpdateRepo repo;
-        repo.enabled = true;
-        repo.host = safeRepo();
-        return repo;
-    }
-
     void run() override
     {
         std::vector<UpdatePackage> pkgs;
-        std::vector<UpdateRepo> repos (Updater::repositories());
-        if (repos.empty())
-            repos.push_back (fallbackRepo());
-
         std::string out;
         clearCached();
 
-        for (const auto& repo : repos)
-        {
-            if (! repo.enabled)
-                continue;
-            out.clear();
-            for (const auto& p : checkNow (out, repo))
-                pkgs.push_back (p);
-        }
+        out.clear();
+        for (const auto& p : checkNow (out))
+            pkgs.push_back (p);
 
         {
             juce::ScopedLock sl (lock);
@@ -279,8 +194,6 @@ private:
     juce::CriticalSection lock;
     Updater& owner;
     UpdatePackage local;
-    std::string exeFile;
-    std::string updatesFilename { "latest.xml" };
     std::string repo;
     std::string cachedXml;
     std::vector<UpdatePackage> cachedPackages;
@@ -289,8 +202,7 @@ private:
 Updater::Updater()
 {
     updates = std::make_unique<Updates> (*this);
-    setExeFile (Updater::findExe (EL_UPDATER_EXE_NAME));
-    setInfo (EL_PACKAGE_ID, ELEMENT_VERSION_STRING, EL_UPDATE_REPOSITORY_URL);
+    setInfo (EL_PACKAGE_ID, ELEMENT_VERSION_STRING, ELEMENT_UPDATES_URL);
 }
 
 Updater::Updater (const std::string& package, const std::string& version, const std::string& repo)
@@ -348,109 +260,6 @@ void Updater::setInfo (const std::string& package, const std::string& version)
 }
 
 //==============================================================================
-std::string Updater::findExe (const std::string& basename)
-{
-    String fileName (boost::trim_copy (basename));
-    if (fileName.isEmpty())
-        fileName = "updater";
-
-#if JUCE_WINDOWS
-    fileName << ".exe";
-    const auto updaterExe = DataPath::applicationDataDir()
-                                .getChildFile ("installer")
-                                .getChildFile (fileName);
-#elif JUCE_MAC
-    fileName << ".app/Contents/MacOS/"; // << boost::trim_copy ("updater");
-    const auto installerDir = DataPath::applicationDataDir()
-                                  .getChildFile ("installer");
-
-    auto updaterExe = installerDir.getChildFile (fileName + boost::trim_copy (basename));
-
-    if (! updaterExe.existsAsFile())
-    {
-        // workaround for when the actual exe name has to be 'updater'
-        updaterExe = installerDir.getChildFile (fileName + "updater");
-    }
-#else
-    const auto updaterExe = DataPath::applicationDataDir()
-                                .getChildFile ("installer")
-                                .getChildFile (fileName);
-#endif
-
-    return updaterExe.getFullPathName().toStdString();
-}
-
-//==============================================================================
-bool Updater::exists() const noexcept
-{
-    return File::isAbsolutePath (exeFile()) && File (exeFile()).exists();
-}
-
-void Updater::launch()
-{
-    Logger::writeToLog ("launching updater");
-    if (updates->exeFile.empty())
-        updates->exeFile = findExe (EL_UPDATER_EXE_NAME);
-    if (! exists())
-    {
-#if EL_TRACE_UPDATER
-        std::clog << "[element] updater does not exist: " << std::endl
-                  << "[element] " << updates->exeFile << std::endl;
-#endif
-        return;
-    }
-
-#if JUCE_MAC || JUCE_LINUX
-    juce::File exeFile = File (updates->exeFile);
-    exeFile.startAsProcess ("--su");
-#elif JUCE_WINDOWS
-    juce::File exeFile = File (updates->exeFile);
-    exeFile.startAsProcess ("--su");
-#endif
-}
-
-//==============================================================================
-std::vector<UpdateRepo> Updater::repositories()
-{
-    std::vector<UpdateRepo> _repos;
-    if (auto xml = readNetworkFile())
-    {
-        if (auto xml2 = xml->getChildByName ("Repositories"))
-        {
-            for (const auto* const e : xml2->getChildIterator())
-            {
-                UpdateRepo repo;
-
-                if (auto c = e->getChildByName ("Host"))
-                    repo.host = c->getAllSubText().toStdString();
-                if (auto c = e->getChildByName ("Username"))
-                    repo.username = c->getAllSubText().toStdString();
-                if (auto c = e->getChildByName ("Password"))
-                    repo.password = c->getAllSubText().toStdString();
-
-                if (auto c = e->getChildByName ("Enabled"))
-                {
-                    auto st = c->getAllSubText();
-                    repo.enabled = st.getIntValue() != 0;
-                }
-
-                if (! repo.host.empty())
-                {
-#if EL_TRACE_UPDATER
-                    std::clog << "[element] found repo: " << repo.host << std::endl;
-#endif
-                    _repos.push_back (repo);
-                }
-            }
-        }
-    }
-    return _repos;
-}
-
-//==============================================================================
-std::string Updater::exeFile() const noexcept { return updates->exeFile; }
-void Updater::setExeFile (const std::string& file) { updates->exeFile = file; }
-void Updater::setUpdatesFilename (const std::string& filename) { updates->updatesFilename = filename; }
 std::string Updater::repository() const noexcept { return updates->safeRepo(); }
 void Updater::setRepository (const std::string& url)
 {
@@ -470,5 +279,4 @@ void Updater::setUpdatesXml (const std::string& xml)
     updates->updateCached();
 }
 
-} // namespace ui
 } // namespace element

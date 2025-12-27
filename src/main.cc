@@ -153,66 +153,8 @@ private:
     {
         if (! isFirstRun)
             return;
-#if EL_UPDATER
-        auto& settings = world.settings();
-        const auto repos (ui::Updater::repositories());
-        if (repos.empty())
-            return;
+#if ELEMENT_UPDATER
 
-        const auto repo (repos.front());
-        if (! juce::URL::isProbablyAWebsiteURL (repo.host))
-            return;
-
-        auto setPublic = [&]() -> void {
-            settings.setUpdateChannel ("public");
-            settings.setUpdateKeyUser ("");
-            settings.setUpdateKey ("");
-        };
-
-        const juce::String host (repo.host);
-        if (host.contains ("/public"))
-        {
-            setPublic();
-            return;
-        }
-
-        const auto channel = [&]() -> juce::String {
-            if (host.contains ("stable") || host.contains ("release"))
-            {
-                return "stable";
-            }
-            else if (host.contains ("nightly"))
-            {
-                return "nightly";
-            }
-            return "";
-        }();
-
-        const juce::String username (repo.username);
-        const juce::String passData (repo.password);
-        const auto keyType = passData.upToFirstOccurrenceOf (":", false, false);
-        const auto key = passData.fromFirstOccurrenceOf (":", false, false);
-
-        // clang-format off
-        auto repoValid = [&]() -> bool {
-            return username.isNotEmpty() &&
-                key.isNotEmpty() &&
-                (keyType == "member" || keyType == "element-v1" || keyType == "patreon") &&
-                (channel == "stable" || channel == "nightly");
-        };
-        // clang-format on
-
-        if (repoValid())
-        {
-            settings.setUpdateChannel (channel);
-            settings.setUpdateKeyUser (username);
-            settings.setUpdateKeyType (keyType);
-            settings.setUpdateKey (key);
-        }
-        else
-        {
-            setPublic();
-        }
 #endif
     }
 

@@ -215,8 +215,8 @@ void Services::handleMessage (const Message& msg)
                 break;
         }
 
-        if (handled) {
-           
+        if (handled)
+        {
             gui->refreshMainMenu();
             return;
         }

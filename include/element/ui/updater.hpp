@@ -9,26 +9,25 @@
 
 #include <element/signals.hpp>
 
-#ifndef EL_UPDATE_REPOSITORY_HOST
-    #define EL_UPDATE_REPOSITORY_HOST "https://repo.kushview.net"
+#ifndef ELEMENT_UPDATES_HOST
+    #define ELEMENT_UPDATES_HOST "https://repo.kushview.net"
 #endif
 
-#ifndef EL_UPDATE_REPOSITORY_PATH
-    #define EL_UPDATE_REPOSITORY_PATH "/element/1/stable"
+#ifndef ELEMENT_UPDATES_PATH
+    #define ELEMENT_UPDATES_PATH "/element/1/stable"
 #endif
 
-#define EL_UPDATE_REPOSITORY_URL_BASE EL_UPDATE_REPOSITORY_HOST EL_UPDATE_REPOSITORY_PATH
+#define ELEMENT_UPDATES_URL_BASE ELEMENT_UPDATES_HOST ELEMENT_UPDATES_PATH
 
 #if JUCE_MAC
-    #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/osx"
+    #define ELEMENT_UPDATES_URL ELEMENT_UPDATES_URL_BASE "/osx"
 #elif JUCE_WINDOWS
-    #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/windows"
+    #define ELEMENT_UPDATES_URL ELEMENT_UPDATES_URL_BASE "/windows"
 #else
-    #define EL_UPDATE_REPOSITORY_URL EL_UPDATE_REPOSITORY_URL_BASE "/linux"
+    #define ELEMENT_UPDATES_URL ELEMENT_UPDATES_URL_BASE "/linux"
 #endif
 
 namespace element {
-namespace ui {
 
 /** An update package. */
 struct UpdatePackage {
@@ -40,14 +39,7 @@ struct UpdatePackage {
     std::string version;
 };
 
-struct UpdateRepo {
-    std::string host;
-    std::string username;
-    std::string password;
-    bool enabled { false };
-};
-
-/** Updater helper that can deal with Qt Installer Framework installers */
+/** Updater helper for checking available updates */
 class Updater {
 public:
     Updater();
@@ -63,9 +55,6 @@ public:
 
     /** Check for updates now or later. */
     void check (bool async);
-
-    /** Checks if the updater program has been found on disk. */
-    bool exists() const noexcept;
 
     /** Returns all package updates listed in the repo. */
     std::vector<UpdatePackage> packages() const noexcept;
@@ -83,22 +72,6 @@ public:
     void setInfo (const std::string& package, const std::string& version);
 
     //==========================================================================
-    /** Returns the EXE file of the updater program. */
-    std::string exeFile() const noexcept;
-
-    /** Changes the EXE file of the updater program. */
-    void setExeFile (const std::string& file);
-
-    /** Change the XML file to check. Default is 'Updates.xml' */
-    void setUpdatesFilename (const std::string& filename);
-
-    /** Launch the updater GUI if possible. */
-    void launch();
-
-    //==========================================================================
-    /** Returns a list of user repositories. */
-    static std::vector<UpdateRepo> repositories();
-
     /** Returns the repository URL or file:/// path */
     std::string repository() const noexcept;
 
@@ -116,8 +89,6 @@ public:
 private:
     class Updates;
     std::unique_ptr<Updates> updates;
-    static std::string findExe (const std::string& basename = "updater");
 };
 
-} // namespace ui
 } // namespace element

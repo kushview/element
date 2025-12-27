@@ -42,7 +42,7 @@ void MainMenu::setupMenu()
 #if JUCE_MAC
     macMenu.reset (new PopupMenu());
     macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About "));
-#if EL_UPDATER
+#if ELEMENT_UPDATER
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
 #endif
     macMenu->addSeparator();
@@ -258,7 +258,7 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
 
 #if ! JUCE_MAC
     menu.addSeparator();
-#if EL_UPDATER
+#if ELEMENT_UPDATER
     menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");
 #endif
     menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
@@ -328,7 +328,7 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
     menu.addItem (7002, TRANS ("Log files..."));
     menu.addItem (7000, TRANS ("Issue tracking..."));
     menu.addItem (7003, TRANS ("Change log..."));
-#if ! EL_UPDATER
+#if ! ELEMENT_UPDATER
     menu.addSeparator();
     menu.addItem (7001, TRANS ("Donate..."));
 #endif

@@ -22,7 +22,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-namespace ui = element::ui;
 using element::Version;
 
 static const juce::String Updates_xml = R"(
@@ -80,27 +79,10 @@ BOOST_AUTO_TEST_CASE (XML)
     }
 }
 
-BOOST_AUTO_TEST_CASE (findExe)
-{
-#if ! defined(__linux__)
-    ui::Updater updater;
-    BOOST_REQUIRE (updater.exeFile().empty() == false);
-#endif
-}
-
-BOOST_AUTO_TEST_CASE (GettersSetters)
-{
-    ui::Updater updater;
-    updater.setExeFile ("/home/my/updater.exe");
-    BOOST_REQUIRE_EQUAL (updater.exeFile(), std::string ("/home/my/updater.exe"));
-    updater.setRepository ("https://cd.kushview.net/element/release/osx");
-    BOOST_REQUIRE_EQUAL (updater.repository(), std::string ("https://cd.kushview.net/element/release/osx"));
-}
-
 BOOST_AUTO_TEST_CASE (CheckNow)
 {
     std::string ID = "net.kushview.element";
-    ui::Updater updater (ID, "1.0.0", "https://fakeupdateurl.com");
+    element::Updater updater (ID, "1.0.0", "https://fakeupdateurl.com");
     updater.setUpdatesXml (makeXml (ID, "1.1.0").toStdString());
     updater.check (false);
     BOOST_REQUIRE_EQUAL (updater.packages().size(), (size_t) 1);
