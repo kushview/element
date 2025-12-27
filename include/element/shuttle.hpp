@@ -75,9 +75,6 @@ private:
     int64_t framePos;
     uint32_t duration;
     double sampleRate;
-
-    [[maybe_unused]] double ppqLoopStart;
-    [[maybe_unused]] double ppqLoopEnd;
 };
 
 } // namespace element
