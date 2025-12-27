@@ -731,36 +731,36 @@ void PluginManager::addDefaultFormats()
 
 #if JUCE_MAC && JUCE_PLUGINHOST_AU
         else if (fmt == "AudioUnit")
-            audioPlugs.addFormat (new AudioUnitPluginFormat());
+            audioPlugs.addFormat (std::make_unique<AudioUnitPluginFormat>());
 #endif
 
 #if JUCE_PLUGINHOST_VST
         else if (fmt == "VST")
-            audioPlugs.addFormat (new VSTPluginFormat());
+            audioPlugs.addFormat (std::make_unique<VSTPluginFormat>());
 #endif
 
 #if JUCE_PLUGINHOST_VST3
         else if (fmt == "VST3")
-            audioPlugs.addFormat (new VST3PluginFormat());
+            audioPlugs.addFormat (std::make_unique<VST3PluginFormat>());
 #endif
 
 #if JUCE_PLUGINHOST_LV2
         else if (fmt == "LV2")
-            audioPlugs.addFormat (new LV2PluginFormat());
+            audioPlugs.addFormat (std::make_unique<LV2PluginFormat>());
 #endif
 
 #if JUCE_PLUGINHOST_LADSPA
         else if (fmt == "LADSPA")
-            audioPlugs.addFormat (new LADSPAPluginFormat());
+            audioPlugs.addFormat (std::make_unique<LADSPAPluginFormat>());
 #endif
     }
 
     priv->hasAddedFormats = true;
 }
 
-void PluginManager::addFormat (AudioPluginFormat* fmt)
+void PluginManager::addFormat (std::unique_ptr<juce::AudioPluginFormat> fmt)
 {
-    getAudioPluginFormats().addFormat (fmt);
+    getAudioPluginFormats().addFormat (std::move (fmt));
 }
 
 NodeFactory& PluginManager::getNodeFactory() { return priv->nodes; }

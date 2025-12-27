@@ -26,7 +26,7 @@ public:
     void addDefaultFormats();
 
     /** Add a plugin format */
-    void addFormat (juce::AudioPluginFormat*);
+    void addFormat (std::unique_ptr<juce::AudioPluginFormat>);
 
     /** Get the dead mans pedal file */
     const juce::File& getDeadAudioPluginsFile() const;
