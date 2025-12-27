@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0_beta1] - 2025-MM-DD
+## [1.0.0b1] - 2025-02-04
 
 ### Changed
 - Migrate to Meson build system.  Projucer no longer needed.
