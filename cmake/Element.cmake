@@ -5,6 +5,7 @@ option(ELEMENT_BUILD_TESTS "Build the unit tests" ON)
 option(ELEMENT_ENABLE_ASIO "Build with ASIO support" OFF)
 option(ELEMENT_ENABLE_VST2 "Build with VST2 support" OFF)
 option(ELEMENT_ENABLE_LTO "Build with Link Time Optimization" OFF)
+option(ELEMENT_ENABLE_UPDATER "Build with updater support" OFF)
 
 if(APPLE)
     enable_language(OBJC)

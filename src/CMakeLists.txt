@@ -77,6 +77,11 @@ target_link_libraries(element
         juce::juce_recommended_config_flags
     )
 
+if(ELEMENT_ENABLE_UPDATER)
+    message(STATUS "Element updater enabled")
+    target_compile_definitions(element PUBLIC ELEMENT_UPDATER=1)
+endif()
+
 if(ELEMENT_ENABLE_LTO)
     message("Link Time Optimization enabled")
     target_link_libraries(element PUBLIC juce::juce_recommended_lto_flags)
