@@ -19,6 +19,7 @@ public:
     virtual void perform (AudioSampleBuffer& sharedBufferChans,
                           const OwnedArray<MidiBuffer>& sharedMidiBuffers,
                           const int numSamples) = 0;
+
 private:
     JUCE_LEAK_DETECTOR (GraphOp)
 };

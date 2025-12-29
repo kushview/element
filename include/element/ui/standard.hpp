@@ -3,7 +3,11 @@
 
 #pragma once
 
+#include <element/juce/core.hpp>
+#include <element/juce/gui_basics.hpp>
 #include <element/ui/content.hpp>
+
+#include <boost/signals2/connection.hpp>
 
 namespace element {
 

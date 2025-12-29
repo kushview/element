@@ -368,9 +368,9 @@ struct Content::Tooltips
     std::unique_ptr<TooltipWindow> tooltipWindow;
 };
 
-Content::Content (Context& ctl_)
-    : _context (ctl_),
-      controller (ctl_.services())
+Content::Content (Context& ctx)
+    : _context (ctx),
+      _services (ctx.services())
 {
     setOpaque (true);
 
@@ -414,7 +414,7 @@ void Content::resized()
 
 void Content::post (Message* message)
 {
-    controller.postMessage (message);
+    _services.postMessage (message);
 }
 
 void Content::setToolbarVisible (bool visible)

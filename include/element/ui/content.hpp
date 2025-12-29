@@ -68,7 +68,7 @@ private:
 //==============================================================================
 class Content : public juce::Component {
 protected:
-    Content (Context& app);
+    Content (Context& ctx);
 
 public:
     virtual ~Content() noexcept;
@@ -77,7 +77,7 @@ public:
     Context& context();
 
     /** Access to the app controller */
-    Services& services() { return controller; }
+    Services& services() { return _services; }
 
     /** Access to the currently opened session */
     SessionPtr session();
@@ -124,7 +124,7 @@ protected:
 
 private:
     Context& _context;
-    Services& controller;
+    Services& _services;
 
     struct Tooltips;
     juce::SharedResourcePointer<Tooltips> tips;

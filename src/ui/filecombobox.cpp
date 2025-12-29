@@ -121,10 +121,10 @@ File FileComboBox::getLocationToBrowse()
 void FileComboBox::showChooser()
 {
     int flags = isDir
-        ? FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories
-        : (isSaving
-            ? FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles
-            : FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles);
+                    ? FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories
+                    : (isSaving
+                           ? FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles
+                           : FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles);
 
     chooser = std::make_unique<FileChooser> (
         isDir ? TRANS ("Choose a new directory") : TRANS ("Choose a new file"),
@@ -132,8 +132,7 @@ void FileComboBox::showChooser()
         wildcard);
 
     auto safeThis = Component::SafePointer<FileComboBox> (this);
-    chooser->launchAsync (flags, [safeThis] (const FileChooser& fc)
-    {
+    chooser->launchAsync (flags, [safeThis] (const FileChooser& fc) {
         if (safeThis != nullptr && fc.getResults().size() > 0)
             safeThis->setCurrentFile (fc.getResult(), true);
     });

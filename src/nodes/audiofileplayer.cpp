@@ -309,8 +309,7 @@ private:
 
             auto safeThis = Component::SafePointer<AudioFilePlayerEditor> (this);
             int flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-            folderChooser->launchAsync (flags, [safeThis] (const FileChooser& fc)
-            {
+            folderChooser->launchAsync (flags, [safeThis] (const FileChooser& fc) {
                 if (safeThis != nullptr && fc.getResults().size() > 0)
                 {
                     safeThis->processor.setWatchDir (fc.getResult());
