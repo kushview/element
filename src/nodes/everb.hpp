@@ -21,9 +21,10 @@ class ReverbProcessor : public BaseProcessor
 
 public:
     explicit ReverbProcessor()
-        : BaseProcessor()
+        : BaseProcessor (BusesProperties()
+                             .withInput ("Input", AudioChannelSet::stereo())
+                             .withOutput ("Output", AudioChannelSet::stereo()))
     {
-        setPlayConfigDetails (2, 2, 44100.0, 1024);
         addLegacyParameter (roomSize = new AudioParameterFloat ("roomSize", "Room Size", 0.0f, 1.0f, params.roomSize));
         addLegacyParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.0f, 1.0f, params.damping));
         addLegacyParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.0f, 1.0f, params.wetLevel));
@@ -145,6 +146,13 @@ public:
                 verb.setParameters (params);
             }
         }
+    }
+
+protected:
+    bool isBusesLayoutSupported (const BusesLayout& layout) const override
+    {
+        return layout.getMainInputChannelSet() == AudioChannelSet::stereo()
+               && layout.getMainOutputChannelSet() == AudioChannelSet::stereo();
     }
 
 private:
