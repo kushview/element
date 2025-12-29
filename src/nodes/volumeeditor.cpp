@@ -18,33 +18,6 @@ public:
     {
         setVolumeMinMax (-30, 12, 0.5);
 
-        ioButton = new SettingButton();
-        ioButton->setPath (getIcons().fasCog);
-        ioButton->onClick = [this]() {
-            auto node = getNode();
-            ProcessorPtr obj = node.getObject();
-            auto* proc = (obj) ? obj->getAudioProcessor() : 0;
-            if (! proc)
-                return;
-
-            if (ioButton->getToggleState())
-            {
-                ioButton->setToggleState (false, dontSendNotification);
-                ioBox.clear();
-            }
-            else
-            {
-                auto* component = new NodeAudioBusesComponent (node, proc, ViewHelpers::findContentComponent (this));
-                auto& box = CallOutBox::launchAsynchronously (
-                    std::unique_ptr<Component> (component),
-                    ioButton->getScreenBounds(),
-                    0);
-                ioBox.setNonOwned (&box);
-            }
-        };
-
-        getChannelStrip().addButton (ioButton);
-
         onVolumeChanged = [this] (double value) {
             float fvalue = static_cast<float> (value);
             if (param != nullptr)
@@ -58,12 +31,6 @@ public:
 
     ~ChannelStrip()
     {
-        if (ioButton)
-        {
-            ioButton->onClick = nullptr;
-            ioButton = nullptr;
-        }
-
         if (param)
             param->removeListener (this);
         param = nullptr;
@@ -107,8 +74,6 @@ protected:
 
 private:
     AudioParameterFloat* param = nullptr;
-    SettingButton* ioButton = nullptr;
-    OptionalScopedPointer<CallOutBox> ioBox;
 };
 
 VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiService& gui)
