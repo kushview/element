@@ -14,7 +14,6 @@
 #include "ui/contextmenus.hpp"
 #include "ui/grapheditorcomponent.hpp"
 #include "ui/ioconfigurationwindow.hpp"
-#include "ui/nodeioconfiguration.hpp"
 #include "ui/nodeeditorfactory.hpp"
 #include "ui/viewhelpers.hpp"
 #include "ui/block.hpp"

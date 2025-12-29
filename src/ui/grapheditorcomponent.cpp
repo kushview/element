@@ -26,7 +26,6 @@
 #include "ui/pluginspanelview.hpp"
 #include "ui/sessiontreepanel.hpp"
 #include "ui/audioiopanelview.hpp"
-#include "ui/nodeioconfiguration.hpp"
 #include "ui/grapheditorcomponent.hpp"
 
 #include "scopedflag.hpp"

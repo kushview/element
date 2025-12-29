@@ -3,7 +3,6 @@
 
 #include "ui/nodechannelstrip.hpp"
 #include "ui/guicommon.hpp"
-#include "ui/nodeioconfiguration.hpp"
 #include "nodes/volume.hpp"
 #include "nodes/volumeeditor.hpp"
 
