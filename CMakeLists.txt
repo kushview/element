@@ -1,7 +1,7 @@
 # Element CMakeLists.txt
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.26.0)
 project(element VERSION 1.0.0)
 set(PROJECT_VERSION_SUFFIX "b2")
 set(PROJECT_VERSION_FULL "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
