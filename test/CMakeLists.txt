@@ -15,6 +15,7 @@ target_compile_definitions(test_element
         EL_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
 
 # Register all test suites with CTest
+add_test(NAME "AlignedDataTests" COMMAND test_element --run_test=AlignedDataTests)
 add_test(NAME "AtomTests" COMMAND test_element --run_test=AtomTests)
 add_test(NAME "AtomicValueTests" COMMAND test_element --run_test=AtomicValueTests)
 add_test(NAME "AtomicLockTests" COMMAND test_element --run_test=AtomicLockTests)
