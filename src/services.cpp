@@ -298,6 +298,8 @@ void Services::handleMessage (const Message& msg)
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {
         ec->changeBusesLayout (cbm->node, cbm->layout);
+        if (cbm->onFinished)
+            cbm->onFinished();
     }
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {

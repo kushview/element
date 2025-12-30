@@ -30,6 +30,7 @@
 
 namespace element {
 
+class Context;
 class MainWindow;
 class GraphNode;
 class GraphEditorComponent;
@@ -38,7 +39,7 @@ class GraphEditorComponent;
 class IOConfigurationWindow final : public juce::AudioProcessorEditor
 {
 public:
-    IOConfigurationWindow (const Node&, juce::AudioProcessor&);
+    IOConfigurationWindow (Context&, const Node&, juce::AudioProcessor&);
     ~IOConfigurationWindow() override;
 
     //==============================================================================
@@ -51,10 +52,16 @@ private:
     juce::AudioProcessor::BusesLayout currentLayout;
     juce::Label title;
     std::unique_ptr<InputOutputConfig> inConfig, outConfig;
+
+    Context& _context;
     Node _node;
+
+    juce::TextButton applyButton { "Apply", "ApplyButton" };
 
     InputOutputConfig* getConfig (bool isInput) noexcept { return isInput ? inConfig.get() : outConfig.get(); }
     void update();
+    void stabilize();
+    void applyButtonClicked();
 
     MainWindow* getMainWindow() const;
     GraphEditorComponent* getGraphEditor() const;

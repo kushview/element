@@ -1036,7 +1036,8 @@ void EngineService::changeBusesLayout (const Node& n, const AudioProcessor::Buse
         {
             if (proc->checkBusesLayoutSupported (layout))
             {
-                gp->suspendProcessing (true);
+                while (! gp->isSuspended())
+                    gp->suspendProcessing (true);
                 gp->releaseResources();
 
                 const bool wasNotSuspended = ! proc->isSuspended();
@@ -1048,7 +1049,9 @@ void EngineService::changeBusesLayout (const Node& n, const AudioProcessor::Buse
                     proc->suspendProcessing (false);
 
                 gp->prepareToRender (gp->getSampleRate(), gp->getBlockSize());
-                gp->suspendProcessing (false);
+
+                while (gp->isSuspended())
+                    gp->suspendProcessing (false);
 
                 controller->removeIllegalConnections();
                 controller->syncArcsModel();

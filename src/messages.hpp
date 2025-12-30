@@ -238,6 +238,7 @@ struct ChangeBusesLayout : public AppMessage
         : node (n), layout (l) {}
     const Node node;
     const AudioProcessor::BusesLayout layout;
+    std::function<void()> onFinished;
 };
 
 struct OpenSessionMessage : public AppMessage

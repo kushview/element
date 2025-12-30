@@ -25,9 +25,11 @@
 
 #include <element/audioengine.hpp>
 #include <element/context.hpp>
+#include <element/services.hpp>
 #include <element/ui/mainwindow.hpp>
 
 #include "ui/grapheditorcomponent.hpp"
+#include "messages.hpp"
 #include "ioconfigurationwindow.hpp"
 #include "engine/graphnode.hpp"
 
@@ -201,6 +203,9 @@ public:
         layoutLabel.setFont (layoutLabel.getFont().withStyle (Font::bold));
         enabledToggle.setClickingTogglesState (true);
 
+        // TODO: Handle toggled state in the GUI. Until then, don't show the toggle.
+        enabledToggle.setVisible (false);
+
         enabledToggle.addListener (this);
 
         addAndMakeVisible (layoutLabel);
@@ -315,6 +320,26 @@ private:
     //==============================================================================
     void applyBusLayout (const AudioChannelSet& set)
     {
+        using Layout = AudioProcessor::BusesLayout;
+        auto findMatchingAudioSet = [&] (AudioProcessor& proc) -> AudioChannelSet {
+            AudioChannelSet set;
+
+            return set;
+        };
+
+        auto* p = owner.getAudioProcessor();
+        auto* bus = p != nullptr ? p->getBus (isInput, currentBus) : nullptr;
+        if (p == nullptr || bus == nullptr)
+            return;
+
+        auto newLayout = owner.currentLayout;
+        auto& buses = isInput ? newLayout.inputBuses : newLayout.outputBuses;
+        auto& otherBuses = ! isInput ? newLayout.inputBuses : newLayout.outputBuses;
+        buses.set (currentBus, set);
+
+        owner.currentLayout = newLayout;
+        owner.stabilize();
+#if 0
         if (auto* p = owner.getAudioProcessor())
         {
             if (auto* bus = p->getBus (isInput, currentBus))
@@ -328,6 +353,7 @@ private:
                 }
             }
         }
+#endif
     }
 
     void buttonClicked (Button*) override {}
@@ -440,9 +466,10 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputOutputConfig)
 };
 
-IOConfigurationWindow::IOConfigurationWindow (const Node& n, AudioProcessor& p)
+IOConfigurationWindow::IOConfigurationWindow (Context& ctx, const Node& n, AudioProcessor& p)
     : AudioProcessorEditor (&p),
       title ("title", p.getName()),
+      _context (ctx),
       _node (n)
 {
     setOpaque (true);
@@ -451,9 +478,9 @@ IOConfigurationWindow::IOConfigurationWindow (const Node& n, AudioProcessor& p)
     addAndMakeVisible (title);
 
     {
-        ScopedLock renderLock (p.getCallbackLock());
-        p.suspendProcessing (true);
-        p.releaseResources();
+        // ScopedLock renderLock (p.getCallbackLock());
+        // p.suspendProcessing (true);
+        // p.releaseResources();
     }
 
     if (p.getBusCount (true) > 0 || p.canAddBus (true))
@@ -468,8 +495,11 @@ IOConfigurationWindow::IOConfigurationWindow (const Node& n, AudioProcessor& p)
         addAndMakeVisible (outConfig.get());
     }
 
+    applyButton.onClick = [this] { applyButtonClicked(); };
+    addAndMakeVisible (applyButton);
+
     currentLayout = p.getBusesLayout();
-    setSize (400, (inConfig != nullptr && outConfig != nullptr ? 160 : 0) + 200);
+    setSize (400, (inConfig != nullptr && outConfig != nullptr ? 160 : 0) + 240);
 }
 
 IOConfigurationWindow::~IOConfigurationWindow()
@@ -478,16 +508,16 @@ IOConfigurationWindow::~IOConfigurationWindow()
     {
         if (auto* p = getAudioProcessor())
         {
-            ScopedLock renderLock (graph->getPropertyLock());
+            // ScopedLock renderLock (graph->getPropertyLock());
 
-            graph->suspendProcessing (true);
-            graph->releaseResources();
+            // graph->suspendProcessing (true);
+            // graph->releaseResources();
 
-            p->prepareToPlay (graph->getSampleRate(), graph->getBlockSize());
-            p->suspendProcessing (false);
+            // p->prepareToPlay (graph->getSampleRate(), graph->getBlockSize());
+            // p->suspendProcessing (false);
 
-            graph->prepareToRender (graph->getSampleRate(), graph->getBlockSize());
-            graph->suspendProcessing (false);
+            // graph->prepareToRender (graph->getSampleRate(), graph->getBlockSize());
+            // graph->suspendProcessing (false);
         }
     }
 }
@@ -509,11 +539,13 @@ void IOConfigurationWindow::resized()
 
     if (outConfig != nullptr)
         outConfig->setBounds (r.removeFromTop (160));
+
+    r.removeFromTop (10);
+    applyButton.setBounds (r.removeFromTop (24).removeFromRight (100));
 }
 
 void IOConfigurationWindow::update()
 {
-    _node.resetPorts();
 #if 0
     auto nodeID = getNodeID();
 
@@ -527,6 +559,14 @@ void IOConfigurationWindow::update()
         if (auto* panel = graphEditor->graphPanel.get())
             panel->updateComponents();
 #endif
+}
+
+void IOConfigurationWindow::stabilize()
+{
+    if (auto* p = getAudioProcessor())
+    {
+        applyButton.setEnabled (p->checkBusesLayoutSupported (currentLayout));
+    }
 }
 
 uint32_t IOConfigurationWindow::getNodeID() const
@@ -565,6 +605,22 @@ GraphNode* IOConfigurationWindow::getGraph() const
 {
     const auto graph = _node.getParentGraph();
     return dynamic_cast<GraphNode*> (graph.getObject());
+}
+
+void IOConfigurationWindow::applyButtonClicked()
+{
+    auto msg = new ChangeBusesLayout (_node, currentLayout);
+    Component::SafePointer<IOConfigurationWindow> safeThis (this);
+    msg->onFinished = [safeThis]() {
+        if (auto* c = safeThis.getComponent())
+        {
+            if (auto* callOut = c->findParentComponentOfClass<CallOutBox>())
+                callOut->dismiss();
+            else
+                c->stabilize();
+        }
+    };
+    _context.services().postMessage (msg);
 }
 
 } // namespace element
