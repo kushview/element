@@ -26,7 +26,7 @@
             "includePath": [
                 "${userHome}/SDKs/include/*",
                 "${workspaceFolder}/deps/juce/modules/*",
-                "${workspaceFolder}/deps/juce/modules/juce_audio_processors/format_types/LV2_SDK/lv2/*",
+                "${workspaceFolder}/deps/juce/modules/juce_audio_processors_headless/format_types/LV2_SDK/lv2/*",
                 "${workspaceFolder}/deps/clap-juce-extensions/clap-libs/clap/include/*",
                 "${workspaceFolder}/deps/clap-juce-extensions/clap-libs/clap-helpers/include/*",
                 "${workspaceFolder}/src/lua/src/*",
@@ -75,7 +75,6 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\SDKs\\boost_1_71_0\\*",
                 "${workspaceFolder}/subprojects/juce/modules/*",
                 "${workspaceFolder}/subprojects/lv2/include/*",
                 "${workspaceFolder}/subprojects/lvtk/include/*",
