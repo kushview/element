@@ -186,6 +186,7 @@ public:
         logfile.create();
         logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
         Logger::setCurrentLogger (logger.get());
+        logger->logMessage ("[scanner] Worker process started");
     }
 
     ~PluginScannerWorker()
@@ -220,7 +221,13 @@ public:
             if (pendingBlocks.empty())
                 return;
 
-            sendResults (doScan (pendingBlocks.front()));
+            auto block = pendingBlocks.front();
+            MemoryInputStream stream { block, false };
+            const auto formatName = stream.readString();
+            const auto identifier = stream.readString();
+            logger->logMessage (String ("Scanning: ") + formatName + ": " + identifier);
+
+            sendResults (doScan (block));
             pendingBlocks.pop();
         }
     }
@@ -230,9 +237,6 @@ public:
         MemoryInputStream stream { block, false };
         const auto formatName = stream.readString();
         const auto identifier = stream.readString();
-        String msg = "scan: ";
-        msg << formatName << ": " << identifier;
-        logger->logMessage (msg);
         return nullptr == plugins->getAudioPluginFormat (formatName)
                    ? scanProvider (formatName, identifier)
                    : scanJuce (formatName, identifier);
@@ -253,7 +257,15 @@ public:
             && (MessageManager::getInstance()->isThisTheMessageThread()
                 || matchingFormat->requiresUnblockedMessageThreadDuringCreation (pd)))
         {
+            const auto startTime = Time::getMillisecondCounterHiRes();
             matchingFormat->findAllTypesForFile (results, identifier);
+            const auto duration = (Time::getMillisecondCounterHiRes() - startTime) / 1000.0;
+
+            for (const auto* desc : results)
+                logger->logMessage (String ("Found: ") + desc->name + " v" + desc->version + " by " + desc->manufacturerName + String::formatted (" (%.2fs) [file: ", duration) + desc->fileOrIdentifier + "]");
+
+            if (results.isEmpty())
+                logger->logMessage (String ("Failed: ") + identifier + String::formatted (" - No plugins found (%.2fs)", duration));
         }
 
         return results;
@@ -313,7 +325,7 @@ public:
 
     void handleConnectionLost() override
     {
-        logger->logMessage ("[scanner] connection lost");
+        logger->logMessage ("[scanner] scanner disconnected");
         logger.reset();
         settings = nullptr;
         plugins = nullptr;
@@ -364,6 +376,9 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
 
     using State = PluginScannerCoordinator::State;
 
+    int timeoutCount = 0;
+    const int maxTimeouts = 1000;
+
     for (;;)
     {
         if (cancelFlag.get() != 0)
@@ -372,7 +387,25 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
         const auto response = superprocess->getResponse();
 
         if (response.state == State::timeout)
+        {
+            if (++timeoutCount >= maxTimeouts)
+            {
+                const int timeoutSeconds = maxTimeouts * 50 / 1000;
+                DBG ("[coordinator] Scan timeout after " << timeoutSeconds << " seconds: " << fileOrIdentifier);
+                Logger::writeToLog ("[coordinator] TIMEOUT after " + String (timeoutSeconds) + " seconds: " + fileOrIdentifier);
+                superprocess->killWorkerProcess();
+                superprocess.reset();
+                return false;
+            }
             continue;
+        }
+
+        if (response.state == State::connectionLost)
+        {
+            DBG ("[coordinator] Worker disconnected, will restart on next scan");
+            superprocess.reset();
+            return false;
+        }
 
         if (response.xml != nullptr)
         {
@@ -394,6 +427,9 @@ File PluginScanner::scannerExeFile() const noexcept { return _scannerExe; }
 void PluginScanner::scanAudioFormat (const String& formatName)
 {
     detail::applyBlacklistingsFromDeadMansPedal (list);
+
+    DBG ("[coordinator] Starting scan for format: " << formatName << ", known plugins: " << list.getNumTypes());
+    Logger::writeToLog ("[coordinator] Starting scan for format: " + formatName + ", known plugins: " + String (list.getNumTypes()));
 
     StringArray identifiers;
     std::function<String (const String&)> pluginName = [] (const String& ID) -> juce::String { return ID; };
@@ -427,8 +463,44 @@ void PluginScanner::scanAudioFormat (const String& formatName)
 
         listeners.call (&Listener::audioPluginScanStarted, pluginName (ID));
 
-        if (list.getTypeForFile (ID) || list.getBlacklistedFiles().contains (ID))
+        // Check if plugin is already scanned (direct path match)
+        bool shouldSkip = false;
+        if (list.getTypeForFile (ID))
+        {
+            DBG ("[coordinator] Skipping already scanned: " << ID);
+            Logger::writeToLog ("[coordinator] Skipping already scanned: " + ID);
+            shouldSkip = true;
+        }
+        else
+        {
+            // For VST3 bundles, searchPathsForPlugins returns the bundle directory,
+            // but plugins.xml stores the actual binary path inside the bundle.
+            // Check if any stored plugin's file path is inside this bundle.
+            const auto bundlePath = ID + File::getSeparatorString();
+            for (int i = 0; i < list.getNumTypes(); ++i)
+            {
+                if (auto* type = list.getType (i))
+                {
+                    if (type->fileOrIdentifier.startsWith (bundlePath))
+                    {
+                        DBG ("[coordinator] Skipping already scanned (bundle): " << ID);
+                        Logger::writeToLog ("[coordinator] Skipping already scanned (bundle): " + ID);
+                        shouldSkip = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (shouldSkip)
             continue;
+
+        if (list.getBlacklistedFiles().contains (ID))
+        {
+            DBG ("[coordinator] Skipping blacklisted: " << ID);
+            Logger::writeToLog ("[coordinator] Skipping blacklisted: " + ID);
+            continue;
+        }
 
         OwnedArray<PluginDescription> descriptions;
 
@@ -441,6 +513,9 @@ void PluginScanner::scanAudioFormat (const String& formatName)
         {
             for (auto* desc : descriptions)
                 list.addType (*desc);
+
+            if (auto elm = list.createXml())
+                elm->writeTo (detail::pluginsXmlFile());
 
             // Managed to load without crashing, so remove it from the dead-man's-pedal..
             crashed.removeString (ID);
