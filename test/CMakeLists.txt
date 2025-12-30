@@ -16,8 +16,11 @@ target_compile_definitions(test_element
 
 # Register all test suites with CTest
 add_test(NAME "AtomTests" COMMAND test_element --run_test=AtomTests)
+add_test(NAME "AtomicValueTests" COMMAND test_element --run_test=AtomicValueTests)
+add_test(NAME "AtomicLockTests" COMMAND test_element --run_test=AtomicLockTests)
 add_test(NAME "AudioRoutingTests" COMMAND test_element --run_test=AudioRoutingTests)
 add_test(NAME "BytesTest" COMMAND test_element --run_test=BytesTest)
+add_test(NAME "JuceIntegrationTests" COMMAND test_element --run_test=JuceIntegrationTests)
 add_test(NAME "DataPathTests" COMMAND test_element --run_test=DataPathTests)
 add_test(NAME "DSPScriptTest" COMMAND test_element --run_test=DSPScriptTest)
 add_test(NAME "Element" COMMAND test_element --run_test=Element)
