@@ -56,17 +56,4 @@ private:
     size_t _space = 0;
 };
 
-#if 0
-template <size_t Alignment>
-static AlignedData<Alignment> grow (SingleSizeAlignedStorage<Alignment> storage, size_t size)
-{
-    if (size <= storage.size())
-        return storage;
-
-    AlignedData<Alignment> newStorage { jmax (size, (storage.size() * 3) / 2) };
-    std::memcpy (newStorage.data(), storage.data(), storage.size());
-    return newStorage;
-}
-#endif
-
 } // namespace element
