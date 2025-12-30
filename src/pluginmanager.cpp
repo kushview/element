@@ -93,6 +93,18 @@ static void applyBlacklistingsFromDeadMansPedal (KnownPluginList& list)
 
 } // namespace detail
 
+// Static worker instance counter for tracking restarts
+static int workerInstanceCount = 0;
+
+// Helper function to generate timestamp for coordinator logs
+static String getTimestamp()
+{
+    auto now = Time::getCurrentTime();
+    auto timestamp = now.formatted ("[%H:%M:%S.");
+    auto millis = String (now.toMilliseconds() % 1000);
+    return timestamp + millis.paddedLeft ('0', 3) + "] ";
+}
+
 //==============================================================================
 class PluginScannerCoordinator : public juce::ChildProcessCoordinator
 {
@@ -162,11 +174,12 @@ private:
         auto scannerExe = owner.scannerExeFile();
         if (! scannerExe.existsAsFile())
         {
-            Logger::writeToLog ("Failed to launch plugin scanner.");
+            Logger::writeToLog (getTimestamp() + "Failed to launch plugin scanner.");
             return false;
         }
 
-        Logger::writeToLog (String ("launching plugin scanner: ") + scannerExe.getFullPathName());
+        ++workerInstanceCount;
+        Logger::writeToLog (getTimestamp() + "launching plugin scanner #" + String (workerInstanceCount) + ": " + scannerExe.getFullPathName());
         return launchWorkerProcess (scannerExe,
                                     EL_PLUGIN_SCANNER_PROCESS_ID,
                                     timeout,
@@ -182,22 +195,20 @@ public:
     PluginScannerWorker()
     {
         SystemStats::setApplicationCrashHandler (detail::pluginScannerCrashHandler);
-        auto logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
-        logfile.create();
-        logger = std::make_unique<juce::FileLogger> (logfile, "Plugin Scanner");
-        Logger::setCurrentLogger (logger.get());
-        logger->logMessage ("[scanner] Worker process started");
+        logfile = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
+        logToScanner ("Worker #" + String (workerInstanceCount) + " started");
     }
 
     ~PluginScannerWorker()
     {
-        Logger::setCurrentLogger (nullptr);
     }
 
     void handleMessageFromCoordinator (const MemoryBlock& mb) override
     {
         if (mb.isEmpty())
             return;
+
+        logToScanner ("Received scan request from coordinator");
 
         const std::lock_guard<std::mutex> lock (mutex);
 
@@ -225,7 +236,7 @@ public:
             MemoryInputStream stream { block, false };
             const auto formatName = stream.readString();
             const auto identifier = stream.readString();
-            logger->logMessage (String ("Scanning: ") + formatName + ": " + identifier);
+            logToScanner (String ("Scanning: ") + formatName + ": " + identifier);
 
             sendResults (doScan (block));
             pendingBlocks.pop();
@@ -262,10 +273,10 @@ public:
             const auto duration = (Time::getMillisecondCounterHiRes() - startTime) / 1000.0;
 
             for (const auto* desc : results)
-                logger->logMessage (String ("Found: ") + desc->name + " v" + desc->version + " by " + desc->manufacturerName + String::formatted (" (%.2fs) [file: ", duration) + desc->fileOrIdentifier + "]");
+                logToScanner (String ("Found: ") + desc->name + " v" + desc->version + " by " + desc->manufacturerName + String::formatted (" (%.2fs) [file: ", duration) + desc->fileOrIdentifier + "]");
 
             if (results.isEmpty())
-                logger->logMessage (String ("Failed: ") + identifier + String::formatted (" - No plugins found (%.2fs)", duration));
+                logToScanner (String ("Failed: ") + identifier + String::formatted (" - No plugins found (%.2fs)", duration));
         }
 
         return results;
@@ -311,12 +322,12 @@ public:
 
     void handleConnectionMade() override
     {
-        logger->logMessage ("[scanner] connection to coordinator established");
-        logger->logMessage ("[scanner] creating global objects");
+        logToScanner ("Connection established");
+        logToScanner ("Creating global objects");
         settings = std::make_unique<Settings>();
         plugins = std::make_unique<PluginManager>();
 
-        logger->logMessage ("[scanner] setting up formats");
+        logToScanner ("Setting up formats");
         auto& nf = plugins->getNodeFactory();
         nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
@@ -325,11 +336,24 @@ public:
 
     void handleConnectionLost() override
     {
-        logger->logMessage ("[scanner] scanner disconnected");
-        logger.reset();
+        logToScanner ("Disconnected");
         settings = nullptr;
         plugins = nullptr;
         JUCEApplication::quit();
+    }
+
+    void logToScanner (const String& message)
+    {
+        auto now = Time::getCurrentTime();
+        auto timestamp = now.formatted ("[%H:%M:%S.");
+        auto millis = String (now.toMilliseconds() % 1000);
+        timestamp += millis.paddedLeft ('0', 3) + "] ";
+
+        if (! logfile.appendText (timestamp + message + "\n", false, false))
+        {
+            // If append fails, try to log to debug output at least
+            DBG ("[scanner] LOG APPEND FAILED: " << message);
+        }
     }
 
 private:
@@ -337,7 +361,7 @@ private:
     std::unique_ptr<PluginManager> plugins;
     std::mutex mutex;
     std::queue<MemoryBlock> pendingBlocks;
-    std::unique_ptr<juce::FileLogger> logger;
+    File logfile;
 };
 
 //==============================================================================
@@ -364,20 +388,30 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
                                           OwnedArray<PluginDescription>& result)
 {
     if (superprocess == nullptr)
+    {
         superprocess = std::make_unique<PluginScannerCoordinator> (*this);
+        Logger::writeToLog (getTimestamp() + "[coordinator] Worker process ready");
+    }
 
     MemoryBlock block;
     MemoryOutputStream stream { block, true };
     stream.writeString (formatName);
     stream.writeString (fileOrIdentifier);
 
+    DBG ("[coordinator] Sending scan request: " << fileOrIdentifier);
+
     if (! superprocess->sendMessageToWorker (block))
+    {
+        Logger::writeToLog (getTimestamp() + "[coordinator] Failed to send message to worker");
+        Logger::writeToLog (getTimestamp() + "[coordinator] Resetting worker process for restart");
+        superprocess.reset();
         return false;
+    }
 
     using State = PluginScannerCoordinator::State;
 
     int timeoutCount = 0;
-    const int maxTimeouts = 1000;
+    const int maxTimeouts = 5000;
 
     for (;;)
     {
@@ -392,7 +426,8 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
             {
                 const int timeoutSeconds = maxTimeouts * 50 / 1000;
                 DBG ("[coordinator] Scan timeout after " << timeoutSeconds << " seconds: " << fileOrIdentifier);
-                Logger::writeToLog ("[coordinator] TIMEOUT after " + String (timeoutSeconds) + " seconds: " + fileOrIdentifier);
+                Logger::writeToLog (getTimestamp() + "[coordinator] TIMEOUT after " + String (timeoutSeconds) + " seconds: " + fileOrIdentifier);
+                Logger::writeToLog (getTimestamp() + "[coordinator] Killing and resetting worker process");
                 superprocess->killWorkerProcess();
                 superprocess.reset();
                 return false;
@@ -403,6 +438,8 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
         if (response.state == State::connectionLost)
         {
             DBG ("[coordinator] Worker disconnected, will restart on next scan");
+            Logger::writeToLog (getTimestamp() + "[coordinator] Worker connection lost (likely crashed)");
+            Logger::writeToLog (getTimestamp() + "[coordinator] Resetting worker process for restart");
             superprocess.reset();
             return false;
         }
@@ -426,10 +463,56 @@ File PluginScanner::scannerExeFile() const noexcept { return _scannerExe; }
 
 void PluginScanner::scanAudioFormat (const String& formatName)
 {
+    Logger::writeToLog (getTimestamp() + "[coordinator] ============================");
+    Logger::writeToLog (getTimestamp() + "[coordinator] Plugin scan started");
+    Logger::writeToLog (getTimestamp() + "[coordinator] ============================");
+
+    // Clear scanner.log at start of scan session
+    auto scannerLog = DataPath::applicationDataDir().getChildFile ("log/scanner.log");
+    scannerLog.deleteFile();
+    scannerLog.create();
+
     detail::applyBlacklistingsFromDeadMansPedal (list);
 
-    DBG ("[coordinator] Starting scan for format: " << formatName << ", known plugins: " << list.getNumTypes());
-    Logger::writeToLog ("[coordinator] Starting scan for format: " + formatName + ", known plugins: " + String (list.getNumTypes()));
+    // Remove plugins whose files no longer exist
+    int removedCount = 0;
+    for (int i = list.getNumTypes() - 1; i >= 0; --i)
+    {
+        if (auto* type = list.getType (i))
+        {
+            if (type->pluginFormatName == formatName)
+            {
+                if (! File (type->fileOrIdentifier).exists())
+                {
+                    DBG ("[coordinator] Removing deleted plugin: " << type->fileOrIdentifier);
+                    Logger::writeToLog (getTimestamp() + "[coordinator] Removing deleted plugin: " + type->fileOrIdentifier);
+                    list.removeType (*type);
+                    ++removedCount;
+                }
+            }
+        }
+    }
+
+    if (removedCount > 0)
+    {
+        Logger::writeToLog (getTimestamp() + "[coordinator] Removed " + String (removedCount) + " deleted plugins");
+        if (auto elm = list.createXml())
+            elm->writeTo (detail::pluginsXmlFile());
+    }
+
+    // Count plugins for this specific format
+    int knownPluginsForFormat = 0;
+    for (int i = 0; i < list.getNumTypes(); ++i)
+    {
+        if (auto* type = list.getType (i))
+        {
+            if (type->pluginFormatName == formatName)
+                ++knownPluginsForFormat;
+        }
+    }
+
+    DBG ("[coordinator] Starting scan for format: " << formatName << ", known plugins: " << knownPluginsForFormat);
+    Logger::writeToLog (getTimestamp() + "[coordinator] Starting scan for format: " + formatName + ", known plugins: " + String (knownPluginsForFormat));
 
     StringArray identifiers;
     std::function<String (const String&)> pluginName = [] (const String& ID) -> juce::String { return ID; };
@@ -456,20 +539,35 @@ void PluginScanner::scanAudioFormat (const String& formatName)
     listeners.call (&Listener::audioPluginScanProgress, 0.0f);
 
     float step = 1.f;
+    int pluginIndex = 0;
+    const int totalPlugins = identifiers.size();
     for (const auto& ID : identifiers)
     {
         if (cancelFlag.get() != 0)
             return;
 
+        ++pluginIndex;
         listeners.call (&Listener::audioPluginScanStarted, pluginName (ID));
 
         // Check if plugin is already scanned (direct path match)
         bool shouldSkip = false;
-        if (list.getTypeForFile (ID))
+        if (auto existingType = list.getTypeForFile (ID))
         {
-            DBG ("[coordinator] Skipping already scanned: " << ID);
-            Logger::writeToLog ("[coordinator] Skipping already scanned: " + ID);
-            shouldSkip = true;
+            // Check if file has been modified since last scan
+            auto fileModTime = File (ID).getLastModificationTime();
+            if (fileModTime != existingType->lastFileModTime)
+            {
+                DBG ("[coordinator] Plugin file modified, rescanning: " << ID);
+                Logger::writeToLog (getTimestamp() + "[coordinator] Plugin file modified, rescanning: " + ID);
+                list.removeType (*existingType);
+                shouldSkip = false;
+            }
+            else
+            {
+                DBG ("[coordinator] Skipping already scanned: " << ID);
+                Logger::writeToLog (getTimestamp() + "[coordinator] Skipping already scanned: " + ID);
+                shouldSkip = true;
+            }
         }
         else
         {
@@ -483,9 +581,21 @@ void PluginScanner::scanAudioFormat (const String& formatName)
                 {
                     if (type->fileOrIdentifier.startsWith (bundlePath))
                     {
-                        DBG ("[coordinator] Skipping already scanned (bundle): " << ID);
-                        Logger::writeToLog ("[coordinator] Skipping already scanned (bundle): " + ID);
-                        shouldSkip = true;
+                        // Check if the actual binary file has been modified
+                        auto fileModTime = File (type->fileOrIdentifier).getLastModificationTime();
+                        if (fileModTime != type->lastFileModTime)
+                        {
+                            DBG ("[coordinator] Bundle modified, rescanning: " << ID);
+                            Logger::writeToLog (getTimestamp() + "[coordinator] Bundle modified, rescanning: " + ID);
+                            list.removeType (*type);
+                            shouldSkip = false;
+                        }
+                        else
+                        {
+                            DBG ("[coordinator] Skipping already scanned (bundle): " << ID);
+                            Logger::writeToLog (getTimestamp() + "[coordinator] Skipping already scanned (bundle): " + ID);
+                            shouldSkip = true;
+                        }
                         break;
                     }
                 }
@@ -498,7 +608,7 @@ void PluginScanner::scanAudioFormat (const String& formatName)
         if (list.getBlacklistedFiles().contains (ID))
         {
             DBG ("[coordinator] Skipping blacklisted: " << ID);
-            Logger::writeToLog ("[coordinator] Skipping blacklisted: " + ID);
+            Logger::writeToLog (getTimestamp() + "[coordinator] Skipping blacklisted: " + ID);
             continue;
         }
 
@@ -508,6 +618,8 @@ void PluginScanner::scanAudioFormat (const String& formatName)
         crashed.removeString (ID);
         crashed.add (ID);
         detail::setDeadMansPedalFile (crashed);
+
+        Logger::writeToLog (getTimestamp() + "[coordinator] Requesting scan [" + String (pluginIndex) + "/" + String (totalPlugins) + "]: " + ID);
 
         if (retrieveDescriptions (formatName, ID, descriptions))
         {
