@@ -8,10 +8,10 @@ set(ELEMENT_BUILD_NUMBER "" CACHE STRING "Computed build number (overrideable)")
 
 # Only run git commands if git is found and .git directory exists
 find_package(Git)
-if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     # Get full commit hash
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE ELEMENT_GIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
@@ -23,7 +23,7 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     
     # Get short hash
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE ELEMENT_GIT_SHORT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET)
@@ -35,7 +35,7 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     # Compute build number (commit count since base) if not overridden
     if(NOT ELEMENT_BUILD_NUMBER)
         execute_process(COMMAND ${GIT_EXECUTABLE} rev-list ${ELEMENT_GIT_BASE}..HEAD --count
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE ELEMENT_BUILD_NUMBER
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
