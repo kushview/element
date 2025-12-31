@@ -13,9 +13,7 @@
 
 using namespace juce;
 
-// clang-format off
-EL_PLUGIN_EXPORT
-int luaopen_el_Point (lua_State* L)
+int register_el_Point (lua_State* L)
 {
     sol::state_view lua (L);
     using PTF = Point<lua_Number>;
@@ -105,8 +103,7 @@ int luaopen_el_Point (lua_State* L)
         // @function Point:distanceSquared
         "distanceSquared", sol::overload (
             [] (PTF& self) { return self.getDistanceSquaredFromOrigin(); }, 
-            [] (PTF& self, PTF& o) { return self.getDistanceSquaredFrom (o); 
-        }),
+            [] (PTF& self, PTF& o) { return self.getDistanceSquaredFrom (o); }),
 
         /// Returns the angle from this point to another one.
         //
@@ -138,4 +135,14 @@ int luaopen_el_Point (lua_State* L)
 
     sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_POINT));
     return 1;
+}
+
+// clang-format off
+// Wrapper needed: Modern MSVC toolsets (14.5+) enforce stricter C++20 linkage rules.
+// Lambdas with explicit return types inside extern "C" functions are flagged as errors.
+// The wrapper isolates C linkage from C++ lambda code.
+EL_PLUGIN_EXPORT
+int luaopen_el_Point (lua_State* L)
+{
+    return register_el_Point(L);
 }
