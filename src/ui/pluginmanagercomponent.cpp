@@ -290,11 +290,19 @@ private:
 class PluginListComponent::TableModel : public TableListBoxModel
 {
 public:
-    TableModel (PluginListComponent& c, KnownPluginList& l) : owner (c), list (l) {}
+    TableModel (PluginListComponent& c, KnownPluginList& l) : owner (c), list (l) 
+    {
+        refreshCache();
+    }
+
+    void refreshCache()
+    {
+        cachedTypes = list.getTypes();
+    }
 
     int getNumRows() override
     {
-        return list.getNumTypes() + list.getBlacklistedFiles().size();
+        return cachedTypes.size() + list.getBlacklistedFiles().size();
     }
 
     void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
@@ -322,19 +330,18 @@ public:
     void paintCell (Graphics& g, int row, int columnId, int width, int height, bool rowIsSelected) override
     {
         String text;
-        bool isBlacklisted = row >= list.getNumTypes();
+        bool isBlacklisted = row >= cachedTypes.size();
 
         if (isBlacklisted)
         {
             if (columnId == nameCol)
-                text = list.getBlacklistedFiles()[row - list.getNumTypes()];
+                text = list.getBlacklistedFiles()[row - cachedTypes.size()];
             else if (columnId == descCol)
                 text = TRANS ("Deactivated after failing to initialise correctly");
         }
-        else if (isPositiveAndBelow (row, list.getNumTypes()))
+        else if (isPositiveAndBelow (row, cachedTypes.size()))
         {
-            const auto types = list.getTypes();
-            const auto& desc = types.getReference (row);
+            const auto& desc = cachedTypes.getReference (row);
             switch (columnId)
             {
                 case nameCol:
@@ -431,6 +438,8 @@ public:
                 jassertfalse;
                 break;
         }
+        
+        refreshCache();
     }
 
     static String getPluginDescription (const PluginDescription& desc)
@@ -448,6 +457,7 @@ public:
 
     PluginListComponent& owner;
     KnownPluginList& list;
+    Array<PluginDescription> cachedTypes;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TableModel)
 };
@@ -557,6 +567,8 @@ void PluginListComponent::changeListenerCallback (ChangeBroadcaster* cb)
 
 void PluginListComponent::updateList()
 {
+    if (auto* model = dynamic_cast<TableModel*>(tableModel.get()))
+        model->refreshCache();
     table.updateContent();
     table.repaint();
 }
