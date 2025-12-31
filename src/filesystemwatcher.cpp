@@ -137,7 +137,9 @@ public:
     CFArrayRef paths { nullptr };
     dispatch_queue_t queue { nullptr };
     FSEventStreamRef stream { nullptr };
-    struct FSEventStreamContext context {};
+    struct FSEventStreamContext context
+    {
+    };
 };
 #endif
 

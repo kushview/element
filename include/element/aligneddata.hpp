@@ -74,7 +74,7 @@ public:
         @return  A pointer to the aligned data, or nullptr if no memory is allocated
     */
     constexpr void* data() const noexcept { return _ptr; }
-    
+
     /** Returns the size of the usable aligned memory region.
         
         Note: This may be less than the originally requested size due to alignment.
