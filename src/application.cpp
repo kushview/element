@@ -115,8 +115,10 @@ private:
 
     void setupMidiEngine()
     {
+#if ! JUCE_LINUX
         auto& midi = world.midi();
         midi.applySettings (world.settings());
+#endif
     }
 
     void setupKeyMappings()
@@ -173,7 +175,26 @@ private:
     }
 };
 
-Application::Application() {}
+//=============================================================================
+#if JUCE_LINUX
+Application::MidiSettingsApply::MidiSettingsApply (Context& c)
+    : context (c)
+{
+    juce::WeakReference<Application::MidiSettingsApply> safeThis (this);
+    connection = juce::MidiDeviceListConnection::make ([safeThis] {
+        if (auto self = safeThis.get())
+        {
+            self->connection.reset();
+            self->context.midi().applySettings (
+                self->context.settings());
+        }
+    });
+}
+#endif
+
+Application::Application()
+{
+}
 
 Application::~Application() {}
 
@@ -210,6 +231,8 @@ void Application::shutdown()
 {
     if (! world)
         return;
+
+    applyMidiSettings.reset();
 
     workers.clearQuick (true);
     auto& srvs = world->services();
@@ -377,6 +400,9 @@ void Application::launchApplication()
     startup = std::make_unique<Startup> (*world);
     startup->addActionListener (this);
     startup->launchApplication();
+#if JUCE_LINUX
+    applyMidiSettings = std::make_unique<MidiSettingsApply> (*world);
+#endif
 }
 
 void Application::initializeModulePath()
