@@ -6,10 +6,10 @@
 #include <element/juce/core.hpp>
 #include <element/juce/events.hpp>
 #include <element/juce/gui_basics.hpp>
+#include <element/ui/content.hpp>
 
 namespace element {
 
-class ContentFactory;
 class Context;
 class Startup;
 
