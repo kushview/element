@@ -11,7 +11,7 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        os: [ubuntu-22.04, macos-latest, windows-latest]
+        os: [ubuntu-22.04, macos-latest, windows-2019]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -21,6 +21,15 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    
+    - name: Cache apt packages (Linux)
+      if: runner.os == 'Linux'
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
     
     - name: Install dependencies (Linux)
       if: runner.os == 'Linux'
@@ -47,27 +56,86 @@ jobs:
           libglu1-mesa-dev \
           mesa-common-dev
     
+    - name: Setup Boost (Linux)
+      if: runner.os == 'Linux'
+      id: install-boost-linux
+      uses: MarkusJx/install-boost@v2.4.5
+      with:
+        boost_version: 1.83.0
+        platform_version: 22.04
+        toolset: gcc
+    
+    - name: Cache Homebrew (macOS)
+      if: runner.os == 'macOS'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Caches/Homebrew
+          /usr/local/Cellar
+        key: ${{ runner.os }}-brew-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-brew-
+    
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install cmake ninja pandoc boost
+        brew install cmake ninja pandoc
+    
+    - name: Setup Boost (macOS)
+      if: runner.os == 'macOS'
+      id: install-boost-macos
+      uses: MarkusJx/install-boost@v2.4.5
+      with:
+        boost_version: 1.83.0
+        platform_version: 11
+        toolset: clang
+
+    - name: Cache Chocolatey (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: ~\AppData\Local\Temp\chocolatey
+        key: ${{ runner.os }}-choco-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-choco-
 
     - name: Install dependencies (Windows)
       if: runner.os == 'Windows'
       run: |
-        choco install cmake ninja pandoc boost -y
+        choco install cmake ninja pandoc -y
+    
+    - name: Setup Boost (Windows)
+      if: runner.os == 'Windows'
+      id: install-boost-windows
+      uses: MarkusJx/install-boost@v2.4.5
+      with:
+        boost_version: 1.83.0
+        platform_version: 2019
+        toolset: msvc
+        link: static
     
     - name: Setup MSVC environment (Windows)
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
     
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ matrix.os }}-ccache-${{ github.sha }}
+        restore-keys: |
+          ${{ matrix.os }}-ccache-
+    
     - name: Configure CMake (Windows)
       if: runner.os == 'Windows'
       run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost-windows.outputs.BOOST_ROOT }}
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
       run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost-linux.outputs.BOOST_ROOT || steps.install-boost-macos.outputs.BOOST_ROOT }}
     
     - name: Build
       run: cmake --build build --config Release
