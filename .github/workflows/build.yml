@@ -58,6 +58,7 @@ jobs:
     
     - name: Setup Boost (Linux)
       if: runner.os == 'Linux'
+      id: install-boost-linux
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
@@ -82,6 +83,7 @@ jobs:
     
     - name: Setup Boost (macOS)
       if: runner.os == 'macOS'
+      id: install-boost-macos
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
@@ -104,6 +106,7 @@ jobs:
     
     - name: Setup Boost (Windows)
       if: runner.os == 'Windows'
+      id: install-boost-windows
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
@@ -124,10 +127,14 @@ jobs:
     - name: Configure CMake (Windows)
       if: runner.os == 'Windows'
       run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost-windows.outputs.BOOST_ROOT }}
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
       run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost-linux.outputs.BOOST_ROOT || steps.install-boost-macos.outputs.BOOST_ROOT }}
     
     - name: Build
       run: cmake --build build --config Release
