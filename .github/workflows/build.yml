@@ -58,12 +58,12 @@ jobs:
     
     - name: Setup Boost (Linux)
       if: runner.os == 'Linux'
+      id: install-boost
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
         platform_version: 22.04
         toolset: gcc
-        boost_install_libraries: false
     
     - name: Cache Homebrew (macOS)
       if: runner.os == 'macOS'
@@ -83,12 +83,12 @@ jobs:
     
     - name: Setup Boost (macOS)
       if: runner.os == 'macOS'
+      id: install-boost
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
         platform_version: 11
         toolset: clang
-        boost_install_libraries: false
 
     - name: Cache Chocolatey (Windows)
       if: runner.os == 'Windows'
@@ -106,12 +106,12 @@ jobs:
     
     - name: Setup Boost (Windows)
       if: runner.os == 'Windows'
+      id: install-boost
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
         platform_version: 2022
         toolset: msvc
-        boost_install_libraries: false
     
     - name: Setup MSVC environment (Windows)
       if: runner.os == 'Windows'
@@ -126,11 +126,15 @@ jobs:
     
     - name: Configure CMake (Windows)
       if: runner.os == 'Windows'
-      run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON -DBOOST_ROOT="$env:BOOST_ROOT" -DBoost_INCLUDE_DIR="$env:BOOST_ROOT\include"
+      run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
-      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON -DBOOST_ROOT=$BOOST_ROOT -DBoost_INCLUDE_DIR=$BOOST_ROOT/include
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
     
     - name: Build
       run: cmake --build build --config Release
