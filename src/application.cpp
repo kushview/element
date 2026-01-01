@@ -231,9 +231,9 @@ void Application::shutdown()
 {
     if (! world)
         return;
-
+#if JUCE_LINUX
     applyMidiSettings.reset();
-
+#endif
     workers.clearQuick (true);
     auto& srvs = world->services();
     srvs.saveSettings();
