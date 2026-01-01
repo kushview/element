@@ -290,11 +290,24 @@ private:
 class PluginListComponent::TableModel : public TableListBoxModel
 {
 public:
-    TableModel (PluginListComponent& c, KnownPluginList& l) : owner (c), list (l) {}
+    TableModel (PluginListComponent& c, KnownPluginList& l) : owner (c), list (l) 
+    {
+        refreshCache();
+    }
+
+    void refreshCache()
+    {
+        cachedTypes = list.getTypes();
+    }
+
+    const Array<PluginDescription>& getCachedTypes() const
+    {
+        return cachedTypes;
+    }
 
     int getNumRows() override
     {
-        return list.getNumTypes() + list.getBlacklistedFiles().size();
+        return cachedTypes.size() + list.getBlacklistedFiles().size();
     }
 
     void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
@@ -322,19 +335,23 @@ public:
     void paintCell (Graphics& g, int row, int columnId, int width, int height, bool rowIsSelected) override
     {
         String text;
-        bool isBlacklisted = row >= list.getNumTypes();
+        bool isBlacklisted = row >= cachedTypes.size();
 
         if (isBlacklisted)
         {
+            const auto blacklisted = list.getBlacklistedFiles();
+            const int blacklistIndex = row - cachedTypes.size();
+            if (!isPositiveAndBelow (blacklistIndex, blacklisted.size()))
+                return;
+            
             if (columnId == nameCol)
-                text = list.getBlacklistedFiles()[row - list.getNumTypes()];
+                text = blacklisted[blacklistIndex];
             else if (columnId == descCol)
                 text = TRANS ("Deactivated after failing to initialise correctly");
         }
-        else if (isPositiveAndBelow (row, list.getNumTypes()))
+        else if (isPositiveAndBelow (row, cachedTypes.size()))
         {
-            const auto types = list.getTypes();
-            const auto& desc = types.getReference (row);
+            const auto& desc = cachedTypes.getReference (row);
             switch (columnId)
             {
                 case nameCol:
@@ -380,6 +397,7 @@ public:
             case 1:
                 removeNonElementPlugins (owner.list);
                 owner.saveListToSettings();
+                refreshCache();
                 break;
             case 2:
                 owner.removeSelectedPlugins();
@@ -431,6 +449,8 @@ public:
                 jassertfalse;
                 break;
         }
+        
+        refreshCache();
     }
 
     static String getPluginDescription (const PluginDescription& desc)
@@ -448,6 +468,7 @@ public:
 
     PluginListComponent& owner;
     KnownPluginList& list;
+    Array<PluginDescription> cachedTypes;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TableModel)
 };
@@ -557,6 +578,8 @@ void PluginListComponent::changeListenerCallback (ChangeBroadcaster* cb)
 
 void PluginListComponent::updateList()
 {
+    if (auto* model = dynamic_cast<TableModel*>(tableModel.get()))
+        model->refreshCache();
     table.updateContent();
     table.repaint();
 }
@@ -583,11 +606,14 @@ void PluginListComponent::setTableModel (TableListBoxModel* model)
 
 bool PluginListComponent::canShowSelectedFolder() const
 {
-    const auto types = list.getTypes();
-    if (isPositiveAndBelow (table.getSelectedRow(), types.size()))
-        return File::createFileWithoutCheckingPath (
-                   types.getReference (table.getSelectedRow()).fileOrIdentifier)
-            .exists();
+    if (auto* model = dynamic_cast<TableModel*>(tableModel.get()))
+    {
+        const auto& types = model->getCachedTypes();
+        if (isPositiveAndBelow (table.getSelectedRow(), types.size()))
+            return File::createFileWithoutCheckingPath (
+                       types.getReference (table.getSelectedRow()).fileOrIdentifier)
+                .exists();
+    }
 
     return false;
 }
@@ -597,33 +623,46 @@ void PluginListComponent::showSelectedFolder()
     if (! canShowSelectedFolder())
         return;
 
-    const auto types = list.getTypes();
-    const auto type = types[(table.getSelectedRow())];
-    File (type.fileOrIdentifier).getParentDirectory().startAsProcess();
+    if (auto* model = dynamic_cast<TableModel*>(tableModel.get()))
+    {
+        const auto& types = model->getCachedTypes();
+        if (isPositiveAndBelow (table.getSelectedRow(), types.size()))
+        {
+            const auto& type = types.getReference (table.getSelectedRow());
+            File (type.fileOrIdentifier).getParentDirectory().startAsProcess();
+        }
+    }
 }
 
 void PluginListComponent::removeMissingPlugins()
 {
-    const auto types = list.getTypes();
-    for (int i = types.size(); --i >= 0;)
-        if (! formatManager.doesPluginStillExist (types.getReference (i)))
-            list.removeType (types.getReference (i));
+    if (auto* model = dynamic_cast<TableModel*>(tableModel.get()))
+    {
+        const auto& types = model->getCachedTypes();
+        for (int i = types.size(); --i >= 0;)
+            if (! formatManager.doesPluginStillExist (types.getReference (i)))
+                list.removeType (types.getReference (i));
+    }
 }
 
 void PluginListComponent::removePluginItem (int index)
 {
-    const auto types = list.getTypes();
-    if (! isPositiveAndBelow (index, types.size()))
+    if (auto* model = dynamic_cast<TableModel*>(tableModel.get()))
     {
-        list.removeFromBlacklist (list.getBlacklistedFiles()[index - types.size()]);
-        return;
+        const auto& types = model->getCachedTypes();
+        if (! isPositiveAndBelow (index, types.size()))
+        {
+            const auto blacklisted = list.getBlacklistedFiles();
+            const int blacklistIndex = index - types.size();
+            if (isPositiveAndBelow (blacklistIndex, blacklisted.size()))
+                list.removeFromBlacklist (blacklisted[blacklistIndex]);
+        }
+        else
+        {
+            list.removeType (index);
+        }
+        model->refreshCache();
     }
-
-    const auto& type = types.getReference (index);
-    if (type.pluginFormatName == "Element")
-        return;
-
-    list.removeType (type);
 }
 
 void PluginListComponent::optionsMenuStaticCallback (int result, PluginListComponent* pluginList)
