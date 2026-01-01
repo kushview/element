@@ -117,6 +117,13 @@ jobs:
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
     
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ matrix.os }}-ccache-${{ github.sha }}
+        restore-keys: |
+          ${{ matrix.os }}-ccache-
+    
     - name: Configure CMake (Windows)
       if: runner.os == 'Windows'
       run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
