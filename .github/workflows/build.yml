@@ -22,6 +22,15 @@ jobs:
       with:
         submodules: recursive
     
+    - name: Cache apt packages (Linux)
+      if: runner.os == 'Linux'
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
+    
     - name: Install dependencies (Linux)
       if: runner.os == 'Linux'
       run: |
@@ -47,15 +56,62 @@ jobs:
           libglu1-mesa-dev \
           mesa-common-dev
     
+    - name: Setup Boost (Linux)
+      if: runner.os == 'Linux'
+      uses: MarkusJx/install-boost@v2.4.5
+      with:
+        boost_version: 1.83.0
+        platform_version: 22.04
+        toolset: gcc
+        boost_install_libraries: false
+    
+    - name: Cache Homebrew (macOS)
+      if: runner.os == 'macOS'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Caches/Homebrew
+          /usr/local/Cellar
+        key: ${{ runner.os }}-brew-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-brew-
+    
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install cmake ninja pandoc boost
+        brew install cmake ninja pandoc
+    
+    - name: Setup Boost (macOS)
+      if: runner.os == 'macOS'
+      uses: MarkusJx/install-boost@v2.4.5
+      with:
+        boost_version: 1.83.0
+        platform_version: 11
+        toolset: clang
+        boost_install_libraries: false
+
+    - name: Cache Chocolatey (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: ~\AppData\Local\Temp\chocolatey
+        key: ${{ runner.os }}-choco-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-choco-
 
     - name: Install dependencies (Windows)
       if: runner.os == 'Windows'
       run: |
-        choco install cmake ninja pandoc boost -y
+        choco install cmake ninja pandoc -y
+    
+    - name: Setup Boost (Windows)
+      if: runner.os == 'Windows'
+      uses: MarkusJx/install-boost@v2.4.5
+      with:
+        boost_version: 1.83.0
+        platform_version: 2022
+        toolset: msvc
+        boost_install_libraries: false
     
     - name: Setup MSVC environment (Windows)
       if: runner.os == 'Windows'
