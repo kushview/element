@@ -123,6 +123,8 @@ Result ScriptNode::loadScript (const String& newCode)
     if (result.failed())
         return result;
 
+    ScopedLock sl (lock); // Lock EVERYTHING
+
     ScriptLoader loader (lua);
     loader.load (newCode);
     if (loader.hasError())
@@ -133,18 +135,14 @@ Result ScriptNode::loadScript (const String& newCode)
         return Result::fail ("Could not instantiate script");
 
     auto newScript = std::make_unique<DSPScript> (dsp);
+    newScript->setPlayHead (getPlayHead());
+    if (prepared)
+        newScript->prepare (sampleRate, blockSize);
+    triggerPortReset();
 
-    if (true)
-    {
-        newScript->setPlayHead (getPlayHead());
-        if (prepared)
-            newScript->prepare (sampleRate, blockSize);
-        triggerPortReset();
-        ScopedLock sl (lock);
-        if (script != nullptr)
-            newScript->copyParameterValues (*script);
-        script.swap (newScript);
-    }
+    if (script != nullptr)
+        newScript->copyParameterValues (*script);
+    script.swap (newScript);
 
     if (newScript != nullptr)
     {
