@@ -202,21 +202,38 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Element")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/data/intro.txt")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSES/GPL3.txt")
 
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" ELEMENT_PROCESSOR)
+
 if(LINUX)
-    set(CPACK_GENERATOR "TGZ;STGZ;DEB")
+    set(ELEMENT_SYSTEM_NAME "linux")
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_PACKAGE_NAME "element")
     set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
     set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libasound2;libfreetype6;libx11-6;libxext6;libxrandr2;libxinerama1;libxcursor1;libcurl4;libgl1;libstdc++6")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libasound2;libjack-jackd2-0;fonts-roboto;libfreetype6;libx11-6;libxext6;libxrandr2;libxinerama1;libxcursor1;libxrender1;libxcomposite1;libcurl4;libgl1;libstdc++6")
 elseif(APPLE)
+    set(ELEMENT_SYSTEM_NAME "macos")
+    set(ELEMENT_PROCESSOR "universal")
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
     set(CPACK_SET_DESTDIR OFF)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 else()
+    set(ELEMENT_SYSTEM_NAME "windows")
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif()
 
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+set(ELEMENT_GENERATOR ${CPACK_GENERATOR})
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${ELEMENT_SYSTEM_NAME}-${ELEMENT_PROCESSOR}")
 include(CPack)
+
+# Clean CPack staging directory before and after packaging to prevent macOS relocation issues
+add_custom_target(installer
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${PROJECT_BINARY_DIR}/_CPack_Packages"
+    COMMAND ${CMAKE_COMMAND} --build "${PROJECT_BINARY_DIR}" --target package
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${PROJECT_BINARY_DIR}/_CPack_Packages"
+    COMMENT "Cleaning CPack staging and building package"
+    VERBATIM
+    USES_TERMINAL)

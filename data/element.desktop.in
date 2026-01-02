@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Element
+GenericName=Audio Plugin Host
+Comment=Audio Plugin Host and Modular Instrument (v@PROJECT_VERSION_FULL@)
+Exec=@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/element
+Icon=element
+Terminal=false
+Categories=AudioVideo;Audio;Midi;Sequencer;
+MimeType=application/x-element-session;application/x-element-graph;
+Keywords=audio;midi;plugin;host;daw;vst;lv2;
+StartupNotify=true
