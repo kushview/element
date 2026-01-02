@@ -9,16 +9,16 @@ This project uses git submodules. To get them, run:
 __Dependencies__
 
 The following packages are needed...
-```
+```bash
 sudo apt-get install git build-essential pkg-config libboost-dev \
     libfreetype-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev \
-    libxinerama-dev libxcursor-dev libjack-dev libasound2-dev lv2-dev liblilv-dev \
-    libsuil-dev ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
+    libxinerama-dev libxrender-dev libxcursor-dev libxrender-dev libasound2-dev \
+    ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
 ```
 
 __Compiling__
 ```
-cmake -B build
+cmake -B build -G Ninja
 cmake --build build
 ```
 
@@ -31,8 +31,11 @@ sudo ldconfig
 ## Arch Linux
 Install these packages, then run the `cmake` commands described above.
 
-```
-sudo pacman -S git lilv suil lv2 ladspa boost ttf-mswin10
+```bash
+sudo pacman -S git base-devel cmake ninja pkgconf boost \
+    freetype2 fontconfig libx11 libxext libxrandr libxcomposite \
+    libxinerama libxrender libxcursor alsa-lib jack2 \
+    ladspa curl ttf-roboto clang
 ```
 
 ## Mac OSX
