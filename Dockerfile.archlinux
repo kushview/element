@@ -1,0 +1,40 @@
+# Dockerfile for building and testing Element on Arch Linux
+# This creates a build environment - mount your source code as a volume
+FROM archlinux:latest
+
+# Update system and install dependencies
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+        git \
+        base-devel \
+        cmake \
+        ninja \
+        pkgconf \
+        boost \
+        freetype2 \
+        fontconfig \
+        libx11 \
+        libxext \
+        libxrandr \
+        libxcomposite \
+        libxinerama \
+        libxrender \
+        libxcursor \
+        alsa-lib \
+        jack2 \
+        lv2 \
+        lilv \
+        suil \
+        ladspa \
+        curl \
+        ttf-roboto \
+        clang \
+        pandoc \
+        ccache && \
+    pacman -Scc --noconfirm
+
+# Set up working directory
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]

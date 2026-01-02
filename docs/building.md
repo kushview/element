@@ -38,6 +38,31 @@ sudo pacman -S git base-devel cmake ninja pkgconf boost \
     ladspa curl ttf-roboto clang
 ```
 
+### Checking With Docker
+
+You can also build in a Docker container without installing packages on your system:
+
+```bash
+# Build the Arch Linux environment image
+docker build -f Dockerfile.archlinux -t element:archlinux .
+
+# Build the project with your source mounted as a volume
+docker run --rm --user $(id -u):$(id -g) -v $(pwd):/workspace element:archlinux bash -c "
+  git config --global --add safe.directory /workspace && \
+  git submodule update --init --recursive && \
+  cmake -B build-arch -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON && \
+  cmake --build build-arch && \
+  ctest --test-dir build-arch --output-on-failure
+"
+```
+
+Or run interactively:
+```bash
+docker run --rm -it --user $(id -u):$(id -g) -v $(pwd):/workspace element:archlinux
+# Then run cmake commands manually inside the container
+```
+
+
 ## Mac OSX
 __Dependencies__
 
