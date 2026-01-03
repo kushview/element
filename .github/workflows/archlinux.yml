@@ -1,4 +1,4 @@
-name: Arch Linux Build
+name: Build and Test (Arch Linux)
 
 on:
   workflow_dispatch:
@@ -22,8 +22,6 @@ jobs:
     - name: Build and test Element in Arch Linux container
       run: |
         docker run --rm --user $(id -u):$(id -g) -v $(pwd):/workspace element:archlinux bash -c "
-          git config --global --add safe.directory /workspace && \
-          git submodule update --init --recursive && \
           cmake -B build-arch -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON -DELEMENT_BUILD_TESTS=ON && \
           cmake --build build-arch && \
           ctest --test-dir build-arch --output-on-failure
