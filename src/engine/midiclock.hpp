@@ -37,9 +37,20 @@ private:
     DelayLockedLoop dll;
     double timeOfLastUpdate = 0.0;
     double lastKnownTimeDiff = 0.0;
+    double lastReportedBpm = 0.0;
     int midiClockTicks = 0;
-    int syncPeriodTicks = 48;
-    [[maybe_unused]] double bpmUpdateSeconds = 1.0;
+
+    // Number of ticks required before signal is considered acquired
+    // 24 ticks = 1 beat at MIDI standard 24 PPQN
+    static constexpr int syncPeriodTicks = 24;
+
+    // Minimum interval between BPM updates (in seconds)
+    // Shorter interval = more responsive but potentially more jittery
+    static constexpr double bpmUpdateInterval = 0.25;
+
+    // Minimum BPM change required to trigger an update (hysteresis)
+    // Prevents jittery updates when BPM is stable
+    static constexpr double bpmChangeThreshold = 0.5;
 
     Array<Listener*> listeners;
 };

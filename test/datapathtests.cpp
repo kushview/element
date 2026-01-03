@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE (DataPathTests)
 
 BOOST_AUTO_TEST_CASE (PathsMatch)
 {
-#if ! EL_APPIMAGE
+#if ! ELEMENT_APPIMAGE
     Settings s;
     auto params = s.getStorageParameters();
     params.folderName = params.folderName.replace ("\\", "/");
@@ -23,8 +23,11 @@ BOOST_AUTO_TEST_CASE (PathsMatch)
     BOOST_REQUIRE_MESSAGE (params.folderName.endsWith (EL_APP_DATA_SUBDIR),
                            params.folderName.toStdString());
     BOOST_REQUIRE_MESSAGE (fullPath.endsWith (EL_APP_DATA_SUBDIR), fullPath.toStdString());
-    BOOST_REQUIRE_EQUAL (DataPath::defaultSettingsFile().getFullPathName().toStdString(),
-                         s.getUserSettings()->getFile().getFullPathName().toStdString());
+    // Some CI systems, like the archlinux docker container running on github, might have double
+    // slashes in the settings file path... e.g. when the $HOME is blank.
+    BOOST_REQUIRE_EQUAL (
+        DataPath::defaultSettingsFile().getFullPathName().replace("//", "/").toStdString(),
+        s.getUserSettings()->getFile().getFullPathName().replace("//", "/").toStdString());
 #else
     BOOST_REQUIRE (true);
 #endif

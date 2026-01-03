@@ -127,7 +127,7 @@ File ScriptManager::getSystemScriptsDir()
 {
     File dir;
 
-#if defined(EL_APPIMAGE)
+#if defined(ELEMENT_APPIMAGE)
     dir = File::getSpecialLocation (File::currentExecutableFile)
               .getParentDirectory() // bin
               .getParentDirectory() // usr
