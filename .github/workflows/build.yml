@@ -3,8 +3,20 @@ name: Build and Test
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - '**/*.cmake'
+      - '.gitmodules'
+      - '.github/workflows/build.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - '**/*.cmake'
+      - '.gitmodules'
+      - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
