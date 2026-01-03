@@ -106,9 +106,9 @@ public:
 
 private:
     // Timing state
-    double e2 = 0;           ///< Estimated period
-    double t0 = 0;           ///< Previous filtered timestamp
-    double t1 = 0;           ///< Current filtered timestamp
+    double e2 = 0; ///< Estimated period
+    double t0 = 0; ///< Previous filtered timestamp
+    double t1 = 0; ///< Current filtered timestamp
 
     // Parameters
     double expectedPeriod = 1.0 / 24.0;
@@ -121,9 +121,9 @@ private:
     // Adaptive bandwidth settings
     // Higher initial bandwidth = faster convergence but more jitter
     // Lower locked bandwidth = more stable but slower to track changes
-    static constexpr double initialBandwidth = 0.5;  // Fast convergence
-    double lockedBandwidth = 0.1;   // Stable tracking
-    static constexpr int lockThreshold = 24;         // Lock after ~1 beat
+    static constexpr double initialBandwidth = 0.5; // Fast convergence
+    double lockedBandwidth = 0.1; // Stable tracking
+    static constexpr int lockThreshold = 24; // Lock after ~1 beat
 
     int updateCount = 0;
     bool locked = false;
