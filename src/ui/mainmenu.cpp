@@ -108,25 +108,25 @@ void MainMenu::menuItemSelected (int index, int menu)
 
     if (index == 6000 && menu == Help)
     {
-        URL (EL_URL_MANUAL_HOME).launchInDefaultBrowser();
+        URL (ELEMENT_URL_MANUAL_HOME).launchInDefaultBrowser();
     }
     else if (index == 6001 && menu == Help)
     {
-#ifdef EL_URL_API_LUA_EL
-        URL (EL_URL_API_LUA_EL).launchInDefaultBrowser();
+#ifdef ELEMENT_URL_API_LUA_EL
+        URL (ELEMENT_URL_API_LUA_EL).launchInDefaultBrowser();
 #endif
     }
     else if (index == 6002 && menu == Help)
     {
-        URL (EL_URL_DISCUSSIONS).launchInDefaultBrowser();
+        URL (ELEMENT_URL_DISCUSSIONS).launchInDefaultBrowser();
     }
     else if (index == 7000 && menu == Help)
     {
-        URL (EL_URL_BUG_TRACKER).launchInDefaultBrowser();
+        URL (ELEMENT_URL_BUG_TRACKER).launchInDefaultBrowser();
     }
     else if (index == 7001)
     {
-        URL (EL_URL_DONATE).launchInDefaultBrowser();
+        URL (ELEMENT_URL_DONATE).launchInDefaultBrowser();
     }
     else if (index == 7002)
     {
@@ -137,7 +137,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 7003)
     {
-        URL (EL_URL_CHANGELOG).launchInDefaultBrowser();
+        URL (ELEMENT_URL_CHANGELOG).launchInDefaultBrowser();
     }
 
     else if (index == 2000 && menu == Window)
