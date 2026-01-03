@@ -122,7 +122,7 @@ private:
     // Higher initial bandwidth = faster convergence but more jitter
     // Lower locked bandwidth = more stable but slower to track changes
     static constexpr double initialBandwidth = 0.5;  // Fast convergence
-    static constexpr double lockedBandwidth = 0.1;   // Stable tracking
+    double lockedBandwidth = 0.1;   // Stable tracking
     static constexpr int lockThreshold = 24;         // Lock after ~1 beat
 
     int updateCount = 0;
