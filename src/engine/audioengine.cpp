@@ -305,8 +305,8 @@ class AudioEngine::Private : public AudioIODeviceCallback,
 public:
     Private (AudioEngine& e)
         : engine (e),
-          sampleRate (0),
-          blockSize (0),
+          sampleRate (44100.0),
+          blockSize (512),
           isPrepared (false),
           numInputChans (0),
           numOutputChans (0),
@@ -320,6 +320,10 @@ public:
         midiClock.addListener (this);
         graphs.onActiveGraphChanged = std::bind (&AudioEngine::Private::onCurrentGraphChanged, this);
         midiIOMonitor = new MidiIOMonitor();
+
+        messageCollector.reset (sampleRate);
+        midiClock.reset (sampleRate, blockSize);
+
         startTimerHz (90);
     }
 
@@ -573,6 +577,7 @@ public:
 
         prepareToPlay (sampleRate, blockSize);
         isPrepared = true;
+        audioStarted.store (true, std::memory_order_release);
     }
 
     void audioDeviceStopped() override
@@ -587,8 +592,7 @@ public:
         if (isPrepared)
             releaseResources();
         isPrepared = false;
-        sampleRate = 0.0;
-        blockSize = 0;
+        audioStarted.store (false, std::memory_order_release);
         tempBuffer.setSize (1, 1);
         graphs.releaseBuffers();
     }
@@ -597,7 +601,8 @@ public:
     {
         if (! message.isActiveSense() && ! message.isMidiClock())
             midiIOMonitor->received();
-        messageCollector.addMessageToQueue (message);
+        if (audioStarted.load (std::memory_order_acquire))
+            messageCollector.addMessageToQueue (message);
         const bool clockWanted = processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0;
         const bool doStartStop = startStopCont.get() != 0;
 
@@ -703,7 +708,11 @@ public:
     void midiClockTempoChanged (const float bpm) override
     {
         if (sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0)
+        {
             transport.requestTempo (bpm);
+            if (! audioStarted.load (std::memory_order_acquire))
+                transport.applyTempo();
+        }
     }
 
     void midiClockSignalAcquired() override {}
@@ -761,6 +770,7 @@ private:
     MidiIOMonitorPtr midiIOMonitor;
 
     Atomic<double> midiOutLatency { 0.0 };
+    std::atomic<bool> audioStarted { false };
 
     ReferenceCountedArray<AudioEngine::LevelMeter> inMeters, outMeters;
 
