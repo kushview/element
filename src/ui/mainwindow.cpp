@@ -20,6 +20,9 @@ MainWindow::MainWindow (Context& g)
     : DocumentWindow (Util::appName(), Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
+    setUsingNativeTitleBar (true);
+    setResizable (true, false);
+
     auto& gui = *g.services().find<GuiService>();
 
     auto _mainMenu = new MainMenu (*this, gui.commands());
@@ -30,8 +33,6 @@ MainWindow::MainWindow (Context& g)
 
     g.session()->addChangeListener (this);
     addKeyListener (gui.commands().getKeyMappings());
-    setUsingNativeTitleBar (true);
-    setResizable (true, false);
 }
 
 MainWindow::~MainWindow()

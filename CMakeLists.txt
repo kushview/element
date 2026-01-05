@@ -31,7 +31,7 @@ find_package(Boost 1.74.0)
 if(NOT Boost_FOUND)
     message(" -- Checking user SDK's for boost")
     set(Boost_ROOT "${USER_HOME_DIRECTORY}/SDKs/include")
-    find_package(Boost 1.80.0 REQUIRED)
+    find_package(Boost 1.74.0 REQUIRED)
 endif()
 
 add_subdirectory(data)
