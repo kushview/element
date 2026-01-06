@@ -13,26 +13,28 @@
 
 using namespace juce;
 
-int register_el_Point (lua_State* L)
+namespace element::lua {
+static int register_el_Point (lua_State* L)
 {
     sol::state_view lua (L);
     using PTF = Point<lua_Number>;
     auto M = lua.create_table();
+    // clang-format off
     M.new_usertype<PTF> (
         EL_TYPE_NAME_POINT, sol::no_constructor, "new", sol::factories (
-                                                            /// Create a new point with x and y = 0.
-                                                            // @function Point.new
-                                                            // @treturn el.Point
-                                                            // @within Constructors
-                                                            []() { return PTF(); },
+            /// Create a new point with x and y = 0.
+            // @function Point.new
+            // @treturn el.Point
+            // @within Constructors
+            []() { return PTF(); },
 
-                                                            /// Create a new point.
-                                                            // @function Point.new
-                                                            // @number x X coordinate
-                                                            // @number y Y coordinate
-                                                            // @treturn el.Point
-                                                            // @within Constructors
-                                                            [] (lua_Number x, lua_Number y) { return PTF (x, y); }),
+            /// Create a new point.
+            // @function Point.new
+            // @number x X coordinate
+            // @number y Y coordinate
+            // @treturn el.Point
+            // @within Constructors
+            [] (lua_Number x, lua_Number y) { return PTF (x, y); }),
         sol::meta_method::to_string, [] (PTF& self) {
             return self.toString().toStdString();
         },
@@ -132,17 +134,14 @@ int register_el_Point (lua_State* L)
         // @treturn int
         "toInt", &PTF::toInt
     );
-
+    // clang-format on
     sol::stack::push (L, element::lua::removeAndClear (M, EL_TYPE_NAME_POINT));
     return 1;
 }
+} // namespace element::lua
 
-// clang-format off
-// Wrapper needed: Modern MSVC toolsets (14.5+) enforce stricter C++20 linkage rules.
-// Lambdas with explicit return types inside extern "C" functions are flagged as errors.
-// The wrapper isolates C linkage from C++ lambda code.
 EL_PLUGIN_EXPORT
 int luaopen_el_Point (lua_State* L)
 {
-    return register_el_Point(L);
+    return element::lua::register_el_Point (L);
 }
