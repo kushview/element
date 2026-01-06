@@ -51,6 +51,7 @@ target_compile_definitions(element
         JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=1
+        JUCE_USE_XRENDER=1
         JUCE_LOAD_CURL_SYMBOLS_LAZILY=1
         JUCE_PLUGINHOST_LV2=1
         JUCE_PLUGINHOST_VST3=1

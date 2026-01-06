@@ -1,0 +1,58 @@
+name: Generate Lua Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**/*.lua'
+      - 'docs/config.ld'
+      - 'util/ldoc.sh'
+      - 'src/el/*.*'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/**/*.lua'
+      - 'docs/config.ld'
+      - 'util/ldoc.sh'
+      - 'src/el/*.*'
+  workflow_dispatch:
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Lua and LuaRocks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.4 liblua5.4-dev luarocks
+
+      - name: Install ldoc from GitHub (latest)
+        run: |
+          sudo luarocks install penlight
+          sudo luarocks install ldoc
+
+      - name: Generate documentation
+        run: |
+          sh util/ldoc.sh "${{ github.workspace }}/build/lua-html"
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lua-docs
+          path: build/lua-html/
+          retention-days: 14
+
+      - name: Push to documentation repository
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        run: |
+          cd build/lua-html
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update Lua documentation from ${{ github.sha }}"
+          git push --force https://x-access-token:${{ secrets.DOCS_DEPLOY_TOKEN }}@github.com/kushview/element-ldoc.git HEAD:main

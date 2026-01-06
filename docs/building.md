@@ -9,16 +9,16 @@ This project uses git submodules. To get them, run:
 __Dependencies__
 
 The following packages are needed...
-```
+```bash
 sudo apt-get install git build-essential pkg-config libboost-dev \
     libfreetype-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev \
-    libxinerama-dev libxcursor-dev libjack-dev libasound2-dev lv2-dev liblilv-dev \
-    libsuil-dev ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
+    libxinerama-dev libxrender-dev libxcursor-dev libxrender-dev libasound2-dev \
+    ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
 ```
 
 __Compiling__
 ```
-cmake -B build
+cmake -B build -G Ninja
 cmake --build build
 ```
 
@@ -31,9 +31,37 @@ sudo ldconfig
 ## Arch Linux
 Install these packages, then run the `cmake` commands described above.
 
+```bash
+sudo pacman -S git base-devel cmake ninja pkgconf boost \
+    freetype2 fontconfig libx11 libxext libxrandr libxcomposite \
+    libxinerama libxrender libxcursor alsa-lib jack2 \
+    ladspa curl ttf-roboto clang
 ```
-sudo pacman -S git lilv suil lv2 ladspa boost ttf-mswin10
+
+### Checking With Docker
+
+You can also build in a Docker container without installing packages on your system:
+
+```bash
+# Build the Arch Linux environment image
+docker build -f Dockerfile.archlinux -t element:archlinux .
+
+# Build the project with your source mounted as a volume
+docker run --rm --user $(id -u):$(id -g) -v $(pwd):/workspace element:archlinux bash -c "
+  git config --global --add safe.directory /workspace && \
+  git submodule update --init --recursive && \
+  cmake -B build-arch -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON && \
+  cmake --build build-arch && \
+  ctest --test-dir build-arch --output-on-failure
+"
 ```
+
+Or run interactively:
+```bash
+docker run --rm -it --user $(id -u):$(id -g) -v $(pwd):/workspace element:archlinux
+# Then run cmake commands manually inside the container
+```
+
 
 ## Mac OSX
 __Dependencies__

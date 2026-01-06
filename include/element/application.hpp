@@ -6,10 +6,12 @@
 #include <element/juce/core.hpp>
 #include <element/juce/events.hpp>
 #include <element/juce/gui_basics.hpp>
+#include <element/juce/audio_devices.hpp>
+
+#include <element/ui/content.hpp>
 
 namespace element {
 
-class ContentFactory;
 class Context;
 class Startup;
 
@@ -116,6 +118,26 @@ private:
     std::unique_ptr<Context> world;                     ///< The application context and services
     std::unique_ptr<Startup> startup;                   ///< Handles startup initialization
     juce::OwnedArray<juce::ChildProcessWorker> workers; ///< Worker processes (e.g., plugin scanner)
+
+#if JUCE_LINUX
+    class MidiSettingsApply {
+    public:
+        MidiSettingsApply (Context& c);
+
+        ~MidiSettingsApply()
+        {
+            masterReference.clear();
+            connection.reset();
+        }
+
+    private:
+        Context& context;
+        juce::MidiDeviceListConnection connection;
+        juce::WeakReference<MidiSettingsApply>::Master masterReference;
+        friend class WeakReference<MidiSettingsApply>;
+    };
+    std::unique_ptr<MidiSettingsApply> applyMidiSettings;
+#endif
 
     /** Prints the copyright notice to the log. */
     void printCopyNotice();
