@@ -12,3 +12,11 @@
 - Write clear, readable code with descriptive names for variables, functions, and classes.
 - Maintain consistency with the existing codebase style and patterns.
 - Consider maintainability and future developers who will read the code.
+
+## Audio Graph Architecture
+
+- **IONodes** (audio/MIDI input/output) require a parent `GraphNode` to be set before ports can be properly initialized.
+- `IONode::refreshPorts()` queries the parent graph's port count via `graph->getNumPorts()`. If the parent is null or has zero ports, the IONode will have zero ports.
+- When adding IONodes, ensure the parent graph has a valid port count first using `graph->setNumPorts()`.
+- Default port counts: 2 channels for audio (stereo), 1 channel for MIDI.
+- Message flow for adding nodes: `AddPluginMessage` → `AddPluginAction::perform()` → `EngineService::addPlugin()` → `GraphManager::addNode()`.
