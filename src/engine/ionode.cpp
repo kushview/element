@@ -183,6 +183,20 @@ bool IONode::isOutput() const { return type == audioOutputNode || type == midiOu
 void IONode::setParentGraph (GraphNode* const newGraph)
 {
     graph = newGraph;
+
+    // Ensure the parent graph has a minimum port count for this IONode's type.
+    // Default: 2 channels for audio (stereo), 1 channel for MIDI.
+    if (graph != nullptr)
+    {
+        const auto portType = getPortType();
+        const int currentCount = graph->getNumPorts (portType, isInput());
+        if (currentCount == 0)
+        {
+            const int defaultCount = (portType == PortType::Audio) ? 2 : 1;
+            graph->setNumPorts (portType, defaultCount, isInput(), false);
+        }
+    }
+
     refreshPorts();
 }
 
