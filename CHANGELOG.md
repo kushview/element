@@ -1,5 +1,58 @@
 # Change Log
 
+## [1.0.0b2] - 2026-01-06
+
+### Changed
+- Update to JUCE 8.0.12.
+- Migrate to CMake build system. Meson is no longer used.
+- Improve MIDI clock sync algorithm for faster BPM updates.
+- Refactor Application class to its own file and allow subclasses to create ContentFactory.
+- Update URL macros to use ELEMENT_ prefix for consistency.
+- Add option to enable updater support in CMake configuration.
+
+### Added
+- CMake build system support with comprehensive configuration options.
+- GitHub Actions CI workflows for build, test, and release on Mac/PC/Linux.
+- Arch Linux Docker build support and workflow.
+- Linux desktop file installation support.
+- Unit tests for DelayLockedLoop, MidiClock, AlignedData, AtomicValue, and AtomicLock.
+- Comprehensive audio routing unit tests.
+- Apply button to IOConfigurationWindow.
+- Lua documentation generation with ldoc.
+- OSC send utility for testing audio engine.
+- Support for ccache to speed up builds.
+
+### Removed
+- Qt Installer framework references (deprecated).
+- Meson build system files and configurations.
+- Unused nodeioconfiguration files.
+- Old deploy directory.
+
+### Fixed
+- Fix race condition in script reload causing null pointer crash.
+- Fix MIDI clock and message collector assertions when audio device not running.
+- Fix save prompt on clean project load.
+- Convert file choosers to async to prevent crash.
+- Fix GCC 15 build error with incomplete type in std::unique_ptr.
+- Fix device availability checks in MidiDeviceProcessor.
+- Fix AU parameter ID problems.
+- Fix compile error when binding lua Point:rotated.
+- Fix macOS file system watcher implementation.
+- Fix paths on Windows for LV2 plugins.
+- Fix problems scanning when crashed plugins file doesn't exist.
+- Fix restoration of desktop scale.
+- Fix IO node port labels to match containing graph IO.
+- CLAP: Fix note off not being handled correctly in synths.
+- CLAP: Send time information to plugins.
+- LV2: Add port-resize support for Atom output ports.
+- eVerb: Use buses layout support instead of old play config method.
+- Audio Router Node: Actually size to 12 channels when selected.
+- Audio Mixer: Fix crashing when trying to change bus size.
+- Audio Mixer: Ensure temp buffer gets sized appropriately before clearing.
+- Scanner: Apply default plugin paths on first run.
+- Scanner: Use 24 second timeout.
+- Generic UI: Show output parameters.
+
 ## [1.0.0b1] - 2025-02-04
 
 ### Changed
