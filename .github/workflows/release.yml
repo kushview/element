@@ -20,6 +20,12 @@ jobs:
       with:
         name: Element v${{ github.event.inputs.version || github.ref_name }}
         tag_name: ${{ github.event.inputs.version || github.ref_name }}
+        body: |
+          **Element ${{ github.event.inputs.version || github.ref_name }} is now available!**
+          
+          For a list of notable changes, see the [CHANGELOG](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.version || github.ref_name }}/CHANGELOG.md).
+          
+          Please see the release notes below for details on what's changed.
         draft: true
         generate_release_notes: true
         prerelease: false
