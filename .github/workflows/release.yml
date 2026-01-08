@@ -14,11 +14,12 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         name: Element v${{ github.event.inputs.version || github.ref_name }}
-        tag_name: ${{ github.event.inputs.version || github.ref_name }}      
+        tag_name: ${{ github.event.inputs.version || github.ref_name }}
         draft: true
         generate_release_notes: true
         prerelease: false
