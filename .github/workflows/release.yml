@@ -12,7 +12,6 @@ on:
 
 jobs:
   create-release:
-    needs: build-release
     runs-on: ubuntu-latest
     steps:
     - name: Create Release
