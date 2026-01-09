@@ -277,13 +277,23 @@ protected:
                 break;
         }
     }
-#if 0
-      // clap_host_params
-      virtual bool implementsParams() const noexcept { return false; }
-      virtual void paramsRescan(clap_param_rescan_flags flags) noexcept {}
-      virtual void paramsClear(clap_id paramId, clap_param_clear_flags flags) noexcept {}
-      virtual void paramsRequestFlush() noexcept {}
 
+    // clap_host_params
+    std::function<void()> onRescanParamValues;
+    bool implementsParams() const noexcept override { return true; }
+    void paramsRescan (clap_param_rescan_flags flags) noexcept override
+    {
+        if (flags & CLAP_PARAM_RESCAN_VALUES)
+            if (onRescanParamValues)
+                onRescanParamValues();
+    }
+
+    void paramsClear (clap_id paramId, clap_param_clear_flags flags) noexcept override
+    {
+        juce::ignoreUnused (paramId, flags);
+    }
+    void paramsRequestFlush() noexcept override {}
+#if 0
       // clap_host_posix_fd_support
       virtual bool implementsPosixFdSupport() const noexcept { return false; }
       virtual bool posixFdSupportRegisterFd(int fd, clap_posix_fd_flags_t flags) noexcept { return false; }
@@ -338,7 +348,7 @@ protected:
     ProxyPtr _proxy;
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_timer_support_t* _timer { nullptr };
-
+    
     void setPlugin (const clap_plugin_t* plugin)
     {
         if (plugin != nullptr)
@@ -837,8 +847,10 @@ public:
         if (! _params->get_value (_plugin, _info.id, &value))
             return;
 
-        value = _range.convertFrom0to1 (value);
-        if (value != _value.load())
+        std::cout << "sync=" << value << " min: " << _range.start << " max: " << _range.end << std::endl;
+
+        value = _range.convertTo0to1 (value);
+        if (! juce::exactlyEqual (value, (double) _value.load()))
         {
             _value.store (static_cast<float> (value));
             sendValueChangedMessageToListeners (value);
@@ -1200,6 +1212,8 @@ class CLAPProcessor : public Processor
 public:
     ~CLAPProcessor()
     {
+        _host.onRescanParamValues = nullptr;
+
         if (_plugin != nullptr)
         {
             _plugin->destroy (_plugin);
@@ -1543,6 +1557,7 @@ private:
         {
             _host.setPlugin (plugin);
             _plugin = _host.clapPlugin();
+            _host.onRescanParamValues = [this]() { syncParams(); };
         }
     }
 
