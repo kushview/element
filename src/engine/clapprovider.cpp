@@ -847,8 +847,6 @@ public:
         if (! _params->get_value (_plugin, _info.id, &value))
             return;
 
-        std::cout << "sync=" << value << " min: " << _range.start << " max: " << _range.end << std::endl;
-
         value = _range.convertTo0to1 (value);
         if (! juce::exactlyEqual (value, (double) _value.load()))
         {
