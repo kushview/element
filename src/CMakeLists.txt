@@ -90,7 +90,7 @@ endif()
 
 if(WIN32 AND ELEMENT_ENABLE_ASIO)
     message("ASIO audio device support enabled")
-    target_include_directories(element PUBLIC "${USER_HOME_DIRECTORY}/SDKs/ASIOSDK2.3/common")
+    target_include_directories(element PUBLIC "${ASIOSDK_SOURCE_DIR}/common")
     target_compile_definitions(element PUBLIC JUCE_ASIO=1)
 endif()
 

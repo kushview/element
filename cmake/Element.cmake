@@ -40,6 +40,15 @@ else()
 endif()
 
 include(GNUInstallDirs)
+include(FetchContent)
+
+# Fetch ASIO
+if(WIN32 AND ELEMENT_ENABLE_ASIO)
+    FetchContent_Declare(ASIOSDK
+        GIT_REPOSITORY https://github.com/audiosdk/asio.git
+        GIT_TAG 496a0765b8bb9c26f764f22f9a9712a937177db2)
+    FetchContent_MakeAvailable(ASIOSDK)
+endif()
 
 # JUCE VST2 SDK path setup
 if(ELEMENT_ENABLE_VST2)
