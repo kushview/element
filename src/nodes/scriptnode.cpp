@@ -256,6 +256,9 @@ const String ScriptNode::getProgramName (int index) const
         case 1:
             return "Channelizer";
             break;
+        case 2:
+            return "Spoton Scale Chooser";
+            break;
     }
 
     String name = TRANS ("Program");
@@ -279,6 +282,10 @@ void ScriptNode::setCurrentProgram (int index)
             break;
         case 1:
             newDspCode = String::fromUTF8 (scripts::channelize_lua, scripts::channelize_luaSize);
+            newUiCode.clear();
+            break;
+        case 2:
+            newDspCode = String::fromUTF8 (scripts::spontonchordchooser_lua, scripts::spontonchordchooser_luaSize);
             newUiCode.clear();
             break;
     }
