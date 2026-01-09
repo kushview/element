@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE (ScanDirectory)
     element::ScriptManager scripts;
     auto d = et::sourceRoot().getChildFile ("scripts");
     scripts.scanDirectory (d);
-    BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 7);
+    BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 8);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
