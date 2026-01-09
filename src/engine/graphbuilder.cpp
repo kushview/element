@@ -679,10 +679,13 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 bufIndex = newFreeBuffer;
             }
 
-            const int nodeDelay = getNodeDelay (srcNode);
+            if (portType.isAudio())
+            {
+                const int nodeDelay = getNodeDelay (srcNode);
 
-            if (nodeDelay < maxLatency)
-                renderingOps.add (new DelayChannelOp (bufIndex, maxLatency - nodeDelay));
+                if (nodeDelay < maxLatency)
+                    renderingOps.add (new DelayChannelOp (bufIndex, maxLatency - nodeDelay));
+            }
         }
         else
         {
