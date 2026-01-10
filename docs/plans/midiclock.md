@@ -186,3 +186,40 @@ And clamp:
 * `en` clamp to ±0.5
 
 These aren’t magic—just sane “won’t explode” defaults.
+
+# Tips To Avoid Wasting Time
+
+A couple of **parting tips before you dive in**, just to save you time later:
+
+### 1. Log in *normalized units* first
+
+When tuning, log:
+
+* `e / T` (normalized phase error)
+* `T` (samplesPerTick)
+* derived BPM
+
+If those look sane, everything else usually is. Raw samples can be misleading.
+
+### 2. Tune gains in “locked mode” first
+
+* Get rock-solid behavior *after* lock
+* Then increase acquire gains until it feels responsive but not twitchy
+
+Most bad PLL behavior comes from overtuned acquire gains.
+
+### 3. Don’t over-smooth twice
+
+If you:
+
+* median-filter intervals **and**
+* heavily lowpass BPM
+
+…you’ll get sluggish response. One strong filter + one light filter is enough.
+
+### 4. Expect different masters to behave differently
+
+* Hardware DIN MIDI clocks are usually cleaner than USB
+* Some DAWs jitter badly on tempo ramps
+
+Design for **robustness**, not perfection.
