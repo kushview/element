@@ -1,5 +1,5 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
-// SPDX-License-Identifier: GPL3-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 /// An Audio buffer designed for real time performance.
 // - **Safety**: For speed, virtually no type checking in method calls.

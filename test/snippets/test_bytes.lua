@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+-- SPDX-License-Identifier: GPL-3.0-or-later
+
 local bytes = require ('el.bytes')
 local data = bytes.new (1024)
 

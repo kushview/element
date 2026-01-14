@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2018 by Roland Rabien
+// SPDX-License-Identifier: ISC
+
 /*==============================================================================
 
 Copyright 2018 by Roland Rabien

@@ -52,3 +52,6 @@ return {
     layout      = amp_layout,
     process     = amp_process
 }
+
+-- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+-- SPDX-License-Identifier: GPL-3.0-or-later

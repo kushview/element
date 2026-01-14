@@ -1,5 +1,5 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
-// SPDX-License-Identifier: GPL3-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/gzip.hpp>
 #include <element/script.hpp>
@@ -193,7 +193,7 @@ Script Script::make (const juce::String& name, const juce::Identifier& type)
         "-- Script description." << juce::newLine <<
         "-- " << juce::newLine <<
         "-- @type " << type.toString() << juce::newLine <<
-        "-- @license GPL3-or-later"  << juce::newLine <<
+        "-- @license GPL-3.0-or-later"  << juce::newLine <<
         "-- @author Your Name" << juce::newLine <<
         juce::newLine;
     // clang-format on

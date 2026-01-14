@@ -1,5 +1,5 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
-// SPDX-License-Identifier: GPL3-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 /// The main context in which Element is running.
 // The main Element context.  A collection of "global" objects.

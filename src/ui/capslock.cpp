@@ -1,5 +1,5 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
-// SPDX-License-Identifier: GPL3-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #if defined(__MINGW32__) || defined(_MSC_VER)
 #include <windows.h>

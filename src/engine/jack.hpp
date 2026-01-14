@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
     This file is part of the Kushview Modules for JUCE
     Copyright (c) 2014-2019  Kushview, LLC.  All rights reserved.

@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 # Runs the kushview/element docker image. By default it starts
 # a bash shell.
 

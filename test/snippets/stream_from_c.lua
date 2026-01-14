@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+-- SPDX-License-Identifier: GPL-3.0-or-later
+
 result = ""
 local function read_and_print_input()
     result = io.read ("a")

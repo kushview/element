@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
 # SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Send OSC messages to Element audio engine.
 
