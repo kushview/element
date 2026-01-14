@@ -204,3 +204,6 @@ return {
     layout  = layout,
     process = process,
 }
+
+-- SPDX-FileCopyrightText: Copyright (C) Lokki.
+-- SPDX-License-Identifier: GPL-3.0-or-later

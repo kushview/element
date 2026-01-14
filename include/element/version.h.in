@@ -3,6 +3,9 @@
  * Do not edit, your changes will be lost.
  */
 
+// SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // clang-format off
 #define ELEMENT_BUILD_NUMBER     @ELEMENT_BUILD_NUMBER@

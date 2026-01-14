@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.

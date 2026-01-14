@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 const OSC = require('osc-js')
 
 const senderPort = 9001 // To Element: OSC Receiver node

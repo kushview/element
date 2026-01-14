@@ -1,5 +1,5 @@
 // Copyright Copyright (C) 2005-2012, rncbc aka Rui Nuno Capela. All rights reserved.
-// SPDX-License-Identifier: GPL3-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Modified: 2013 Michael Fisher <mfisher@kushview.net>
 
 #pragma once

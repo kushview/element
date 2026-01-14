@@ -1,5 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) Raw Material Software Limited
 // Copyright: Copied from JUCE framework.
-// SPDX-License-Identifier: GPL3-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 

@@ -3,7 +3,7 @@
 -- Script description.
 -- 
 -- @type View
--- @license GPL3-or-later
+-- @license GPL-3.0-or-later
 -- @author Your Name
 
 local object = require ('el.object')
@@ -27,3 +27,6 @@ return {
     instantiate = instantiate,
     graph_changed = handleGraphChange
 }
+
+-- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+-- SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #if __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -348,7 +350,7 @@ protected:
     ProxyPtr _proxy;
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_timer_support_t* _timer { nullptr };
-    
+
     void setPlugin (const clap_plugin_t* plugin)
     {
         if (plugin != nullptr)

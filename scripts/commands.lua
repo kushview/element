@@ -46,3 +46,6 @@ end
 if type(list[format]) == 'function' then
     list[format] (cmds)
 end
+
+-- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+-- SPDX-License-Identifier: GPL-3.0-or-later

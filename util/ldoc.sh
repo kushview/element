@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # This file executes ldoc to generate documentation for Lua source files.
 # It should be ran from the top level source directory.
