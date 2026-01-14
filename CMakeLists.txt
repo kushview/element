@@ -7,6 +7,9 @@ set(PROJECT_VERSION_SUFFIX "b2")
 set(PROJECT_VERSION_FULL "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
 
 include(cmake/Element.cmake)
+if(ELEMENT_ENABLE_UPDATER)
+    include(cmake/FindSparkle.cmake)
+endif()
 include(cmake/FindJack.cmake)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
@@ -73,6 +76,15 @@ target_link_libraries(element_app PRIVATE kv::element)
 if(NOT APPLE)
     install(TARGETS element_app DESTINATION ${CMAKE_INSTALL_BINDIR})
 else()
+    if(ELEMENT_ENABLE_UPDATER)
+        target_link_libraries(element_app PRIVATE ${SPARKLE_FRAMEWORK})
+        add_custom_command(TARGET element_app POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${SPARKLE_FRAMEWORK}"
+                "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework"
+        COMMENT "Copying Sparkle.framework into app bundle"
+    )
+    endif()
     install(TARGETS element_app
         BUNDLE DESTINATION "Applications"
         COMPONENT "Standalone")
