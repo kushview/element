@@ -76,9 +76,7 @@ if(APPLE AND ELEMENT_ENABLE_UPDATER)
     string(APPEND ELEMENT_APP_PLIST_TO_MERGE "<string>${SPARKLE_PUBLIC_KEY}</string>")
 
     string(APPEND ELEMENT_APP_PLIST_TO_MERGE "</dict></plist>")
-    message(${ELEMENT_APP_PLIST_TO_MERGE})
 endif()
-
 
 juce_add_gui_app(element_app
     PRODUCT_NAME            "${ELEMENT_STANDALONE_PRODUCT_NAME}"
@@ -103,7 +101,9 @@ else()
         target_link_libraries(element_app PRIVATE ${SPARKLE_FRAMEWORK})
         target_sources(element_app PRIVATE src/sparkle.mm)
         add_custom_command(TARGET element_app POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            COMMAND ${CMAKE_COMMAND} -E rm -rf
+                    "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework"
+            COMMAND /usr/bin/ditto
                     "${SPARKLE_FRAMEWORK}"
                     "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework")
         # Set rpath to find Sparkle.framework in app bundle
