@@ -59,6 +59,27 @@ else()
     set(ELEMENT_STANDALONE_PRODUCT_NAME "Element")
 endif()
 
+set(SPARKLE_FEED_URL "https://kushview.net/element/appcast.xml")
+set(SPARKLE_PUBLIC_KEY "xxx")
+set(ELEMENT_APP_PLIST_TO_MERGE "")
+
+if(APPLE AND ELEMENT_ENABLE_UPDATER)
+    message(STATUS "PLIST UPDATED")
+    string(APPEND ELEMENT_APP_PLIST_TO_MERGE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+                        <!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+                        <plist version=\"1.0\">
+                        <dict>")
+    
+    string(APPEND ELEMENT_APP_PLIST_TO_MERGE "<key>SUFeedURL</key>")
+    string(APPEND ELEMENT_APP_PLIST_TO_MERGE "<string>${SPARKLE_FEED_URL}</string>")
+    string(APPEND ELEMENT_APP_PLIST_TO_MERGE "<key>SUPublicEDKey</key>")
+    string(APPEND ELEMENT_APP_PLIST_TO_MERGE "<string>${SPARKLE_PUBLIC_KEY}</string>")
+
+    string(APPEND ELEMENT_APP_PLIST_TO_MERGE "</dict></plist>")
+    message(${ELEMENT_APP_PLIST_TO_MERGE})
+endif()
+
+
 juce_add_gui_app(element_app
     PRODUCT_NAME            "${ELEMENT_STANDALONE_PRODUCT_NAME}"
     BUILD_VERSION           "${ELEMENT_BUILD_NUMBER}"
@@ -68,6 +89,8 @@ juce_add_gui_app(element_app
 
     BUNDLE_ID               "net.kushview.Element"
     MICROPHONE_PERMISSION_ENABLED TRUE
+
+    PLIST_TO_MERGE          "${ELEMENT_APP_PLIST_TO_MERGE}"
 )
 
 target_sources(element_app PRIVATE src/main.cc)
@@ -78,6 +101,7 @@ if(NOT APPLE)
 else()
     if(ELEMENT_ENABLE_UPDATER)
         target_link_libraries(element_app PRIVATE ${SPARKLE_FRAMEWORK})
+        target_sources(element_app PRIVATE src/sparkle.mm)
         add_custom_command(TARGET element_app POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${SPARKLE_FRAMEWORK}"
