@@ -65,6 +65,7 @@ static juce::String makeXml (const juce::String& pkg, const juce::String& vers)
 
 namespace element {
 
+#if ELEMENT_UPDATER
 class TestUpdater : public Updater {
 public:
     TestUpdater() = default;
@@ -75,6 +76,7 @@ std::unique_ptr<Updater> Updater::create()
 {
     return std::make_unique<TestUpdater>();
 }
+#endif
 
 } // namespace element
 BOOST_AUTO_TEST_SUITE (UpdateTests)
