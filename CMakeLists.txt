@@ -103,11 +103,14 @@ else()
         target_link_libraries(element_app PRIVATE ${SPARKLE_FRAMEWORK})
         target_sources(element_app PRIVATE src/sparkle.mm)
         add_custom_command(TARGET element_app POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                "${SPARKLE_FRAMEWORK}"
-                "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework"
-        COMMENT "Copying Sparkle.framework into app bundle"
-    )
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "${SPARKLE_FRAMEWORK}"
+                    "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework")
+        # Set rpath to find Sparkle.framework in app bundle
+        set_target_properties(element_app PROPERTIES
+            BUILD_RPATH "@executable_path/../Frameworks"
+            INSTALL_RPATH "@executable_path/../Frameworks"
+        )
     endif()
     install(TARGETS element_app
         BUNDLE DESTINATION "Applications"
