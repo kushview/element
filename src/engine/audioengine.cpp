@@ -148,7 +148,7 @@ struct RootGraphRender : public AsyncUpdater
                 }
 
                 {
-                    RenderContext rc (audioTemp, cvTemp, midiTemp, atomTemp, numSamples);
+                    RenderContext rc (audioTemp, cvTemp, midiTemp, numSamples);
                     const ScopedLock sl (graph->getPropertyLock());
                     if (graph->isSuspended())
                     {
@@ -272,7 +272,6 @@ private:
     int numOutputChans = -1;
     AudioSampleBuffer audioOut, audioTemp, cvTemp;
     MidiBuffer midiOut, midiTemp;
-    AtomBuffer atomTemp;
 
     void updateIndexes()
     {

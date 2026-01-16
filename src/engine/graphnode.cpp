@@ -6,13 +6,10 @@
 #include <element/node.hpp>
 #include <element/portcount.hpp>
 #include <element/context.hpp>
-#include <element/symbolmap.hpp>
 
 #include "engine/graphbuilder.hpp"
 #include "engine/ionode.hpp"
 #include "nodes/audioprocessor.hpp"
-#include "engine/miditranspose.hpp"
-#include "nodes/nodetypes.hpp"
 #include "engine/graphnode.hpp"
 
 #ifndef EL_GRAPH_NODE_NAME
@@ -435,18 +432,12 @@ void GraphNode::buildRenderingSequence()
             const ScopedLock sl (getPropertyLock());
             renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
             renderingBuffers.clear();
-            for (auto ab : atomBuffers)
-                ab->clear();
+
             for (int i = midiBuffers.size(); --i >= 0;)
                 midiBuffers.getUnchecked (i)->clear();
 
             while (midiBuffers.size() < numMidiBuffersNeeded)
                 midiBuffers.add (new MidiBuffer());
-            while (atomBuffers.size() < numAtomBuffersNeeded)
-            {
-                auto ab = atomBuffers.add (new AtomBuffer());
-                ab->setTypes (_context.symbols());
-            }
         }
 
         ScopedLock sl (seqLock);

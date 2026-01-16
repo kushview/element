@@ -6,7 +6,6 @@
 #include <element/settings.hpp>
 #include <element/plugins.hpp>
 #include <element/services.hpp>
-#include <element/symbolmap.hpp>
 #include <element/context.hpp>
 
 #include "engine/audioprocessorfactory.hpp"
@@ -57,7 +56,6 @@ public:
     AudioEnginePtr engine;
     SessionPtr session;
 
-    std::unique_ptr<SymbolMap> symbols;
     std::unique_ptr<DeviceManager> devices;
     std::unique_ptr<PluginManager> plugins;
     std::unique_ptr<Settings> settings;
@@ -73,7 +71,6 @@ private:
 
     void init()
     {
-        symbols.reset (new SymbolMap());
         log.reset (new Log());
         devices.reset (new DeviceManager());
         settings.reset (new Settings());
@@ -265,6 +262,5 @@ void Context::addModulePath (const std::string& path)
 }
 
 void Context::discoverModules() { impl->modules->discover(); }
-SymbolMap& Context::symbols() { return *impl->symbols; }
 
 } // namespace element

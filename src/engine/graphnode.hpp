@@ -214,7 +214,6 @@ private:
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
     OwnedArray<MidiBuffer> midiBuffers;
-    OwnedArray<AtomBuffer> atomBuffers;
     Array<void*> renderingOps;
     bool _prepared = false;
 

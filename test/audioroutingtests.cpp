@@ -4,13 +4,11 @@
 #include <boost/test/unit_test.hpp>
 
 #include <element/context.hpp>
-#include <element/symbolmap.hpp>
 
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
 #include "engine/graphnode.hpp"
 #include "engine/ionode.hpp"
-#include "utils.hpp"
 
 using namespace element;
 
@@ -208,19 +206,19 @@ public:
             tempBuffer.setSize (1, numSamples, false, false, false);
 
         // For mixing with replace-processing: sum all inputs into temp buffer
-        const int maxInputs = jmin(numIns, totalChans);
+        const int maxInputs = jmin (numIns, totalChans);
         const int outputChan = 0; // Write result to first channel (replace-processing)
 
         // Clear temp buffer
-        float* temp = tempBuffer.getWritePointer(0);
-        FloatVectorOperations::clear(temp, numSamples);
-        
+        float* temp = tempBuffer.getWritePointer (0);
+        FloatVectorOperations::clear (temp, numSamples);
+
         // Sum all inputs into temp buffer
         for (int inCh = 0; inCh < maxInputs; ++inCh) {
             const float* input = rc.audio.getReadPointer (inCh);
             FloatVectorOperations::add (temp, input, numSamples);
         }
-        
+
         // Copy result to output channel
         float* output = rc.audio.getWritePointer (outputChan);
         FloatVectorOperations::copy (output, temp, numSamples);
@@ -253,10 +251,8 @@ BOOST_AUTO_TEST_CASE (SingleAudioToSingleAudio)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify audio was received
@@ -292,10 +288,8 @@ BOOST_AUTO_TEST_CASE (MultiAudioToSingleAudio)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify signals merged (3 x 0.25 = ~0.75)
@@ -333,10 +327,8 @@ BOOST_AUTO_TEST_CASE (SingleAudioToMultiAudio)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify all captures received identical audio
@@ -377,10 +369,8 @@ BOOST_AUTO_TEST_CASE (AudioIsolation)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify each capture only received its corresponding generator
@@ -413,10 +403,8 @@ BOOST_AUTO_TEST_CASE (DisconnectedAudioNode)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify capture received silence
@@ -456,10 +444,8 @@ BOOST_AUTO_TEST_CASE (AudioThroughIONodes)
     }
 
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify both channels received external audio
@@ -522,10 +508,8 @@ BOOST_AUTO_TEST_CASE (ComplexAudioRouting)
         data[i] = 0.2f;
 
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify each destination received correct sum
@@ -588,10 +572,8 @@ BOOST_AUTO_TEST_CASE (AudioChainWithBranching)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify branching worked correctly
@@ -656,10 +638,8 @@ BOOST_AUTO_TEST_CASE (AudioMultiLevelMerging)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify hierarchical merging
@@ -715,10 +695,8 @@ BOOST_AUTO_TEST_CASE (AudioIOPlusGenerators)
         data[i] = 0.4f;
 
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify routing with I/O + generators
@@ -750,10 +728,8 @@ BOOST_AUTO_TEST_CASE (AudioOutputIOUnused)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify unused audio output doesn't interfere
@@ -785,10 +761,8 @@ BOOST_AUTO_TEST_CASE (AudioOutputIOConnected)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify internal routing still works with audio output connected
@@ -833,10 +807,8 @@ BOOST_AUTO_TEST_CASE (AudioFullIOChain)
         data[i] = 0.35f;
 
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify routing: gen signal to dst1, audioIn signal to dst2
@@ -876,10 +848,8 @@ BOOST_AUTO_TEST_CASE (AudioMultipleOutputs)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify dst1 only gets gen2 signal, not gen1
@@ -909,10 +879,8 @@ BOOST_AUTO_TEST_CASE (AudioStereoRouting)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify both channels received audio
@@ -946,10 +914,8 @@ BOOST_AUTO_TEST_CASE (AudioChannelCrossover)
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify crossover worked - channels should be swapped
@@ -965,7 +931,7 @@ BOOST_AUTO_TEST_CASE (AudioChannelCrossover)
 BOOST_AUTO_TEST_CASE (AudioMixerNodeTest)
 {
     // Test dedicated mixer node summing multiple inputs
-    
+
     PreparedGraph fix;
     GraphNode& graph = fix.graph;
 
@@ -987,17 +953,15 @@ BOOST_AUTO_TEST_CASE (AudioMixerNodeTest)
     BOOST_REQUIRE (graph.connectChannels (PortType::Audio, gen1->nodeId, 0, mixer->nodeId, 0));
     BOOST_REQUIRE (graph.connectChannels (PortType::Audio, gen2->nodeId, 0, mixer->nodeId, 1));
     BOOST_REQUIRE (graph.connectChannels (PortType::Audio, gen3->nodeId, 0, mixer->nodeId, 2));
-    
+
     // Connect mixer output to destination
     BOOST_REQUIRE (graph.connectChannels (PortType::Audio, mixer->nodeId, 0, dst->nodeId, 0));
 
     graph.rebuild();
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
-    
-    RenderContext rc (audio, audio, midi, atom, 512);
+
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify mixer summed all inputs (0.2 + 0.3 + 0.25 = 0.75)
@@ -1039,7 +1003,7 @@ BOOST_AUTO_TEST_CASE (IONodeMinimumAudioPortCount)
 {
     // Test that Audio I/O nodes get a minimum port count when added to a graph with zero audio ports
     // This prevents the bug where Audio Input/Output nodes appear with zero ports
-    
+
     PreparedGraph fix;
     GraphNode& graph = fix.graph;
 
@@ -1050,13 +1014,13 @@ BOOST_AUTO_TEST_CASE (IONodeMinimumAudioPortCount)
     // Verify graph starts with zero audio ports configured
     BOOST_REQUIRE_EQUAL (graph.getNumPorts (PortType::Audio, true), 0);
     BOOST_REQUIRE_EQUAL (graph.getNumPorts (PortType::Audio, false), 0);
-    
+
     // Add Audio Input node - should set graph audio inputs to minimum 2 (stereo)
     auto* audioIn = new IONode (IONode::audioInputNode);
     graph.addNode (audioIn);
     BOOST_REQUIRE_EQUAL (graph.getNumPorts (PortType::Audio, true), 2);
     BOOST_REQUIRE_EQUAL (audioIn->getNumPorts(), 2);
-    
+
     // Add Audio Output node - should set graph audio outputs to minimum 2 (stereo)
     auto* audioOut = new IONode (IONode::audioOutputNode);
     graph.addNode (audioOut);

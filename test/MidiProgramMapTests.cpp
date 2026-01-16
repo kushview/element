@@ -40,7 +40,6 @@ static void testMappings (ProcessorPtr node)
 
 static void testMidiStream (ProcessorPtr node, const String& name = "Renders mappings")
 {
-    AtomBuffer atoms;
     MidiBuffer midi;
     AudioSampleBuffer audio, cv;
     audio.setSize (2, 1024, false, true, false);
@@ -50,7 +49,7 @@ static void testMidiStream (ProcessorPtr node, const String& name = "Renders map
     midi.addEvent (MidiMessage::noteOn (1, 12, static_cast<uint8> (50)), 300);
     midi.addEvent (MidiMessage::noteOff (1, 12), 300);
 
-    RenderContext rc (audio, cv, midi, atoms, audio.getNumSamples());
+    RenderContext rc (audio, cv, midi, audio.getNumSamples());
     node->render (rc);
 
     int index = 0;
