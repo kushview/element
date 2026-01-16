@@ -109,6 +109,9 @@ private:
     Processor* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
     Processor* createPlaceholder (const Node& node);
 
+    double sampleRate() const noexcept;
+    int blockSize() const noexcept;
+    
     void setupNode (const ValueTree& data, ProcessorPtr object);
 
     void processorArcsChanged();

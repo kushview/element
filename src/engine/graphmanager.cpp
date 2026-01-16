@@ -339,7 +339,7 @@ Processor* GraphManager::createFilter (const PluginDescription* desc, double x, 
 Processor* GraphManager::createPlaceholder (const Node& node)
 {
     auto* ph = new PlaceholderProcessor();
-    ph->setupFor (node, processor.getSampleRate(), processor.getBlockSize());
+    ph->setupFor (node, sampleRate(), blockSize());
     return processor.addNode (new AudioProcessorNode (node.getNodeId(), ph), node.getNodeId());
 }
 
@@ -469,7 +469,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
                 if (! proc->setBusesLayout (*tryStereo))
                     proc->setBusesLayout (oldLayout);
 
-                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->prepareToPlay (sampleRate(), blockSize());
                 proc->suspendProcessing (false);
             }
         }
@@ -763,6 +763,20 @@ void GraphManager::processorArcsChanged()
     changed();
 }
 
+double GraphManager::sampleRate() const noexcept {
+    auto sr = processor.getSampleRate();
+    if (sr <= 0.0)
+        sr = 44100.0;
+    return sr;
+}
+
+int GraphManager::blockSize() const noexcept {
+    auto bs = processor.getBlockSize();
+    if (bs <= 0)
+        bs = 512;
+    return 512;
+}
+
 void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 {
     jassert (obj && data.hasType (types::Node));
@@ -804,7 +818,7 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
                     proc->suspendProcessing (true);
                     proc->releaseResources();
                     busesConfigured = proc->setBusesLayoutWithoutEnabling (layout);
-                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                    proc->prepareToPlay (sampleRate(), blockSize());
                     proc->suspendProcessing (false);
                 }
             }
@@ -823,7 +837,7 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
                 proc->suspendProcessing (true);
                 proc->releaseResources();
                 proc->setBusesLayoutWithoutEnabling (layout);
-                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->prepareToPlay (sampleRate(), blockSize());
                 proc->suspendProcessing (false);
             }
 
