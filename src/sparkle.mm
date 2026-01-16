@@ -1,10 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#import <Foundation/Foundation.h>
 #import <Sparkle/Sparkle.h>
-#include <memory>
-#include "juce_core/juce_core.h"
 
+#include <memory>
+
+#include <element/juce/core.hpp>
 #include <element/ui/updater.hpp>
 
 // An updater delegate class that mainly takes care of updating the check for updates menu item's state
