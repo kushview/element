@@ -3,20 +3,20 @@ name: Build and Test
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'src/**'
-      - 'include/**'
-      - '**/*.cmake'
-      - '.gitmodules'
-      - '.github/workflows/build.yml'
+    <<: &ci_paths
+      paths-ignore:
+        - 'deps/**'
+      paths:
+        - 'src/**'
+        - 'include/**'
+        - '**/*.cmake'
+        - 'CMakeLists.txt'
+        - '**/CMakeLists.txt'
+        - '.gitmodules'
+        - '.github/workflows/build.yml'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'src/**'
-      - 'include/**'
-      - '**/*.cmake'
-      - '.gitmodules'
-      - '.github/workflows/build.yml'
+    <<: *ci_paths
   workflow_dispatch:
 
 jobs:
