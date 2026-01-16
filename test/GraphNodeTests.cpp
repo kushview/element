@@ -4,7 +4,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <element/context.hpp>
-#include <element/symbolmap.hpp>
 
 #include <lv2/atom/atom.h>
 #include <lv2/midi/midi.h>

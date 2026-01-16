@@ -4,7 +4,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <element/context.hpp>
-#include <element/symbolmap.hpp>
 
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"

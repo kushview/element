@@ -6,13 +6,10 @@
 #include <element/node.hpp>
 #include <element/portcount.hpp>
 #include <element/context.hpp>
-#include <element/symbolmap.hpp>
 
 #include "engine/graphbuilder.hpp"
 #include "engine/ionode.hpp"
 #include "nodes/audioprocessor.hpp"
-#include "engine/miditranspose.hpp"
-#include "nodes/nodetypes.hpp"
 #include "engine/graphnode.hpp"
 
 #ifndef EL_GRAPH_NODE_NAME

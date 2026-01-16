@@ -13,7 +13,6 @@ target_include_directories(element
         "${PROJECT_SOURCE_DIR}/src/lua/src"
         "${PROJECT_SOURCE_DIR}/deps/clap-juce-extensions/clap-libs/clap/include"
         "${PROJECT_SOURCE_DIR}/deps/clap-juce-extensions/clap-libs/clap-helpers/include"
-        "${PROJECT_SOURCE_DIR}/deps/lvtk/include"
         "${Boost_INCLUDE_DIRS}"       
 )
 
