@@ -1,3 +1,5 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/kushview/element)](https://api.reuse.software/info/github.com/kushview/element) [![Build and Test](https://github.com/kushview/element/actions/workflows/build.yml/badge.svg)](https://github.com/kushview/element/actions/workflows/build.yml) [![Generate Lua Documentation](https://github.com/kushview/element/actions/workflows/ldoc.yml/badge.svg)](https://github.com/kushview/element/actions/workflows/ldoc.yml)
+
 # Element
 ![Element Screenshot](data/screenshot.png)
 
