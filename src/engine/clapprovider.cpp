@@ -17,7 +17,8 @@
 #include <element/version.hpp>
 #include <element/ui/nodeeditor.hpp>
 
-#include "lv2/messages.hpp"
+#include <lvtk/spin_lock.hpp>
+#include <lvtk/spin_lock.ipp>
 
 #include "appinfo.hpp"
 #include "engine/clapprovider.hpp"
@@ -518,6 +519,42 @@ private:
 #endif
 
 //==============================================================================
+struct TryLockAndCall
+{
+    template <typename Fn>
+    void operator() (lvtk::SpinLock& mutex, Fn&& fn)
+    {
+        if (mutex.try_lock())
+        {
+            fn();
+            mutex.unlock();
+        }
+    }
+};
+
+struct LockAndCall
+{
+    template <typename Fn>
+    void operator() (lvtk::SpinLock& mutex, Fn&& fn)
+    {
+        mutex.lock();
+        fn();
+        mutex.unlock();
+    }
+};
+
+struct RealtimeReadTrait
+{
+    using Read = TryLockAndCall;
+    using Write = LockAndCall;
+};
+
+struct RealtimeWriteTrait
+{
+    using Read = LockAndCall;
+    using Write = TryLockAndCall;
+};
+
 template <typename Locks>
 class CLAPEventQueue final
 {
@@ -812,7 +849,7 @@ private:
 //==============================================================================
 class CLAPParameter : public Parameter
 {
-    using Queue = CLAPEventQueue<lvtk::RealtimeReadTrait>;
+    using Queue = CLAPEventQueue<RealtimeReadTrait>;
     Queue& _queue;
     const clap_plugin_t* _plugin;
     const clap_plugin_params_t* _params;
@@ -1547,8 +1584,8 @@ private:
     AudioBuffer<float> _tmpAudio;
 
     clap::helpers::EventList _eventIn, _eventOut;
-    CLAPEventQueue<lvtk::RealtimeReadTrait> _queueIn;
-    CLAPEventQueue<lvtk::RealtimeWriteTrait> _queueOut;
+    CLAPEventQueue<RealtimeReadTrait> _queueIn;
+    CLAPEventQueue<RealtimeWriteTrait> _queueOut;
 
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
