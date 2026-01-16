@@ -3,13 +3,13 @@
 
 #include <element/engine.hpp>
 #include <element/ui.hpp>
+#include <element/plugins.hpp>
+#include <element/settings.hpp>
+
 #include "services/sessionservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/deviceservice.hpp"
 #include "engine/internalformat.hpp"
-#include <element/plugins.hpp>
-#include "ElementApp.h"
-#include <element/settings.hpp>
 
 #include "pluginprocessor.hpp"
 #include "plugineditor.hpp"

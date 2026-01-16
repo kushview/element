@@ -62,3 +62,4 @@ docs/_build/
 
 Cardinal
 .meson-subproject*.txt
+.cache/

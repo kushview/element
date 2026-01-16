@@ -8,3 +8,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new element::PluginProcessor (
         element::PluginProcessor::Instrument, 16);
 }
+
+#if ELEMENT_UPDATER
+#include "./pluginupdater.cc"
+#endif

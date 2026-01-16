@@ -163,7 +163,9 @@ class GuiService::UpdateManager
 {
 public:
     UpdateManager()
+        : updater (Updater::create())
     {
+        jassert (updater != nullptr);
         setupUpdater();
     }
 
@@ -174,7 +176,7 @@ public:
 
     bool launchRequested() const noexcept { return launchUpdaterOnExit; }
 
-    void check() { updater.check (true); }
+    void check() { updater->check (true); }
 
 private:
     friend class GuiService;
@@ -183,12 +185,12 @@ private:
         juce::String ver (ELEMENT_VERSION_STRING);
         ver << "-" << ELEMENT_BUILD_NUMBER;
         // ver = "0.20.0.0";
-        updater.setInfo ("net.kushview.element", ver.toStdString());
-        updater.setRepository (ELEMENT_UPDATES_URL);
+        updater->setInfo ("net.kushview.element", ver.toStdString());
+        updater->setRepository (ELEMENT_UPDATES_URL);
 
         _conn.disconnect();
-        _conn = updater.sigUpdatesAvailable.connect ([this]() {
-            if (updater.available().size() > 0)
+        _conn = updater->sigUpdatesAvailable.connect ([this]() {
+            if (updater->available().size() > 0)
             {
                 AlertWindow::showMessageBoxAsync (
                     AlertWindow::InfoIcon,
@@ -207,7 +209,7 @@ private:
 
     bool launchUpdaterOnExit { false };
     bool showAlertWhenNoUpdatesReady = false;
-    element::Updater updater;
+    std::unique_ptr<element::Updater> updater;
     boost::signals2::connection _conn;
 };
 
@@ -420,8 +422,8 @@ Commands& GuiService::commands() { return impl->commands; }
 void GuiService::setUpdaterPackage (const std::string_view package, std::string_view version)
 {
 #if ELEMENT_UPDATER
-    auto& upd = updates->updater;
-    upd.setInfo (package.data(), version.data());
+    auto& updater = *updates->updater;
+    updater.setInfo (package.data(), version.data());
 #endif
 }
 

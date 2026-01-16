@@ -42,9 +42,9 @@ struct UpdatePackage {
 /** Updater helper for checking available updates */
 class Updater {
 public:
-    Updater();
-    Updater (const std::string& package, const std::string& version, const std::string& url);
-    ~Updater();
+    static std::unique_ptr<Updater> create();
+
+    virtual ~Updater();
 
     //==========================================================================
     /** Triggered when updates are found. Only fired when checking async. */
@@ -54,7 +54,7 @@ public:
     void clear();
 
     /** Check for updates now or later. */
-    void check (bool async);
+    virtual void check (bool async);
 
     /** Returns all package updates listed in the repo. */
     std::vector<UpdatePackage> packages() const noexcept;
@@ -85,6 +85,10 @@ public:
         Call clear() to wipe it out.
      */
     void setUpdatesXml (const std::string& xml);
+
+protected:
+    Updater();
+    Updater (const std::string& package, const std::string& version, const std::string& url);
 
 private:
     class Updates;

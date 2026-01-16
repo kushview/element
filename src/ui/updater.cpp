@@ -199,6 +199,14 @@ private:
     std::vector<UpdatePackage> cachedPackages;
 };
 
+#if ! ELEMENT_UPDATER
+std::unique_ptr<Updater> Updater::create()
+{
+    std::unique_ptr<Updater> u (new Updater());
+    return u;
+}
+#endif
+
 Updater::Updater()
 {
     updates = std::make_unique<Updates> (*this);

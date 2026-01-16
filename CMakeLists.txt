@@ -7,6 +7,9 @@ set(PROJECT_VERSION_SUFFIX "b2")
 set(PROJECT_VERSION_FULL "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
 
 include(cmake/Element.cmake)
+if(APPLE AND ELEMENT_ENABLE_UPDATER)
+    include(cmake/FindSparkle.cmake)
+endif()
 include(cmake/FindJack.cmake)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
@@ -65,6 +68,8 @@ juce_add_gui_app(element_app
 
     BUNDLE_ID               "net.kushview.Element"
     MICROPHONE_PERMISSION_ENABLED TRUE
+
+    PLIST_TO_MERGE          "${ELEMENT_APP_PLIST_TO_MERGE}"
 )
 
 target_sources(element_app PRIVATE src/main.cc)
@@ -73,6 +78,22 @@ target_link_libraries(element_app PRIVATE kv::element)
 if(NOT APPLE)
     install(TARGETS element_app DESTINATION ${CMAKE_INSTALL_BINDIR})
 else()
+    if(ELEMENT_ENABLE_UPDATER)
+        target_compile_options(element_app PRIVATE "-F${sparkle_SOURCE_DIR}")
+        target_link_options(element_app PRIVATE "-F${sparkle_SOURCE_DIR}" -framework Sparkle)
+        target_sources(element_app PRIVATE src/sparkle.mm)
+        add_custom_command(TARGET element_app POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E rm -rf
+                    "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework"
+            COMMAND /usr/bin/ditto
+                    "${SPARKLE_FRAMEWORK}"
+                    "$<TARGET_BUNDLE_CONTENT_DIR:element_app>/Frameworks/Sparkle.framework")
+        # Set rpath to find Sparkle.framework in app bundle
+        set_target_properties(element_app PROPERTIES
+            BUILD_RPATH "@executable_path/../Frameworks"
+            INSTALL_RPATH "@executable_path/../Frameworks"
+        )
+    endif()
     install(TARGETS element_app
         BUNDLE DESTINATION "Applications"
         COMPONENT "Standalone")

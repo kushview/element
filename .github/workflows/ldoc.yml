@@ -1,4 +1,4 @@
-name: Generate Lua Documentation
+name: LDoc
 
 on:
   push:
