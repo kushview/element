@@ -435,18 +435,12 @@ void GraphNode::buildRenderingSequence()
             const ScopedLock sl (getPropertyLock());
             renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
             renderingBuffers.clear();
-            for (auto ab : atomBuffers)
-                ab->clear();
+
             for (int i = midiBuffers.size(); --i >= 0;)
                 midiBuffers.getUnchecked (i)->clear();
 
             while (midiBuffers.size() < numMidiBuffersNeeded)
                 midiBuffers.add (new MidiBuffer());
-            while (atomBuffers.size() < numAtomBuffersNeeded)
-            {
-                auto ab = atomBuffers.add (new AtomBuffer());
-                ab->setTypes (_context.symbols());
-            }
         }
 
         ScopedLock sl (seqLock);

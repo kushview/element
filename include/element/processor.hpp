@@ -7,7 +7,6 @@
 #include <element/juce/audio_basics.hpp>
 #include <element/juce/audio_processors.hpp>
 
-#include <element/atombuffer.hpp>
 #include <element/atomic.hpp>
 #include <element/midipipe.hpp>
 #include <element/oversampler.hpp>
@@ -25,7 +24,6 @@ namespace GraphRender {
 class ProcessBufferOp;
 }
 
-class AtomBuffer;
 class Editor;
 class GraphNode;
 class ProcessBufferOp;
@@ -34,24 +32,8 @@ struct RenderContext {
     juce::AudioSampleBuffer audio;
     juce::AudioSampleBuffer cv;
     MidiPipe midi;
-    AtomPipe atom;
 
     // clang-format off
-    RenderContext (float* const *audioData, 
-                   int numAudio,
-                   float* const *cvData, 
-                   int numCV,
-                   const juce::OwnedArray<juce::MidiBuffer>& sharedMidi,
-                   const juce::Array<int>& midiIndexes,
-                   const juce::OwnedArray<AtomBuffer>& sharedAtom,
-                   const juce::Array<int>& atomIndexes,
-                   int numSamples)
-        : audio (audioData, numAudio, numSamples),
-          cv (cvData, numCV, numSamples),
-          midi (sharedMidi, midiIndexes),
-          atom (sharedAtom, atomIndexes)
-    {}
-
     RenderContext (float* const *audioData, 
                    int numAudio,
                    float* const *cvData, 
@@ -67,14 +49,11 @@ struct RenderContext {
     RenderContext (AudioSampleBuffer& audioRef,
                    AudioSampleBuffer& cvRef,
                    MidiBuffer& midiRef,
-                   AtomBuffer& atomRef,
                    int numSamples)
         : audio (audioRef.getArrayOfWritePointers(), audioRef.getNumChannels(), numSamples), 
           cv (cvRef.getArrayOfWritePointers(), cvRef.getNumChannels(), numSamples),
-          midi (midiRef),
-          atom (atomRef)
-    {
-    }
+          midi (midiRef)
+    {}
     // clang-format on
 };
 

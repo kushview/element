@@ -628,7 +628,6 @@ void Processor::renderBypassed (RenderContext& rc)
     rc.audio.clear (0, numSamples);
     rc.cv.clear (0, numSamples);
     rc.midi.clear (0, numSamples);
-    rc.atom.clear (0, numSamples);
 }
 
 //=============================================================================

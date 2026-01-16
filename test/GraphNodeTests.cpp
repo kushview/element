@@ -11,13 +11,10 @@
 
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
-#include "fixture/AtomTestNode.h"
 #include "fixture/MidiGeneratorNode.h"
 #include "fixture/MidiCaptureNode.h"
-#include "fixture/AtomCaptureNode.h"
 #include "engine/graphnode.hpp"
 #include "engine/ionode.hpp"
-#include "utils.hpp"
 
 using namespace element;
 
@@ -127,10 +124,8 @@ BOOST_AUTO_TEST_CASE (MultiMidiToSingleMidi)
     // Render the graph
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify all 6 events arrived at the MIDI destination
@@ -169,10 +164,8 @@ BOOST_AUTO_TEST_CASE (SingleMidiToMultiMidi)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Both destinations should receive all 3 events
@@ -219,10 +212,8 @@ BOOST_AUTO_TEST_CASE (MidiIsolation)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Each destination should only receive events from its connected source
@@ -251,10 +242,8 @@ BOOST_AUTO_TEST_CASE (DisconnectedMidiNode)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Destination should receive no events
@@ -295,10 +284,7 @@ BOOST_AUTO_TEST_CASE (MidiThroughIONodes)
     midi.addEvent (MidiMessage::noteOn (1, 64, 0.8f), 10);
     midi.addEvent (MidiMessage::noteOff (1, 60), 20);
 
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
-
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Processor should receive the 3 MIDI events from graph input
@@ -371,10 +357,7 @@ BOOST_AUTO_TEST_CASE (ComplexMidiRouting)
     midi.addEvent (MidiMessage::noteOn (1, 48, 0.9f), 8);
     midi.addEvent (MidiMessage::noteOff (1, 48), 18);
 
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
-
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify event counts
@@ -460,10 +443,8 @@ BOOST_AUTO_TEST_CASE (MidiChainWithBranching)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Dst1 gets src1 only: 2 events
@@ -556,10 +537,8 @@ BOOST_AUTO_TEST_CASE (MidiMultiLevelMerging)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify hierarchical merging and distribution
@@ -628,10 +607,7 @@ BOOST_AUTO_TEST_CASE (MidiIOPlusGenerators)
     gen2->addEvent (MidiMessage::noteOn (1, 71, 0.7f), 18);
     gen2->addEvent (MidiMessage::noteOff (1, 67), 28);
 
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
-
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify routing with I/O + generators
@@ -665,10 +641,8 @@ BOOST_AUTO_TEST_CASE (MidiOutputIOUnused)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify unused MIDI output doesn't interfere
@@ -703,10 +677,8 @@ BOOST_AUTO_TEST_CASE (MidiOutputIOConnected)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify internal routing still works with MIDI output connected
@@ -752,10 +724,7 @@ BOOST_AUTO_TEST_CASE (MidiFullIOChain)
     gen->addEvent (MidiMessage::noteOff (1, 60), 15);
     gen->addEvent (MidiMessage::noteOn (1, 62, 0.8f), 25);
 
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
-
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify routing: gen events go to dst1, midiIn events go to dst2
@@ -801,10 +770,8 @@ BOOST_AUTO_TEST_CASE (MidiMultipleOutputs)
 
     AudioSampleBuffer audio (2, 512);
     MidiBuffer midi;
-    AtomBuffer atom;
-    atom.setTypes (element::test::context()->symbols().mapPtr());
 
-    RenderContext rc (audio, audio, midi, atom, 512);
+    RenderContext rc (audio, audio, midi, 512);
     graph.render (rc);
 
     // Verify dst1 only gets gen2 events, not gen1

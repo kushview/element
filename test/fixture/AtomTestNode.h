@@ -4,7 +4,6 @@
 #pragma once
 
 #include <element/processor.hpp>
-#include <element/atombuffer.hpp>
 
 namespace element {
 
