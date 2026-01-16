@@ -17,8 +17,7 @@
 #include <element/version.hpp>
 #include <element/ui/nodeeditor.hpp>
 
-#include <lvtk/spin_lock.hpp>
-#include <lvtk/spin_lock.ipp>
+#include <element/spinlock.hpp>
 
 #include "appinfo.hpp"
 #include "engine/clapprovider.hpp"
@@ -522,9 +521,9 @@ private:
 struct TryLockAndCall
 {
     template <typename Fn>
-    void operator() (lvtk::SpinLock& mutex, Fn&& fn)
+    void operator() (SpinLock& mutex, Fn&& fn)
     {
-        if (mutex.try_lock())
+        if (mutex.tryLock())
         {
             fn();
             mutex.unlock();
@@ -535,7 +534,7 @@ struct TryLockAndCall
 struct LockAndCall
 {
     template <typename Fn>
-    void operator() (lvtk::SpinLock& mutex, Fn&& fn)
+    void operator() (SpinLock& mutex, Fn&& fn)
     {
         mutex.lock();
         fn();
@@ -600,7 +599,7 @@ private:
     Write write;
 
     static constexpr auto initialSize = 8192;
-    lvtk::SpinLock mutex;
+    SpinLock mutex;
     std::vector<char> data;
 };
 
