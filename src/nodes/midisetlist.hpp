@@ -3,23 +3,24 @@
 
 #pragma once
 
-#include "nodes/midifilter.hpp"
 #include <element/node.h>
 #include <element/midipipe.hpp>
 #include <element/signals.hpp>
+
+#include "nodes/midifilter.hpp"
 
 namespace element {
 
 class Context;
 
 class MidiSetListProcessor : public MidiFilterNode,
-                             public AsyncUpdater,
-                             public ChangeBroadcaster
+                             public juce::AsyncUpdater,
+                             public juce::ChangeBroadcaster
 {
 public:
     struct ProgramEntry
     {
-        String name;
+        juce::String name;
         int in;
         int out;
         double tempo { 0.0 };
@@ -28,7 +29,7 @@ public:
     MidiSetListProcessor (Context&);
     virtual ~MidiSetListProcessor();
 
-    void getPluginDescription (PluginDescription& desc) const override
+    void getPluginDescription (juce::PluginDescription& desc) const override
     {
         desc.fileOrIdentifier = EL_NODE_ID_MIDI_SET_LIST;
         desc.name = getName();
@@ -52,10 +53,10 @@ public:
     void sendProgramChange (int program, int channel);
 
     int getNumProgramEntries() const;
-    void addProgramEntry (const String& name, int programIn, int programOut = -1);
+    void addProgramEntry (const juce::String& name, int programIn, int programOut = -1);
     void removeProgramEntry (int index);
     void editProgramEntry (int index,
-                           const String& name,
+                           const juce::String& name,
                            int inProgram,
                            int outProgram,
                            double tempo);
@@ -66,33 +67,33 @@ public:
 
     inline void setSize (int w, int h)
     {
-        width = jmax (w, (int) 1);
-        height = jmax (h, (int) 1);
+        width = juce::jmax (w, (int) 1);
+        height = juce::jmax (h, (int) 1);
     }
 
     inline float getFontSize() const { return fontSize; }
     inline void setFontSize (float newSize)
     {
-        fontSize = jlimit (9.f, 72.f, newSize);
+        fontSize = juce::jlimit (9.f, 72.f, newSize);
     }
 
     inline int getLastProgram() const
     {
-        ScopedLock sl (lock);
+        juce::ScopedLock sl (lock);
         return lastProgram;
     }
 
     void setState (const void* data, int size) override
     {
-        const auto tree = ValueTree::readFromGZIPData (data, (size_t) size);
+        const auto tree = juce::ValueTree::readFromGZIPData (data, (size_t) size);
         if (! tree.isValid())
             return;
 
         clear();
 
-        fontSize = jlimit (9.f, 72.f, (float) tree.getProperty ("fontSize", 15.f));
-        width = jmax (10, (int) tree.getProperty ("width", 360));
-        height = jmax (10, (int) tree.getProperty ("height", 540));
+        fontSize = juce::jlimit (9.f, 72.f, (float) tree.getProperty ("fontSize", 15.f));
+        width = juce::jmax (10, (int) tree.getProperty ("width", 360));
+        height = juce::jmax (10, (int) tree.getProperty ("height", 540));
 
         for (int i = 0; i < tree.getNumChildren(); ++i)
         {
@@ -105,7 +106,7 @@ public:
         }
 
         {
-            ScopedLock sl (lock);
+            juce::ScopedLock sl (lock);
             for (const auto* const entry : entries)
                 programMap[entry->in] = entry->out;
         }
@@ -113,16 +114,16 @@ public:
         sendChangeMessage();
     }
 
-    void getState (MemoryBlock& block) override
+    void getState (juce::MemoryBlock& block) override
     {
-        ValueTree tree ("state");
+        juce::ValueTree tree ("state");
         tree.setProperty ("fontSize", fontSize, nullptr)
             .setProperty ("width", width, nullptr)
             .setProperty ("height", height, nullptr);
 
         for (const auto* const entry : entries)
         {
-            ValueTree e ("entry");
+            juce::ValueTree e ("entry");
             e.setProperty ("name", entry->name, nullptr)
                 .setProperty ("in", entry->in, nullptr)
                 .setProperty ("out", entry->out, nullptr)
@@ -130,10 +131,10 @@ public:
             tree.appendChild (e, nullptr);
         }
 
-        MemoryOutputStream stream (block, false);
+        juce::MemoryOutputStream stream (block, false);
 
         {
-            GZIPCompressorOutputStream gzip (stream);
+            juce::GZIPCompressorOutputStream gzip (stream);
             tree.writeToStream (gzip);
         }
     }
@@ -143,15 +144,15 @@ public:
 
 protected:
     Context& _context;
-    CriticalSection lock;
-    OwnedArray<ProgramEntry> entries;
+    juce::CriticalSection lock;
+    juce::OwnedArray<ProgramEntry> entries;
     int programMap[128];
 
     bool assertedLowChannels = false;
     bool createdPorts = false;
-    MidiBuffer* buffers[16];
-    MidiBuffer tempMidi;
-    MidiBuffer toSendMidi;
+    juce::MidiBuffer* buffers[16];
+    juce::MidiBuffer tempMidi;
+    juce::MidiBuffer toSendMidi;
 
     int width = 360;
     int height = 540;

@@ -29,7 +29,7 @@ struct ViewSizeListener : private juce::ComponentMovementWatcher
     {
         if (wasResized)
         {
-            const auto physicalSize = Desktop::getInstance().getDisplays().logicalToPhysical (getComponent()->localAreaToGlobal (getComponent()->getLocalBounds()));
+            const auto physicalSize = juce::Desktop::getInstance().getDisplays().logicalToPhysical (getComponent()->localAreaToGlobal (getComponent()->getLocalBounds()));
             const auto width = physicalSize.getWidth();
             const auto height = physicalSize.getHeight();
 

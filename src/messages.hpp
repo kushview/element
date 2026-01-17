@@ -36,9 +36,9 @@ struct AppMessage : public juce::Message
 
 struct AddMidiDeviceMessage : public AppMessage
 {
-    AddMidiDeviceMessage (const MidiDeviceInfo& dev, const bool isInput)
+    AddMidiDeviceMessage (const juce::MidiDeviceInfo& dev, const bool isInput)
         : device (dev), inputDevice (isInput) {}
-    const MidiDeviceInfo device;
+    const juce::MidiDeviceInfo device;
     const bool inputDevice;
 };
 
@@ -49,7 +49,7 @@ struct AddPresetMessage : public AppMessage
         : node (n), name (name_) {}
     ~AddPresetMessage() noexcept {}
     const Node node;
-    const String name;
+    const juce::String name;
 };
 
 /** Send this to add a preset for a node */
@@ -66,17 +66,17 @@ struct RemoveNodeMessage : public AppMessage
     RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) {}
     RemoveNodeMessage (const NodeArray& n) : nodeId (EL_INVALID_NODE) { nodes.addArray (n); }
     RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) {}
-    const uint32 nodeId;
+    const uint32_t nodeId;
     const Node node;
     NodeArray nodes;
 
-    virtual void createActions (Services& app, OwnedArray<UndoableAction>& actions) const;
+    virtual void createActions (Services& app, juce::OwnedArray<juce::UndoableAction>& actions) const;
 };
 
 /** Send this to add a new connection */
 struct AddConnectionMessage : public AppMessage
 {
-    AddConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& tgt = Node())
+    AddConnectionMessage (uint32_t s, int sc, uint32_t d, int dc, const Node& tgt = Node())
         : target (tgt)
     {
         sourceNode = s;
@@ -87,7 +87,7 @@ struct AddConnectionMessage : public AppMessage
         jassert (useChannels());
     }
 
-    AddConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp, const Node& tgt = Node())
+    AddConnectionMessage (uint32_t s, uint32_t sp, uint32_t d, uint32_t dp, const Node& tgt = Node())
         : target (tgt)
     {
         sourceNode = s;
@@ -98,14 +98,14 @@ struct AddConnectionMessage : public AppMessage
         jassert (usePorts());
     }
 
-    uint32 sourceNode, sourcePort, destNode, destPort;
+    uint32_t sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
 
     const Node target;
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return ! useChannels(); }
-    void createActions (Services& app, OwnedArray<UndoableAction>& actions) const override;
+    void createActions (Services& app, juce::OwnedArray<juce::UndoableAction>& actions) const override;
 };
 
 /** Send this to remove a connection from the graph */
@@ -134,16 +134,16 @@ public:
         jassert (usePorts());
     }
 
-    uint32 sourceNode, sourcePort, destNode, destPort;
+    uint32_t sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
     const Node target;
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return ! useChannels(); }
-    void createActions (Services& app, OwnedArray<UndoableAction>& actions) const override;
+    void createActions (Services& app, juce::OwnedArray<juce::UndoableAction>& actions) const override;
 };
 
-class AddNodeMessage : public Message
+class AddNodeMessage : public juce::Message
 {
 public:
     AddNodeMessage (const Node& n, const Node& t = Node(), const File& f = File())
@@ -160,17 +160,17 @@ public:
 };
 
 /** Send this when a plugin needs loaded into the graph */
-class LoadPluginMessage : public Message
+class LoadPluginMessage : public juce::Message
 {
 public:
-    LoadPluginMessage (const PluginDescription& pluginDescription, const bool pluginVerified)
+    LoadPluginMessage (const juce::PluginDescription& pluginDescription, const bool pluginVerified)
         : Message(), description (pluginDescription), verified (pluginVerified) {}
-    LoadPluginMessage (const PluginDescription& d, const bool v, const float rx, const float ry)
+    LoadPluginMessage (const juce::PluginDescription& d, const bool v, const float rx, const float ry)
         : Message(), description (d), relativeX (rx), relativeY (ry), verified (v) {}
     ~LoadPluginMessage() {}
 
     /** Descriptoin of the plugin to load */
-    const PluginDescription description;
+    const juce::PluginDescription description;
 
     /** Relative X of the node UI in a graph editor */
     const float relativeX = 0.5f;
@@ -184,30 +184,30 @@ public:
 
 struct AddPluginMessage : public AppMessage
 {
-    AddPluginMessage (const Node& g, const PluginDescription& d, const bool v = true)
+    AddPluginMessage (const Node& g, const juce::PluginDescription& d, const bool v = true)
         : graph (g), description (d), verified (v)
     {
     }
 
     const Node graph;
-    const PluginDescription description;
+    const juce::PluginDescription description;
     const bool verified;
     ConnectionBuilder builder;
-    void createActions (Services& app, OwnedArray<UndoableAction>& actions) const override;
+    void createActions (Services& app, juce::OwnedArray<juce::UndoableAction>& actions) const override;
 };
 
 struct ReplaceNodeMessage : public AppMessage
 {
-    ReplaceNodeMessage (const Node& n, const PluginDescription& d, const bool v = true)
+    ReplaceNodeMessage (const Node& n, const juce::PluginDescription& d, const bool v = true)
         : graph (n.getParentGraph()), node (n), description (d), verified (v) {}
     const Node graph;
     const Node node;
-    const PluginDescription description;
+    const juce::PluginDescription description;
     const bool verified;
     boost::signals2::signal<void()> success;
 };
 
-class DuplicateNodeMessage : public Message
+class DuplicateNodeMessage : public juce::Message
 {
 public:
     DuplicateNodeMessage (const Node& n)
@@ -216,7 +216,7 @@ public:
     const Node node;
 };
 
-class DisconnectNodeMessage : public Message
+class DisconnectNodeMessage : public juce::Message
 {
 public:
     DisconnectNodeMessage (const Node& n, const bool i = true, const bool o = true, const bool a = true, const bool m = true)
@@ -236,10 +236,10 @@ struct FinishedLaunchingMessage : public AppMessage
 
 struct ChangeBusesLayout : public AppMessage
 {
-    ChangeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& l)
+    ChangeBusesLayout (const Node& n, const juce::AudioProcessor::BusesLayout& l)
         : node (n), layout (l) {}
     const Node node;
-    const AudioProcessor::BusesLayout layout;
+    const juce::AudioProcessor::BusesLayout layout;
     std::function<void()> onFinished;
 };
 

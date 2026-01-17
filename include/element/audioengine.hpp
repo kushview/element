@@ -38,7 +38,7 @@ public:
                                         by a MidiInputDevice callback (don't use 
                                         except for debugging)
      */
-    void addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueue = false);
+    void addMidiMessage (const juce::MidiMessage msg, bool handleOnDeviceQueue = false);
 
     void applySettings (Settings&);
 
@@ -58,22 +58,22 @@ public:
 
     void setPlaying (const bool shouldBePlaying);
     void setRecording (const bool shouldBeRecording);
-    void seekToAudioFrame (const int64 frame);
+    void seekToAudioFrame (const int64_t frame);
     void setMeter (int beatsPerBar, int beatDivisor);
 
     void togglePlayPause();
 
-    MidiKeyboardState& getKeyboardState();
+    juce::MidiKeyboardState& getKeyboardState();
     Transport::MonitorPtr getTransportMonitor() const;
-    AudioIODeviceCallback& getAudioIODeviceCallback();
-    MidiInputCallback& getMidiInputCallback();
+    juce::AudioIODeviceCallback& getAudioIODeviceCallback();
+    juce::MidiInputCallback& getMidiInputCallback();
 
     /** For use by external systems only! e.g. the AU/VST version of Element and
         possibly things like rendering in the future
      */
     void prepareExternalPlayback (const double sampleRate, const int blockSize, const int numIns, const int numOuts);
-    void processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi);
-    void processExternalPlayhead (AudioPlayHead* playhead, const int nframes);
+    void processExternalBuffers (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi);
+    void processExternalPlayhead (juce::AudioPlayHead* playhead, const int nframes);
     void releaseExternalResources();
     void updateExternalLatencySamples();
     int getExternalLatencySamples() const;
@@ -88,11 +88,11 @@ public:
     private:
         friend class AudioEngine;
 
-        Atomic<float> _level { 0 };
+        juce::Atomic<float> _level { 0 };
         void updateLevel (const float* const*, int numChannels, int numSamples) noexcept;
     };
 
-    using LevelMeterPtr = ReferenceCountedObjectPtr<LevelMeter>;
+    using LevelMeterPtr = juce::ReferenceCountedObjectPtr<LevelMeter>;
 
     LevelMeterPtr getLevelMeter (int channel, bool input);
     int getNumChannels (bool input) const noexcept;
@@ -104,6 +104,6 @@ private:
     RunMode runMode;
 };
 
-using AudioEnginePtr = ReferenceCountedObjectPtr<AudioEngine>;
+using AudioEnginePtr = juce::ReferenceCountedObjectPtr<AudioEngine>;
 
 } // namespace element

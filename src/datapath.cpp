@@ -10,6 +10,8 @@
 #define EL_INSTALL_DIR_AWARE 1
 #endif
 
+using namespace juce;
+
 namespace element {
 namespace detail {
 inline static StringArray getSubDirs()

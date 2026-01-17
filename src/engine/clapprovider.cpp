@@ -53,6 +53,8 @@ static void _fpreset()
 #define CLAP_LOG(a)
 #endif
 
+using namespace juce;
+
 namespace element {
 namespace detail {
 #if JUCE_MAC

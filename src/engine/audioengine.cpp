@@ -949,7 +949,7 @@ void AudioEngine::setRecording (const bool shouldBeRecording)
     transport.requestRecordState (shouldBeRecording);
 }
 
-void AudioEngine::seekToAudioFrame (const int64 frame)
+void AudioEngine::seekToAudioFrame (const int64_t frame)
 {
     auto& transport (priv->transport);
     transport.requestAudioFrame (frame);

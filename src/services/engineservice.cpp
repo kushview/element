@@ -15,6 +15,8 @@
 #include <element/engine.hpp>
 #include <element/ui.hpp>
 
+using namespace juce;
+
 namespace element {
 
 namespace detail {

@@ -4,6 +4,8 @@
 #include "nodes/genericeditor.hpp"
 #include <element/ui/style.hpp>
 
+using namespace juce;
+
 namespace element {
 
 class BooleanParameterComponent final : public Component,

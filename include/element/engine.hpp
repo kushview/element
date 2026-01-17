@@ -45,17 +45,17 @@ public:
     Node addNode (const Node& node, const Node& target, const ConnectionBuilder&);
 
     /** Adds a plugin by description to the current graph */
-    Node addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f, bool dontShowUI = false);
+    Node addPlugin (const juce::PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f, bool dontShowUI = false);
 
     /** Adds a plugin to a specific graph */
-    Node addPlugin (const Node& graph, const PluginDescription& desc);
+    Node addPlugin (const Node& graph, const juce::PluginDescription& desc);
 
     /** Adds a plugin to a specific graph and adds connections from
         a ConnectionBuilder */
-    Node addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
+    Node addPlugin (const Node& graph, const juce::PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
 
     /** Adds a midi device node to the current root graph */
-    Node addMidiDeviceNode (const MidiDeviceInfo& device, const bool isInput);
+    Node addMidiDeviceNode (const juce::MidiDeviceInfo& device, const bool isInput);
 
     /** Removes a node from the current graph */
     void removeNode (const uint32);
@@ -64,7 +64,7 @@ public:
     void removeNode (const Node& node);
 
     /** remove a node by Uuid */
-    void removeNode (const Uuid&);
+    void removeNode (const juce::Uuid&);
 
     /** Adds a new root graph */
     void addGraph();
@@ -123,9 +123,9 @@ public:
     void sessionReloaded();
 
     /** replace a node with a given plugin */
-    void replace (const Node&, const PluginDescription&);
+    void replace (const Node&, const juce::PluginDescription&);
 
-    void changeBusesLayout (const Node& node, const AudioProcessor::BusesLayout& layout);
+    void changeBusesLayout (const Node& node, const juce::AudioProcessor::BusesLayout& layout);
 
     Signal<void (const Node&)> sigNodeRemoved;
 
@@ -136,7 +136,7 @@ private:
     std::unique_ptr<RootGraphs> graphs;
 
     friend class ChangeBroadcaster;
-    Node addPlugin (GraphManager& controller, const PluginDescription& desc);
+    Node addPlugin (GraphManager& controller, const juce::PluginDescription& desc);
 };
 
 } // namespace element
