@@ -8,9 +8,11 @@
 
 #include "messages.hpp"
 
+using namespace juce;
+
 namespace element {
 
-class AddPluginAction : public UndoableAction
+class AddPluginAction : public juce::UndoableAction
 {
 public:
     AddPluginAction (Services& _app, const AddPluginMessage& msg)
@@ -58,7 +60,7 @@ private:
     }
 };
 
-class RemoveNodeAction : public UndoableAction
+class RemoveNodeAction : public juce::UndoableAction
 {
 public:
     explicit RemoveNodeAction (Services& a, const Node& node)
@@ -96,11 +98,11 @@ public:
 
 private:
     Services& app;
-    ValueTree nodeData;
+    juce::ValueTree nodeData;
     const Node targetGraph;
-    const Uuid nodeUuid;
+    const juce::Uuid nodeUuid;
     ConnectionBuilder builder;
-    OwnedArray<Arc> arcs;
+    juce::OwnedArray<Arc> arcs;
     double x = 0.5;
     double y = 0.5;
     bool isDataValid() const
@@ -109,7 +111,7 @@ private:
     }
 };
 
-class AddConnectionAction : public UndoableAction
+class AddConnectionAction : public juce::UndoableAction
 {
 public:
     AddConnectionAction (Services& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)
@@ -143,7 +145,7 @@ private:
     const Arc arc;
 };
 
-class RemoveConnectionAction : public UndoableAction
+class RemoveConnectionAction : public juce::UndoableAction
 {
 public:
     RemoveConnectionAction (Services& a, const Node& targetGraph, const uint32 sn, const uint32 sp, const uint32 dn, const uint32 dp)

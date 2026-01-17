@@ -1,7 +1,6 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "ElementApp.h"
 #include "nodes/midiprogrammap.hpp"
 #include "engine/trace.hpp"
 

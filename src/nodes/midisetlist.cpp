@@ -1,11 +1,12 @@
 // Copyright 2024 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "ElementApp.h"
+#include <element/context.hpp>
+
 #include "nodes/midisetlist.hpp"
 #include "engine/trace.hpp"
 
-#include <element/context.hpp>
+using namespace juce;
 
 namespace element {
 

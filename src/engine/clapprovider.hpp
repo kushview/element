@@ -19,11 +19,11 @@ public:
     juce::String format() const override;
     Processor* create (const juce::String&) override;
     juce::FileSearchPath defaultSearchPath() override;
-    juce::StringArray findTypes (const FileSearchPath& path,
+    juce::StringArray findTypes (const juce::FileSearchPath& path,
                                  bool recursive,
                                  bool allowAsync) override;
-    StringArray getHiddenTypes() override { return {}; }
-    void scan (const String& fileOrID, OwnedArray<PluginDescription>& out) override;
+    juce::StringArray getHiddenTypes() override { return {}; }
+    void scan (const juce::String& fileOrID, juce::OwnedArray<juce::PluginDescription>& out) override;
 
 private:
     class Host;

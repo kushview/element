@@ -7,8 +7,6 @@
 #include <element/ui/content.hpp>
 #include <element/ui/navigation.hpp>
 
-#include "ElementApp.h"
-
 #include "engine/graphmanager.hpp"
 #include "nodes/baseprocessor.hpp"
 #include "nodes/audioprocessor.hpp"

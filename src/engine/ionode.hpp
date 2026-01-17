@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <element/juce/core.hpp>
 #include <element/processor.hpp>
 
 namespace element {
@@ -63,10 +64,10 @@ public:
     /** True if this is an audio or midi output. */
     bool isOutput() const;
 
-    void fillInPluginDescription (PluginDescription& d) const;
+    void fillInPluginDescription (juce::PluginDescription& d) const;
 
-    const String getInputChannelName (int channelIndex) const;
-    const String getOutputChannelName (int channelIndex) const;
+    const juce::String getInputChannelName (int channelIndex) const;
+    const juce::String getOutputChannelName (int channelIndex) const;
 
     //==========================================================================
     void refreshPorts() override;
@@ -74,7 +75,7 @@ public:
     void prepareToRender (double, int) override;
     void releaseResources() override;
     void render (RenderContext&) override;
-    void getState (MemoryBlock&) override {}
+    void getState (juce::MemoryBlock&) override {}
     void setState (const void*, int sizeInBytes) override {}
 
     //==========================================================================

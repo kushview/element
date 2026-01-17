@@ -27,7 +27,12 @@
 #include <jack/jack.h>
 
 #include "engine/jack.hpp"
-#include "dynlib.h"
+
+#ifdef _WIN32
+// FIXME:
+#else
+#include <dlfcn.h>
+#endif
 
 using namespace juce;
 

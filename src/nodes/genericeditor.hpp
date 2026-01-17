@@ -13,7 +13,7 @@ public:
     GenericNodeEditor (const Node&);
     ~GenericNodeEditor() override;
     void resized() override;
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
 
 private:
     struct Pimpl;

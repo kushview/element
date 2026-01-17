@@ -12,17 +12,15 @@
 
 namespace element {
 
-using namespace juce;
-
 //=============================================================================
-class PerformanceParameter : public HostedAudioProcessorParameter,
+class PerformanceParameter : public juce::HostedAudioProcessorParameter,
                              public element::Parameter::Listener
 {
 public:
     std::function<void()> onCleared;
 
     explicit PerformanceParameter (int paramIdx)
-        : HostedAudioProcessorParameter (1),
+        : juce::HostedAudioProcessorParameter (1),
           index (paramIdx)
     {
         clearNode();
@@ -35,9 +33,9 @@ public:
 
     bool haveNode() const { return node != nullptr; }
 
-    String getBoundParameterName() const
+    juce::String getBoundParameterName() const
     {
-        SpinLock::ScopedLockType sl (lock);
+        juce::SpinLock::ScopedLockType sl (lock);
         return parameter != nullptr ? parameter->getName (100) : String();
     }
 
@@ -78,7 +76,7 @@ public:
         ProcessorPtr newNodeObj = model.getObject();
 
         {
-            SpinLock::ScopedLockType sl (lock);
+            juce::SpinLock::ScopedLockType sl (lock);
             parameterIdx = newParam;
             node = newNodeObj;
             processor = (node != nullptr) ? node->getAudioProcessor() : nullptr;
@@ -126,14 +124,14 @@ public:
 
     float getValue() const override
     {
-        SpinLock::ScopedLockType sl (lock);
+        juce::SpinLock::ScopedLockType sl (lock);
         return (parameter != nullptr) ? parameter->getValue() : value.get();
     }
 
     void setValue (float newValue) override
     {
         value.set (newValue);
-        SpinLock::ScopedLockType sl (lock);
+        juce::SpinLock::ScopedLockType sl (lock);
 
         if (parameter != nullptr)
         {
@@ -146,7 +144,7 @@ public:
 
     float getDefaultValue() const override
     {
-        SpinLock::ScopedLockType sl (lock);
+        juce::SpinLock::ScopedLockType sl (lock);
         if (parameter != nullptr)
             return parameter->getDefaultValue();
 
@@ -166,25 +164,25 @@ public:
         return 0.f;
     }
 
-    String getParameterID() const override
+    juce::String getParameterID() const override
     {
         return getName (32).toLowerCase().replace (" ", "-");
     }
 
-    String getName (int maximumStringLength) const override
+    juce::String getName (int maximumStringLength) const override
     {
         String name ("Parameter ");
         name << int (index + 1);
         return name.substring (0, maximumStringLength);
     }
 
-    String getLabel() const override
+    juce::String getLabel() const override
     {
         return parameter != nullptr ? parameter->getLabel() : String();
     }
 
     /** Should parse a string and return the appropriate value for it. */
-    float getValueForText (const String& text) const override
+    float getValueForText (const juce::String& text) const override
     {
         return parameter != nullptr ? parameter->getValueForText (text)
                                     : jlimit (0.f, 1.f, text.getFloatValue());
@@ -204,7 +202,7 @@ public:
                 break;
         }
 
-        return AudioProcessorParameter::getNumSteps();
+        return juce::AudioProcessorParameter::getNumSteps();
     }
 
     bool isDiscrete() const override
@@ -236,24 +234,24 @@ public:
                                       : AudioProcessorParameter::isMetaParameter();
     }
 
-    AudioProcessorParameter::Category getCategory() const override
+    juce::AudioProcessorParameter::Category getCategory() const override
     {
         return (parameter != nullptr)
-                   ? static_cast<AudioProcessorParameter::Category> (parameter->getCategory())
-                   : AudioProcessorParameter::getCategory();
+                   ? static_cast<juce::AudioProcessorParameter::Category> (parameter->getCategory())
+                   : juce::AudioProcessorParameter::getCategory();
     }
 
-    String getText (float value, int length) const override
+    juce::String getText (float value, int length) const override
     {
         return (parameter != nullptr)
                    ? parameter->getText (value, length)
-                   : AudioProcessorParameter::getText (value, length);
+                   : juce::AudioProcessorParameter::getText (value, length);
     }
 
     bool isOrientationInverted() const override
     {
         return (parameter != nullptr) ? parameter->isOrientationInverted()
-                                      : AudioProcessorParameter::isOrientationInverted();
+                                      : juce::AudioProcessorParameter::isOrientationInverted();
     }
 
     //=========================================================================
@@ -318,17 +316,17 @@ public:
     Node getNode() const { return model; }
     int getBoundParameter() const
     {
-        SpinLock::ScopedLockType sl (lock);
+        juce::SpinLock::ScopedLockType sl (lock);
         return parameterIdx;
     }
 
 private:
-    SpinLock lock;
+    juce::SpinLock lock;
     const int index;
-    Atomic<float> value { 0.f };
+    juce::Atomic<float> value { 0.f };
     Node model;
     ProcessorPtr node;
-    AudioProcessor* processor = nullptr;
+    juce::AudioProcessor* processor = nullptr;
     element::ParameterPtr parameter = nullptr;
     int parameterIdx = -1;
     bool special = false;
@@ -336,8 +334,8 @@ private:
     SignalConnection removedConnection;
 };
 
-class PluginProcessor : public AudioProcessor,
-                        private AsyncUpdater
+class PluginProcessor : public juce::AudioProcessor,
+                        private juce::AsyncUpdater
 {
 public:
     enum Variant

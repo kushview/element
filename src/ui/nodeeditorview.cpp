@@ -7,8 +7,6 @@
 #include <element/ui/style.hpp>
 #include <element/ui.hpp>
 
-#include "ElementApp.h"
-
 #include "engine/graphnode.hpp"
 #include "nodes/ionodeeditor.hpp"
 #include "nodes/audioroutereditor.hpp"

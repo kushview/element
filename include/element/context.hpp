@@ -40,12 +40,6 @@ public:
 
     Settings& settings();
 
-    //=========================================================================
-    void openModule (const std::string& path);
-    void loadModules();
-    void addModulePath (const std::string& path);
-    void discoverModules();
-
 private:
     friend class Application;
     class Impl;

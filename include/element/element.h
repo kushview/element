@@ -63,34 +63,6 @@ typedef enum {
 #define EL_MT_MIDI_PIPE       "el.MidiPipe"
 #define EL_MT_VECTOR          "el.Vector"
 
-//=============================================================================
-typedef void* elHandle;
-
-typedef struct elFeature {
-    const char* ID;
-    void* data;
-} elFeature;
-
-/** NULL terminated array of elFeature pointers */
-typedef const elFeature* const* elFeatures;
-#define EL_FEATURES_FOREACH(features, f) \
-    for (const elFeature* f = *features; f != NULL; f = *(++features))
-
-/** Descriptor for an Element module */
-typedef struct elDescriptor {
-    const char* ID;
-    elHandle (*create)();
-    const void* (*extension) (elHandle handle, const char* name);
-    void (*load) (elHandle handle, elFeatures features);
-    void (*unload) (elHandle handle);
-    void (*destroy) (elHandle handle);
-} elDescriptor;
-
-typedef const elDescriptor* (*elDescriptorFunction)();
-
-EL_PLUGIN_EXPORT
-const elDescriptor* element_descriptor();
-
 #ifdef __cplusplus
 } // extern "C"
 #endif

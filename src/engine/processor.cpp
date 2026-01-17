@@ -8,8 +8,6 @@
 #include <element/processor.hpp>
 #include <element/node.hpp>
 
-#include "ElementApp.h"
-
 #include "nodes/audioprocessor.hpp"
 #include "nodes/mididevice.hpp"
 #include "nodes/placeholder.hpp"

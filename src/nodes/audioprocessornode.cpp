@@ -8,6 +8,8 @@
 
 #include "scopedflag.hpp"
 
+using namespace juce;
+
 namespace element {
 
 //=============================================================================
@@ -95,7 +97,7 @@ void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 AudioProcessorNode::AudioProcessorNode (AudioProcessor* processor)
     : AudioProcessorNode (0, processor) {}
 
-AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor)
+AudioProcessorNode::AudioProcessorNode (uint32_t nodeId, AudioProcessor* processor)
     : Processor (nodeId),
       enablement (*this)
 {

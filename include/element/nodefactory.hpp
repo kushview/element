@@ -21,15 +21,15 @@ public:
     /** Create the instance by ID string. */
     virtual Processor* create (const String&) = 0;
     /** return a list of types contained in this provider. */
-    virtual StringArray findTypes (const FileSearchPath& path,
+    virtual StringArray findTypes (const juce::FileSearchPath& path,
                                    bool recursive,
                                    bool allowAsync) = 0;
     /** Return a list of types that should be hidden in the UI by default. */
-    virtual StringArray getHiddenTypes() { return {}; }
+    virtual juce::StringArray getHiddenTypes() { return {}; }
 
-    virtual FileSearchPath defaultSearchPath() { return {}; }
+    virtual juce::FileSearchPath defaultSearchPath() { return {}; }
 
-    virtual void scan (const String& fileOrID, OwnedArray<PluginDescription>& out) {}
+    virtual void scan (const juce::String& fileOrID, juce::OwnedArray<juce::PluginDescription>& out) {}
 };
 
 //==========================================================================
@@ -41,18 +41,18 @@ public:
     ~NodeFactory();
 
     /** Fill a list of Element type plugin descriptions. public */
-    void getPluginDescriptions (OwnedArray<PluginDescription>& out,
-                                const String& identifier,
+    void getPluginDescriptions (juce::OwnedArray<juce::PluginDescription>& out,
+                                const juce::String& identifier,
                                 bool includeHidden = false);
 
     /** Fill a list of plugin descriptions. public */
-    void getPluginDescriptions (OwnedArray<PluginDescription>& out,
-                                const String& format,
-                                const String& identifier,
+    void getPluginDescriptions (juce::OwnedArray<juce::PluginDescription>& out,
+                                const juce::String& format,
+                                const juce::String& identifier,
                                 bool includeHidden = false);
 
     /** Returns a list of known Node IDs public and private. */
-    const StringArray& knownIDs() const noexcept;
+    const juce::StringArray& knownIDs() const noexcept;
 
     //==========================================================================
     /** Add a new provider to the factory. */
@@ -60,26 +60,26 @@ public:
 
     //==========================================================================
     /** Mark a type as hidden in the UI. */
-    void hideType (const String& tp);
+    void hideType (const juce::String& tp);
     /** Hide all types in the UI. */
     void hideAllTypes();
     /** Returns true if a type is hidden in the UI. */
-    bool isTypeHidden (const String& tp) const noexcept;
+    bool isTypeHidden (const juce::String& tp) const noexcept;
     /** Remove a type from the hidden list. */
-    void removeHiddenType (const String& tp);
+    void removeHiddenType (const juce::String& tp);
 
     //==========================================================================
     /** Instantiate a node processor. */
-    Processor* instantiate (const PluginDescription&);
+    Processor* instantiate (const juce::PluginDescription&);
     /** Instantiate a node processor. */
-    Processor* instantiate (const String& identifier);
+    Processor* instantiate (const juce::String& identifier);
 
     /** Wrap an audio plugin instance as a node processor. */
-    static Processor* wrap (AudioProcessor*);
+    static Processor* wrap (juce::AudioProcessor*);
 
     //==========================================================================
     /** Return the list of providers registered with this factory. */
-    const OwnedArray<NodeProvider>& providers() const noexcept;
+    const juce::OwnedArray<NodeProvider>& providers() const noexcept;
 
 private:
     class Impl;

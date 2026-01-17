@@ -50,26 +50,26 @@ public:
 
     bool addGraph (const Node& node, const bool setActive);
 
-    ValueTree getValueTree() const { return objectData; }
-    bool loadData (const ValueTree& data);
+    juce::ValueTree getValueTree() const { return objectData; }
+    bool loadData (const juce::ValueTree& data);
     void clear();
 
-    inline void setName (const String& name) { setProperty (tags::name, name); }
-    inline String getName() const { return objectData.getProperty (tags::name, "Invalid Session"); }
-    inline Value getNameValue() { return getPropertyAsValue (tags::name); }
+    inline void setName (const juce::String& name) { setProperty (tags::name, name); }
+    inline juce::String getName() const { return objectData.getProperty (tags::name, "Invalid Session"); }
+    inline juce::Value getNameValue() { return getPropertyAsValue (tags::name); }
 
     inline bool useExternalClock() const { return (bool) getProperty ("externalSync", false); }
 
     inline bool notificationsFrozen() const { return freezeChangeNotification; }
 
-    std::unique_ptr<XmlElement> createXml() const;
+    std::unique_ptr<juce::XmlElement> createXml() const;
 
     void saveGraphState();
     void restoreGraphState();
 
     inline int getNumControllers() const { return getControllersValueTree().getNumChildren(); }
 
-    inline ValueTree getControllerValueTree (const int i) const
+    inline juce::ValueTree getControllerValueTree (const int i) const
     {
         return getControllersValueTree().getChild (i);
     }
@@ -89,54 +89,54 @@ public:
     inline ControllerMap getControllerMap (const int index) const { return ControllerMap (getControllerMapsValueTree().getChild (index)); }
     inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.data()); }
 
-    Node findNodeById (const Uuid&);
-    Controller findControllerById (const Uuid&);
+    Node findNodeById (const juce::Uuid&);
+    Controller findControllerById (const juce::Uuid&);
 
     void cleanOrphanControllerMaps();
 
-    typedef std::function<void (const ValueTree& tree)> ValueTreeFunction;
+    typedef std::function<void (const juce::ValueTree& tree)> ValueTreeFunction;
     void forEach (ValueTreeFunction handler) const;
 
     void setActiveGraph (int index);
     bool containsGraph (const Node& graph) const;
 
     /** Writes an encoded file */
-    bool writeToFile (const File&) const;
-    static ValueTree readFromFile (const File&);
+    bool writeToFile (const juce::File&) const;
+    static juce::ValueTree readFromFile (const juce::File&);
 
-    Value getActiveGraphIndexObject (bool syncUpdate = false) const
+    juce::Value getActiveGraphIndexObject (bool syncUpdate = false) const
     {
         return getGraphsValueTree().getPropertyAsValue (tags::active, nullptr, syncUpdate);
     }
 
-    static ValueTree migrate (const ValueTree&, String& error);
+    static juce::ValueTree migrate (const juce::ValueTree&, juce::String& error);
 
 protected:
-    void forEach (const ValueTree tree, ValueTreeFunction handler) const;
+    void forEach (const juce::ValueTree tree, ValueTreeFunction handler) const;
 
     Session();
     friend class Context;
 
     /** Set a property. */
-    inline void setProperty (const Identifier& prop, const var& val) { objectData.setProperty (prop, val, nullptr); }
+    inline void setProperty (const juce::Identifier& prop, const juce::var& val) { objectData.setProperty (prop, val, nullptr); }
 
-    friend class ValueTree;
-    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
-    virtual void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
-    virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int);
-    virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved, int, int);
-    virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged);
-    virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged);
+    friend class juce::ValueTree;
+    virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property);
+    virtual void valueTreeChildAdded (juce::ValueTree& parentTree, juce::ValueTree& childWhichHasBeenAdded);
+    virtual void valueTreeChildRemoved (juce::ValueTree& parentTree, juce::ValueTree& childWhichHasBeenRemoved, int);
+    virtual void valueTreeChildOrderChanged (juce::ValueTree& parentTreeWhoseChildrenHaveMoved, int, int);
+    virtual void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged);
+    virtual void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged);
 
 private:
     class Impl;
     std::unique_ptr<Impl> impl;
     void setMissingProperties (bool resetExisting = false);
 
-    inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (tags::graphs); }
-    inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
-    inline ValueTree getControllersValueTree() const { return objectData.getChildWithName (tags::controllers); }
-    inline ValueTree getControllerMapsValueTree() const { return objectData.getChildWithName (tags::maps); }
+    inline juce::ValueTree getGraphsValueTree() const { return objectData.getChildWithName (tags::graphs); }
+    inline juce::ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
+    inline juce::ValueTree getControllersValueTree() const { return objectData.getChildWithName (tags::controllers); }
+    inline juce::ValueTree getControllerMapsValueTree() const { return objectData.getChildWithName (tags::maps); }
 
     friend class SessionService;
     friend class SessionImportWizard;
@@ -153,7 +153,7 @@ public:
     Signal<void (const Control&)> controlRemoved;
 };
 
-typedef ReferenceCountedObjectPtr<Session> SessionPtr;
+typedef juce::ReferenceCountedObjectPtr<Session> SessionPtr;
 typedef SessionPtr SessionRef;
 
 struct ControllerMapObjects {
@@ -162,9 +162,9 @@ struct ControllerMapObjects {
         : session (s), controllerMap (m)
     {
         if (session != nullptr) {
-            device = session->findControllerById (Uuid (controllerMap.getProperty (tags::controller)));
-            control = device.findControlById (Uuid (controllerMap.getProperty (tags::control)));
-            node = session->findNodeById (Uuid (controllerMap.getProperty (tags::node)));
+            device = session->findControllerById (juce::Uuid (controllerMap.getProperty (tags::controller)));
+            control = device.findControlById (juce::Uuid (controllerMap.getProperty (tags::control)));
+            node = session->findNodeById (juce::Uuid (controllerMap.getProperty (tags::node)));
         }
     }
 

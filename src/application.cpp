@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "ElementApp.h"
-
 #include <element/application.hpp>
 #include <element/services.hpp>
 #include <element/version.hpp>

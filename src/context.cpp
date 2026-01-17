@@ -17,7 +17,6 @@
 
 #include "appinfo.hpp"
 #include "log.hpp"
-#include "module.hpp"
 #include "scripting.hpp"
 
 namespace element {
@@ -64,7 +63,6 @@ public:
     std::unique_ptr<MidiEngine> midi;
     std::unique_ptr<ScriptingEngine> lua;
     std::unique_ptr<Log> log;
-    std::unique_ptr<Modules> modules;
 
 private:
     friend class Context;
@@ -190,77 +188,5 @@ void Context::setEngine (AudioEnginePtr engine)
 
     devices().attach (engine);
 }
-
-void Context::openModule (const std::string& ID)
-{
-    if (impl->modules->contains (ID))
-        return;
-
-    auto it = impl->modules->discovered.find (ID);
-    if (it == impl->modules->discovered.end())
-    {
-        std::clog << "module not found: " << ID << std::endl;
-        return;
-    }
-
-    if (auto mod = std::make_unique<Module> (it->second, *this, *impl->lua))
-    {
-        if (mod->open())
-        {
-            std::clog << "module opened: " << mod->name() << std::endl;
-            impl->modules->add (std::move (mod));
-        }
-        else
-        {
-            std::clog << "could not open module: " << mod->name() << std::endl;
-        }
-    }
-}
-
-void Context::loadModules()
-{
-    std::vector<const elFeature*> features;
-
-    for (const auto& mod : *impl->modules)
-    {
-        for (const auto& e : mod->public_extensions())
-        {
-            auto f = (elFeature*) std::malloc (sizeof (elFeature));
-            features.push_back (f);
-            f->ID = strdup (e.first.c_str());
-            f->data = (void*) e.second;
-        }
-    }
-
-    auto ctxfeature = (elFeature*) malloc (sizeof (elFeature));
-    ctxfeature->ID = strdup ("el.Context");
-    ctxfeature->data = this;
-    features.push_back (ctxfeature);
-    features.push_back ((elFeature*) nullptr);
-    elFeatures fptr = &features.front();
-
-    for (const auto& mod : *impl->modules)
-    {
-        if (! mod->loaded())
-            mod->load (fptr);
-    }
-
-    for (auto f : features)
-    {
-        if (nullptr == f)
-            continue;
-        std::free ((void*) f->ID);
-        std::free ((void*) f);
-    }
-    features.clear();
-}
-
-void Context::addModulePath (const std::string& path)
-{
-    auto& sp = impl->modules->searchpath;
-    sp.add (path);
-}
-
-void Context::discoverModules() { impl->modules->discover(); }
 
 } // namespace element

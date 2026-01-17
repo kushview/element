@@ -11,7 +11,6 @@
 
 #include "plugineditor.hpp"
 #include "pluginprocessor.hpp"
-#include "ElementApp.h"
 
 #define EL_PLUGIN_MIN_WIDTH 546
 #define EL_PLUGIN_MIN_HEIGHT 266

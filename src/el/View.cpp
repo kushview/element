@@ -13,6 +13,8 @@
 
 #define EL_TYPE_NAME_VIEW "View"
 
+using namespace juce;
+
 namespace element {
 namespace lua {
 

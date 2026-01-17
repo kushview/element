@@ -10,7 +10,6 @@
 #include <element/lua.hpp>
 #include <element/midipipe.hpp>
 
-#include "ElementApp.h"
 #include "el/midi_buffer.hpp"
 #include "el/factories.hpp"
 
