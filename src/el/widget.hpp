@@ -8,10 +8,9 @@
 #pragma once
 
 #include <element/element.hpp>
-#include "sol_helpers.hpp"
-#include <element/juce.hpp>
+#include <element/juce/gui_basics.hpp>
 
-using namespace juce;
+#include "sol_helpers.hpp"
 
 namespace element {
 namespace lua {
@@ -42,18 +41,18 @@ public:
     /// Draw your widget here.
     // @function Widget:paint
     // @tparam el.Graphics g The graphics object to paint with
-    void paint (Graphics& g)
+    void paint (juce::Graphics& g)
     {
         if (sol::safe_function f = widget["paint"])
         {
-            f (widget, std::ref<Graphics> (g));
+            f (widget, std::ref<juce::Graphics> (g));
         }
     }
 
     /// Called when the mouse is moving.
     // @function Widget:mouseMove
     // @tparam el.MouseEvent ev The event to process
-    void mouseMove (const MouseEvent& ev)
+    void mouseMove (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseMove"])
             f (widget, ev);
@@ -62,7 +61,7 @@ public:
     /// Called when the mouse enters your widget.
     // @function Widget:mouseEnter
     // @tparam el.MouseEvent ev The event to process
-    void mouseEnter (const MouseEvent& ev)
+    void mouseEnter (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseEnter"])
             f (widget, ev);
@@ -71,7 +70,7 @@ public:
     /// Called when the mouse exits your widget.
     // @function Widget:mouseExit
     // @tparam el.MouseEvent ev The event to process
-    void mouseExit (const MouseEvent& ev)
+    void mouseExit (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseExit"])
             f (widget, ev);
@@ -80,7 +79,7 @@ public:
     /// Called when the mouse is dragging.
     // @function Widget:mouseDrag
     // @tparam el.MouseEvent ev The event to process
-    void mouseDrag (const MouseEvent& ev)
+    void mouseDrag (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseDrag"])
             f (widget, ev);
@@ -89,7 +88,7 @@ public:
     /// Called when the mouse is pressed down.
     // @function Widget:mouseDown
     // @tparam el.MouseEvent ev The event to process
-    void mouseDown (const MouseEvent& ev)
+    void mouseDown (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseDown"])
             f (widget, ev);
@@ -98,7 +97,7 @@ public:
     /// Called when the mouse has been released.
     // @function Widget:mouseUp
     // @tparam el.MouseEvent ev The event to process
-    void mouseUp (const MouseEvent& ev)
+    void mouseUp (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseUp"])
             f (widget, ev);
@@ -107,7 +106,7 @@ public:
     /// Called when the mouse is double clicked.
     // @function Widget:mouseDoubleClick
     // @tparam el.MouseEvent ev The event to process
-    void mouseDoubleClick (const MouseEvent& ev)
+    void mouseDoubleClick (const juce::MouseEvent& ev)
     {
         if (sol::safe_function f = widget["mouseDoubleClick"])
             f (widget, ev);
@@ -117,7 +116,7 @@ public:
     // @function Widget:mouseWheelMove
     // @tparam el.MouseEvent ev The event to process
     // @tparam mixed details Wheel info to process
-    void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& details)
+    void mouseWheelMove (const juce::MouseEvent& ev, const juce::MouseWheelDetails& details)
     {
         if (sol::safe_function f = widget["mouseWheelMove"])
             f (widget, ev, details);
@@ -127,7 +126,7 @@ public:
     // @function Widget:mouseWheelMove
     // @tparam el.MouseEvent ev The event to process
     // @param  scale The scale to magnify by, 1.0 being no scale
-    void mouseMagnify (const MouseEvent& ev, float scale)
+    void mouseMagnify (const juce::MouseEvent& ev, float scale)
     {
         if (sol::safe_function f = widget["mouseMagnify"])
             f (widget, ev, static_cast<lua_Number> (scale));
@@ -136,9 +135,9 @@ public:
     sol::table addWithZ (const sol::object& child, int zorder)
     {
         jassert (child.valid());
-        if (auto* const w = object_userdata<Component> (widget))
+        if (auto* const w = object_userdata<juce::Component> (widget))
         {
-            if (Component* const impl = object_userdata<Component> (child))
+            if (juce::Component* const impl = object_userdata<juce::Component> (child))
             {
                 w->addAndMakeVisible (*impl, zorder);
             }
@@ -154,7 +153,7 @@ public:
     void init (const sol::table& proxy)
     {
         widget = proxy;
-        data = object_userdata<Component> (widget);
+        data = object_userdata<juce::Component> (widget);
     }
 
     sol::table getBoundsTable()
@@ -169,11 +168,11 @@ public:
         return t;
     }
 
-    Component* component() noexcept { return data; }
+    juce::Component* component() noexcept { return data; }
 
 private:
     sol::table widget;
-    Component* data = nullptr;
+    juce::Component* data = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WidgetProxy)
 };
@@ -281,7 +280,7 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
         // })
         "setBounds", sol::overload (
             [] (Widget& self, double x, double y, double w, double h) { 
-                self.setBounds (Rectangle<double> (x, y, w, h).toNearestInt()); }, 
+                self.setBounds (juce::Rectangle<double> (x, y, w, h).toNearestInt()); }, 
             [] (Widget& self, const sol::object& obj) { widget_setbounds (self, obj); }
         ),
 

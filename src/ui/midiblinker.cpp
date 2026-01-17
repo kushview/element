@@ -4,6 +4,8 @@
 #include "ui/midiblinker.hpp"
 #include <element/ui/style.hpp>
 
+using namespace juce;
+
 namespace element {
 
 MidiBlinker::MidiBlinker()
