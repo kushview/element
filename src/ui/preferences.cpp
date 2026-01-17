@@ -341,7 +341,7 @@ public:
         clockSourceBox.addItem ("Internal", ClockSourceInternal);
         clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
         clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
-
+#if ELEMENT_UPDATER
         addAndMakeVisible (checkForUpdatesLabel);
         checkForUpdatesLabel.setText ("Check for updates on startup", dontSendNotification);
         checkForUpdatesLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -349,7 +349,7 @@ public:
         checkForUpdates.setClickingTogglesState (true);
         checkForUpdates.setToggleState (settings.checkForUpdates(), dontSendNotification);
         checkForUpdates.getToggleStateValue().addListener (this);
-
+#endif
         addAndMakeVisible (scanForPlugsLabel);
         scanForPlugsLabel.setText ("Scan plugins on startup", dontSendNotification);
         scanForPlugsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -516,13 +516,13 @@ public:
         auto r2 = r.removeFromTop (settingHeight);
         clockSourceLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
         clockSourceBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-
+#if ELEMENT_UPDATER
         r.removeFromTop (spacingBetweenSections);
         r2 = r.removeFromTop (settingHeight);
         checkForUpdatesLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
         checkForUpdates.setBounds (r2.removeFromLeft (toggleWidth)
                                        .withSizeKeepingCentre (toggleWidth, toggleHeight));
-
+#endif
         r.removeFromTop (spacingBetweenSections);
         r2 = r.removeFromTop (settingHeight);
         scanForPlugsLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
@@ -561,15 +561,17 @@ public:
 
     void valueChanged (Value& value) override
     {
-        if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
+        if (value.refersToSameSourceAs (legacyCtl.getToggleStateValue()))
+        {
+            settings.set ("legacyControllers", legacyCtl.getToggleState());
+        }
+#if ELEMENT_UPDATER
+        else if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
         {
             settings.setCheckForUpdates (checkForUpdates.getToggleState());
             jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
         }
-        else if (value.refersToSameSourceAs (legacyCtl.getToggleStateValue()))
-        {
-            settings.set ("legacyControllers", legacyCtl.getToggleState());
-        }
+#endif
         // clock source
         else if (value.refersToSameSourceAs (clockSource))
         {

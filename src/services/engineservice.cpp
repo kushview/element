@@ -939,13 +939,15 @@ void EngineService::sessionReloaded()
     {
         Logger::writeToLog ("[element] model and engine graph counts do not match");
     }
+#if JUCE_DEBUG
     else
     {
         String msg ("[element] session reloaded");
         if (session->getName().isNotEmpty())
             msg << ": " << session->getName();
-        Logger::writeToLog (msg);
+        DBG (msg);
     }
+#endif
 }
 
 Node EngineService::addPlugin (GraphManager& c, const PluginDescription& desc)

@@ -76,7 +76,6 @@ class SparkleUpdater : public Updater
     void check(bool async) override
     {
         juce::ignoreUnused(async);
-        std::cout << "checking for updates: async=" << (int)async << std::endl;
         @autoreleasepool
         {
             [_updaterDelegate.updaterController checkForUpdates:nil];

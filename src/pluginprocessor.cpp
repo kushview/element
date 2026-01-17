@@ -627,7 +627,6 @@ void PluginProcessor::updateLatencySamples()
     int latency = 0;
     if (! forceZeroLatency && engine != nullptr)
     {
-        std::clog << "update latency from change signal\n";
         latency = engine->getExternalLatencySamples();
     }
     setLatencySamples (latency);
