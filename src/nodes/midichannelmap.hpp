@@ -24,7 +24,7 @@ public:
             identifier << String (i + 1);
             String name = "Channel ";
             name << String (i + 1);
-            auto param = new AudioParameterInt (identifier, name, 1, 16, i + 1);
+            auto param = new AudioParameterInt (juce::ParameterID (identifier, 1), name, 1, 16, i + 1);
             addLegacyParameter (param);
             params.add (param);
             param->addListener (this);

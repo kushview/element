@@ -20,8 +20,10 @@ public:
         : BaseProcessor()
     {
         setPlayConfigDetails (4, 2, 44100.0, 1024);
-        addLegacyParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.f, 1.f, 0.33f));
-        addLegacyParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.f, 1.f, 0.40f));
+        addLegacyParameter (wetLevel = new AudioParameterFloat (
+                                juce::ParameterID ("wetLevel", 1), "Wet Level", 0.f, 1.f, 0.33f));
+        addLegacyParameter (dryLevel = new AudioParameterFloat (
+                                juce::ParameterID ("dryLevel", 1), "Dry Level", 0.f, 1.f, 0.40f));
     }
 
     virtual ~WetDryProcessor()

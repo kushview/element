@@ -26,13 +26,14 @@ CompressorProcessor::CompressorProcessor (const int _numChannels)
     NormalisableRange<float> releaseRange (10.0f, 3000.0f);
     releaseRange.setSkewForCentre (100.0f);
 
-    addLegacyParameter (threshDB = new AudioParameterFloat ("thresh", "Threshold [dB]", -30.0f, 0.0f, 0.0f));
-    addLegacyParameter (ratio = new AudioParameterFloat ("ratio", "Ratio", ratioRange, 1.0f));
-    addLegacyParameter (kneeDB = new AudioParameterFloat ("knee", "Knee [dB]", 0.0f, 12.0f, 6.0f));
-    addLegacyParameter (attackMs = new AudioParameterFloat ("attack", "Attack [ms]", attackRange, 10.0f));
-    addLegacyParameter (releaseMs = new AudioParameterFloat ("release", "Release [ms]", releaseRange, 100.0f));
-    addLegacyParameter (makeupDB = new AudioParameterFloat ("makeup", "Makeup [dB]", -18.0f, 18.0f, 0.0f));
-    addLegacyParameter (sideChain = new AudioParameterFloat ("sidechain", "Side Chain", 0.0f, 1.0f, 0.0f));
+    using PID = juce::ParameterID;
+    addLegacyParameter (threshDB = new AudioParameterFloat (PID ("thresh", 1), "Threshold [dB]", -30.0f, 0.0f, 0.0f));
+    addLegacyParameter (ratio = new AudioParameterFloat (PID ("ratio", 1), "Ratio", ratioRange, 1.0f));
+    addLegacyParameter (kneeDB = new AudioParameterFloat (PID ("knee", 1), "Knee [dB]", 0.0f, 12.0f, 6.0f));
+    addLegacyParameter (attackMs = new AudioParameterFloat (PID ("attack", 1), "Attack [ms]", attackRange, 10.0f));
+    addLegacyParameter (releaseMs = new AudioParameterFloat (PID ("release", 1), "Release [ms]", releaseRange, 100.0f));
+    addLegacyParameter (makeupDB = new AudioParameterFloat (PID ("makeup", 1), "Makeup [dB]", -18.0f, 18.0f, 0.0f));
+    addLegacyParameter (sideChain = new AudioParameterFloat (PID ("sidechain", 1), "Side Chain", 0.0f, 1.0f, 0.0f));
 
     makeupGain.reset (numSteps);
 }

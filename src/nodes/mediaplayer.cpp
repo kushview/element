@@ -160,9 +160,9 @@ MediaPlayerProcessor::MediaPlayerProcessor()
     : BaseProcessor (BusesProperties()
                          .withOutput ("Main", AudioChannelSet::stereo(), true))
 {
-    addLegacyParameter (playing = new AudioParameterBool ("playing", "Playing", false));
-    addLegacyParameter (slave = new AudioParameterBool ("slave", "Slave", false));
-    addLegacyParameter (volume = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
+    addLegacyParameter (playing = new AudioParameterBool (juce::ParameterID ("playing", 1), "Playing", false));
+    addLegacyParameter (slave = new AudioParameterBool (juce::ParameterID ("slave", 1), "Slave", false));
+    addLegacyParameter (volume = new AudioParameterFloat (juce::ParameterID ("volume", 1), "Volume", -60.f, 12.f, 0.f));
     for (auto* const param : getParameters())
         param->addListener (this);
 }

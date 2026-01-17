@@ -21,10 +21,11 @@ EQFilterProcessor::EQFilterProcessor (const int _numChannels)
     NormalisableRange<float> qRange (0.1f, 18.0f);
     qRange.setSkewForCentre (0.707f);
 
-    addLegacyParameter (freq = new AudioParameterFloat ("freq", "Cutoff Frequency [Hz]", freqRange, 1000.0f));
-    addLegacyParameter (q = new AudioParameterFloat ("q", "Filter Q", qRange, 0.707f));
-    addLegacyParameter (gainDB = new AudioParameterFloat ("gain", "Filter Gain [dB]", -15.0f, 15.0f, 0.0f));
-    addLegacyParameter (eqShape = new AudioParameterChoice ("shape", "EQ Shape", { "Bell", "Notch", "Hi Shelf", "Low Shelf", "HPF", "LPF" }, 0));
+    using PID = juce::ParameterID;
+    addLegacyParameter (freq = new AudioParameterFloat (PID ("freq", 1), "Cutoff Frequency [Hz]", freqRange, 1000.0f));
+    addLegacyParameter (q = new AudioParameterFloat (PID ("q", 1), "Filter Q", qRange, 0.707f));
+    addLegacyParameter (gainDB = new AudioParameterFloat (PID ("gain", 1), "Filter Gain [dB]", -15.0f, 15.0f, 0.0f));
+    addLegacyParameter (eqShape = new AudioParameterChoice (PID ("shape", 1), "EQ Shape", { "Bell", "Notch", "Hi Shelf", "Low Shelf", "HPF", "LPF" }, 0));
 }
 
 void EQFilterProcessor::fillInPluginDescription (PluginDescription& desc) const

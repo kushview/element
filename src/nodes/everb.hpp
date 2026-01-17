@@ -25,11 +25,11 @@ public:
                              .withInput ("Input", AudioChannelSet::stereo())
                              .withOutput ("Output", AudioChannelSet::stereo()))
     {
-        addLegacyParameter (roomSize = new AudioParameterFloat ("roomSize", "Room Size", 0.0f, 1.0f, params.roomSize));
-        addLegacyParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.0f, 1.0f, params.damping));
-        addLegacyParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.0f, 1.0f, params.wetLevel));
-        addLegacyParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.0f, 1.0f, params.dryLevel));
-        addLegacyParameter (width = new AudioParameterFloat ("width", "Width", 0.0f, 1.0f, params.width));
+        addLegacyParameter (roomSize = new AudioParameterFloat (juce::ParameterID ("roomSize", 1), "Room Size", 0.0f, 1.0f, params.roomSize));
+        addLegacyParameter (damping = new AudioParameterFloat (juce::ParameterID ("damping", 1), "Damping", 0.0f, 1.0f, params.damping));
+        addLegacyParameter (wetLevel = new AudioParameterFloat (juce::ParameterID ("wetLevel", 1), "Wet Level", 0.0f, 1.0f, params.wetLevel));
+        addLegacyParameter (dryLevel = new AudioParameterFloat (juce::ParameterID ("dryLevel", 1), "Dry Level", 0.0f, 1.0f, params.dryLevel));
+        addLegacyParameter (width = new AudioParameterFloat (juce::ParameterID ("width", 1), "Width", 0.0f, 1.0f, params.width));
     }
 
     virtual ~ReverbProcessor() {}

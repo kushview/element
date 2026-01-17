@@ -34,7 +34,7 @@ public:
     ChannelizeProcessor()
     {
         setPlayConfigDetails (0, 0, 44100.0, 512);
-        addLegacyParameter (channel = new AudioParameterInt ("channel", "Out Channel", 1, 16, 1));
+        addLegacyParameter (channel = new AudioParameterInt (juce::ParameterID ("channel", 1), "Out Channel", 1, 16, 1));
     }
 
     ~ChannelizeProcessor()

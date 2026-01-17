@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "juce_audio_processors_headless/juce_audio_processors_headless.h"
 #include "nodes/baseprocessor.hpp"
 
 namespace element {
@@ -89,11 +90,16 @@ public:
         : BaseProcessor(),
           stereo (_stereo)
     {
+        using PID = juce::ParameterID;
+
         setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1, 44100.0, 1024);
-        addLegacyParameter (length = new AudioParameterFloat ("length", "Buffer Length", 1.f, 500.f, 90.f));
+        addLegacyParameter (length = new AudioParameterFloat (
+                                PID ("length", 1), "Buffer Length", 1.f, 500.f, 90.f));
         lastLength = *length;
-        addLegacyParameter (damping = new AudioParameterFloat ("damping", "Damping", 0.f, 1.f, 0.f));
-        addLegacyParameter (feedback = new AudioParameterFloat ("feedback", "Feedback Level", 0.f, 1.f, 0.5f));
+        addLegacyParameter (damping = new AudioParameterFloat (
+                                PID ("damping", 1), "Damping", 0.f, 1.f, 0.f));
+        addLegacyParameter (feedback = new AudioParameterFloat (
+                                PID ("feedback", 1), "Feedback Level", 0.f, 1.f, 0.5f));
     }
 
     virtual ~CombFilterProcessor()

@@ -23,7 +23,7 @@ public:
                              .withOutput ("Main", _stereo ? AudioChannelSet::stereo() : AudioChannelSet::mono(), true)),
           stereo (_stereo)
     {
-        addLegacyParameter (volume = new AudioParameterFloat (tags::volume.toString(),
+        addLegacyParameter (volume = new AudioParameterFloat (juce::ParameterID (tags::volume.toString(), 1),
                                                               "Volume",
                                                               minDb,
                                                               maxDb,

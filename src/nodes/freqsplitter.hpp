@@ -27,8 +27,8 @@ public:
         NormalisableRange<float> freqRange (20.0f, 22000.0f);
         freqRange.setSkewForCentre (1000.0f);
 
-        addLegacyParameter (lowFreq = new AudioParameterFloat ("lowFreq", "Low Frequency [Hz]", freqRange, 500.0f));
-        addLegacyParameter (highFreq = new AudioParameterFloat ("highFreq", "High Frequency [Hz]", freqRange, 2000.0f));
+        addLegacyParameter (lowFreq = new AudioParameterFloat (juce::ParameterID ("lowFreq", 1), "Low Frequency [Hz]", freqRange, 500.0f));
+        addLegacyParameter (highFreq = new AudioParameterFloat (juce::ParameterID ("highFreq", 1), "High Frequency [Hz]", freqRange, 2000.0f));
     }
 
     const String getName() const override { return "Frequency Band Splitter"; }
