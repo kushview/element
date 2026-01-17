@@ -127,7 +127,7 @@ public:
 
     //=========================================================================
     /** Returns the nodeId as defined in the engine */
-    const uint32_t getNodeId() const { return (uint32_t) (int64_t) getProperty (tags::id); }
+    const uint32_t getNodeId() const { return (uint32_t) (juce::int64) getProperty (tags::id); }
 
     /** Returns this Node's UUID as a string */
     juce::String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }
@@ -594,8 +594,8 @@ struct ConnectionBuilder {
 
         for (int i = 0; i < 2; ++i) {
             juce::ValueTree connection (types::Arc);
-            connection.setProperty (tags::sourceNode, (int64_t) src.getNodeId(), 0)
-                .setProperty (tags::destNode, (int64_t) dst.getNodeId(), 0)
+            connection.setProperty (tags::sourceNode, (juce::int64) src.getNodeId(), 0)
+                .setProperty (tags::destNode, (juce::int64) dst.getNodeId(), 0)
                 .setProperty (tags::sourceChannel, i + srcOffset, 0)
                 .setProperty (tags::destChannel, i + dstOffset, 0);
             arcs.addChild (connection, -1, 0);
