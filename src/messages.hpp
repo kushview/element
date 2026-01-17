@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <element/juce/core.hpp>
+#include <element/juce/data_structures.hpp>
+
 #include <element/controller.hpp>
 #include <element/node.hpp>
 
@@ -13,7 +15,7 @@ class Services;
 class ContentView;
 class Context;
 
-class Action : public UndoableAction
+class Action : public juce::UndoableAction
 {
 public:
     virtual ~Action() {}
@@ -22,14 +24,14 @@ protected:
     Action() {}
 };
 
-struct AppMessage : public Message
+struct AppMessage : public juce::Message
 {
     enum ID
     {
 
     };
 
-    inline virtual void createActions (Services&, OwnedArray<UndoableAction>&) const {}
+    inline virtual void createActions (Services&, juce::OwnedArray<juce::UndoableAction>&) const {}
 };
 
 struct AddMidiDeviceMessage : public AppMessage
@@ -43,7 +45,7 @@ struct AddMidiDeviceMessage : public AppMessage
 /** Send this to add a preset for a node */
 struct AddPresetMessage : public AppMessage
 {
-    AddPresetMessage (const Node& n, const String& name_ = String())
+    AddPresetMessage (const Node& n, const juce::String& name_ = String())
         : node (n), name (name_) {}
     ~AddPresetMessage() noexcept {}
     const Node node;

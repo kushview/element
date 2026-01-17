@@ -6,8 +6,6 @@
 #include <element/midipipe.hpp>
 #include <element/parameter.hpp>
 
-#include "ElementApp.h"
-
 #include "luascripts.hpp"
 
 #include "sol/sol.hpp"

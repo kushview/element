@@ -6,7 +6,6 @@
 #include <element/node.hpp>
 #include <element/ui/commands.hpp>
 
-#include "ElementApp.h"
 #include "ui/window.hpp"
 #include "ui/pluginwindow.hpp"
 

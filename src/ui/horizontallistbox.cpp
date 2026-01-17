@@ -3,6 +3,8 @@
 
 #include "ui/horizontallistbox.hpp"
 
+using namespace juce;
+
 namespace element {
 
 class HorizontalListBox::RowComponent : public Component,

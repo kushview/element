@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <element/juce.hpp>
-#include "ElementApp.h" // FIXME
+#include <element/juce/gui_basics.hpp>
 
 namespace element {
 /**
@@ -17,8 +16,8 @@ namespace element {
     @see juce::ComboBox, juce::TableListBox
 */
 
-class HorizontalListBox : public Component,
-                          public SettableTooltipClient
+class HorizontalListBox : public juce::Component,
+                          public juce::SettableTooltipClient
 {
 public:
     /** Creates a ListBox.
@@ -26,17 +25,17 @@ public:
      The model pointer passed-in can be null, in which case you can set it later
      with setModel().
      */
-    HorizontalListBox (const String& componentName = String(),
-                       ListBoxModel* model = nullptr);
+    HorizontalListBox (const juce::String& componentName = juce::String(),
+                       juce::ListBoxModel* model = nullptr);
 
     /** Destructor. */
     ~HorizontalListBox();
 
     /** Changes the current data model to display. */
-    void setModel (ListBoxModel* newModel);
+    void setModel (juce::ListBoxModel* newModel);
 
     /** Returns the current list model. */
-    ListBoxModel* getModel() const noexcept { return model; }
+    juce::ListBoxModel* getModel() const noexcept { return model; }
 
     /** Causes the list to refresh its content.
      
@@ -121,7 +120,7 @@ public:
     /** Returns a sparse set indicating the rows that are currently selected.
      @see setSelectedRows
      */
-    SparseSet<int> getSelectedRows() const;
+    juce::SparseSet<int> getSelectedRows() const;
 
     /** Sets the rows that should be selected, based on an explicit set of ranges.
      
@@ -130,8 +129,8 @@ public:
      
      @see getSelectedRows
      */
-    void setSelectedRows (const SparseSet<int>& setOfRowsToBeSelected,
-                          NotificationType sendNotificationEventToModel = sendNotification);
+    void setSelectedRows (const juce::SparseSet<int>& setOfRowsToBeSelected,
+                          juce::NotificationType sendNotificationEventToModel = juce::sendNotification);
 
     /** Checks whether a row is selected.
      */
@@ -177,7 +176,7 @@ public:
      @see selectRow
      */
     void selectRowsBasedOnModifierKeys (int rowThatWasClickedOn,
-                                        ModifierKeys modifiers,
+                                        juce::ModifierKeys modifiers,
                                         bool isMouseUpEvent);
 
     /** Scrolls the list to a particular position.
@@ -208,10 +207,10 @@ public:
     void setScrollBarsShown (bool vertical, bool horizontal);
 
     /** Returns a pointer to the vertical scrollbar. */
-    ScrollBar* getVerticalScrollBar() const noexcept;
+    juce::ScrollBar* getVerticalScrollBar() const noexcept;
 
     /** Returns a pointer to the horizontal scrollbar. */
-    ScrollBar* getHorizontalScrollBar() const noexcept;
+    juce::ScrollBar* getHorizontalScrollBar() const noexcept;
 
     /** Finds the row index that contains a given x,y position.
      The position is relative to the ListBox's top-left.
@@ -241,8 +240,8 @@ public:
      This may be off-screen, and the range of the row number that is passed-in is
      not checked to see if it's a valid row.
      */
-    Rectangle<int> getRowPosition (int rowNumber,
-                                   bool relativeToComponentTopLeft) const noexcept;
+    juce::Rectangle<int> getRowPosition (int rowNumber,
+                                         bool relativeToComponentTopLeft) const noexcept;
 
     /** Finds the row component for a given row in the list.
      
@@ -361,52 +360,52 @@ public:
 
         @see Component::createComponentSnapshot
      */
-    virtual Image createSnapshotOfSelectedRows (int& x, int& y);
+    virtual juce::Image createSnapshotOfSelectedRows (int& x, int& y);
 
     /** Returns the viewport that this ListBox uses.
      
      You may need to use this to change parameters such as whether scrollbars
      are shown, etc.
      */
-    Viewport* getViewport() const noexcept;
+    juce::Viewport* getViewport() const noexcept;
 
     /** @internal */
-    bool keyPressed (const KeyPress&) override;
+    bool keyPressed (const juce::KeyPress&) override;
     /** @internal */
     bool keyStateChanged (bool isKeyDown) override;
     /** @internal */
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     /** @internal */
-    void paintOverChildren (Graphics&) override;
+    void paintOverChildren (juce::Graphics&) override;
     /** @internal */
     void resized() override;
     /** @internal */
     void visibilityChanged() override;
     /** @internal */
-    void mouseWheelMove (const MouseEvent&, const MouseWheelDetails&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     /** @internal */
-    void mouseUp (const MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
     /** @internal */
     void colourChanged() override;
     /** @internal */
     void parentHierarchyChanged() override;
     /** @internal */
-    void startDragAndDrop (const MouseEvent&, const var& dragDescription, bool allowDraggingToOtherWindows);
+    void startDragAndDrop (const juce::MouseEvent&, const juce::var& dragDescription, bool allowDraggingToOtherWindows);
 
 private:
     JUCE_PUBLIC_IN_DLL_BUILD (class ListViewport)
     JUCE_PUBLIC_IN_DLL_BUILD (class RowComponent)
     friend class ListViewport;
     friend class TableListBox;
-    ListBoxModel* model;
+    juce::ListBoxModel* model;
     std::unique_ptr<ListViewport> viewport;
-    std::unique_ptr<Component> headerComponent;
+    std::unique_ptr<juce::Component> headerComponent;
     std::unique_ptr<MouseListener> mouseMoveSelector;
     int totalItems, rowHeight, minimumRowWidth;
     int outlineThickness;
     int lastRowSelected;
     bool multipleSelection, alwaysFlipSelection, hasDoneInitialUpdate;
-    SparseSet<int> selected;
+    juce::SparseSet<int> selected;
 
     void selectRowInternal (int rowNumber, bool dontScrollToShowThisRow, bool deselectOthersFirst, bool isMouseClick);
 
