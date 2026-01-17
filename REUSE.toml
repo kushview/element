@@ -6,11 +6,6 @@ SPDX-FileCopyrightText = "Copyright (C) 1994-2020 Lua.org, PUC-Rio."
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
-path = [ "src/dlfcn*.*" ]
-SPDX-FileCopyrightText = "Copyright (c) 2007 Ramiro Polla"
-SPDX-License-Identifier = "MIT"
-
-[[annotations]]
 path = "data/fonts/Roboto-Regular.ttf"
 SPDX-FileCopyrightText = "Copyright 2011 Google Inc."
 SPDX-License-Identifier = "Apache-2.0"
