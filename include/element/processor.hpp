@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <element/juce.hpp> // FIXME: namespace juce
 #include <element/juce/core.hpp>
 #include <element/juce/audio_basics.hpp>
 #include <element/juce/audio_processors.hpp>
