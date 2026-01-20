@@ -1,9 +1,8 @@
-// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-FileCopyrightText: 2023 Kushview, LLC
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 
-#include "appinfo.hpp"
 #include <element/datapath.hpp>
 
 namespace element {
@@ -17,7 +16,7 @@ class Log : public juce::Logger
 public:
     Log()
     {
-        mainlogger = std::make_unique<FileLogger> (
+        mainlogger = std::make_unique<juce::FileLogger> (
             getMainLogFile(), "Element (main)");
     }
 
@@ -32,7 +31,7 @@ public:
     public:
         Listener() = default;
         virtual ~Listener() = default;
-        virtual void messageLogged (const String& msg) = 0;
+        virtual void messageLogged (const juce::String& msg) = 0;
     };
 
     /** Returns the absolute path to the main log file */
@@ -50,16 +49,16 @@ public:
     void removeListener (Listener* listener) { listeners.remove (listener); }
 
     /** Returns a copy of the message history */
-    StringArray getHistory() const
+    juce::StringArray getHistory() const
     {
-        ScopedLock sl (lock);
+        juce::ScopedLock sl (lock);
         return history;
     }
 
     /** Flush message history */
     void flushHistory()
     {
-        ScopedLock sl (lock);
+        juce::ScopedLock sl (lock);
         history.clear();
     }
 
@@ -69,7 +68,7 @@ public:
     */
     void logMessage (const String& message) override
     {
-        ScopedLock sl (lock);
+        juce::ScopedLock sl (lock);
         mainlogger->logMessage (message);
         history.add (message);
         if (history.size() > maxLines)
@@ -81,11 +80,11 @@ public:
     }
 
 private:
-    CriticalSection lock;
-    std::unique_ptr<FileLogger> mainlogger;
-    StringArray history;
+    juce::CriticalSection lock;
+    std::unique_ptr<juce::FileLogger> mainlogger;
+    juce::StringArray history;
     int maxLines = 1024;
-    ListenerList<Listener> listeners;
+    juce::ListenerList<Listener> listeners;
 };
 
 } // namespace element

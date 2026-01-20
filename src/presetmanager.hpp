@@ -6,7 +6,7 @@
 #include <element/node.hpp>
 #include <element/presets.hpp>
 
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 
 namespace element {
 

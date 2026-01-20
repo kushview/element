@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
-#include <iostream>
-
 #include <winsparkle.h>
 
 #include <element/version.h>
@@ -28,7 +26,8 @@ public:
     void check (bool async) override
     {
         juce::ignoreUnused (async);
-        if (! _initialized) {
+        if (! _initialized)
+        {
             win_sparkle_init();
             _initialized = true;
         }
@@ -36,6 +35,7 @@ public:
         // win_sparkle_check_update_without_ui();
         win_sparkle_check_update_with_ui();
     }
+
 private:
     bool _initialized { false };
 };

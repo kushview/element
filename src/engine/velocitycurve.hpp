@@ -1,9 +1,11 @@
-// Copyright 2023 Kushview, LLC <info@kushview.net>
+// SPDX-FileCopyrightText: 2023 Kushview, LLC
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 
-#include "ElementApp.h"
+#include <cstdint>
+
+#include <element/juce/core.hpp>
 
 namespace element {
 
@@ -59,7 +61,7 @@ public:
         return {};
     }
 
-    inline String getModeName() const { return getModeName (mode); }
+    inline juce::String getModeName() const { return getModeName (mode); }
     inline int getMode() const { return static_cast<int> (mode); }
     inline void setMode (const Mode m)
     {
@@ -111,11 +113,11 @@ public:
 
         if (t < 0.5)
         {
-            velocity = c1 - sqrtf (rsq - square (127.f * velocity - c0));
+            velocity = c1 - sqrtf (rsq - juce::square (127.f * velocity - c0));
         }
         else if (t > 0.5)
         {
-            velocity = c1 + sqrtf (rsq - square (127.f * velocity - c0));
+            velocity = c1 + sqrtf (rsq - juce::square (127.f * velocity - c0));
         }
         else
         {
@@ -125,13 +127,13 @@ public:
         return velocity / 127.f;
     }
 
-    inline uint8 process (const uint8 velocity)
+    inline uint8_t process (const uint8_t velocity)
     {
         if (mode == Linear)
             return velocity;
         else if (mode == Max)
             return 127;
-        return static_cast<uint8> (roundToIntAccurate (
+        return static_cast<uint8_t> (juce::roundToIntAccurate (
             process (static_cast<float> (velocity) / 127.f)));
     }
 
@@ -165,7 +167,7 @@ private:
         c1 /= (s0 - s1);
         c1 -= (s1 * b2);
         c1 += b3;
-        rsq = square (c0) + square (c1);
+        rsq = juce::square (c0) + juce::square (c1);
 
 #if dbgVars
         DBG ("t=" << t << " z0=" << z0 << " z1=" << z1);

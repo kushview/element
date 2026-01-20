@@ -9,7 +9,7 @@
 #include <element/element.hpp>
 #include <element/tags.hpp>
 
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 
 namespace element {
 using namespace juce;

@@ -1,8 +1,6 @@
 // Copyright 2014-2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <boost/dll.hpp>
-
 #include <element/nodefactory.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
@@ -11,7 +9,7 @@
 #include "engine/clapprovider.hpp"
 #include "nodes/nodetypes.hpp"
 #include "engine/ionode.hpp"
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 #include "utils.hpp"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME "scanner/crashed.txt"

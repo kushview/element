@@ -8,7 +8,7 @@
 
 #include "ui/filetreeview.hpp"
 #include "ui/viewhelpers.hpp"
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 #include "filesystemwatcher.hpp"
 #include "messages.hpp"
 

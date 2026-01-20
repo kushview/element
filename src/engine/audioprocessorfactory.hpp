@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <element/node.h>
 #include <element/nodefactory.hpp>
 
 namespace element {

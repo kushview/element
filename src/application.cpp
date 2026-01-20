@@ -17,7 +17,7 @@
 #include "engine/internalformat.hpp"
 #include "engine/midiengine.hpp"
 #include "scripting.hpp"
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 #include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"

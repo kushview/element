@@ -6,7 +6,7 @@
 
 #include "scripting/scriptmanager.hpp"
 #include "scripting/bindings.hpp"
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 #include "sol/sol.hpp"
 
 namespace element {

@@ -7,7 +7,7 @@
 #include "presetmanager.hpp"
 #include <element/context.hpp>
 
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 #include "services/presetservice.hpp"
 
 using juce::String;

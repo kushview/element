@@ -64,13 +64,13 @@ public:
 
     inline bool get (const int in, const int out) const noexcept
     {
-        jassert (isPositiveAndBelow (in, numIns) && isPositiveAndBelow (out, numOuts));
+        jassert (juce::isPositiveAndBelow (in, numIns) && juce::isPositiveAndBelow (out, numOuts));
         return toggles[in][out];
     }
 
     inline void set (const int in, const int out, const bool value) noexcept
     {
-        jassert (isPositiveAndBelow (in, numIns) && isPositiveAndBelow (out, numOuts));
+        jassert (juce::isPositiveAndBelow (in, numIns) && juce::isPositiveAndBelow (out, numOuts));
         toggles[in][out] = value;
     }
 
@@ -94,8 +94,8 @@ public:
         }
         else
         {
-            for (int i = 0; i < jmin (numIns, other.numIns); ++i)
-                for (int o = 0; o < jmin (numOuts, other.numOuts); ++o)
+            for (int i = 0; i < juce::jmin (numIns, other.numIns); ++i)
+                for (int o = 0; o < juce::jmin (numOuts, other.numOuts); ++o)
                     toggles[i][o] = other.toggles[i][o];
         }
 

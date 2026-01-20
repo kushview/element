@@ -4,7 +4,7 @@
 #include <element/node.hpp>
 
 #include "appinfo.hpp"
-#include "datapath.hpp"
+#include <element/datapath.hpp>
 
 #ifndef EL_INSTALL_DIR_AWARE
 #define EL_INSTALL_DIR_AWARE 1
