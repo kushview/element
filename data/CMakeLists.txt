@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 file(GLOB_RECURSE ELEMENT_RES
     "${CMAKE_CURRENT_SOURCE_DIR}/*.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.ttf"

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 set(SPARKLE_VERSION "2.8.1" CACHE STRING "Sparkle version to download")
 
 set(SPARKLE_FEED_URL "http://localhost:8000/appcast.xml"

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 file(GLOB ELEMENT_LUA_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/*.lua")
 # Lua scripts are currently built into the the binaries until the app and plugins
 # are able to deal with search paths and so forth.

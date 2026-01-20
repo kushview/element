@@ -16,14 +16,14 @@ path = [ "*.md", "src/**/*.rc", "docs/**/*.md", "docs/**/*.css",
          "data/intro.txt", "data/developers.txt", "cmake/version.txt.in",
          "data/acknowledgements.txt", "src/res/icon.ico", "data/**/*.png",
          "data/**/*.svg", "data/**/*.els", ".github/**/*.*" ]
-SPDX-FileCopyrightText = "Copyright (C) Kushview, LLC."
+SPDX-FileCopyrightText = "Kushview, LLC."
 SPDX-License-Identifier = "CC0-1.0"
 
 
 [[annotations]]
-path = [ "**/CMakeLists.txt", "cmake/*.*", ".gitignore", "**/.gitignore", 
+path = [ ".gitignore", "**/.gitignore", 
          ".gitmodules", ".dockerignore", ".vscode/*.*",
          "**/sol/config.hpp", "test/**/package.json", "Dockerfile*",
          "**/element.desktop.in", "docs/config.ld" ]
-SPDX-FileCopyrightText = "Copyright (C) Kushview, LLC."
+SPDX-FileCopyrightText = "Kushview, LLC."
 SPDX-License-Identifier = "GPL-3.0-or-later"

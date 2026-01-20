@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Generate a version header in a specific path (build/include/element/version.h)
 
 # Configurable base commit/tag for build numbering

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 find_package(PkgConfig)
 if(PkgConfig_FOUND)
     message(STATUS "Checking for jack audio")
