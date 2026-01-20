@@ -1,10 +1,14 @@
 # SPDX-FileCopyrightText: 2026 Kushview, LLC
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-file(GLOB_RECURSE ELEMENT_RES
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.txt"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.ttf"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+set(ELEMENT_RES
+    fonts/Roboto-Regular.ttf
+    images/icon-template.png
+    images/icon.png
+    images/power_48x48.png
+    acknowledgements.txt
+    developers.txt
+)
 juce_add_binary_data(element-binarydata 
     HEADER_NAME binarydata.hpp 
     NAMESPACE element::res
