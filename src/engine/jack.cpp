@@ -29,7 +29,8 @@
 #include "engine/jack.hpp"
 
 #ifdef _WIN32
-// FIXME:
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -45,7 +46,11 @@ static void* juce_loadJackFunction (const char* const name)
     if (juce_libjackHandle == nullptr)
         return nullptr;
 
+#if JUCE_WINDOWS
+    return GetProcAddress ((HMODULE) juce_libjackHandle, name);
+#else
     return dlsym (juce_libjackHandle, name);
+#endif
 }
 
 #define JUCE_DECL_JACK_FUNCTION(return_type, fn_name, argument_types, arguments) \
@@ -802,8 +807,13 @@ public:
         if (juce_libjackHandle == nullptr)
             juce_libjackHandle = dlopen ("libjack.so", RTLD_LAZY);
 #elif JUCE_WINDOWS
+#if JUCE_64BIT
         if (juce_libjackHandle == nullptr)
-            juce_libjackHandle = dlopen ("libjack64.dll", RTLD_NOW | RTLD_LOCAL);
+            juce_libjackHandle = LoadLibraryA ("libjack64.dll");
+#else
+        if (juce_libjackHandle == nullptr)
+            juce_libjackHandle = LoadLibraryA ("libjack.dll");
+#endif
 #elif JUCE_MAC
         if (juce_libjackHandle == nullptr)
             juce_libjackHandle = dlopen ("/usr/local/lib/libjack.0.dylib", RTLD_LAZY | RTLD_LOCAL);
