@@ -5,10 +5,10 @@
 
 #include <element/juce/gui_basics.hpp>
 #include <element/ui/content.hpp>
+#include <element/datapath.hpp>
 
 #include "ui/filetreeview.hpp"
 #include "ui/viewhelpers.hpp"
-#include <element/datapath.hpp>
 #include "filesystemwatcher.hpp"
 #include "messages.hpp"
 
