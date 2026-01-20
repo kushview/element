@@ -1,14 +1,15 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <element/context.hpp>
+#include <element/ui.hpp>
 #include <element/ui/commands.hpp>
 #include <element/ui/mainwindow.hpp>
-#include <element/ui.hpp>
-#include <element/context.hpp>
 
 #include "ui/systemtray.hpp"
-#include "ui/res.hpp"
 #include "utils.hpp"
+
+#include "binarydata.hpp"
 
 #define EL_USE_NEW_SYSTRAY_ICON 0
 #define EL_SYSTRAY_MIN_SIZE 22

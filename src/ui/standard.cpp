@@ -1,51 +1,46 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <element/context.hpp>
+#include <element/devices.hpp>
+#include <element/node.hpp>
+#include <element/plugins.hpp>
 #include <element/services.hpp>
+#include <element/settings.hpp>
+#include <element/ui/commands.hpp>
+#include <element/ui/mainwindow.hpp>
 #include <element/ui/meterbridge.hpp>
-#include "ui/datapathbrowser.hpp"
+#include <element/ui/navigation.hpp>
+#include <element/ui/standard.hpp>
+#include <element/ui/style.hpp>
 
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
-#include "ui/emptyview.hpp"
 #include "ui/audioiopanelview.hpp"
-#include "ui/pluginspanelview.hpp"
 #include "ui/connectiongrid.hpp"
 #include "ui/controllersview.hpp"
+#include "ui/datapathbrowser.hpp"
+#include "ui/emptyview.hpp"
 #include "ui/grapheditorview.hpp"
 #include "ui/graphmixerview.hpp"
 #include "ui/keymapeditorview.hpp"
 #include "ui/luaconsoleview.hpp"
-#include "ui/nodechannelstripview.hpp"
-#include <element/ui/mainwindow.hpp>
 #include "ui/mainmenu.hpp"
-#include "ui/midiblinker.hpp"
 #include "ui/navigationview.hpp"
+#include "ui/nodechannelstripview.hpp"
+#include "ui/pluginspanelview.hpp"
 #include "ui/sessiontreepanel.hpp"
 #include "ui/viewhelpers.hpp"
-#include <element/ui/style.hpp>
-#include "ui/pluginmanagercomponent.hpp"
-#include "ui/sessionsettingsview.hpp"
+
+#include "ui/audioiopanelview.hpp"
 #include "ui/graphsettingsview.hpp"
-#include "ui/virtualkeyboardview.hpp"
-#include "ui/tempoandmeterbar.hpp"
-#include "ui/transportbar.hpp"
-#include <element/ui/navigation.hpp>
 #include "ui/nodeeditorview.hpp"
 #include "ui/nodepropertiesview.hpp"
+#include "ui/pluginmanagercomponent.hpp"
 #include "ui/pluginspanelview.hpp"
-#include "ui/audioiopanelview.hpp"
+#include "ui/sessionsettingsview.hpp"
 #include "ui/sessiontreepanel.hpp"
-
-#include <element/devices.hpp>
-#include <element/plugins.hpp>
-#include <element/node.hpp>
-
-#include <element/ui/commands.hpp>
-#include <element/context.hpp>
-#include <element/settings.hpp>
-
-#include <element/ui/standard.hpp>
+#include "ui/virtualkeyboardview.hpp"
 
 #define EL_NAV_MIN_WIDTH 170
 #define EL_NAV_MAX_WIDTH 510

@@ -1,12 +1,13 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <element/ui/style.hpp>
 #include <element/ui/simplemeter.hpp>
+#include <element/ui/style.hpp>
 
 #include "ui/buttons.hpp"
 #include "ui/midiblinker.hpp"
-#include "ui/res.hpp"
+
+#include "binarydata.hpp"
 
 // clang-format off
 

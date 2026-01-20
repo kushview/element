@@ -3,11 +3,10 @@
 
 #include <element/version.hpp>
 
-#include "ui/aboutscreen.hpp"
 #include "appinfo.hpp"
+#include "ui/aboutscreen.hpp"
 
-// resources
-#include "ui/res.hpp"
+#include "binarydata.hpp"
 
 #define EL_LICENSE_TEXT                                                        \
     "Copyright (C) 2014-@0@  Kushview, LLC.  All rights reserved.\r\n\r\n"     \

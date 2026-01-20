@@ -15,6 +15,8 @@
 #include <element/engine.hpp>
 #include <element/ui.hpp>
 
+#define ELEMENT_TRACE_SESSION_LOAD 0
+
 using namespace juce;
 
 namespace element {
@@ -939,7 +941,7 @@ void EngineService::sessionReloaded()
     {
         Logger::writeToLog ("[element] model and engine graph counts do not match");
     }
-#if JUCE_DEBUG
+#if ELEMENT_TRACE_SESSION_LOAD
     else
     {
         String msg ("[element] session reloaded");

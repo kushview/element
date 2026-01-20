@@ -5,30 +5,28 @@
 #include <element/devices.hpp>
 #include <element/engine.hpp>
 #include <element/services.hpp>
+#include <element/settings.hpp>
 #include <element/version.hpp>
 
 #include <element/ui.hpp>
-#include <element/ui/content.hpp>
-#include <element/ui/updater.hpp>
 #include <element/ui/commands.hpp>
-#include <element/ui/standard.hpp>
-#include <element/ui/style.hpp>
+#include <element/ui/content.hpp>
 #include <element/ui/mainwindow.hpp>
 #include <element/ui/preferences.hpp>
-
-#include "engine/midipanic.hpp"
+#include <element/ui/standard.hpp>
+#include <element/ui/style.hpp>
+#include <element/ui/updater.hpp>
 
 #include "appinfo.hpp"
+#include "engine/midipanic.hpp"
+#include "messages.hpp"
 #include "services/sessionservice.hpp"
-#include "ui/virtualkeyboardview.hpp"
 #include "ui/aboutscreen.hpp"
-#include "ui/guicommon.hpp"
+#include "ui/capslock.hpp"
 #include "ui/pluginwindow.hpp"
 #include "ui/systemtray.hpp"
+#include "ui/virtualkeyboardview.hpp"
 #include "ui/windowmanager.hpp"
-
-#include "ui/capslock.hpp"
-#include "ui/res.hpp"
 
 #ifndef EL_USE_SYSTEM_TRAY
 #define EL_USE_SYSTEM_TRAY 1
