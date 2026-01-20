@@ -1,9 +1,6 @@
 [submodule "deps/sol2"]
 	path = deps/sol2
 	url = https://github.com/ThePhD/sol2.git
-[submodule "deps/juce"]
-	path = deps/juce
-	url = https://github.com/juce-framework/JUCE.git
 [submodule "deps/clap-juce-extensions"]
 	path = deps/clap-juce-extensions
 	url = https://github.com/free-audio/clap-juce-extensions
