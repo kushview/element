@@ -8,5 +8,4 @@ if(NOT JUCE_FOUND)
         GIT_TAG 8.0.12
         GIT_SHALLOW ON)
     FetchContent_MakeAvailable(JUCE)
-    add_subdirectory(${JUCE_SOURCE_DIR} EXCLUDE_FROM_ALL)
 endif()
