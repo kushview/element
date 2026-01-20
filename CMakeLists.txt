@@ -11,8 +11,7 @@ if(APPLE AND ELEMENT_ENABLE_UPDATER)
     include(cmake/FindSparkle.cmake)
 endif()
 include(cmake/FindJack.cmake)
-
-add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
+include(cmake/FindSol2.cmake)
 include(cmake/FindJUCE.cmake)
 
 # Global JUCE properties
