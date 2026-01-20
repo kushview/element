@@ -144,13 +144,18 @@ jobs:
           -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl `
           -DCMAKE_BUILD_TYPE=Release `
           -DELEMENT_ENABLE_ASIO=ON `
+          -DELEMENT_ENABLE_UPDATER=ON `
           -DELEMENT_BUILD_PLUGINS=ON
       env:
         BOOST_ROOT: ${{ steps.install-boost-windows.outputs.BOOST_ROOT }}
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
-      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON
+      run: |
+        cmake -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DELEMENT_ENABLE_UPDATER=${{ runner.os == 'macOS' && 'ON' || 'OFF' }} \
+        -DELEMENT_BUILD_PLUGINS=ON
       env:
         BOOST_ROOT: ${{ steps.install-boost-linux.outputs.BOOST_ROOT || steps.install-boost-macos.outputs.BOOST_ROOT }}
     
