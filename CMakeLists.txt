@@ -13,7 +13,7 @@ endif()
 include(cmake/FindJack.cmake)
 
 add_subdirectory(deps/sol2 EXCLUDE_FROM_ALL)
-add_subdirectory(deps/juce EXCLUDE_FROM_ALL)
+include(cmake/FindJUCE.cmake)
 
 # Global JUCE properties
 set_directory_properties(PROPERTIES JUCE_COMPANY_NAME "Kushview")
