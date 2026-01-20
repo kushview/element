@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Lua library configuration
 set(LUA_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src")
 

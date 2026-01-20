@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 find_package(sol2 4.0.0 CONFIG)
 if(NOT sol2_FOUND)
     FetchContent_Declare(sol2

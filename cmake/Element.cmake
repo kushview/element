@@ -1,3 +1,4 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 option(ELEMENT_BUILD_PLUGINS "Build the plugin versions of Element" OFF)

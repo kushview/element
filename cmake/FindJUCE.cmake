@@ -1,4 +1,4 @@
-# Copyright Kushview, LLC
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 find_package(JUCE 8.0.12 CONFIG)
