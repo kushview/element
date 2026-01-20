@@ -3,21 +3,22 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include <element/juce/core.hpp>
+#include <element/juce/gui_basics.hpp>
 #include <element/signals.hpp>
 
 namespace element {
 
 class GuiApp;
 
-struct DialogOptions : public DialogWindow::LaunchOptions
+struct DialogOptions : public juce::DialogWindow::LaunchOptions
 {
     DialogOptions()
-        : DialogWindow::LaunchOptions()
+        : juce::DialogWindow::LaunchOptions()
     {
-        dialogBackgroundColour = Colours::darkgrey;
+        dialogBackgroundColour = juce::Colours::darkgrey;
         content.set (nullptr, true);
-        dialogTitle = String();
+        dialogTitle = juce::String();
         resizable = false;
         useBottomRightCornerResizer = false;
 #if JUCE_IOS
@@ -34,7 +35,7 @@ class WindowHook
 {
 public:
     WindowHook() {}
-    virtual ~WindowHook() { Logger::writeToLog ("~WindowHook()"); }
+    virtual ~WindowHook() { juce::Logger::writeToLog ("~WindowHook()"); }
     inline Signal<void()>& signalClosed() { return closedSignal; }
 
 protected:
@@ -42,21 +43,21 @@ protected:
 };
 
 /** A juce DialogWindow that emits a closed signal */
-class Dialog : public DialogWindow,
+class Dialog : public juce::DialogWindow,
                public WindowHook
 {
 public:
-    Dialog (const String& name);
+    Dialog (const juce::String& name);
     virtual ~Dialog();
     virtual void closeButtonPressed();
 };
 
 /** A juce DocumentWindow that emits a closed signal */
-class Window : public DocumentWindow,
+class Window : public juce::DocumentWindow,
                public WindowHook
 {
 public:
-    Window (const String& name);
+    Window (const juce::String& name);
     virtual ~Window();
     void closeButtonPressed();
 };

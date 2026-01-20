@@ -6,6 +6,8 @@
 
 namespace element {
 
+using namespace juce;
+
 Dialog::Dialog (const String& name)
     : DialogWindow (name, Colours::darkgrey, true, true)
 {
