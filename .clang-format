@@ -89,19 +89,3 @@ Standard: "c++17"
 TabWidth: 4
 UseTab: Never
 ForEachMacros: [ EL_FEATURES_FOREACH, BOOST_FOREACH ]
-
----
-Language: ObjC
-BasedOnStyle: Chromium
-AlignTrailingComments: true
-BreakBeforeBraces: Allman
-ColumnLimit: 0
-IndentWidth: 4
-KeepEmptyLinesAtTheStartOfBlocks: false
-ObjCSpaceAfterProperty: true
-ObjCSpaceBeforeProtocolList: true
-PointerAlignment: Left
-SpacesBeforeTrailingComments: 1
-TabWidth: 4
-UseTab: Never
-...
