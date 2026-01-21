@@ -40,14 +40,8 @@ public:
     void run();
     Commands& commands();
 
-    /** Change updater info. */
-    void setUpdaterPackage (const std::string_view package, std::string_view version);
-
     /** Check for a newer version and show alert, if available. */
     void checkUpdates();
-
-    /** Launch the updater tool, if available and enabled. */
-    void launchUpdater();
 
     Services& services() const { return controller; }
     juce::KeyListener* getKeyListener() const;
