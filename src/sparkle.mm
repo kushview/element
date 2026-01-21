@@ -14,6 +14,7 @@
 @interface AppUpdaterDelegate : NSObject <SPUUpdaterDelegate>
 
 @property (assign, nonatomic) SPUStandardUpdaterController* updaterController;
+@property (strong, nonatomic) NSURL* feedURL;
 
 @end
 
@@ -51,6 +52,11 @@
     }
 }
 
+- (nullable NSString*)feedURLStringForUpdater:(SPUUpdater*)updater
+{
+    return [_feedURL absoluteString];
+}
+
 @end
 
 namespace element
@@ -62,14 +68,14 @@ class SparkleUpdater : public Updater
     {
         @autoreleasepool
         {
-            _updaterDelegate = [[AppUpdaterDelegate alloc] init];
-            _updaterDelegate.updaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES
-                                                                                               updaterDelegate:_updaterDelegate
-                                                                                            userDriverDelegate:nil];
+            _delegate = [[AppUpdaterDelegate alloc] init];
+            _delegate.updaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES
+                                                                                        updaterDelegate:_delegate
+                                                                                     userDriverDelegate:nil];
 
             // connect(checkForUpdatesAction, &QAction::triggered, this, &Updater::checkForUpdates);
 
-            [_updaterDelegate observeCanCheckForUpdatesWithAction:dynamic_cast<Updater*>(this)];
+            [_delegate observeCanCheckForUpdatesWithAction:dynamic_cast<Updater*>(this)];
         }
     }
 
@@ -78,12 +84,28 @@ class SparkleUpdater : public Updater
         juce::ignoreUnused(async);
         @autoreleasepool
         {
-            [_updaterDelegate.updaterController checkForUpdates:nil];
+            [_delegate.updaterController checkForUpdates:nil];
+        }
+    }
+
+    void setFeedUrl(const std::string& url) override
+    {
+        @autoreleasepool
+        {
+            if (url.empty())
+            {
+                _delegate.feedURL = nil;
+            }
+            else
+            {
+                NSString* nsString = [NSString stringWithUTF8String:url.c_str()];
+                _delegate.feedURL = [NSURL URLWithString:nsString];
+            }
         }
     }
 
    private:
-    AppUpdaterDelegate* _updaterDelegate{nullptr};
+    AppUpdaterDelegate* _delegate{nullptr};
 };
 
 std::unique_ptr<Updater> Updater::create()
@@ -98,12 +120,12 @@ std::unique_ptr<Updater> Updater::create()
 Updater::Updater(QAction *checkForUpdatesAction)
 {
     @autoreleasepool {
-        _updaterDelegate = [[AppUpdaterDelegate alloc] init];
-        _updaterDelegate.updaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES updaterDelegate:_updaterDelegate userDriverDelegate:nil];
+        _delegate = [[AppUpdaterDelegate alloc] init];
+        _delegate.updaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES updaterDelegate:_delegate userDriverDelegate:nil];
         
         connect(checkForUpdatesAction, &QAction::triggered, this, &Updater::checkForUpdates);
         
-        [_updaterDelegate observeCanCheckForUpdatesWithAction:checkForUpdatesAction];
+        [_delegate observeCanCheckForUpdatesWithAction:checkForUpdatesAction];
     }
 }
 
@@ -111,7 +133,7 @@ Updater::Updater(QAction *checkForUpdatesAction)
 void Updater::checkForUpdates()
 {
     @autoreleasepool {
-        [_updaterDelegate.updaterController checkForUpdates:nil];
+        [_delegate.updaterController checkForUpdates:nil];
     }
 }
 #endif

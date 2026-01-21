@@ -169,8 +169,6 @@ public:
 
     ~UpdateManager() {}
 
-    bool launchRequested() const noexcept { return launchUpdaterOnExit; }
-
     void check() { updater->check (true); }
 
 private:
@@ -180,7 +178,7 @@ private:
     {
         juce::String ver (ELEMENT_VERSION_STRING);
         ver << "-" << ELEMENT_BUILD_NUMBER;
-        updater->setRepository (ELEMENT_UPDATES_URL);
+        updater->setFeedUrl (ELEMENT_UPDATES_URL);
     }
 
     bool launchUpdaterOnExit { false };
@@ -394,26 +392,10 @@ void GuiService::closeAllWindows()
 
 Commands& GuiService::commands() { return impl->commands; }
 
-void GuiService::setUpdaterPackage (const std::string_view package, std::string_view version)
-{
-#if ELEMENT_UPDATER
-    auto& updater = *updates->updater;
-    updater.setInfo (package.data(), version.data());
-#endif
-}
-
 void GuiService::checkUpdates()
 {
 #if ELEMENT_UPDATER
     updates->check();
-#endif
-}
-
-void GuiService::launchUpdater()
-{
-#if ELEMENT_UPDATER
-    updates->launchUpdaterOnExit = true;
-    JUCEApplication::getInstance()->systemRequestedQuit();
 #endif
 }
 

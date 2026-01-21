@@ -5,10 +5,8 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <element/element.hpp>
-#include <element/signals.hpp>
 
 #ifndef ELEMENT_UPDATES_HOST
     #define ELEMENT_UPDATES_HOST "https://repo.kushview.net"
@@ -30,16 +28,6 @@
 
 namespace element {
 
-/** An update package. */
-struct UpdatePackage {
-    /** Package (component) Identifier */
-    std::string ID;
-    /** Version number of the package
-        can be 3 or 4 segements.
-     */
-    std::string version;
-};
-
 /** Updater helper for checking available updates */
 class Updater {
 public:
@@ -51,18 +39,12 @@ public:
     virtual void check (bool async);
 
     /** Returns the repository URL or file:/// path */
-    std::string repository() const noexcept;
+    virtual std::string feedUrl() const noexcept;
 
     /** Set the base URL to the repository to check for Updates with.
         This can also be a file:///path/to/folder on the system.
     */
-    void setRepository (const std::string& url);
-
-    //==========================================================================
-    /** Override Online XML with local xml 
-        Call clear() to wipe it out.
-     */
-    void setUpdatesXml (const std::string& xml);
+    virtual void setFeedUrl (const std::string& url);
 
 protected:
     Updater();
