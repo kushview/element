@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <atomic>
 #include <element/application.hpp>
 #include <element/services.hpp>
 #include <element/version.hpp>
@@ -257,7 +258,7 @@ void Application::shutdown()
 
     srvs.deactivate();
     srvs.shutdown();
-    sCanShutdown.store (1, std::memory_order_acquire);
+    sCanShutdown.store (1, std::memory_order_release);
 
     plugins.saveUserPlugins (settings);
     midi.writeSettings (settings);
