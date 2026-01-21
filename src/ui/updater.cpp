@@ -25,7 +25,7 @@ std::unique_ptr<Updater> Updater::create()
 Updater::Updater() {}
 Updater::~Updater() {}
 
-void Updater::check (bool async) { juce::ignoreUnused (async); }
+void Updater::check (bool background) { juce::ignoreUnused (background); }
 std::string Updater::feedUrl() const noexcept { return {}; }
 void Updater::setFeedUrl (const std::string& url) { juce::ignoreUnused (url); }
 

@@ -35,8 +35,10 @@ public:
 
     virtual ~Updater();
 
-    /** Check for updates now or later. */
-    virtual void check (bool async);
+    /** Check for updates with dialog or in the background. Note that setting
+        background to true still will cause a dialog to show if an update is 
+        available. */
+    virtual void check (bool background);
 
     /** Returns the repository URL or file:/// path */
     virtual std::string feedUrl() const noexcept;

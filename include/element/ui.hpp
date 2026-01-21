@@ -41,7 +41,7 @@ public:
     Commands& commands();
 
     /** Check for a newer version and show alert, if available. */
-    void checkUpdates();
+    void checkUpdates (bool background);
 
     Services& services() const { return controller; }
     juce::KeyListener* getKeyListener() const;

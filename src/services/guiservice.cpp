@@ -178,7 +178,7 @@ private:
     {
         juce::String ver (ELEMENT_VERSION_STRING);
         ver << "-" << ELEMENT_BUILD_NUMBER;
-        updater->setFeedUrl("http://localhost:8000/appcast.xml");
+        updater->setFeedUrl ("http://localhost:8000/appcast.xml");
         // updater->setFeedUrl (ELEMENT_UPDATES_URL);
     }
 
@@ -393,10 +393,10 @@ void GuiService::closeAllWindows()
 
 Commands& GuiService::commands() { return impl->commands; }
 
-void GuiService::checkUpdates()
+void GuiService::checkUpdates (bool background)
 {
 #if ELEMENT_UPDATER
-    updates->check();
+    updates->updater->check (background);
 #endif
 }
 
@@ -986,7 +986,7 @@ bool GuiService::perform (const InvocationInfo& info)
         //======================================================================
         case Commands::checkNewerVersion:
             updates->showAlertWhenNoUpdatesReady = true;
-            checkUpdates();
+            checkUpdates (false);
             break;
         //======================================================================
         case Commands::recentsClear: {

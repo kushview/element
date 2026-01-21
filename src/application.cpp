@@ -365,7 +365,7 @@ void Application::finishLaunching()
     world->services().run();
 
     if (world->settings().checkForUpdates())
-        startTimer (5000);
+        startTimer (10 * 1000);
 
     maybeOpenCommandLineFile (getCommandLineParameters());
 }
@@ -436,8 +436,7 @@ void Application::initializeModulePath()
 
 void Application::timerCallback()
 {
-    world->logger().logMessage ("[element] checking updates...");
-    world->services().find<UI>()->checkUpdates();
+    world->services().find<UI>()->checkUpdates (true);
     stopTimer();
 }
 

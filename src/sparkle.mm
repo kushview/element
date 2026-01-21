@@ -9,12 +9,11 @@
 #include <element/juce/core.hpp>
 #include <element/ui/updater.hpp>
 
-// An updater delegate class that mainly takes care of updating the check for updates menu item's state
-// This class can also be used to implement other updater delegate methods
 @interface AppUpdaterDelegate : NSObject <SPUUpdaterDelegate>
 
 @property (assign, nonatomic) SPUStandardUpdaterController* updaterController;
 @property (strong, nonatomic) NSURL* feedURL;
+@property BOOL isBackgroundCheck;
 
 @end
 
@@ -32,14 +31,22 @@
 {
     if ([keyPath isEqualToString:NSStringFromSelector(@selector(canCheckForUpdates))])
     {
-        // TODO: implement
-        // QAction *menuAction = (QAction *)context;
-        // menuAction->setEnabled(_updaterController.updater.canCheckForUpdates);
+        // TODO: implement by enabling/disabling menu?
     }
     else
     {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        _isBackgroundCheck = YES;
+    }
+    return self;
 }
 
 - (void)dealloc
@@ -57,18 +64,24 @@
     return [_feedURL absoluteString];
 }
 
-- (void)updater:(SPUUpdater *)updater didFindValidUpdate:(id)item
+- (void)updater:(SPUUpdater*)updater didFindValidUpdate:(id)item
 {
     juce::Logger::writeToLog("[element] sparkle: update available");
+    if (_isBackgroundCheck)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [_updaterController checkForUpdates:nil];
+        });
+    }
 }
 
 @end
+// clang-format off
+namespace element {
 
-namespace element
-{
 class SparkleUpdater : public Updater
 {
-   public:
+public:
     SparkleUpdater()
     {
         @autoreleasepool
@@ -78,18 +91,22 @@ class SparkleUpdater : public Updater
                                                                                         updaterDelegate:_delegate
                                                                                      userDriverDelegate:nil];
 
-            // connect(checkForUpdatesAction, &QAction::triggered, this, &Updater::checkForUpdates);
-
+            auto controller = _delegate.updaterController;
             [_delegate observeCanCheckForUpdatesWithAction:dynamic_cast<Updater*>(this)];
         }
     }
 
-    void check(bool async) override
+    void check(bool background) override
     {
-        juce::ignoreUnused(async);
         @autoreleasepool
         {
-            [_delegate.updaterController checkForUpdates:nil];
+            if (!_delegate.updaterController.updater.sessionInProgress)
+                return;
+            _delegate.isBackgroundCheck = background;
+            if (background)
+                [_delegate.updaterController.updater checkForUpdatesInBackground];
+            else
+                [_delegate.updaterController checkForUpdates:nil];
         }
     }
 
@@ -109,7 +126,7 @@ class SparkleUpdater : public Updater
         }
     }
 
-   private:
+private:
     AppUpdaterDelegate* _delegate{nullptr};
 };
 
@@ -119,3 +136,4 @@ std::unique_ptr<Updater> Updater::create()
 }
 
 } // namespace element
+// clang-format on
