@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include <element/element.hpp>
 #include <element/signals.hpp>
 
 #ifndef ELEMENT_UPDATES_HOST
@@ -46,32 +47,9 @@ public:
 
     virtual ~Updater();
 
-    //==========================================================================
-    /** Triggered when updates are found. Only fired when checking async. */
-    Signal<void()> sigUpdatesAvailable;
-
-    /** Check for updates in the background */
-    void clear();
-
     /** Check for updates now or later. */
     virtual void check (bool async);
 
-    /** Returns all package updates listed in the repo. */
-    std::vector<UpdatePackage> packages() const noexcept;
-
-    /** Returns available packages matching this updater's ID
-        and also is a greater version.
-    */
-    std::vector<UpdatePackage> available() const noexcept;
-
-    //==========================================================================
-    /** Change updater / package / repo information */
-    void setInfo (const std::string& package, const std::string& version, const std::string& url);
-
-    /** Change updater / package information */
-    void setInfo (const std::string& package, const std::string& version);
-
-    //==========================================================================
     /** Returns the repository URL or file:/// path */
     std::string repository() const noexcept;
 
@@ -88,11 +66,9 @@ public:
 
 protected:
     Updater();
-    Updater (const std::string& package, const std::string& version, const std::string& url);
 
 private:
-    class Updates;
-    std::unique_ptr<Updates> updates;
+    EL_DISABLE_COPY (Updater)
 };
 
 } // namespace element

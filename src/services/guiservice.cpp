@@ -167,10 +167,7 @@ public:
         setupUpdater();
     }
 
-    ~UpdateManager()
-    {
-        _conn.disconnect();
-    }
+    ~UpdateManager() {}
 
     bool launchRequested() const noexcept { return launchUpdaterOnExit; }
 
@@ -178,37 +175,17 @@ public:
 
 private:
     friend class GuiService;
+
     void setupUpdater()
     {
         juce::String ver (ELEMENT_VERSION_STRING);
         ver << "-" << ELEMENT_BUILD_NUMBER;
-        // ver = "0.20.0.0";
-        updater->setInfo ("net.kushview.element", ver.toStdString());
         updater->setRepository (ELEMENT_UPDATES_URL);
-
-        _conn.disconnect();
-        _conn = updater->sigUpdatesAvailable.connect ([this]() {
-            if (updater->available().size() > 0)
-            {
-                AlertWindow::showMessageBoxAsync (
-                    AlertWindow::InfoIcon,
-                    TRANS ("Updates Ready"),
-                    String ("Updates are available. Please download from the website."));
-            }
-            else
-            {
-                if (showAlertWhenNoUpdatesReady)
-                    AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                                      TRANS ("Updates"),
-                                                      String ("You're up to date with the latest XXX").replace ("XXX", EL_APP_NAME));
-            }
-        });
     }
 
     bool launchUpdaterOnExit { false };
     bool showAlertWhenNoUpdatesReady = false;
     std::unique_ptr<element::Updater> updater;
-    boost::signals2::connection _conn;
 };
 
 //=============================================================================
