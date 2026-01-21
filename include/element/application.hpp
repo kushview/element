@@ -109,6 +109,8 @@ public:
     */
     void finishLaunching();
 
+    static bool canShutdown();
+
 protected:
     Context& context() { return *world; }
     virtual std::unique_ptr<ContentFactory> createContentFactory() { return nullptr; }
@@ -118,7 +120,6 @@ private:
     std::unique_ptr<Context> world;                     ///< The application context and services
     std::unique_ptr<Startup> startup;                   ///< Handles startup initialization
     juce::OwnedArray<juce::ChildProcessWorker> workers; ///< Worker processes (e.g., plugin scanner)
-
 #if JUCE_LINUX
     class MidiSettingsApply {
     public:

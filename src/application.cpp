@@ -37,6 +37,8 @@
 
 namespace element {
 
+static std::atomic<int> sCanShutdown { 0 };
+
 class Startup : public ActionBroadcaster
 {
 public:
@@ -227,6 +229,11 @@ void Application::actionListenerCallback (const String& message)
         finishLaunching();
 }
 
+bool Application::canShutdown()
+{
+    return 1 == sCanShutdown.load (std::memory_order_acquire);
+}
+
 void Application::shutdown()
 {
     if (! world)
@@ -250,6 +257,7 @@ void Application::shutdown()
 
     srvs.deactivate();
     srvs.shutdown();
+    sCanShutdown.store (1, std::memory_order_acquire);
 
     plugins.saveUserPlugins (settings);
     midi.writeSettings (settings);
