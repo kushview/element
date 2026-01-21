@@ -178,7 +178,8 @@ private:
     {
         juce::String ver (ELEMENT_VERSION_STRING);
         ver << "-" << ELEMENT_BUILD_NUMBER;
-        updater->setFeedUrl (ELEMENT_UPDATES_URL);
+        updater->setFeedUrl("http://localhost:8000/appcast.xml");
+        // updater->setFeedUrl (ELEMENT_UPDATES_URL);
     }
 
     bool launchUpdaterOnExit { false };

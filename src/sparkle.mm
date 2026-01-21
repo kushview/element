@@ -57,6 +57,11 @@
     return [_feedURL absoluteString];
 }
 
+- (void)updater:(SPUUpdater *)updater didFindValidUpdate:(id)item
+{
+    juce::Logger::writeToLog("[element] sparkle: update available");
+}
+
 @end
 
 namespace element
@@ -114,26 +119,3 @@ std::unique_ptr<Updater> Updater::create()
 }
 
 } // namespace element
-
-#if 0
-// Creates and starts the updater. There's nothing else required.
-Updater::Updater(QAction *checkForUpdatesAction)
-{
-    @autoreleasepool {
-        _delegate = [[AppUpdaterDelegate alloc] init];
-        _delegate.updaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES updaterDelegate:_delegate userDriverDelegate:nil];
-        
-        connect(checkForUpdatesAction, &QAction::triggered, this, &Updater::checkForUpdates);
-        
-        [_delegate observeCanCheckForUpdatesWithAction:checkForUpdatesAction];
-    }
-}
-
-// Called when the user checks for updates
-void Updater::checkForUpdates()
-{
-    @autoreleasepool {
-        [_delegate.updaterController checkForUpdates:nil];
-    }
-}
-#endif
