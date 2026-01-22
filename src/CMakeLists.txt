@@ -5,7 +5,12 @@
 add_library(element STATIC)
 add_library(kv::element ALIAS element)
 
-set_target_properties(element PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(element PROPERTIES 
+    POSITION_INDEPENDENT_CODE ON
+    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
 
 target_include_directories(element
     PUBLIC
