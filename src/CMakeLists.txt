@@ -13,6 +13,8 @@ set_target_properties(element PROPERTIES
 )
 
 target_include_directories(element
+    PRIVATE
+        ${JUCE_MODULES_DIR}
     PUBLIC
         "${GENERATED_INCLUDE_DIR}"
         "${PROJECT_SOURCE_DIR}/include"
@@ -34,7 +36,8 @@ if(APPLE)
     target_sources(element PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ui/nsviewwithparent.mm")
 endif()
 
-target_compile_definitions(element PUBLIC BOOST_ALL_NO_LIB=1)
+target_compile_definitions(element 
+    PUBLIC BOOST_ALL_NO_LIB=1)
 
 target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
 
@@ -53,7 +56,7 @@ elseif(MSVC)
 endif()
 
 target_compile_definitions(element
-    PUBLIC
+    INTERFACE
         DONT_SET_USING_JUCE_NAMESPACE=1
         JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_WEB_BROWSER=0
@@ -66,7 +69,7 @@ target_compile_definitions(element
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
 target_link_libraries(element
-    PUBLIC
+    INTERFACE
         juce::juce_core
         juce::juce_gui_basics
         juce::juce_gui_extra
@@ -78,11 +81,12 @@ target_link_libraries(element
         juce::juce_audio_processors
         juce::juce_audio_formats
         juce::juce_audio_utils
+    PUBLIC
+        juce::juce_recommended_config_flags
         element-binarydata
         element-luascripts
         element-luamods
         sol2::sol2
-        juce::juce_recommended_config_flags
     )
 
 if(ELEMENT_ENABLE_UPDATER)
@@ -104,6 +108,6 @@ endif()
 # VST2 enable host support
 if(ELEMENT_ENABLE_VST2)
     message(STATUS "VST2 Plugin support enabled")
-    target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
-    target_link_libraries(element PUBLIC juce_vst2_sdk)
+    target_compile_definitions(element INTERFACE JUCE_PLUGINHOST_VST=1)
+    target_link_libraries(element INTERFACE juce_vst2_sdk)
 endif()
