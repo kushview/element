@@ -84,6 +84,13 @@ set_target_properties(element_app PROPERTIES
 )
 
 if(APPLE)
+    add_custom_target(uninstaller
+        COMMAND osacompile -o "${PROJECT_BINARY_DIR}/Uninstall.app" "${PROJECT_SOURCE_DIR}/util/uninstall.applescript"
+        COMMENT "Building Uninstall.app from AppleScript"
+        VERBATIM
+    )
+    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${PROJECT_BINARY_DIR}/Uninstall.app")
+
     if(ELEMENT_ENABLE_UPDATER)
         target_compile_options(element_app PRIVATE "-F${sparkle_SOURCE_DIR}")
         target_link_options(element_app PRIVATE "-F${sparkle_SOURCE_DIR}" -framework Sparkle)
