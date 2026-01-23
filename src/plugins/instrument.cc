@@ -8,7 +8,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     // Ensure JUCE's MessageManager is initialized before creating processor
     // This initializes critical JUCE statics like AudioChannelSet
     juce::MessageManager::getInstance();
-    
+
     return new element::PluginProcessor (
         element::PluginProcessor::Instrument, 16);
 }

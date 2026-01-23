@@ -77,6 +77,11 @@ juce_add_gui_app(element_app
 
 target_sources(element_app PRIVATE src/main.cc)
 target_link_libraries(element_app PRIVATE kv::element)
+set_target_properties(element_app PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
 
 if(APPLE)
     if(ELEMENT_ENABLE_UPDATER)
@@ -117,11 +122,6 @@ if(ELEMENT_BUILD_PLUGINS)
     if(ELEMENT_ENABLE_VST2)
         list(APPEND ELEMENT_PLUGIN_FORMATS "VST")
     endif()
-    
-    # Set default visibility for all plugin targets
-    set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-    set(CMAKE_C_VISIBILITY_PRESET hidden)
-    set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
     ## Instrument Plugin
     juce_add_plugin(element_instrument
@@ -147,19 +147,7 @@ if(ELEMENT_BUILD_PLUGINS)
         CLAP_FEATURES instrument)
     target_sources(element_instrument PRIVATE src/plugins/instrument.cc)
     target_link_libraries(element_instrument PRIVATE kv::element)
-    
-    # Hide symbols in plugin to prevent collision with host
-    set_target_properties(element_instrument PROPERTIES
-        CXX_VISIBILITY_PRESET hidden
-        C_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN ON
-    )
-    
-    # On macOS, add linker flag to strip hidden symbols
-    if(APPLE AND TARGET element_instrument_AU)
-        target_link_options(element_instrument_AU PRIVATE "LINKER:-exported_symbol,_KV_ElementAUFactory")
-    endif()
-    
+    element_setup_plugin(element_instrument)
     element_install_plugin(element_instrument)
     
     ## Effect Plugin
@@ -187,14 +175,7 @@ if(ELEMENT_BUILD_PLUGINS)
 
     target_sources(element_effect PRIVATE src/plugins/effect.cc)
     target_link_libraries(element_effect PRIVATE kv::element)
-    
-    # Hide symbols in plugin to prevent collision with host
-    set_target_properties(element_effect PROPERTIES
-        CXX_VISIBILITY_PRESET hidden
-        C_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN ON
-    )
-    
+    element_setup_plugin(element_effect)
     element_install_plugin(element_effect)
 
     if(APPLE)
@@ -218,13 +199,7 @@ if(ELEMENT_BUILD_PLUGINS)
 
         target_sources(element_midi_effect PRIVATE src/plugins/midieffect.cc)
         target_link_libraries(element_midi_effect PRIVATE kv::element)
-        
-        # Hide symbols in plugin to prevent collision with host
-        set_target_properties(element_midi_effect PROPERTIES
-            CXX_VISIBILITY_PRESET hidden
-            C_VISIBILITY_PRESET hidden
-            VISIBILITY_INLINES_HIDDEN ON
-        )
+        element_setup_plugin(element_midi_effect)
         
         # MFX version is AU only so function helper won't work here.
         install(TARGETS element_midi_effect_AU

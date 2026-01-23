@@ -55,9 +55,46 @@ endif()
 
 # JUCE VST2 SDK path setup
 if(ELEMENT_ENABLE_VST2)
-    set(JUCE_GLOBAL_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
+    set(ELEMENT_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
+    set(JUCE_GLOBAL_VST2_SDK_PATH "${ELEMENT_VST2_SDK_PATH}")
     message(STATUS "VST2 SDK Path: ${JUCE_GLOBAL_VST2_SDK_PATH}")
 endif()
+
+# Setup a plugin by target name
+function(element_setup_plugin tgt)
+    # Hide symbols in plugin to prevent collision with host
+    set_target_properties(${tgt} PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        C_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN ON
+    )
+
+    # On macOS, add linker flag to strip hidden symbols
+    if(APPLE)
+        if(TARGET ${tgt}_AU)
+            get_target_property(outname ${tgt} JUCE_PRODUCT_NAME)
+            string(REPLACE "-" "_" outsym ${outname})
+            target_link_options(${tgt}_AU PRIVATE "LINKER:-exported_symbol,_${outsym}AUFactory")
+            unset(outname)
+            unset(outsym)
+        endif()
+        if(TARGET ${tgt}_CLAP)
+            target_link_options(${tgt}_CLAP PRIVATE "LINKER:-exported_symbol,_clap_entry")
+        endif()
+        if(TARGET ${tgt}_VST3)
+            target_link_options(${tgt}_VST3 PRIVATE "LINKER:-exported_symbol,_GetPluginFactory")
+            target_link_options(${tgt}_VST3 PRIVATE "LINKER:-exported_symbol,_bundleEntry")
+            target_link_options(${tgt}_VST3 PRIVATE "LINKER:-exported_symbol,_bundleExit")
+        endif()
+        if(TARGET ${tgt}_LV2)
+            target_link_options(${tgt}_LV2 PRIVATE "LINKER:-exported_symbol,_lv2_descriptor")
+            target_link_options(${tgt}_LV2 PRIVATE "LINKER:-exported_symbol,_lv2ui_descriptor")
+        endif()
+        if(TARGET ${tgt}_VST)
+            target_link_options(${tgt}_VST PRIVATE "LINKER:-exported_symbol,_VSTPluginMain")
+        endif()
+    endif()
+endfunction()
 
 # Install a plugin by target name
 function(element_install_plugin tgt)
