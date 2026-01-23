@@ -13,9 +13,6 @@ set_target_properties(element PROPERTIES
 )
 
 target_include_directories(element
-    PRIVATE
-        ${JUCE_MODULES_DIR}
-        ${JUCE_MODULES_DIR}/juce_audio_processors_headless/format_types/LV2_SDK/lv2
     PUBLIC
         "${GENERATED_INCLUDE_DIR}"
         "${PROJECT_SOURCE_DIR}/include"
@@ -59,9 +56,6 @@ endif()
 
 target_compile_definitions(element
     PUBLIC
-        DONT_SET_USING_JUCE_NAMESPACE=1
-        JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1  
-        JUCE_MODULE_AVAILABLE_juce_data_structures=1  
         JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=1
@@ -72,18 +66,8 @@ target_compile_definitions(element
         JUCE_PLUGINHOST_AU=1
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
-# Use generator expressions so this works with multi-config generators.
-# Treat both Debug and RelWithDebInfo as "debug-like" builds.
-target_compile_definitions(element
-    PUBLIC
-        $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG>
-        $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:_DEBUG>
-        $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>>:NDEBUG>
-        $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>>:_NDEBUG>
-)
-
 target_link_libraries(element
-    INTERFACE
+    PUBLIC
         juce::juce_core
         juce::juce_gui_basics
         juce::juce_gui_extra
@@ -95,7 +79,6 @@ target_link_libraries(element
         juce::juce_audio_processors
         juce::juce_audio_formats
         juce::juce_audio_utils
-    PUBLIC
         juce::juce_recommended_config_flags
         element-binarydata
         element-luascripts
@@ -124,5 +107,5 @@ if(ELEMENT_ENABLE_VST2)
     message(STATUS "VST2 Plugin support enabled")
     juce_set_vst2_sdk_path("${ELEMENT_VST2_SDK_PATH}")
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
-    target_link_libraries(element INTERFACE juce_vst2_sdk)
+    target_link_libraries(element PUBLIC juce_vst2_sdk)
 endif()
