@@ -5,7 +5,12 @@
 add_library(element STATIC)
 add_library(kv::element ALIAS element)
 
-set_target_properties(element PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(element PROPERTIES 
+    POSITION_INDEPENDENT_CODE ON
+    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
 
 target_include_directories(element
     PUBLIC
@@ -29,7 +34,8 @@ if(APPLE)
     target_sources(element PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ui/nsviewwithparent.mm")
 endif()
 
-target_compile_definitions(element PUBLIC BOOST_ALL_NO_LIB=1)
+target_compile_definitions(element 
+    PUBLIC BOOST_ALL_NO_LIB=1)
 
 target_compile_options(element PRIVATE ${SUIL_CFLAGS_OTHER})
 
@@ -47,9 +53,9 @@ elseif(MSVC)
     target_compile_options(element PRIVATE /wd4244)
 endif()
 
+
 target_compile_definitions(element
     PUBLIC
-        DONT_SET_USING_JUCE_NAMESPACE=1
         JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=1
@@ -73,11 +79,11 @@ target_link_libraries(element
         juce::juce_audio_processors
         juce::juce_audio_formats
         juce::juce_audio_utils
+        juce::juce_recommended_config_flags
         element-binarydata
         element-luascripts
         element-luamods
         sol2::sol2
-        juce::juce_recommended_config_flags
     )
 
 if(ELEMENT_ENABLE_UPDATER)
@@ -99,6 +105,7 @@ endif()
 # VST2 enable host support
 if(ELEMENT_ENABLE_VST2)
     message(STATUS "VST2 Plugin support enabled")
+    juce_set_vst2_sdk_path("${ELEMENT_VST2_SDK_PATH}")
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
     target_link_libraries(element PUBLIC juce_vst2_sdk)
 endif()
