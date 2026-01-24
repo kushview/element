@@ -1,15 +1,17 @@
 // Copyright 2014-2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <element/nodefactory.hpp>
+#include <array>
+
+#include <element/datapath.hpp>
 #include <element/node.hpp>
+#include <element/nodefactory.hpp>
 #include <element/plugins.hpp>
 #include <element/settings.hpp>
 
 #include "engine/clapprovider.hpp"
-#include "nodes/nodetypes.hpp"
 #include "engine/ionode.hpp"
-#include <element/datapath.hpp>
+#include "nodes/nodetypes.hpp"
 #include "utils.hpp"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME "scanner/crashed.txt"
@@ -48,12 +50,12 @@ static File scannerExeFullPath()
 #if JUCE_LINUX
     if (! scannerExe.existsAsFile())
     {
-        char* path = (char*) malloc (PATH_MAX);
-        if (path != NULL)
+        std::array<char, PATH_MAX> path {};
+        const ssize_t len = readlink ("/proc/self/exe", path.data(), PATH_MAX - 1);
+        if (len > 0)
         {
-            if (readlink ("/proc/self/exe", path, PATH_MAX) > 0)
-                scannerExe = File (String (path));
-            std::free (path);
+            path[static_cast<size_t> (len)] = '\0';
+            scannerExe = File (String (path.data()));
         }
     }
 #endif
@@ -98,7 +100,14 @@ public:
     explicit PluginScannerCoordinator (PluginScanner& o)
         : owner (o)
     {
-        launchScanner (EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, 0);
+        if (! launchScanner (EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, 0))
+        {
+            o.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
+            juce::AlertWindow::showMessageBoxAsync (
+                juce::MessageBoxIconType::WarningIcon,
+                "Plugin Scanner",
+                "Could not launch plugin scanner.");
+        }
     }
 
     ~PluginScannerCoordinator() {}
