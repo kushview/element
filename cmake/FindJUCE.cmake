@@ -1,14 +1,27 @@
 # SPDX-FileCopyrightText: 2026 Kushview, LLC
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# The juce version to use.  This can be a git tag, hash, or branch.
+set(ELEMENT_JUCE_VERSION 8.0.12)
+
 if(NOT TARGET juce::juce_core)
-    find_package(JUCE 8.0.12 CONFIG)
+    find_package(JUCE ${ELEMENT_JUCE_VERSION} CONFIG)
     if(NOT JUCE_FOUND)
-        FetchContent_Declare(juce
-            GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-            GIT_TAG 8.0.12
-            GIT_SHALLOW ON)
-        FetchContent_MakeAvailable(juce)
+        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
+            FetchContent_Declare(juce
+                GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+                GIT_TAG ${ELEMENT_JUCE_VERSION}
+                GIT_SHALLOW ON
+                EXCLUDE_FROM_ALL)
+            FetchContent_MakeAvailable(juce)
+        else()
+            FetchContent_Declare(juce
+                GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+                GIT_TAG ${ELEMENT_JUCE_VERSION}
+                GIT_SHALLOW ON)
+            FetchContent_Populate(juce)
+            add_subdirectory(${juce_SOURCE_DIR} ${juce_BINARY_DIR} EXCLUDE_FROM_ALL)
+        endif()
     endif()
 endif()
 
