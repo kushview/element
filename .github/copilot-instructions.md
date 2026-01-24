@@ -4,6 +4,7 @@
 
 - **Always check documentation**: Before making assumptions about APIs, libraries, or tools, consult the official documentation first.
 - **Do not make assumptions and guesses**: When uncertain about implementation details, research or ask rather than guessing.
+- **Avoid workarounds**: Do things "the right way" by using the proper APIs and intended patterns. Take time to research the correct solution rather than applying quick hacks that create technical debt.
 - **KISS (Keep It Simple, Stupid)**: Favor simple, straightforward solutions over complex ones.
 - **DRY (Don't Repeat Yourself)**: Avoid code duplication. Extract common functionality into reusable functions or components.
 
