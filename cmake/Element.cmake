@@ -98,12 +98,18 @@ endfunction()
 
 # Install a plugin by target name
 function(element_install_plugin tgt)
-    if(LINUX OR WIN32)
-        install(TARGETS ${tgt}_CLAP DESTINATION "${CMAKE_INSTALL_LIBDIR}/clap")
+    if(LINUX)
+        install(TARGETS ${tgt}_CLAP DESTINATION "lib/clap")
         install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/LV2/"
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/lv2")
+            DESTINATION "lib/lv2")
         install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST3/"
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst3")
+            DESTINATION "lib/vst3")
+    elseif(WIN32)
+        install(TARGETS ${tgt}_CLAP DESTINATION "CLAP")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/LV2/"
+            DESTINATION "LV2")
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${tgt}_artefacts/$<CONFIG>/VST3/"
+            DESTINATION "VST3")
     elseif(APPLE)
         install(TARGETS "${tgt}_AU"   LIBRARY DESTINATION "Library/Audio/Plug-Ins/Components")
         install(TARGETS "${tgt}_CLAP" LIBRARY DESTINATION "Library/Audio/Plug-Ins/CLAP")
@@ -114,8 +120,10 @@ function(element_install_plugin tgt)
     endif()
 
     if(ELEMENT_ENABLE_VST2)
-        if(LINUX OR WIN32)
-            install(TARGETS ${tgt}_VST DESTINATION "${CMAKE_INSTALL_LIBDIR}/vst")
+        if(LINUX)
+            install(TARGETS ${tgt}_VST DESTINATION "lib/vst")
+        elseif(WIN32)
+            install(TARGETS ${tgt}_VST DESTINATION "VST")
         elseif(APPLE)
             install(TARGETS "${tgt}_VST" LIBRARY DESTINATION "Library/Audio/Plug-Ins/VST")
         endif()
