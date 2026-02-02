@@ -109,6 +109,14 @@ public:
     */
     void finishLaunching();
 
+    /** Checks if the application can safely shut down.
+        
+        Determines whether there are any unsaved changes in the current session
+        that would be lost on shutdown.
+        
+        @return true if there are no pending session changes and shutdown can proceed,
+                false if the session has unsaved changes
+    */
     static bool canShutdown();
 
 protected:

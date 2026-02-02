@@ -21,13 +21,13 @@ public:
 
     void openDefaultSession();
     void openFile (const File& file);
-    const File getSessionFile() const { return document != nullptr ? document->getFile() : File(); }
+    const File getSessionFile() const;
     void closeSession();
     void saveSession (const bool saveAs = false,
                       const bool askForFile = true,
                       const bool showError = true);
     void newSession();
-    bool hasSessionChanged() { return (document) ? document->hasChangedSinceSaved() : false; }
+    bool hasSessionChanged();
 
     void resetChanges (const bool clearDocumentFile = false);
 

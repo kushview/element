@@ -14,6 +14,24 @@
 - Maintain consistency with the existing codebase style and patterns.
 - Consider maintainability and future developers who will read the code.
 
+## Documentation
+
+- Use Doxygen-style comments with `/** ... */` for documenting classes, functions, and methods.
+- Include a brief description, parameter documentation with `@param`, and return value documentation with `@return`.
+- Document what the function does, not how it does it (implementation details belong in inline comments).
+- Example:
+  ```cpp
+  /** Checks if the application can safely shut down.
+      
+      Determines whether there are any unsaved changes in the current session
+      that would be lost on shutdown.
+      
+      @return true if there are no pending session changes and shutdown can proceed,
+              false if the session has unsaved changes
+  */
+  static bool canShutdown();
+  ```
+
 ## Audio Graph Architecture
 
 - **IONodes** (audio/MIDI input/output) require a parent `GraphNode` to be set before ports can be properly initialized.

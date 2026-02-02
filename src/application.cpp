@@ -232,7 +232,19 @@ void Application::actionListenerCallback (const String& message)
 
 bool Application::canShutdown()
 {
-    return 1 == sCanShutdown.load (std::memory_order_acquire);
+    if (! MessageManager::getInstance()->isThisTheMessageThread()) 
+    {
+        auto result = MessageManager::getInstance()->callSync (Application::canShutdown);
+        return result.has_value() ? * result : true;
+    }
+
+    if (auto app = dynamic_cast<Application*> (getInstance())) {
+        auto& services = app->world->services();
+        auto ssvc = services.find<SessionService>();
+        return !ssvc->hasSessionChanged();
+    }
+
+    return true;
 }
 
 void Application::shutdown()

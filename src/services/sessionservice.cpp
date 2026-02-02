@@ -153,6 +153,10 @@ void SessionService::openFile (const File& file)
     }
 }
 
+const File SessionService::getSessionFile() const { 
+    return document != nullptr ? document->getFile() : File(); 
+}
+
 void SessionService::exportGraph (const Node& node, const File& targetFile)
 {
     if (! node.hasNodeType (types::Graph))
@@ -174,6 +178,10 @@ void SessionService::importGraph (const File& file)
 void SessionService::closeSession()
 {
     DBG ("[SC] close session");
+}
+
+bool SessionService::hasSessionChanged() { 
+    return (document) ? document->hasChangedSinceSaved() : false; 
 }
 
 void SessionService::resetChanges (const bool resetDocumentFile)
