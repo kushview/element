@@ -368,6 +368,7 @@ void Application::finishLaunching()
     if (world->settings().scanForPluginsOnStartup())
         world->plugins().scanAudioPlugins();
 
+    const bool isFirstRun =startup->isFirstRun;
     startup.reset();
 
     auto& ui = *world->services().find<UI>();
@@ -376,7 +377,7 @@ void Application::finishLaunching()
 
     world->services().run();
 
-    if (world->settings().checkForUpdates())
+    if (! isFirstRun && world->settings().checkForUpdates())
         startTimer (10 * 1000);
 
     maybeOpenCommandLineFile (getCommandLineParameters());
