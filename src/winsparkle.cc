@@ -8,6 +8,10 @@
 #include <element/application.hpp>
 #include <element/ui/updater.hpp>
 
+#ifndef ELEMENT_APPCAST_URL
+#define ELEMENT_APPCAST_URL "http://localhost:8000/appcast.xml"
+#endif
+
 namespace element {
 
 static int __cdecl canShutdown()
@@ -29,7 +33,7 @@ public:
         // Use "0.0.1" to force update detection during testing
         // win_sparkle_set_app_details (L"Kushview", L"Element", L"0.0.1");
         // win_sparkle_set_app_build_version (L"1");
-        win_sparkle_set_appcast_url ("http://localhost:8000/appcast.xml");
+        win_sparkle_set_appcast_url (ELEMENT_APPCAST_URL);
         win_sparkle_set_automatic_check_for_updates (0);
 
         // Set shutdown callbacks so installer can replace the running exe
@@ -37,7 +41,9 @@ public:
         win_sparkle_set_shutdown_request_callback (shutdownRequest);
 
         // Don't set public key for testing - allows unsigned updates
-        // win_sparkle_set_eddsa_public_key ("pubkey");
+#ifdef ELEMENT_EDDSA_PUBLIC_KEY
+        win_sparkle_set_eddsa_public_key (ELEMENT_EDDSA_PUBLIC_KEY);
+#endif
     }
 
     void check (bool async) override
