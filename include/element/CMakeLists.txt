@@ -7,7 +7,7 @@
 set(ELEMENT_GIT_BASE "72f454b409ee0e719b72a87d3a0209339952814a" CACHE STRING "Base commit/tag for build numbering")
 
 # Allow build number override (e.g., from CI)
-set(ELEMENT_BUILD_NUMBER "" CACHE STRING "Computed build number (overrideable)")
+set(ELEMENT_BUILD_NUMBER 0)
 
 # Only run git commands if git is found and .git directory exists
 find_package(Git)
@@ -57,12 +57,16 @@ else()
     endif()
 endif()
 
+set(ELEMENT_BUILD_NUMBER ${ELEMENT_BUILD_NUMBER} PARENT_SCOPE)
+
 set(ELEMENT_VERSION_STRING ${PROJECT_VERSION_FULL})
 
 set(GENERATED_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 set(GENERATED_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include PARENT_SCOPE)
 file(MAKE_DIRECTORY ${GENERATED_INCLUDE_DIR}/element)
 
+configure_file(${PROJECT_SOURCE_DIR}/cmake/buildversion.txt.in
+    ${CMAKE_BINARY_DIR}/buildversion.txt @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/version.txt.in
     ${CMAKE_BINARY_DIR}/version.txt @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in

@@ -64,7 +64,7 @@ endif()
 
 juce_add_gui_app(element_app
     PRODUCT_NAME            "${ELEMENT_STANDALONE_PRODUCT_NAME}"
-    BUILD_VERSION           "${ELEMENT_BUILD_NUMBER}"
+    BUILD_VERSION           "${PROJECT_VERSION}.${ELEMENT_BUILD_NUMBER}"
     DOCUMENT_EXTENSIONS     els elg
     ICON_BIG                data/images/icon.png
     ICON_SMALL              data/images/icon.png
@@ -134,7 +134,7 @@ if(ELEMENT_BUILD_PLUGINS)
     juce_add_plugin(element_instrument
         PLUGIN_NAME                 "Element"
         PRODUCT_NAME                "KV-Element"
-        BUILD_VERSION               "${ELEMENT_BUILD_NUMBER}"
+        BUILD_VERSION               "${PROJECT_VERSION}.${ELEMENT_BUILD_NUMBER}"
         PLUGIN_MANUFACTURER_CODE    KshV
         PLUGIN_CODE                 Elmt
 
@@ -161,7 +161,7 @@ if(ELEMENT_BUILD_PLUGINS)
     juce_add_plugin(element_effect
         PLUGIN_NAME                 "Element FX"
         PRODUCT_NAME                "KV-Element-FX"
-        BUILD_VERSION               "${ELEMENT_BUILD_NUMBER}"
+        BUILD_VERSION               "${PROJECT_VERSION}.${ELEMENT_BUILD_NUMBER}"
         PLUGIN_MANUFACTURER_CODE    KshV
         PLUGIN_CODE                 ElFX
 
@@ -190,7 +190,7 @@ if(ELEMENT_BUILD_PLUGINS)
         juce_add_plugin(element_midi_effect
             PLUGIN_NAME                 "Element MFX"
             PRODUCT_NAME                "KV-Element-MFX"
-            BUILD_VERSION               "${ELEMENT_BUILD_NUMBER}"
+            BUILD_VERSION               "${PROJECT_VERSION}.${ELEMENT_BUILD_NUMBER}"
             PLUGIN_MANUFACTURER_CODE    KshV
             PLUGIN_CODE                 ElMX
             
