@@ -13,9 +13,10 @@ SPDX-License-Identifier = "Apache-2.0"
 [[annotations]]
 path = [ "*.md", "src/**/*.rc", "docs/**/*.md", "docs/**/*.css", 
          "test/**/*.md", ".clang-format", "**/.clang-format", 
-         "data/intro.txt", "data/developers.txt", "cmake/version.txt.in",
-         "data/acknowledgements.txt", "src/res/icon.ico", "data/**/*.png",
-         "data/**/*.svg", "data/**/*.els", ".github/**/*.*" ]
+         "data/intro.txt", "data/developers.txt", "cmake/buildversion.txt.in",
+         "cmake/version.txt.in", "data/acknowledgements.txt", 
+         "src/res/icon.ico", "data/**/*.png", "data/**/*.svg", 
+         "data/**/*.els", ".github/**/*.*" ]
 SPDX-FileCopyrightText = "Kushview, LLC."
 SPDX-License-Identifier = "CC0-1.0"
 
