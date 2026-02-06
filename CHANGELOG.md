@@ -1,5 +1,53 @@
 # Change Log
 
+## [1.0.0] - 2026-02-06
+
+### Changed
+- Update versioning to include project version in build number.
+- Refactor updater interface to use feed URL instead of repository.
+- Remove build version suffix for consistency.
+- Use JUCE and Sol2 system packages when available.
+- Extract sol2 repository based on CMake version.
+- Stop using ElementApp.h.
+- Reduce binary data size by excluding unused resources.
+- Remove alias headers and update client code.
+- Improve symbol visibility and export properties for plugin loading.
+- Use standard plugin locations on Linux for installation.
+- Refactor appcast URL definition for consistency and clarity.
+
+### Added
+- Sparkle updater integration for macOS.
+- WinSparkle updater support for Windows.
+- Background update checks with improved documentation.
+- Shutdown handling for updates.
+- Update checks prevented on first run.
+- Feed URL for updater with availability logging.
+- macOS uninstaller target to build Uninstall.app from AppleScript.
+- Spoton Scale Chooser program.
+- Build and REUSE status badges to README.
+- REUSE compliance tagging.
+
+### Removed
+- JUCE submodule (now uses system package or FetchContent).
+- LVTK submodule and all references to internal LV2/LVTK implementation.
+- Unused Element modules and legacy code.
+- Obsolete updater documentation.
+- Unused strings.cpp file.
+- Duplicate includes and unused headers.
+
+### Fixed
+- MSVC 14.5+ compilation error in Point.cpp by isolating C linkage from C++ lambda code.
+- Ensure IONode's parent graph has minimum port count on setParentGraph.
+- Correctly handle parameter sync from plugin to host in CLAP.
+- Don't create audio delay ops for control ports on single connection.
+- Warnings from JUCE about parameter IDs not being set.
+- Hide check updates preference when updater disabled.
+- JACK on Windows to use system library loader and symbol lookup functions.
+- Linux to correctly acquire exe full path when launched by PATH.
+- Remove duplicate include of datapath.hpp in datapathbrowser.hpp.
+- Code signing with JUCE CMake helpers.
+- Replace hardcoded ASIO SDK path with FetchContent for reproducible builds.
+
 ## [1.0.0b2] - 2026-01-06
 
 ### Changed
