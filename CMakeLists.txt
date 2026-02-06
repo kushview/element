@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.26.0)
 project(element VERSION 1.0.0)
-set(PROJECT_VERSION_SUFFIX "b2")
+set(PROJECT_VERSION_SUFFIX "")
 set(PROJECT_VERSION_FULL "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
 
 include(cmake/Element.cmake)
