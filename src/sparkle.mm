@@ -100,7 +100,7 @@ public:
     {
         @autoreleasepool
         {
-            if (!_delegate.updaterController.updater.sessionInProgress)
+            if (_delegate.updaterController.updater.sessionInProgress)
                 return;
             _delegate.isBackgroundCheck = background;
             if (background)

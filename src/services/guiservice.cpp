@@ -176,10 +176,8 @@ private:
 
     void setupUpdater()
     {
-        juce::String ver (ELEMENT_VERSION_STRING);
-        ver << "-" << ELEMENT_BUILD_NUMBER;
-        updater->setFeedUrl ("http://localhost:8000/appcast.xml");
-        // updater->setFeedUrl (ELEMENT_UPDATES_URL);
+        // TODO: Setup updater with settings.  Not needed until supported access
+        // is implemented
     }
 
     bool launchUpdaterOnExit { false };
