@@ -114,10 +114,8 @@ elseif(WIN32)
     if(ELEMENT_ENABLE_UPDATER)
         target_link_libraries(element_app PRIVATE WinSparkle::WinSparkle)
         target_sources(element_app PRIVATE src/winsparkle.cc)
-        set_source_files_properties (src/winsparkle.cc PROPERTIES 
-            COMPILE_DEFINITIONS 
-                "ELEMENT_APPCAST_URL=${WIN_SPARKLE_FEED_URL}"
-                "ELEMENT_EDDSA_PUBLIC_KEY=${WIN_SPARKLE_PUBLIC_KEY}")
+        set_source_files_properties(src/winsparkle.cc PROPERTIES 
+            COMPILE_DEFINITIONS "ELEMENT_APPCAST_URL=${WIN_SPARKLE_FEED_URL};ELEMENT_EDDSA_PUBLIC_KEY=${WIN_SPARKLE_PUBLIC_KEY}")
         add_custom_command(TARGET element_app POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${WIN_SPARKLE_DLL}" "$<TARGET_FILE_DIR:element_app>")
