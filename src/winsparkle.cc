@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
+#include <CarbonCore/Script.h>
 #include <winsparkle.h>
 
 #include <element/version.h>
@@ -30,17 +31,16 @@ class WinSparkleUpdater : public Updater
 public:
     WinSparkleUpdater()
     {
-        // Use "0.0.1" to force update detection during testing
-        // win_sparkle_set_app_details (L"Kushview", L"Element", L"0.0.1");
-        // win_sparkle_set_app_build_version (L"1");
+        const juce::String versionString (ELEMENT_VERSION_STRING);
+        const juce::String buildVersion (ELEMENT_BUILD_VERSION);
+        win_sparkle_set_app_details (L"Kushview", L"Element", versionString.toWideCharPointer());
+        win_sparkle_set_app_build_version (buildVersion.toWideCharPointer());
         win_sparkle_set_appcast_url (ELEMENT_APPCAST_URL);
         win_sparkle_set_automatic_check_for_updates (0);
 
-        // Set shutdown callbacks so installer can replace the running exe
         win_sparkle_set_can_shutdown_callback (canShutdown);
         win_sparkle_set_shutdown_request_callback (shutdownRequest);
 
-        // Don't set public key for testing - allows unsigned updates
 #ifdef ELEMENT_EDDSA_PUBLIC_KEY
         win_sparkle_set_eddsa_public_key (ELEMENT_EDDSA_PUBLIC_KEY);
 #endif
@@ -55,7 +55,6 @@ public:
             _initialized = true;
         }
 
-        // win_sparkle_check_update_without_ui();
         win_sparkle_check_update_with_ui();
     }
 
