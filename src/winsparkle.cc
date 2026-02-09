@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
-#include <CarbonCore/Script.h>
 #include <winsparkle.h>
 
 #include <element/version.h>
