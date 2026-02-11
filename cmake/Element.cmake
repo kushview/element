@@ -56,8 +56,8 @@ endif()
 # JUCE VST2 SDK path setup
 if(ELEMENT_ENABLE_VST2)
     set(ELEMENT_VST2_SDK_PATH "${USER_HOME_DIRECTORY}/SDKs/vstsdk2.4")
-    set(JUCE_GLOBAL_VST2_SDK_PATH "${ELEMENT_VST2_SDK_PATH}")
-    message(STATUS "VST2 SDK Path: ${JUCE_GLOBAL_VST2_SDK_PATH}")
+    # set(JUCE_GLOBAL_VST2_SDK_PATH "${ELEMENT_VST2_SDK_PATH}")
+    message(STATUS "VST2 SDK Path: ${ELEMENT_VST2_SDK_PATH}")
 endif()
 
 # Setup a plugin by target name
