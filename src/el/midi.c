@@ -107,8 +107,7 @@ static int f_pitch (lua_State* L)
     PackedMessage msg = { .packed = 0x00 };
     msg.data.byte1 = 0xE0 | (uint8_t) (lua_tointeger (L, 1) - 1);
     msg.data.byte2 = (uint8_t) (position & 127);
-    msg.data.byte2 = (uint8_t) ((position >> 7) & 127);
-    msg.data.byte2 = 0x00;
+    msg.data.byte3 = (uint8_t) ((position >> 7) & 127);
     lua_pushinteger (L, msg.packed);
     return 1;
 }
@@ -134,7 +133,7 @@ static int f_aftertouch (lua_State* L)
 static int f_channelpressure (lua_State* L)
 {
     lua_pushinteger (L, 0x00);
-    return f_msg3bytes (L, 0x00);
+    return f_msg3bytes (L, 0xD0);
 }
 
 /// Make an all notes off message.
@@ -247,7 +246,7 @@ static int f_clamp (lua_State* L)
     else if (value > 127)
         value = 127;
     lua_pushinteger (L, value);
-    return 0;
+    return 1;
 }
 
 static const luaL_Reg midi_f[] = {
