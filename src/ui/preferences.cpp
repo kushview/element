@@ -1141,7 +1141,8 @@ private:
 
 //==============================================================================
 #if ELEMENT_UPDATER
-class UpdatesSettingsPage : public SettingsPage
+class UpdatesSettingsPage : public SettingsPage,
+                            public Button::Listener
 {
 public:
     UpdatesSettingsPage (Context& w)
@@ -1157,29 +1158,43 @@ public:
         releaseChannelBox.setSelectedId (1, dontSendNotification);
 
         addAndMakeVisible (authorizationLabel);
-        authorizationLabel.setText ("Authorization", dontSendNotification);
+        authorizationLabel.setText ("Preview Access", dontSendNotification);
         authorizationLabel.setFont (Font (FontOptions (15.0f).withStyle ("Bold")));
 
-        addAndMakeVisible (usernameLabel);
-        usernameLabel.setText ("Username", dontSendNotification);
-        usernameLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-
-        addAndMakeVisible (usernameField);
-        usernameField.setTextToShowWhenEmpty ("Enter username", Colours::grey);
-
-        addAndMakeVisible (passwordLabel);
-        passwordLabel.setText ("Password", dontSendNotification);
-        passwordLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-
-        addAndMakeVisible (passwordField);
-        passwordField.setPasswordCharacter ('*');
-        passwordField.setTextToShowWhenEmpty ("Enter password", Colours::grey);
+        addAndMakeVisible (statusLabel);
+        statusLabel.setText ("Not authorized", dontSendNotification);
+        statusLabel.setFont (Font (FontOptions (12.0)));
+        statusLabel.setColour (Label::textColourId, Colours::grey);
 
         addAndMakeVisible (authorizeButton);
-        authorizeButton.setButtonText ("Authorize");
+        authorizeButton.setButtonText ("Sign in with Kushview.net");
+        authorizeButton.addListener (this);
+
+        addAndMakeVisible (signOutButton);
+        signOutButton.setButtonText ("Sign Out");
+        signOutButton.addListener (this);
+        signOutButton.setVisible (false);
+
+        updateAuthorizationState();
     }
 
-    ~UpdatesSettingsPage() {}
+    ~UpdatesSettingsPage()
+    {
+        authorizeButton.removeListener (this);
+        signOutButton.removeListener (this);
+    }
+
+    void buttonClicked (Button* button) override
+    {
+        if (button == &authorizeButton)
+        {
+            startOAuthFlow();
+        }
+        else if (button == &signOutButton)
+        {
+            signOut();
+        }
+    }
 
     void resized() override
     {
@@ -1199,15 +1214,15 @@ public:
 
         r.removeFromTop (spacingBetweenSections);
 
-        // Username
-        layoutSetting (r, usernameLabel, usernameField, getWidth() / 2);
+        // Status label
+        statusLabel.setBounds (r.removeFromTop (settingHeight));
 
-        // Password
-        layoutSetting (r, passwordLabel, passwordField, getWidth() / 2);
-
-        // Authorize button
+        // Buttons
         r.removeFromTop (spacingBetweenSections);
-        authorizeButton.setBounds (r.removeFromTop (settingHeight).removeFromLeft (100));
+        auto buttonRow = r.removeFromTop (settingHeight);
+        authorizeButton.setBounds (buttonRow.removeFromLeft (180));
+        buttonRow.removeFromLeft (spacingBetweenSections);
+        signOutButton.setBounds (buttonRow.removeFromLeft (100));
     }
 
 private:
@@ -1217,11 +1232,96 @@ private:
     ComboBox releaseChannelBox;
 
     Label authorizationLabel;
-    Label usernameLabel;
-    TextEditor usernameField;
-    Label passwordLabel;
-    TextEditor passwordField;
+    Label statusLabel;
     TextButton authorizeButton;
+    TextButton signOutButton;
+
+    /** Initiates the OAuth authorization flow.
+        
+        Opens the user's default browser to kushview.net OAuth page.
+        The website will redirect back to the app via custom URL scheme
+        after successful authentication.
+     */
+    void startOAuthFlow()
+    {
+        // TODO: Implement OAuth flow
+        // 1. Generate state parameter for CSRF protection
+        // 2. Build authorization URL with client_id, redirect_uri, scope
+        // 3. Launch in default browser
+        // 4. Register URL handler to receive callback
+        
+        const String authUrl = "https://kushview.net/oauth/authorize?"
+                               "client_id=element-app&"
+                               "redirect_uri=element://auth/callback&"
+                               "response_type=code&"
+                               "scope=updates";
+        
+        URL (authUrl).launchInDefaultBrowser();
+        
+        Logger::writeToLog ("OAuth: Authorization flow started");
+    }
+
+    /** Handles the OAuth callback with authorization code.
+        
+        Exchanges the authorization code for an access token and
+        refresh token, then stores them securely.
+        
+        @param code The authorization code received from the OAuth callback
+     */
+    void handleOAuthCallback (const String& code)
+    {
+        // TODO: Implement token exchange
+        // 1. POST to token endpoint with code
+        // 2. Parse response to get access_token and refresh_token
+        // 3. Store tokens securely (keychain/credential manager)
+        // 4. Update UI and configure updater
+        
+        Logger::writeToLog ("OAuth: Received authorization code: " + code);
+        
+        // For now, just update UI as if authorized
+        updateAuthorizationState (true, "user@example.com");
+    }
+
+    /** Signs out the user and clears stored tokens. */
+    void signOut()
+    {
+        // TODO: Implement sign out
+        // 1. Clear stored tokens from keychain/credential manager
+        // 2. Reset updater to use stable channel URL
+        // 3. Update UI
+        
+        Logger::writeToLog ("OAuth: Signing out");
+        updateAuthorizationState (false);
+    }
+
+    /** Updates the UI to reflect current authorization state.
+        
+        @param authorized Whether the user is currently authorized
+        @param email Optional email address to display when authorized
+     */
+    void updateAuthorizationState (bool authorized = false, const String& email = String())
+    {
+        if (authorized)
+        {
+            statusLabel.setText ("Authorized as: " + email, dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colours::green);
+            authorizeButton.setVisible (false);
+            signOutButton.setVisible (true);
+            releaseChannelBox.setItemEnabled (2, true); // Enable Preview
+        }
+        else
+        {
+            statusLabel.setText ("Not authorized", dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colours::grey);
+            authorizeButton.setVisible (true);
+            signOutButton.setVisible (false);
+            releaseChannelBox.setItemEnabled (2, false); // Disable Preview
+            
+            // Switch to Stable if Preview was selected
+            if (releaseChannelBox.getSelectedId() == 2)
+                releaseChannelBox.setSelectedId (1, dontSendNotification);
+        }
+    }
 };
 #endif
 
