@@ -1139,6 +1139,90 @@ private:
 };
 
 //==============================================================================
+class UpdatesSettingsPage : public SettingsPage 
+{
+public:
+    UpdatesSettingsPage (Context& w)
+        : world (w)
+    {
+        addAndMakeVisible (releaseChannelLabel);
+        releaseChannelLabel.setText ("Release Channel", dontSendNotification);
+        releaseChannelLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+        
+        addAndMakeVisible (releaseChannelBox);
+        releaseChannelBox.addItem ("Stable", 1);
+        releaseChannelBox.addItem ("Preview", 2);
+        releaseChannelBox.setSelectedId (1, dontSendNotification);
+        
+        addAndMakeVisible (authorizationLabel);
+        authorizationLabel.setText ("Authorization", dontSendNotification);
+        authorizationLabel.setFont (Font (FontOptions (15.0f).withStyle ("Bold")));
+        
+        addAndMakeVisible (usernameLabel);
+        usernameLabel.setText ("Username", dontSendNotification);
+        usernameLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+        
+        addAndMakeVisible (usernameField);
+        usernameField.setTextToShowWhenEmpty ("Enter username", Colours::grey);
+        
+        addAndMakeVisible (passwordLabel);
+        passwordLabel.setText ("Password", dontSendNotification);
+        passwordLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+        
+        addAndMakeVisible (passwordField);
+        passwordField.setPasswordCharacter ('*');
+        passwordField.setTextToShowWhenEmpty ("Enter password", Colours::grey);
+        
+        addAndMakeVisible (authorizeButton);
+        authorizeButton.setButtonText ("Authorize");
+    }
+    
+    ~UpdatesSettingsPage() {}
+    
+    void resized() override
+    {
+        const int spacingBetweenSections = 6;
+        const int settingHeight = 22;
+        
+        Rectangle<int> r (getLocalBounds());
+        
+        // Release channel selector
+        auto r2 = r.removeFromTop (settingHeight);
+        releaseChannelLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+        releaseChannelBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+        
+        // Authorization section
+        r.removeFromTop (spacingBetweenSections * 2);
+        authorizationLabel.setBounds (r.removeFromTop (24));
+        
+        r.removeFromTop (spacingBetweenSections);
+        
+        // Username
+        layoutSetting (r, usernameLabel, usernameField, getWidth() / 2);
+        
+        // Password
+        layoutSetting (r, passwordLabel, passwordField, getWidth() / 2);
+        
+        // Authorize button
+        r.removeFromTop (spacingBetweenSections);
+        authorizeButton.setBounds (r.removeFromTop (settingHeight).removeFromLeft (100));
+    }
+    
+private:
+    Context& world;
+    
+    Label releaseChannelLabel;
+    ComboBox releaseChannelBox;
+    
+    Label authorizationLabel;
+    Label usernameLabel;
+    TextEditor usernameField;
+    Label passwordLabel;
+    TextEditor passwordField;
+    TextButton authorizeButton;
+};
+
+//==============================================================================
 Preferences::Preferences (GuiService& ui)
     : _context (ui.context()), _ui (ui)
 {
@@ -1208,6 +1292,10 @@ Component* Preferences::createPageForName (const String& name)
     {
         return new OSCSettingsPage (_context, _ui);
     }
+    else if (name == EL_REPOSITORY_PREFERENCE_NAME)
+    {
+        return new UpdatesSettingsPage (_context);
+    }
 
     return nullptr;
 }
@@ -1223,6 +1311,7 @@ void Preferences::addDefaultPages()
 #if ! ELEMENT_SE
     addPage (EL_OSC_SETTINGS_NAME);
 #endif
+    addPage (EL_REPOSITORY_PREFERENCE_NAME);
 
     setPage (EL_GENERAL_SETTINGS_NAME);
 }
