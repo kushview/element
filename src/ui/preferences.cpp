@@ -1,22 +1,23 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
-#include <element/context.hpp>
 #include <element/settings.hpp>
-#include <element/version.hpp>
+#include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/ui/mainwindow.hpp>
-#include <element/ui/updater.hpp>
 #include <element/ui/preferences.hpp>
+#include <element/ui/updater.hpp>
+#include <element/version.hpp>
 
-#include "ui/audiodeviceselector.hpp"
-#include "ui/guicommon.hpp"
-#include "ui/viewhelpers.hpp"
-#include "services/oscservice.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/midipanic.hpp"
+#include "messages.hpp"
+#include "services/oscservice.hpp"
+#include "ui/buttons.hpp"
+#include "ui/viewhelpers.hpp"
 
 namespace element {
 
@@ -1139,7 +1140,8 @@ private:
 };
 
 //==============================================================================
-class UpdatesSettingsPage : public SettingsPage 
+#if ELEMENT_UPDATER
+class UpdatesSettingsPage : public SettingsPage
 {
 public:
     UpdatesSettingsPage (Context& w)
@@ -1148,72 +1150,72 @@ public:
         addAndMakeVisible (releaseChannelLabel);
         releaseChannelLabel.setText ("Release Channel", dontSendNotification);
         releaseChannelLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        
+
         addAndMakeVisible (releaseChannelBox);
         releaseChannelBox.addItem ("Stable", 1);
         releaseChannelBox.addItem ("Preview", 2);
         releaseChannelBox.setSelectedId (1, dontSendNotification);
-        
+
         addAndMakeVisible (authorizationLabel);
         authorizationLabel.setText ("Authorization", dontSendNotification);
         authorizationLabel.setFont (Font (FontOptions (15.0f).withStyle ("Bold")));
-        
+
         addAndMakeVisible (usernameLabel);
         usernameLabel.setText ("Username", dontSendNotification);
         usernameLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        
+
         addAndMakeVisible (usernameField);
         usernameField.setTextToShowWhenEmpty ("Enter username", Colours::grey);
-        
+
         addAndMakeVisible (passwordLabel);
         passwordLabel.setText ("Password", dontSendNotification);
         passwordLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        
+
         addAndMakeVisible (passwordField);
         passwordField.setPasswordCharacter ('*');
         passwordField.setTextToShowWhenEmpty ("Enter password", Colours::grey);
-        
+
         addAndMakeVisible (authorizeButton);
         authorizeButton.setButtonText ("Authorize");
     }
-    
+
     ~UpdatesSettingsPage() {}
-    
+
     void resized() override
     {
         const int spacingBetweenSections = 6;
         const int settingHeight = 22;
-        
+
         Rectangle<int> r (getLocalBounds());
-        
+
         // Release channel selector
         auto r2 = r.removeFromTop (settingHeight);
         releaseChannelLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
         releaseChannelBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-        
+
         // Authorization section
         r.removeFromTop (spacingBetweenSections * 2);
         authorizationLabel.setBounds (r.removeFromTop (24));
-        
+
         r.removeFromTop (spacingBetweenSections);
-        
+
         // Username
         layoutSetting (r, usernameLabel, usernameField, getWidth() / 2);
-        
+
         // Password
         layoutSetting (r, passwordLabel, passwordField, getWidth() / 2);
-        
+
         // Authorize button
         r.removeFromTop (spacingBetweenSections);
         authorizeButton.setBounds (r.removeFromTop (settingHeight).removeFromLeft (100));
     }
-    
+
 private:
     Context& world;
-    
+
     Label releaseChannelLabel;
     ComboBox releaseChannelBox;
-    
+
     Label authorizationLabel;
     Label usernameLabel;
     TextEditor usernameField;
@@ -1221,6 +1223,7 @@ private:
     TextEditor passwordField;
     TextButton authorizeButton;
 };
+#endif
 
 //==============================================================================
 Preferences::Preferences (GuiService& ui)
@@ -1292,11 +1295,12 @@ Component* Preferences::createPageForName (const String& name)
     {
         return new OSCSettingsPage (_context, _ui);
     }
+#if ELEMENT_UPDATER
     else if (name == EL_REPOSITORY_PREFERENCE_NAME)
     {
         return new UpdatesSettingsPage (_context);
     }
-
+#endif
     return nullptr;
 }
 
@@ -1311,7 +1315,9 @@ void Preferences::addDefaultPages()
 #if ! ELEMENT_SE
     addPage (EL_OSC_SETTINGS_NAME);
 #endif
+#if ELEMENT_UPDATER
     addPage (EL_REPOSITORY_PREFERENCE_NAME);
+#endif
 
     setPage (EL_GENERAL_SETTINGS_NAME);
 }
