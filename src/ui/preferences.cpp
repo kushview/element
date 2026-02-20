@@ -1249,15 +1249,17 @@ private:
         // 2. Build authorization URL with client_id, redirect_uri, scope
         // 3. Launch in default browser
         // 4. Register URL handler to receive callback
-        
+
+        // WP OAuth Server endpoint - may need adjustment based on plugin configuration
+        // Could be /oauth/authorize or /wp-json/oauth/authorize
         const String authUrl = "https://kushview.net/oauth/authorize?"
-                               "client_id=element-app&"
+                               "client_id=wX6ESifSO3MpHmnSwqevJYYMT9oTVVxi3oYteiUF&"
                                "redirect_uri=element://auth/callback&"
                                "response_type=code&"
-                               "scope=updates";
-        
+                               "scope=basic"; // WP OAuth Server default scope
+
         URL (authUrl).launchInDefaultBrowser();
-        
+
         Logger::writeToLog ("OAuth: Authorization flow started");
     }
 
@@ -1275,9 +1277,9 @@ private:
         // 2. Parse response to get access_token and refresh_token
         // 3. Store tokens securely (keychain/credential manager)
         // 4. Update UI and configure updater
-        
+
         Logger::writeToLog ("OAuth: Received authorization code: " + code);
-        
+
         // For now, just update UI as if authorized
         updateAuthorizationState (true, "user@example.com");
     }
@@ -1289,7 +1291,7 @@ private:
         // 1. Clear stored tokens from keychain/credential manager
         // 2. Reset updater to use stable channel URL
         // 3. Update UI
-        
+
         Logger::writeToLog ("OAuth: Signing out");
         updateAuthorizationState (false);
     }
@@ -1316,7 +1318,7 @@ private:
             authorizeButton.setVisible (true);
             signOutButton.setVisible (false);
             releaseChannelBox.setItemEnabled (2, false); // Disable Preview
-            
+
             // Switch to Stable if Preview was selected
             if (releaseChannelBox.getSelectedId() == 2)
                 releaseChannelBox.setSelectedId (1, dontSendNotification);
