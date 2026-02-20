@@ -221,7 +221,21 @@ void Application::initialise (const String& commandLine)
 
     initializeModulePath();
     printCopyNotice();
+
+    Logger::writeToLog ("=== Command line: " + commandLine);
+
+#if JUCE_MAC
+    registerURLSchemeHandler();
+#endif
+
     launchApplication();
+
+    // Handle URL scheme if passed on command line
+    if (commandLine.startsWith ("element://"))
+    {
+        Logger::writeToLog ("=== Handling URL from command line: " + commandLine);
+        handleURLSchemeCallback (commandLine);
+    }
 }
 
 void Application::actionListenerCallback (const String& message)
@@ -232,16 +246,17 @@ void Application::actionListenerCallback (const String& message)
 
 bool Application::canShutdown()
 {
-    if (! MessageManager::getInstance()->isThisTheMessageThread()) 
+    if (! MessageManager::getInstance()->isThisTheMessageThread())
     {
         auto result = MessageManager::getInstance()->callSync (Application::canShutdown);
-        return result.has_value() ? * result : true;
+        return result.has_value() ? *result : true;
     }
 
-    if (auto app = dynamic_cast<Application*> (getInstance())) {
+    if (auto app = dynamic_cast<Application*> (getInstance()))
+    {
         auto& services = app->world->services();
         auto ssvc = services.find<SessionService>();
-        return !ssvc->hasSessionChanged();
+        return ! ssvc->hasSessionChanged();
     }
 
     return true;
@@ -251,6 +266,11 @@ void Application::shutdown()
 {
     if (! world)
         return;
+
+#if JUCE_MAC
+    unregisterURLSchemeHandler();
+#endif
+
 #if JUCE_LINUX
     applyMidiSettings.reset();
 #endif
@@ -349,7 +369,77 @@ void Application::anotherInstanceStarted (const String& commandLine)
     if (! world)
         return;
 
+    // Handle custom URL scheme callbacks (e.g., OAuth)
+    if (commandLine.startsWith ("element://"))
+    {
+        handleURLSchemeCallback (commandLine);
+        return;
+    }
+
     maybeOpenCommandLineFile (commandLine);
+}
+
+void Application::handleURLSchemeCallback (const String& urlString)
+{
+    Logger::setCurrentLogger (nullptr);
+    Logger::writeToLog ("=== handleURLSchemeCallback called with: " + urlString);
+
+    URL url (urlString);
+
+    // Handle OAuth callback: element://auth/callback?code=...
+    // Note: getSubPath() returns "callback" without leading slash
+    if (url.getDomain() == "auth" && url.getSubPath() == "callback")
+    {
+        Logger::writeToLog ("=== Detected OAuth callback");
+
+        // Bring main window to front
+        if (world)
+        {
+            if (auto* gui = world->services().find<GuiService>())
+            {
+                if (auto* mainWindow = gui->getMainWindow())
+                {
+                    mainWindow->toFront (true);
+                    Logger::writeToLog ("=== Brought main window to front");
+                }
+            }
+        }
+
+        // Parse query parameters from URL
+        StringPairArray parameters;
+        String query = url.toString (true).fromFirstOccurrenceOf ("?", false, false);
+
+        // Parse key=value pairs
+        StringArray pairs = StringArray::fromTokens (query, "&", "");
+        for (const auto& pair : pairs)
+        {
+            int equalsPos = pair.indexOf ("=");
+            if (equalsPos > 0)
+            {
+                String key = pair.substring (0, equalsPos);
+                String value = pair.substring (equalsPos + 1);
+                parameters.set (key, URL::removeEscapeChars (value));
+            }
+        }
+
+        String authCode = parameters["code"];
+        if (authCode.isNotEmpty())
+        {
+            Logger::writeToLog ("=== Authorization code: " + authCode);
+            std::cout << "OAuth: Received authorization code: " << authCode << std::endl;
+            // TODO: Notify the preferences page or handle token exchange here
+        }
+        else
+        {
+            String error = parameters["error"];
+            Logger::writeToLog ("=== OAuth error: " + error);
+            std::cout << "OAuth error: " << error << std::endl;
+        }
+    }
+    else
+    {
+        Logger::writeToLog ("=== Not an OAuth callback, domain=" + url.getDomain() + " path=" + url.getSubPath());
+    }
 }
 
 void Application::suspended() {}
@@ -368,7 +458,7 @@ void Application::finishLaunching()
     if (world->settings().scanForPluginsOnStartup())
         world->plugins().scanAudioPlugins();
 
-    const bool isFirstRun =startup->isFirstRun;
+    const bool isFirstRun = startup->isFirstRun;
     startup.reset();
 
     auto& ui = *world->services().find<UI>();

@@ -88,11 +88,28 @@ public:
 
     /** Called when another instance of the application is started.
         
-        Attempts to open any file specified in the command line of the new instance.
+        Attempts to open any file specified in the command line of the new instance,
+        or handles custom URL scheme callbacks (e.g., OAuth).
         
         @param commandLine The command line from the new instance
     */
     void anotherInstanceStarted (const juce::String& commandLine) override;
+
+    /** Handles custom URL scheme callbacks.
+        
+        Processes URLs with the element:// scheme, such as OAuth authorization callbacks.
+        
+        @param urlString The complete URL string (e.g., element://auth/callback?code=...)
+    */
+    void handleURLSchemeCallback (const juce::String& urlString);
+
+#if JUCE_MAC
+    /** Registers the URL scheme handler for macOS Apple Events. */
+    void registerURLSchemeHandler();
+
+    /** Unregisters the URL scheme handler. */
+    void unregisterURLSchemeHandler();
+#endif
 
     /** Called when the application is suspended (mobile platforms). */
     void suspended() override;
