@@ -222,8 +222,6 @@ void Application::initialise (const String& commandLine)
     initializeModulePath();
     printCopyNotice();
 
-    Logger::writeToLog ("=== Command line: " + commandLine);
-
 #if JUCE_MAC
     registerURLSchemeHandler();
 #endif
@@ -232,10 +230,7 @@ void Application::initialise (const String& commandLine)
 
     // Handle URL scheme if passed on command line
     if (commandLine.startsWith ("element://"))
-    {
-        Logger::writeToLog ("=== Handling URL from command line: " + commandLine);
         handleURLSchemeCallback (commandLine);
-    }
 }
 
 void Application::actionListenerCallback (const String& message)
@@ -381,27 +376,19 @@ void Application::anotherInstanceStarted (const String& commandLine)
 
 void Application::handleURLSchemeCallback (const String& urlString)
 {
-    Logger::setCurrentLogger (nullptr);
-    Logger::writeToLog ("=== handleURLSchemeCallback called with: " + urlString);
-
     URL url (urlString);
 
     // Handle OAuth callback: element://auth/callback?code=...
     // Note: getSubPath() returns "callback" without leading slash
     if (url.getDomain() == "auth" && url.getSubPath() == "callback")
     {
-        Logger::writeToLog ("=== Detected OAuth callback");
-
         // Bring main window to front
         if (world)
         {
             if (auto* gui = world->services().find<GuiService>())
             {
                 if (auto* mainWindow = gui->getMainWindow())
-                {
                     mainWindow->toFront (true);
-                    Logger::writeToLog ("=== Brought main window to front");
-                }
             }
         }
 
@@ -425,20 +412,8 @@ void Application::handleURLSchemeCallback (const String& urlString)
         String authCode = parameters["code"];
         if (authCode.isNotEmpty())
         {
-            Logger::writeToLog ("=== Authorization code: " + authCode);
-            std::cout << "OAuth: Received authorization code: " << authCode << std::endl;
             // TODO: Notify the preferences page or handle token exchange here
         }
-        else
-        {
-            String error = parameters["error"];
-            Logger::writeToLog ("=== OAuth error: " + error);
-            std::cout << "OAuth error: " << error << std::endl;
-        }
-    }
-    else
-    {
-        Logger::writeToLog ("=== Not an OAuth callback, domain=" + url.getDomain() + " path=" + url.getSubPath());
     }
 }
 
