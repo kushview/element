@@ -22,8 +22,6 @@ using namespace juce;
 {
     NSString* urlString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
 
-    NSLog(@"*** ELEMENT: URL Event Handler called with: %@ ***", urlString);
-
     if (urlString && _app)
     {
         String juceURL = String::fromUTF8([urlString UTF8String]);
@@ -32,10 +30,7 @@ using namespace juce;
         MessageManager::callAsync([appPtr, juceURL]()
                                   {
             if (appPtr)
-            {
-                NSLog(@"*** ELEMENT: Dispatching to handleURLSchemeCallback ***");
-                appPtr->handleURLSchemeCallback(juceURL);
-            } });
+                appPtr->handleURLSchemeCallback(juceURL); });
     }
 }
 
