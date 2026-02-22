@@ -13,7 +13,8 @@ class Context;
 
 struct MidiPanicParams;
 
-class Settings : public juce::ApplicationProperties {
+class Settings : public juce::ApplicationProperties,
+                 public juce::ChangeBroadcaster {
 public:
     Settings();
     ~Settings();

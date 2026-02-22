@@ -480,6 +480,7 @@ void Settings::setUpdateKey (const String& slug)
 {
     if (auto p = getProps())
         p->setValue (updateKeyKey, slug.trim());
+    sendChangeMessage();
 }
 
 juce::String Settings::getUpdateChannel() const

@@ -1,22 +1,24 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
-#include <element/context.hpp>
 #include <element/settings.hpp>
-#include <element/version.hpp>
+#include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/ui/mainwindow.hpp>
-#include <element/ui/updater.hpp>
 #include <element/ui/preferences.hpp>
+#include <element/ui/updater.hpp>
+#include <element/version.hpp>
 
-#include "ui/audiodeviceselector.hpp"
-#include "ui/guicommon.hpp"
-#include "ui/viewhelpers.hpp"
-#include "services/oscservice.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/midipanic.hpp"
+#include "messages.hpp"
+#include "auth.hpp"
+#include "services/oscservice.hpp"
+#include "ui/buttons.hpp"
+#include "ui/viewhelpers.hpp"
 
 namespace element {
 
@@ -1139,6 +1141,194 @@ private:
 };
 
 //==============================================================================
+#if ELEMENT_UPDATER
+class UpdatesSettingsPage : public SettingsPage,
+                            public Button::Listener,
+                            public juce::ChangeListener
+{
+public:
+    UpdatesSettingsPage (Context& w)
+        : world (w)
+    {
+        world.settings().addChangeListener (this);
+        addAndMakeVisible (releaseChannelLabel);
+        releaseChannelLabel.setText ("Release Channel", dontSendNotification);
+        releaseChannelLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+
+        addAndMakeVisible (releaseChannelBox);
+        releaseChannelBox.addItem ("Stable", 1);
+        releaseChannelBox.addItem ("Preview", 2);
+        releaseChannelBox.setSelectedId (1, dontSendNotification);
+
+        addAndMakeVisible (authorizationLabel);
+        authorizationLabel.setText ("Preview Access", dontSendNotification);
+        authorizationLabel.setFont (Font (FontOptions (15.0f).withStyle ("Bold")));
+
+        addAndMakeVisible (statusLabel);
+        statusLabel.setText ("Not authorized", dontSendNotification);
+        statusLabel.setFont (Font (FontOptions (12.0)));
+        statusLabel.setColour (Label::textColourId, Colours::grey);
+
+        addAndMakeVisible (authorizeButton);
+        authorizeButton.setButtonText ("Sign in with Kushview.net");
+        authorizeButton.addListener (this);
+
+        addAndMakeVisible (signOutButton);
+        signOutButton.setButtonText ("Sign Out");
+        signOutButton.addListener (this);
+        signOutButton.setVisible (false);
+
+        updateAuthorizationState();
+    }
+
+    ~UpdatesSettingsPage()
+    {
+        world.settings().removeChangeListener (this);
+        authorizeButton.removeListener (this);
+        signOutButton.removeListener (this);
+    }
+
+    void changeListenerCallback (juce::ChangeBroadcaster*) override
+    {
+        updateAuthorizationState();
+    }
+
+    void buttonClicked (Button* button) override
+    {
+        if (button == &authorizeButton)
+        {
+            startOAuthFlow();
+        }
+        else if (button == &signOutButton)
+        {
+            signOut();
+        }
+    }
+
+    void resized() override
+    {
+        const int spacingBetweenSections = 6;
+        const int settingHeight = 22;
+
+        Rectangle<int> r (getLocalBounds());
+
+        // Release channel selector
+        auto r2 = r.removeFromTop (settingHeight);
+        releaseChannelLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+        releaseChannelBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+
+        // Authorization section
+        r.removeFromTop (spacingBetweenSections * 2);
+        authorizationLabel.setBounds (r.removeFromTop (24));
+
+        r.removeFromTop (spacingBetweenSections);
+
+        // Status label
+        statusLabel.setBounds (r.removeFromTop (settingHeight));
+
+        // Buttons
+        r.removeFromTop (spacingBetweenSections);
+        auto buttonRow = r.removeFromTop (settingHeight);
+        authorizeButton.setBounds (buttonRow.removeFromLeft (180));
+        buttonRow.removeFromLeft (spacingBetweenSections);
+        signOutButton.setBounds (buttonRow.removeFromLeft (100));
+    }
+
+private:
+    Context& world;
+
+    Label releaseChannelLabel;
+    ComboBox releaseChannelBox;
+
+    Label authorizationLabel;
+    Label statusLabel;
+    TextButton authorizeButton;
+    TextButton signOutButton;
+
+    /** Initiates the OAuth authorization flow.
+        
+        Opens the user's default browser to kushview.net OAuth page.
+        The website will redirect back to the app via custom URL scheme
+        after successful authentication.
+     */
+    void startOAuthFlow()
+    {
+        auto* props = world.settings().getUserSettings();
+        if (props == nullptr)
+        {
+            Logger::writeToLog ("Auth: Unable to start authorization flow (missing user settings)");
+            return;
+        }
+
+        const auto state = auth::generateState();
+        const auto codeVerifier = auth::generateCodeVerifier();
+        if (! auth::storePendingPKCE (world.settings(), state, codeVerifier))
+        {
+            Logger::writeToLog ("Auth: Unable to start authorization flow (failed to store PKCE state)");
+            return;
+        }
+
+        const auto authUrl = auth::buildAuthorizationURL (state, codeVerifier);
+
+        std::cout << "authUrl=" << authUrl << std::endl;
+        URL (authUrl).launchInDefaultBrowser();
+
+        Logger::writeToLog ("Auth: Authorization flow started (PKCE)");
+    }
+
+    /** Signs out the user and clears stored tokens. */
+    void signOut()
+    {
+        Logger::writeToLog ("Auth: Signing out");
+
+        auto& settings = world.settings();
+        settings.setUpdateKey ({});
+        settings.setUpdateKeyUser ({});
+        settings.setUpdateKeyType ("element-v1");
+
+        if (auto* props = settings.getUserSettings())
+        {
+            props->setValue (auth::refreshTokenKey, juce::String());
+            props->save();
+        }
+
+        // updateAuthorizationState() is triggered automatically via changeListenerCallback.
+    }
+
+    /** Updates the UI to reflect current authorization state from Settings. */
+    void updateAuthorizationState()
+    {
+        const auto& settings  = world.settings();
+        const auto accessToken = settings.getUpdateKey().trim();
+        const auto userDisplay = settings.getUpdateKeyUser().trim();
+        const bool authorized  = accessToken.isNotEmpty();
+
+        if (authorized)
+        {
+            const auto label = userDisplay.isNotEmpty() ? userDisplay : accessToken.substring (0, 12) + "...";
+            statusLabel.setText ("Authorized as: " + label, dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colours::green);
+            authorizeButton.setVisible (false);
+            signOutButton.setVisible (true);
+            releaseChannelBox.setItemEnabled (2, true); // Enable Preview
+        }
+        else
+        {
+            statusLabel.setText ("Not authorized", dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colours::grey);
+            authorizeButton.setVisible (true);
+            signOutButton.setVisible (false);
+            releaseChannelBox.setItemEnabled (2, false); // Disable Preview
+
+            // Switch to Stable if Preview was selected
+            if (releaseChannelBox.getSelectedId() == 2)
+                releaseChannelBox.setSelectedId (1, dontSendNotification);
+        }
+    }
+};
+#endif
+
+//==============================================================================
 Preferences::Preferences (GuiService& ui)
     : _context (ui.context()), _ui (ui)
 {
@@ -1208,7 +1398,12 @@ Component* Preferences::createPageForName (const String& name)
     {
         return new OSCSettingsPage (_context, _ui);
     }
-
+#if ELEMENT_UPDATER
+    else if (name == EL_REPOSITORY_PREFERENCE_NAME)
+    {
+        return new UpdatesSettingsPage (_context);
+    }
+#endif
     return nullptr;
 }
 
@@ -1222,6 +1417,9 @@ void Preferences::addDefaultPages()
     addPage (EL_MIDI_SETTINGS_NAME);
 #if ! ELEMENT_SE
     addPage (EL_OSC_SETTINGS_NAME);
+#endif
+#if ELEMENT_UPDATER
+    addPage (EL_REPOSITORY_PREFERENCE_NAME);
 #endif
 
     setPage (EL_GENERAL_SETTINGS_NAME);

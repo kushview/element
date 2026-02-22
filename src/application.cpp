@@ -22,6 +22,7 @@
 #include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"
+#include "auth.hpp"
 #include "utils.hpp"
 
 /** Define to force the application to behave as if running for the first time.
@@ -221,7 +222,16 @@ void Application::initialise (const String& commandLine)
 
     initializeModulePath();
     printCopyNotice();
+
+#if JUCE_MAC
+    registerURLSchemeHandler();
+#endif
+
     launchApplication();
+
+    // Handle URL scheme if passed on command line
+    if (commandLine.startsWith ("element://"))
+        handleURLSchemeCallback (commandLine);
 }
 
 void Application::actionListenerCallback (const String& message)
@@ -232,16 +242,17 @@ void Application::actionListenerCallback (const String& message)
 
 bool Application::canShutdown()
 {
-    if (! MessageManager::getInstance()->isThisTheMessageThread()) 
+    if (! MessageManager::getInstance()->isThisTheMessageThread())
     {
         auto result = MessageManager::getInstance()->callSync (Application::canShutdown);
-        return result.has_value() ? * result : true;
+        return result.has_value() ? *result : true;
     }
 
-    if (auto app = dynamic_cast<Application*> (getInstance())) {
+    if (auto app = dynamic_cast<Application*> (getInstance()))
+    {
         auto& services = app->world->services();
         auto ssvc = services.find<SessionService>();
-        return !ssvc->hasSessionChanged();
+        return ! ssvc->hasSessionChanged();
     }
 
     return true;
@@ -251,6 +262,11 @@ void Application::shutdown()
 {
     if (! world)
         return;
+
+#if JUCE_MAC
+    unregisterURLSchemeHandler();
+#endif
+
 #if JUCE_LINUX
     applyMidiSettings.reset();
 #endif
@@ -349,7 +365,73 @@ void Application::anotherInstanceStarted (const String& commandLine)
     if (! world)
         return;
 
+    // Handle custom URL scheme callbacks (e.g., auth)
+    if (commandLine.startsWith ("element://"))
+    {
+        handleURLSchemeCallback (commandLine);
+        return;
+    }
+
     maybeOpenCommandLineFile (commandLine);
+}
+
+void Application::handleURLSchemeCallback (const String& urlString)
+{
+    URL url (urlString);
+
+    // Handle auth callback: element://auth/callback?code=...
+    // Note: getSubPath() returns "callback" without leading slash
+    if (url.getDomain() == "auth" && url.getSubPath() == "callback")
+    {
+        // Bring main window to front
+        if (world)
+        {
+            if (auto* gui = world->services().find<GuiService>())
+            {
+                if (auto* mainWindow = gui->getMainWindow())
+                    mainWindow->toFront (true);
+            }
+        }
+
+        const auto parameters = auth::parseQueryParameters (url.toString (true));
+
+        const auto authError = parameters["error"];
+        if (authError.isNotEmpty())
+        {
+            Logger::writeToLog ("Auth callback error: " + authError);
+            return;
+        }
+
+        String authCode = parameters["code"];
+        if (authCode.isNotEmpty())
+        {
+            auto& settings = world->settings();
+            String expectedState;
+            String codeVerifier;
+            if (! auth::consumePendingPKCE (settings, expectedState, codeVerifier))
+            {
+                Logger::writeToLog ("Auth token exchange failed: missing PKCE session; restart sign-in");
+                return;
+            }
+
+            const auto callbackState = parameters["state"].trim();
+            if (callbackState.isEmpty() || callbackState != expectedState)
+            {
+                Logger::writeToLog ("Auth callback rejected: invalid state");
+                return;
+            }
+
+            auto tokenResponse = auth::exchangeAuthorizationCode (authCode, codeVerifier);
+            if (! tokenResponse.success)
+            {
+                Logger::writeToLog (tokenResponse.error);
+                return;
+            }
+
+            auth::persistTokens (settings, tokenResponse);
+            Logger::writeToLog ("Auth token exchange completed successfully");
+        }
+    }
 }
 
 void Application::suspended() {}
@@ -368,7 +450,7 @@ void Application::finishLaunching()
     if (world->settings().scanForPluginsOnStartup())
         world->plugins().scanAudioPlugins();
 
-    const bool isFirstRun =startup->isFirstRun;
+    const bool isFirstRun = startup->isFirstRun;
     startup.reset();
 
     auto& ui = *world->services().find<UI>();
