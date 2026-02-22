@@ -15,6 +15,7 @@
 #include "engine/midiengine.hpp"
 #include "engine/midipanic.hpp"
 #include "messages.hpp"
+#include "auth.hpp"
 #include "services/oscservice.hpp"
 #include "ui/buttons.hpp"
 #include "ui/viewhelpers.hpp"
@@ -1142,12 +1143,14 @@ private:
 //==============================================================================
 #if ELEMENT_UPDATER
 class UpdatesSettingsPage : public SettingsPage,
-                            public Button::Listener
+                            public Button::Listener,
+                            public juce::ChangeListener
 {
 public:
     UpdatesSettingsPage (Context& w)
         : world (w)
     {
+        world.settings().addChangeListener (this);
         addAndMakeVisible (releaseChannelLabel);
         releaseChannelLabel.setText ("Release Channel", dontSendNotification);
         releaseChannelLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -1180,8 +1183,14 @@ public:
 
     ~UpdatesSettingsPage()
     {
+        world.settings().removeChangeListener (this);
         authorizeButton.removeListener (this);
         signOutButton.removeListener (this);
+    }
+
+    void changeListenerCallback (juce::ChangeBroadcaster*) override
+    {
+        updateAuthorizationState();
     }
 
     void buttonClicked (Button* button) override
@@ -1244,68 +1253,60 @@ private:
      */
     void startOAuthFlow()
     {
-        // TODO: Implement OAuth flow
-        // 1. Generate state parameter for CSRF protection
-        // 2. Build authorization URL with client_id, redirect_uri, scope
-        // 3. Launch in default browser
-        // 4. Register URL handler to receive callback
+        auto* props = world.settings().getUserSettings();
+        if (props == nullptr)
+        {
+            Logger::writeToLog ("Auth: Unable to start authorization flow (missing user settings)");
+            return;
+        }
 
-        // WP OAuth Server endpoint - may need adjustment based on plugin configuration
-        // Could be /oauth/authorize or /wp-json/oauth/authorize
-        const String authUrl = "https://kushview.net/oauth/authorize?"
-                               "client_id=wX6ESifSO3MpHmnSwqevJYYMT9oTVVxi3oYteiUF&"
-                               "redirect_uri=element://auth/callback&"
-                               "response_type=code&"
-                               "scope=basic"; // WP OAuth Server default scope
+        const auto state = auth::generateState();
+        const auto codeVerifier = auth::generateCodeVerifier();
+        if (! auth::storePendingPKCE (world.settings(), state, codeVerifier))
+        {
+            Logger::writeToLog ("Auth: Unable to start authorization flow (failed to store PKCE state)");
+            return;
+        }
 
+        const auto authUrl = auth::buildAuthorizationURL (state, codeVerifier);
+
+        std::cout << "authUrl=" << authUrl << std::endl;
         URL (authUrl).launchInDefaultBrowser();
 
-        Logger::writeToLog ("OAuth: Authorization flow started");
-    }
-
-    /** Handles the OAuth callback with authorization code.
-        
-        Exchanges the authorization code for an access token and
-        refresh token, then stores them securely.
-        
-        @param code The authorization code received from the OAuth callback
-     */
-    void handleOAuthCallback (const String& code)
-    {
-        // TODO: Implement token exchange
-        // 1. POST to token endpoint with code
-        // 2. Parse response to get access_token and refresh_token
-        // 3. Store tokens securely (keychain/credential manager)
-        // 4. Update UI and configure updater
-
-        Logger::writeToLog ("OAuth: Received authorization code: " + code);
-
-        // For now, just update UI as if authorized
-        updateAuthorizationState (true, "user@example.com");
+        Logger::writeToLog ("Auth: Authorization flow started (PKCE)");
     }
 
     /** Signs out the user and clears stored tokens. */
     void signOut()
     {
-        // TODO: Implement sign out
-        // 1. Clear stored tokens from keychain/credential manager
-        // 2. Reset updater to use stable channel URL
-        // 3. Update UI
+        Logger::writeToLog ("Auth: Signing out");
 
-        Logger::writeToLog ("OAuth: Signing out");
-        updateAuthorizationState (false);
+        auto& settings = world.settings();
+        settings.setUpdateKey ({});
+        settings.setUpdateKeyUser ({});
+        settings.setUpdateKeyType ("element-v1");
+
+        if (auto* props = settings.getUserSettings())
+        {
+            props->setValue (auth::refreshTokenKey, juce::String());
+            props->save();
+        }
+
+        // updateAuthorizationState() is triggered automatically via changeListenerCallback.
     }
 
-    /** Updates the UI to reflect current authorization state.
-        
-        @param authorized Whether the user is currently authorized
-        @param email Optional email address to display when authorized
-     */
-    void updateAuthorizationState (bool authorized = false, const String& email = String())
+    /** Updates the UI to reflect current authorization state from Settings. */
+    void updateAuthorizationState()
     {
+        const auto& settings  = world.settings();
+        const auto accessToken = settings.getUpdateKey().trim();
+        const auto userDisplay = settings.getUpdateKeyUser().trim();
+        const bool authorized  = accessToken.isNotEmpty();
+
         if (authorized)
         {
-            statusLabel.setText ("Authorized as: " + email, dontSendNotification);
+            const auto label = userDisplay.isNotEmpty() ? userDisplay : accessToken.substring (0, 12) + "...";
+            statusLabel.setText ("Authorized as: " + label, dontSendNotification);
             statusLabel.setColour (Label::textColourId, Colours::green);
             authorizeButton.setVisible (false);
             signOutButton.setVisible (true);

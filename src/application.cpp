@@ -22,6 +22,7 @@
 #include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"
+#include "auth.hpp"
 #include "utils.hpp"
 
 /** Define to force the application to behave as if running for the first time.
@@ -364,7 +365,7 @@ void Application::anotherInstanceStarted (const String& commandLine)
     if (! world)
         return;
 
-    // Handle custom URL scheme callbacks (e.g., OAuth)
+    // Handle custom URL scheme callbacks (e.g., auth)
     if (commandLine.startsWith ("element://"))
     {
         handleURLSchemeCallback (commandLine);
@@ -378,7 +379,7 @@ void Application::handleURLSchemeCallback (const String& urlString)
 {
     URL url (urlString);
 
-    // Handle OAuth callback: element://auth/callback?code=...
+    // Handle auth callback: element://auth/callback?code=...
     // Note: getSubPath() returns "callback" without leading slash
     if (url.getDomain() == "auth" && url.getSubPath() == "callback")
     {
@@ -392,27 +393,43 @@ void Application::handleURLSchemeCallback (const String& urlString)
             }
         }
 
-        // Parse query parameters from URL
-        StringPairArray parameters;
-        String query = url.toString (true).fromFirstOccurrenceOf ("?", false, false);
+        const auto parameters = auth::parseQueryParameters (url.toString (true));
 
-        // Parse key=value pairs
-        StringArray pairs = StringArray::fromTokens (query, "&", "");
-        for (const auto& pair : pairs)
+        const auto authError = parameters["error"];
+        if (authError.isNotEmpty())
         {
-            int equalsPos = pair.indexOf ("=");
-            if (equalsPos > 0)
-            {
-                String key = pair.substring (0, equalsPos);
-                String value = pair.substring (equalsPos + 1);
-                parameters.set (key, URL::removeEscapeChars (value));
-            }
+            Logger::writeToLog ("Auth callback error: " + authError);
+            return;
         }
 
         String authCode = parameters["code"];
         if (authCode.isNotEmpty())
         {
-            // TODO: Notify the preferences page or handle token exchange here
+            auto& settings = world->settings();
+            String expectedState;
+            String codeVerifier;
+            if (! auth::consumePendingPKCE (settings, expectedState, codeVerifier))
+            {
+                Logger::writeToLog ("Auth token exchange failed: missing PKCE session; restart sign-in");
+                return;
+            }
+
+            const auto callbackState = parameters["state"].trim();
+            if (callbackState.isEmpty() || callbackState != expectedState)
+            {
+                Logger::writeToLog ("Auth callback rejected: invalid state");
+                return;
+            }
+
+            auto tokenResponse = auth::exchangeAuthorizationCode (authCode, codeVerifier);
+            if (! tokenResponse.success)
+            {
+                Logger::writeToLog (tokenResponse.error);
+                return;
+            }
+
+            auth::persistTokens (settings, tokenResponse);
+            Logger::writeToLog ("Auth token exchange completed successfully");
         }
     }
 }
