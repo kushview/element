@@ -326,7 +326,6 @@ String fetchSignedAppcastUrl (const String& accessToken)
     const auto body = stream->readEntireStreamAsString();
     auto json = JSON::parse (body);
     const auto appcastUrl = json["url"].toString();
-    std::cout << "URL: " << appcastUrl << std::endl;
     if (appcastUrl.isNotEmpty())
         Logger::writeToLog ("Auth: fetched signed appcast URL");
     else
