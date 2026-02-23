@@ -1146,6 +1146,7 @@ private:
 #if ELEMENT_UPDATER
 class UpdatesSettingsPage : public SettingsPage,
                             public Button::Listener,
+                            public ComboBox::Listener,
                             public juce::ChangeListener
 {
 public:
@@ -1160,7 +1161,12 @@ public:
         addAndMakeVisible (releaseChannelBox);
         releaseChannelBox.addItem ("Stable", 1);
         releaseChannelBox.addItem ("Preview", 2);
-        releaseChannelBox.setSelectedId (1, dontSendNotification);
+        // ID 3 is reserved for a future "Testing" channel.
+
+        // Restore the persisted channel selection (defaults to stable).
+        const auto savedSlug = world.settings().getUpdateChannel();
+        releaseChannelBox.setSelectedId (channelIdForSlug (savedSlug), dontSendNotification);
+        releaseChannelBox.addListener (this);
 
         addAndMakeVisible (authorizationLabel);
         authorizationLabel.setText ("Preview Access", dontSendNotification);
@@ -1186,6 +1192,7 @@ public:
     ~UpdatesSettingsPage()
     {
         world.settings().removeChangeListener (this);
+        releaseChannelBox.removeListener (this);
         authorizeButton.removeListener (this);
         signOutButton.removeListener (this);
     }
@@ -1193,6 +1200,18 @@ public:
     void changeListenerCallback (juce::ChangeBroadcaster*) override
     {
         updateAuthorizationState();
+    }
+
+    void comboBoxChanged (ComboBox* box) override
+    {
+        if (box != &releaseChannelBox)
+            return;
+
+        const auto slug = channelSlugForId (releaseChannelBox.getSelectedId());
+        world.settings().setUpdateChannel (slug);
+
+        if (auto* g = world.services().find<GuiService>())
+            g->applyStoredChannelToUpdater();
     }
 
     void buttonClicked (Button* button) override
@@ -1246,6 +1265,31 @@ private:
     Label statusLabel;
     TextButton authorizeButton;
     TextButton signOutButton;
+
+    /** Converts a settings channel slug to its combo box item ID.
+        Add new channels both here and in the combo box initialiser.
+        @param slug  "stable", "preview", or a future slug
+        @return      Combo box ID (1 = Stable if slug is unrecognised) */
+    static int channelIdForSlug (const juce::String& slug)
+    {
+        if (slug == "preview")
+            return 2;
+        // if (slug == "testing") return 3;  // reserved for future use
+        return 1;
+    }
+
+    /** Returns the settings slug stored for a given combo box item ID. */
+    static juce::String channelSlugForId (int id)
+    {
+        switch (id)
+        {
+            case 2:
+                return "preview";
+            // case 3: return "testing";  // reserved for future use
+            default:
+                return "stable";
+        }
+    }
 
     /** Initiates the OAuth authorization flow.
         
@@ -1305,10 +1349,11 @@ private:
         settings.setUpdateKeyType ("element-v1");
         settings.setAuthPreviewUpdates (false);
         settings.setAuthAppcastUrl ({});
+        settings.setUpdateChannel ("stable");
 
-        // Revert the updater to the compiled-in default feed URL.
+        // Revert the updater to the public stable feed.
         if (auto* g = world.services().find<GuiService>())
-            g->setUpdaterFeedUrl ({});
+            g->applyStoredChannelToUpdater();
 
         if (auto* props = settings.getUserSettings())
         {
@@ -1345,9 +1390,14 @@ private:
             signOutButton.setVisible (false);
             releaseChannelBox.setItemEnabled (2, false); // Disable Preview
 
-            // Switch to Stable if Preview was selected
-            if (releaseChannelBox.getSelectedId() == 2)
+            // Revert to Stable if a non-public channel was selected.
+            if (releaseChannelBox.getSelectedId() != 1)
+            {
                 releaseChannelBox.setSelectedId (1, dontSendNotification);
+                world.settings().setUpdateChannel ("stable");
+                if (auto* g = world.services().find<GuiService>())
+                    g->applyStoredChannelToUpdater();
+            }
         }
     }
 };

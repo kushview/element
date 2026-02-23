@@ -45,6 +45,15 @@ public:
 #endif
     }
 
+    void setFeedUrl (const std::string& url) override
+    {
+        if (url.empty())
+            win_sparkle_set_appcast_url (ELEMENT_APPCAST_URL);
+        else
+            win_sparkle_set_appcast_url (url.c_str());
+        ;
+    }
+
     void check (bool async) override
     {
         juce::ignoreUnused (async);

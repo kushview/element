@@ -478,6 +478,13 @@ void Application::finishLaunching()
 void Application::AuthStartupThread::run()
 {
     auth::maybeRefreshOnStartup (ctx.settings());
+
+    // Re-apply the channel preference to the updater from the message thread:
+    // the startup refresh may have fetched a new signed appcast URL.
+    juce::MessageManager::callAsync ([&ctx = ctx]() {
+        if (auto* gui = ctx.services().find<GuiService>())
+            gui->applyStoredChannelToUpdater();
+    });
 }
 
 void Application::printCopyNotice()

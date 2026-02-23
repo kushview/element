@@ -357,11 +357,8 @@ void GuiService::activate()
     context().devices().addChangeListener (this);
     impl->restoreRecents();
 
-    // Apply any cached signed appcast URL so the updater points at the
-    // correct channel (stable vs preview) immediately on launch.
-    const auto storedAppcastUrl = settings().getAuthAppcastUrl();
-    if (storedAppcastUrl.isNotEmpty())
-        setUpdaterFeedUrl (storedAppcastUrl);
+    // Apply the saved release channel to the updater on launch.
+    applyStoredChannelToUpdater();
 }
 
 void GuiService::deactivate()
@@ -419,6 +416,16 @@ void GuiService::checkUpdates (bool background)
 void GuiService::setUpdaterFeedUrl (const juce::String& url)
 {
     updates->setFeedUrl (url);
+}
+
+void GuiService::applyStoredChannelToUpdater()
+{
+    const auto& s = settings();
+    const auto channel = s.getUpdateChannel();
+    if (channel == "preview" && s.getAuthPreviewUpdates())
+        updates->setFeedUrl (s.getAuthAppcastUrl());
+    else
+        updates->setFeedUrl ({});
 }
 
 void GuiService::showPreferencesDialog (const String& section)

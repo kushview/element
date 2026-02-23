@@ -47,6 +47,11 @@ public:
         Pass an empty string to revert to the compiled-in default. */
     void setUpdaterFeedUrl (const juce::String& url);
 
+    /** Re-reads the saved release channel from Settings and applies the
+        appropriate feed URL to the updater. Safe to call from the message
+        thread at any time (e.g. after a token refresh or sign-out). */
+    void applyStoredChannelToUpdater();
+
     Services& services() const { return controller; }
     juce::KeyListener* getKeyListener() const;
 
