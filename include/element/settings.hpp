@@ -50,6 +50,8 @@ public:
     static const char* updateKeyTypeKey;
     static const char* updateKeyKey;
     static const char* updateKeyUserKey;
+    static const char* authPreviewUpdatesKey;
+    static const char* authAppcastUrlKey;
     static const char* transportStartStopContinue;
 
     bool getBool (std::string_view key, bool fallback = false) const noexcept;
@@ -153,6 +155,18 @@ public:
 
     /** Change the update channgel. stable or nightly. */
     void setUpdateChannel (const String& key);
+
+    /** Returns true if the authenticated user has preview update access. */
+    bool getAuthPreviewUpdates() const;
+
+    /** Set whether the authenticated user has preview update access. */
+    void setAuthPreviewUpdates (bool enabled);
+
+    /** Returns the cached signed appcast URL, or empty if not set. */
+    juce::String getAuthAppcastUrl() const;
+
+    /** Stores the signed appcast URL returned by the server. */
+    void setAuthAppcastUrl (const juce::String& url);
 
     /** Set global midi panic settings. */
     void setMidiPanicParams (MidiPanicParams);
