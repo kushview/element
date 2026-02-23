@@ -141,10 +141,21 @@ protected:
     virtual std::unique_ptr<ContentFactory> createContentFactory() { return nullptr; }
 
 private:
-    juce::String launchCommandLine;                     ///< The command line used to launch the app
-    std::unique_ptr<Context> world;                     ///< The application context and services
-    std::unique_ptr<Startup> startup;                   ///< Handles startup initialization
-    juce::OwnedArray<juce::ChildProcessWorker> workers; ///< Worker processes (e.g., plugin scanner)
+    /** Background thread that attempts a token refresh on startup. */
+    class AuthStartupThread : public juce::Thread {
+    public:
+        explicit AuthStartupThread (Context& c) : juce::Thread ("AuthStartup"), ctx (c) {}
+        void run() override;
+
+    private:
+        Context& ctx;
+    };
+
+    juce::String launchCommandLine;                       ///< The command line used to launch the app
+    std::unique_ptr<Context> world;                       ///< The application context and services
+    std::unique_ptr<Startup> startup;                     ///< Handles startup initialization
+    std::unique_ptr<AuthStartupThread> authStartupThread; ///< Startup auth refresh thread
+    juce::OwnedArray<juce::ChildProcessWorker> workers;   ///< Worker processes (e.g., plugin scanner)
 #if JUCE_LINUX
     class MidiSettingsApply {
     public:

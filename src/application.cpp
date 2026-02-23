@@ -274,6 +274,10 @@ void Application::shutdown()
     auto& srvs = world->services();
     srvs.saveSettings();
 
+    if (authStartupThread && authStartupThread->isThreadRunning())
+        authStartupThread->stopThread (3000);
+    authStartupThread.reset();
+
     auto& devices (world->devices());
     devices.closeAudioDevice();
 
@@ -459,10 +463,19 @@ void Application::finishLaunching()
 
     world->services().run();
 
+    // Attempt to restore auth state from a stored refresh token in the background.
+    authStartupThread = std::make_unique<AuthStartupThread> (*world);
+    authStartupThread->startThread (Thread::Priority::low);
+
     if (! isFirstRun && world->settings().checkForUpdates())
         startTimer (10 * 1000);
 
     maybeOpenCommandLineFile (getCommandLineParameters());
+}
+
+void Application::AuthStartupThread::run()
+{
+    auth::maybeRefreshOnStartup (ctx.settings());
 }
 
 void Application::printCopyNotice()

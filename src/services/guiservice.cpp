@@ -180,6 +180,18 @@ private:
         // is implemented
     }
 
+    void setFeedUrl (const juce::String& url)
+    {
+#if ELEMENT_UPDATER
+        if (url.isNotEmpty())
+            updater->setFeedUrl (url.toStdString());
+        else
+            updater->setFeedUrl ({});
+#else
+        juce::ignoreUnused (url);
+#endif
+    }
+
     bool launchUpdaterOnExit { false };
     bool showAlertWhenNoUpdatesReady = false;
     std::unique_ptr<element::Updater> updater;
@@ -344,6 +356,12 @@ void GuiService::activate()
     SystemTray::init (*this);
     context().devices().addChangeListener (this);
     impl->restoreRecents();
+
+    // Apply any cached signed appcast URL so the updater points at the
+    // correct channel (stable vs preview) immediately on launch.
+    const auto storedAppcastUrl = settings().getAuthAppcastUrl();
+    if (storedAppcastUrl.isNotEmpty())
+        setUpdaterFeedUrl (storedAppcastUrl);
 }
 
 void GuiService::deactivate()
@@ -396,6 +414,11 @@ void GuiService::checkUpdates (bool background)
 #if ELEMENT_UPDATER
     updates->updater->check (background);
 #endif
+}
+
+void GuiService::setUpdaterFeedUrl (const juce::String& url)
+{
+    updates->setFeedUrl (url);
 }
 
 void GuiService::showPreferencesDialog (const String& section)

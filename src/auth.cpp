@@ -7,7 +7,7 @@
 #include <cstring>
 
 #if JUCE_MAC
-    #include <CommonCrypto/CommonDigest.h>
+#include <CommonCrypto/CommonDigest.h>
 #endif
 
 namespace element::auth {
@@ -85,6 +85,10 @@ static TokenResponse parseTokenPayload (const String& payload, const String& err
         response.error = errorPrefix + ": access token missing in response";
         return response;
     }
+
+    if (auto entitlements = object->getProperty ("entitlements"); entitlements.isObject())
+        if (auto* ent = entitlements.getDynamicObject())
+            response.previewUpdates = static_cast<bool> (ent->getProperty ("preview_updates"));
 
     response.success = true;
     return response;
@@ -271,9 +275,15 @@ void persistTokens (element::Settings& settings, const TokenResponse& tokenRespo
     settings.setUpdateKeyType ("member");
     settings.setUpdateKey (tokenResponse.accessToken);
     settings.setUpdateKeyUser (tokenResponse.userDisplay);
+    settings.setAuthPreviewUpdates (tokenResponse.previewUpdates);
 
     if (auto* props = settings.getUserSettings())
         props->setValue (refreshTokenKey, tokenResponse.refreshToken);
+
+    // Fetch a short-lived signed appcast URL and cache it so the updater
+    // can point at the correct channel without needing a token at feed time.
+    const auto appcastUrl = fetchSignedAppcastUrl (tokenResponse.accessToken);
+    settings.setAuthAppcastUrl (appcastUrl);
 }
 
 bool consumePendingPKCE (element::Settings& settings, String& state, String& verifier)
@@ -288,6 +298,105 @@ bool consumePendingPKCE (element::Settings& settings, String& state, String& ver
     }
 
     return false;
+}
+
+String fetchSignedAppcastUrl (const String& accessToken)
+{
+    if (accessToken.isEmpty())
+        return {};
+
+    const String endpoint = String (apiBaseEndpoint) + "/appcast-url";
+    URL url (endpoint);
+
+    int statusCode = -1;
+    auto options = URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                       .withHttpRequestCmd ("GET")
+                       .withExtraHeaders ("Authorization: Bearer " + accessToken + "\r\n"
+                                                                                   "Accept: application/json\r\n")
+                       .withConnectionTimeoutMs (10000)
+                       .withStatusCode (&statusCode);
+
+    std::unique_ptr<InputStream> stream (url.createInputStream (options));
+    if (statusCode != 200 || stream == nullptr)
+    {
+        Logger::writeToLog ("Auth: appcast-url request failed (HTTP " + String (statusCode) + ")");
+        return {};
+    }
+
+    const auto body = stream->readEntireStreamAsString();
+    auto json = JSON::parse (body);
+    const auto appcastUrl = json["url"].toString();
+    std::cout << "URL: " << appcastUrl << std::endl;
+    if (appcastUrl.isNotEmpty())
+        Logger::writeToLog ("Auth: fetched signed appcast URL");
+    else
+        Logger::writeToLog ("Auth: appcast-url response missing 'url' field");
+
+    return appcastUrl;
+}
+
+void revokeRefreshToken (const String& refreshToken)
+{
+    if (refreshToken.isEmpty())
+        return;
+
+    const String revokeEndpoint = String (apiBaseEndpoint) + "/token/revoke";
+    auto body = String ("refresh_token=") + URL::addEscapeChars (refreshToken, true);
+
+    URL url (revokeEndpoint);
+    url = url.withPOSTData (body);
+
+    int statusCode = -1;
+    auto options = URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                       .withHttpRequestCmd ("POST")
+                       .withExtraHeaders ("Content-Type: application/x-www-form-urlencoded\r\n"
+                                          "Accept: application/json\r\n")
+                       .withConnectionTimeoutMs (10000)
+                       .withStatusCode (&statusCode);
+
+    std::unique_ptr<InputStream> stream (url.createInputStream (options));
+    if (statusCode >= 200 && statusCode < 300)
+        Logger::writeToLog ("Auth: refresh token revoked successfully");
+    else
+        Logger::writeToLog ("Auth: revoke request failed (HTTP " + String (statusCode) + ")");
+}
+
+void maybeRefreshOnStartup (element::Settings& settings)
+{
+    const auto storedRefreshToken = [&]() -> String {
+        if (auto* props = settings.getUserSettings())
+            return props->getValue (refreshTokenKey).trim();
+        return {};
+    }();
+
+    if (storedRefreshToken.isEmpty())
+    {
+        Logger::writeToLog ("Auth: no stored refresh token, skipping startup refresh");
+        return;
+    }
+
+    Logger::writeToLog ("Auth: attempting token refresh on startup");
+    const auto response = refreshAccessToken (storedRefreshToken);
+
+    if (! response.success)
+    {
+        Logger::writeToLog ("Auth: startup refresh failed: " + response.error);
+        // Clear stale credentials so the UI reflects signed-out state.
+        settings.setUpdateKey ({});
+        settings.setUpdateKeyUser ({});
+        settings.setUpdateKeyType ("element-v1");
+        settings.setAuthPreviewUpdates (false);
+        settings.setAuthAppcastUrl ({});
+        if (auto* props = settings.getUserSettings())
+        {
+            props->setValue (refreshTokenKey, String());
+            props->save();
+        }
+        return;
+    }
+
+    persistTokens (settings, response);
+    Logger::writeToLog ("Auth: startup token refresh succeeded");
 }
 
 } // namespace element::auth

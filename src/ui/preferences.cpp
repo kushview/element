@@ -1,6 +1,8 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <thread>
+
 #include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
@@ -1270,7 +1272,6 @@ private:
 
         const auto authUrl = auth::buildAuthorizationURL (state, codeVerifier);
 
-        std::cout << "authUrl=" << authUrl << std::endl;
         URL (authUrl).launchInDefaultBrowser();
 
         Logger::writeToLog ("Auth: Authorization flow started (PKCE)");
@@ -1282,9 +1283,32 @@ private:
         Logger::writeToLog ("Auth: Signing out");
 
         auto& settings = world.settings();
+
+        // Grab the refresh token before clearing it, then revoke server-side
+        // on a background thread (fire-and-forget).
+        const auto refreshToken = [&]() -> juce::String {
+            if (auto* props = settings.getUserSettings())
+                return props->getValue (auth::refreshTokenKey).trim();
+            return {};
+        }();
+
+        if (refreshToken.isNotEmpty())
+        {
+            juce::String tokenCopy = refreshToken;
+            std::thread ([tokenCopy]() {
+                auth::revokeRefreshToken (tokenCopy);
+            }).detach();
+        }
+
         settings.setUpdateKey ({});
         settings.setUpdateKeyUser ({});
         settings.setUpdateKeyType ("element-v1");
+        settings.setAuthPreviewUpdates (false);
+        settings.setAuthAppcastUrl ({});
+
+        // Revert the updater to the compiled-in default feed URL.
+        if (auto* g = world.services().find<GuiService>())
+            g->setUpdaterFeedUrl ({});
 
         if (auto* props = settings.getUserSettings())
         {
@@ -1298,10 +1322,11 @@ private:
     /** Updates the UI to reflect current authorization state from Settings. */
     void updateAuthorizationState()
     {
-        const auto& settings  = world.settings();
+        const auto& settings = world.settings();
         const auto accessToken = settings.getUpdateKey().trim();
         const auto userDisplay = settings.getUpdateKeyUser().trim();
-        const bool authorized  = accessToken.isNotEmpty();
+        const bool authorized = accessToken.isNotEmpty();
+        const bool canPreview = authorized && settings.getAuthPreviewUpdates();
 
         if (authorized)
         {
@@ -1310,7 +1335,7 @@ private:
             statusLabel.setColour (Label::textColourId, Colours::green);
             authorizeButton.setVisible (false);
             signOutButton.setVisible (true);
-            releaseChannelBox.setItemEnabled (2, true); // Enable Preview
+            releaseChannelBox.setItemEnabled (2, canPreview); // Preview requires entitlement
         }
         else
         {

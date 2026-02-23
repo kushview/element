@@ -43,6 +43,10 @@ public:
     /** Check for a newer version and show alert, if available. */
     void checkUpdates (bool background);
 
+    /** Override the updater's feed URL at runtime.
+        Pass an empty string to revert to the compiled-in default. */
+    void setUpdaterFeedUrl (const juce::String& url);
+
     Services& services() const { return controller; }
     juce::KeyListener* getKeyListener() const;
 

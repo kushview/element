@@ -48,15 +48,22 @@ inline constexpr const char* pkceStateKey = "authPkceState";
 /** User settings key for PKCE code verifier. */
 inline constexpr const char* pkceVerifierKey = "authPkceVerifier";
 
+/** User settings key for the cached signed appcast URL. */
+inline constexpr const char* appcastUrlKey = "authAppcastUrl";
+
 /** Token response parsed from auth server payload. */
-struct TokenResponse {
-	bool success { false };
-	juce::String accessToken;
-	juce::String refreshToken;
-	int expiresInSeconds { 0 };
-	juce::String userDisplay;
-	juce::String userEmail;
-	juce::String error;
+struct TokenResponse
+{
+    bool success { false };
+    juce::String accessToken;
+    juce::String refreshToken;
+    int expiresInSeconds { 0 };
+    juce::String userDisplay;
+    juce::String userEmail;
+    juce::String error;
+
+    /** Entitlement: whether the user has access to preview update builds. */
+    bool previewUpdates { false };
 };
 
 /** Generates a random CSRF state value. */
@@ -67,12 +74,12 @@ juce::String generateCodeVerifier();
 
 /** Builds the browser authorization URL for sign-in. */
 juce::String buildAuthorizationURL (const juce::String& state,
-							const juce::String& codeVerifier);
+                                    const juce::String& codeVerifier);
 
 /** Stores pending PKCE values used by callback validation and token exchange. */
 bool storePendingPKCE (element::Settings& settings,
-					   const juce::String& state,
-					   const juce::String& verifier);
+                       const juce::String& state,
+                       const juce::String& verifier);
 
 /** Parses URL query key/value pairs from a callback URL string.
 
@@ -88,7 +95,7 @@ juce::StringPairArray parseQueryParameters (const juce::String& urlString);
 	@return Parsed token response and error details
  */
 TokenResponse exchangeAuthorizationCode (const juce::String& authCode,
-						 const juce::String& codeVerifier);
+                                         const juce::String& codeVerifier);
 
 /** Refreshes an access token using refresh token rotation semantics. */
 TokenResponse refreshAccessToken (const juce::String& refreshToken);
@@ -108,5 +115,34 @@ void persistTokens (element::Settings& settings, const TokenResponse& tokenRespo
 	@return true when both values were available
  */
 bool consumePendingPKCE (element::Settings& settings, juce::String& state, juce::String& verifier);
+
+/** Sends a best-effort revocation request for the given refresh token.
+
+	This is a fire-and-forget call — failures are logged but not returned.
+	Must be called from a background thread.
+
+	@param refreshToken The opaque refresh token to revoke
+ */
+void revokeRefreshToken (const juce::String& refreshToken);
+
+/** Fetches a short-lived signed appcast URL from the server.
+
+	Uses the access token to authenticate. The returned URL is suitable for
+	passing directly to Sparkle — no token header needed at fetch time.
+	Must be called from a background thread.
+
+	@param accessToken  The current JWT access token
+	@return The signed URL string, or empty on failure
+ */
+juce::String fetchSignedAppcastUrl (const juce::String& accessToken);
+
+/** Attempts to restore auth state on startup using a stored refresh token.
+
+	If a refresh token is present in settings, exchanges it for a fresh token pair
+	and persists the result. Must be called from a background thread.
+
+	@param settings Application settings containing the stored refresh token
+ */
+void maybeRefreshOnStartup (element::Settings& settings);
 
 } // namespace element::auth
