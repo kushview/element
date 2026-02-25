@@ -14,7 +14,7 @@ namespace element {
 //==============================================================================
 
 /// Time information for DSP Scripts.
-// An object of this type is passed to to a DSP Script's process function
+// An object of this type is passed to a DSP Script's process function
 // conveying timing information.
 // @classmod el.DSPScriptPosition
 // @pragma nostrip

@@ -257,6 +257,9 @@ const String ScriptNode::getProgramName (int index) const
         case 2:
             return "Spoton Scale Chooser";
             break;
+        case 3:
+            return "MIDI Timecode (MTC) Generator";
+            break;
     }
 
     String name = TRANS ("Program");
@@ -286,6 +289,9 @@ void ScriptNode::setCurrentProgram (int index)
             newDspCode = String::fromUTF8 (scripts::spontonchordchooser_lua, scripts::spontonchordchooser_luaSize);
             newUiCode.clear();
             break;
+        case 3:
+            newDspCode = String::fromUTF8 (scripts::mtc_generator_lua, scripts::mtc_generator_luaSize);
+            newUiCode.clear();
     }
 
     dspCode.replaceAllContent (newDspCode);
