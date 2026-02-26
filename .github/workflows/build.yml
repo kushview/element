@@ -23,7 +23,7 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        os: [ubuntu-22.04, macos-latest, windows-2019]
+        os: [ubuntu-22.04, macos-latest, windows-2022]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -122,13 +122,15 @@ jobs:
       uses: MarkusJx/install-boost@v2.4.5
       with:
         boost_version: 1.83.0
-        platform_version: 2019
+        platform_version: 2022
         toolset: msvc
         link: static
     
     - name: Setup MSVC environment (Windows)
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: amd64
     
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
@@ -145,7 +147,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release `
           -DELEMENT_ENABLE_ASIO=ON `
           -DELEMENT_ENABLE_UPDATER=ON `
-          -DELEMENT_BUILD_PLUGINS=ON
+          -DELEMENT_BUILD_PLUGINS=ON `
+          -DBoost_INCLUDE_DIR="${{ steps.install-boost-windows.outputs.BOOST_ROOT }}/include" `
+          -DBoost_LIBRARY_DIRS="${{ steps.install-boost-windows.outputs.BOOST_ROOT }}/lib"
       env:
         BOOST_ROOT: ${{ steps.install-boost-windows.outputs.BOOST_ROOT }}
     
