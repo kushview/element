@@ -138,10 +138,10 @@ jobs:
           -DELEMENT_ENABLE_ASIO=ON `
           -DELEMENT_ENABLE_UPDATER=ON `
           -DELEMENT_BUILD_PLUGINS=ON `
-          -DBoost_INCLUDE_DIR="C:/local/boost" `
-          -DBoost_LIBRARY_DIRS="C:/local/boost/lib64-msvc-14.3"
+          -DBoost_INCLUDE_DIR="C:/local/boost_1_87_0" `
+          -DBoost_LIBRARY_DIRS="C:/local/boost_1_87_0/lib64-msvc-14.3"
       env:
-        BOOST_ROOT: C:/local/boost
+        BOOST_ROOT: C:/local/boost_1_87_0
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
