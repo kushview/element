@@ -81,26 +81,10 @@ bool ScriptLoader::load (const String& buffer)
     try
     {
         loaded = view.load_buffer (buffer.toRawUTF8(), (size_t) buffer.length(), chunk);
-        switch (loaded.status())
+        if (loaded.status() != sol::load_status::ok)
         {
-            case sol::load_status::file:
-                error = "File error";
-                break;
-            case sol::load_status::gc:
-                error = "Garbage error";
-                break;
-            case sol::load_status::memory:
-                error = "Memory error";
-                break;
-            case sol::load_status::syntax:
-                error = "Syntax error";
-                break;
-            case sol::load_status::ok:
-                error = "";
-                break;
-            default:
-                error = "Unknown error";
-                break;
+            sol::error err = loaded;
+            error = err.what();
         }
     } catch (const std::exception& e)
     {
