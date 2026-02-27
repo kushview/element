@@ -114,21 +114,13 @@ jobs:
     - name: Install dependencies (Windows)
       if: runner.os == 'Windows'
       run: |
-        choco install cmake ninja pandoc -y
-    
-    - name: Setup Boost (Windows)
-      if: runner.os == 'Windows'
-      id: install-boost-windows
-      uses: MarkusJx/install-boost@v2.4.5
-      with:
-        boost_version: 1.83.0
-        platform_version: 2022
-        toolset: msvc
-        link: static
+        choco install cmake ninja pandoc boost-msvc-14.3 -y
     
     - name: Setup MSVC environment (Windows)
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: amd64
     
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
@@ -145,9 +137,11 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release `
           -DELEMENT_ENABLE_ASIO=ON `
           -DELEMENT_ENABLE_UPDATER=ON `
-          -DELEMENT_BUILD_PLUGINS=ON
+          -DELEMENT_BUILD_PLUGINS=ON `
+          -DBoost_INCLUDE_DIR="C:/local/boost_1_87_0" `
+          -DBoost_LIBRARY_DIRS="C:/local/boost_1_87_0/lib64-msvc-14.3"
       env:
-        BOOST_ROOT: ${{ steps.install-boost-windows.outputs.BOOST_ROOT }}
+        BOOST_ROOT: C:/local/boost_1_87_0
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
