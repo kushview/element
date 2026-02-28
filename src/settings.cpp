@@ -40,6 +40,8 @@ const char* Settings::updateChannelKey = "updateChannel";
 const char* Settings::updateKeyTypeKey = "updateKeyType";
 const char* Settings::updateKeyKey = "updateKey";
 const char* Settings::updateKeyUserKey = "updateKeyUserKey";
+const char* Settings::authPreviewUpdatesKey = "authPreviewUpdates";
+const char* Settings::authAppcastUrlKey = "authAppcastUrl";
 const char* Settings::transportStartStopContinue = "transportStartStopContinueKey";
 
 //=============================================================================
@@ -480,6 +482,7 @@ void Settings::setUpdateKey (const String& slug)
 {
     if (auto p = getProps())
         p->setValue (updateKeyKey, slug.trim());
+    sendChangeMessage();
 }
 
 juce::String Settings::getUpdateChannel() const
@@ -493,6 +496,34 @@ void Settings::setUpdateChannel (const String& channel)
 {
     if (auto p = getProps())
         p->setValue (updateChannelKey, channel.trim());
+}
+
+bool Settings::getAuthPreviewUpdates() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (authPreviewUpdatesKey, false);
+    return false;
+}
+
+void Settings::setAuthPreviewUpdates (bool enabled)
+{
+    if (auto* p = getProps())
+        p->setValue (authPreviewUpdatesKey, enabled);
+    sendChangeMessage();
+}
+
+juce::String Settings::getAuthAppcastUrl() const
+{
+    if (auto* p = getProps())
+        return p->getValue (authAppcastUrlKey);
+    return {};
+}
+
+void Settings::setAuthAppcastUrl (const juce::String& url)
+{
+    if (auto* p = getProps())
+        p->setValue (authAppcastUrlKey, url);
+    sendChangeMessage();
 }
 
 void Settings::setMidiPanicParams (MidiPanicParams params)
