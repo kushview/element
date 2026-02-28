@@ -305,7 +305,15 @@ String fetchSignedAppcastUrl (const String& accessToken)
     if (accessToken.isEmpty())
         return {};
 
-    const String endpoint = String (apiBaseEndpoint) + "/appcast-url";
+#if JUCE_MAC
+    constexpr const char* plat = "macos";
+#elif JUCE_WINDOWS
+    constexpr const char* plat = "windows";
+#else
+    constexpr const char* plat = "unknown";
+#endif
+
+    const String endpoint = String (apiBaseEndpoint) + "/appcast-url?plat=" + plat;
     URL url (endpoint);
 
     int statusCode = -1;
