@@ -1633,8 +1633,8 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         }
         while (!ttisfunction(s2v(ra))) {  /* not a function? */
           luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */
-          b++;  /* there is now one extra argument */
           checkstackGCp(L, 1, ra);
+          b++;  /* there is now one extra argument */
         }
         if (!ttisLclosure(s2v(ra))) {  /* C function? */
           luaD_call(L, ra, LUA_MULTRET);  /* call it */
