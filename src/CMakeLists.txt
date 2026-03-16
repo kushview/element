@@ -109,3 +109,10 @@ if(ELEMENT_ENABLE_VST2)
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
     target_link_libraries(element PUBLIC juce_vst2_sdk)
 endif()
+
+# MSVC 14.44+ constexpr mutex constructor workaround (debug only).
+# See CMakeLists.txt in the root for explanation.
+if(MSVC)
+    target_compile_definitions(element PRIVATE
+        $<$<CONFIG:Debug>:_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR>)
+endif()

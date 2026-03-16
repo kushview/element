@@ -111,6 +111,12 @@ if(APPLE)
         BUNDLE DESTINATION "Applications"
         COMPONENT "Standalone")
 elseif(WIN32)
+    # MSVC 14.44+ introduced a constexpr std::mutex constructor that zero-initializes
+    # _Thread_id to -1. In debug builds, _Mtx_lock's deadlock detection can misfire
+    # when JUCE acquires a mutex inside a noexcept function (MessageManager::isThisTheMessageThread),
+    # causing std::terminate(). This define restores the old _Mtx_init_in_situ path.
+    target_compile_definitions(element_app PRIVATE
+        $<$<CONFIG:Debug>:_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR>)
     if(ELEMENT_ENABLE_UPDATER)
         target_link_libraries(element_app PRIVATE WinSparkle::WinSparkle)
         target_sources(element_app PRIVATE src/winsparkle.cc)
