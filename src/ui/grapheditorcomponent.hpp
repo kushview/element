@@ -245,14 +245,13 @@ public:
     {
         g.fillAll (findColour (Style::widgetBackgroundColorId).darker());
     }
+
     void resized() override
     {
         auto r = getLocalBounds();
         _viewport.setBounds (r);
-        if (_editor.getWidth() < _viewport.getWidth() || _editor.getHeight() < _viewport.getHeight())
-        {
-            _editor.setBounds (_viewport.getBounds());
-        }
+        _editor.setSize (jmax (_editor.getWidth(), _viewport.getWidth()),
+                         jmax (_editor.getHeight(), _viewport.getHeight()));
     }
 
     juce::Viewport& viewport() { return _viewport; }
