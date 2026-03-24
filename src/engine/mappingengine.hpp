@@ -33,7 +33,7 @@ public:
     void stopMapping();
 
     void capture (const bool start = true) { capturedEvent.capture.set (start); }
-    MidiMessage getCapturedMidiMessage() const { return capturedEvent.message; }
+    juce::MidiMessage getCapturedMidiMessage() const { return capturedEvent.message; }
     Control getCapturedControl() const { return capturedEvent.control; }
     CapturedEventSignal& capturedSignal() { return capturedEvent.callback; }
 
@@ -42,7 +42,7 @@ private:
     class Inputs;
     std::unique_ptr<Inputs> inputs;
 
-    class CapturedEvent : public AsyncUpdater
+    class CapturedEvent : public juce::AsyncUpdater
     {
     public:
         CapturedEvent() { capture.set (false); }
@@ -55,13 +55,13 @@ private:
 
     private:
         friend class MappingEngine;
-        Atomic<bool> capture;
+        juce::Atomic<bool> capture;
         Control control;
-        MidiMessage message;
+        juce::MidiMessage message;
         CapturedEventSignal callback;
     } capturedEvent;
 
-    bool captureNextEvent (ControllerMapInput&, const Control&, const MidiMessage&);
+    bool captureNextEvent (ControllerMapInput&, const Control&, const juce::MidiMessage&);
 };
 
 } // namespace element

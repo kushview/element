@@ -11,26 +11,26 @@
 namespace element {
 
 class MidiRouterNode : public Processor,
-                       public ChangeBroadcaster
+                       public juce::ChangeBroadcaster
 {
 public:
     explicit MidiRouterNode (int ins = 4, int outs = 4);
     ~MidiRouterNode();
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
+    void prepareToRender (double sampleRate, int maxBufferSize) override { juce::ignoreUnused (sampleRate, maxBufferSize); }
     void releaseResources() override {}
 
     inline bool wantsContext() const noexcept override { return true; }
     void render (RenderContext&) override;
-    void getState (MemoryBlock&) override;
+    void getState (juce::MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 
     void setMatrixState (const MatrixState&);
     MatrixState getMatrixState() const;
     void setWithoutLocking (int src, int dst, bool set);
-    CriticalSection& getLock() { return lock; }
+    juce::CriticalSection& getLock() { return lock; }
 
-    int getNumPrograms() const override { return jmax (1, programs.size()); }
+    int getNumPrograms() const override { return juce::jmax (1, programs.size()); }
     int getCurrentProgram() const override { return currentProgram; }
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) const override
@@ -40,7 +40,7 @@ public:
         return "MIDI Router " + String (index + 1);
     }
 
-    void getPluginDescription (PluginDescription& desc) const override
+    void getPluginDescription (juce::PluginDescription& desc) const override
     {
         desc.fileOrIdentifier = EL_NODE_ID_MIDI_ROUTER;
         desc.uniqueId = EL_NODE_UID_MIDI_ROUTER;
@@ -74,7 +74,7 @@ public:
     }
 
 private:
-    CriticalSection lock;
+    juce::CriticalSection lock;
     const int numSources;
     const int numDestinations;
 
@@ -87,7 +87,7 @@ private:
         MatrixState matrix;
     };
 
-    OwnedArray<Program> programs;
+    juce::OwnedArray<Program> programs;
     int currentProgram = -1;
 
     void set (int src, int dst, bool patched);
@@ -100,8 +100,8 @@ private:
     ToggleGrid nextToggles;
     bool togglesChanged { false };
 
-    OwnedArray<MidiBuffer> midiOuts;
-    void initMidiOuts (OwnedArray<MidiBuffer>& outs);
+    juce::OwnedArray<juce::MidiBuffer> midiOuts;
+    void initMidiOuts (juce::OwnedArray<juce::MidiBuffer>& outs);
 };
 
 } // namespace element

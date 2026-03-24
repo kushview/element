@@ -11,6 +11,7 @@
 #include "services/presetservice.hpp"
 
 using juce::String;
+using namespace juce;
 
 namespace element {
 

@@ -6,6 +6,7 @@
 #include <element/nodefactory.hpp>
 
 using namespace element;
+using namespace juce;
 
 BOOST_AUTO_TEST_SUITE (NodeFactoryTests)
 

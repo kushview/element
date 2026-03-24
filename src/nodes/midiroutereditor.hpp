@@ -25,18 +25,18 @@
 namespace element {
 
 class MidiRouterEditor : public NodeEditor,
-                         public ChangeListener
+                         public juce::ChangeListener
 {
 public:
     MidiRouterEditor (const Node& node);
     ~MidiRouterEditor();
 
     void resized() override;
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
 
     MatrixState& getMatrixState() { return matrix; }
     void applyMatrix();
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
 
 private:
     MatrixState matrix;

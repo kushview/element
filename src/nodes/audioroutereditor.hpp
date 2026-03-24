@@ -9,21 +9,21 @@
 namespace element {
 
 class AudioRouterEditor : public NodeEditor,
-                          public ChangeListener
+                          public juce::ChangeListener
 {
 public:
     AudioRouterEditor (const Node& node);
     ~AudioRouterEditor();
 
     void resized() override;
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
 
     void adjustBoundsToMatrixSize (int cellSize = 0);
     String getSizeString() const;
     MatrixState& getMatrixState() { return matrix; }
     void applyMatrix();
     void setFadeLength (double length);
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
 
     void setAutoResize (bool yn) { autoResize = yn; }
 

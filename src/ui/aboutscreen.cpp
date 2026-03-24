@@ -25,6 +25,8 @@
     "along with this program; if not, write to the Free Software\r\n"          \
     "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\r\n"
 
+using namespace juce;
+
 namespace element {
 
 namespace detail {

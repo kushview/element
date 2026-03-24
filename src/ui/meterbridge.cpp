@@ -8,6 +8,8 @@
 
 #include <element/ui/style.hpp>
 
+using namespace juce;
+
 namespace element {
 
 struct SimpleLevelMeter : public Component,

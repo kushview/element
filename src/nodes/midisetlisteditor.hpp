@@ -9,13 +9,13 @@
 namespace element {
 
 class MidiSetListEditor : public NodeEditor,
-                          public ChangeListener
+                          public juce::ChangeListener
 {
 public:
     MidiSetListEditor (const Node& node);
     virtual ~MidiSetListEditor();
 
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     void resized() override;
 
     void addProgram();
@@ -34,19 +34,19 @@ public:
     void selectRow (int row);
     void setStoreSize (const bool storeSize);
 
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
 
-    bool keyPressed (const KeyPress&) override;
+    bool keyPressed (const juce::KeyPress&) override;
 
 private:
     Node node;
     class TableModel;
     friend class TableModel;
     std::unique_ptr<TableModel> model;
-    TableListBox table;
-    TextButton addButton;
-    TextButton delButton;
-    Slider fontSlider;
+    juce::TableListBox table;
+    juce::TextButton addButton;
+    juce::TextButton delButton;
+    juce::Slider fontSlider;
     bool storeSizeInNode = true;
     float fontSize = 15.f;
     SignalConnection lastProgramChangeConnection;

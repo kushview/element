@@ -9,6 +9,8 @@
 #include <element/context.hpp>
 #include "tempo.hpp"
 
+using namespace juce;
+
 namespace element {
 
 static Node findNodeRecursive (const Node& start, const Uuid& uuid)

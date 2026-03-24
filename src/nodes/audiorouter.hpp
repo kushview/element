@@ -11,19 +11,19 @@
 namespace element {
 
 class AudioRouterNode : public Processor,
-                        public ChangeBroadcaster
+                        public juce::ChangeBroadcaster
 {
 public:
     explicit AudioRouterNode (int ins = 4, int outs = 4);
     ~AudioRouterNode();
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
+    void prepareToRender (double sampleRate, int maxBufferSize) override { juce::ignoreUnused (sampleRate, maxBufferSize); }
     void releaseResources() override {}
 
     inline bool wantsContext() const noexcept override { return true; }
     void render (RenderContext&) override;
 
-    void getState (MemoryBlock&) override;
+    void getState (juce::MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 
     void setSize (int newIns, int newOuts, bool async = true);
@@ -31,9 +31,9 @@ public:
     void setMatrixState (const MatrixState&);
     MatrixState getMatrixState() const;
     void setWithoutLocking (int src, int dst, bool set);
-    CriticalSection& getLock() { return lock; }
+    juce::CriticalSection& getLock() { return lock; }
 
-    int getNumPrograms() const override { return jmax (1, programs.size()); }
+    int getNumPrograms() const override { return juce::jmax (1, programs.size()); }
     int getCurrentProgram() const override { return currentProgram; }
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) const override
@@ -45,14 +45,14 @@ public:
 
     void setFadeLength (double seconds)
     {
-        seconds = jlimit (0.001, 5.0, seconds);
-        ScopedLock sl (lock);
+        seconds = juce::jlimit (0.001, 5.0, seconds);
+        juce::ScopedLock sl (lock);
         fadeLengthSeconds = seconds;
         fadeIn.setLength (static_cast<float> (fadeLengthSeconds));
         fadeOut.setLength (static_cast<float> (fadeLengthSeconds));
     }
 
-    void getPluginDescription (PluginDescription& desc) const override
+    void getPluginDescription (juce::PluginDescription& desc) const override
     {
         desc.fileOrIdentifier = EL_NODE_ID_AUDIO_ROUTER;
         desc.name = "Audio Router";
@@ -92,12 +92,12 @@ public:
     }
 
 private:
-    CriticalSection lock;
+    juce::CriticalSection lock;
     [[maybe_unused]] int numSources;
     [[maybe_unused]] int nextNumSources;
     [[maybe_unused]] int numDestinations;
     [[maybe_unused]] int nextNumDestinations;
-    AudioSampleBuffer tempAudio { 1, 1 };
+    juce::AudioSampleBuffer tempAudio { 1, 1 };
     bool rebuildPorts = true;
 
     struct Program
@@ -109,7 +109,7 @@ private:
         MatrixState matrix;
     };
 
-    OwnedArray<Program> programs;
+    juce::OwnedArray<Program> programs;
     int currentProgram = -1;
 
     void set (int src, int dst, bool patched);

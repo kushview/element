@@ -143,7 +143,7 @@ private:
         Context& context;
         juce::MidiDeviceListConnection connection;
         juce::WeakReference<MidiSettingsApply>::Master masterReference;
-        friend class WeakReference<MidiSettingsApply>;
+        friend class juce::WeakReference<MidiSettingsApply>;
     };
     std::unique_ptr<MidiSettingsApply> applyMidiSettings;
 #endif

@@ -186,7 +186,7 @@ void MidiRouterEditor::applyMatrix()
         node->setMatrixState (matrix);
 }
 
-void MidiRouterEditor::changeListenerCallback (ChangeBroadcaster*)
+void MidiRouterEditor::changeListenerCallback (juce::ChangeBroadcaster*)
 {
     if (auto* const node = getNodeObjectOfType<MidiRouterNode>())
     {

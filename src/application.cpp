@@ -36,6 +36,8 @@
 #define ELEMENT_FIRST_RUN 0
 #endif
 
+using namespace juce;
+
 namespace element {
 
 static std::atomic<int> sCanShutdown { 0 };
