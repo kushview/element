@@ -5,6 +5,7 @@
 
 #include <element/signals.hpp>
 #include "nodes/baseprocessor.hpp"
+#include <engine/midioutput.h>
 
 namespace element {
 
@@ -154,7 +155,7 @@ private:
     MidiDeviceInfo deviceWanted; // The device as saved in Stage and chosen by users.
     MidiMessageCollector inputMessages;
     std::unique_ptr<MidiInput> input;
-    std::unique_ptr<MidiOutput> output;
+    std::unique_ptr<ElementMidiOutput> output;
     Atomic<double> midiOutLatency { 0.0 };
 
     void waitForDevice() {}
