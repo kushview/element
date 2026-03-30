@@ -9,6 +9,8 @@
 #include <element/processor.hpp>
 
 using namespace element;
+using namespace juce;
+
 namespace element {
 
 //==============================================================================

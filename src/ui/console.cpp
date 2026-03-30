@@ -4,6 +4,8 @@
 #include "ui/console.hpp"
 #include <element/ui/style.hpp>
 
+using namespace juce;
+
 namespace element {
 
 static void setupEditor (TextEditor& editor)

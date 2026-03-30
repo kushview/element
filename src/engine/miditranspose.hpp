@@ -27,26 +27,26 @@ public:
     inline int getNoteOffset() const { return offset.get(); }
 
     /** Process a single event */
-    inline static void process (MidiMessage& message, const int offset)
+    inline static void process (juce::MidiMessage& message, const int offset)
     {
         if (message.isNoteOnOrOff())
             message.setNoteNumber (offset + message.getNoteNumber());
     }
 
     /** Process a single event */
-    inline void process (MidiMessage& message) noexcept
+    inline void process (juce::MidiMessage& message) noexcept
     {
         if (message.isNoteOnOrOff())
             message.setNoteNumber (offset.get() + message.getNoteNumber());
     }
 
     /** Process a MidiBuffer */
-    inline void process (MidiBuffer& midi, int numSamples)
+    inline void process (juce::MidiBuffer& midi, int numSamples)
     {
         if (0 == offset.get())
             return;
 
-        MidiMessage msg;
+        juce::MidiMessage msg;
         for (auto m : midi)
         {
             if (m.samplePosition >= numSamples)
@@ -62,8 +62,8 @@ public:
     }
 
 private:
-    Atomic<int> offset { 0 };
-    MidiBuffer output;
+    juce::Atomic<int> offset { 0 };
+    juce::MidiBuffer output;
 };
 
 } // namespace element

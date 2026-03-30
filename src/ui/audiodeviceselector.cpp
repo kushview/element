@@ -5,6 +5,8 @@
 
 #include "ui/audiodeviceselector.hpp"
 
+using namespace juce;
+
 namespace element {
 
 struct SimpleDeviceManagerInputLevelMeter : public Component,

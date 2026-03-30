@@ -11,7 +11,7 @@
 namespace element {
 
 class AudioIONodeEditor : public NodeEditor,
-                          public ChangeListener
+                          public juce::ChangeListener
 {
 public:
     AudioIONodeEditor (const Node& node, DeviceManager& devs, bool ins = true, bool outs = true)
@@ -31,7 +31,7 @@ public:
         content.reset();
     }
 
-    void paint (Graphics& g) override
+    void paint (juce::Graphics& g) override
     {
         g.setFont (13.f);
         g.setColour (Colors::textColor);
@@ -40,10 +40,10 @@ public:
             text << "Input";
         else if (getNode().isAudioOutputNode())
             text << "Output";
-        g.drawText (text, getLocalBounds(), Justification::centred);
+        g.drawText (text, getLocalBounds(), juce::Justification::centred);
     }
 
-    void changeListenerCallback (ChangeBroadcaster*) override
+    void changeListenerCallback (juce::ChangeBroadcaster*) override
     {
         content->updateDevices();
     }
@@ -58,10 +58,10 @@ private:
     DeviceManager& devices;
     bool showIns = true;
     bool showOuts = true;
-    Viewport view;
+    juce::Viewport view;
 
     struct Content : public Component,
-                     public Button::Listener
+                     public juce::Button::Listener
     {
         Content (AudioIONodeEditor& ed)
             : owner (ed)
@@ -98,7 +98,7 @@ private:
         {
         }
 
-        void buttonClicked (Button* button) override
+        void buttonClicked (juce::Button* button) override
         {
         }
 

@@ -8,6 +8,8 @@
 #include "ui/patchmatrix.hpp"
 #include "common.hpp"
 
+using namespace juce;
+
 namespace element {
 
 class AudioRouterMatrix : public PatchMatrixComponent
@@ -268,7 +270,7 @@ String AudioRouterEditor::getSizeString() const
     return {};
 }
 
-void AudioRouterEditor::changeListenerCallback (ChangeBroadcaster*)
+void AudioRouterEditor::changeListenerCallback (juce::ChangeBroadcaster*)
 {
     if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
     {

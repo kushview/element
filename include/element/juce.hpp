@@ -21,6 +21,5 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_osc/juce_osc.h>
 
-using namespace juce; // FIXME: namespace juce
 namespace element {
 }

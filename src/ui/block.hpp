@@ -367,7 +367,7 @@ private:
     PortAlignment _portAlign { PortsMiddle };
     bool selected { false };
 
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
 
     void deleteAllPins();
 

@@ -9,6 +9,8 @@
 #include <element/datapath.hpp>
 #include "sol/sol.hpp"
 
+using namespace juce;
+
 namespace element {
 
 static void scanForScripts (File dir, Array<ScriptInfo>& results, bool recursive = true)

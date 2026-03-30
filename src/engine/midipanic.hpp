@@ -25,8 +25,8 @@ public:
     /** Write panic messags to a buffer. */
     inline static void write (juce::MidiBuffer& buffer, int ch, int frame)
     {
-        buffer.addEvent (MidiMessage::allNotesOff (ch), frame);
-        buffer.addEvent (MidiMessage::allSoundOff (ch), frame);
+        buffer.addEvent (juce::MidiMessage::allNotesOff (ch), frame);
+        buffer.addEvent (juce::MidiMessage::allSoundOff (ch), frame);
     }
 
     /** Write panic messages on all midi channels in the buffer. */
@@ -47,11 +47,11 @@ public:
     inline static std::vector<juce::MidiMessage> messages (int ch)
     {
         std::vector<juce::MidiMessage> msgs;
-        const auto timestamp = Time::getMillisecondCounterHiRes();
-        auto msg = MidiMessage::allNotesOff (ch);
+        const auto timestamp = juce::Time::getMillisecondCounterHiRes();
+        auto msg = juce::MidiMessage::allNotesOff (ch);
         msg.setTimeStamp (timestamp);
         msgs.push_back (msg);
-        msg = MidiMessage::allSoundOff (ch);
+        msg = juce::MidiMessage::allSoundOff (ch);
         msg.setTimeStamp (timestamp);
         msgs.push_back (msg);
         return msgs;
@@ -61,13 +61,13 @@ public:
     inline static std::vector<juce::MidiMessage> messages()
     {
         std::vector<juce::MidiMessage> msgs;
-        const auto timestamp = Time::getMillisecondCounterHiRes();
+        const auto timestamp = juce::Time::getMillisecondCounterHiRes();
         for (int ch = 1; ch <= 16; ++ch)
         {
-            auto msg = MidiMessage::allNotesOff (ch);
+            auto msg = juce::MidiMessage::allNotesOff (ch);
             msg.setTimeStamp (timestamp);
             msgs.push_back (msg);
-            msg = MidiMessage::allSoundOff (ch);
+            msg = juce::MidiMessage::allSoundOff (ch);
             msg.setTimeStamp (timestamp);
             msgs.push_back (msg);
         }

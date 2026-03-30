@@ -35,7 +35,7 @@ public:
         presets.clear();
     }
 
-    inline void getPresetsFor (const Node& node, OwnedArray<PresetInfo>& results) const
+    inline void getPresetsFor (const Node& node, juce::OwnedArray<PresetInfo>& results) const
     {
         SortByName sorter;
         for (const auto* const preset : presets)
@@ -81,7 +81,7 @@ public:
 
 private:
     DataPath path;
-    OwnedArray<PresetInfo> presets;
+    juce::OwnedArray<PresetInfo> presets;
 };
 
 } // namespace element

@@ -17,6 +17,8 @@
 
 #include "utils.hpp"
 
+using namespace juce;
+
 namespace element {
 
 class AudioFilePlayerEditor;
@@ -156,7 +158,7 @@ public:
     }
 
     void timerCallback() override { stabilizeComponents(); }
-    void changeListenerCallback (ChangeBroadcaster*) override { stabilizeComponents(); }
+    void changeListenerCallback (juce::ChangeBroadcaster*) override { stabilizeComponents(); }
 
     void stabilizeComponents()
     {

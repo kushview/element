@@ -91,7 +91,7 @@ private:
     std::unique_ptr<NavigationConcertinaPanel> nav;
     friend class ContentContainer;
     std::unique_ptr<ContentContainer> container;
-    StretchableLayoutManager layout;
+    juce::StretchableLayoutManager layout;
     class Resizer;
     friend class Resizer;
     std::unique_ptr<Resizer> bar1;

@@ -21,6 +21,8 @@
 #include <element/juce.hpp>
 #include <element/porttype.hpp>
 
+using namespace juce;
+
 using PortType = element::PortType;
 
 BOOST_AUTO_TEST_SUITE (PortListTests)

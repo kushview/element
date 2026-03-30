@@ -9,7 +9,7 @@ namespace element {
 
 class Services;
 
-class SessionImportWizard final : public Component
+class SessionImportWizard final : public juce::Component
 {
 public:
     SessionImportWizard();
@@ -18,7 +18,7 @@ public:
     void loadSession (const File& file);
     SessionPtr session();
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
 private:
@@ -27,7 +27,7 @@ private:
     SessionPtr _session;
 };
 
-class SessionImportWizardDialog : public DialogWindow
+class SessionImportWizardDialog : public juce::DialogWindow
 {
 public:
     SessionImportWizardDialog (std::unique_ptr<Component>& h, const File& file);

@@ -12,7 +12,7 @@ namespace element {
 class PluginManager;
 class RootGraph;
 
-class GraphManager : public ChangeBroadcaster
+class GraphManager : public juce::ChangeBroadcaster
 {
 public:
     static const uint32 invalidNodeId = EL_INVALID_PORT;
@@ -49,7 +49,7 @@ public:
     uint32 addNode (const Node& node);
 
     /** Adss a node with a plugin description */
-    uint32 addNode (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
+    uint32 addNode (const juce::PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
 
     /** Remove a node by ID */
     void removeNode (const uint32 nodeId);

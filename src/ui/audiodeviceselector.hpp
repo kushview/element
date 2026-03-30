@@ -18,9 +18,9 @@ namespace element {
 
     @tags{Audio}
 */
-class JUCE_API AudioDeviceSelectorComponent : public Component,
-                                              private ChangeListener,
-                                              private Timer
+class JUCE_API AudioDeviceSelectorComponent : public juce::Component,
+                                              private juce::ChangeListener,
+                                              private juce::Timer
 {
 public:
     //==============================================================================
@@ -42,7 +42,7 @@ public:
         @param hideAdvancedOptionsWithButton    if true, only the minimum amount of UI components
                                         are shown, with an "advanced" button that shows the rest of them
     */
-    AudioDeviceSelectorComponent (AudioDeviceManager& deviceManager,
+    AudioDeviceSelectorComponent (juce::AudioDeviceManager& deviceManager,
                                   int minAudioInputChannels,
                                   int maxAudioInputChannels,
                                   int minAudioOutputChannels,
@@ -56,7 +56,7 @@ public:
     ~AudioDeviceSelectorComponent() override;
 
     /** The device manager that this component is controlling */
-    AudioDeviceManager& deviceManager;
+    juce::AudioDeviceManager& deviceManager;
 
     /** Sets the standard height used for items in the panel. */
     void setItemHeight (int itemHeight);
@@ -65,7 +65,7 @@ public:
     int getItemHeight() const noexcept { return itemHeight; }
 
     /** Returns the ListBox that's being used to show the midi inputs, or nullptr if there isn't one. */
-    ListBox* getMidiInputSelectorListBox() const noexcept;
+    juce::ListBox* getMidiInputSelectorListBox() const noexcept;
 
     //==============================================================================
     /** @internal */
@@ -78,11 +78,11 @@ private:
     void handleBluetoothButton();
     void updateDeviceType();
     void updateMidiOutput();
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
     void updateAllControls();
 
-    std::unique_ptr<ComboBox> deviceTypeDropDown;
-    std::unique_ptr<Label> deviceTypeDropDownLabel;
+    std::unique_ptr<juce::ComboBox> deviceTypeDropDown;
+    std::unique_ptr<juce::Label> deviceTypeDropDownLabel;
     std::unique_ptr<Component> audioDeviceSettingsComp;
     String audioDeviceSettingsCompType;
     int itemHeight;
@@ -92,9 +92,9 @@ private:
 
     class MidiInputSelectorComponentListBox;
     std::unique_ptr<MidiInputSelectorComponentListBox> midiInputsList;
-    std::unique_ptr<ComboBox> midiOutputSelector;
-    std::unique_ptr<Label> midiInputsLabel, midiOutputLabel;
-    std::unique_ptr<TextButton> bluetoothButton;
+    std::unique_ptr<juce::ComboBox> midiOutputSelector;
+    std::unique_ptr<juce::Label> midiInputsLabel, midiOutputLabel;
+    std::unique_ptr<juce::TextButton> bluetoothButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioDeviceSelectorComponent)
 };

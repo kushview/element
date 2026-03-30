@@ -14,6 +14,8 @@
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
 #define EL_OSC_ADDRESS_ENGINE "/element/engine"
 
+using namespace juce;
+
 namespace element {
 
 struct CommandOSCListener final : juce::OSCReceiver::ListenerWithOSCAddress<>

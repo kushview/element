@@ -28,7 +28,7 @@ public:
     /** @internal */
     void textEditorTextChanged (TextEditor&) override;
     void textEditorReturnKeyPressed (TextEditor&) override;
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
     void timerCallback() override;
 
 private:

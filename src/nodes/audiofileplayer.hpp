@@ -9,8 +9,8 @@
 namespace element {
 
 class AudioFilePlayerNode : public BaseProcessor,
-                            public AudioProcessorParameter::Listener,
-                            public AsyncUpdater
+                            public juce::AudioProcessorParameter::Listener,
+                            public juce::AsyncUpdater
 {
 public:
     enum Parameters

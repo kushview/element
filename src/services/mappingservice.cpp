@@ -9,6 +9,8 @@
 #include <element/context.hpp>
 #include <element/signals.hpp>
 
+using namespace juce;
+
 namespace element {
 
 enum LearnState
