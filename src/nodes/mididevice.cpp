@@ -205,22 +205,19 @@ void MidiDeviceProcessor::setDevice (const MidiDeviceInfo& newDevice)
     {
         if (output)
         {
-            output->stopBackgroundThread();
-            output->clearAllPendingMessages();
+            output->closeDevice();
             output.reset();
         }
 
-        output = MidiOutput::openDevice (deviceWanted.identifier);
+        auto openResult = ElementMidiOutput::openDevice (deviceWanted, output);
 
-        if (output)
+        if (openResult.wasOk())
         {
-            output->clearAllPendingMessages();
-            output->startBackgroundThread();
             device = deviceWanted;
         }
         else
         {
-            DBG ("[element] could not open MIDI output: " << deviceWanted.name);
+            DBG ("[element] " << openResult.getErrorMessage());
         }
     }
 
@@ -252,10 +249,10 @@ Result MidiDeviceProcessor::closeDevice()
     {
         if (output)
         {
-            output->clearAllPendingMessages();
-            std::unique_ptr<MidiOutput> closer;
+            std::unique_ptr<ElementMidiOutput> closer;
             {
                 ScopedLock sl (getCallbackLock());
+                output->closeDevice();
                 std::swap (output, closer);
             }
             closer.reset();
@@ -319,12 +316,7 @@ void MidiDeviceProcessor::processBlock (AudioBuffer<float>& audio, MidiBuffer& m
         if (output && ! midi.isEmpty())
         {
             const auto delayMs = midiOutLatency.get();
-#if JUCE_WINDOWS
-            output->sendBlockOfMessagesNow (midi);
-#else
-            output->sendBlockOfMessages (
-                midi, delayMs + Time::getMillisecondCounterHiRes(), getSampleRate());
-#endif
+            output->sendBlockOfMessages (midi, delayMs, getSampleRate());
         }
 
         midi.clear (0, nframes);
@@ -403,7 +395,7 @@ bool MidiDeviceProcessor::deviceIsAvailable (const String& name)
         if (info.name == name)
             return true;
     }
-    return true;
+    return false;
 }
 
 bool MidiDeviceProcessor::deviceIsAvailable (const MidiDeviceInfo& dev)
@@ -411,7 +403,7 @@ bool MidiDeviceProcessor::deviceIsAvailable (const MidiDeviceInfo& dev)
     for (const auto& info : getAvailableDevices())
         if (info.identifier == dev.identifier)
             return true;
-    return true;
+    return false;
 }
 
 void MidiDeviceProcessor::timerCallback()

@@ -6,8 +6,8 @@ file(GLOB_RECURSE TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 juce_add_console_app(test_element)
 target_sources(test_element PRIVATE ${TEST_SOURCES})
 target_link_libraries(test_element PRIVATE kv::element)
-target_include_directories(test_element 
-    PRIVATE 
+target_include_directories(test_element
+    PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         ${GENERATED_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS})
@@ -32,6 +32,9 @@ add_test(NAME "MidiChannelMapTest" COMMAND test_element --run_test=MidiChannelMa
 add_test(NAME "MidiClockTest" COMMAND test_element --run_test=MidiClockTest)
 add_test(NAME "MidiProgramMapTests" COMMAND test_element --run_test=MidiProgramMapTests)
 add_test(NAME "MidiScriptTests" COMMAND test_element --run_test=MidiScriptTests)
+if (APPLE)
+    add_test(NAME "MidiOutputTests" COMMAND test_element --run_test=MidiOutputTests)
+endif()
 add_test(NAME "NodeFactoryTests" COMMAND test_element --run_test=NodeFactoryTests)
 add_test(NAME "NodeObjectTests" COMMAND test_element --run_test=NodeObjectTests)
 add_test(NAME "NodeTests" COMMAND test_element --run_test=NodeTests)
