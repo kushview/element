@@ -210,6 +210,21 @@ public:
         {
             auto sub = dynamic_cast<GraphNode*> (object.get());
             jassert (sub);
+
+            for (auto portType : { PortType::Audio, PortType::Midi })
+            {
+                PortArray savedIns, savedOuts;
+                node.getPorts (savedIns, savedOuts, portType);
+                if (savedIns.size() != sub->getNumPorts (portType, true))
+                {
+                    sub->setNumPorts (portType, savedIns.size(), true, false);
+                }
+                if (savedOuts.size() != sub->getNumPorts (portType, false))
+                {
+                    sub->setNumPorts (portType, savedOuts.size(), false, false);
+                }
+            }
+
             manager = std::make_unique<GraphManager> (*sub, owner.pluginManager);
             manager->setNodeModel (node);
             IONodeEnforcer addIO (*manager);
@@ -768,13 +783,21 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
     jassert (obj && data.hasType (types::Node));
     Node node (data, false);
     node.setProperty (tags::type, obj->getTypeString())
-        .setProperty (tags::object, obj.get())
-        .setProperty (tags::updater, new NodeModelUpdater (*this, data, obj.get()));
+        .setProperty (tags::object, obj.get());
 
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);
     bool resetPorts = false;
     juce::ignoreUnused (resetPorts);
+
+    if (obj->isSubGraph())
+    {
+        bindings.add (new Binding (*this, obj, node));
+        resetPorts = true;
+    }
+
+    node.setProperty (tags::updater, new NodeModelUpdater (*this, data, obj.get()));
+
     if (auto* const proc = obj->getAudioProcessor())
     {
         bool busesConfigured = false;
@@ -829,12 +852,6 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 
             resetPorts = true;
         }
-    }
-
-    if (obj->isSubGraph())
-    {
-        bindings.add (new Binding (*this, obj, node));
-        resetPorts = true;
     }
 
     node.restorePluginState();
