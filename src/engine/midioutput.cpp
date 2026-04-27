@@ -123,7 +123,8 @@ juce::Result ElementMidiOutput::openDevice (const juce::MidiDeviceInfo& deviceIn
 juce::Result ElementMidiOutput::sendBlockOfMessages (const juce::MidiBuffer& midi, double delayMs, double sampleRate) const
 {
 #if JUCE_WINDOWS
-    output->sendBlockOfMessagesNow (midi);
+    output->sendBlockOfMessages (
+        midi, delayMs + juce::Time::getMillisecondCounter(), sampleRate);
 #else
     output->sendBlockOfMessages (
         midi, delayMs + juce::Time::getMillisecondCounterHiRes(), sampleRate);

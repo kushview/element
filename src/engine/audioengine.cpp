@@ -438,7 +438,7 @@ public:
                 {
                     midiIOMonitor->sent();
 #if JUCE_WINDOWS
-                    midiOut->sendBlockOfMessagesNow (tempMidi);
+                    midiOut->sendBlockOfMessages (tempMidi, delayMs + Time::getMillisecondCounter(), sampleRate);
 #else
                     midiOut->sendBlockOfMessages (tempMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
 #endif
