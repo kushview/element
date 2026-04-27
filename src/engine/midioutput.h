@@ -31,7 +31,7 @@ private:
     MIDIClientRef client {};
     MIDIEndpointRef destination {};
     MIDIPortRef port {};
-    mach_timebase_info_data_t timebase{};
+    mach_timebase_info_data_t timebase {};
     MIDITimeStamp futureTimestamp (uint64_t nanosFromNow) const;
 #else
     std::unique_ptr<juce::MidiOutput> output;
