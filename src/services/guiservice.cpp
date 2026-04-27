@@ -18,6 +18,7 @@
 #include <element/ui/updater.hpp>
 
 #include "appinfo.hpp"
+#include "auth.hpp"
 #include "engine/midipanic.hpp"
 #include "messages.hpp"
 #include "services/sessionservice.hpp"
@@ -409,6 +410,32 @@ Commands& GuiService::commands() { return impl->commands; }
 void GuiService::checkUpdates (bool background)
 {
 #if ELEMENT_UPDATER
+    if (auth::isAppcastUrlExpired (settings().getAuthAppcastUrl()))
+    {
+        // Appcast URL has expired — refresh token pair and re-fetch it on a
+        // background thread before triggering the actual update check.
+        std::thread ([this, background]() {
+            const auto storedRefresh = [this]() -> juce::String {
+                if (auto* p = settings().getUserSettings())
+                    return p->getValue (auth::refreshTokenKey).trim();
+                return {};
+            }();
+
+            if (storedRefresh.isNotEmpty())
+            {
+                const auto resp = auth::refreshAccessToken (storedRefresh);
+                if (resp.success)
+                    auth::persistTokens (settings(), resp);
+            }
+
+            juce::MessageManager::callAsync ([this, background]() {
+                applyStoredChannelToUpdater();
+                updates->updater->check (background);
+            });
+        }).detach();
+        return;
+    }
+
     updates->updater->check (background);
 #endif
 }

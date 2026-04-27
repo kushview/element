@@ -24,18 +24,10 @@ inline constexpr const char* authorizeEndpoint = "https://scratch-woo.local/auth
 inline constexpr const char* tokenEndpoint = "https://scratch-woo.local/wp-json/element-auth/v1/token";
 inline constexpr const char* refreshEndpoint = "https://scratch-woo.local/wp-json/element-auth/v1/token/refresh";
 #else
-/** Custom auth API base endpoint. */
 inline constexpr const char* apiBaseEndpoint = "https://kushview.net/wp-json/element-auth/v1";
-
-/** Browser authorization endpoint. */
 inline constexpr const char* authorizeEndpoint = "https://kushview.net/auth/authorize";
-
-/** Token exchange endpoint. */
 inline constexpr const char* tokenEndpoint = "https://kushview.net/wp-json/element-auth/v1/token";
-
-/** Refresh endpoint. */
 inline constexpr const char* refreshEndpoint = "https://kushview.net/wp-json/element-auth/v1/token/refresh";
-
 #endif
 
 /** User settings key for persisted refresh token. */
@@ -143,5 +135,13 @@ juce::String fetchSignedAppcastUrl (const juce::String& accessToken);
 	@param settings Application settings containing the stored refresh token
  */
 void maybeRefreshOnStartup (element::Settings& settings);
+
+/** Returns true if the cached signed appcast URL has expired or is empty.
+
+	Parses the 'exp' query parameter embedded in the URL by the server.
+
+	@param cachedUrl The URL string previously returned by fetchSignedAppcastUrl
+ */
+bool isAppcastUrlExpired (const juce::String& cachedUrl);
 
 } // namespace element::auth

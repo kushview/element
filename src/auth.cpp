@@ -368,6 +368,17 @@ void revokeRefreshToken (const String& refreshToken)
         Logger::writeToLog ("Auth: revoke request failed (HTTP " + String (statusCode) + ")");
 }
 
+bool isAppcastUrlExpired (const String& cachedUrl)
+{
+    if (cachedUrl.isEmpty())
+        return true;
+    const auto params = parseQueryParameters (cachedUrl);
+    const auto expStr = params["exp"];
+    if (expStr.isEmpty())
+        return true;
+    return expStr.getLargeIntValue() < (int64) (Time::currentTimeMillis() / 1000);
+}
+
 void maybeRefreshOnStartup (element::Settings& settings)
 {
     const auto storedRefreshToken = [&]() -> String {
