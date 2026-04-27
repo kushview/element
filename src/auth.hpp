@@ -19,15 +19,15 @@ inline constexpr const char* clientId = "element-desktop";
 inline constexpr const char* redirectUri = "element://auth/callback";
 
 #if ELEMENT_LOCAL_AUTH
-inline constexpr const char* apiBaseEndpoint = "https://scratch-woo.local/wp-json/element-auth/v1";
+inline constexpr const char* apiBaseEndpoint = "https://scratch-woo.local/wp-json/kv-auth/v1";
 inline constexpr const char* authorizeEndpoint = "https://scratch-woo.local/auth/authorize";
-inline constexpr const char* tokenEndpoint = "https://scratch-woo.local/wp-json/element-auth/v1/token";
-inline constexpr const char* refreshEndpoint = "https://scratch-woo.local/wp-json/element-auth/v1/token/refresh";
+inline constexpr const char* tokenEndpoint = "https://scratch-woo.local/wp-json/kv-auth/v1/token";
+inline constexpr const char* refreshEndpoint = "https://scratch-woo.local/wp-json/kv-auth/v1/token/refresh";
 #else
-inline constexpr const char* apiBaseEndpoint = "https://kushview.net/wp-json/element-auth/v1";
+inline constexpr const char* apiBaseEndpoint = "https://kushview.net/wp-json/kv-auth/v1";
 inline constexpr const char* authorizeEndpoint = "https://kushview.net/auth/authorize";
-inline constexpr const char* tokenEndpoint = "https://kushview.net/wp-json/element-auth/v1/token";
-inline constexpr const char* refreshEndpoint = "https://kushview.net/wp-json/element-auth/v1/token/refresh";
+inline constexpr const char* tokenEndpoint = "https://kushview.net/wp-json/kv-auth/v1/token";
+inline constexpr const char* refreshEndpoint = "https://kushview.net/wp-json/kv-auth/v1/token/refresh";
 #endif
 
 /** User settings key for persisted refresh token. */
@@ -143,5 +143,35 @@ void maybeRefreshOnStartup (element::Settings& settings);
 	@param cachedUrl The URL string previously returned by fetchSignedAppcastUrl
  */
 bool isAppcastUrlExpired (const juce::String& cachedUrl);
+
+/** Begins the PKCE authorization flow.
+
+	Generates a state token and code verifier, stores them for later validation,
+	and returns the browser URL to open. Returns an empty string on failure.
+
+	@param settings Application settings for PKCE state storage
+	@return Authorization URL to open in the browser, or empty on failure
+ */
+juce::String beginAuthorizationFlow (element::Settings& settings);
+
+/** Signs out the current user.
+
+	Clears all stored auth credentials from settings and fires a best-effort
+	server-side revocation of the refresh token on a background thread.
+
+	@param settings Application settings containing the stored credentials
+ */
+void signOut (element::Settings& settings);
+
+/** Handles an OAuth callback URL.
+
+	Validates the PKCE state, exchanges the authorization code for tokens,
+	and persists the result. Safe to call for any URL — non-callback URLs
+	are silently ignored.
+
+	@param urlString Full callback URL (e.g. element://auth/callback?code=...)
+	@param settings  Application settings for PKCE state and token storage
+ */
+void handleCallback (const juce::String& urlString, element::Settings& settings);
 
 } // namespace element::auth

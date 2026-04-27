@@ -383,60 +383,14 @@ void Application::anotherInstanceStarted (const String& commandLine)
 
 void Application::handleURLSchemeCallback (const String& urlString)
 {
-    URL url (urlString);
-
-    // Handle auth callback: element://auth/callback?code=...
-    // Note: getSubPath() returns "callback" without leading slash
+    const URL url (urlString);
     if (url.getDomain() == "auth" && url.getSubPath() == "callback")
     {
-        // Bring main window to front
-        if (world)
-        {
-            if (auto* gui = world->services().find<GuiService>())
-            {
-                if (auto* mainWindow = gui->getMainWindow())
-                    mainWindow->toFront (true);
-            }
-        }
+        if (auto* gui = world->services().find<GuiService>())
+            if (auto* mainWindow = gui->getMainWindow())
+                mainWindow->toFront (true);
 
-        const auto parameters = auth::parseQueryParameters (url.toString (true));
-
-        const auto authError = parameters["error"];
-        if (authError.isNotEmpty())
-        {
-            Logger::writeToLog ("Auth callback error: " + authError);
-            return;
-        }
-
-        String authCode = parameters["code"];
-        if (authCode.isNotEmpty())
-        {
-            auto& settings = world->settings();
-            String expectedState;
-            String codeVerifier;
-            if (! auth::consumePendingPKCE (settings, expectedState, codeVerifier))
-            {
-                Logger::writeToLog ("Auth token exchange failed: missing PKCE session; restart sign-in");
-                return;
-            }
-
-            const auto callbackState = parameters["state"].trim();
-            if (callbackState.isEmpty() || callbackState != expectedState)
-            {
-                Logger::writeToLog ("Auth callback rejected: invalid state");
-                return;
-            }
-
-            auto tokenResponse = auth::exchangeAuthorizationCode (authCode, codeVerifier);
-            if (! tokenResponse.success)
-            {
-                Logger::writeToLog (tokenResponse.error);
-                return;
-            }
-
-            auth::persistTokens (settings, tokenResponse);
-            Logger::writeToLog ("Auth token exchange completed successfully");
-        }
+        auth::handleCallback (urlString, world->settings());
     }
 }
 

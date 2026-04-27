@@ -1299,67 +1299,19 @@ private:
      */
     void startOAuthFlow()
     {
-        auto* props = world.settings().getUserSettings();
-        if (props == nullptr)
-        {
-            Logger::writeToLog ("Auth: Unable to start authorization flow (missing user settings)");
-            return;
-        }
-
-        const auto state = auth::generateState();
-        const auto codeVerifier = auth::generateCodeVerifier();
-        if (! auth::storePendingPKCE (world.settings(), state, codeVerifier))
-        {
-            Logger::writeToLog ("Auth: Unable to start authorization flow (failed to store PKCE state)");
-            return;
-        }
-
-        const auto authUrl = auth::buildAuthorizationURL (state, codeVerifier);
-
-        URL (authUrl).launchInDefaultBrowser();
-
-        Logger::writeToLog ("Auth: Authorization flow started (PKCE)");
+        const auto authUrl = auth::beginAuthorizationFlow (world.settings());
+        if (authUrl.isNotEmpty())
+            URL (authUrl).launchInDefaultBrowser();
     }
 
     /** Signs out the user and clears stored tokens. */
     void signOut()
     {
-        Logger::writeToLog ("Auth: Signing out");
-
-        auto& settings = world.settings();
-
-        // Grab the refresh token before clearing it, then revoke server-side
-        // on a background thread (fire-and-forget).
-        const auto refreshToken = [&]() -> juce::String {
-            if (auto* props = settings.getUserSettings())
-                return props->getValue (auth::refreshTokenKey).trim();
-            return {};
-        }();
-
-        if (refreshToken.isNotEmpty())
-        {
-            juce::String tokenCopy = refreshToken;
-            std::thread ([tokenCopy]() {
-                auth::revokeRefreshToken (tokenCopy);
-            }).detach();
-        }
-
-        settings.setUpdateKey ({});
-        settings.setUpdateKeyUser ({});
-        settings.setUpdateKeyType ("element-v1");
-        settings.setAuthPreviewUpdates (false);
-        settings.setAuthAppcastUrl ({});
-        settings.setUpdateChannel ("stable");
+        auth::signOut (world.settings());
 
         // Revert the updater to the public stable feed.
         if (auto* g = world.services().find<GuiService>())
             g->applyStoredChannelToUpdater();
-
-        if (auto* props = settings.getUserSettings())
-        {
-            props->setValue (auth::refreshTokenKey, juce::String());
-            props->save();
-        }
 
         // updateAuthorizationState() is triggered automatically via changeListenerCallback.
     }

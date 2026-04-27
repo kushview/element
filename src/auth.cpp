@@ -417,4 +417,93 @@ void maybeRefreshOnStartup (element::Settings& settings)
     Logger::writeToLog ("Auth: startup token refresh succeeded");
 }
 
+void handleCallback (const String& urlString, element::Settings& settings)
+{
+    const URL url (urlString);
+    if (url.getDomain() != "auth" || url.getSubPath() != "callback")
+        return;
+
+    const auto parameters = parseQueryParameters (url.toString (true));
+
+    const auto authError = parameters["error"];
+    if (authError.isNotEmpty())
+    {
+        Logger::writeToLog ("Auth callback error: " + authError);
+        return;
+    }
+
+    const auto authCode = parameters["code"];
+    if (authCode.isEmpty())
+        return;
+
+    String expectedState, codeVerifier;
+    if (! consumePendingPKCE (settings, expectedState, codeVerifier))
+    {
+        Logger::writeToLog ("Auth: missing PKCE session — restart sign-in");
+        return;
+    }
+
+    const auto callbackState = parameters["state"].trim();
+    if (callbackState.isEmpty() || callbackState != expectedState)
+    {
+        Logger::writeToLog ("Auth: callback rejected — invalid state");
+        return;
+    }
+
+    const auto response = exchangeAuthorizationCode (authCode, codeVerifier);
+    if (! response.success)
+    {
+        Logger::writeToLog ("Auth: token exchange failed: " + response.error);
+        return;
+    }
+
+    persistTokens (settings, response);
+    Logger::writeToLog ("Auth: token exchange completed successfully");
+}
+
+String beginAuthorizationFlow (element::Settings& settings)
+{
+    const auto state = generateState();
+    const auto codeVerifier = generateCodeVerifier();
+    if (! storePendingPKCE (settings, state, codeVerifier))
+    {
+        Logger::writeToLog ("Auth: failed to store PKCE state");
+        return {};
+    }
+
+    Logger::writeToLog ("Auth: authorization flow started (PKCE)");
+    return buildAuthorizationURL (state, codeVerifier);
+}
+
+void signOut (element::Settings& settings)
+{
+    Logger::writeToLog ("Auth: signing out");
+
+    const auto refreshToken = [&]() -> String {
+        if (auto* props = settings.getUserSettings())
+            return props->getValue (refreshTokenKey).trim();
+        return {};
+    }();
+
+    if (refreshToken.isNotEmpty())
+    {
+        std::thread ([refreshToken]() {
+            revokeRefreshToken (refreshToken);
+        }).detach();
+    }
+
+    settings.setUpdateKey ({});
+    settings.setUpdateKeyUser ({});
+    settings.setUpdateKeyType ("element-v1");
+    settings.setAuthPreviewUpdates (false);
+    settings.setAuthAppcastUrl ({});
+    settings.setUpdateChannel ("stable");
+
+    if (auto* props = settings.getUserSettings())
+    {
+        props->setValue (refreshTokenKey, String());
+        props->save();
+    }
+}
+
 } // namespace element::auth
