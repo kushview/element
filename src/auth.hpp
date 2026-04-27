@@ -18,7 +18,6 @@ inline constexpr const char* clientId = "element-desktop";
 /** Redirect URI registered for the desktop app callback. */
 inline constexpr const char* redirectUri = "element://auth/callback";
 
-#define ELEMENT_LOCAL_AUTH 1
 #if ELEMENT_LOCAL_AUTH
 inline constexpr const char* apiBaseEndpoint = "https://scratch-woo.local/wp-json/element-auth/v1";
 inline constexpr const char* authorizeEndpoint = "https://scratch-woo.local/auth/authorize";

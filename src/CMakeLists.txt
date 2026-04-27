@@ -94,6 +94,11 @@ if(ELEMENT_ENABLE_UPDATER)
     target_compile_definitions(element PUBLIC ELEMENT_UPDATER=1)
 endif()
 
+if(ELEMENT_LOCAL_AUTH)
+    message(STATUS "Element local auth endpoints enabled")
+    target_compile_definitions(element PRIVATE ELEMENT_LOCAL_AUTH=1)
+endif()
+
 if(ELEMENT_ENABLE_LTO)
     message("Link Time Optimization enabled")
     target_link_libraries(element PUBLIC juce::juce_recommended_lto_flags)
