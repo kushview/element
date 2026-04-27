@@ -18,6 +18,7 @@
 #include <element/ui/updater.hpp>
 
 #include "appinfo.hpp"
+#include "auth.hpp"
 #include "engine/midipanic.hpp"
 #include "messages.hpp"
 #include "services/sessionservice.hpp"
@@ -178,6 +179,18 @@ private:
     {
         // TODO: Setup updater with settings.  Not needed until supported access
         // is implemented
+    }
+
+    void setFeedUrl (const juce::String& url)
+    {
+#if ELEMENT_UPDATER
+        if (url.isNotEmpty())
+            updater->setFeedUrl (url.toStdString());
+        else
+            updater->setFeedUrl ({});
+#else
+        juce::ignoreUnused (url);
+#endif
     }
 
     bool launchUpdaterOnExit { false };
@@ -344,6 +357,9 @@ void GuiService::activate()
     SystemTray::init (*this);
     context().devices().addChangeListener (this);
     impl->restoreRecents();
+
+    // Apply the saved release channel to the updater on launch.
+    applyStoredChannelToUpdater();
 }
 
 void GuiService::deactivate()
@@ -394,8 +410,49 @@ Commands& GuiService::commands() { return impl->commands; }
 void GuiService::checkUpdates (bool background)
 {
 #if ELEMENT_UPDATER
+    if (auth::isAppcastUrlExpired (settings().getAuthAppcastUrl()))
+    {
+        // Appcast URL has expired — refresh token pair and re-fetch it on a
+        // background thread before triggering the actual update check.
+        std::thread ([this, background]() {
+            const auto storedRefresh = [this]() -> juce::String {
+                if (auto* p = settings().getUserSettings())
+                    return p->getValue (auth::refreshTokenKey).trim();
+                return {};
+            }();
+
+            if (storedRefresh.isNotEmpty())
+            {
+                const auto resp = auth::refreshAccessToken (storedRefresh);
+                if (resp.success)
+                    auth::persistTokens (settings(), resp);
+            }
+
+            juce::MessageManager::callAsync ([this, background]() {
+                applyStoredChannelToUpdater();
+                updates->updater->check (background);
+            });
+        }).detach();
+        return;
+    }
+
     updates->updater->check (background);
 #endif
+}
+
+void GuiService::setUpdaterFeedUrl (const juce::String& url)
+{
+    updates->setFeedUrl (url);
+}
+
+void GuiService::applyStoredChannelToUpdater()
+{
+    const auto& s = settings();
+    const auto channel = s.getUpdateChannel();
+    if (channel == "preview" && s.getAuthPreviewUpdates())
+        updates->setFeedUrl (s.getAuthAppcastUrl());
+    else
+        updates->setFeedUrl ({});
 }
 
 void GuiService::showPreferencesDialog (const String& section)

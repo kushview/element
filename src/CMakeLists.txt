@@ -31,7 +31,10 @@ file(GLOB_RECURSE ELEMENT_SOURCES
 target_sources(element PRIVATE ${ELEMENT_SOURCES})
 
 if(APPLE)
-    target_sources(element PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ui/nsviewwithparent.mm")
+    target_sources(element PRIVATE 
+        "${CMAKE_CURRENT_SOURCE_DIR}/ui/nsviewwithparent.mm"
+        "${CMAKE_CURRENT_SOURCE_DIR}/urlhandler.mm"
+    )
 endif()
 
 target_compile_definitions(element 
@@ -89,6 +92,11 @@ target_link_libraries(element
 if(ELEMENT_ENABLE_UPDATER)
     message(STATUS "Element updater enabled")
     target_compile_definitions(element PUBLIC ELEMENT_UPDATER=1)
+endif()
+
+if(ELEMENT_LOCAL_AUTH)
+    message(STATUS "Element local auth endpoints enabled")
+    target_compile_definitions(element PRIVATE ELEMENT_LOCAL_AUTH=1)
 endif()
 
 if(ELEMENT_ENABLE_LTO)

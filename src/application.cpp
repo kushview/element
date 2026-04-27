@@ -22,6 +22,7 @@
 #include "services/sessionservice.hpp"
 #include "log.hpp"
 #include "messages.hpp"
+#include "auth.hpp"
 #include "utils.hpp"
 
 /** Define to force the application to behave as if running for the first time.
@@ -223,7 +224,16 @@ void Application::initialise (const String& commandLine)
 
     initializeModulePath();
     printCopyNotice();
+
+#if JUCE_MAC
+    registerURLSchemeHandler();
+#endif
+
     launchApplication();
+
+    // Handle URL scheme if passed on command line
+    if (commandLine.startsWith ("element://"))
+        handleURLSchemeCallback (commandLine);
 }
 
 void Application::actionListenerCallback (const String& message)
@@ -234,16 +244,17 @@ void Application::actionListenerCallback (const String& message)
 
 bool Application::canShutdown()
 {
-    if (! MessageManager::getInstance()->isThisTheMessageThread()) 
+    if (! MessageManager::getInstance()->isThisTheMessageThread())
     {
         auto result = MessageManager::getInstance()->callSync (Application::canShutdown);
-        return result.has_value() ? * result : true;
+        return result.has_value() ? *result : true;
     }
 
-    if (auto app = dynamic_cast<Application*> (getInstance())) {
+    if (auto app = dynamic_cast<Application*> (getInstance()))
+    {
         auto& services = app->world->services();
         auto ssvc = services.find<SessionService>();
-        return !ssvc->hasSessionChanged();
+        return ! ssvc->hasSessionChanged();
     }
 
     return true;
@@ -253,12 +264,21 @@ void Application::shutdown()
 {
     if (! world)
         return;
+
+#if JUCE_MAC
+    unregisterURLSchemeHandler();
+#endif
+
 #if JUCE_LINUX
     applyMidiSettings.reset();
 #endif
     workers.clearQuick (true);
     auto& srvs = world->services();
     srvs.saveSettings();
+
+    if (authStartupThread && authStartupThread->isThreadRunning())
+        authStartupThread->stopThread (3000);
+    authStartupThread.reset();
 
     auto& devices (world->devices());
     devices.closeAudioDevice();
@@ -351,7 +371,27 @@ void Application::anotherInstanceStarted (const String& commandLine)
     if (! world)
         return;
 
+    // Handle custom URL scheme callbacks (e.g., auth)
+    if (commandLine.startsWith ("element://"))
+    {
+        handleURLSchemeCallback (commandLine);
+        return;
+    }
+
     maybeOpenCommandLineFile (commandLine);
+}
+
+void Application::handleURLSchemeCallback (const String& urlString)
+{
+    const URL url (urlString);
+    if (url.getDomain() == "auth" && url.getSubPath() == "callback")
+    {
+        if (auto* gui = world->services().find<GuiService>())
+            if (auto* mainWindow = gui->getMainWindow())
+                mainWindow->toFront (true);
+
+        auth::handleCallback (urlString, world->settings());
+    }
 }
 
 void Application::suspended() {}
@@ -370,7 +410,7 @@ void Application::finishLaunching()
     if (world->settings().scanForPluginsOnStartup())
         world->plugins().scanAudioPlugins();
 
-    const bool isFirstRun =startup->isFirstRun;
+    const bool isFirstRun = startup->isFirstRun;
     startup.reset();
 
     auto& ui = *world->services().find<UI>();
@@ -379,10 +419,26 @@ void Application::finishLaunching()
 
     world->services().run();
 
+    // Attempt to restore auth state from a stored refresh token in the background.
+    authStartupThread = std::make_unique<AuthStartupThread> (*world);
+    authStartupThread->startThread (Thread::Priority::low);
+
     if (! isFirstRun && world->settings().checkForUpdates())
         startTimer (10 * 1000);
 
     maybeOpenCommandLineFile (getCommandLineParameters());
+}
+
+void Application::AuthStartupThread::run()
+{
+    auth::maybeRefreshOnStartup (ctx.settings());
+
+    // Re-apply the channel preference to the updater from the message thread:
+    // the startup refresh may have fetched a new signed appcast URL.
+    juce::MessageManager::callAsync ([&ctx = ctx]() {
+        if (auto* gui = ctx.services().find<GuiService>())
+            gui->applyStoredChannelToUpdater();
+    });
 }
 
 void Application::printCopyNotice()

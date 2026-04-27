@@ -1,22 +1,26 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <thread>
+
+#include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
-#include <element/context.hpp>
 #include <element/settings.hpp>
-#include <element/version.hpp>
+#include <element/ui.hpp>
 #include <element/ui/content.hpp>
 #include <element/ui/mainwindow.hpp>
-#include <element/ui/updater.hpp>
 #include <element/ui/preferences.hpp>
+#include <element/ui/updater.hpp>
+#include <element/version.hpp>
 
-#include "ui/audiodeviceselector.hpp"
-#include "ui/guicommon.hpp"
-#include "ui/viewhelpers.hpp"
-#include "services/oscservice.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/midipanic.hpp"
+#include "messages.hpp"
+#include "auth.hpp"
+#include "services/oscservice.hpp"
+#include "ui/buttons.hpp"
+#include "ui/viewhelpers.hpp"
 
 namespace element {
 
@@ -1139,6 +1143,219 @@ private:
 };
 
 //==============================================================================
+#if ELEMENT_UPDATER
+class UpdatesSettingsPage : public SettingsPage,
+                            public Button::Listener,
+                            public ComboBox::Listener,
+                            public juce::ChangeListener
+{
+public:
+    UpdatesSettingsPage (Context& w)
+        : world (w)
+    {
+        world.settings().addChangeListener (this);
+        addAndMakeVisible (releaseChannelLabel);
+        releaseChannelLabel.setText ("Release Channel", dontSendNotification);
+        releaseChannelLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+
+        addAndMakeVisible (releaseChannelBox);
+        releaseChannelBox.addItem ("Stable", 1);
+        releaseChannelBox.addItem ("Preview", 2);
+        // ID 3 is reserved for a future "Testing" channel.
+
+        // Restore the persisted channel selection (defaults to stable).
+        const auto savedSlug = world.settings().getUpdateChannel();
+        releaseChannelBox.setSelectedId (channelIdForSlug (savedSlug), dontSendNotification);
+        releaseChannelBox.addListener (this);
+
+        addAndMakeVisible (authorizationLabel);
+        authorizationLabel.setText ("Preview Access", dontSendNotification);
+        authorizationLabel.setFont (Font (FontOptions (15.0f).withStyle ("Bold")));
+
+        addAndMakeVisible (statusLabel);
+        statusLabel.setText ("Not authorized", dontSendNotification);
+        statusLabel.setFont (Font (FontOptions (12.0)));
+        statusLabel.setColour (Label::textColourId, Colours::grey);
+
+        addAndMakeVisible (authorizeButton);
+        authorizeButton.setButtonText ("Sign in with Kushview.net");
+        authorizeButton.addListener (this);
+
+        addAndMakeVisible (signOutButton);
+        signOutButton.setButtonText ("Sign Out");
+        signOutButton.addListener (this);
+        signOutButton.setVisible (false);
+
+        updateAuthorizationState();
+    }
+
+    ~UpdatesSettingsPage()
+    {
+        world.settings().removeChangeListener (this);
+        releaseChannelBox.removeListener (this);
+        authorizeButton.removeListener (this);
+        signOutButton.removeListener (this);
+    }
+
+    void changeListenerCallback (juce::ChangeBroadcaster*) override
+    {
+        updateAuthorizationState();
+    }
+
+    void comboBoxChanged (ComboBox* box) override
+    {
+        if (box != &releaseChannelBox)
+            return;
+
+        const auto slug = channelSlugForId (releaseChannelBox.getSelectedId());
+        world.settings().setUpdateChannel (slug);
+
+        if (auto* g = world.services().find<GuiService>())
+            g->applyStoredChannelToUpdater();
+    }
+
+    void buttonClicked (Button* button) override
+    {
+        if (button == &authorizeButton)
+        {
+            startOAuthFlow();
+        }
+        else if (button == &signOutButton)
+        {
+            signOut();
+        }
+    }
+
+    void resized() override
+    {
+        const int spacingBetweenSections = 6;
+        const int settingHeight = 22;
+
+        Rectangle<int> r (getLocalBounds());
+
+        // Release channel selector
+        auto r2 = r.removeFromTop (settingHeight);
+        releaseChannelLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+        releaseChannelBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+
+        // Authorization section
+        r.removeFromTop (spacingBetweenSections * 2);
+        authorizationLabel.setBounds (r.removeFromTop (24));
+
+        r.removeFromTop (spacingBetweenSections);
+
+        // Status label
+        statusLabel.setBounds (r.removeFromTop (settingHeight));
+
+        // Buttons
+        r.removeFromTop (spacingBetweenSections);
+        auto buttonRow = r.removeFromTop (settingHeight);
+        authorizeButton.setBounds (buttonRow.removeFromLeft (180));
+        buttonRow.removeFromLeft (spacingBetweenSections);
+        signOutButton.setBounds (buttonRow.removeFromLeft (100));
+    }
+
+private:
+    Context& world;
+
+    Label releaseChannelLabel;
+    ComboBox releaseChannelBox;
+
+    Label authorizationLabel;
+    Label statusLabel;
+    TextButton authorizeButton;
+    TextButton signOutButton;
+
+    /** Converts a settings channel slug to its combo box item ID.
+        Add new channels both here and in the combo box initialiser.
+        @param slug  "stable", "preview", or a future slug
+        @return      Combo box ID (1 = Stable if slug is unrecognised) */
+    static int channelIdForSlug (const juce::String& slug)
+    {
+        if (slug == "preview")
+            return 2;
+        // if (slug == "testing") return 3;  // reserved for future use
+        return 1;
+    }
+
+    /** Returns the settings slug stored for a given combo box item ID. */
+    static juce::String channelSlugForId (int id)
+    {
+        switch (id)
+        {
+            case 2:
+                return "preview";
+            // case 3: return "testing";  // reserved for future use
+            default:
+                return "stable";
+        }
+    }
+
+    /** Initiates the OAuth authorization flow.
+        
+        Opens the user's default browser to kushview.net OAuth page.
+        The website will redirect back to the app via custom URL scheme
+        after successful authentication.
+     */
+    void startOAuthFlow()
+    {
+        const auto authUrl = auth::beginAuthorizationFlow (world.settings());
+        if (authUrl.isNotEmpty())
+            URL (authUrl).launchInDefaultBrowser();
+    }
+
+    /** Signs out the user and clears stored tokens. */
+    void signOut()
+    {
+        auth::signOut (world.settings());
+
+        // Revert the updater to the public stable feed.
+        if (auto* g = world.services().find<GuiService>())
+            g->applyStoredChannelToUpdater();
+
+        // updateAuthorizationState() is triggered automatically via changeListenerCallback.
+    }
+
+    /** Updates the UI to reflect current authorization state from Settings. */
+    void updateAuthorizationState()
+    {
+        const auto& settings = world.settings();
+        const auto accessToken = settings.getUpdateKey().trim();
+        const auto userDisplay = settings.getUpdateKeyUser().trim();
+        const bool authorized = accessToken.isNotEmpty();
+        const bool canPreview = authorized && settings.getAuthPreviewUpdates();
+
+        if (authorized)
+        {
+            const auto label = userDisplay.isNotEmpty() ? userDisplay : accessToken.substring (0, 12) + "...";
+            statusLabel.setText ("Authorized as: " + label, dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colours::green);
+            authorizeButton.setVisible (false);
+            signOutButton.setVisible (true);
+            releaseChannelBox.setItemEnabled (2, canPreview); // Preview requires entitlement
+        }
+        else
+        {
+            statusLabel.setText ("Not authorized", dontSendNotification);
+            statusLabel.setColour (Label::textColourId, Colours::grey);
+            authorizeButton.setVisible (true);
+            signOutButton.setVisible (false);
+            releaseChannelBox.setItemEnabled (2, false); // Disable Preview
+
+            // Revert to Stable if a non-public channel was selected.
+            if (releaseChannelBox.getSelectedId() != 1)
+            {
+                releaseChannelBox.setSelectedId (1, dontSendNotification);
+                world.settings().setUpdateChannel ("stable");
+                if (auto* g = world.services().find<GuiService>())
+                    g->applyStoredChannelToUpdater();
+            }
+        }
+    }
+};
+#endif
+
+//==============================================================================
 Preferences::Preferences (GuiService& ui)
     : _context (ui.context()), _ui (ui)
 {
@@ -1208,7 +1425,12 @@ Component* Preferences::createPageForName (const String& name)
     {
         return new OSCSettingsPage (_context, _ui);
     }
-
+#if ELEMENT_UPDATER
+    else if (name == EL_REPOSITORY_PREFERENCE_NAME)
+    {
+        return new UpdatesSettingsPage (_context);
+    }
+#endif
     return nullptr;
 }
 
@@ -1222,6 +1444,9 @@ void Preferences::addDefaultPages()
     addPage (EL_MIDI_SETTINGS_NAME);
 #if ! ELEMENT_SE
     addPage (EL_OSC_SETTINGS_NAME);
+#endif
+#if ELEMENT_UPDATER
+    addPage (EL_REPOSITORY_PREFERENCE_NAME);
 #endif
 
     setPage (EL_GENERAL_SETTINGS_NAME);
