@@ -62,9 +62,6 @@ public:
 
         checkNewerVersion = 0x0500,
 
-        signIn,
-        signOut,
-
         transportRewind = 0x0600,
         transportForward,
         transportPlay,
@@ -143,9 +140,6 @@ public:
             importSession,
 
             checkNewerVersion,
-
-            signIn,
-            signOut,
 
             transportRewind,
             transportForward,
