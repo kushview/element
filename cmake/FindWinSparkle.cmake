@@ -3,9 +3,9 @@
 
 set(WIN_SPARKLE_VERSION "0.9.2" CACHE STRING "WinSparkle version to download")
 
-set(WIN_SPARKLE_FEED_URL "http://localhost:8000/appcast.xml"
+set(WIN_SPARKLE_FEED_URL "https://cd.kushview.net/release/element/appcast-windows.xml"
     CACHE STRING "The WinSparkle feed url to use")
-set(WIN_SPARKLE_PUBLIC_KEY "+3pPKr274O3KL4lTWaEs/ukVk3Ayvnc7BkdS45zOnE4="
+set(WIN_SPARKLE_PUBLIC_KEY "fDx5MoKd4UR4nkYTU8OZyjGLxeaTe487l97WV3sEP7U="
     CACHE STRING "The WinSparkle eDSA public key to use")
 
 FetchContent_Declare(

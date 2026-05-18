@@ -3,9 +3,9 @@
 
 set(SPARKLE_VERSION "2.8.1" CACHE STRING "Sparkle version to download")
 
-set(SPARKLE_FEED_URL "http://localhost:8000/appcast.xml"
+set(SPARKLE_FEED_URL "https://cd.kushview.net/release/element/appcast-macos.xml"
     CACHE STRING "The Sparkle feed url to use")
-set(SPARKLE_PUBLIC_KEY "+3pPKr274O3KL4lTWaEs/ukVk3Ayvnc7BkdS45zOnE4="
+set(SPARKLE_PUBLIC_KEY "fDx5MoKd4UR4nkYTU8OZyjGLxeaTe487l97WV3sEP7U="
     CACHE STRING "The Sparkle eDSA public key to use")
 
 FetchContent_Declare(
