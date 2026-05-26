@@ -324,7 +324,7 @@ PluginWindow::~PluginWindow()
     setLookAndFeel (nullptr);
 }
 
-float PluginWindow::getDesktopScaleFactor() const { return 1.f; }
+float PluginWindow::getDesktopScaleFactor() const { return (float) juce::Desktop::getInstance().getGlobalScaleFactor(); }
 
 Content* PluginWindow::getElementContentComponent() const
 {
