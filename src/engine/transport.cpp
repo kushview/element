@@ -122,7 +122,7 @@ void Transport::postProcess (int nframes)
     if (ts.beatDivisor() != nextBeatDivisor.get())
     {
         ts.setBeatType ((unsigned short) nextBeatDivisor.get());
-        ts.setBeatDivisor (1 << ts.beatType());
+        ts.setBeatDivisor ((unsigned short) nextBeatDivisor.get());
         monitor->beatDivisor.set (nextBeatDivisor.get());
         updateTimeScale = true;
     }

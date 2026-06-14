@@ -49,6 +49,7 @@ add_test(NAME "ScriptManagerTest" COMMAND test_element --run_test=ScriptManagerT
 add_test(NAME "ScriptPlayground" COMMAND test_element --run_test=ScriptPlayground)
 add_test(NAME "SessionChangedTest" COMMAND test_element --run_test=SessionChangedTest)
 add_test(NAME "ShuttleTests" COMMAND test_element --run_test=ShuttleTests)
+add_test(NAME "TransportTests" COMMAND test_element --run_test=TransportTests)
 add_test(NAME "ToggleGridTest" COMMAND test_element --run_test=ToggleGridTest)
 add_test(NAME "UpdateTests" COMMAND test_element --run_test=UpdateTests)
 add_test(NAME "VelocityCurveTest" COMMAND test_element --run_test=VelocityCurveTest)
