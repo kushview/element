@@ -24,6 +24,7 @@ public:
 
     int getIndexOfPanel (juce::Component* panel);
     Component* findPanelByName (const juce::String& name);
+    void insertPanel (juce::Component* comp, int index = -1);
     void showPanel (const juce::String& name);
     void hidePanel (const juce::String& name);
     void setPanelName (const juce::String& panel, const juce::String& newName);

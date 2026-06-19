@@ -239,6 +239,12 @@ int NavigationConcertinaPanel::getIndexOfPanel (Component* panel)
 }
 
 //====
+
+void NavigationConcertinaPanel::insertPanel (juce::Component* comp, int index)
+{
+    addPanelInternal (index, comp);
+}
+
 void NavigationConcertinaPanel::showPanel (const juce::String& name)
 {
     namesHidden.removeString (name);
