@@ -116,6 +116,18 @@ if(ELEMENT_ENABLE_VST2)
     juce_set_vst2_sdk_path("${ELEMENT_VST2_SDK_PATH}")
     target_compile_definitions(element PUBLIC JUCE_PLUGINHOST_VST=1)
     target_link_libraries(element PUBLIC juce_vst2_sdk)
+
+    # jBridge support (Windows only): force-include the jBridge macro definitions
+    # before JUCE compiles its VST2 hosting code. Applied to the JUCE module
+    # target so every consumer compiling the module sources gets the macros.
+    if(WIN32)
+        set(JBRIDGE_HEADER "${PROJECT_SOURCE_DIR}/src/juce/jbridge.cpp")
+        if(MSVC)
+            target_compile_options(juce_audio_processors INTERFACE "/FI${JBRIDGE_HEADER}")
+        else()
+            target_compile_options(juce_audio_processors INTERFACE "-include" "${JBRIDGE_HEADER}")
+        endif()
+    endif()
 endif()
 
 # MSVC 14.44+ constexpr mutex constructor workaround (debug only).
