@@ -536,7 +536,9 @@ void GraphNode::render (RenderContext& rc)
     currentAudioOutputBuffer.setSize (jmax (1, rc.audio.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
 
-    if (midiChannels.isOmni() && velocityCurve.getMode() == VelocityCurve::Linear)
+    const bool applyVelocityCurve = (velocityCurve.getMode() != VelocityCurve::Linear);
+
+    if (midiChannels.isOmni() && ! applyVelocityCurve)
     {
         currentMidiInputBuffer = &midiMessages;
     }
@@ -552,7 +554,7 @@ void GraphNode::render (RenderContext& rc)
             if (chan > 0 && midiChannels.isOff (chan))
                 continue;
 
-            if (msg.isNoteOn())
+            if (applyVelocityCurve && msg.isNoteOn())
             {
                 msg.setVelocity (velocityCurve.process (msg.getFloatVelocity()));
             }
