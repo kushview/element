@@ -10,6 +10,9 @@
 #include <CommonCrypto/CommonDigest.h>
 #endif
 
+#define AUTH_LOG(o)
+// #define AUTH_LOG(o) Logger::writeToLog(o)
+
 namespace element::auth {
 using namespace juce;
 
@@ -327,7 +330,7 @@ String fetchSignedAppcastUrl (const String& accessToken)
     std::unique_ptr<InputStream> stream (url.createInputStream (options));
     if (statusCode != 200 || stream == nullptr)
     {
-        Logger::writeToLog ("Auth: appcast-url request failed (HTTP " + String (statusCode) + ")");
+        AUTH_LOG ("Auth: appcast-url request failed (HTTP " + String (statusCode) + ")");
         return {};
     }
 
@@ -335,9 +338,9 @@ String fetchSignedAppcastUrl (const String& accessToken)
     auto json = JSON::parse (body);
     const auto appcastUrl = json["url"].toString();
     if (appcastUrl.isNotEmpty())
-        Logger::writeToLog ("Auth: fetched signed appcast URL");
+        AUTH_LOG ("Auth: fetched signed appcast URL");
     else
-        Logger::writeToLog ("Auth: appcast-url response missing 'url' field");
+        AUTH_LOG ("Auth: appcast-url response missing 'url' field");
 
     return appcastUrl;
 }
@@ -363,9 +366,9 @@ void revokeRefreshToken (const String& refreshToken)
 
     std::unique_ptr<InputStream> stream (url.createInputStream (options));
     if (statusCode >= 200 && statusCode < 300)
-        Logger::writeToLog ("Auth: refresh token revoked successfully");
+        AUTH_LOG ("Auth: refresh token revoked successfully");
     else
-        Logger::writeToLog ("Auth: revoke request failed (HTTP " + String (statusCode) + ")");
+        AUTH_LOG ("Auth: revoke request failed (HTTP " + String (statusCode) + ")");
 }
 
 bool isAppcastUrlExpired (const String& cachedUrl)
@@ -389,16 +392,16 @@ void maybeRefreshOnStartup (element::Settings& settings)
 
     if (storedRefreshToken.isEmpty())
     {
-        Logger::writeToLog ("Auth: no stored refresh token, skipping startup refresh");
+        AUTH_LOG ("Auth: no stored refresh token, skipping startup refresh");
         return;
     }
 
-    Logger::writeToLog ("Auth: attempting token refresh on startup");
+    AUTH_LOG ("Auth: attempting token refresh on startup");
     const auto response = refreshAccessToken (storedRefreshToken);
 
     if (! response.success)
     {
-        Logger::writeToLog ("Auth: startup refresh failed: " + response.error);
+        AUTH_LOG ("Auth: startup refresh failed: " + response.error);
         // Clear stale credentials so the UI reflects signed-out state.
         settings.setUpdateKey ({});
         settings.setUpdateKeyUser ({});
@@ -414,7 +417,7 @@ void maybeRefreshOnStartup (element::Settings& settings)
     }
 
     persistTokens (settings, response);
-    Logger::writeToLog ("Auth: startup token refresh succeeded");
+    AUTH_LOG ("Auth: startup token refresh succeeded");
 }
 
 void handleCallback (const String& urlString, element::Settings& settings)
@@ -428,7 +431,7 @@ void handleCallback (const String& urlString, element::Settings& settings)
     const auto authError = parameters["error"];
     if (authError.isNotEmpty())
     {
-        Logger::writeToLog ("Auth callback error: " + authError);
+        AUTH_LOG ("Auth callback error: " + authError);
         return;
     }
 
@@ -439,26 +442,26 @@ void handleCallback (const String& urlString, element::Settings& settings)
     String expectedState, codeVerifier;
     if (! consumePendingPKCE (settings, expectedState, codeVerifier))
     {
-        Logger::writeToLog ("Auth: missing PKCE session — restart sign-in");
+        AUTH_LOG ("Auth: missing PKCE session — restart sign-in");
         return;
     }
 
     const auto callbackState = parameters["state"].trim();
     if (callbackState.isEmpty() || callbackState != expectedState)
     {
-        Logger::writeToLog ("Auth: callback rejected — invalid state");
+        AUTH_LOG ("Auth: callback rejected — invalid state");
         return;
     }
 
     const auto response = exchangeAuthorizationCode (authCode, codeVerifier);
     if (! response.success)
     {
-        Logger::writeToLog ("Auth: token exchange failed: " + response.error);
+        AUTH_LOG ("Auth: token exchange failed: " + response.error);
         return;
     }
 
     persistTokens (settings, response);
-    Logger::writeToLog ("Auth: token exchange completed successfully");
+    AUTH_LOG ("Auth: token exchange completed successfully");
 }
 
 String beginAuthorizationFlow (element::Settings& settings)
@@ -467,17 +470,17 @@ String beginAuthorizationFlow (element::Settings& settings)
     const auto codeVerifier = generateCodeVerifier();
     if (! storePendingPKCE (settings, state, codeVerifier))
     {
-        Logger::writeToLog ("Auth: failed to store PKCE state");
+        AUTH_LOG ("Auth: failed to store PKCE state");
         return {};
     }
 
-    Logger::writeToLog ("Auth: authorization flow started (PKCE)");
+    AUTH_LOG ("Auth: authorization flow started (PKCE)");
     return buildAuthorizationURL (state, codeVerifier);
 }
 
 void signOut (element::Settings& settings)
 {
-    Logger::writeToLog ("Auth: signing out");
+    AUTH_LOG ("Auth: signing out");
 
     const auto refreshToken = [&]() -> String {
         if (auto* props = settings.getUserSettings())
