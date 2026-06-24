@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # The juce version to use.  This can be a git tag, hash, or branch.
-set(ELEMENT_JUCE_VERSION 8.0.12)
+set(ELEMENT_JUCE_VERSION 8.0.13)
 
 if(NOT TARGET juce::juce_core)
     find_package(JUCE ${ELEMENT_JUCE_VERSION} CONFIG)
