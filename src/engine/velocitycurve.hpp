@@ -134,7 +134,7 @@ public:
         else if (mode == Max)
             return 127;
         return static_cast<uint8_t> (juce::roundToIntAccurate (
-            process (static_cast<float> (velocity) / 127.f)));
+            127.f * process (static_cast<float> (velocity) / 127.f)));
     }
 
 private:
