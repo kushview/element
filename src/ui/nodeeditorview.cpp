@@ -416,7 +416,7 @@ Component* NodeEditorView::createEmbededEditor()
     ProcessorPtr object = node.getObject();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (proc != nullptr && node.getFormat() == "Element" && proc->hasEditor())
-        return proc->createEditor();
+        return proc->createEditorAndMakeActive();
 
     return proc != nullptr ? new GenericNodeEditor (node) : nullptr;
 }
