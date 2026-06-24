@@ -23,7 +23,7 @@
 #define JUCE_VST_WRAPPER_INVOKE_MAIN typedef Vst2::AEffect * (VSTCALLBACK *PFNBRIDGEMAIN)( Vst2::audioMasterCallback audiomaster_, char * pszPluginPath ); \
 if (module->moduleMain) \
 { \
-    effect = module->moduleMain (&audioMaster); \
+    effect = module->moduleMain (audioMaster); \
 } \
 else if ((unsigned __int64)(module->customMain) == 0xfffffffffffffffe) \
 { \
@@ -36,7 +36,7 @@ else if ((unsigned __int64)(module->customMain) == 0xfffffffffffffffe) \
     plug32bitPath[0] = 0; \
     strcpy (plug32bitPath, module->file.getFullPathName().toRawUTF8()); \
     if (jBridgeMain) \
-        effect = (Vst2::AEffect*)(jBridgeMain (&audioMaster, plug32bitPath));\
+        effect = (Vst2::AEffect*)(jBridgeMain (audioMaster, plug32bitPath));\
 }
 #endif
 // clang-format on
