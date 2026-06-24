@@ -224,7 +224,7 @@ std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEdi
     if (proc == nullptr)
         return nullptr;
 
-    editor.reset (proc->hasEditor() ? proc->createEditorIfNeeded()
+    editor.reset (proc->hasEditor() ? proc->createEditorAndMakeActive()
                                     : new GenericAudioProcessorEditor (*proc));
 
     return editor;

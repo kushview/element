@@ -522,7 +522,10 @@ private:
                     MemoryBlock block;
                     stream.readIntoMemoryBlock (block);
                     if (block.getSize() > 0)
-                        wasOk = VSTPluginFormat::loadFromFXBFile (proc, block.getData(), block.getSize());
+                    {
+                        if (auto* vst = proc->getVSTClient())
+                            wasOk = vst->loadFromFXBFile ({ static_cast<const std::byte*> (block.getData()), block.getSize() });
+                    }
                 }
 
                 if (! wasOk)
@@ -541,7 +544,8 @@ private:
                 {
                     const File f (chooser.getResult());
                     MemoryBlock block;
-                    if (VSTPluginFormat::saveToFXBFile (proc, block, f.hasFileExtension ("fxb")))
+                    auto* vst = proc->getVSTClient();
+                    if (vst != nullptr && vst->saveToFXBFile (block, f.hasFileExtension ("fxb")))
                     {
                         FileOutputStream stream (f);
                         stream.write (block.getData(), block.getSize());
