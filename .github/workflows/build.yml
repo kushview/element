@@ -51,7 +51,6 @@ jobs:
           build-essential \
           cmake \
           ninja-build \
-          pandoc \
           libasound2-dev \
           libjack-jackd2-dev \
           ladspa-sdk \
@@ -91,7 +90,7 @@ jobs:
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install cmake ninja pandoc
+        brew install cmake ninja
     
     - name: Setup Boost (macOS)
       if: runner.os == 'macOS'
@@ -102,26 +101,24 @@ jobs:
         platform_version: 11
         toolset: clang
 
-    - name: Cache Chocolatey (Windows)
+    - name: Install Boost headers (Windows)
       if: runner.os == 'Windows'
-      uses: actions/cache@v4
-      with:
-        path: ~\AppData\Local\Temp\chocolatey
-        key: ${{ runner.os }}-choco-${{ hashFiles('.github/workflows/build.yml') }}
-        restore-keys: |
-          ${{ runner.os }}-choco-
-
-    - name: Install dependencies (Windows)
-      if: runner.os == 'Windows'
+      shell: pwsh
       run: |
-        choco install cmake ninja pandoc boost-msvc-14.3 -y
-    
+        $boost_ver = "1.83.0"
+        $boost_dir = "boost_$($boost_ver -replace '\.','_')"
+        $url = "https://archives.boost.io/release/$boost_ver/source/${boost_dir}.zip"
+        Invoke-WebRequest -Uri $url -OutFile boost.zip
+        New-Item -ItemType Directory -Force -Path C:\local
+        Expand-Archive -Path boost.zip -DestinationPath C:\local
+        echo "BOOST_ROOT=C:\local\$boost_dir" >> $env:GITHUB_ENV
+
     - name: Setup MSVC environment (Windows)
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: amd64
-    
+
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
@@ -137,11 +134,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release `
           -DELEMENT_ENABLE_ASIO=ON `
           -DELEMENT_ENABLE_UPDATER=ON `
-          -DELEMENT_BUILD_PLUGINS=ON `
-          -DBoost_INCLUDE_DIR="C:/local/boost_1_87_0" `
-          -DBoost_LIBRARY_DIRS="C:/local/boost_1_87_0/lib64-msvc-14.3"
-      env:
-        BOOST_ROOT: C:/local/boost_1_87_0
+          -DELEMENT_BUILD_PLUGINS=ON
     
     - name: Configure CMake (Unix)
       if: runner.os != 'Windows'
