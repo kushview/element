@@ -189,7 +189,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     else if (index == 4444)
     {
         if (session)
-            session->cleanOrphanControllerMaps();
+            session->cleanOrphanMidiMappings();
         auto& app = owner.services();
         if (auto* devices = app.find<DeviceService>())
             devices->refresh();
@@ -270,13 +270,9 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
 void MainMenu::buildEditMenu (PopupMenu& menu) { buildEditMenu (cmd, menu); }
 void MainMenu::buildViewMenu (PopupMenu& menu)
 {
-    auto& settings (world.settings());
     buildViewMenu (cmd, menu);
-    if (settings.getBool ("legacyControllers", false))
-    {
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::showControllers, "Controllers");
-    }
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::showControllers, "MIDI Mappings");
 }
 
 void MainMenu::buildWindowMenu (PopupMenu& menu)

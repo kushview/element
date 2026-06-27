@@ -14,6 +14,11 @@
 - Maintain consistency with the existing codebase style and patterns.
 - Consider maintainability and future developers who will read the code.
 
+## Headers & Includes
+
+- **Never `using namespace ...` in a header** (repository-wide rule). It leaks the namespace into every translation unit that includes the header. Fully qualify names (e.g. `juce::Component`) in headers instead. A file-local `using namespace juce;` inside a `.cpp` is fine.
+- **Do not include `ElementApp.h` in new source files.** It is a legacy helper that declares `using namespace juce;` at public scope, which the codebase is moving away from. Instead include the specific clean umbrella headers under `element/juce/` (e.g. `<element/juce/gui_basics.hpp>`, `<element/juce/audio_basics.hpp>`) or `<element/juce.hpp>` (which does not pull in the juce namespace).
+
 ## Documentation
 
 - Use Doxygen-style comments with `/** ... */` for documenting classes, functions, and methods.

@@ -115,8 +115,8 @@ public:
             tempoBar.stabilizeWithSession (false);
         }
 
-        mapButton.setEnabled (settings.getBool ("legacyControllers", false));
-        mapButton.setVisible (mapButton.isEnabled());
+        mapButton.setEnabled (true);
+        mapButton.setVisible (true);
         resized();
     }
 

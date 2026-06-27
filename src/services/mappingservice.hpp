@@ -3,7 +3,7 @@
 
 #include <element/services.hpp>
 #include <element/processor.hpp>
-#include <element/controller.hpp>
+#include <element/midimapping.hpp>
 #include <element/signals.hpp>
 
 namespace element {
@@ -20,7 +20,7 @@ public:
     void deactivate() override;
     void learn (const bool shouldLearn = true);
     bool isLearning() const;
-    void remove (const ControllerMap&);
+    void remove (const MidiMapping&);
 
 private:
     class Impl;

@@ -18,7 +18,7 @@
 #include "services/sessionservice.hpp"
 #include "ui/audioiopanelview.hpp"
 #include "ui/connectiongrid.hpp"
-#include "ui/controllersview.hpp"
+#include "ui/midimappingsview.hpp"
 #include "ui/datapathbrowser.hpp"
 #include "ui/emptyview.hpp"
 #include "ui/grapheditorview.hpp"
@@ -410,7 +410,7 @@ static ContentView* createLastContentView (Settings& settings)
     else if (lastContentView == EL_VIEW_GRAPH_EDITOR)
         view.reset (new GraphEditorView());
     else if (lastContentView == EL_VIEW_CONTROLLERS)
-        view = std::make_unique<ControllersView>();
+        view = std::make_unique<MidiMappingsView>();
     else
         view = std::make_unique<DefaultView>();
 
@@ -582,7 +582,7 @@ void StandardContent::setMainView (const String& name)
     }
     else if (name == EL_VIEW_CONTROLLERS)
     {
-        setContentView (new ControllersView());
+        setContentView (new MidiMappingsView());
     }
     else
     {
@@ -1001,7 +1001,7 @@ void StandardContent::getCommandInfo (CommandID commandID, ApplicationCommandInf
             int flags = 0;
             if (getMainViewName() == EL_VIEW_CONTROLLERS)
                 flags |= Info::isTicked;
-            result.setInfo ("Controllers", "Show the session's controllers", "UI", flags);
+            result.setInfo ("MIDI Mappings", "Show the session's MIDI mappings", "UI", flags);
             result.addDefaultKeypress ('m', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             break;
         }

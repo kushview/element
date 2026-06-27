@@ -6,7 +6,6 @@
 #include <element/juce/core.hpp>
 #include <element/juce/data_structures.hpp>
 
-#include <element/controller.hpp>
 #include <element/node.hpp>
 
 namespace element {
@@ -248,60 +247,6 @@ struct OpenSessionMessage : public AppMessage
     OpenSessionMessage (const File& f) : file (f) {}
     ~OpenSessionMessage() {}
     const File file;
-};
-
-//=============================================================================
-struct RefreshControllerMessage : public AppMessage
-{
-    RefreshControllerMessage (const Controller& d)
-        : device (d) {}
-    ~RefreshControllerMessage() {}
-    const Controller device;
-};
-
-struct AddControllerMessage : public AppMessage
-{
-    AddControllerMessage (const Controller& d)
-        : device (d) {}
-    AddControllerMessage (const File& f)
-        : file (f) {}
-    ~AddControllerMessage() noexcept {}
-    const Controller device;
-    const File file;
-};
-
-struct RemoveControllerMessage : public AppMessage
-{
-    RemoveControllerMessage (const Controller& d)
-        : device (d) {}
-    ~RemoveControllerMessage() noexcept {}
-    const Controller device;
-};
-
-struct AddControlMessage : public AppMessage
-{
-    AddControlMessage (const Controller& d, const Control& c)
-        : device (d), control (c) {}
-    ~AddControlMessage() noexcept {}
-    const Controller device;
-    const Control control;
-};
-
-struct RemoveControlMessage : public AppMessage
-{
-    RemoveControlMessage (const Controller& d, const Control& c)
-        : device (d), control (c) {}
-    ~RemoveControlMessage() noexcept {}
-    const Controller device;
-    const Control control;
-};
-
-struct RemoveControllerMapMessage : public AppMessage
-{
-    RemoveControllerMapMessage (const ControllerMap& mapp)
-        : controllerMap (mapp) {}
-    ~RemoveControllerMapMessage() noexcept {}
-    const ControllerMap controllerMap;
 };
 
 //=============================================================================

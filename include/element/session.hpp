@@ -4,7 +4,7 @@
 #pragma once
 
 #include <element/model.hpp>
-#include <element/controller.hpp>
+#include <element/midimapping.hpp>
 #include <element/node.hpp>
 #include <element/signals.hpp>
 
@@ -67,32 +67,22 @@ public:
     void saveGraphState();
     void restoreGraphState();
 
-    inline int getNumControllers() const { return getControllersValueTree().getNumChildren(); }
+    //=========================================================================
+    /** Flat MIDI mappings stored directly on the session. */
+    inline int getNumMidiMappings() const { return getMidiMappingsValueTree().getNumChildren(); }
+    inline MidiMapping getMidiMapping (const int index) const { return MidiMapping (getMidiMappingsValueTree().getChild (index)); }
+    inline int indexOf (const MidiMapping& mapping) const { return getMidiMappingsValueTree().indexOf (mapping.data()); }
 
-    inline juce::ValueTree getControllerValueTree (const int i) const
-    {
-        return getControllersValueTree().getChild (i);
-    }
-
-    inline Controller getController (const int index) const
-    {
-        Controller device (getControllerValueTree (index));
-        return device;
-    }
-
-    inline int indexOf (const Controller& device) const
-    {
-        return getControllersValueTree().indexOf (device.data());
-    }
-
-    inline int getNumControllerMaps() const { return getControllerMapsValueTree().getNumChildren(); }
-    inline ControllerMap getControllerMap (const int index) const { return ControllerMap (getControllerMapsValueTree().getChild (index)); }
-    inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.data()); }
+    /** Append a mapping. */
+    void addMidiMapping (const MidiMapping& mapping);
+    /** Remove a mapping. */
+    void removeMidiMapping (const MidiMapping& mapping);
+    /** Find a mapping by uuid. */
+    MidiMapping findMidiMappingById (const juce::Uuid&) const;
+    /** Drop parameter mappings whose target node no longer exists. */
+    void cleanOrphanMidiMappings();
 
     Node findNodeById (const juce::Uuid&);
-    Controller findControllerById (const juce::Uuid&);
-
-    void cleanOrphanControllerMaps();
 
     typedef std::function<void (const juce::ValueTree& tree)> ValueTreeFunction;
     void forEach (ValueTreeFunction handler) const;
@@ -135,8 +125,7 @@ private:
 
     inline juce::ValueTree getGraphsValueTree() const { return objectData.getChildWithName (tags::graphs); }
     inline juce::ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
-    inline juce::ValueTree getControllersValueTree() const { return objectData.getChildWithName (tags::controllers); }
-    inline juce::ValueTree getControllerMapsValueTree() const { return objectData.getChildWithName (tags::maps); }
+    inline juce::ValueTree getMidiMappingsValueTree() const { return objectData.getChildWithName (tags::midiMappings); }
 
     friend class SessionService;
     friend class SessionImportWizard;
@@ -145,48 +134,15 @@ private:
     void notifyChanged();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Session);
-
-public:
-    Signal<void (const Controller&)> controllerDeviceAdded;
-    Signal<void (const Controller&)> controllerDeviceRemoved;
-    Signal<void (const Control&)> controlAdded;
-    Signal<void (const Control&)> controlRemoved;
 };
 
 typedef juce::ReferenceCountedObjectPtr<Session> SessionPtr;
 typedef SessionPtr SessionRef;
 
-struct ControllerMapObjects {
-    ControllerMapObjects() = default;
-    ControllerMapObjects (SessionPtr s, const ControllerMap& m)
-        : session (s), controllerMap (m)
-    {
-        if (session != nullptr) {
-            device = session->findControllerById (juce::Uuid (controllerMap.getProperty (tags::controller)));
-            control = device.findControlById (juce::Uuid (controllerMap.getProperty (tags::control)));
-            node = session->findNodeById (juce::Uuid (controllerMap.getProperty (tags::node)));
-        }
-    }
+/** Convert legacy <controllers> + <maps> data into flat <midiMappings>.
+    Operates directly on a session value tree so it can be unit tested.
+    Appends one MidiMapping per resolvable ControllerMap; legacy trees are
+    left untouched. Safe to call repeatedly only on freshly loaded data. */
+void migrateControllerMaps (juce::ValueTree session);
 
-    ControllerMapObjects (const ControllerMapObjects& o) { operator= (o); }
-    ControllerMapObjects& operator= (const ControllerMapObjects& o)
-    {
-        this->session = o.session;
-        this->controllerMap = o.controllerMap;
-        this->node = o.node;
-        this->device = o.device;
-        this->control = o.control;
-        return *this;
-    }
-
-    ~ControllerMapObjects() = default;
-
-    inline bool isValid() const { return device.isValid() && control.isValid() && node.isValid(); }
-
-    SessionPtr session;
-    ControllerMap controllerMap;
-    Node node;
-    Controller device;
-    Control control;
-};
 } // namespace element

@@ -4,7 +4,6 @@
 #pragma once
 
 #include <element/services.hpp>
-#include <element/controller.hpp>
 
 namespace element {
 
@@ -17,12 +16,7 @@ public:
     void activate() override;
     void deactivate() override;
 
-    void add (const Controller&);
-    void add (const Controller&, const Control&);
-    void add (const File& file);
-    void remove (const Controller&);
-    void remove (const Controller&, const Control&);
-    void refresh (const Controller&);
+    /** Rebuild live MIDI mapping bindings from the current session. */
     void refresh();
 
 private:

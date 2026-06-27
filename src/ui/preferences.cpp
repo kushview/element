@@ -441,13 +441,6 @@ public:
             }
         };
 
-        addAndMakeVisible (legacyCtlLabel);
-        legacyCtlLabel.setText ("Enable legacy controllers?", dontSendNotification);
-        addAndMakeVisible (legacyCtl);
-        legacyCtl.setClickingTogglesState (true);
-        legacyCtl.setToggleState (settings.getBool ("legacyControllers", false), dontSendNotification);
-        legacyCtl.getToggleStateValue().addListener (this);
-
         addAndMakeVisible (defaultSessionFileLabel);
         defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
         defaultSessionFileLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -546,7 +539,6 @@ public:
 
         layoutSetting (r, systrayLabel, systray);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
-        layoutSetting (r, legacyCtlLabel, legacyCtl);
 
 #if ! ELEMENT_SE
         layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
@@ -565,19 +557,19 @@ public:
 
     void valueChanged (Value& value) override
     {
-        if (value.refersToSameSourceAs (legacyCtl.getToggleStateValue()))
-        {
-            settings.set ("legacyControllers", legacyCtl.getToggleState());
-        }
 #if ELEMENT_UPDATER
-        else if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
+        if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
         {
             settings.setCheckForUpdates (checkForUpdates.getToggleState());
             jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
+            settings.saveIfNeeded();
+            gui.stabilizeViews();
+            gui.refreshMainMenu();
+            return;
         }
 #endif
         // clock source
-        else if (value.refersToSameSourceAs (clockSource))
+        if (value.refersToSameSourceAs (clockSource))
         {
             const var val = ClockSourceInternal == (int) clockSource.getValue() ? "internal" : "midiClock";
             settings.setClockSource (val);
@@ -681,9 +673,6 @@ private:
 
     Label mainContentLabel;
     ComboBox mainContentBox;
-
-    Label legacyCtlLabel;
-    SettingButton legacyCtl;
 
     Settings& settings;
     AudioEnginePtr engine;
