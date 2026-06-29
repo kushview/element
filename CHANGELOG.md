@@ -1,5 +1,30 @@
 # Change Log
 
+## [1.1.0]
+
+### Added
+- Local authentication option and OAuth sign-in flow with custom URL scheme registration and token exchange.
+- Signed appcast URLs including platform information, with expiration check and refresh logic.
+- MTC (MIDI Time Code) message generation functions and a Lua script example.
+- Insert panel navigation helper.
+
+### Changed
+- Update to JUCE 8.0.13.
+- Send correct time signature info to the JUCE playhead.
+- Fully qualify the juce namespace across header files.
+- Switch Windows CI runner to MSVC 2022.
+- Disable auth debug logging by default.
+
+### Fixed
+- jbridge: correct how audioMaster is passed in JUCE 8.0.13 and improve plugin auto-loading on Windows.
+- MIDI velocity curve processing and avoid an unnecessary float round-trip.
+- Prevent the audio thread from stuttering when outputting large MIDI messages.
+- Preserve the number of ports after loading a project.
+- Prevent MIDI out devices from dropping notes on macOS.
+- Pitch wheel packing, channel pressure, and clamp return bugs.
+- Editor resizing logic in GraphEditorComponent.
+- MSVC constexpr mutex constructor in debug builds.
+
 ## [1.0.0] - 2026-02-06
 
 ### Changed
