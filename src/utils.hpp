@@ -39,6 +39,60 @@ inline static String noteValueToString (double value)
     return juce::MidiMessage::getMidiNoteName (juce::roundToInt (value), true, true, 3);
 }
 
+/** Parses a note name (e.g. "C3", "F#2", "Eb4") or a raw MIDI number into a
+    MIDI note number 0-127.
+
+    Uses the same octave-for-middle-C convention as noteValueToString (middle C = C3),
+    so this is the inverse of that function.
+
+    @param text             the text to parse
+    @param octaveForMiddleC the octave number assigned to middle C (note 60)
+    @return the MIDI note number 0-127, or -1 if the text cannot be parsed
+*/
+inline static int noteValueFromString (const juce::String& text, int octaveForMiddleC = 3)
+{
+    const auto trimmed = text.trim();
+    if (trimmed.isEmpty())
+        return -1;
+
+    const auto first = trimmed[0];
+    const auto upperFirst = juce::CharacterFunctions::toUpperCase (first);
+
+    if (upperFirst >= 'A' && upperFirst <= 'G')
+    {
+        // Pitch classes for A..G.
+        static const int pitchClasses[] = { 9, 11, 0, 2, 4, 5, 7 };
+        int note = pitchClasses[upperFirst - 'A'];
+
+        // Accidentals: '#'/'s' raise, lowercase 'b' lowers (so the note letter
+        // 'B' is never mistaken for a flat).
+        int i = 1;
+        for (; i < trimmed.length(); ++i)
+        {
+            const auto c = trimmed[i];
+            if (c == '#' || c == 's' || c == 'S')
+                ++note;
+            else if (c == 'b')
+                --note;
+            else
+                break;
+        }
+
+        const auto octaveStr = trimmed.substring (i).trim();
+        if (octaveStr.isEmpty() || ! octaveStr.containsOnly ("0123456789-"))
+            return -1;
+
+        note += 12 * (octaveStr.getIntValue() - octaveForMiddleC + 5);
+        return juce::jlimit (0, 127, note);
+    }
+
+    // Fall back to a raw MIDI note number.
+    if (trimmed.containsOnly ("0123456789-"))
+        return juce::jlimit (0, 127, trimmed.getIntValue());
+
+    return -1;
+}
+
 /** Returns the application name depending on product.
     Element Lite, Element Solo, or Element
  */

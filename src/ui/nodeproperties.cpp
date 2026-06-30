@@ -249,8 +249,9 @@ public:
         : SliderPropertyComponent (value, name, 0.0, 127.0, 1.0, 1.0, false)
     {
         slider.textFromValueFunction = Util::noteValueToString;
-        slider.valueFromTextFunction = [] (const String& text) -> double {
-            return 0.0;
+        slider.valueFromTextFunction = [this] (const String& text) -> double {
+            const int note = Util::noteValueFromString (text);
+            return note >= 0 ? (double) note : slider.getValue();
         };
 
         slider.updateText();
