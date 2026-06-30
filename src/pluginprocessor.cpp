@@ -36,6 +36,295 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 }
 
 //=============================================================================
+PerformanceParameter::PerformanceParameter (int paramIdx)
+    : juce::HostedAudioProcessorParameter (1),
+      index (paramIdx)
+{
+    clearNode();
+}
+
+PerformanceParameter::~PerformanceParameter()
+{
+    clearNode();
+}
+
+String PerformanceParameter::getBoundParameterName() const
+{
+    juce::SpinLock::ScopedLockType sl (lock);
+    return parameter != nullptr ? parameter->getName (100) : String();
+}
+
+int PerformanceParameter::getBoundParameter() const
+{
+    juce::SpinLock::ScopedLockType sl (lock);
+    return parameterIdx;
+}
+
+void PerformanceParameter::clearNode()
+{
+    ProcessorPtr oldNode;
+    element::ParameterPtr oldParam;
+
+    if (parameter)
+        parameter->removeListener (this);
+    removedConnection.disconnect();
+    portsChangedConnection.disconnect();
+
+    {
+        SpinLock::ScopedLockType sl (lock);
+        special = false;
+        processor = nullptr;
+        oldNode = node;
+        node = nullptr;
+        oldParam = parameter;
+        parameter = nullptr;
+        parameterIdx = Processor::NoParameter;
+    }
+
+    oldParam.reset();
+    oldNode.reset();
+    model = Node();
+
+    if (onCleared)
+        onCleared();
+}
+
+void PerformanceParameter::bindToNode (const Node& newNode, int newParam)
+{
+    if (newNode == model)
+        return;
+
+    model = newNode;
+    ProcessorPtr newNodeObj = model.getObject();
+
+    {
+        juce::SpinLock::ScopedLockType sl (lock);
+        parameterIdx = newParam;
+        node = newNodeObj;
+        processor = (node != nullptr) ? node->getAudioProcessor() : nullptr;
+        parameter = nullptr;
+        if (isPositiveAndBelow (parameterIdx, node->getParameters().size()))
+            parameter = node->getParameters()[parameterIdx];
+    }
+
+    if (node)
+    {
+        removedConnection = node->willBeRemoved.connect (
+            std::bind (&PerformanceParameter::clearNode, this));
+        portsChangedConnection = node->portsChanged.connect (
+            std::bind (&PerformanceParameter::nodePortsChanged, this));
+    }
+
+    if (parameter != nullptr)
+        parameter->addListener (this);
+}
+
+void PerformanceParameter::nodePortsChanged()
+{
+    if (node == nullptr)
+        return;
+
+    element::ParameterPtr newParam;
+    if (isPositiveAndBelow (parameterIdx, node->getParameters().size()))
+        newParam = node->getParameters()[parameterIdx];
+
+    if (newParam == parameter)
+        return;
+
+    if (newParam == nullptr)
+    {
+        clearNode();
+        return;
+    }
+
+    if (parameter)
+        parameter->removeListener (this);
+
+    {
+        juce::SpinLock::ScopedLockType sl (lock);
+        parameter = newParam;
+    }
+
+    parameter->addListener (this);
+    updateValue();
+}
+
+void PerformanceParameter::setAndNotify (float value)
+{
+    if (parameter)
+        parameter->setValueNotifyingHost (value);
+}
+
+void PerformanceParameter::updateValue()
+{
+    if (parameter)
+    {
+        setValueNotifyingHost (parameter->getValue());
+    }
+    else
+    {
+        switch (parameterIdx)
+        {
+            case Processor::EnabledParameter:
+                setValueNotifyingHost (node->isEnabled() ? 1.f : 0.f);
+                break;
+            case Processor::BypassParameter:
+                setValueNotifyingHost (node->isSuspended() ? 1.f : 0.f);
+                break;
+            case Processor::MuteParameter:
+                setValueNotifyingHost (node->isMuted() ? 1.f : 0.f);
+                break;
+        }
+    }
+}
+
+float PerformanceParameter::getValue() const
+{
+    juce::SpinLock::ScopedLockType sl (lock);
+    return (parameter != nullptr) ? parameter->getValue() : value.get();
+}
+
+void PerformanceParameter::setValue (float newValue)
+{
+    value.set (newValue);
+    juce::SpinLock::ScopedLockType sl (lock);
+
+    if (parameter != nullptr)
+    {
+        parameter->setValue (value.get());
+    }
+}
+
+float PerformanceParameter::getDefaultValue() const
+{
+    juce::SpinLock::ScopedLockType sl (lock);
+    if (parameter != nullptr)
+        return parameter->getDefaultValue();
+
+    switch (parameterIdx)
+    {
+        case Processor::MuteParameter:
+            return 0.f;
+            break;
+        case Processor::EnabledParameter:
+            return 1.f;
+            break;
+        case Processor::BypassParameter:
+            return 0.f;
+            break;
+    }
+
+    return 0.f;
+}
+
+String PerformanceParameter::getParameterID() const
+{
+    return getName (32).toLowerCase().replace (" ", "-");
+}
+
+String PerformanceParameter::getName (int maximumStringLength) const
+{
+    String name ("Parameter ");
+    name << int (index + 1);
+    return name.substring (0, maximumStringLength);
+}
+
+String PerformanceParameter::getLabel() const
+{
+    return parameter != nullptr ? parameter->getLabel() : String();
+}
+
+float PerformanceParameter::getValueForText (const juce::String& text) const
+{
+    return parameter != nullptr ? parameter->getValueForText (text)
+                                : jlimit (0.f, 1.f, text.getFloatValue());
+}
+
+int PerformanceParameter::getNumSteps() const
+{
+    if (parameter != nullptr)
+        return parameter->getNumSteps();
+
+    switch (parameterIdx)
+    {
+        case Processor::MuteParameter:
+        case Processor::EnabledParameter:
+        case Processor::BypassParameter:
+            return 1;
+            break;
+    }
+
+    return juce::AudioProcessorParameter::getNumSteps();
+}
+
+bool PerformanceParameter::isDiscrete() const
+{
+    return (parameter != nullptr) ? parameter->isDiscrete()
+                                  : AudioProcessorParameter::isDiscrete();
+}
+
+bool PerformanceParameter::isBoolean() const
+{
+    if (parameter != nullptr)
+        return parameter->isBoolean();
+
+    switch (parameterIdx)
+    {
+        case Processor::MuteParameter:
+        case Processor::EnabledParameter:
+        case Processor::BypassParameter:
+            return true;
+            break;
+    }
+
+    return AudioProcessorParameter::isBoolean();
+}
+
+bool PerformanceParameter::isMetaParameter() const
+{
+    return (parameter != nullptr) ? parameter->isMetaParameter()
+                                  : AudioProcessorParameter::isMetaParameter();
+}
+
+juce::AudioProcessorParameter::Category PerformanceParameter::getCategory() const
+{
+    return (parameter != nullptr)
+               ? static_cast<juce::AudioProcessorParameter::Category> (parameter->getCategory())
+               : juce::AudioProcessorParameter::getCategory();
+}
+
+String PerformanceParameter::getText (float value, int length) const
+{
+    return (parameter != nullptr)
+               ? parameter->getText (value, length)
+               : juce::AudioProcessorParameter::getText (value, length);
+}
+
+bool PerformanceParameter::isOrientationInverted() const
+{
+    return (parameter != nullptr) ? parameter->isOrientationInverted()
+                                  : juce::AudioProcessorParameter::isOrientationInverted();
+}
+
+void PerformanceParameter::controlValueChanged (int parameterIndex, float newValue)
+{
+    if (recursionBlock)
+        return;
+    ignoreUnused (parameterIndex, newValue);
+    recursionBlock = true;
+    updateValue();
+    recursionBlock = false;
+}
+
+void PerformanceParameter::controlTouched (int, bool touched)
+{
+    if (touched)
+        beginChangeGesture();
+    else
+        endChangeGesture();
+}
+
+//=============================================================================
 struct PluginProcessor::Latency : public juce::Timer
 {
     Latency (PluginProcessor& p) : plugin (p) {}
@@ -539,14 +828,16 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
             ProcessorPtr ptr = node.getObject();
             if (ptr == nullptr)
                 continue;
-            auto* proc = ptr->getAudioProcessor();
-            if (proc == nullptr)
-                continue;
 
-            for (int k = 0; k < proc->getParameters().size(); ++k)
+            // Enumerate Element's own input parameters rather than the JUCE
+            // AudioProcessor's. Element-native nodes (e.g. ScriptNode) have no
+            // backing AudioProcessor but still expose parameters here, and this
+            // matches the index space used by PerformanceParameter::bindToNode.
+            const auto& params = ptr->getParameters();
+            for (int k = 0; k < params.size(); ++k)
             {
-                auto* const param = proc->getParameters()[k];
-                if (! param->isAutomatable())
+                auto* const param = params[k].get();
+                if (param == nullptr || ! param->isAutomatable())
                     continue;
 
                 const bool isMine = paramObj->getNode() == node && k == paramObj->getBoundParameter();

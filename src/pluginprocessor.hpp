@@ -19,306 +19,48 @@ class PerformanceParameter : public juce::HostedAudioProcessorParameter,
 public:
     std::function<void()> onCleared;
 
-    explicit PerformanceParameter (int paramIdx)
-        : juce::HostedAudioProcessorParameter (1),
-          index (paramIdx)
-    {
-        clearNode();
-    }
-
-    ~PerformanceParameter()
-    {
-        clearNode();
-    }
+    explicit PerformanceParameter (int paramIdx);
+    ~PerformanceParameter();
 
     bool haveNode() const { return node != nullptr; }
-
-    juce::String getBoundParameterName() const
-    {
-        juce::SpinLock::ScopedLockType sl (lock);
-        return parameter != nullptr ? parameter->getName (100) : String();
-    }
-
-    void clearNode()
-    {
-        ProcessorPtr oldNode;
-        element::ParameterPtr oldParam;
-
-        if (parameter)
-            parameter->removeListener (this);
-        removedConnection.disconnect();
-
-        {
-            SpinLock::ScopedLockType sl (lock);
-            special = false;
-            processor = nullptr;
-            oldNode = node;
-            node = nullptr;
-            oldParam = parameter;
-            parameter = nullptr;
-            parameterIdx = Processor::NoParameter;
-        }
-
-        oldParam.reset();
-        oldNode.reset();
-        model = Node();
-
-        if (onCleared)
-            onCleared();
-    }
-
-    void bindToNode (const Node& newNode, int newParam)
-    {
-        if (newNode == model)
-            return;
-
-        model = newNode;
-        ProcessorPtr newNodeObj = model.getObject();
-
-        {
-            juce::SpinLock::ScopedLockType sl (lock);
-            parameterIdx = newParam;
-            node = newNodeObj;
-            processor = (node != nullptr) ? node->getAudioProcessor() : nullptr;
-            parameter = nullptr;
-            if (isPositiveAndBelow (parameterIdx, node->getParameters().size()))
-                parameter = node->getParameters()[parameterIdx];
-        }
-
-        if (node)
-            removedConnection = node->willBeRemoved.connect (
-                std::bind (&PerformanceParameter::clearNode, this));
-
-        if (parameter != nullptr)
-            parameter->addListener (this);
-    }
-
-    void setAndNotify (float value)
-    {
-        if (parameter)
-            parameter->setValueNotifyingHost (value);
-    }
-
-    void updateValue()
-    {
-        if (parameter)
-        {
-            setValueNotifyingHost (parameter->getValue());
-        }
-        else
-        {
-            switch (parameterIdx)
-            {
-                case Processor::EnabledParameter:
-                    setValueNotifyingHost (node->isEnabled() ? 1.f : 0.f);
-                    break;
-                case Processor::BypassParameter:
-                    setValueNotifyingHost (node->isSuspended() ? 1.f : 0.f);
-                    break;
-                case Processor::MuteParameter:
-                    setValueNotifyingHost (node->isMuted() ? 1.f : 0.f);
-                    break;
-            }
-        }
-    }
-
-    float getValue() const override
-    {
-        juce::SpinLock::ScopedLockType sl (lock);
-        return (parameter != nullptr) ? parameter->getValue() : value.get();
-    }
-
-    void setValue (float newValue) override
-    {
-        value.set (newValue);
-        juce::SpinLock::ScopedLockType sl (lock);
-
-        if (parameter != nullptr)
-        {
-            parameter->setValue (value.get());
-        }
-        else
-        {
-        }
-    }
-
-    float getDefaultValue() const override
-    {
-        juce::SpinLock::ScopedLockType sl (lock);
-        if (parameter != nullptr)
-            return parameter->getDefaultValue();
-
-        switch (parameterIdx)
-        {
-            case Processor::MuteParameter:
-                return 0.f;
-                break;
-            case Processor::EnabledParameter:
-                return 1.f;
-                break;
-            case Processor::BypassParameter:
-                return 0.f;
-                break;
-        }
-
-        return 0.f;
-    }
-
-    juce::String getParameterID() const override
-    {
-        return getName (32).toLowerCase().replace (" ", "-");
-    }
-
-    juce::String getName (int maximumStringLength) const override
-    {
-        String name ("Parameter ");
-        name << int (index + 1);
-        return name.substring (0, maximumStringLength);
-    }
-
-    juce::String getLabel() const override
-    {
-        return parameter != nullptr ? parameter->getLabel() : String();
-    }
-
-    /** Should parse a string and return the appropriate value for it. */
-    float getValueForText (const juce::String& text) const override
-    {
-        return parameter != nullptr ? parameter->getValueForText (text)
-                                    : jlimit (0.f, 1.f, text.getFloatValue());
-    }
-
-    int getNumSteps() const override
-    {
-        if (parameter != nullptr)
-            return parameter->getNumSteps();
-
-        switch (parameterIdx)
-        {
-            case Processor::MuteParameter:
-            case Processor::EnabledParameter:
-            case Processor::BypassParameter:
-                return 1;
-                break;
-        }
-
-        return juce::AudioProcessorParameter::getNumSteps();
-    }
-
-    bool isDiscrete() const override
-    {
-        return (parameter != nullptr) ? parameter->isDiscrete()
-                                      : AudioProcessorParameter::isDiscrete();
-    }
-
-    bool isBoolean() const override
-    {
-        if (parameter != nullptr)
-            return parameter->isBoolean();
-
-        switch (parameterIdx)
-        {
-            case Processor::MuteParameter:
-            case Processor::EnabledParameter:
-            case Processor::BypassParameter:
-                return true;
-                break;
-        }
-
-        return AudioProcessorParameter::isBoolean();
-    }
-
-    bool isMetaParameter() const override
-    {
-        return (parameter != nullptr) ? parameter->isMetaParameter()
-                                      : AudioProcessorParameter::isMetaParameter();
-    }
-
-    juce::AudioProcessorParameter::Category getCategory() const override
-    {
-        return (parameter != nullptr)
-                   ? static_cast<juce::AudioProcessorParameter::Category> (parameter->getCategory())
-                   : juce::AudioProcessorParameter::getCategory();
-    }
-
-    juce::String getText (float value, int length) const override
-    {
-        return (parameter != nullptr)
-                   ? parameter->getText (value, length)
-                   : juce::AudioProcessorParameter::getText (value, length);
-    }
-
-    bool isOrientationInverted() const override
-    {
-        return (parameter != nullptr) ? parameter->isOrientationInverted()
-                                      : juce::AudioProcessorParameter::isOrientationInverted();
-    }
-
-    //=========================================================================
-
-    void controlValueChanged (int parameterIndex, float newValue) override
-    {
-        if (recursionBlock)
-            return;
-        ignoreUnused (parameterIndex, newValue);
-        recursionBlock = true;
-        updateValue();
-        recursionBlock = false;
-    }
-
-    void controlTouched (int, bool touched) override
-    {
-        if (touched)
-            beginChangeGesture();
-        else
-            endChangeGesture();
-    }
-
-    //=========================================================================
-#if 0
-    
-    /** This can be overridden to tell the host that this parameter operates in the
-     reverse direction.
-     (Not all plugin formats or hosts will actually use this information).
-     */
-    virtual bool isOrientationInverted() const;
-    
-    /** Returns true if the host can automate this parameter.
-     By default, this returns true.
-     */
-    virtual bool isAutomatable() const;
-    
-    
-    //==============================================================================
-    /** Returns the current value of the parameter as a String.
-     
-     This function can be called when you are hosting plug-ins to get a
-     more specialsed textual represenation of the current value from the
-     plug-in, for example "On" rather than "1.0".
-     
-     If you are implementing a plug-in then you should ignore this function
-     and instead override getText.
-     */
-    virtual String getCurrentValueAsText() const;
-    
-    /** Returns the set of strings which represent the possible states a parameter
-     can be in.
-     
-     If you are hosting a plug-in you can use the result of this function to
-     populate a ComboBox listing the allowed values.
-     
-     If you are implementing a plug-in then you do not need to override this.
-     */
-    virtual StringArray getAllValueStrings() const;
-#endif
-
-public:
     Node getNode() const { return model; }
-    int getBoundParameter() const
-    {
-        juce::SpinLock::ScopedLockType sl (lock);
-        return parameterIdx;
-    }
+
+    juce::String getBoundParameterName() const;
+    int getBoundParameter() const;
+
+    void clearNode();
+    void bindToNode (const Node& newNode, int newParam);
+
+    /** Re-validate the bound parameter after the node's parameter set changed.
+
+        Nodes with dynamic parameters (e.g. script nodes) rebuild their parameter
+        array when ports change, orphaning the previously bound parameter. Re-resolve
+        by the stored index, or clear the binding if that index no longer exists.
+    */
+    void nodePortsChanged();
+
+    void setAndNotify (float value);
+    void updateValue();
+
+    //=========================================================================
+    float getValue() const override;
+    void setValue (float newValue) override;
+    float getDefaultValue() const override;
+    juce::String getParameterID() const override;
+    juce::String getName (int maximumStringLength) const override;
+    juce::String getLabel() const override;
+    float getValueForText (const juce::String& text) const override;
+    int getNumSteps() const override;
+    bool isDiscrete() const override;
+    bool isBoolean() const override;
+    bool isMetaParameter() const override;
+    juce::AudioProcessorParameter::Category getCategory() const override;
+    juce::String getText (float value, int length) const override;
+    bool isOrientationInverted() const override;
+
+    //=========================================================================
+    void controlValueChanged (int parameterIndex, float newValue) override;
+    void controlTouched (int, bool touched) override;
 
 private:
     juce::SpinLock lock;
@@ -332,6 +74,7 @@ private:
     bool special = false;
     bool recursionBlock = false;
     SignalConnection removedConnection;
+    SignalConnection portsChangedConnection;
 };
 
 class PluginProcessor : public juce::AudioProcessor,
