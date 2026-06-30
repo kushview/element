@@ -314,6 +314,8 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
 
     addToDesktop();
     content->stabilizeComponents();
+
+    ensureOnScreen();
 }
 
 PluginWindow::~PluginWindow()
@@ -347,6 +349,33 @@ void PluginWindow::restoreAlwaysOnTopState()
         if (shouldBeOnTop)
             toFront (false);
     }
+}
+
+void PluginWindow::ensureOnScreen()
+{
+    auto& displays = Desktop::getInstance().getDisplays();
+
+    // A window is reachable as long as a minimum, grabbable amount of its title
+    // bar is visible on a connected display. Require at least this many pixels of
+    // the top edge to remain on screen before considering the window "lost".
+    const int minGrabHeight = jmax (getTitleBarHeight(), 24);
+
+    // A centred chunk of the title bar; requiring a meaningful piece (not a
+    // single corner pixel) to stay on screen for the window to count as reachable.
+    auto titleBar = getBounds().withHeight (minGrabHeight);
+    titleBar = titleBar.withSizeKeepingCentre (jmin (titleBar.getWidth(), 48), minGrabHeight);
+
+    if (displays.getRectangleList (true).intersects (titleBar))
+        return; // still reachable — leave it where it is (handles multi-display spans)
+
+    auto* display = displays.getDisplayForRect (getBounds());
+    if (display == nullptr)
+        display = displays.getPrimaryDisplay();
+    if (display == nullptr)
+        return;
+
+    const auto area = display->userBounds.toNearestInt();
+    setBounds (getBounds().constrainedWithin (area));
 }
 
 void PluginWindow::resized()

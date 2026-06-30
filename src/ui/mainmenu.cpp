@@ -283,6 +283,7 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::hideAllPluginWindows, "Close plugin windows...");
     menu.addCommandItem (&cmd, Commands::showAllPluginWindows, "Show plugin windows...");
+    menu.addCommandItem (&cmd, Commands::resetPluginWindows, "Reset plugin windows");
 }
 
 void MainMenu::buildWorkspaceMenu (PopupMenu& menu)
