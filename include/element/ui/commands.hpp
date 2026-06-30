@@ -27,6 +27,7 @@ public:
         showAllPluginWindows,
         showKeymapEditor,
         hideAllPluginWindows,
+        resetPluginWindows,
 
         toggleVirtualKeyboard,
         rotateContentView,

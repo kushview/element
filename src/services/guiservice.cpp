@@ -705,6 +705,7 @@ void GuiService::getAllCommands (Array<CommandID>& ids)
                     Commands::showPreferences,
                     Commands::showAllPluginWindows,
                     Commands::hideAllPluginWindows,
+                    Commands::resetPluginWindows,
                     Commands::toggleUserInterface,
                     //======================================================================
                     Commands::sessionOpen,
@@ -769,6 +770,9 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
         case Commands::hideAllPluginWindows:
             result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier);
             result.setInfo ("Hide all plugin windows", "Hides all plugins on the current graph.", "Session", 0);
+            break;
+        case Commands::resetPluginWindows:
+            result.setInfo ("Reset plugin windows", "Move off-screen plugin windows back on screen.", "Session", 0);
             break;
         case Commands::toggleUserInterface:
             result.setInfo ("Show UI", "Show the main UI", "UI", 0);
@@ -938,6 +942,16 @@ bool GuiService::perform (const InvocationInfo& info)
         }
         case Commands::hideAllPluginWindows: {
             closeAllPluginWindows (false);
+            break;
+        }
+        case Commands::resetPluginWindows: {
+            if (windowManager)
+                for (int i = 0; i < windowManager->getNumPluginWindows(); ++i)
+                    if (auto* w = windowManager->getPluginWindow (i))
+                    {
+                        w->ensureOnScreen();
+                        w->toFront (false);
+                    }
             break;
         }
         case Commands::toggleUserInterface: {

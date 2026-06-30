@@ -34,6 +34,15 @@ public:
     Node getNode() const { return node; }
     void restoreAlwaysOnTopState();
 
+    /** Ensures the window's title bar remains reachable on a connected display.
+
+        If a minimum portion of the title bar is already visible on any display the
+        window is left untouched (this preserves windows intentionally spanning
+        multiple monitors). Otherwise the window is moved the minimum amount needed
+        to sit within its nearest display.
+    */
+    void ensureOnScreen();
+
     void moved() override;
     void closeButtonPressed() override;
     void resized() override;
