@@ -98,13 +98,21 @@ Processor* GraphNode::addNode (Processor* newNode, uint32 nodeId)
             lastNodeId = nodeId;
     }
 
+    // Register the node before configuring it. setParentGraph() may synchronously
+    // adjust the parent graph's port count (for IO nodes), which re-enters
+    // IONodeEnforcer. That enforcer scans this same nodes array to decide which IO
+    // nodes are missing, so the node must already be present here or it gets added
+    // a second time (duplicate Audio In/Out). Keeping the port setup synchronous
+    // also ensures refreshPorts()/prepare() below see the final port count, so the
+    // node's RMS meter buffers are sized correctly.
+    auto* const added = nodes.add (newNode);
     newNode->setPlayHead (playhead);
     newNode->setParentGraph (this);
     newNode->refreshPorts();
     if (prepared())
         newNode->prepare (getSampleRate(), getBlockSize(), this);
     triggerAsyncUpdate();
-    return nodes.add (newNode);
+    return added;
 }
 
 bool GraphNode::removeNode (const uint32 nodeId)

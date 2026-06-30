@@ -663,6 +663,28 @@ void Processor::setPorts (const PortList& newPorts)
     parameters.swapWith (newParams);
     newParamsOut.sort (sorter, true);
     parametersOut.swapWith (newParamsOut);
+
+    // Keep the RMS metering buffers in sync with the (possibly changed) channel
+    // counts. prepare() sizes these once, but an IO node's channel count can grow
+    // later (e.g. raising a graph's Audio Out count via the +/- controls), which
+    // refreshes ports without re-preparing. Grow-only: never drop a slot the audio
+    // or UI threads may still be reading.
+    if (isPrepared)
+    {
+        for (int i = inRMS.size(); i < getNumAudioInputs(); ++i)
+        {
+            auto* avf = new AtomicValue<float>();
+            avf->set (0);
+            inRMS.add (avf);
+        }
+
+        for (int i = outRMS.size(); i < getNumAudioOutputs(); ++i)
+        {
+            auto* avf = new AtomicValue<float>();
+            avf->set (0);
+            outRMS.add (avf);
+        }
+    }
 }
 
 ValueTree Processor::createPortsData() const
