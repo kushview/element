@@ -69,15 +69,25 @@ private:
         const bool wantsMidiIn = graph.getNumPorts (PortType::Midi, true) > 0;
         const bool wantsMidiOut = graph.getNumPorts (PortType::Midi, false) > 0;
 
+        Array<uint32> nodesToRemove;
+
         ProcessorPtr ioNodes[IONode::numDeviceTypes];
         for (int i = 0; i < manager.getNumNodes(); ++i)
         {
             ProcessorPtr node = manager.getNode (i);
             if (auto* ioProc = dynamic_cast<IONode*> (node.get()))
-                ioNodes[ioProc->getType()] = node;
+            {
+                const auto type = ioProc->getType();
+                // Keep the first IO node found for each type; any additional
+                // ones are duplicates (see the re-entrancy bug fixed in
+                // IONode::setParentGraph) and get removed below. This also
+                // repairs sessions already corrupted by that bug on load.
+                if (ioNodes[type] == nullptr)
+                    ioNodes[type] = node;
+                else
+                    nodesToRemove.add (node->nodeId);
+            }
         }
-
-        Array<uint32> nodesToRemove;
 
         for (int t = 0; t < IONode::numDeviceTypes; ++t)
         {

@@ -193,7 +193,12 @@ void IONode::setParentGraph (GraphNode* const newGraph)
         if (currentCount == 0)
         {
             const int defaultCount = (portType == PortType::Audio) ? 2 : 1;
-            graph->setNumPorts (portType, defaultCount, isInput(), false);
+            // NB: use the async path. A synchronous port reset here fires
+            // portsChanged() while we're still inside GraphNode::addNode (before
+            // this node is registered in the runtime nodes array), which makes a
+            // re-entrant IONodeEnforcer think this IO node is missing and add a
+            // duplicate. Deferring lets the add complete first.
+            graph->setNumPorts (portType, defaultCount, isInput(), true);
         }
     }
 
