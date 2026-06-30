@@ -19,10 +19,10 @@ class Settings;
      A component displaying a list of plugins, with options to scan for them,
      add, remove and sort them.
  */
-class PluginListComponent : public Component,
-                            public FileDragAndDropTarget,
-                            private ChangeListener,
-                            private Button::Listener
+class PluginListComponent : public juce::Component,
+                            public juce::FileDragAndDropTarget,
+                            private juce::ChangeListener,
+                            private juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -32,7 +32,7 @@ public:
      For info about the deadMansPedalFile, see the PluginDirectoryScanner constructor.
      The properties file, if supplied, is used to store the user's last search paths.
      */
-    PluginListComponent (PluginManager&, PropertiesFile* props = nullptr, bool allowPluginsWhichRequireAsynchronousInstantiation = false);
+    PluginListComponent (PluginManager&, juce::PropertiesFile* props = nullptr, bool allowPluginsWhichRequireAsynchronousInstantiation = false);
 
     /** Destructor. */
     ~PluginListComponent();
@@ -52,19 +52,19 @@ public:
     void setNumberOfThreadsForScanning (int numThreads);
 
     /** Returns the last search path stored in a given properties file for the specified format. */
-    static FileSearchPath getLastSearchPath (PropertiesFile&, AudioPluginFormat&);
+    static juce::FileSearchPath getLastSearchPath (juce::PropertiesFile&, juce::AudioPluginFormat&);
 
     /** Returns the last search path stored in a given properties file for the specified format. */
-    static FileSearchPath getLastSearchPath (PropertiesFile&, NodeProvider&);
+    static juce::FileSearchPath getLastSearchPath (juce::PropertiesFile&, NodeProvider&);
 
     /** Stores a search path in a properties file for the given format. */
-    static void setLastSearchPath (PropertiesFile&, AudioPluginFormat&, const FileSearchPath&);
+    static void setLastSearchPath (juce::PropertiesFile&, juce::AudioPluginFormat&, const juce::FileSearchPath&);
 
     /** Stores a search path in a properties file for the given format. */
-    static void setLastSearchPath (PropertiesFile&, NodeProvider&, const FileSearchPath&);
+    static void setLastSearchPath (juce::PropertiesFile&, NodeProvider&, const juce::FileSearchPath&);
 
     /** Triggers an asynchronous scan for the given format. */
-    void scanFor (AudioPluginFormat&);
+    void scanFor (juce::AudioPluginFormat&);
 
     /** Scan for all third party types */
     void scanAll();
@@ -78,34 +78,34 @@ public:
     /** Sets a custom table model to be used.
      This will take ownership of the model and delete it when no longer needed.
      */
-    void setTableModel (TableListBoxModel* model);
+    void setTableModel (juce::TableListBoxModel* model);
 
     /** Returns the table used to display the plugin list. */
-    TableListBox& getTableListBox() noexcept { return table; }
+    juce::TableListBox& getTableListBox() noexcept { return table; }
 
 private:
     PluginManager& plugins;
-    AudioPluginFormatManager& formatManager;
-    KnownPluginList& list;
+    juce::AudioPluginFormatManager& formatManager;
+    juce::KnownPluginList& list;
     File deadMansPedalFile;
-    TableListBox table;
-    TextButton optionsButton, closeButton, scanButton;
-    PropertiesFile* propertiesToUse;
+    juce::TableListBox table;
+    juce::TextButton optionsButton, closeButton, scanButton;
+    juce::PropertiesFile* propertiesToUse;
     String dialogTitle, dialogText;
     bool allowAsync;
     int numThreads;
 
     class TableModel;
-    std::unique_ptr<TableListBoxModel> tableModel;
+    std::unique_ptr<juce::TableListBoxModel> tableModel;
 
     class Scanner;
     friend class Scanner;
-    friend struct ContainerDeletePolicy<Scanner>;
+    friend struct juce::ContainerDeletePolicy<Scanner>;
     std::unique_ptr<Scanner> currentScanner;
 
-    OwnedArray<TextButton> formatButtons;
+    juce::OwnedArray<juce::TextButton> formatButtons;
 
-    void scanFinished (const StringArray&);
+    void scanFinished (const juce::StringArray&);
     static void optionsMenuStaticCallback (int, PluginListComponent*);
     void optionsMenuCallback (int);
     void updateList();
@@ -115,10 +115,10 @@ private:
     void removePluginItem (int index);
 
     void resized() override;
-    bool isInterestedInFileDrag (const StringArray&) override;
-    void filesDropped (const StringArray&, int, int) override;
-    void buttonClicked (Button*) override;
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    bool isInterestedInFileDrag (const juce::StringArray&) override;
+    void filesDropped (const juce::StringArray&, int, int) override;
+    void buttonClicked (juce::Button*) override;
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
 
     void scanWithBackgroundScanner();
 
