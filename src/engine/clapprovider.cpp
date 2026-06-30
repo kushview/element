@@ -24,6 +24,10 @@
 #include "ui/resizelistener.hpp"
 #include "ui/nsviewwithparent.hpp"
 
+#if JUCE_LINUX || JUCE_BSD
+#include <poll.h>
+#endif
+
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
 
 #if __APPLE__
@@ -205,22 +209,32 @@ public:
 
     bool threadCheckIsAudioThread() const noexcept override
     {
-        return gThreadType == ThreadType::AudioThread;
+        // Thread-pool worker tasks run in the audio-thread context.
+        return gThreadType == ThreadType::AudioThread
+               || gThreadType == ThreadType::AudioThreadPool;
     }
 
 protected:
-    // clap_host
+    // clap_host. These can be called from any thread, so they only flag work
+    // which the owning CLAPProcessor later performs on the main thread.
+    std::function<void()> onRequestRestart;
+    std::function<void()> onRequestProcess;
+    std::function<void()> onRequestCallback;
+
     void requestRestart() noexcept override
     {
-        CLAP_LOG ("host:requestRestart()")
+        if (onRequestRestart)
+            onRequestRestart();
     }
     void requestProcess() noexcept override
     {
-        CLAP_LOG ("host:requestProcess()")
+        if (onRequestProcess)
+            onRequestProcess();
     }
     void requestCallback() noexcept override
     {
-        CLAP_LOG ("host:requestCallback()")
+        if (onRequestCallback)
+            onRequestCallback();
     }
 
     bool enableDraftExtensions() const noexcept override { return false; }
@@ -230,24 +244,55 @@ protected:
         return nullptr;
     }
 
-#if 0
-      // clap_host_audio_ports
-      virtual bool implementsAudioPorts() const noexcept { return false; }
-      virtual bool audioPortsIsRescanFlagSupported(uint32_t flag) noexcept { return false; }
-      virtual void audioPortsRescan(uint32_t flags) noexcept {}
+    // clap_host_audio_ports
+    std::function<void (uint32_t)> onAudioPortsRescan;
+    bool implementsAudioPorts() const noexcept override { return true; }
+    bool audioPortsIsRescanFlagSupported (uint32_t flag) noexcept override
+    {
+        // The port list is rebuilt in full, so every standard aspect is supported.
+        juce::ignoreUnused (flag);
+        return true;
+    }
+    void audioPortsRescan (uint32_t flags) noexcept override
+    {
+        if (onAudioPortsRescan)
+            onAudioPortsRescan (flags);
+    }
 
-      // clap_host_gui
-      virtual bool implementsGui() const noexcept { return false; }
-      virtual void guiResizeHintsChanged() noexcept {}
-      virtual bool guiRequestResize(uint32_t width, uint32_t height) noexcept { return false; }
-      virtual bool guiRequestShow() noexcept { return false; }
-      virtual bool guiRequestHide() noexcept { return false; }
-      virtual void guiClosed(bool wasDestroyed) noexcept {}
+    // clap_host_gui
+    std::function<bool (uint32_t, uint32_t)> onGuiRequestResize;
+    std::function<bool()> onGuiRequestShow;
+    std::function<bool()> onGuiRequestHide;
+    std::function<void (bool)> onGuiClosed;
 
-      // clap_host_latency
-      virtual bool implementsLatency() const noexcept { return false; }
-      virtual void latencyChanged() noexcept {}
-#endif
+    bool implementsGui() const noexcept override { return true; }
+    void guiResizeHintsChanged() noexcept override {}
+    bool guiRequestResize (uint32_t width, uint32_t height) noexcept override
+    {
+        return onGuiRequestResize ? onGuiRequestResize (width, height) : false;
+    }
+    bool guiRequestShow() noexcept override
+    {
+        return onGuiRequestShow ? onGuiRequestShow() : false;
+    }
+    bool guiRequestHide() noexcept override
+    {
+        return onGuiRequestHide ? onGuiRequestHide() : false;
+    }
+    void guiClosed (bool wasDestroyed) noexcept override
+    {
+        if (onGuiClosed)
+            onGuiClosed (wasDestroyed);
+    }
+
+    // clap_host_latency
+    std::function<void()> onLatencyChanged;
+    bool implementsLatency() const noexcept override { return true; }
+    void latencyChanged() noexcept override
+    {
+        if (onLatencyChanged)
+            onLatencyChanged();
+    }
 
     // clap_host_log
     bool implementsLog() const noexcept override { return true; }
@@ -297,22 +342,139 @@ protected:
         juce::ignoreUnused (paramId, flags);
     }
     void paramsRequestFlush() noexcept override {}
-#if 0
-      // clap_host_posix_fd_support
-      virtual bool implementsPosixFdSupport() const noexcept { return false; }
-      virtual bool posixFdSupportRegisterFd(int fd, clap_posix_fd_flags_t flags) noexcept { return false; }
-      virtual bool posixFdSupportModifyFd(int fd, clap_posix_fd_flags_t flags) noexcept { return false; }
-      virtual bool posixFdSupportUnregisterFd(int fd) noexcept { return false; }
 
-      // clap_host_remote_controls
-      virtual bool implementsRemoteControls() const noexcept { return false; }
-      virtual void remoteControlsChanged() noexcept {}
-      virtual void remoteControlsSuggestPage(clap_id pageId) noexcept {}
+    // clap_host_state
+    std::function<void()> onStateMarkDirty;
+    bool implementsState() const noexcept override { return true; }
+    void stateMarkDirty() noexcept override
+    {
+        if (onStateMarkDirty)
+            onStateMarkDirty();
+    }
 
-      // clap_host_state
-      virtual bool implementsState() const noexcept { return false; }
-      virtual void stateMarkDirty() noexcept {}
+    // clap_host_posix_fd_support (Linux/BSD): hook plugin fds into a main-thread
+    // poll loop so X11 plugin GUIs receive their I/O events.
+#if JUCE_LINUX || JUCE_BSD
+    struct FdPoller : public juce::Timer
+    {
+        const clap_plugin_t* plugin { nullptr };
+        const clap_plugin_posix_fd_support_t* fdSupport { nullptr };
+        std::unordered_map<int, clap_posix_fd_flags_t> fds;
+
+        void timerCallback() override
+        {
+            if (plugin == nullptr || fdSupport == nullptr || fds.empty())
+                return;
+
+            std::vector<struct pollfd> pfds;
+            pfds.reserve (fds.size());
+            for (const auto& f : fds)
+            {
+                struct pollfd p {};
+                p.fd = f.first;
+                if (f.second & CLAP_POSIX_FD_READ)
+                    p.events |= POLLIN;
+                if (f.second & CLAP_POSIX_FD_WRITE)
+                    p.events |= POLLOUT;
+                pfds.push_back (p);
+            }
+
+            if (::poll (pfds.data(), (nfds_t) pfds.size(), 0) <= 0)
+                return;
+
+            // Dispatch from the snapshot so on_fd() may re-enter modify/unregister.
+            for (const auto& p : pfds)
+            {
+                clap_posix_fd_flags_t ev = 0;
+                if (p.revents & POLLIN)
+                    ev |= CLAP_POSIX_FD_READ;
+                if (p.revents & POLLOUT)
+                    ev |= CLAP_POSIX_FD_WRITE;
+                if (p.revents & (POLLERR | POLLHUP | POLLNVAL))
+                    ev |= CLAP_POSIX_FD_ERROR;
+                if (ev != 0)
+                    fdSupport->on_fd (plugin, p.fd, ev);
+            }
+        }
+    };
+
+    std::unique_ptr<FdPoller> _fdPoller;
 #endif
+    const clap_plugin_posix_fd_support_t* _fdSupport { nullptr };
+
+    void setPluginFdSupport (const clap_plugin_posix_fd_support_t* fd) { _fdSupport = fd; }
+
+    bool implementsPosixFdSupport() const noexcept override
+    {
+#if JUCE_LINUX || JUCE_BSD
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    bool posixFdSupportRegisterFd (int fd, clap_posix_fd_flags_t flags) noexcept override
+    {
+#if JUCE_LINUX || JUCE_BSD
+        if (_plugin == nullptr || _fdSupport == nullptr)
+            return false;
+        if (_fdPoller == nullptr)
+        {
+            _fdPoller = std::make_unique<FdPoller>();
+            _fdPoller->plugin = _plugin;
+            _fdPoller->fdSupport = _fdSupport;
+            _fdPoller->startTimerHz (60);
+        }
+        _fdPoller->fds[fd] = flags;
+        return true;
+#else
+        juce::ignoreUnused (fd, flags);
+        return false;
+#endif
+    }
+
+    bool posixFdSupportModifyFd (int fd, clap_posix_fd_flags_t flags) noexcept override
+    {
+#if JUCE_LINUX || JUCE_BSD
+        if (_fdPoller == nullptr)
+            return false;
+        auto it = _fdPoller->fds.find (fd);
+        if (it == _fdPoller->fds.end())
+            return false;
+        it->second = flags;
+        return true;
+#else
+        juce::ignoreUnused (fd, flags);
+        return false;
+#endif
+    }
+
+    bool posixFdSupportUnregisterFd (int fd) noexcept override
+    {
+#if JUCE_LINUX || JUCE_BSD
+        if (_fdPoller == nullptr)
+            return false;
+        return _fdPoller->fds.erase (fd) > 0;
+#else
+        juce::ignoreUnused (fd);
+        return false;
+#endif
+    }
+
+    // clap_host_remote_controls
+    std::function<void()> onRemoteControlsChanged;
+    std::function<void (clap_id)> onRemoteControlsSuggestPage;
+    bool implementsRemoteControls() const noexcept override { return true; }
+    void remoteControlsChanged() noexcept override
+    {
+        if (onRemoteControlsChanged)
+            onRemoteControlsChanged();
+    }
+    void remoteControlsSuggestPage (clap_id pageId) noexcept override
+    {
+        if (onRemoteControlsSuggestPage)
+            onRemoteControlsSuggestPage (pageId);
+    }
 
     struct CLAPTimer : public juce::Timer
     {
@@ -403,15 +565,22 @@ protected:
         return false;
     }
 
-#if 0
-      // clap_host_tail
-      virtual bool implementsTail() const noexcept { return false; }
-      virtual void tailChanged() noexcept {}
+    // clap_host_tail
+    std::function<void()> onTailChanged;
+    bool implementsTail() const noexcept override { return true; }
+    void tailChanged() noexcept override
+    {
+        if (onTailChanged)
+            onTailChanged();
+    }
 
-      // clap_host_thread_pool
-      virtual bool implementsThreadPool() const noexcept { return false; }
-      virtual bool threadPoolRequestExec(uint32_t numTasks) noexcept { return false; }
-#endif
+    // clap_host_thread_pool
+    std::function<bool (uint32_t)> onThreadPoolExec;
+    bool implementsThreadPool() const noexcept override { return true; }
+    bool threadPoolRequestExec (uint32_t numTasks) noexcept override
+    {
+        return onThreadPoolExec ? onThreadPoolExec (numTasks) : false;
+    }
 
 private:
     clap::helpers::EventList _evIn, _evOut;
@@ -1042,6 +1211,9 @@ public:
 
     ~CLAPEditor()
     {
+        if (onEditorDestroyed)
+            onEditorDestroyed();
+
         _view->prepareForDestruction();
         _view.reset();
 
@@ -1050,6 +1222,21 @@ public:
             _gui->hide (_plugin);
             _gui->destroy (_plugin);
         }
+    }
+
+    /** Called when the editor is destroyed so the owner can drop its reference. */
+    std::function<void()> onEditorDestroyed;
+
+    /** Applies a size the plugin requested via clap_host_gui.request_resize. */
+    void hostRequestedResize (uint32_t width, uint32_t height)
+    {
+        setSize ((int) width, (int) height);
+    }
+
+    /** Shows or hides the editor in response to request_show / request_hide. */
+    void hostRequestedVisible (bool shouldBeVisible)
+    {
+        setVisible (shouldBeVisible);
     }
 
     void viewRequestedResizeInPhysicalPixels (int width, int height) override
@@ -1245,12 +1432,17 @@ private:
 };
 
 //==============================================================================
-class CLAPProcessor : public Processor
+class CLAPProcessor : public Processor,
+                      private juce::AsyncUpdater
 {
 public:
     ~CLAPProcessor()
     {
+        cancelPendingUpdate();
         _host.onRescanParamValues = nullptr;
+        _host.onRequestRestart = nullptr;
+        _host.onRequestProcess = nullptr;
+        _host.onRequestCallback = nullptr;
 
         if (_plugin != nullptr)
         {
@@ -1298,19 +1490,28 @@ public:
     //==========================================================================
     void prepareToRender (double sampleRate, int maxBufferSize) override
     {
+        gThreadType = ThreadType::MainThread;
         if (_plugin == nullptr)
             return;
+        _sampleRate = sampleRate;
+        _blockSize = maxBufferSize;
         const auto maxChans = std::max ((int) detail::totalChannels (_audioIns),
                                         (int) detail::totalChannels (_audioOuts));
         _tmpAudio.setSize (maxChans, maxBufferSize);
-        _plugin->activate (_plugin, sampleRate, 1U, (uint32_t) maxBufferSize);
+        _steadyTime = 0;
+        _activated = _plugin->activate (_plugin, sampleRate, 1U, (uint32_t) maxBufferSize);
+        updateLatency();
+        updateTail();
     }
 
     void releaseResources() override
     {
+        gThreadType = ThreadType::MainThread;
         if (_plugin == nullptr)
             return;
-        _plugin->deactivate (_plugin);
+        if (_activated)
+            _plugin->deactivate (_plugin);
+        _activated = false;
         _tmpAudio.setSize (1, 1);
     }
 
@@ -1318,7 +1519,16 @@ public:
     {
         gThreadType = ThreadType::AudioThread;
 
-        _proc.steady_time = -1;
+        // If the plugin is inactive or a restart is underway on the main thread,
+        // emit silence for this block rather than touch the plugin.
+        if (! _activated || ! _processLock.tryLock())
+        {
+            for (int i = rc.audio.getNumChannels(); --i >= 0;)
+                rc.audio.clear (i, 0, rc.audio.getNumSamples());
+            return;
+        }
+
+        _proc.steady_time = _steadyTime;
 
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
@@ -1449,20 +1659,47 @@ public:
         _plugin->process (_plugin, &_proc);
         _plugin->stop_processing (_plugin);
 
-        // Process any output events from the plugin
+        // Handle output events from the plugin.
+        juce::MidiBuffer* midiOut = (_noteOutputs > 0) ? rc.midi.getWriteBuffer (0) : nullptr;
+        if (midiOut != nullptr)
+            midiOut->clear();
+
         for (uint32_t i = 0; i < _eventOut.size(); ++i)
         {
             auto h = _eventOut.get (i);
-            // For now, just log note events to help with debugging
             switch (h->type)
             {
-                case CLAP_EVENT_NOTE_END:
-                case CLAP_EVENT_NOTE_OFF:
-                    CLAP_LOG ("Plugin generated NOTE_OFF/END event");
+                case CLAP_EVENT_PARAM_VALUE:
+                case CLAP_EVENT_PARAM_GESTURE_BEGIN:
+                case CLAP_EVENT_PARAM_GESTURE_END:
+                    // Parameter changes from the plugin are applied to the host
+                    // parameters on the main thread.
+                    _paramsChanged.store (true);
+                    triggerAsyncUpdate();
                     break;
+
                 case CLAP_EVENT_NOTE_ON:
-                    CLAP_LOG ("Plugin generated NOTE_ON event");
+                case CLAP_EVENT_NOTE_OFF: {
+                    if (midiOut != nullptr)
+                    {
+                        auto ev = reinterpret_cast<const clap_event_note_t*> (h);
+                        auto msg = h->type == CLAP_EVENT_NOTE_ON
+                                       ? juce::MidiMessage::noteOn (ev->channel + 1, ev->key, (float) ev->velocity)
+                                       : juce::MidiMessage::noteOff (ev->channel + 1, ev->key, (float) ev->velocity);
+                        midiOut->addEvent (msg, (int) h->time);
+                    }
                     break;
+                }
+
+                case CLAP_EVENT_MIDI: {
+                    if (midiOut != nullptr)
+                    {
+                        auto ev = reinterpret_cast<const clap_event_midi_t*> (h);
+                        midiOut->addEvent (ev->data, 3, (int) h->time);
+                    }
+                    break;
+                }
+
                 default:
                     break;
             }
@@ -1472,6 +1709,10 @@ public:
         {
             rc.audio.copyFrom (rcc, 0, _tmpAudio, rcc, 0, rc.audio.getNumSamples());
         }
+
+        // steady_time must advance by at least frames_count for the next process().
+        _steadyTime += (int64_t) rc.audio.getNumSamples();
+        _processLock.unlock();
 
         gThreadType = ThreadType::AudioThread;
     }
@@ -1506,8 +1747,15 @@ public:
             stream.ctx = (void*) &mo,
             stream.write = &writeState;
             state->save (_plugin, &stream);
+            _stateDirty.store (false);
         }
     }
+
+    /** Returns true if the plugin has reported unsaved state changes. */
+    bool isStateDirty() const noexcept { return _stateDirty.load(); }
+
+    /** Returns the remote-control page the plugin last suggested, if any. */
+    clap_id getSuggestedRemotePage() const noexcept { return _suggestedRemotePage.load(); }
 
     static int64_t readState (const clap_istream* stream, void* buffer, uint64_t size)
     {
@@ -1520,6 +1768,66 @@ public:
         for (auto param : getParameters (true))
             if (auto cp = dynamic_cast<CLAPParameter*> (param))
                 cp->syncAndNotify();
+    }
+
+    //==========================================================================
+    /** Services clap_host requests on the main thread. */
+    void handleAsyncUpdate() override
+    {
+        gThreadType = ThreadType::MainThread;
+
+        if (_callbackRequested.exchange (false) && _plugin != nullptr)
+            _plugin->on_main_thread (_plugin);
+
+        if (_restartRequested.exchange (false))
+            performRestart();
+
+        if (_paramsChanged.exchange (false))
+            syncParams();
+    }
+
+    /** Deactivates and reactivates the plugin, as requested by
+        clap_host.request_restart. Activation must happen on the main thread, so
+        the audio thread is held off with _processLock while it runs. */
+    void performRestart()
+    {
+        if (_plugin == nullptr || ! _activated)
+            return;
+
+        _processLock.lock();
+        _plugin->deactivate (_plugin);
+        _activated = false;
+        if (_plugin->activate (_plugin, _sampleRate, 1U, (uint32_t) _blockSize))
+        {
+            _activated = true;
+            _steadyTime = 0;
+        }
+        _processLock.unlock();
+
+        updateLatency();
+    }
+
+    /** Queries the plugin's reported latency and updates the node. Latency may
+        only be read while active (clap_plugin_latency is [main-thread & active]). */
+    void updateLatency()
+    {
+        if (_plugin == nullptr || ! _activated)
+            return;
+        if (auto latency = (const clap_plugin_latency_t*) extension (CLAP_EXT_LATENCY))
+            setLatencySamples ((int) latency->get (_plugin));
+    }
+
+    /** Returns the plugin's reported tail length in samples. */
+    int getTailSamples() const noexcept { return _tailSamples.load(); }
+
+    /** Queries and stores the plugin tail. clap_plugin_tail.get() is callable on
+        both the main and audio threads, so this is safe from clap_host_tail. */
+    void updateTail()
+    {
+        if (_plugin == nullptr)
+            return;
+        if (auto tail = (const clap_plugin_tail_t*) extension (CLAP_EXT_TAIL))
+            _tailSamples.store ((int) tail->get (_plugin));
     }
 
     void setState (const void* data, int size) override
@@ -1539,7 +1847,76 @@ public:
     bool hasEditor() override { return _gui != nullptr; }
     Editor* createEditor() override
     {
-        return hasEditor() ? new CLAPEditor (_plugin, _gui) : nullptr;
+        if (! hasEditor())
+            return nullptr;
+        auto* editor = new CLAPEditor (_plugin, _gui);
+        _editor.store (editor);
+        editor->onEditorDestroyed = [this]() { _editor.store (nullptr); };
+        return editor;
+    }
+
+    //==========================================================================
+    // clap_host_gui handlers. Editor access happens on the message thread; calls
+    // arriving from other threads are marshalled there and acknowledged.
+    bool guiRequestResize (uint32_t width, uint32_t height)
+    {
+        auto apply = [this, width, height]() {
+            if (auto* ed = _editor.load())
+                ed->hostRequestedResize (width, height);
+        };
+
+        if (juce::MessageManager::existsAndIsCurrentThread())
+        {
+            if (_editor.load() == nullptr)
+                return false;
+            apply();
+            return true;
+        }
+
+        juce::MessageManager::callAsync (apply);
+        return true;
+    }
+
+    bool guiRequestVisible (bool shouldBeVisible)
+    {
+        auto apply = [this, shouldBeVisible]() {
+            if (auto* ed = _editor.load())
+                ed->hostRequestedVisible (shouldBeVisible);
+        };
+
+        if (juce::MessageManager::existsAndIsCurrentThread())
+        {
+            if (_editor.load() == nullptr)
+                return false;
+            apply();
+            return true;
+        }
+
+        juce::MessageManager::callAsync (apply);
+        return true;
+    }
+
+    void guiClosed (bool wasDestroyed)
+    {
+        juce::ignoreUnused (wasDestroyed);
+        // Element embeds plugin GUIs, so closure simply hides the editor.
+        juce::MessageManager::callAsync ([this]() {
+            if (auto* ed = _editor.load())
+                ed->hostRequestedVisible (false);
+        });
+    }
+
+    //==========================================================================
+    /** clap_host_thread_pool.request_exec handler. Only valid from within the
+        plugin's process() call. The tasks are run on the calling audio thread; a
+        parallel worker pool is a future optimization. [audio-thread] */
+    bool threadPoolExec (uint32_t numTasks)
+    {
+        if (_threadPool == nullptr || gThreadType != ThreadType::AudioThread)
+            return false;
+        for (uint32_t i = 0; i < numTasks; ++i)
+            _threadPool->exec (_plugin, i);
+        return true;
     }
 
 protected:
@@ -1579,6 +1956,7 @@ private:
     const clap_plugin_note_ports_t* _notes { nullptr };
     const clap_plugin_params_t* _params { nullptr };
     const clap_plugin_gui_t* _gui { nullptr };
+    const clap_plugin_thread_pool_t* _threadPool { nullptr };
 
     clap_process_t _proc;
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
@@ -1588,6 +1966,38 @@ private:
     CLAPEventQueue<RealtimeReadTrait> _queueIn;
     CLAPEventQueue<RealtimeWriteTrait> _queueOut;
 
+    // Activation parameters cached for plugin restarts (clap_host.request_restart).
+    double _sampleRate { 44100.0 };
+    int _blockSize { 512 };
+    bool _activated { false };
+
+    // A free running per-instance sample counter for clap_process.steady_time.
+    int64_t _steadyTime { 0 };
+
+    // Number of plugin note output ports, used to route note/MIDI output.
+    int _noteOutputs { 0 };
+
+    // Plugin tail length in samples, updated via clap_host_tail.
+    std::atomic<int> _tailSamples { 0 };
+
+    // Set when the plugin reports its state changed (clap_host_state.mark_dirty).
+    std::atomic<bool> _stateDirty { false };
+
+    // The remote-control page the plugin last suggested (CLAP_INVALID_ID if none).
+    std::atomic<clap_id> _suggestedRemotePage { CLAP_INVALID_ID };
+
+    // The currently open editor, if any. Set and cleared on the message thread;
+    // atomic so clap_host_gui callbacks can read it from any thread.
+    std::atomic<CLAPEditor*> _editor { nullptr };
+
+    // Guards plugin activation state against the audio thread during a restart.
+    SpinLock _processLock;
+
+    // Set from any thread; serviced on the main thread by handleAsyncUpdate().
+    std::atomic<bool> _restartRequested { false };
+    std::atomic<bool> _callbackRequested { false };
+    std::atomic<bool> _paramsChanged { false };
+
     CLAPProcessor (CLAPModule::Ptr m, const String& i)
         : Processor (0), ID (i), _module (m)
     {
@@ -1596,6 +2006,21 @@ private:
             _host.setPlugin (plugin);
             _plugin = _host.clapPlugin();
             _host.onRescanParamValues = [this]() { syncParams(); };
+            _host.onRequestRestart = [this]() { _restartRequested.store (true); triggerAsyncUpdate(); };
+            _host.onRequestCallback = [this]() { _callbackRequested.store (true); triggerAsyncUpdate(); };
+            // Element drives processing continuously; nothing extra is required to
+            // keep the plugin out of its sleep state.
+            _host.onRequestProcess = []() {};
+            _host.onLatencyChanged = [this]() { updateLatency(); };
+            _host.onTailChanged = [this]() { updateTail(); };
+            _host.onStateMarkDirty = [this]() { _stateDirty.store (true); };
+            _host.onAudioPortsRescan = [this] (uint32_t f) { rescanAudioPorts (f); };
+            _host.onGuiRequestResize = [this] (uint32_t w, uint32_t h) { return guiRequestResize (w, h); };
+            _host.onGuiRequestShow = [this]() { return guiRequestVisible (true); };
+            _host.onGuiRequestHide = [this]() { return guiRequestVisible (false); };
+            _host.onGuiClosed = [this] (bool d) { guiClosed (d); };
+            _host.onThreadPoolExec = [this] (uint32_t n) { return threadPoolExec (n); };
+            _host.onRemoteControlsSuggestPage = [this] (clap_id page) { _suggestedRemotePage.store (page); };
         }
     }
 
@@ -1611,55 +2036,12 @@ private:
         if (_plugin == nullptr)
             return false;
 
-        PortCount pc;
-        if (auto audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS))
-        {
-            _audio = audio;
+        _audio = (const clap_plugin_audio_ports_t*) extension (CLAP_EXT_AUDIO_PORTS);
+        _notes = (const clap_plugin_note_ports_t*) extension (CLAP_EXT_NOTE_PORTS);
+        _params = (const clap_plugin_params_t*) extension (CLAP_EXT_PARAMS);
+        _threadPool = (const clap_plugin_thread_pool_t*) extension (CLAP_EXT_THREAD_POOL);
 
-            initAudioBuffers (_audioIns, true);
-            _proc.audio_inputs_count = _audio->count (_plugin, true);
-            _proc.audio_inputs = _audioIns.data();
-            pc.inputs[PortType::Audio] = detail::totalChannels (_audioIns);
-            jassert (_proc.audio_inputs_count == _audioIns.size());
-
-            initAudioBuffers (_audioOuts, false);
-            _proc.audio_outputs_count = _audio->count (_plugin, false);
-            _proc.audio_outputs = _audioOuts.data();
-            pc.outputs[PortType::Audio] = detail::totalChannels (_audioOuts);
-            jassert (_proc.audio_outputs_count == _audioOuts.size());
-        }
-
-        if (auto notes = (const clap_plugin_note_ports_t*) extension (CLAP_EXT_NOTE_PORTS))
-        {
-            _notes = notes;
-            for (uint32_t i = 0; i < notes->count (_plugin, true); ++i)
-            {
-                clap_note_port_info_t info;
-                notes->get (_plugin, i, true, &info);
-                ++pc.inputs[PortType::Midi];
-            }
-
-            for (uint32_t i = 0; i < notes->count (_plugin, false); ++i)
-            {
-                clap_note_port_info_t info;
-                notes->get (_plugin, i, false, &info);
-                ++pc.outputs[PortType::Midi];
-            }
-        }
-
-        if (auto params = (const clap_plugin_params_t*) extension (CLAP_EXT_PARAMS))
-        {
-            _params = params;
-            for (uint32_t i = 0; i < params->count (_plugin); ++i)
-            {
-                clap_param_info_t info;
-                params->get_info (_plugin, i, &info);
-                ++pc.inputs[PortType::Control];
-            }
-        }
-
-        auto list = pc.toPortList();
-        setPorts (list);
+        configurePorts();
 
         if (auto gui = (const clap_plugin_gui_t*) extension (CLAP_EXT_GUI))
         {
@@ -1673,11 +2055,81 @@ private:
         }
 
         if (auto fd = (const clap_plugin_posix_fd_support_t*) extension (CLAP_EXT_POSIX_FD_SUPPORT))
-        {
-            juce::ignoreUnused (fd);
-            CLAP_LOG ("plugin wants FD support.");
-        }
+            _host.setPluginFdSupport (fd);
+
         return true;
+    }
+
+    /** (Re)builds the audio buffers and the Element port list from the plugin's
+        current port configuration. The plugin must be deactivated. [main-thread] */
+    void configurePorts()
+    {
+        detail::freeAudioBuffers (_audioIns);
+        detail::freeAudioBuffers (_audioOuts);
+        _noteOutputs = 0;
+
+        PortCount pc;
+        if (_audio != nullptr)
+        {
+            initAudioBuffers (_audioIns, true);
+            _proc.audio_inputs_count = _audio->count (_plugin, true);
+            _proc.audio_inputs = _audioIns.data();
+            pc.inputs[PortType::Audio] = detail::totalChannels (_audioIns);
+            jassert (_proc.audio_inputs_count == _audioIns.size());
+
+            initAudioBuffers (_audioOuts, false);
+            _proc.audio_outputs_count = _audio->count (_plugin, false);
+            _proc.audio_outputs = _audioOuts.data();
+            pc.outputs[PortType::Audio] = detail::totalChannels (_audioOuts);
+            jassert (_proc.audio_outputs_count == _audioOuts.size());
+        }
+
+        if (_notes != nullptr)
+        {
+            pc.inputs[PortType::Midi] = _notes->count (_plugin, true);
+            _noteOutputs = (int) _notes->count (_plugin, false);
+            pc.outputs[PortType::Midi] = (uint32_t) _noteOutputs;
+        }
+
+        if (_params != nullptr)
+            pc.inputs[PortType::Control] = _params->count (_plugin);
+
+        setPorts (pc.toPortList());
+    }
+
+    /** clap_host_audio_ports.rescan handler. Rebuilds ports, deactivating the
+        plugin across the change when required by the flags. [main-thread] */
+    void rescanAudioPorts (uint32_t flags)
+    {
+        constexpr uint32_t structural = CLAP_AUDIO_PORTS_RESCAN_FLAGS
+                                        | CLAP_AUDIO_PORTS_RESCAN_CHANNEL_COUNT
+                                        | CLAP_AUDIO_PORTS_RESCAN_PORT_TYPE
+                                        | CLAP_AUDIO_PORTS_RESCAN_IN_PLACE_PAIR
+                                        | CLAP_AUDIO_PORTS_RESCAN_LIST;
+
+        // A names-only change does not affect buffers or activation.
+        if ((flags & structural) == 0)
+            return;
+
+        const bool wasActive = _activated;
+        _processLock.lock();
+        if (wasActive)
+        {
+            _plugin->deactivate (_plugin);
+            _activated = false;
+        }
+
+        configurePorts();
+
+        if (wasActive && _plugin->activate (_plugin, _sampleRate, 1U, (uint32_t) _blockSize))
+        {
+            _activated = true;
+            _steadyTime = 0;
+        }
+        _processLock.unlock();
+
+        updateLatency();
+        updateTail();
     }
 
     void initAudioBuffers (std::vector<clap_audio_buffer_t>& bufs,
