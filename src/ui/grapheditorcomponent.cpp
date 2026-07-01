@@ -939,7 +939,7 @@ AudioProcessorEditor* GraphEditorComponent::createEditorForNode (ProcessorPtr no
     if (! useGenericEditor)
     {
         if (auto* proc = node->getAudioProcessor())
-            ui.reset (proc->createEditorIfNeeded());
+            ui.reset (proc->createEditorAndMakeActive());
         if (ui == nullptr)
             useGenericEditor = true;
     }
