@@ -8,15 +8,11 @@
 
 #include "luascripts.hpp"
 
-#include "sol/sol.hpp"
-#include "element/element.h"
-#include "el/factories.hpp"
 #include "engine/graphnode.hpp"
 #include "nodes/scriptnode.hpp"
 #include "scripting/bindings.hpp"
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
-#include "scripting/scriptmanager.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -260,6 +256,18 @@ const String ScriptNode::getProgramName (int index) const
         case 3:
             return "MIDI Timecode (MTC) Generator";
             break;
+        case 4:
+            return "Value";
+            break;
+        case 5:
+            return "MIDI CC";
+            break;
+        case 6:
+            return "Tremolo";
+            break;
+        case 7:
+            return "Test Tone";
+            break;
     }
 
     String name = TRANS ("Program");
@@ -292,6 +300,23 @@ void ScriptNode::setCurrentProgram (int index)
         case 3:
             newDspCode = String::fromUTF8 (scripts::mtc_generator_lua, scripts::mtc_generator_luaSize);
             newUiCode.clear();
+            break;
+        case 4:
+            newDspCode = String::fromUTF8 (scripts::dial_lua, scripts::dial_luaSize);
+            newUiCode.clear();
+            break;
+        case 5:
+            newDspCode = String::fromUTF8 (scripts::midicc_lua, scripts::midicc_luaSize);
+            newUiCode.clear();
+            break;
+        case 6:
+            newDspCode = String::fromUTF8 (scripts::tremolo_lua, scripts::tremolo_luaSize);
+            newUiCode.clear();
+            break;
+        case 7:
+            newDspCode = String::fromUTF8 (scripts::testtone_lua, scripts::testtone_luaSize);
+            newUiCode.clear();
+            break;
     }
 
     dspCode.replaceAllContent (newDspCode);

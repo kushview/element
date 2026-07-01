@@ -45,7 +45,7 @@ public:
     void setPlayHead (juce::AudioPlayHead*) override;
 
     //==========================================================================
-    int getNumPrograms() const override { return 4; }
+    int getNumPrograms() const override { return 8; }
     int getCurrentProgram() const override { return _program; }
     const String getProgramName (int index) const override;
     void setCurrentProgram (int index) override;
