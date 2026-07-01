@@ -1,6 +1,19 @@
 # Change Log
 
-## [1.1.0]
+## [1.1.1]
+
+### Added
+- Value, MIDI CC, Tremolo, and Test Tone Script node presets.
+- Many additional CLAP host features.
+- Performance parameter connectivity to Script node parameters.
+- Command to gather offscreen plugin windows back on screen.
+- Parse note names into note numbers for a node's key start/end.
+
+### Fixed
+- Graph IO node duplication.
+- Keep audio out node meters alive and in sync when added from the graph panel.
+
+## [1.1.0] - 2026-06-29
 
 ### Added
 - Local authentication option and OAuth sign-in flow with custom URL scheme registration and token exchange.
