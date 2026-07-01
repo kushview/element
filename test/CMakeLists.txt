@@ -19,6 +19,7 @@ target_compile_definitions(test_element
 add_test(NAME "AtomicValueTests" COMMAND test_element --run_test=AtomicValueTests)
 add_test(NAME "AtomicLockTests" COMMAND test_element --run_test=AtomicLockTests)
 add_test(NAME "AudioRoutingTests" COMMAND test_element --run_test=AudioRoutingTests)
+add_test(NAME "AuthTests" COMMAND test_element --run_test=AuthTests)
 add_test(NAME "BytesTest" COMMAND test_element --run_test=BytesTest)
 add_test(NAME "JuceIntegrationTests" COMMAND test_element --run_test=JuceIntegrationTests)
 add_test(NAME "DataPathTests" COMMAND test_element --run_test=DataPathTests)

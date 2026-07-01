@@ -4,11 +4,8 @@
 #include "auth.hpp"
 
 #include <element/settings.hpp>
-#include <cstring>
 
-#if JUCE_MAC
-#include <CommonCrypto/CommonDigest.h>
-#endif
+#include <juce_cryptography/juce_cryptography.h>
 
 #define AUTH_LOG(o)
 // #define AUTH_LOG(o) Logger::writeToLog(o)
@@ -31,18 +28,14 @@ static String base64UrlEncode (const void* data, size_t numBytes)
 
 static String createCodeChallenge (const String& verifier, String& method)
 {
-#if JUCE_MAC
     const auto utf8 = verifier.toUTF8();
-    unsigned char digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
-    CC_SHA256 (reinterpret_cast<const unsigned char*> (utf8.getAddress()),
-               static_cast<CC_LONG> (std::strlen (utf8.getAddress())),
-               digest);
+    // sizeInBytes() includes the null terminator; drop it so we hash the same
+    // bytes that a strlen-based digest would (i.e. the verifier text only).
+    const SHA256 hash (utf8.getAddress(), (size_t) utf8.sizeInBytes() - 1);
+    const auto digest = hash.getRawData();
+
     method = "S256";
-    return base64UrlEncode (digest, sizeof (digest));
-#else
-    method = "plain";
-    return verifier;
-#endif
+    return base64UrlEncode (digest.getData(), digest.getSize());
 }
 
 static TokenResponse parseTokenPayload (const String& payload, const String& errorPrefix)

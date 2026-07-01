@@ -17,7 +17,10 @@ BOOST_AUTO_TEST_CASE (ScanDirectory)
     element::ScriptManager scripts;
     auto d = et::sourceRoot().getChildFile ("scripts");
     scripts.scanDirectory (d);
-    BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 9);
+
+    // Counts every script that parses with a non-empty @type (ScriptInfo::valid),
+    // regardless of type — not just dsp/dspui.
+    BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 13);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
