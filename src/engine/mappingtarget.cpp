@@ -27,9 +27,13 @@ bool ParameterTarget::isValid() const
         return false;
     if (parameter != nullptr)
         return true;
-    return parameterIndex == Processor::EnabledParameter
-           || parameterIndex == Processor::BypassParameter
-           || parameterIndex == Processor::MuteParameter;
+    return Processor::isSpecialParameter (parameterIndex);
+}
+
+static bool isGainParameter (int parameterIndex)
+{
+    return parameterIndex == Processor::InputGainParameter
+           || parameterIndex == Processor::OutputGainParameter;
 }
 
 void ParameterTarget::apply (const juce::MidiMessage& message, bool toggle)
@@ -38,6 +42,8 @@ void ParameterTarget::apply (const juce::MidiMessage& message, bool toggle)
         return;
     if (parameter != nullptr)
         applyToParameter (message, toggle);
+    else if (isGainParameter (parameterIndex))
+        applyGain (message, toggle);
     else
         applySpecial (message, toggle);
 }
@@ -113,6 +119,50 @@ void ParameterTarget::applySpecial (const juce::MidiMessage& message, bool toggl
             break;
         default:
             break;
+    }
+}
+
+void ParameterTarget::applyGain (const juce::MidiMessage& message, bool toggle)
+{
+    // dB range mirrors the default node channel-strip fader (see ChannelStripComponent).
+    constexpr double minDb = -60.0;
+    constexpr double maxDb = 6.0;
+
+    const bool input = parameterIndex == Processor::InputGainParameter;
+    const float current = input ? object->getInputGain() : object->getGain();
+
+    float gain = current;
+
+    if (message.isController())
+    {
+        const double norm = static_cast<double> (message.getControllerValue()) / 127.0;
+        gain = static_cast<float> (Decibels::decibelsToGain (minDb + norm * (maxDb - minDb), minDb));
+    }
+    else if (message.isNoteOnOrOff())
+    {
+        // Notes drive gain to full (max) or silence, latching in toggle mode.
+        const float full = static_cast<float> (Decibels::decibelsToGain (maxDb, minDb));
+        if (toggle)
+        {
+            if (! message.isNoteOn())
+                return; // ignore note-off in toggle mode
+            gain = current > 0.0f ? 0.0f : full;
+        }
+        else
+        {
+            gain = message.isNoteOn() ? full : 0.0f;
+        }
+    }
+
+    if (input)
+    {
+        object->setInputGain (gain);
+        model.setProperty (tags::inputGain, gain);
+    }
+    else
+    {
+        object->setGain (gain);
+        model.setProperty (tags::gain, gain);
     }
 }
 

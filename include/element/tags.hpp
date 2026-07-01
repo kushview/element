@@ -105,6 +105,7 @@ static const juce::Identifier enabled = "enabled";
 static const juce::Identifier gain = "gain";
 static const juce::Identifier graphs = "graphs";
 static const juce::Identifier hiddenPorts = "hiddenPorts";
+static const juce::Identifier inputGain = "inputGain";
 static const juce::Identifier mappingData = "mappingData";
 static const juce::Identifier map = "map";
 static const juce::Identifier maps = "maps";

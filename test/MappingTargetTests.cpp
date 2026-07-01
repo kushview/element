@@ -101,6 +101,34 @@ BOOST_AUTO_TEST_CASE (SpecialMuteParameter)
     BOOST_REQUIRE (! node.isMuted());
 }
 
+BOOST_AUTO_TEST_CASE (CCToOutputGain)
+{
+    // dB range mirrors ParameterTarget::applyGain: [-60, +6] dB.
+    ProcessorPtr obj = new ParamTestNode (1);
+    auto node = makeNode (obj);
+    ParameterTarget target (node, Processor::OutputGainParameter);
+    BOOST_REQUIRE (target.isValid());
+
+    target.apply (MidiMessage::controllerEvent (1, 7, 127), false); // +6 dB
+    BOOST_REQUIRE_CLOSE (obj->getGain(), (float) Decibels::decibelsToGain (6.0), 0.5f);
+    BOOST_REQUIRE_CLOSE ((float) node.getProperty (tags::gain), obj->getGain(), 0.01f);
+
+    target.apply (MidiMessage::controllerEvent (1, 7, 0), false); // floor => silence
+    BOOST_REQUIRE_SMALL (obj->getGain(), 0.0001f);
+}
+
+BOOST_AUTO_TEST_CASE (CCToInputGain)
+{
+    ProcessorPtr obj = new ParamTestNode (1);
+    auto node = makeNode (obj);
+    ParameterTarget target (node, Processor::InputGainParameter);
+    BOOST_REQUIRE (target.isValid());
+
+    target.apply (MidiMessage::controllerEvent (1, 7, 127), false);
+    BOOST_REQUIRE_CLOSE (obj->getInputGain(), (float) Decibels::decibelsToGain (6.0), 0.5f);
+    BOOST_REQUIRE_CLOSE ((float) node.getProperty (tags::inputGain), obj->getInputGain(), 0.01f);
+}
+
 BOOST_AUTO_TEST_CASE (InvalidTargets)
 {
     ProcessorPtr obj = new ParamTestNode (1);

@@ -37,8 +37,8 @@ public:
 };
 
 //=============================================================================
-/** Targets a node parameter (regular index, or a special Enabled/Bypass/Mute
-    parameter). */
+/** Targets a node parameter (regular index, or a special Enabled/Bypass/Mute or
+    Input/Output gain parameter). */
 class ParameterTarget : public MappingTarget
 {
 public:
@@ -56,6 +56,7 @@ private:
 
     void applyToParameter (const juce::MidiMessage&, bool toggle);
     void applySpecial (const juce::MidiMessage&, bool toggle);
+    void applyGain (const juce::MidiMessage&, bool toggle);
 };
 
 //=============================================================================

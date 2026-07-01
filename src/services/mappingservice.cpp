@@ -55,7 +55,7 @@ public:
 
         if (capturedObject != nullptr && capturedObject.get() == capturedNode.getObject())
         {
-            if (capturedParameter == Processor::EnabledParameter || capturedParameter == Processor::BypassParameter || capturedParameter == Processor::MuteParameter || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
+            if (Processor::isSpecialParameter (capturedParameter) || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
             {
                 callback (capturedNode, capturedParameter);
             }
@@ -129,6 +129,10 @@ private:
                 &Mappable::onBypassChanged, this, std::placeholders::_1)));
             connections.add (object->muteChanged.connect (std::bind (
                 &Mappable::onMuteChanged, this, std::placeholders::_1)));
+            connections.add (object->gainChanged.connect (std::bind (
+                &Mappable::onGainChanged, this, std::placeholders::_1)));
+            connections.add (object->inputGainChanged.connect (std::bind (
+                &Mappable::onInputGainChanged, this, std::placeholders::_1)));
 
             for (auto* const param : object->getParameters())
                 param->addListener (this);
@@ -188,6 +192,32 @@ private:
             capture.triggerAsyncUpdate();
         }
 
+        void onGainChanged (Processor*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node = node;
+            capture.object = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = Processor::OutputGainParameter;
+            capture.triggerAsyncUpdate();
+        }
+
+        void onInputGainChanged (Processor*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node = node;
+            capture.object = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = Processor::InputGainParameter;
+            capture.triggerAsyncUpdate();
+        }
+
     private:
         AudioProcessorParameterCapture& capture;
         Node node;
@@ -222,7 +252,7 @@ public:
     bool isCaptureComplete() const
     {
         ProcessorPtr object = node.getObject();
-        return object != nullptr && (parameter == Processor::EnabledParameter || parameter == Processor::BypassParameter || parameter == Processor::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOnOrOff());
+        return object != nullptr && (Processor::isSpecialParameter (parameter) || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOnOrOff());
     }
 
     AudioProcessorParameterCapture capture;

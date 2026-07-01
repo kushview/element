@@ -92,6 +92,12 @@ String Processor::getSpecialParameterName (int parameter)
         case MuteParameter:
             name = "Mute";
             break;
+        case InputGainParameter:
+            name = "Input Gain";
+            break;
+        case OutputGainParameter:
+            name = "Output Gain";
+            break;
     }
 
     return name;
@@ -111,12 +117,18 @@ bool Processor::containsParameter (const int index) const
 
 void Processor::setInputGain (const float f)
 {
+    if (f == inputGain.get())
+        return;
     inputGain.set (f);
+    inputGainChanged (this);
 }
 
 void Processor::setGain (const float f)
 {
+    if (f == gain.get())
+        return;
     gain.set (f);
+    gainChanged (this);
 }
 
 void Processor::getPluginDescription (PluginDescription& desc) const
