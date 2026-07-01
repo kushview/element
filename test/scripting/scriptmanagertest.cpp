@@ -3,8 +3,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include "scripting/scriptmanager.hpp"
-#include "scripting/bindings.hpp"
-#include "sol/sol.hpp"
 
 #include "testutil.hpp"
 
