@@ -16,7 +16,7 @@ path = [ "*.md", "src/**/*.rc", "docs/**/*.md", "docs/**/*.css",
          "data/intro.txt", "data/developers.txt", "cmake/buildversion.txt.in",
          "cmake/version.txt.in", "data/acknowledgements.txt", 
          "src/res/icon.ico", "data/**/*.png", "data/**/*.svg", 
-         "data/**/*.els", ".github/**/*.*" ]
+         "data/**/*.els", ".github/**/*.*", ".claude/settings.json" ]
 SPDX-FileCopyrightText = "Kushview, LLC."
 SPDX-License-Identifier = "CC0-1.0"
 
