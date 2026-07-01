@@ -103,8 +103,8 @@ public:
     */
     void handleURLSchemeCallback (const juce::String& urlString);
 
-#if JUCE_MAC
-    /** Registers the URL scheme handler for macOS Apple Events. */
+#if JUCE_MAC || JUCE_WINDOWS
+    /** Registers the URL scheme handler. */
     void registerURLSchemeHandler();
 
     /** Unregisters the URL scheme handler. */
