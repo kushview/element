@@ -1513,9 +1513,34 @@ public:
         if (_plugin == nullptr)
             return;
         if (_activated)
+        {
+            stopProcessing();
             _plugin->deactivate (_plugin);
+        }
         _activated = false;
         _tmpAudio.setSize (1, 1);
+    }
+
+    /** Enters the plugin's processing state if not already in it. Must be called
+        with _processLock held (audio thread). Returns true when processing. */
+    bool ensureProcessing() noexcept
+    {
+        if (! _activated)
+            return false;
+        if (! _processing)
+            _processing = _plugin->start_processing (_plugin);
+        return _processing;
+    }
+
+    /** Exits the plugin's processing state if entered. Caller must guarantee no
+        concurrent render() (hold _processLock, or the node is out of the graph). */
+    void stopProcessing() noexcept
+    {
+        if (_processing)
+        {
+            _plugin->stop_processing (_plugin);
+            _processing = false;
+        }
     }
 
     void render (RenderContext& rc) override
@@ -1658,9 +1683,11 @@ public:
 
         jassert (_tmpAudio.getNumChannels() >= rcc);
 
-        _plugin->start_processing (_plugin);
-        _plugin->process (_plugin, &_proc);
-        _plugin->stop_processing (_plugin);
+        // Enter the plugin's processing state once (lazily) and keep it there;
+        // start_processing/stop_processing bracket a processing session, not each
+        // block. If the plugin refuses to start, this block stays silent.
+        if (ensureProcessing())
+            _plugin->process (_plugin, &_proc);
 
         // Handle output events from the plugin.
         juce::MidiBuffer* midiOut = (_noteOutputs > 0) ? rc.midi.getWriteBuffer (0) : nullptr;
@@ -1798,6 +1825,7 @@ public:
             return;
 
         _processLock.lock();
+        stopProcessing();
         _plugin->deactivate (_plugin);
         _activated = false;
         if (_plugin->activate (_plugin, _sampleRate, 1U, (uint32_t) _blockSize))
@@ -1974,6 +2002,10 @@ private:
     int _blockSize { 512 };
     bool _activated { false };
 
+    // True once start_processing() has entered the plugin's processing state.
+    // Guarded by _processLock like _activated. [audio-thread transitions]
+    bool _processing { false };
+
     // A free running per-instance sample counter for clap_process.steady_time.
     int64_t _steadyTime { 0 };
 
@@ -2011,8 +2043,9 @@ private:
             _host.onRescanParamValues = [this]() { syncParams(); };
             _host.onRequestRestart = [this]() { _restartRequested.store (true); triggerAsyncUpdate(); };
             _host.onRequestCallback = [this]() { _callbackRequested.store (true); triggerAsyncUpdate(); };
-            // Element drives processing continuously; nothing extra is required to
-            // keep the plugin out of its sleep state.
+            // render() enters the processing state on demand (ensureProcessing),
+            // so a plugin's request_process is honoured on the next block without
+            // any extra work here.
             _host.onRequestProcess = []() {};
             _host.onLatencyChanged = [this]() { updateLatency(); };
             _host.onTailChanged = [this]() { updateTail(); };
@@ -2118,6 +2151,7 @@ private:
         _processLock.lock();
         if (wasActive)
         {
+            stopProcessing();
             _plugin->deactivate (_plugin);
             _activated = false;
         }
