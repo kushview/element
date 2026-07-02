@@ -1325,6 +1325,7 @@ private:
         clap_window_t hostWindow()
         {
             clap_window_t win;
+            win.api = CLAP_WINDOW_API_X11;
             win.x11 = inner.getHostWindowID();
             return win;
         }
@@ -1368,6 +1369,7 @@ private:
         clap_window_t hostWindow()
         {
             clap_window_t w;
+            w.api = CLAP_WINDOW_API_COCOA;
             w.cocoa = (clap_nsview) getView();
             return w;
         }
@@ -1399,6 +1401,7 @@ private:
         clap_window_t hostWindow()
         {
             clap_window_t w;
+            w.api = CLAP_WINDOW_API_WIN32;
             w.win32 = getHWND();
             return w;
         }
