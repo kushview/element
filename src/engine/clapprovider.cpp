@@ -1577,34 +1577,54 @@ public:
                 _transport.flags |= CLAP_TRANSPORT_IS_LOOP_ACTIVE;
             if (pos->getIsRecording())
                 _transport.flags |= CLAP_TRANSPORT_IS_RECORDING;
-            _transport.flags |= CLAP_TRANSPORT_HAS_TEMPO | CLAP_TRANSPORT_HAS_TIME_SIGNATURE;
-
-            _transport.song_pos_beats = juce::roundToInt (*pos->getPpqPosition() * CLAP_BEATTIME_FACTOR);
-
-            // position in seconds
-            _transport.song_pos_seconds = juce::roundToInt (
-                CLAP_SECTIME_FACTOR * *pos->getTimeInSeconds());
 
             // in bpm
-            _transport.tempo = *pos->getBpm();
-            _transport.tempo_inc = 0; // tempo increment for each sample and until the next
-            // time info event
+            if (auto bpm = pos->getBpm())
+            {
+                _transport.tempo = *bpm;
+                _transport.tempo_inc = 0; // tempo increment per sample until next event
+                _transport.flags |= CLAP_TRANSPORT_HAS_TEMPO;
+            }
 
-            // Looping
+            if (auto sig = pos->getTimeSignature())
+            {
+                _transport.tsig_num = static_cast<uint16_t> (sig->numerator);
+                _transport.tsig_denom = static_cast<uint16_t> (sig->denominator);
+                _transport.flags |= CLAP_TRANSPORT_HAS_TIME_SIGNATURE;
+            }
+
+            // Beat timeline. NOTE: clap_beattime is fixed-point int64 with
+            // CLAP_BEATTIME_FACTOR == (1 << 31); rounding through a 32-bit int
+            // (juce::roundToInt) overflows for any position >= 1 beat, so round
+            // in 64-bit. The HAS_*_TIMELINE flags MUST be set or hosts/plugins
+            // (e.g. nih-plug) ignore the position entirely.
+            if (auto ppq = pos->getPpqPosition())
+            {
+                _transport.song_pos_beats = static_cast<clap_beattime> (
+                    std::llround (*ppq * static_cast<double> (CLAP_BEATTIME_FACTOR)));
+
+                if (auto barStart = pos->getPpqPositionOfLastBarStart())
+                    _transport.bar_start = static_cast<clap_beattime> (
+                        std::llround (*barStart * static_cast<double> (CLAP_BEATTIME_FACTOR)));
+                if (auto barCount = pos->getBarCount())
+                    _transport.bar_number = static_cast<int32_t> (*barCount);
+
+                _transport.flags |= CLAP_TRANSPORT_HAS_BEATS_TIMELINE;
+            }
+
+            // Seconds timeline (same 64-bit rounding requirement).
+            if (auto secs = pos->getTimeInSeconds())
+            {
+                _transport.song_pos_seconds = static_cast<clap_sectime> (
+                    std::llround (*secs * static_cast<double> (CLAP_SECTIME_FACTOR)));
+                _transport.flags |= CLAP_TRANSPORT_HAS_SECONDS_TIMELINE;
+            }
+
+            // Looping (bounds not currently reported).
             _transport.loop_start_beats = 0;
             _transport.loop_end_beats = 0;
             _transport.loop_start_seconds = 0;
             _transport.loop_end_seconds = 0;
-
-            // start pos of the current bar
-            _transport.bar_start = juce::roundToInt (
-                CLAP_BEATTIME_FACTOR * *pos->getPpqPositionOfLastBarStart());
-            // bar at song pos 0 has the number 0
-            _transport.bar_number = static_cast<int32_t> (*pos->getBarCount());
-
-            auto sig = pos->getTimeSignature();
-            _transport.tsig_num = static_cast<uint16_t> (sig->numerator); // time signature numerator
-            _transport.tsig_denom = static_cast<uint16_t> (sig->denominator); // time signature denominator
 
             _proc.transport = &_transport;
         }

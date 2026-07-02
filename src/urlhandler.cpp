@@ -9,10 +9,10 @@
 #include "log.hpp"
 
 #ifndef WIN32_LEAN_AND_MEAN
- #define WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #endif
 #ifndef NOMINMAX
- #define NOMINMAX
+#define NOMINMAX
 #endif
 #include <windows.h>
 
@@ -33,10 +33,10 @@ void Application::registerURLSchemeHandler()
     if (::RegCreateKeyExW (HKEY_CURRENT_USER, keyPath, 0, nullptr, 0, KEY_WRITE, nullptr, &hkey, &disposition) == ERROR_SUCCESS)
     {
         // Set default value to "URL:Element Protocol"
-        ::RegSetValueExW (hkey, nullptr, 0, REG_SZ, (const BYTE*)L"URL:Element Protocol", sizeof (wchar_t) * 20);
+        ::RegSetValueExW (hkey, nullptr, 0, REG_SZ, (const BYTE*) L"URL:Element Protocol", sizeof (wchar_t) * 20);
 
         // Set "URL Protocol" value to empty string
-        ::RegSetValueExW (hkey, L"URL Protocol", 0, REG_SZ, (const BYTE*)L"", sizeof (wchar_t));
+        ::RegSetValueExW (hkey, L"URL Protocol", 0, REG_SZ, (const BYTE*) L"", sizeof (wchar_t));
 
         ::RegCloseKey (hkey);
     }
@@ -46,7 +46,7 @@ void Application::registerURLSchemeHandler()
     if (::RegCreateKeyExW (HKEY_CURRENT_USER, fullPath.c_str(), 0, nullptr, 0, KEY_WRITE, nullptr, &hkey, &disposition) == ERROR_SUCCESS)
     {
         const std::wstring cmdW = cmd.toWideCharPointer();
-        ::RegSetValueExW (hkey, nullptr, 0, REG_SZ, (const BYTE*)cmdW.c_str(), (DWORD)((cmdW.length() + 1) * sizeof (wchar_t)));
+        ::RegSetValueExW (hkey, nullptr, 0, REG_SZ, (const BYTE*) cmdW.c_str(), (DWORD) ((cmdW.length() + 1) * sizeof (wchar_t)));
         ::RegCloseKey (hkey);
     }
 
