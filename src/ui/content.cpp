@@ -117,6 +117,8 @@ public:
 
         mapButton.setEnabled (true);
         mapButton.setVisible (true);
+        if (! isTimerRunning())
+            startTimer (600);
         resized();
     }
 
@@ -180,28 +182,16 @@ public:
         }
         else if (btn == &mapButton)
         {
-            if (auto* mapping = owner.services().find<MappingService>())
-            {
-                mapping->learn (! mapButton.getToggleState());
-                mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
-                if (mapping->isLearning())
-                {
-                    startTimer (600);
-                }
-            }
+            ViewHelpers::invokeDirectly (this, Commands::toggleMidiLearn, true);
         }
     }
 
     void timerCallback() override
     {
+        // Keep the button in sync with the learn state no matter how it was
+        // toggled (header button, keyboard shortcut, or menu).
         if (auto* mapping = owner.services().find<MappingService>())
-        {
-            if (! mapping->isLearning())
-            {
-                mapButton.setToggleState (false, dontSendNotification);
-                stopTimer();
-            }
-        }
+            mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
     }
 
 private:

@@ -13,6 +13,7 @@
 - Write clear, readable code with descriptive names for variables, functions, and classes.
 - Maintain consistency with the existing codebase style and patterns.
 - Consider maintainability and future developers who will read the code.
+- Format code with `util/format.py`
 
 ## Headers & Includes
 

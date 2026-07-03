@@ -34,10 +34,7 @@ public:
 
 private:
     juce::TableListBox table;
-    juce::TextButton learnButton { "Learn" };
     juce::TextButton deleteButton { "Delete" };
-
-    void updateLearnButton();
 };
 
 } // namespace element

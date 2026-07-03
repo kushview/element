@@ -39,6 +39,7 @@ public:
         mediaSaveAs,
 
         showControllers,
+        toggleMidiLearn,
         toggleUserInterface,
         toggleChannelStrip,
         showGraphMixer,
@@ -119,6 +120,7 @@ public:
             mediaSaveAs,
 
             showControllers,
+            toggleMidiLearn,
             toggleUserInterface,
             toggleChannelStrip,
             showGraphMixer,
@@ -215,6 +217,9 @@ public:
             case Commands::showControllers:
                 return "showControllers";
                 break;
+            case Commands::toggleMidiLearn:
+                return "toggleMidiLearn";
+                break;
             case Commands::toggleUserInterface:
                 return "toggleUserInterface";
                 break;
@@ -289,6 +294,8 @@ public:
 
         if (str == "showControllers")
             return Commands::showControllers;
+        if (str == "toggleMidiLearn")
+            return Commands::toggleMidiLearn;
         if (str == "toggleUserInterface")
             return Commands::toggleUserInterface;
         if (str == "toggleChannelStrip")

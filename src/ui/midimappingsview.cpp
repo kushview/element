@@ -35,8 +35,6 @@ MidiMappingsView::MidiMappingsView()
     table.getHeader().addColumn ("Target", ColTarget, 220);
     table.setHeaderHeight (22);
 
-    addAndMakeVisible (learnButton);
-    learnButton.addListener (this);
     addAndMakeVisible (deleteButton);
     deleteButton.addListener (this);
 
@@ -45,7 +43,6 @@ MidiMappingsView::MidiMappingsView()
 
 MidiMappingsView::~MidiMappingsView()
 {
-    learnButton.removeListener (this);
     deleteButton.removeListener (this);
     table.setModel (nullptr);
 }
@@ -54,8 +51,6 @@ void MidiMappingsView::resized()
 {
     auto r = getLocalBounds().reduced (4);
     auto top = r.removeFromTop (26);
-    learnButton.setBounds (top.removeFromLeft (80));
-    top.removeFromLeft (4);
     deleteButton.setBounds (top.removeFromLeft (80));
     r.removeFromTop (4);
     table.setBounds (r);
@@ -65,16 +60,6 @@ void MidiMappingsView::stabilizeContent()
 {
     table.updateContent();
     table.repaint();
-    updateLearnButton();
-}
-
-void MidiMappingsView::updateLearnButton()
-{
-    bool learning = false;
-    if (auto* cc = ViewHelpers::findContentComponent (this))
-        if (auto* maps = cc->services().find<MappingService>())
-            learning = maps->isLearning();
-    learnButton.setToggleState (learning, dontSendNotification);
 }
 
 int MidiMappingsView::getNumRows()
@@ -133,12 +118,7 @@ void MidiMappingsView::buttonClicked (Button* b)
     if (maps == nullptr)
         return;
 
-    if (b == &learnButton)
-    {
-        maps->learn (! maps->isLearning());
-        updateLearnButton();
-    }
-    else if (b == &deleteButton)
+    if (b == &deleteButton)
     {
         const int row = table.getSelectedRow();
         if (auto session = ViewHelpers::getSession (this))
