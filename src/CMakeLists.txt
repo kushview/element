@@ -72,6 +72,7 @@ target_compile_definitions(element
 target_link_libraries(element
     PUBLIC
         juce::juce_core
+        juce::juce_cryptography
         juce::juce_gui_basics
         juce::juce_gui_extra
         juce::juce_osc

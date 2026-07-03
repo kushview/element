@@ -225,15 +225,17 @@ void Application::initialise (const String& commandLine)
     initializeModulePath();
     printCopyNotice();
 
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     registerURLSchemeHandler();
 #endif
 
     launchApplication();
 
-    // Handle URL scheme if passed on command line
-    if (commandLine.startsWith ("element://"))
-        handleURLSchemeCallback (commandLine);
+    // Handle URL scheme if passed on command line. On Windows the URL arrives as a
+    // quoted argument (element.exe "element://..."), so strip quotes before matching.
+    const auto url = commandLine.unquoted().trim();
+    if (url.startsWith ("element://"))
+        handleURLSchemeCallback (url);
 }
 
 void Application::actionListenerCallback (const String& message)
@@ -265,7 +267,7 @@ void Application::shutdown()
     if (! world)
         return;
 
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     unregisterURLSchemeHandler();
 #endif
 
@@ -371,10 +373,12 @@ void Application::anotherInstanceStarted (const String& commandLine)
     if (! world)
         return;
 
-    // Handle custom URL scheme callbacks (e.g., auth)
-    if (commandLine.startsWith ("element://"))
+    // Handle custom URL scheme callbacks (e.g., auth). On Windows the URL arrives as a
+    // quoted argument forwarded from the launching instance, so strip quotes before matching.
+    const auto url = commandLine.unquoted().trim();
+    if (url.startsWith ("element://"))
     {
-        handleURLSchemeCallback (commandLine);
+        handleURLSchemeCallback (url);
         return;
     }
 

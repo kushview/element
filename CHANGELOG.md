@@ -12,6 +12,9 @@
 ### Fixed
 - Graph IO node duplication.
 - Keep audio out node meters alive and in sync when added from the graph panel.
+- Bad URL generation in authorization
+- CLAP: Start/Stop handing in host
+- CLAP: Some UI's not loading on new macs
 
 ## [1.1.0] - 2026-06-29
 

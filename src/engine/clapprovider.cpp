@@ -1325,6 +1325,7 @@ private:
         clap_window_t hostWindow()
         {
             clap_window_t win;
+            win.api = CLAP_WINDOW_API_X11;
             win.x11 = inner.getHostWindowID();
             return win;
         }
@@ -1368,6 +1369,7 @@ private:
         clap_window_t hostWindow()
         {
             clap_window_t w;
+            w.api = CLAP_WINDOW_API_COCOA;
             w.cocoa = (clap_nsview) getView();
             return w;
         }
@@ -1399,6 +1401,7 @@ private:
         clap_window_t hostWindow()
         {
             clap_window_t w;
+            w.api = CLAP_WINDOW_API_WIN32;
             w.win32 = getHWND();
             return w;
         }
@@ -1510,9 +1513,34 @@ public:
         if (_plugin == nullptr)
             return;
         if (_activated)
+        {
+            stopProcessing();
             _plugin->deactivate (_plugin);
+        }
         _activated = false;
         _tmpAudio.setSize (1, 1);
+    }
+
+    /** Enters the plugin's processing state if not already in it. Must be called
+        with _processLock held (audio thread). Returns true when processing. */
+    bool ensureProcessing() noexcept
+    {
+        if (! _activated)
+            return false;
+        if (! _processing)
+            _processing = _plugin->start_processing (_plugin);
+        return _processing;
+    }
+
+    /** Exits the plugin's processing state if entered. Caller must guarantee no
+        concurrent render() (hold _processLock, or the node is out of the graph). */
+    void stopProcessing() noexcept
+    {
+        if (_processing)
+        {
+            _plugin->stop_processing (_plugin);
+            _processing = false;
+        }
     }
 
     void render (RenderContext& rc) override
@@ -1549,34 +1577,54 @@ public:
                 _transport.flags |= CLAP_TRANSPORT_IS_LOOP_ACTIVE;
             if (pos->getIsRecording())
                 _transport.flags |= CLAP_TRANSPORT_IS_RECORDING;
-            _transport.flags |= CLAP_TRANSPORT_HAS_TEMPO | CLAP_TRANSPORT_HAS_TIME_SIGNATURE;
-
-            _transport.song_pos_beats = juce::roundToInt (*pos->getPpqPosition() * CLAP_BEATTIME_FACTOR);
-
-            // position in seconds
-            _transport.song_pos_seconds = juce::roundToInt (
-                CLAP_SECTIME_FACTOR * *pos->getTimeInSeconds());
 
             // in bpm
-            _transport.tempo = *pos->getBpm();
-            _transport.tempo_inc = 0; // tempo increment for each sample and until the next
-            // time info event
+            if (auto bpm = pos->getBpm())
+            {
+                _transport.tempo = *bpm;
+                _transport.tempo_inc = 0; // tempo increment per sample until next event
+                _transport.flags |= CLAP_TRANSPORT_HAS_TEMPO;
+            }
 
-            // Looping
+            if (auto sig = pos->getTimeSignature())
+            {
+                _transport.tsig_num = static_cast<uint16_t> (sig->numerator);
+                _transport.tsig_denom = static_cast<uint16_t> (sig->denominator);
+                _transport.flags |= CLAP_TRANSPORT_HAS_TIME_SIGNATURE;
+            }
+
+            // Beat timeline. NOTE: clap_beattime is fixed-point int64 with
+            // CLAP_BEATTIME_FACTOR == (1 << 31); rounding through a 32-bit int
+            // (juce::roundToInt) overflows for any position >= 1 beat, so round
+            // in 64-bit. The HAS_*_TIMELINE flags MUST be set or hosts/plugins
+            // (e.g. nih-plug) ignore the position entirely.
+            if (auto ppq = pos->getPpqPosition())
+            {
+                _transport.song_pos_beats = static_cast<clap_beattime> (
+                    std::llround (*ppq * static_cast<double> (CLAP_BEATTIME_FACTOR)));
+
+                if (auto barStart = pos->getPpqPositionOfLastBarStart())
+                    _transport.bar_start = static_cast<clap_beattime> (
+                        std::llround (*barStart * static_cast<double> (CLAP_BEATTIME_FACTOR)));
+                if (auto barCount = pos->getBarCount())
+                    _transport.bar_number = static_cast<int32_t> (*barCount);
+
+                _transport.flags |= CLAP_TRANSPORT_HAS_BEATS_TIMELINE;
+            }
+
+            // Seconds timeline (same 64-bit rounding requirement).
+            if (auto secs = pos->getTimeInSeconds())
+            {
+                _transport.song_pos_seconds = static_cast<clap_sectime> (
+                    std::llround (*secs * static_cast<double> (CLAP_SECTIME_FACTOR)));
+                _transport.flags |= CLAP_TRANSPORT_HAS_SECONDS_TIMELINE;
+            }
+
+            // Looping (bounds not currently reported).
             _transport.loop_start_beats = 0;
             _transport.loop_end_beats = 0;
             _transport.loop_start_seconds = 0;
             _transport.loop_end_seconds = 0;
-
-            // start pos of the current bar
-            _transport.bar_start = juce::roundToInt (
-                CLAP_BEATTIME_FACTOR * *pos->getPpqPositionOfLastBarStart());
-            // bar at song pos 0 has the number 0
-            _transport.bar_number = static_cast<int32_t> (*pos->getBarCount());
-
-            auto sig = pos->getTimeSignature();
-            _transport.tsig_num = static_cast<uint16_t> (sig->numerator); // time signature numerator
-            _transport.tsig_denom = static_cast<uint16_t> (sig->denominator); // time signature denominator
 
             _proc.transport = &_transport;
         }
@@ -1655,9 +1703,11 @@ public:
 
         jassert (_tmpAudio.getNumChannels() >= rcc);
 
-        _plugin->start_processing (_plugin);
-        _plugin->process (_plugin, &_proc);
-        _plugin->stop_processing (_plugin);
+        // Enter the plugin's processing state once (lazily) and keep it there;
+        // start_processing/stop_processing bracket a processing session, not each
+        // block. If the plugin refuses to start, this block stays silent.
+        if (ensureProcessing())
+            _plugin->process (_plugin, &_proc);
 
         // Handle output events from the plugin.
         juce::MidiBuffer* midiOut = (_noteOutputs > 0) ? rc.midi.getWriteBuffer (0) : nullptr;
@@ -1795,6 +1845,7 @@ public:
             return;
 
         _processLock.lock();
+        stopProcessing();
         _plugin->deactivate (_plugin);
         _activated = false;
         if (_plugin->activate (_plugin, _sampleRate, 1U, (uint32_t) _blockSize))
@@ -1971,6 +2022,10 @@ private:
     int _blockSize { 512 };
     bool _activated { false };
 
+    // True once start_processing() has entered the plugin's processing state.
+    // Guarded by _processLock like _activated. [audio-thread transitions]
+    bool _processing { false };
+
     // A free running per-instance sample counter for clap_process.steady_time.
     int64_t _steadyTime { 0 };
 
@@ -2008,8 +2063,9 @@ private:
             _host.onRescanParamValues = [this]() { syncParams(); };
             _host.onRequestRestart = [this]() { _restartRequested.store (true); triggerAsyncUpdate(); };
             _host.onRequestCallback = [this]() { _callbackRequested.store (true); triggerAsyncUpdate(); };
-            // Element drives processing continuously; nothing extra is required to
-            // keep the plugin out of its sleep state.
+            // render() enters the processing state on demand (ensureProcessing),
+            // so a plugin's request_process is honoured on the next block without
+            // any extra work here.
             _host.onRequestProcess = []() {};
             _host.onLatencyChanged = [this]() { updateLatency(); };
             _host.onTailChanged = [this]() { updateTail(); };
@@ -2115,6 +2171,7 @@ private:
         _processLock.lock();
         if (wasActive)
         {
+            stopProcessing();
             _plugin->deactivate (_plugin);
             _activated = false;
         }
