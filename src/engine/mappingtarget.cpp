@@ -167,7 +167,29 @@ void ParameterTarget::applyGain (const juce::MidiMessage& message, bool toggle)
 }
 
 //=============================================================================
-std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session)
+TempoTarget::TempoTarget (const juce::ValueTree& sessionData, TapTempo& shared)
+    : session (sessionData), tapTempo (shared)
+{
+}
+
+bool TempoTarget::isValid() const
+{
+    return session.isValid();
+}
+
+void TempoTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
+{
+    if (! isValid() || ! message.isNoteOn())
+        return; // note-on only: each press is a tap
+
+    // Tap at the message's arrival time (stamped by the router), not "now" on
+    // the message thread, so the interval matches what the player performed.
+    if (auto bpm = tapTempo.tap (message.getTimeStamp()))
+        session.setProperty (tags::tempo, *bpm, nullptr);
+}
+
+//=============================================================================
+std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo)
 {
     const auto targetType = mapping.getTargetType();
 
@@ -182,7 +204,15 @@ std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session
         return target;
     }
 
-    // TODO: "tempo" / "transport" targets (see docs/plans/midimapping.md open questions)
+    if (targetType == "tempo")
+    {
+        auto target = std::make_unique<TempoTarget> (session.data(), tapTempo);
+        if (! target->isValid())
+            return nullptr;
+        return target;
+    }
+
+    // TODO: "transport" targets (see docs/plans/midimapping.md open questions)
     return nullptr;
 }
 

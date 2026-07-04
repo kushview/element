@@ -261,6 +261,9 @@ public:
     int parameter = -1;
     MidiMessage message;
     String device;
+
+    // Target for the armed capture: "parameter" (node + param) or "tempo".
+    String pendingTargetType = "parameter";
 };
 
 MappingService::MappingService()
@@ -307,6 +310,7 @@ void MappingService::learn (const bool shouldLearn)
     auto& mapping (context().mapping());
 
     impl->learnState = CaptureStopped;
+    impl->pendingTargetType = "parameter";
     capture.clear();
     mapping.captureMapping (false);
 
@@ -315,6 +319,75 @@ void MappingService::learn (const bool shouldLearn)
         DBG ("[element] MappingService: start learning");
         impl->learnState = CaptureParameter;
         capture.addNodes (context().session());
+    }
+}
+
+void MappingService::tapTempo()
+{
+    if (auto bpm = context().mapping().tapTempo (Time::getMillisecondCounterHiRes()))
+        if (auto session = context().session())
+            session->data().setProperty (tags::tempo, *bpm, nullptr);
+}
+
+void MappingService::learnTempo()
+{
+    auto& mapping (context().mapping());
+
+    // Skip the parameter-capture phase: arm MIDI capture directly and bind the
+    // next event to the session tempo.
+    impl->capture.clear();
+    impl->pendingTargetType = "tempo";
+    impl->learnState = CaptureControl;
+    mapping.captureMapping (true);
+}
+
+bool MappingService::hasTempoMapping()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return false;
+    for (int i = 0; i < session->getNumMidiMappings(); ++i)
+        if (session->getMidiMapping (i).isTempoTarget())
+            return true;
+    return false;
+}
+
+String MappingService::getTempoMappingDescription()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return {};
+    for (int i = 0; i < session->getNumMidiMappings(); ++i)
+    {
+        auto m = session->getMidiMapping (i);
+        if (m.isTempoTarget())
+            return (m.isNoteEvent() ? String ("Note ") : String ("CC ")) + String (m.getEventId());
+    }
+    return {};
+}
+
+void MappingService::clearTempoMapping()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return;
+
+    bool removed = false;
+    for (int i = session->getNumMidiMappings(); --i >= 0;)
+    {
+        auto m = session->getMidiMapping (i);
+        if (m.isTempoTarget())
+        {
+            session->removeMidiMapping (m);
+            removed = true;
+        }
+    }
+
+    if (removed)
+    {
+        context().mapping().rebuildBindings (session);
+        if (auto* gui = sibling<GuiService>())
+            gui->stabilizeViews();
     }
 }
 
@@ -348,7 +421,17 @@ void MappingService::onControlCaptured()
 
         DBG ("[element] MappingService: captured MIDI on device: " << impl->device);
 
-        if (impl->isCaptureComplete())
+        const bool haveMidi = impl->message.isController() || impl->message.isNoteOnOrOff();
+
+        if (impl->pendingTargetType == "tempo" && haveMidi)
+        {
+            session->addMidiMapping (MidiMapping::fromCaptureTempo (impl->device, impl->message));
+            mapping.rebuildBindings (session); // live immediately
+
+            if (auto* gui = sibling<GuiService>())
+                gui->stabilizeViews();
+        }
+        else if (impl->isCaptureComplete())
         {
             auto newMapping = MidiMapping::fromCapture (
                 impl->device, impl->message, "parameter", impl->node.getUuid(), impl->parameter);
@@ -358,6 +441,8 @@ void MappingService::onControlCaptured()
             if (auto* gui = sibling<GuiService>())
                 gui->stabilizeViews();
         }
+
+        impl->pendingTargetType = "parameter";
     }
     else
     {

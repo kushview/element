@@ -56,7 +56,7 @@ private:
 
     /** List filters (empty = show all). Shared with the panel's Filter section;
         applied in updateRowOrder(). */
-    juce::Value filterDevice, filterNode, filterGraph;
+    juce::Value filterDevice, filterNode, filterGraph, filterTarget;
 
     /** Display row -> index into the session's mapping list, honouring the
         current filter + sort column. Rebuilt by updateRowOrder(). */

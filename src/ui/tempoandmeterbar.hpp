@@ -5,6 +5,7 @@
 
 #include "ui/guicommon.hpp"
 #include "ui/viewhelpers.hpp"
+#include "services/mappingservice.hpp"
 #include <element/transport.hpp>
 
 namespace element {
@@ -14,7 +15,7 @@ class TempoAndMeterBar : public Component,
                          public Timer
 {
 public:
-    TempoAndMeterBar() : tapTempoButton (tempoLabel)
+    TempoAndMeterBar()
     {
         addAndMakeVisible (extButton);
 
@@ -338,8 +339,7 @@ private:
     class TapTempoButton : public Button
     {
     public:
-        TapTempoButton (TempoLabel& tempoLabel) : Button ("TapTempoButton"),
-                                                  tempoLabel (tempoLabel)
+        TapTempoButton() : Button ("TapTempoButton")
         {
             setButtonText ("TAP");
             onClick = [this] { tempoTap(); };
@@ -363,34 +363,78 @@ private:
             g.drawRect (0, 0, getWidth(), getHeight());
         }
 
-    private:
-        void tempoTap()
+        void mouseDown (const MouseEvent& ev) override
         {
-            const double timeNow = tapTimer.getMillisecondCounterHiRes();
-            const double interval = timeNow - tapTime;
-
-            // if it's been  a long time since the last tap, reset
-            if (interval > tapTempoMaxInterval)
-                tapNum = 0;
-            if (tapNum == 0)
+            if (isEnabled() && ev.mods.isPopupMenu())
             {
-                tapTime = timeNow;
-                tapNum++;
+                showContextMenu();
                 return;
             }
-
-            // convert to BPM
-            int newTempo = roundToInt ((tapNum / interval) * 60000);
-            if (newTempo != tempoLabel.tempoValue)
-                tempoLabel.tempoValue.setValue (newTempo);
-            tapNum++;
+            Button::mouseDown (ev);
         }
 
-        TempoLabel& tempoLabel;
-        Time tapTimer;
-        double tapTime = 0.0;
-        int tapNum = 0;
-        const double tapTempoMaxInterval = 2000.0;
+    private:
+        // The button is only an entry point: a UI tap and MIDI taps run the same
+        // shared tap-tempo logic in MappingService/MappingEngine, so no MIDI or
+        // model code lives here.
+        void tempoTap()
+        {
+            auto* maps = findMappingService();
+            if (maps == nullptr)
+                return;
+
+            // In MIDI-map mode, a click arms tap-tempo capture ("map, then click
+            // the thing to map") instead of tapping; the next note binds it.
+            if (maps->isLearning())
+                maps->learnTempo();
+            else
+                maps->tapTempo();
+        }
+
+        MappingService* findMappingService()
+        {
+            if (auto* cc = ViewHelpers::findContentComponent (this))
+                return cc->services().find<MappingService>();
+            return nullptr;
+        }
+
+        void showContextMenu()
+        {
+            auto* maps = findMappingService();
+            if (maps == nullptr)
+                return;
+
+            const bool mapped = maps->hasTempoMapping();
+
+            PopupMenu menu;
+            enum
+            {
+                Learn = 1,
+                Clear
+            };
+
+            menu.addItem (Learn, mapped ? TRANS ("Re-learn MIDI Mapping") : TRANS ("MIDI Learn Tap Tempo"));
+
+            if (mapped)
+            {
+                const auto desc = maps->getTempoMappingDescription();
+                menu.addItem (Clear, TRANS ("Clear MIDI Mapping") + (desc.isNotEmpty() ? " (" + desc + ")" : String()));
+            }
+
+            Component::SafePointer<TapTempoButton> self (this);
+            menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this),
+                                [self] (int result) mutable {
+                                    if (self == nullptr)
+                                        return;
+                                    if (auto* svc = self->findMappingService())
+                                    {
+                                        if (result == Learn)
+                                            svc->learnTempo();
+                                        else if (result == Clear)
+                                            svc->clearTempoMapping();
+                                    }
+                                });
+        }
     } tapTempoButton;
 
     class TopMeter : public TimeSignatureSetting

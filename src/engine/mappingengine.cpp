@@ -32,9 +32,14 @@ public:
         if (! message.isController() && ! message.isNoteOnOrOff())
             return;
         const juce::String id = source != nullptr ? source->getIdentifier() : juce::String();
+        // Stamp with the arrival time so tap-tempo measures the true inter-event
+        // interval, not the (variable) message-thread dispatch latency added by
+        // the hop below. Cheap + RT-safe; consistent with the UI TAP clock.
+        juce::MidiMessage stamped (message);
+        stamped.setTimeStamp (juce::Time::getMillisecondCounterHiRes());
         {
             juce::ScopedLock sl (lock);
-            queue.add ({ id, message });
+            queue.add ({ id, stamped });
         }
         triggerAsyncUpdate();
     }
@@ -79,7 +84,7 @@ void MappingEngine::rebuildBindings (SessionPtr session)
     for (int i = 0; i < session->getNumMidiMappings(); ++i)
     {
         auto mapping = session->getMidiMapping (i);
-        auto target = createTarget (mapping, *session);
+        auto target = createTarget (mapping, *session, tempoTap);
         if (target == nullptr)
             continue;
         auto binding = std::make_unique<Binding>();

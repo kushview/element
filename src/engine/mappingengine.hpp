@@ -4,12 +4,14 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <element/juce.hpp>
 #include <element/midimapping.hpp>
 #include <element/session.hpp>
 #include <element/signals.hpp>
+#include <element/taptempo.hpp>
 
 namespace element {
 
@@ -40,6 +42,13 @@ public:
     void startListening (MidiEngine& midi);
     void stopListening (MidiEngine& midi);
 
+    /** Shared tap-tempo accumulator driving both the UI TAP button and MIDI
+        tap-tempo mappings; only the call site (thread/location) differs. Call on
+        the message thread. Returns the newly computed BPM, or nullopt on the
+        first tap of a run. */
+    std::optional<double> tapTempo (double timeMs) { return tempoTap.tap (timeMs); }
+    void resetTapTempo() { tempoTap.reset(); }
+
     /** Arm/disarm capture of the next incoming message. */
     void captureMapping (bool shouldCapture) { mapCapture.set (shouldCapture); }
     bool isCapturingMapping() const { return mapCapture.get(); }
@@ -56,6 +65,7 @@ private:
     juce::String capturedDevice;
     juce::MidiMessage capturedMessage;
     CapturedEventSignal mapCapturedCallback;
+    TapTempo tempoTap; // shared by UI + MIDI tap tempo
 };
 
 } // namespace element

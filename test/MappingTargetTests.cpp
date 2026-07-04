@@ -129,6 +129,40 @@ BOOST_AUTO_TEST_CASE (CCToInputGain)
     BOOST_REQUIRE_CLOSE ((float) node.getProperty (tags::inputGain), obj->getInputGain(), 0.01f);
 }
 
+BOOST_AUTO_TEST_CASE (TempoTargetTapsFromNoteOn)
+{
+    // A tempo target writes an in-range BPM to the session tempo property on the
+    // second (and later) note-on; note-off and CC are ignored. Exact timing is
+    // covered by TapTempoTests; here we assert the adapter's routing + clamping.
+    ValueTree session (types::Session);
+    session.setProperty (tags::tempo, 100.0, nullptr);
+    TapTempo shared;
+    TempoTarget target (session, shared);
+    BOOST_REQUIRE (target.isValid());
+
+    // Taps are timed by the message timestamp (arrival time in ms), which the
+    // router stamps in production. 500 ms apart == 120 BPM.
+    auto noteAt = [] (double ms) {
+        auto m = MidiMessage::noteOn (1, 60, (uint8) 100);
+        m.setTimeStamp (ms);
+        return m;
+    };
+
+    // First note-on seeds the run; tempo unchanged.
+    target.apply (noteAt (0.0), false);
+    BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 100.0, 0.0001);
+
+    // Second note-on 500 ms later writes exactly 120 BPM.
+    target.apply (noteAt (500.0), false);
+    BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 120.0, 0.0001);
+
+    // Note-off and CC never tap: tempo stays put.
+    session.setProperty (tags::tempo, 100.0, nullptr);
+    target.apply (MidiMessage::noteOff (1, 60), false);
+    target.apply (MidiMessage::controllerEvent (1, 7, 127), false);
+    BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 100.0, 0.0001);
+}
+
 BOOST_AUTO_TEST_CASE (InvalidTargets)
 {
     ProcessorPtr obj = new ParamTestNode (1);

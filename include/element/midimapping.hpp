@@ -55,6 +55,8 @@ public:
 
     //=========================================================================
     juce::String getTargetType() const { return objectData.getProperty (tags::targetType).toString(); }
+    bool isTempoTarget() const { return getTargetType() == "tempo"; }
+    bool isParameterTarget() const { return getTargetType() == "parameter"; }
     juce::Uuid getNodeUuid() const { return juce::Uuid (objectData.getProperty (tags::node).toString()); }
     int getParameterIndex() const { return (int) objectData.getProperty (tags::parameter, -1); }
 
@@ -94,22 +96,38 @@ public:
     {
         MidiMapping m { juce::String() };
         m.setProperty (tags::device, device);
-
-        if (msg.isController()) {
-            m.setProperty (tags::eventType, "controller");
-            m.setProperty (tags::eventId, msg.getControllerNumber());
-        } else if (msg.isNoteOnOrOff()) {
-            m.setProperty (tags::eventType, "note");
-            m.setProperty (tags::eventId, msg.getNoteNumber());
-        }
-
+        m.setEventFromMessage (msg);
         m.setProperty (tags::targetType, targetType);
         m.setProperty (tags::node, node.toString());
         m.setProperty (tags::parameter, parameter);
         return m;
     }
 
+    /** Build a session-level tempo (tap tempo) mapping from a captured message.
+        Has no node/parameter target. */
+    static MidiMapping fromCaptureTempo (const juce::String& device,
+                                         const juce::MidiMessage& msg)
+    {
+        MidiMapping m { juce::String() };
+        m.setProperty (tags::device, device);
+        m.setEventFromMessage (msg);
+        m.setProperty (tags::targetType, "tempo");
+        return m;
+    }
+
 private:
+    /** Populate eventType/eventId from a note or controller message. */
+    void setEventFromMessage (const juce::MidiMessage& msg)
+    {
+        if (msg.isController()) {
+            setProperty (tags::eventType, "controller");
+            setProperty (tags::eventId, msg.getControllerNumber());
+        } else if (msg.isNoteOnOrOff()) {
+            setProperty (tags::eventType, "note");
+            setProperty (tags::eventId, msg.getNoteNumber());
+        }
+    }
+
     void setMissingProperties()
     {
         stabilizePropertyString (tags::uuid, juce::Uuid().toString());

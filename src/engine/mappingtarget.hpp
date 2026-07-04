@@ -8,6 +8,7 @@
 #include <element/juce/audio_basics.hpp>
 #include <element/node.hpp>
 #include <element/parameter.hpp>
+#include <element/taptempo.hpp>
 
 namespace element {
 
@@ -60,8 +61,30 @@ private:
 };
 
 //=============================================================================
+/** Targets the session tempo as a tap-tempo control: each matching note-on
+    counts as a tap and the averaged BPM is written to the session, which the
+    audio engine picks up on the message thread. */
+class TempoTarget : public MappingTarget
+{
+public:
+    /** @param sessionData  The session tree whose tempo is written.
+        @param tapTempo      Shared tap-tempo accumulator (owned by MappingEngine)
+                             so UI and MIDI taps contribute to the same state. */
+    TempoTarget (const juce::ValueTree& sessionData, TapTempo& tapTempo);
+    ~TempoTarget() override = default;
+
+    bool isValid() const override;
+    void apply (const juce::MidiMessage& message, bool toggle) override;
+
+private:
+    juce::ValueTree session;
+    TapTempo& tapTempo;
+};
+
+//=============================================================================
 /** Resolves a MidiMapping into a concrete target. Returns nullptr if the
-    mapping cannot currently be resolved (e.g. missing node). */
-std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session);
+    mapping cannot currently be resolved (e.g. missing node).
+    @param tapTempo  Shared accumulator passed to a TempoTarget, if created. */
+std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo);
 
 } // namespace element

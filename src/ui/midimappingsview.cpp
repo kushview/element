@@ -103,11 +103,12 @@ public:
 
     /** Share the owner's list-filter values so the Filter section drives them.
         Value assignment shares the underlying source, so edits propagate back. */
-    void setFilterValues (const juce::Value& device, const juce::Value& node, const juce::Value& graph)
+    void setFilterValues (const juce::Value& device, const juce::Value& node, const juce::Value& graph, const juce::Value& target)
     {
         filterDevice.referTo (device);
         filterNode.referTo (node);
         filterGraph.referTo (graph);
+        filterTarget.referTo (target);
     }
 
     void setMapping (const MidiMapping& newMapping, SessionPtr newSession)
@@ -127,7 +128,7 @@ public:
 private:
     MidiMapping mapping;
     SessionPtr session;
-    juce::Value filterDevice, filterNode, filterGraph;
+    juce::Value filterDevice, filterNode, filterGraph, filterTarget;
 
     void collectNodes (juce::StringArray& names, juce::Array<juce::var>& uuids, const Node& node)
     {
@@ -201,41 +202,46 @@ private:
             comps.add (new BooleanPropertyComponent (
                 mapping.getPropertyAsValue (tags::toggle), TRANS ("Latch"), TRANS ("Toggle on each note-on")));
 
-        // Target node.
+        // Node + parameter only apply to parameter targets; a tempo mapping
+        // drives the session tempo (tap tempo) and has no node/parameter.
+        if (! mapping.isTempoTarget())
         {
-            StringArray names;
-            Array<var> uuids;
-            for (int i = 0; i < session->getNumGraphs(); ++i)
-                collectNodes (names, uuids, session->getGraph (i));
-            comps.add (new ChoicePropertyComponent (
-                mapping.getPropertyAsValue (tags::node), TRANS ("Node"), names, uuids));
-        }
-
-        // Parameters of the current target node (regular + special).
-        {
-            StringArray names;
-            Array<var> indices;
-            const auto node = session->findNodeById (mapping.getNodeUuid());
-            if (auto* obj = node.getObject())
+            // Target node.
             {
-                const auto& params = obj->getParameters();
-                for (int i = 0; i < params.size(); ++i)
+                StringArray names;
+                Array<var> uuids;
+                for (int i = 0; i < session->getNumGraphs(); ++i)
+                    collectNodes (names, uuids, session->getGraph (i));
+                comps.add (new ChoicePropertyComponent (
+                    mapping.getPropertyAsValue (tags::node), TRANS ("Node"), names, uuids));
+            }
+
+            // Parameters of the current target node (regular + special).
+            {
+                StringArray names;
+                Array<var> indices;
+                const auto node = session->findNodeById (mapping.getNodeUuid());
+                if (auto* obj = node.getObject())
                 {
-                    auto name = params[i]->getName (64);
-                    names.add (name.isNotEmpty() ? name : "Param " + String (i + 1));
-                    indices.add (var (i));
+                    const auto& params = obj->getParameters();
+                    for (int i = 0; i < params.size(); ++i)
+                    {
+                        auto name = params[i]->getName (64);
+                        names.add (name.isNotEmpty() ? name : "Param " + String (i + 1));
+                        indices.add (var (i));
+                    }
                 }
+                for (int special = Processor::EnabledParameter; special >= Processor::SpecialParameterBegin; --special)
+                {
+                    names.add (Processor::getSpecialParameterName (special));
+                    indices.add (var (special));
+                }
+                comps.add (new ChoicePropertyComponent (
+                    mapping.getPropertyAsValue (tags::parameter), TRANS ("Parameter"), names, indices));
             }
-            for (int special = Processor::EnabledParameter; special >= Processor::SpecialParameterBegin; --special)
-            {
-                names.add (Processor::getSpecialParameterName (special));
-                indices.add (var (special));
-            }
-            comps.add (new ChoicePropertyComponent (
-                mapping.getPropertyAsValue (tags::parameter), TRANS ("Parameter"), names, indices));
         }
 
-        addSection (TRANS ("Mapping"), comps);
+        addSection (mapping.isTempoTarget() ? TRANS ("Tap Tempo") : TRANS ("Mapping"), comps);
     }
 
     /** Filter controls for the whole list. Bound to the owner's shared values so
@@ -276,6 +282,15 @@ private:
             comps.add (new ChoicePropertyComponent (filterNode, TRANS ("Node"), choices, values));
         }
 
+        // Target category: node-parameter mappings vs session-level ones
+        // (tempo today, transport later). Kept as a category so it stays correct
+        // as new session targets are added.
+        {
+            StringArray choices { TRANS ("All Targets"), TRANS ("Nodes"), TRANS ("Session") };
+            Array<var> values { var (String()), var ("parameter"), var ("session") };
+            comps.add (new ChoicePropertyComponent (filterTarget, TRANS ("Target"), choices, values));
+        }
+
         addSection (TRANS ("Filter"), comps);
     }
 
@@ -313,13 +328,15 @@ MidiMappingsView::MidiMappingsView()
     filterDevice.setValue (String());
     filterNode.setValue (String());
     filterGraph.setValue (String());
+    filterTarget.setValue (String());
     filterDevice.addListener (this);
     filterNode.addListener (this);
     filterGraph.addListener (this);
+    filterTarget.addListener (this);
 
     props = std::make_unique<MidiMappingProperties>();
     props->onEdited = [this]() { mappingEdited(); };
-    props->setFilterValues (filterDevice, filterNode, filterGraph);
+    props->setFilterValues (filterDevice, filterNode, filterGraph, filterTarget);
     addAndMakeVisible (*props);
 
     resizer = std::make_unique<StretchableLayoutResizerBar> (&layout, 1, true);
@@ -346,6 +363,7 @@ MidiMappingsView::MidiMappingsView()
 MidiMappingsView::~MidiMappingsView()
 {
     filterDevice.removeListener (this);
+    filterTarget.removeListener (this);
     filterNode.removeListener (this);
     filterGraph.removeListener (this);
     deleteButton.removeListener (this);
@@ -376,7 +394,8 @@ void MidiMappingsView::stabilizeContent()
     const int numRows = (int) rowOrder.size();
     const bool filtered = ! filterDevice.toString().isEmpty()
                           || ! filterNode.toString().isEmpty()
-                          || ! filterGraph.toString().isEmpty();
+                          || ! filterGraph.toString().isEmpty()
+                          || ! filterTarget.toString().isEmpty();
 
     emptyLabel.setVisible (numRows == 0);
     if (numRows == 0)
@@ -423,14 +442,20 @@ void MidiMappingsView::updateRowOrder()
         const String fDevice = filterDevice.toString();
         const String fNode = filterNode.toString();
         const String fGraph = filterGraph.toString();
+        const String fTarget = filterTarget.toString();
 
-        if (fDevice.isNotEmpty() || fNode.isNotEmpty() || fGraph.isNotEmpty())
+        if (fDevice.isNotEmpty() || fNode.isNotEmpty() || fGraph.isNotEmpty() || fTarget.isNotEmpty())
         {
             std::vector<int> kept;
             for (const int idx : rowOrder)
             {
                 const auto m = session->getMidiMapping (idx);
                 if (fDevice.isNotEmpty() && m.getDevice() != fDevice)
+                    continue;
+                // "parameter" = node targets, "session" = anything else (tempo, …).
+                if (fTarget == "parameter" && ! m.isParameterTarget())
+                    continue;
+                if (fTarget == "session" && m.isParameterTarget())
                     continue;
                 if (fNode.isNotEmpty() && m.getNodeUuid().toString() != fNode)
                     continue;
@@ -552,11 +577,21 @@ void MidiMappingsView::paintCell (Graphics& g, int row, int columnId, int w, int
             text = mapping.getMidiChannel() == 0 ? "omni" : String (mapping.getMidiChannel());
             break;
         case ColNode: {
+            if (mapping.isTempoTarget())
+            {
+                text = TRANS ("Tempo");
+                break;
+            }
             auto node = session->findNodeById (mapping.getNodeUuid());
             text = node.isValid() ? node.getDisplayName() : String ("(missing)");
             break;
         }
         case ColParameter: {
+            if (mapping.isTempoTarget())
+            {
+                text = TRANS ("Tap Tempo");
+                break;
+            }
             auto node = session->findNodeById (mapping.getNodeUuid());
             text = parameterName (node, mapping.getParameterIndex());
             break;
