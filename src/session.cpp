@@ -98,6 +98,8 @@ bool Session::loadData (const ValueTree& data)
     objectData.removeListener (this);
     objectData = data;
     setMissingProperties();
+    migrateControllerMaps (objectData);
+    cleanOrphanMidiMappings();
     objectData.addListener (this);
     return true;
 }
@@ -135,6 +137,44 @@ void Session::setMissingProperties (bool resetExisting)
     objectData.getOrCreateChildWithName (tags::graphs, nullptr);
     objectData.getOrCreateChildWithName (tags::controllers, nullptr);
     objectData.getOrCreateChildWithName (tags::maps, nullptr);
+    objectData.getOrCreateChildWithName (tags::midiMappings, nullptr);
+}
+
+void Session::addMidiMapping (const MidiMapping& mapping)
+{
+    auto mappings = getMidiMappingsValueTree();
+    if (mapping.isValid() && mappings.indexOf (mapping.data()) < 0)
+        mappings.addChild (mapping.data(), -1, nullptr);
+}
+
+void Session::removeMidiMapping (const MidiMapping& mapping)
+{
+    auto mappings = getMidiMappingsValueTree();
+    if (mapping.data().isAChildOf (mappings))
+        mappings.removeChild (mapping.data(), nullptr);
+}
+
+MidiMapping Session::findMidiMappingById (const Uuid& uuid) const
+{
+    const auto idStr = uuid.toString();
+    for (int i = getNumMidiMappings(); --i >= 0;)
+    {
+        auto m = getMidiMapping (i);
+        if (m.getUuidString() == idStr)
+            return m;
+    }
+    return MidiMapping (ValueTree());
+}
+
+void Session::cleanOrphanMidiMappings()
+{
+    auto mappings = getMidiMappingsValueTree();
+    for (int i = mappings.getNumChildren(); --i >= 0;)
+    {
+        MidiMapping m (mappings.getChild (i));
+        if (m.getTargetType() == "parameter" && ! findNodeById (m.getNodeUuid()).isValid())
+            mappings.removeChild (i, nullptr);
+    }
 }
 
 Node Session::findNodeById (const Uuid& uuid)
@@ -149,19 +189,6 @@ Node Session::findNodeById (const Uuid& uuid)
     }
 
     return node;
-}
-
-Controller Session::findControllerById (const Uuid& uuid)
-{
-    Controller device;
-    const auto controllerId = uuid.toString();
-    for (int i = getNumControllers(); --i >= 0;)
-    {
-        device = getController (i);
-        if (device.getUuidString() == controllerId)
-            return device;
-    }
-    return device;
 }
 
 void Session::notifyChanged()
@@ -187,39 +214,13 @@ void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& prope
 
 void Session::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
-    // controller device added
-    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (types::Controller))
-    {
-        const Controller device (child);
-        controllerDeviceAdded (device);
-    }
-
-    // controller device control added
-    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (types::Controller) && child.hasType (types::Control))
-    {
-        const Control control (child);
-        controlAdded (control);
-    }
-
+    ignoreUnused (parent, child);
     notifyChanged();
 }
 
 void Session::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
 {
-    // controller device removed
-    if (parent.getParent() == objectData && parent.hasType (tags::controllers) && child.hasType (types::Controller))
-    {
-        const Controller device (child);
-        controllerDeviceRemoved (device);
-    }
-
-    // controller device control removed
-    if (parent.getParent().getParent() == objectData && parent.getParent().hasType (tags::controllers) && parent.hasType (types::Controller) && child.hasType (types::Control))
-    {
-        const Control control (child);
-        controlRemoved (control);
-    }
-
+    ignoreUnused (parent, child);
     notifyChanged();
 }
 
@@ -259,21 +260,43 @@ void Session::forEach (const ValueTree tree, ValueTreeFunction handler) const
         forEach (tree.getChild (i), handler);
 }
 
-void Session::cleanOrphanControllerMaps()
+void migrateControllerMaps (ValueTree session)
 {
-    Array<ValueTree> toRemove;
-    for (int i = 0; i < getNumControllerMaps(); ++i)
+    if (! session.isValid())
+        return;
+
+    auto controllers = session.getChildWithName (tags::controllers);
+    auto maps = session.getChildWithName (tags::maps);
+    auto mappings = session.getOrCreateChildWithName (tags::midiMappings, nullptr);
+
+    for (int i = 0; i < maps.getNumChildren(); ++i)
     {
-        const ControllerMapObjects objects (this, getControllerMap (i));
-        if (! objects.isValid())
-            toRemove.add (objects.controllerMap.data());
-    }
-    if (toRemove.size() > 0)
-    {
-        auto maps = getControllerMapsValueTree();
-        for (const auto& tree : toRemove)
-            maps.removeChild (tree, nullptr);
-        toRemove.clearQuick();
+        const auto map = maps.getChild (i);
+        if (! map.hasType (types::ControllerMap))
+            continue;
+
+        const auto controllerId = map.getProperty (tags::controller).toString();
+        const auto controlId = map.getProperty (tags::control).toString();
+
+        auto controller = controllers.getChildWithProperty (tags::uuid, controllerId);
+        if (! controller.isValid())
+            continue;
+        auto control = controller.getChildWithProperty (tags::uuid, controlId);
+        if (! control.isValid())
+            continue;
+
+        MidiMapping mapping (String {});
+        mapping.setProperty (tags::device, controller.getProperty (tags::inputDevice).toString());
+        mapping.setProperty (tags::name, control.getProperty (tags::name).toString());
+        mapping.setProperty (tags::eventType, control.getProperty ("eventType").toString());
+        mapping.setProperty (tags::eventId, (int) control.getProperty ("eventId", 0));
+        mapping.setProperty (tags::midiChannel, (int) control.getProperty (tags::midiChannel, 0));
+        mapping.setProperty (tags::toggle, ! (bool) control.getProperty ("momentary", false));
+        mapping.setProperty (tags::targetType, "parameter");
+        mapping.setProperty (tags::node, map.getProperty (tags::node).toString());
+        mapping.setProperty (tags::parameter, (int) map.getProperty (tags::parameter, -1));
+
+        mappings.addChild (mapping.data(), -1, nullptr);
     }
 }
 

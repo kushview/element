@@ -21,6 +21,7 @@
 #include "auth.hpp"
 #include "engine/midipanic.hpp"
 #include "messages.hpp"
+#include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/aboutscreen.hpp"
 #include "ui/capslock.hpp"
@@ -706,6 +707,7 @@ void GuiService::getAllCommands (Array<CommandID>& ids)
                     Commands::showAllPluginWindows,
                     Commands::hideAllPluginWindows,
                     Commands::resetPluginWindows,
+                    Commands::toggleMidiLearn,
                     Commands::toggleUserInterface,
                     //======================================================================
                     Commands::sessionOpen,
@@ -774,6 +776,14 @@ void GuiService::getCommandInfo (CommandID commandID, ApplicationCommandInfo& re
         case Commands::resetPluginWindows:
             result.setInfo ("Reset plugin windows", "Move off-screen plugin windows back on screen.", "Session", 0);
             break;
+        case Commands::toggleMidiLearn: {
+            int flags = 0;
+            if (auto* mapping = sibling<MappingService>())
+                flags = mapping->isLearning() ? Info::isTicked : 0;
+            result.setInfo ("MIDI Learn", "Learn a MIDI mapping: wiggle a control, then move a knob.", "UI", flags);
+            result.addDefaultKeypress ('m', ModifierKeys::commandModifier);
+            break;
+        }
         case Commands::toggleUserInterface:
             result.setInfo ("Show UI", "Show the main UI", "UI", 0);
             break;
@@ -952,6 +962,16 @@ bool GuiService::perform (const InvocationInfo& info)
                         w->ensureOnScreen();
                         w->toFront (false);
                     }
+            break;
+        }
+        case Commands::toggleMidiLearn: {
+            if (auto* mapping = sibling<MappingService>())
+            {
+                mapping->learn (! mapping->isLearning());
+                if (auto* cc = content())
+                    cc->stabilizeViews();
+                refreshMainMenu();
+            }
             break;
         }
         case Commands::toggleUserInterface: {

@@ -115,8 +115,22 @@ public:
             tempoBar.stabilizeWithSession (false);
         }
 
-        mapButton.setEnabled (settings.getBool ("legacyControllers", false));
-        mapButton.setVisible (mapButton.isEnabled());
+        mapButton.setEnabled (true);
+        mapButton.setVisible (true);
+        if (! isTimerRunning())
+            startTimer (600);
+
+        // Tooltip carries the live keybinding so it stays correct if rebound.
+        if (auto* ui = owner.services().find<UI>())
+            if (auto* keys = ui->commands().getKeyMappings())
+            {
+                String tip (TRANS ("Learn a MIDI mapping"));
+                const auto assigned = keys->getKeyPressesAssignedToCommand (Commands::toggleMidiLearn);
+                if (! assigned.isEmpty())
+                    tip << " (" << assigned.getReference (0).getTextDescription() << ")";
+                mapButton.setTooltip (tip);
+            }
+
         resized();
     }
 
@@ -180,28 +194,16 @@ public:
         }
         else if (btn == &mapButton)
         {
-            if (auto* mapping = owner.services().find<MappingService>())
-            {
-                mapping->learn (! mapButton.getToggleState());
-                mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
-                if (mapping->isLearning())
-                {
-                    startTimer (600);
-                }
-            }
+            ViewHelpers::invokeDirectly (this, Commands::toggleMidiLearn, true);
         }
     }
 
     void timerCallback() override
     {
+        // Keep the button in sync with the learn state no matter how it was
+        // toggled (header button, keyboard shortcut, or menu).
         if (auto* mapping = owner.services().find<MappingService>())
-        {
-            if (! mapping->isLearning())
-            {
-                mapButton.setToggleState (false, dontSendNotification);
-                stopTimer();
-            }
-        }
+            mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
     }
 
 private:

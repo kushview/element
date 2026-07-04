@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "services/mappingservice.hpp"
-#include "services/deviceservice.hpp"
 #include <element/ui.hpp>
 #include "engine/mappingengine.hpp"
-#include <element/controller.hpp>
 #include <element/context.hpp>
 #include <element/signals.hpp>
 
@@ -56,7 +54,7 @@ public:
 
         if (capturedObject != nullptr && capturedObject.get() == capturedNode.getObject())
         {
-            if (capturedParameter == Processor::EnabledParameter || capturedParameter == Processor::BypassParameter || capturedParameter == Processor::MuteParameter || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
+            if (Processor::isSpecialParameter (capturedParameter) || isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
             {
                 callback (capturedNode, capturedParameter);
             }
@@ -130,6 +128,10 @@ private:
                 &Mappable::onBypassChanged, this, std::placeholders::_1)));
             connections.add (object->muteChanged.connect (std::bind (
                 &Mappable::onMuteChanged, this, std::placeholders::_1)));
+            connections.add (object->gainChanged.connect (std::bind (
+                &Mappable::onGainChanged, this, std::placeholders::_1)));
+            connections.add (object->inputGainChanged.connect (std::bind (
+                &Mappable::onInputGainChanged, this, std::placeholders::_1)));
 
             for (auto* const param : object->getParameters())
                 param->addListener (this);
@@ -189,6 +191,32 @@ private:
             capture.triggerAsyncUpdate();
         }
 
+        void onGainChanged (Processor*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node = node;
+            capture.object = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = Processor::OutputGainParameter;
+            capture.triggerAsyncUpdate();
+        }
+
+        void onInputGainChanged (Processor*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node = node;
+            capture.object = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = Processor::InputGainParameter;
+            capture.triggerAsyncUpdate();
+        }
+
     private:
         AudioProcessorParameterCapture& capture;
         Node node;
@@ -223,7 +251,7 @@ public:
     bool isCaptureComplete() const
     {
         ProcessorPtr object = node.getObject();
-        return object != nullptr && (parameter == Processor::EnabledParameter || parameter == Processor::BypassParameter || parameter == Processor::MuteParameter || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOn()) && control.data().isValid();
+        return object != nullptr && (Processor::isSpecialParameter (parameter) || isPositiveAndBelow (parameter, object->getParameters().size())) && (message.isController() || message.isNoteOnOrOff());
     }
 
     AudioProcessorParameterCapture capture;
@@ -232,7 +260,10 @@ public:
     Node node = Node();
     int parameter = -1;
     MidiMessage message;
-    Control control;
+    String device;
+
+    // Target for the armed capture: "parameter" (node + param) or "tempo".
+    String pendingTargetType = "parameter";
 };
 
 MappingService::MappingService()
@@ -251,17 +282,19 @@ void MappingService::activate()
 {
     Service::activate();
     auto& capture (impl->capture);
-    capturedConnection = context().mapping().capturedSignal().connect (
+    auto& mapping (context().mapping());
+    capturedConnection = mapping.mappingCapturedSignal().connect (
         std::bind (&MappingService::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
         std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
-    context().mapping().startMapping();
+    mapping.rebuildBindings (context().session());
+    mapping.startListening (context().midi());
 }
 
 void MappingService::deactivate()
 {
     Service::deactivate();
-    context().mapping().stopMapping();
+    context().mapping().stopListening (context().midi());
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
 }
@@ -277,14 +310,84 @@ void MappingService::learn (const bool shouldLearn)
     auto& mapping (context().mapping());
 
     impl->learnState = CaptureStopped;
+    impl->pendingTargetType = "parameter";
     capture.clear();
-    mapping.capture (false);
+    mapping.captureMapping (false);
 
     if (shouldLearn)
     {
         DBG ("[element] MappingService: start learning");
         impl->learnState = CaptureParameter;
         capture.addNodes (context().session());
+    }
+}
+
+void MappingService::tapTempo()
+{
+    if (auto bpm = context().mapping().tapTempo (Time::getMillisecondCounterHiRes()))
+        if (auto session = context().session())
+            session->data().setProperty (tags::tempo, *bpm, nullptr);
+}
+
+void MappingService::learnTempo()
+{
+    auto& mapping (context().mapping());
+
+    // Skip the parameter-capture phase: arm MIDI capture directly and bind the
+    // next event to the session tempo.
+    impl->capture.clear();
+    impl->pendingTargetType = "tempo";
+    impl->learnState = CaptureControl;
+    mapping.captureMapping (true);
+}
+
+bool MappingService::hasTempoMapping()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return false;
+    for (int i = 0; i < session->getNumMidiMappings(); ++i)
+        if (session->getMidiMapping (i).isTempoTarget())
+            return true;
+    return false;
+}
+
+String MappingService::getTempoMappingDescription()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return {};
+    for (int i = 0; i < session->getNumMidiMappings(); ++i)
+    {
+        auto m = session->getMidiMapping (i);
+        if (m.isTempoTarget())
+            return (m.isNoteEvent() ? String ("Note ") : String ("CC ")) + String (m.getEventId());
+    }
+    return {};
+}
+
+void MappingService::clearTempoMapping()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return;
+
+    bool removed = false;
+    for (int i = session->getNumMidiMappings(); --i >= 0;)
+    {
+        auto m = session->getMidiMapping (i);
+        if (m.isTempoTarget())
+        {
+            session->removeMidiMapping (m);
+            removed = true;
+        }
+    }
+
+    if (removed)
+    {
+        context().mapping().rebuildBindings (session);
+        if (auto* gui = sibling<GuiService>())
+            gui->stabilizeViews();
     }
 }
 
@@ -297,7 +400,7 @@ void MappingService::onParameterCaptured (const Node& node, int parameter)
         impl->learnState = CaptureControl;
         impl->node = node;
         impl->parameter = parameter;
-        mapping.capture (true);
+        mapping.captureMapping (true);
     }
     else
     {
@@ -313,28 +416,33 @@ void MappingService::onControlCaptured()
     {
         auto& mapping (context().mapping());
         impl->learnState = CaptureStopped;
-        impl->message = mapping.getCapturedMidiMessage();
-        impl->control = mapping.getCapturedControl();
+        impl->message = mapping.getCapturedMessage();
+        impl->device = mapping.getCapturedDevice();
 
-        DBG ("[element] MappingService: got control: " << impl->control.getName().toString());
+        DBG ("[element] MappingService: captured MIDI on device: " << impl->device);
 
-        if (impl->isCaptureComplete())
+        const bool haveMidi = impl->message.isController() || impl->message.isNoteOnOrOff();
+
+        if (impl->pendingTargetType == "tempo" && haveMidi)
         {
-            if (mapping.addHandler (impl->control, impl->node, impl->parameter))
-            {
-                ValueTree newMap (types::ControllerMap);
-                newMap.setProperty (tags::version, EL_CONTROLLER_MAP_VERSION, nullptr)
-                    .setProperty (tags::controller, impl->control.controller().getUuidString(), nullptr)
-                    .setProperty (tags::control, impl->control.getUuidString(), nullptr)
-                    .setProperty (tags::node, impl->node.getUuidString(), nullptr)
-                    .setProperty (tags::parameter, impl->parameter, nullptr);
-                auto maps = session->data().getChildWithName (tags::maps);
-                maps.addChild (newMap, -1, nullptr);
+            session->addMidiMapping (MidiMapping::fromCaptureTempo (impl->device, impl->message));
+            mapping.rebuildBindings (session); // live immediately
 
-                if (auto* gui = sibling<GuiService>())
-                    gui->stabilizeViews();
-            }
+            if (auto* gui = sibling<GuiService>())
+                gui->stabilizeViews();
         }
+        else if (impl->isCaptureComplete())
+        {
+            auto newMapping = MidiMapping::fromCapture (
+                impl->device, impl->message, "parameter", impl->node.getUuid(), impl->parameter);
+            session->addMidiMapping (newMapping);
+            mapping.rebuildBindings (session); // live immediately
+
+            if (auto* gui = sibling<GuiService>())
+                gui->stabilizeViews();
+        }
+
+        impl->pendingTargetType = "parameter";
     }
     else
     {
@@ -342,16 +450,18 @@ void MappingService::onControlCaptured()
     }
 }
 
-void MappingService::remove (const ControllerMap& controllerMap)
+void MappingService::refresh()
+{
+    context().mapping().rebuildBindings (context().session());
+}
+
+void MappingService::remove (const MidiMapping& mapping)
 {
     auto session = context().session();
-    auto maps = session->data().getChildWithName (tags::maps);
-    if (controllerMap.data().isAChildOf (maps))
-    {
-        maps.removeChild (controllerMap.data(), nullptr);
-        if (auto* devs = sibling<DeviceService>())
-            devs->refresh();
-    }
+    session->removeMidiMapping (mapping);
+    context().mapping().rebuildBindings (session);
+    if (auto* gui = sibling<GuiService>())
+        gui->stabilizeViews();
 }
 
 } // namespace element

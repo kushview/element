@@ -18,6 +18,7 @@ EL_TAG (Block)
 EL_TAG (Control)
 EL_TAG (Controller)
 EL_TAG (ControllerMap)
+EL_TAG (MidiMapping)
 
 EL_TAG (Graph)
 EL_TAG (Node)
@@ -104,6 +105,7 @@ static const juce::Identifier enabled = "enabled";
 static const juce::Identifier gain = "gain";
 static const juce::Identifier graphs = "graphs";
 static const juce::Identifier hiddenPorts = "hiddenPorts";
+static const juce::Identifier inputGain = "inputGain";
 static const juce::Identifier mappingData = "mappingData";
 static const juce::Identifier map = "map";
 static const juce::Identifier maps = "maps";
@@ -181,6 +183,14 @@ static const juce::Identifier updater = "updater";
 static const juce::Identifier code = "code";
 static const juce::Identifier source = "source";
 static const juce::Identifier scripts = "scripts";
+
+// MIDI mapping (flat model)
+static const juce::Identifier midiMappings = "midiMappings";
+static const juce::Identifier device = "device";
+static const juce::Identifier eventType = "eventType";
+static const juce::Identifier eventId = "eventId";
+static const juce::Identifier toggle = "toggle";
+static const juce::Identifier targetType = "targetType";
 } // namespace tags
 
 } // namespace element

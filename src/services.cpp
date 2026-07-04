@@ -310,51 +310,6 @@ void Services::handleMessage (const Message& msg)
     {
         ec->addMidiDeviceNode (mdm->device, mdm->inputDevice);
     }
-    else if (const auto* removeControllerMessage = dynamic_cast<const RemoveControllerMessage*> (&msg))
-    {
-        const auto device = removeControllerMessage->device;
-        devs->remove (device);
-    }
-    else if (const auto* addControllerMessage = dynamic_cast<const AddControllerMessage*> (&msg))
-    {
-        const auto device = addControllerMessage->device;
-        const auto file = addControllerMessage->file;
-        if (file.existsAsFile())
-        {
-            devs->add (file);
-        }
-        else if (device.data().isValid())
-        {
-            devs->add (device);
-        }
-        else
-        {
-            DBG ("[element] add controller device not valid");
-        }
-    }
-    else if (const auto* removeControlMessage = dynamic_cast<const RemoveControlMessage*> (&msg))
-    {
-        const auto device = removeControlMessage->device;
-        const auto control = removeControlMessage->control;
-        devs->remove (device, control);
-    }
-    else if (const auto* addControlMessage = dynamic_cast<const AddControlMessage*> (&msg))
-    {
-        const auto device (addControlMessage->device);
-        const auto control (addControlMessage->control);
-        devs->add (device, control);
-    }
-    else if (const auto* refreshController = dynamic_cast<const RefreshControllerMessage*> (&msg))
-    {
-        const auto device = refreshController->device;
-        devs->refresh (device);
-    }
-    else if (const auto* removeMapMessage = dynamic_cast<const RemoveControllerMapMessage*> (&msg))
-    {
-        const auto controllerMap = removeMapMessage->controllerMap;
-        maps->remove (controllerMap);
-        gui->stabilizeViews();
-    }
     else if (const auto* replaceNodeMessage = dynamic_cast<const ReplaceNodeMessage*> (&msg))
     {
         const auto graph = replaceNodeMessage->graph;

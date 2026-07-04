@@ -64,7 +64,9 @@ public:
         EnabledParameter = -2,
         BypassParameter = -3,
         MuteParameter = -4,
-        SpecialParameterBegin = MuteParameter,
+        InputGainParameter = -5,
+        OutputGainParameter = -6,
+        SpecialParameterBegin = OutputGainParameter,
         SpecialParameterEnd = NoParameter
     };
 
@@ -422,6 +424,12 @@ public:
 
     /** Triggered when the mute state changes */
     Signal<void (Processor*)> muteChanged;
+
+    /** Triggered when the output gain changes */
+    Signal<void (Processor*)> gainChanged;
+
+    /** Triggered when the input gain changes */
+    Signal<void (Processor*)> inputGainChanged;
 
     /** Triggered immediately before this node is removed from a graph */
     Signal<void()> willBeRemoved;

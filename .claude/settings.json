@@ -10,7 +10,11 @@
       "Bash(./build/test/test_element_artefacts/Release/test_element --run_test=PresetScriptsTest --log_level=all)",
       "Bash(./build/test/test_element_artefacts/Release/test_element --run_test=PresetScriptsTest)",
       "WebSearch",
-      "Bash(cmake --build build --target element)"
+      "Bash(cmake --build build --target element)",
+      "Bash(cmake --build build)",
+      "Bash(ctest --test-dir build --output-on-failure -R \"MappingTargetTests|MappingEngineTests|MappingLearnTests|MidiMappingModelTests|MidiMappingSessionTests\")",
+      "Bash(ctest --test-dir build)",
+      "Bash(ctest --test-dir build -R ScriptManagerTest --output-on-failure)"
     ]
   }
 }
