@@ -119,6 +119,18 @@ public:
         mapButton.setVisible (true);
         if (! isTimerRunning())
             startTimer (600);
+
+        // Tooltip carries the live keybinding so it stays correct if rebound.
+        if (auto* ui = owner.services().find<UI>())
+            if (auto* keys = ui->commands().getKeyMappings())
+            {
+                String tip (TRANS ("Learn a MIDI mapping"));
+                const auto assigned = keys->getKeyPressesAssignedToCommand (Commands::toggleMidiLearn);
+                if (! assigned.isEmpty())
+                    tip << " (" << assigned.getReference (0).getTextDescription() << ")";
+                mapButton.setTooltip (tip);
+            }
+
         resized();
     }
 

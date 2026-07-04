@@ -22,6 +22,10 @@ public:
     bool isLearning() const;
     void remove (const MidiMapping&);
 
+    /** Rebuild live engine bindings from the current session. Call after
+        editing a mapping in place so the change takes effect immediately. */
+    void refresh();
+
 private:
     class Impl;
     friend class Impl;

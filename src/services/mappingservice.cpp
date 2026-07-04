@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "services/mappingservice.hpp"
-#include "services/deviceservice.hpp"
 #include <element/ui.hpp>
 #include "engine/mappingengine.hpp"
 #include <element/context.hpp>
@@ -364,6 +363,11 @@ void MappingService::onControlCaptured()
     {
         DBG ("[element] received captured control: invalid state: " << (int) impl->learnState);
     }
+}
+
+void MappingService::refresh()
+{
+    context().mapping().rebuildBindings (context().session());
 }
 
 void MappingService::remove (const MidiMapping& mapping)
