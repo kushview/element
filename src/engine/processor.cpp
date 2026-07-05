@@ -490,18 +490,54 @@ Processor::MidiProgram* Processor::getMidiProgram (int program) const
     return ret;
 }
 
+Array<Processor::MidiProgramInfo> Processor::getMidiPrograms() const
+{
+    Array<MidiProgramInfo> result;
+
+    if (useGlobalMidiPrograms())
+    {
+        PluginDescription desc;
+        getPluginDescription (desc);
+        const auto uids = desc.createIdentifierString();
+        if (uids.isEmpty())
+            return result;
+
+        const auto dir = DataPath::defaultGlobalMidiProgramsDir();
+        for (const auto& file : dir.findChildFiles (File::findFiles, false, uids + "_*.eln"))
+        {
+            // Filenames are "<uids>_<NNN>.eln"; parse the trailing program index.
+            const auto index = file.getFileNameWithoutExtension()
+                                   .fromLastOccurrenceOf ("_", false, false)
+                                   .getIntValue();
+            if (isPositiveAndBelow (index, 128))
+            {
+                String name ("Global ");
+                name << (index + 1);
+                result.add ({ index, name });
+            }
+        }
+    }
+    else
+    {
+        // Only include programs that actually have saved state. Reading a
+        // program name elsewhere can find-or-create empty placeholder entries.
+        for (auto* const p : midiPrograms)
+            if (p->state.getSize() > 0)
+                result.add ({ p->program, p->name });
+    }
+
+    std::sort (result.begin(), result.end(), [] (const MidiProgramInfo& a, const MidiProgramInfo& b) {
+        return a.program < b.program;
+    });
+
+    return result;
+}
+
 void Processor::MidiProgramLoader::handleAsyncUpdate()
 {
     const File programFile = node.getMidiProgramFile();
     const bool globalPrograms = node.useGlobalMidiPrograms();
     const auto requestedProgram = node.getMidiProgram();
-#if 0
-    if (node.lastMidiProgram.get() == requestedProgram)
-    {
-        DBG("[element] same program, not loading.");
-        return;
-    }
-#endif
 
     if (globalPrograms)
     {

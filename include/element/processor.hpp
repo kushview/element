@@ -346,11 +346,28 @@ public:
     void getMidiProgramsState (juce::String& state) const;
 
     /** Load all MIDI program states to be stored on the node.
-        
+
         @param state    The state to set. If this is empty, the midi programs
                         on the node will be cleared.
      */
     void setMidiProgramsState (const juce::String& state);
+
+    /** Lightweight description of one saved MIDI program. */
+    struct MidiProgramInfo {
+        int program;       ///< Zero-based program index (0-127)
+        juce::String name; ///< Program name
+    };
+
+    /** Returns the saved MIDI programs for this node.
+
+        Follows the current mode: when useGlobalMidiPrograms() is true the
+        global program files on disk are enumerated, otherwise the local
+        in-memory programs are returned. The result is sorted ascending by
+        program number.
+
+        @return the saved MIDI programs
+    */
+    juce::Array<MidiProgramInfo> getMidiPrograms() const;
 
     //=========================================================================
     inline void setMidiChannels (const juce::BigInteger& ch)

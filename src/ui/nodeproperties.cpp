@@ -116,6 +116,7 @@ public:
                     return;
                 ptr->removeMidiProgram (ptr->getMidiProgram(),
                                         ptr->useGlobalMidiPrograms());
+                notifyProgramsChanged (ptr);
             }
         };
 
@@ -135,6 +136,7 @@ public:
                 {
                     ptr->saveMidiProgram();
                 }
+                notifyProgramsChanged (ptr);
             }
         };
 
@@ -169,6 +171,14 @@ public:
 private:
     Node node;
     NodeMidiProgramComponent program;
+
+    /** Refreshes the properties panel (including the Programs table) after the
+        set of saved programs changes. Deferred so we don't rebuild the panel —
+        and destroy this component — from within a button callback. */
+    static void notifyProgramsChanged (ProcessorPtr ptr)
+    {
+        MessageManager::callAsync ([ptr]() { ptr->midiProgramChanged(); });
+    }
 
     void updateMidiProgram()
     {
@@ -278,10 +288,246 @@ public:
     }
 };
 
-NodeProperties::NodeProperties (const Node& n, int groups)
-    : NodeProperties (n, groups & General, groups & Midi) {}
+//==============================================================================
+/** Lists the saved MIDI programs for a node in a selectable table.
 
-NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
+    Single click selects a row, double-click loads that program, the name is
+    renamed inline, and each row can be deleted. Follows the node's current
+    mode: local in-memory programs or global program files on disk.
+*/
+class NodeMidiProgramsListPropertyComponent : public PropertyComponent,
+                                              public ListBoxModel
+{
+public:
+    NodeMidiProgramsListPropertyComponent (const Node& n)
+        : PropertyComponent ("Saved Programs"),
+          node (n)
+    {
+        fetchPrograms();
+
+        list.setModel (this);
+        list.setRowHeight (rowHeight);
+        list.getViewport()->setScrollBarsShown (true, false);
+        list.setVisible (! programs.isEmpty()); // let the empty hint show through
+        addChildComponent (list);
+
+        // Show up to maxVisibleRows rows before scrolling.
+        const int rows = jlimit (1, maxVisibleRows, jmax (1, programs.size()));
+        setPreferredHeight (rows * rowHeight + 2);
+    }
+
+    /** Draw the full-width table with no property label. PropertyComponent
+        normally reserves its left half for the name and squeezes the editor
+        into the right half; we don't want that here. */
+    void paint (Graphics& g) override
+    {
+        if (programs.isEmpty())
+        {
+            g.setColour (Colors::textColor.withAlpha (0.5f));
+            g.setFont (Font (FontOptions (12.f)));
+            g.drawText ("No saved programs", getLocalBounds().reduced (6, 0), Justification::centredLeft);
+        }
+    }
+
+    void resized() override
+    {
+        list.setBounds (getLocalBounds());
+    }
+
+    void refresh() override
+    {
+        fetchPrograms();
+        list.setVisible (! programs.isEmpty());
+        list.updateContent();
+        list.repaint();
+        repaint();
+    }
+
+    //==========================================================================
+    int getNumRows() override { return programs.size(); }
+
+    void paintListBoxItem (int, Graphics&, int, int, bool) override
+    {
+        // rows are drawn by their ProgramRow component
+    }
+
+    Component* refreshComponentForRow (int rowNumber, bool, Component* existing) override
+    {
+        std::unique_ptr<ProgramRow> row (dynamic_cast<ProgramRow*> (existing));
+        if (! isPositiveAndBelow (rowNumber, programs.size()))
+            return nullptr;
+
+        if (row == nullptr)
+            row = std::make_unique<ProgramRow> (*this);
+
+        row->update (rowNumber, programs.getReference (rowNumber), isGlobal);
+        return row.release();
+    }
+
+    void listBoxItemDoubleClicked (int rowNumber, const MouseEvent&) override
+    {
+        loadRow (rowNumber);
+    }
+
+private:
+    Node node;
+    ListBox list;
+    Array<Processor::MidiProgramInfo> programs;
+    bool isGlobal = false;
+
+    static constexpr int rowHeight = 22;
+    static constexpr int maxVisibleRows = 6;
+
+    void fetchPrograms()
+    {
+        programs.clearQuick();
+        if (ProcessorPtr ptr = node.getObject())
+        {
+            isGlobal = ptr->useGlobalMidiPrograms();
+            programs = ptr->getMidiPrograms();
+        }
+    }
+
+    void selectRow (int rowNumber)
+    {
+        list.selectRow (rowNumber);
+    }
+
+    /** Loads the given row's program, mirroring the slider's load behaviour. */
+    void loadRow (int rowNumber)
+    {
+        if (! isPositiveAndBelow (rowNumber, programs.size()))
+            return;
+        if (ProcessorPtr ptr = node.getObject())
+        {
+            node.setMidiProgram (programs.getReference (rowNumber).program);
+            ptr->reloadMidiProgram(); // fires midiProgramChanged -> panel refreshes
+        }
+    }
+
+    void renameRow (int rowNumber, const String& newName)
+    {
+        if (isGlobal || ! isPositiveAndBelow (rowNumber, programs.size()))
+            return;
+        const auto program = programs.getReference (rowNumber).program;
+        node.setMidiProgramName (program, newName);
+        programs.getReference (rowNumber).name = newName;
+    }
+
+    void deleteRow (int rowNumber)
+    {
+        if (! isPositiveAndBelow (rowNumber, programs.size()))
+            return;
+        if (ProcessorPtr ptr = node.getObject())
+        {
+            ptr->removeMidiProgram (programs.getReference (rowNumber).program,
+                                    ptr->useGlobalMidiPrograms());
+            refresh();
+        }
+    }
+
+    //==========================================================================
+    /** A single program row: number, editable name and a delete button. */
+    class ProgramRow : public Component
+    {
+    public:
+        ProgramRow (NodeMidiProgramsListPropertyComponent& o)
+            : owner (o)
+        {
+            addAndMakeVisible (name);
+            name.setFont (Font (FontOptions (12.f)));
+            name.setEditable (false, true, false);
+            // Forward the label's clicks so single-clicking the name selects the row.
+            name.addMouseListener (this, false);
+
+            // Edit the real (possibly empty) name, showing the placeholder as ghost text.
+            name.onEditorShow = [this]() {
+                if (auto* ed = name.getCurrentTextEditor())
+                {
+                    ed->setText (realName, false);
+                    ed->setTextToShowWhenEmpty (placeholder, Colors::textColor.withAlpha (0.5f));
+                    ed->selectAll();
+                }
+            };
+            name.onTextChange = [this]() {
+                realName = name.getText() == placeholder ? String() : name.getText();
+                owner.renameRow (row, realName);
+                updateNameDisplay();
+            };
+
+            addAndMakeVisible (trashButton);
+            trashButton.setTooltip ("Delete MIDI program");
+            trashButton.setIcon (Icon (getIcons().farTrashAlt, Colors::textColor));
+            trashButton.onClick = [this]() { owner.deleteRow (row); };
+        }
+
+        void update (int newRow, const Processor::MidiProgramInfo& info, bool global)
+        {
+            row = newRow;
+            numberText = String (info.program + 1);
+            realName = info.name;
+            placeholder = "Program " + String (info.program + 1);
+            name.setEditable (false, ! global, false);
+            updateNameDisplay();
+            resized();
+            repaint();
+        }
+
+        /** Show the name, or the dimmed "Program N" placeholder when blank. */
+        void updateNameDisplay()
+        {
+            const bool blank = realName.isEmpty();
+            name.setText (blank ? placeholder : realName, dontSendNotification);
+            name.setColour (Label::textColourId,
+                            blank ? Colors::textColor.withAlpha (0.5f) : Colors::textColor);
+        }
+
+        void paint (Graphics& g) override
+        {
+            // Query live selection so the highlight follows ListBox::selectRow.
+            if (owner.list.isRowSelected (row))
+                g.fillAll (Colors::widgetBackgroundColor.brighter (0.15f));
+            g.setColour (Colors::textColor.withAlpha (0.6f));
+            g.setFont (Font (FontOptions (12.f)));
+            g.drawText (numberText, 4, 0, numberWidth - 4, getHeight(), Justification::centredLeft);
+        }
+
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            r.removeFromLeft (numberWidth);
+            trashButton.setBounds (r.removeFromRight (20).reduced (0, 1));
+            r.removeFromRight (2);
+            name.setBounds (r);
+        }
+
+        void mouseDown (const MouseEvent&) override { owner.selectRow (row); }
+        void mouseDoubleClick (const MouseEvent& e) override
+        {
+            // Double-clicking the name edits it (handled by the Label); only
+            // double-clicks elsewhere on the row load the program.
+            if (e.eventComponent == &name)
+                return;
+            owner.loadRow (row);
+        }
+
+    private:
+        static constexpr int numberWidth = 30;
+        NodeMidiProgramsListPropertyComponent& owner;
+        int row = -1;
+        String numberText;
+        String realName;
+        String placeholder;
+        Label name;
+        IconButton trashButton;
+    };
+};
+
+//==============================================================================
+NodeProperties::NodeProperties (const Node& n, int groups)
+    : NodeProperties (n, groups & General, groups & Midi, groups & Programs) {}
+
+NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps, bool programsProps)
 {
     Node node = n;
 
@@ -302,12 +548,6 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
         // MIDI Channel
         add (new NodeMidiChannelsPropertyComponent (node));
 
-        if (detail::showNodeMidiPrograms (node))
-        {
-            // MIDI Program
-            add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
-        }
-
         if (detail::showMidiFilters (node))
         {
             // Key Start
@@ -319,6 +559,15 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
             // Transpose
             add (new SliderPropertyComponent (node.getPropertyAsValue (tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
         }
+    }
+
+    if (programsProps && detail::showNodeMidiPrograms (node))
+    {
+        // MIDI Program selector (moved from the MIDI section) sits above the table.
+        add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
+
+        // Table of saved MIDI programs.
+        add (new NodeMidiProgramsListPropertyComponent (node));
     }
 }
 
