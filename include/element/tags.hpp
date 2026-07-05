@@ -187,6 +187,7 @@ static const juce::Identifier scripts = "scripts";
 // MIDI mapping (flat model)
 static const juce::Identifier midiMappings = "midiMappings";
 static const juce::Identifier device = "device";
+static const juce::Identifier deviceName = "deviceName";
 static const juce::Identifier eventType = "eventType";
 static const juce::Identifier eventId = "eventId";
 static const juce::Identifier toggle = "toggle";

@@ -4,6 +4,8 @@
 #pragma once
 
 #include <element/services.hpp>
+#include <element/signals.hpp>
+#include <element/juce/audio_devices.hpp>
 
 namespace element {
 
@@ -19,10 +21,17 @@ public:
     /** Rebuild live MIDI mapping bindings from the current session. */
     void refresh();
 
+    /** Fires (on the message thread) whenever the set of available MIDI input or
+        output devices changes, e.g. a controller is plugged in or removed. */
+    Signal<void()> sigMidiDevicesChanged;
+
 private:
     class Impl;
     friend class Impl;
     std::unique_ptr<Impl> impl;
+
+    /** Watches the system MIDI device list and drives sigMidiDevicesChanged. */
+    juce::MidiDeviceListConnection deviceListConnection;
 };
 
 } // namespace element

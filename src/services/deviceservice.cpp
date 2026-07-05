@@ -31,10 +31,15 @@ DeviceService::~DeviceService()
 void DeviceService::activate()
 {
     Service::activate();
+    // Broadcast MIDI device hot-plug/removal to interested services (the callback
+    // is delivered on the message thread).
+    deviceListConnection = juce::MidiDeviceListConnection::make (
+        [this] { sigMidiDevicesChanged(); });
 }
 
 void DeviceService::deactivate()
 {
+    deviceListConnection.reset();
     Service::deactivate();
 }
 

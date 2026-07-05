@@ -2,10 +2,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "services/mappingservice.hpp"
+#include "services/deviceservice.hpp"
+#include "services/sessionservice.hpp"
 #include <element/ui.hpp>
 #include "engine/mappingengine.hpp"
 #include <element/context.hpp>
+#include <element/session.hpp>
 #include <element/signals.hpp>
+#include <element/juce/audio_devices.hpp>
 
 using namespace juce;
 
@@ -287,8 +291,22 @@ void MappingService::activate()
         std::bind (&MappingService::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
         std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
+
+    // Refresh persisted device names (and repaint the table) when a MIDI device
+    // is hot-plugged or removed, and when a session finishes loading.
+    if (auto* devices = sibling<DeviceService>())
+        devicesChangedConnection = devices->sigMidiDevicesChanged.connect ([this] {
+            syncDeviceNames();
+            if (auto* gui = sibling<GuiService>())
+                gui->stabilizeViews();
+        });
+    if (auto* sessions = sibling<SessionService>())
+        sessionLoadedConnection = sessions->sigSessionLoaded.connect (
+            std::bind (&MappingService::syncDeviceNames, this));
+
     mapping.rebuildBindings (context().session());
     mapping.startListening (context().midi());
+    syncDeviceNames();
 }
 
 void MappingService::deactivate()
@@ -297,6 +315,8 @@ void MappingService::deactivate()
     context().mapping().stopListening (context().midi());
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
+    devicesChangedConnection.disconnect();
+    sessionLoadedConnection.disconnect();
 }
 
 bool MappingService::isLearning() const
@@ -452,7 +472,33 @@ void MappingService::onControlCaptured()
 
 void MappingService::refresh()
 {
+    syncDeviceNames();
     context().mapping().rebuildBindings (context().session());
+}
+
+void MappingService::syncDeviceNames()
+{
+    auto session = context().session();
+    if (session == nullptr)
+        return;
+
+    const auto devices = juce::MidiInput::getAvailableDevices();
+    for (int i = 0; i < session->getNumMidiMappings(); ++i)
+    {
+        auto mapping = session->getMidiMapping (i);
+        const auto identifier = mapping.getDevice();
+        if (identifier.isEmpty())
+            continue;
+
+        for (const auto& info : devices)
+        {
+            if (info.identifier != identifier)
+                continue;
+            if (mapping.getDeviceName() != info.name)
+                mapping.setDeviceName (info.name);
+            break;
+        }
+    }
 }
 
 void MappingService::remove (const MidiMapping& mapping)

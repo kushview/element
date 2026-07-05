@@ -54,8 +54,15 @@ private:
     std::unique_ptr<Impl> impl;
     SignalConnection capturedConnection;
     SignalConnection capturedParamConnection;
+    SignalConnection devicesChangedConnection;
+    SignalConnection sessionLoadedConnection;
     void onControlCaptured();
     void onParameterCaptured (const Node&, int);
+
+    /** Store the current human-readable name for every mapping whose MIDI input
+        device is connected, so a later disconnect can still show a friendly name
+        instead of the raw device identifier. */
+    void syncDeviceNames();
 };
 
 } // namespace element

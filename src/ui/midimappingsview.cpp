@@ -26,17 +26,27 @@ enum Columns
     ColParameter
 };
 
-/** Resolve a stored JUCE MIDI input identifier to its human-readable name.
-    Falls back to "(any)" for the wildcard device, or to the raw identifier
-    if the device is not currently connected. */
-String deviceName (const String& identifier)
+/** Display text for a mapping's Device column plus whether that device is
+    currently connected. */
+struct DeviceLabel
 {
+    String text;
+    bool connected;
+};
+
+/** Resolve a mapping's device to a friendly label. The wildcard device shows
+    "(any)"; a connected device shows its live name; a disconnected device falls
+    back to its last-known stored name, or the raw identifier if none was saved. */
+DeviceLabel deviceLabel (const MidiMapping& m)
+{
+    const auto identifier = m.getDevice();
     if (identifier.isEmpty())
-        return "(any)";
+        return { "(any)", true };
     for (const auto& info : MidiInput::getAvailableDevices())
         if (info.identifier == identifier)
-            return info.name;
-    return identifier;
+            return { info.name, true };
+    const auto stored = m.getDeviceName();
+    return { stored.isNotEmpty() ? stored : identifier, false };
 }
 
 /** Resolve a mapping's target parameter to a display name, handling the
@@ -478,7 +488,7 @@ void MidiMappingsView::updateRowOrder()
         switch (col)
         {
             case ColDevice:
-                return deviceName (ma.getDevice()).compareIgnoreCase (deviceName (mb.getDevice()));
+                return deviceLabel (ma).text.compareIgnoreCase (deviceLabel (mb).text);
             case ColEvent:
                 if (ma.getEventType() != mb.getEventType())
                     return ma.getEventType().compare (mb.getEventType());
@@ -564,12 +574,16 @@ void MidiMappingsView::paintCell (Graphics& g, int row, int columnId, int w, int
 
     auto mapping = session->getMidiMapping (index);
     String text;
+    bool dimmed = false;
 
     switch (columnId)
     {
-        case ColDevice:
-            text = deviceName (mapping.getDevice());
+        case ColDevice: {
+            const auto dl = deviceLabel (mapping);
+            text = dl.text;
+            dimmed = ! dl.connected;
             break;
+        }
         case ColEvent:
             text = (mapping.isNoteEvent() ? "Note " : "CC ") + String (mapping.getEventId());
             break;
@@ -600,7 +614,7 @@ void MidiMappingsView::paintCell (Graphics& g, int row, int columnId, int w, int
             break;
     }
 
-    g.setColour (Colours::lightgrey);
+    g.setColour (dimmed ? Colours::lightgrey.withAlpha (0.5f) : Colours::lightgrey);
     g.drawText (text, 4, 0, w - 6, h, Justification::centredLeft);
 }
 

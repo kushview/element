@@ -43,6 +43,10 @@ public:
     //=========================================================================
     /** The JUCE MIDI input device identifier. Empty matches any device. */
     juce::String getDevice() const { return objectData.getProperty (tags::device).toString(); }
+    /** Last-known human-readable name of the MIDI input device. Empty for the
+        wildcard device or a mapping whose device has never been seen connected. */
+    juce::String getDeviceName() const { return objectData.getProperty (tags::deviceName).toString(); }
+    void setDeviceName (const juce::String& name) { setProperty (tags::deviceName, name); }
     juce::String getEventType() const { return objectData.getProperty (tags::eventType).toString(); }
     int getEventId() const { return (int) objectData.getProperty (tags::eventId, 0); }
     /** MIDI channel, 1-16, or 0 for omni. */
@@ -133,6 +137,7 @@ private:
         stabilizePropertyString (tags::uuid, juce::Uuid().toString());
         stabilizePropertyString (tags::name, juce::String());
         stabilizePropertyString (tags::device, juce::String());
+        stabilizePropertyString (tags::deviceName, juce::String());
         stabilizePropertyString (tags::eventType, "controller");
         stabilizePropertyPOD (tags::eventId, 0);
         stabilizePropertyPOD (tags::midiChannel, 0);

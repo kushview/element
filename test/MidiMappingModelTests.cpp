@@ -17,6 +17,7 @@ BOOST_AUTO_TEST_CASE (DefaultsStabilize)
     BOOST_REQUIRE (Uuid (m.getUuidString()).toString() == m.getUuidString());
     BOOST_REQUIRE (m.getName() == "Test");
     BOOST_REQUIRE (m.getDevice().isEmpty());
+    BOOST_REQUIRE (m.getDeviceName().isEmpty());
     BOOST_REQUIRE (m.getEventType() == "controller");
     BOOST_REQUIRE_EQUAL (m.getEventId(), 0);
     BOOST_REQUIRE_EQUAL (m.getMidiChannel(), 0);
@@ -74,6 +75,20 @@ BOOST_AUTO_TEST_CASE (MatchesNote)
     BOOST_REQUIRE (m.matches (MidiMessage::noteOff (1, 60)));
     BOOST_REQUIRE (! m.matches (MidiMessage::noteOn (1, 61, (uint8) 100)));
     BOOST_REQUIRE (! m.matches (MidiMessage::controllerEvent (1, 60, 64)));
+}
+
+BOOST_AUTO_TEST_CASE (DeviceNamePersists)
+{
+    MidiMapping m ("Test");
+    // Default is empty and setMissingProperties must not clobber a set value.
+    BOOST_REQUIRE (m.getDeviceName().isEmpty());
+    m.setDeviceName ("nanoKONTROL2");
+    BOOST_REQUIRE (m.getDeviceName() == "nanoKONTROL2");
+
+    // Survives a serialize / reload round-trip.
+    MidiMapping loaded (ValueTree::fromXml (m.data().toXmlString()));
+    BOOST_REQUIRE (loaded.isValid());
+    BOOST_REQUIRE (loaded.getDeviceName() == "nanoKONTROL2");
 }
 
 BOOST_AUTO_TEST_CASE (ValueTreeRoundTrip)
