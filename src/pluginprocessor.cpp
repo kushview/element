@@ -8,7 +8,6 @@
 
 #include "services/sessionservice.hpp"
 #include "services/mappingservice.hpp"
-#include "services/deviceservice.hpp"
 #include "engine/internalformat.hpp"
 
 #include "pluginprocessor.hpp"
@@ -342,7 +341,6 @@ struct PluginProcessor::Latency : public juce::Timer
 #define guictl context->services().find<GuiService>()
 #define sessionctl context->services().find<SessionService>()
 #define mapsctl context->services().find<MappingService>()
-#define devsctl context->services().find<DeviceService>()
 
 //=============================================================================
 PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
@@ -515,7 +513,7 @@ void PluginProcessor::reloadEngine()
     enginectl->sessionReloaded();
     enginectl->syncModels();
     guictl->stabilizeContent();
-    devsctl->refresh();
+    mapsctl->refresh();
 
     suspendProcessing (wasSuspended);
 }
@@ -763,7 +761,7 @@ void PluginProcessor::initialize()
 
     enginectl->sessionReloaded();
     mapsctl->learn (false);
-    devsctl->refresh();
+    mapsctl->refresh();
 
     shouldProcess.set (wasProc);
 }

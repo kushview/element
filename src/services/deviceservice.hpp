@@ -18,9 +18,6 @@ public:
     void activate() override;
     void deactivate() override;
 
-    /** Rebuild live MIDI mapping bindings from the current session. */
-    void refresh();
-
     /** Fires (on the message thread) whenever the set of available MIDI input or
         output devices changes, e.g. a controller is plugged in or removed. */
     Signal<void()> sigMidiDevicesChanged;

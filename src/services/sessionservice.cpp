@@ -10,7 +10,6 @@
 #include <element/ui.hpp>
 #include <element/ui/content.hpp>
 
-#include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/presetservice.hpp"
 #include "services/sessionservice.hpp"
@@ -301,7 +300,7 @@ void SessionService::loadNewSessionData()
 void SessionService::refreshOtherControllers()
 {
     sibling<EngineService>()->sessionReloaded();
-    sibling<DeviceService>()->refresh();
+    sibling<MappingService>()->refresh();
     sibling<MappingService>()->learn (false);
     sibling<PresetService>()->refresh();
     sigSessionLoaded();

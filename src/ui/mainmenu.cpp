@@ -12,11 +12,8 @@
 #include <element/ui/mainwindow.hpp>
 #include <element/ui/commands.hpp>
 
-#include "log.hpp"
 #include "utils.hpp"
 #include "urls.hpp"
-#include "services/deviceservice.hpp"
-#include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/mainmenu.hpp"
 #include "ui/viewhelpers.hpp"
@@ -191,8 +188,8 @@ void MainMenu::menuItemSelected (int index, int menu)
         if (session)
             session->cleanOrphanMidiMappings();
         auto& app = owner.services();
-        if (auto* devices = app.find<DeviceService>())
-            devices->refresh();
+        if (auto* mapping = app.find<MappingService>())
+            mapping->refresh();
         if (auto* gui = app.find<GuiService>())
             gui->stabilizeContent();
     }

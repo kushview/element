@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "services/deviceservice.hpp"
-#include "engine/mappingengine.hpp"
-#include <element/session.hpp>
-#include <element/context.hpp>
 
 namespace element {
 
@@ -41,12 +38,6 @@ void DeviceService::deactivate()
 {
     deviceListConnection.reset();
     Service::deactivate();
-}
-
-void DeviceService::refresh()
-{
-    if (auto session = context().session())
-        context().mapping().rebuildBindings (session);
 }
 
 } // namespace element
