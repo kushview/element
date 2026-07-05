@@ -4,7 +4,7 @@
 # Generate a version header in a specific path (build/include/element/version.h)
 
 # Configurable base commit/tag for build numbering
-set(ELEMENT_GIT_BASE "400f97d2da70ec6cb9309e0e41c0de0ba616de31" CACHE STRING "Base commit/tag for build numbering")
+set(ELEMENT_GIT_BASE "c31b92b781886c621e3ca9625c5c0197fccbfb00" CACHE STRING "Base commit/tag for build numbering")
 
 # Allow build number override (e.g., from CI)
 set(ELEMENT_BUILD_NUMBER 0)
