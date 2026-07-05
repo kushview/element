@@ -1574,10 +1574,10 @@ public:
 
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
-        clap_event_transport_t _transport = {};
 
         if (auto pos = getPlayHead()->getPosition())
         {
+            _transport = {};
             _transport.header.flags = 0;
             _transport.header.size = sizeof (clap_event_transport_t);
             _transport.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
@@ -2026,6 +2026,8 @@ private:
     clap_process_t _proc;
     std::vector<clap_audio_buffer_t> _audioIns, _audioOuts;
     AudioBuffer<float> _tmpAudio;
+
+    clap_event_transport_t _transport {};
 
     clap::helpers::EventList _eventIn, _eventOut;
     CLAPEventQueue<RealtimeReadTrait> _queueIn;
