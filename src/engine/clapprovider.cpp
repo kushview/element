@@ -1514,8 +1514,13 @@ public:
             return;
         if (_activated)
         {
+            // Hold off any in-flight render() so stopProcessing() has the
+            // audio-thread concurrency guarantee, then deactivate [main-thread].
+            _processLock.lock();
             stopProcessing();
             _plugin->deactivate (_plugin);
+            _activated = false;
+            _processLock.unlock();
         }
         _activated = false;
         _tmpAudio.setSize (1, 1);
@@ -1538,7 +1543,16 @@ public:
     {
         if (_processing)
         {
+            // stop_processing is [audio-thread]. CLAP's audio-thread is symbolic:
+            // the host may designate any thread as THE audio thread as long as it
+            // holds the concurrency guard (no concurrent render()); callers here do
+            // (_processLock). Report that to the plugin's thread-check for the
+            // duration of the call, then restore — the deactivate that typically
+            // follows is [main-thread].
+            const auto prev = gThreadType;
+            gThreadType = ThreadType::AudioThread;
             _plugin->stop_processing (_plugin);
+            gThreadType = prev;
             _processing = false;
         }
     }
