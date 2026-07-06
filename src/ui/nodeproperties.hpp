@@ -13,11 +13,12 @@ struct NodeProperties : public Array<PropertyComponent*>
     {
         General = 1 << 0,
         Midi = 1 << 1,
-        ALL = General | Midi
+        Programs = 1 << 2,
+        ALL = General | Midi | Programs
     };
 
     NodeProperties (const Node& n, int groups);
-    NodeProperties (const Node& n, bool nodeProps = true, bool midiProps = false);
+    NodeProperties (const Node& n, bool nodeProps = true, bool midiProps = false, bool programsProps = false);
 };
 
 } // namespace element

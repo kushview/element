@@ -347,6 +347,12 @@ void NodePropertiesView::updateProperties()
                 nodeName << " - " << _node.getPluginName();
             props.addSection (nodeName, NodeProperties (_node, true, false));
             props.addSection ("MIDI", NodeProperties (_node, false, true));
+
+            // Programs section (empty for node types without MIDI programs).
+            NodeProperties programsProps (_node, false, false, true);
+            if (! programsProps.isEmpty())
+                props.addSection ("Programs", programsProps);
+
             props.setMessageWhenEmpty ("");
         }
     }
