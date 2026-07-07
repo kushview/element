@@ -84,7 +84,7 @@ void MappingEngine::rebuildBindings (SessionPtr session)
     for (int i = 0; i < session->getNumMidiMappings(); ++i)
     {
         auto mapping = session->getMidiMapping (i);
-        auto target = createTarget (mapping, *session, tempoTap);
+        auto target = createTarget (mapping, *session, tempoTap, tempoTapCallback);
         if (target == nullptr)
             continue;
         auto binding = std::make_unique<Binding>();

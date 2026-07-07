@@ -137,7 +137,10 @@ BOOST_AUTO_TEST_CASE (TempoTargetTapsFromNoteOn)
     ValueTree session (types::Session);
     session.setProperty (tags::tempo, 100.0, nullptr);
     TapTempo shared;
-    TempoTarget target (session, shared);
+    Signal<void()> tapped;
+    int flashes = 0;
+    auto conn = tapped.connect ([&flashes] { ++flashes; });
+    TempoTarget target (session, shared, tapped);
     BOOST_REQUIRE (target.isValid());
 
     // Taps are timed by the message timestamp (arrival time in ms), which the
@@ -148,19 +151,25 @@ BOOST_AUTO_TEST_CASE (TempoTargetTapsFromNoteOn)
         return m;
     };
 
-    // First note-on seeds the run; tempo unchanged.
+    // First note-on seeds the run; tempo unchanged, but the flash still fires so
+    // the very first tap gives visual feedback.
     target.apply (noteAt (0.0), false);
     BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 100.0, 0.0001);
+    BOOST_REQUIRE_EQUAL (flashes, 1);
 
-    // Second note-on 500 ms later writes exactly 120 BPM.
+    // Second note-on 500 ms later writes exactly 120 BPM and flashes again.
     target.apply (noteAt (500.0), false);
     BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 120.0, 0.0001);
+    BOOST_REQUIRE_EQUAL (flashes, 2);
 
-    // Note-off and CC never tap: tempo stays put.
+    // Note-off and CC never tap: tempo stays put and the flash does not fire.
     session.setProperty (tags::tempo, 100.0, nullptr);
     target.apply (MidiMessage::noteOff (1, 60), false);
     target.apply (MidiMessage::controllerEvent (1, 7, 127), false);
     BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 100.0, 0.0001);
+    BOOST_REQUIRE_EQUAL (flashes, 2);
+
+    conn.disconnect();
 }
 
 BOOST_AUTO_TEST_CASE (InvalidTargets)

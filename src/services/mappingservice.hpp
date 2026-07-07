@@ -44,6 +44,10 @@ public:
     bool isLearning() const;
     void remove (const MidiMapping&);
 
+    /** Fired on the message thread each time a MIDI tap-tempo mapping is
+        triggered, so the UI can flash the TAP button. */
+    Signal<void()> sigTempoTapApplied;
+
     /** Rebuild live engine bindings from the current session. Call after
         editing a mapping in place so the change takes effect immediately. */
     void refresh();
@@ -56,8 +60,10 @@ private:
     SignalConnection capturedParamConnection;
     SignalConnection devicesChangedConnection;
     SignalConnection sessionLoadedConnection;
+    SignalConnection tempoTapConnection;
     void onControlCaptured();
     void onParameterCaptured (const Node&, int);
+    void onTempoTapApplied() { sigTempoTapApplied(); }
 
     /** Store the current human-readable name for every mapping whose MIDI input
         device is connected, so a later disconnect can still show a friendly name

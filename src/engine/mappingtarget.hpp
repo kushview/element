@@ -8,6 +8,7 @@
 #include <element/juce/audio_basics.hpp>
 #include <element/node.hpp>
 #include <element/parameter.hpp>
+#include <element/signals.hpp>
 #include <element/taptempo.hpp>
 
 namespace element {
@@ -67,10 +68,13 @@ private:
 class TempoTarget : public MappingTarget
 {
 public:
-    /** @param sessionData  The session tree whose tempo is written.
-        @param tapTempo      Shared tap-tempo accumulator (owned by MappingEngine)
-                             so UI and MIDI taps contribute to the same state. */
-    TempoTarget (const juce::ValueTree& sessionData, TapTempo& tapTempo);
+    /** @param sessionData     The session tree whose tempo is written.
+        @param tapTempo         Shared tap-tempo accumulator (owned by MappingEngine)
+                                so UI and MIDI taps contribute to the same state.
+        @param tempoTapApplied  Fired on every recognised tap so the UI can flash
+                                the TAP button; owned by MappingEngine, so it
+                                outlives this target. */
+    TempoTarget (const juce::ValueTree& sessionData, TapTempo& tapTempo, Signal<void()>& tempoTapApplied);
     ~TempoTarget() override = default;
 
     bool isValid() const override;
@@ -79,12 +83,14 @@ public:
 private:
     juce::ValueTree session;
     TapTempo& tapTempo;
+    Signal<void()>& tempoTapApplied;
 };
 
 //=============================================================================
 /** Resolves a MidiMapping into a concrete target. Returns nullptr if the
     mapping cannot currently be resolved (e.g. missing node).
-    @param tapTempo  Shared accumulator passed to a TempoTarget, if created. */
-std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo);
+    @param tapTempo         Shared accumulator passed to a TempoTarget, if created.
+    @param tempoTapApplied  Flash signal forwarded to a TempoTarget, if created. */
+std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo, Signal<void()>& tempoTapApplied);
 
 } // namespace element

@@ -66,6 +66,9 @@ public:
     Value& getTempoValue() { return tempoLabel.tempoValue; }
     Value& getExternalSyncValue() { return extButton.getToggleStateValue(); }
 
+    /** Flash the TAP button, e.g. when a MIDI tap-tempo mapping fires. */
+    void flashTapTempo() { tapTempoButton.triggerFlash(); }
+
     void valueChanged (Value& v) override
     {
         stabilize();
@@ -336,7 +339,8 @@ private:
         TextEditor tempoInput;
     } tempoLabel;
 
-    class TapTempoButton : public Button
+    class TapTempoButton : public Button,
+                           private Timer
     {
     public:
         TapTempoButton() : Button ("TapTempoButton")
@@ -347,10 +351,20 @@ private:
 
         ~TapTempoButton() override {}
 
+        /** Briefly flash the button. Called when a MIDI tap-tempo mapping fires,
+            so a MIDI tap gets the same visual cue as a mouse click. */
+        void triggerFlash()
+        {
+            flashing = true;
+            repaint();
+            startTimer (150);
+        }
+
     protected:
         void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override
         {
-            g.fillAll (isButtonDown ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter());
+            g.fillAll (flashing ? Colors::toggleYellow
+                                : (isButtonDown ? Colors::toggleOrange : Colors::widgetBackgroundColor.brighter()));
 
             if (getButtonText().isNotEmpty())
             {
@@ -374,6 +388,15 @@ private:
         }
 
     private:
+        bool flashing = false;
+
+        void timerCallback() override
+        {
+            flashing = false;
+            stopTimer();
+            repaint();
+        }
+
         // The button is only an entry point: a UI tap and MIDI taps run the same
         // shared tap-tempo logic in MappingService/MappingEngine, so no MIDI or
         // model code lives here.

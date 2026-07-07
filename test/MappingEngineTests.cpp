@@ -143,4 +143,33 @@ BOOST_AUTO_TEST_CASE (CaptureDoesNotRoute)
     conn.disconnect();
 }
 
+BOOST_AUTO_TEST_CASE (TempoTapFiresFlashSignal)
+{
+    Context context;
+    auto session = context.session();
+
+    // A note-on tempo mapping: each matching note-on is a tap and should fire the
+    // flash signal so the UI can pulse the TAP button.
+    session->addMidiMapping (MidiMapping::fromCaptureTempo (
+        "dev-A", MidiMessage::noteOn (1, 60, (uint8) 100)));
+
+    MappingEngine engine;
+    engine.rebuildBindings (session);
+
+    int flashes = 0;
+    auto conn = engine.tempoTapAppliedSignal().connect ([&flashes] { ++flashes; });
+
+    // Two matching note-ons: both taps flash (including the seeding first one).
+    engine.process ("dev-A", MidiMessage::noteOn (1, 60, (uint8) 100));
+    engine.process ("dev-A", MidiMessage::noteOn (1, 60, (uint8) 100));
+    BOOST_REQUIRE_EQUAL (flashes, 2);
+
+    // A non-matching note and a wrong device do not tap.
+    engine.process ("dev-A", MidiMessage::noteOn (1, 61, (uint8) 100));
+    engine.process ("dev-B", MidiMessage::noteOn (1, 60, (uint8) 100));
+    BOOST_REQUIRE_EQUAL (flashes, 2);
+
+    conn.disconnect();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
