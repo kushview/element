@@ -291,6 +291,8 @@ void MappingService::activate()
         std::bind (&MappingService::onControlCaptured, this));
     capturedParamConnection = capture.callback.connect (
         std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
+    tempoTapConnection = mapping.tempoTapAppliedSignal().connect (
+        std::bind (&MappingService::onTempoTapApplied, this));
 
     // Refresh persisted device names (and repaint the table) when a MIDI device
     // is hot-plugged or removed, and when a session finishes loading.
@@ -317,6 +319,7 @@ void MappingService::deactivate()
     capturedParamConnection.disconnect();
     devicesChangedConnection.disconnect();
     sessionLoadedConnection.disconnect();
+    tempoTapConnection.disconnect();
 }
 
 bool MappingService::isLearning() const

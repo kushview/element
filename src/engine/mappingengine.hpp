@@ -26,6 +26,7 @@ class MappingEngine
 {
 public:
     using CapturedEventSignal = Signal<void()>;
+    using TempoTapSignal = Signal<void()>;
 
     MappingEngine();
     ~MappingEngine();
@@ -56,6 +57,10 @@ public:
     juce::MidiMessage getCapturedMessage() const { return capturedMessage; }
     CapturedEventSignal& mappingCapturedSignal() { return mapCapturedCallback; }
 
+    /** Fired on each recognised MIDI tap-tempo event so the UI can flash the
+        TAP button. Long-lived (outlives the per-rebuild targets that fire it). */
+    TempoTapSignal& tempoTapAppliedSignal() { return tempoTapCallback; }
+
 private:
     struct Binding;
     class Router;
@@ -65,6 +70,7 @@ private:
     juce::String capturedDevice;
     juce::MidiMessage capturedMessage;
     CapturedEventSignal mapCapturedCallback;
+    TempoTapSignal tempoTapCallback;
     TapTempo tempoTap; // shared by UI + MIDI tap tempo
 };
 

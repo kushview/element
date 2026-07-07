@@ -20,6 +20,7 @@ const Colour Colors::toggleBlue = Colour (0xff33aaf9);
 const Colour Colors::toggleGreen = Colour (0xff92e75e);
 const Colour Colors::toggleOrange = Colour (0xfffaa63a);
 const Colour Colors::toggleRed = Colour (0xffff0000);
+const Colour Colors::toggleYellow = Colour (0xfff2e94e);
 
 const Colour Colors::elementBlue = Colors::elemental;
 const Colour Colors::backgroundColor = Colour ((uint32) LookAndFeel_E1::defaultBackgroundColor);

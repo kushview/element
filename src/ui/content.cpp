@@ -104,6 +104,14 @@ public:
                 std::bind (&MidiBlinker::triggerReceived, &midiBlinker)));
         }
 
+        if (mappingService == nullptr)
+        {
+            mappingService = owner.services().find<MappingService>();
+            if (mappingService != nullptr)
+                connections.add (mappingService->sigTempoTapApplied.connect (
+                    std::bind (&TempoAndMeterBar::flashTapTempo, &tempoBar)));
+        }
+
         auto* props = settings.getUserSettings();
         const bool showExt = context.services().getRunMode() == RunMode::Plugin || props->getValue ("clockSource") == "midiClock";
 
@@ -210,6 +218,7 @@ private:
     Content& owner;
     SessionPtr session;
     MidiIOMonitorPtr midiIOMonitor;
+    MappingService* mappingService = nullptr;
     SettingButton viewBtn;
     SettingButton mapButton;
     TempoAndMeterBar tempoBar;

@@ -123,20 +123,26 @@ public:
 
     void setMapping (const MidiMapping& newMapping, SessionPtr newSession)
     {
-        if (mapping.isValid())
-            mapping.data().removeListener (this);
+        // Listen on a persistent member tree, never on the temporary returned by
+        // Model::data() — juce::ValueTree stores its listener list on the wrapper
+        // instance, so a listener added to a temporary is dropped the moment that
+        // temporary is destroyed (see juce_ValueTree.cpp addListener/~ValueTree).
+        if (mappingTree.isValid())
+            mappingTree.removeListener (this);
 
         mapping = newMapping;
         session = newSession;
+        mappingTree = mapping.data();
 
-        if (mapping.isValid())
-            mapping.data().addListener (this);
+        if (mappingTree.isValid())
+            mappingTree.addListener (this);
 
         rebuild();
     }
 
 private:
     MidiMapping mapping;
+    juce::ValueTree mappingTree; // persistent owner of the ValueTree::Listener registration
     SessionPtr session;
     juce::Value filterDevice, filterNode, filterGraph, filterTarget;
 
@@ -306,6 +312,13 @@ private:
 
     void valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier& property) override
     {
+        // A different node has its own parameter list; the previous index no
+        // longer means anything, so clear it before anything rebuilds/refreshes.
+        // Re-enters this method once for tags::parameter (harmless: matches no
+        // rebuild branch below, just one extra cheap onEdited()); a no-op if -1.
+        if (property == tags::node)
+            mapping.setProperty (tags::parameter, -1);
+
         if (onEdited)
             onEdited();
 
@@ -536,6 +549,7 @@ void MidiMappingsView::mappingEdited()
         if (auto* maps = cc->services().find<MappingService>())
             maps->refresh();
     updateRowOrder();
+    table.updateContent();
     table.repaint();
 }
 

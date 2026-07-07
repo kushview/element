@@ -167,8 +167,8 @@ void ParameterTarget::applyGain (const juce::MidiMessage& message, bool toggle)
 }
 
 //=============================================================================
-TempoTarget::TempoTarget (const juce::ValueTree& sessionData, TapTempo& shared)
-    : session (sessionData), tapTempo (shared)
+TempoTarget::TempoTarget (const juce::ValueTree& sessionData, TapTempo& shared, Signal<void()>& applied)
+    : session (sessionData), tapTempo (shared), tempoTapApplied (applied)
 {
 }
 
@@ -182,6 +182,11 @@ void TempoTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
     if (! isValid() || ! message.isNoteOn())
         return; // note-on only: each press is a tap
 
+    // Flash on every recognised tap (including the seeding first tap of a run,
+    // which produces no BPM yet), so the UI feedback matches how a parameter
+    // target visibly reacts to every matching MIDI event.
+    tempoTapApplied();
+
     // Tap at the message's arrival time (stamped by the router), not "now" on
     // the message thread, so the interval matches what the player performed.
     if (auto bpm = tapTempo.tap (message.getTimeStamp()))
@@ -189,7 +194,7 @@ void TempoTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
 }
 
 //=============================================================================
-std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo)
+std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo, Signal<void()>& tempoTapApplied)
 {
     const auto targetType = mapping.getTargetType();
 
@@ -206,7 +211,7 @@ std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session
 
     if (targetType == "tempo")
     {
-        auto target = std::make_unique<TempoTarget> (session.data(), tapTempo);
+        auto target = std::make_unique<TempoTarget> (session.data(), tapTempo, tempoTapApplied);
         if (! target->isValid())
             return nullptr;
         return target;

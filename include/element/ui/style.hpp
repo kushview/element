@@ -13,6 +13,7 @@ struct Colors {
     static const juce::Colour toggleGreen;
     static const juce::Colour toggleOrange;
     static const juce::Colour toggleRed;
+    static const juce::Colour toggleYellow;
 
     static const juce::Colour elementBlue;
 
