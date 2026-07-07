@@ -93,7 +93,7 @@ public:
         : owner (o),
           plugins (p)
     {
-        data = KnownPluginList::createTree (p.getKnownPlugins().getTypes(),
+        data = KnownPluginList::createTree (p.getVisiblePluginTypes(),
                                             KnownPluginList::sortByCategory);
     }
 

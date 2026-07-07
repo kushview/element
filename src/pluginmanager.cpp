@@ -36,6 +36,7 @@ static const char* pluginListKey() { return Settings::pluginListKey; }
 /* noop. prevent OS error dialogs from child process */
 static void pluginScannerCrashHandler (void*) {}
 static File pluginsXmlFile() { return DataPath::applicationDataDir().getChildFile ("plugins.xml"); }
+static File pluginMetadataXmlFile() { return DataPath::applicationDataDir().getChildFile ("plugin-metadata.xml"); }
 
 static FileSearchPath readSearchPath (const PropertiesFile& props, const String& f)
 {
@@ -638,6 +639,53 @@ public:
         unverified.searchForPlugins (props);
     }
 
+    /** Load hidden/favorite curation from a metadata file (keyed by
+        PluginDescription::createIdentifierString()). */
+    void loadPluginMetadata (const File& file)
+    {
+        hiddenPlugins.clearQuick();
+        favoritePlugins.clearQuick();
+
+        auto xml = XmlDocument::parse (file);
+        if (xml == nullptr || ! xml->hasTagName (types::PluginMetadata.toString()))
+            return;
+
+        for (auto* const e : xml->getChildWithTagNameIterator (tags::plugin.toString()))
+        {
+            const auto id = e->getStringAttribute (tags::identifier.toString());
+            if (id.isEmpty())
+                continue;
+            if (e->getBoolAttribute (tags::hidden.toString()))
+                hiddenPlugins.addIfNotAlreadyThere (id);
+            if (e->getBoolAttribute (tags::favorite.toString()))
+                favoritePlugins.addIfNotAlreadyThere (id);
+        }
+    }
+
+    /** Persist hidden/favorite curation. Only non-default entries are written. */
+    void savePluginMetadata (const File& file)
+    {
+        XmlElement xml (types::PluginMetadata.toString());
+
+        StringArray ids;
+        ids.addArray (hiddenPlugins);
+        ids.addArray (favoritePlugins);
+        ids.removeDuplicates (false);
+
+        for (const auto& id : ids)
+        {
+            auto* const e = xml.createNewChildElement (tags::plugin.toString());
+            e->setAttribute (tags::identifier.toString(), id);
+            if (hiddenPlugins.contains (id))
+                e->setAttribute (tags::hidden.toString(), 1);
+            if (favoritePlugins.contains (id))
+                e->setAttribute (tags::favorite.toString(), 1);
+        }
+
+        file.getParentDirectory().createDirectory();
+        xml.writeTo (file);
+    }
+
     void getUnverifiedPlugins (const String& format, OwnedArray<PluginDescription>& plugs)
     {
         unverified.getPlugins (plugs, format, allPlugins);
@@ -648,6 +696,7 @@ private:
     PluginManager& owner;
     AudioPluginFormatManager formats;
     KnownPluginList allPlugins;
+    StringArray hiddenPlugins, favoritePlugins;
     File deadAudioPlugins;
     UnverifiedPlugins unverified;
     NodeFactory nodes;
@@ -951,6 +1000,7 @@ void PluginManager::restoreUserPlugins (const XmlElement& xml)
     priv->allPlugins.recreateFromXml (xml);
     scanInternalPlugins();
     priv->updateBlacklistedAudioPlugins();
+    priv->loadPluginMetadata (detail::pluginMetadataXmlFile());
     if (props == nullptr)
         return;
 }
@@ -1117,6 +1167,60 @@ NodeProvider* PluginManager::getProvider (const String& format) noexcept
         if (provider->format() == format)
             return provider;
     return nullptr;
+}
+
+//==============================================================================
+bool PluginManager::isPluginHidden (const PluginDescription& desc) const
+{
+    return priv->hiddenPlugins.contains (desc.createIdentifierString());
+}
+
+void PluginManager::setPluginHidden (const PluginDescription& desc, bool hidden)
+{
+    const auto id = desc.createIdentifierString();
+    if (hidden)
+        priv->hiddenPlugins.addIfNotAlreadyThere (id);
+    else
+        priv->hiddenPlugins.removeString (id);
+    priv->savePluginMetadata (detail::pluginMetadataXmlFile());
+    priv->allPlugins.sendChangeMessage();
+}
+
+bool PluginManager::isPluginFavorite (const PluginDescription& desc) const
+{
+    return priv->favoritePlugins.contains (desc.createIdentifierString());
+}
+
+void PluginManager::setPluginFavorite (const PluginDescription& desc, bool favorite)
+{
+    const auto id = desc.createIdentifierString();
+    if (favorite)
+        priv->favoritePlugins.addIfNotAlreadyThere (id);
+    else
+        priv->favoritePlugins.removeString (id);
+    priv->savePluginMetadata (detail::pluginMetadataXmlFile());
+    priv->allPlugins.sendChangeMessage();
+}
+
+Array<PluginDescription> PluginManager::getVisiblePluginTypes() const
+{
+    Array<PluginDescription> result;
+    for (const auto& desc : priv->allPlugins.getTypes())
+        if (! priv->hiddenPlugins.contains (desc.createIdentifierString()))
+            result.add (desc);
+    return result;
+}
+
+Array<PluginDescription> PluginManager::getFavoritePluginTypes() const
+{
+    Array<PluginDescription> result;
+    for (const auto& desc : priv->allPlugins.getTypes())
+    {
+        const auto id = desc.createIdentifierString();
+        if (priv->favoritePlugins.contains (id) && ! priv->hiddenPlugins.contains (id))
+            result.add (desc);
+    }
+    return result;
 }
 
 } // namespace element

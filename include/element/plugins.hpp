@@ -127,6 +127,55 @@ public:
     /** Get the first node factory by format. e.g. "LV2" */
     NodeProvider* getProvider (const juce::String& format) noexcept;
 
+    //==============================================================================
+    /** Returns true if the plugin is hidden from the "Add Plugin" surfaces.
+
+        Hidden state is user curation stored separately from the known plugins
+        list (keyed by juce::PluginDescription::createIdentifierString()) so it
+        survives plugin rescans.
+
+        @param desc the plugin to query
+        @return true if the plugin is currently hidden
+    */
+    bool isPluginHidden (const juce::PluginDescription& desc) const;
+
+    /** Shows or hides a plugin. Persists immediately and broadcasts a change.
+
+        @param desc   the plugin to update
+        @param hidden true to hide the plugin from "Add Plugin" surfaces
+    */
+    void setPluginHidden (const juce::PluginDescription& desc, bool hidden);
+
+    /** Returns true if the plugin is marked as a favorite.
+
+        @param desc the plugin to query
+        @return true if the plugin is a favorite
+    */
+    bool isPluginFavorite (const juce::PluginDescription& desc) const;
+
+    /** Marks or unmarks a plugin as a favorite. Persists immediately and
+        broadcasts a change.
+
+        @param desc     the plugin to update
+        @param favorite true to mark the plugin as a favorite
+    */
+    void setPluginFavorite (const juce::PluginDescription& desc, bool favorite);
+
+    /** Returns all known plugin types with hidden ones removed.
+
+        This is the shared filter that every "Add Plugin" surface should route
+        through. The result preserves the order of getKnownPlugins().getTypes().
+
+        @return the visible (non-hidden) plugin types
+    */
+    juce::Array<juce::PluginDescription> getVisiblePluginTypes() const;
+
+    /** Returns the visible plugin types that are marked as favorites.
+
+        @return the favorite plugin types (excludes hidden plugins)
+    */
+    juce::Array<juce::PluginDescription> getFavoritePluginTypes() const;
+
 private:
     friend class PluginScanner;
     juce::PropertiesFile* props = nullptr;

@@ -133,7 +133,7 @@ public:
     PluginsNavigationItem (PluginManager& pm)
         : plugins (pm)
     {
-        types = plugins.getKnownPlugins().getTypes();
+        types = plugins.getVisiblePluginTypes();
     }
 
     ~PluginsNavigationItem() {}
