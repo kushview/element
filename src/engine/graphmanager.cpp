@@ -5,6 +5,7 @@
 #include <element/plugins.hpp>
 
 #include "engine/graphmanager.hpp"
+#include "element/tags.hpp"
 #include "nodes/audioprocessor.hpp"
 #include "nodes/audiorouter.hpp"
 #include "nodes/midichannelsplitter.hpp"
@@ -272,8 +273,9 @@ public:
         if (! data.isValid() || object == nullptr)
             return;
         data.setProperty (tags::id, static_cast<int64> (object->nodeId), nullptr)
-            .setProperty (tags::object, object.get(), nullptr)
-            .setProperty (tags::name, object->getName(), nullptr);
+            .setProperty (tags::object, object.get(), nullptr);
+        if (data.getProperty (tags::name).toString().trim().isEmpty())
+            data.setProperty (tags::name, object->getName(), nullptr);
     }
 
 private:
