@@ -24,13 +24,15 @@ public:
         jassert (cc != nullptr);
         plugins = &cc->context().plugins();
         jassert (plugins != nullptr);
-        available = plugins->getKnownPlugins().getTypes();
+        available = plugins->getVisiblePluginTypes();
+        favorites = plugins->getFavoritePluginTypes();
     }
 
     bool isPluginResultCode (const int resultCode)
     {
         // clang-format off
-        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) || 
+        return (isPositiveAndBelow (int (resultCode - favoriteResultOffset), favorites.size())) ||
+               (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) ||
                (isPositiveAndBelow (int (resultCode - 20000), unverified.size()));
         // clang-format on
     }
@@ -38,7 +40,16 @@ public:
     PluginDescription getPluginDescription (int resultCode, bool& verified)
     {
         jassert (plugins != nullptr);
-        int index = plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode);
+
+        // Favorites submenu — a subset of the visible/known plugins, so verified.
+        int index = resultCode - favoriteResultOffset;
+        if (isPositiveAndBelow (index, favorites.size()))
+        {
+            verified = true;
+            return favorites.getReference (index);
+        }
+
+        index = plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode);
         if (isPositiveAndBelow (index, available.size()))
         {
             verified = true;
@@ -57,6 +68,16 @@ public:
         if (hasAddedPlugins)
             return;
         hasAddedPlugins = true;
+
+        if (! favorites.isEmpty())
+        {
+            PopupMenu favMenu;
+            for (int i = 0; i < favorites.size(); ++i)
+                favMenu.addItem (favoriteResultOffset + i, favorites.getReference (i).name);
+            addSubMenu ("Favorites", favMenu);
+            addSeparator();
+        }
+
         plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByManufacturer);
 
         PopupMenu unvMenu;
@@ -89,7 +110,11 @@ public:
     }
 
 private:
-    Array<PluginDescription> available;
+    // Favorites use a private menu-id range so they never collide with the
+    // main list (which uses KnownPluginList's large menuIdBase) or the
+    // unverified submenu (which uses the 20000 range).
+    static constexpr int favoriteResultOffset = 10000;
+    Array<PluginDescription> available, favorites;
     OwnedArray<PluginDescription> unverified;
     PluginManager* plugins { nullptr };
     bool hasAddedPlugins = false;
@@ -222,7 +247,7 @@ public:
 #if ! ELEMENT_SE
         PopupMenu menu;
         KnownPluginList::addToMenu (menu,
-                                    plugins.getKnownPlugins().getTypes(),
+                                    plugins.getVisiblePluginTypes(),
                                     KnownPluginList::sortByManufacturer,
                                     node.getFileOrIdentifier().toString());
         addSubMenu ("Replace", menu);

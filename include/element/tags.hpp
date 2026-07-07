@@ -27,6 +27,7 @@ EL_TAG (Script)
 EL_TAG (Session)
 
 EL_TAG (AudioChannelSet)
+EL_TAG (PluginMetadata)
 } // namespace types
 
 namespace tags {
@@ -152,6 +153,8 @@ static const juce::Identifier renderMode = "renderMode";
 static const juce::Identifier staticPos = "staticPos";
 
 static const juce::Identifier plugin = "plugin";
+static const juce::Identifier hidden = "hidden";
+static const juce::Identifier favorite = "favorite";
 
 static const juce::Identifier windowOnTop = "windowOnTop";
 static const juce::Identifier windowVisible = "windowVisible";

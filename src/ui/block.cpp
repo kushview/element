@@ -555,7 +555,9 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         const int result = menu.show();
         colorSelector.removeChangeListener (this);
 
-        const auto types = plugins.getKnownPlugins().getTypes();
+        // Must match the array used by NodePopupMenu::addReplaceSubmenu so the
+        // menu index resolves to the correct plugin.
+        const auto types = plugins.getVisiblePluginTypes();
 
         if (auto* message = menu.createMessageForResultCode (result))
         {

@@ -83,6 +83,10 @@ public:
     /** Returns the table used to display the plugin list. */
     juce::TableListBox& getTableListBox() noexcept { return table; }
 
+    /** Restores the table header layout, keeping the favorite column first even
+        for layouts saved before the favorite column existed. */
+    void restoreTableHeader (const juce::String& state);
+
 private:
     PluginManager& plugins;
     juce::AudioPluginFormatManager& formatManager;

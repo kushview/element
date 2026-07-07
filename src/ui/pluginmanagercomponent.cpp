@@ -287,6 +287,37 @@ private:
 };
 
 //==============================================================================
+namespace detail {
+/** A unit-square-ish heart shape built from two cubic curves. */
+static Path heartShape()
+{
+    Path p;
+    p.startNewSubPath (0.5f, 1.0f);
+    p.cubicTo (-0.15f, 0.55f, 0.15f, -0.10f, 0.5f, 0.28f);
+    p.cubicTo (0.85f, -0.10f, 1.15f, 0.55f, 0.5f, 1.0f);
+    p.closeSubPath();
+    return p;
+}
+
+/** Draws a heart glyph (filled = favorite, outline = not) fitted into a cell. */
+static void paintHeart (Graphics& g, Rectangle<int> cell, bool filled, Colour colour)
+{
+    auto p = heartShape();
+    // The heart is authored in unit (0..1) coordinates, so it must be scaled up
+    // to fill the cell. Do NOT use onlyReduceInSize here (that would keep it tiny).
+    auto area = cell.toFloat().reduced (cell.getWidth() * 0.22f, cell.getHeight() * 0.22f);
+    const RectanglePlacement placement (RectanglePlacement::centred);
+    p.applyTransform (placement.getTransformToFit (p.getBounds(), area));
+
+    g.setColour (colour);
+    if (filled)
+        g.fillPath (p);
+    else
+        g.strokePath (p, PathStrokeType (1.0f));
+}
+} // namespace detail
+
+//==============================================================================
 class PluginListComponent::TableModel : public TableListBoxModel
 {
 public:
@@ -309,7 +340,8 @@ public:
         categoryCol = 3,
         manufacturerCol = 4,
         descCol = 5,
-        ioCol = 6
+        ioCol = 6,
+        favoriteCol = 7
     };
 
     String getPluginIO (const PluginDescription& desc)
@@ -323,6 +355,7 @@ public:
     {
         String text;
         bool isBlacklisted = row >= list.getNumTypes();
+        bool isHidden = false;
 
         if (isBlacklisted)
         {
@@ -335,6 +368,18 @@ public:
         {
             const auto types = list.getTypes();
             const auto& desc = types.getReference (row);
+            isHidden = owner.plugins.isPluginHidden (desc);
+
+            if (columnId == favoriteCol)
+            {
+                const bool fav = owner.plugins.isPluginFavorite (desc);
+                auto colour = fav ? Colors::toggleRed : Colors::textColor.withAlpha (0.4f);
+                if (isHidden)
+                    colour = colour.withMultipliedAlpha (0.45f);
+                detail::paintHeart (g, { 0, 0, width, height }, fav, colour);
+                return;
+            }
+
             switch (columnId)
             {
                 case nameCol:
@@ -363,15 +408,16 @@ public:
 
         if (text.isNotEmpty())
         {
-            g.setColour (isBlacklisted         ? Colours::red
-                         : columnId == nameCol ? Colors::textColor
-                                               : Colours::grey);
+            auto colour = isBlacklisted         ? Colours::red
+                          : columnId == nameCol ? Colors::textColor
+                                                : Colours::grey;
+            g.setColour (isHidden ? colour.withAlpha (0.45f) : colour);
             g.setFont (Font (FontOptions (height * 0.7f)));
             g.drawFittedText (text, 4, 0, width - 6, height, Justification::centredLeft, 1, 0.9f);
         }
     }
 
-    void cellPopup (const int result)
+    void cellPopup (const int result, const int row)
     {
         switch (result)
         {
@@ -384,6 +430,13 @@ public:
             case 2:
                 owner.removeSelectedPlugins();
                 break;
+            case 3:
+                if (isPositiveAndBelow (row, list.getNumTypes()))
+                {
+                    const auto desc = list.getTypes().getReference (row);
+                    owner.plugins.setPluginHidden (desc, ! owner.plugins.isPluginHidden (desc));
+                }
+                break;
             default: {
             }
             break;
@@ -394,10 +447,23 @@ public:
     {
         if (ev.mods.isPopupMenu())
         {
+            const bool onPlugin = isPositiveAndBelow (row, list.getNumTypes());
+            bool hidden = false;
+            if (onPlugin)
+                hidden = owner.plugins.isPluginHidden (list.getTypes().getReference (row));
+
             PopupMenu menu;
+            menu.addItem (3, hidden ? TRANS ("Show plugin") : TRANS ("Hide plugin"), onPlugin);
+            menu.addSeparator();
             menu.addItem (1, "Clear list");
             menu.addItem (2, "Remove selected");
-            cellPopup (menu.show());
+            cellPopup (menu.show(), row);
+        }
+        else if (col == favoriteCol && isPositiveAndBelow (row, list.getNumTypes()))
+        {
+            const auto desc = list.getTypes().getReference (row);
+            owner.plugins.setPluginFavorite (desc, ! owner.plugins.isPluginFavorite (desc));
+            owner.repaint();
         }
     }
 
@@ -467,6 +533,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
 
     TableHeaderComponent& header = table.getHeader();
 
+    header.addColumn (String(), TableModel::favoriteCol, 26, 26, 26, TableHeaderComponent::notResizable | TableHeaderComponent::notSortable);
     header.addColumn (TRANS ("Name"), TableModel::nameCol, 200, 100, 700, TableHeaderComponent::defaultFlags | TableHeaderComponent::sortedForwards);
     header.addColumn (TRANS ("Format"), TableModel::typeCol, 80, 80, 80, TableHeaderComponent::notResizable);
     header.addColumn (TRANS ("Category"), TableModel::categoryCol, 100, 100, 200);
@@ -561,6 +628,15 @@ void PluginListComponent::updateList()
     table.repaint();
 }
 
+void PluginListComponent::restoreTableHeader (const String& state)
+{
+    auto& header = table.getHeader();
+    header.restoreFromString (state);
+    // Layouts saved before the favorite column existed push it to the end;
+    // force it back to the front so it always reads as the leftmost column.
+    header.moveColumn (TableModel::favoriteCol, 0);
+}
+
 void PluginListComponent::removeSelectedPlugins()
 {
     const SparseSet<int> selected (table.getSelectedRows());
@@ -606,8 +682,17 @@ void PluginListComponent::removeMissingPlugins()
 {
     const auto types = list.getTypes();
     for (int i = types.size(); --i >= 0;)
-        if (! formatManager.doesPluginStillExist (types.getReference (i)))
-            list.removeType (types.getReference (i));
+    {
+        const auto& type = types.getReference (i);
+        // Element (internal) plugins have no file on disk and are always
+        // available via the node factory. The format manager doesn't own the
+        // "Element" format, so doesPluginStillExist() reports them as missing —
+        // never remove them here (mirrors the guard in removePluginItem).
+        if (type.pluginFormatName == "Element")
+            continue;
+        if (! formatManager.doesPluginStillExist (type))
+            list.removeType (type);
+    }
 }
 
 void PluginListComponent::removePluginItem (int index)
@@ -975,10 +1060,9 @@ void PluginManagerContentView::restoreSettings()
 {
     if (nullptr == pluginList)
         return;
-    auto& header = pluginList->getTableListBox().getHeader();
     if (auto s = settings())
         if (auto props = s->getUserSettings())
-            header.restoreFromString (props->getValue (Settings::pluginListHeaderKey));
+            pluginList->restoreTableHeader (props->getValue (Settings::pluginListHeaderKey));
 }
 
 void PluginListComponent::scanWithBackgroundScanner()
