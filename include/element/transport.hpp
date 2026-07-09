@@ -35,13 +35,17 @@ public:
     public:
         Monitor();
 
-        /** Number of beats per bar (time signature numerator). */
+        /** Beats per bar (the time signature numerator, e.g. 4 for 4/4). */
         juce::Atomic<int> beatsPerBar;
 
-        /** Beat type/unit (time signature denominator, e.g. 4 = quarter note). */
+        /** Beat type: the time signature denominator as a BeatType enum index
+            (0 = whole, 1 = half, 2 = quarter, 3 = eighth, 4 = sixteenth). This
+            is the indexed form of beatDivisor; see the BeatType struct. */
         juce::Atomic<int> beatType;
 
-        /** Beat divisor for subdivision calculations. */
+        /** Beat divisor: the time signature denominator itself (2, 4, 8, 16 …),
+            i.e. the note value that gets one beat. beatType is the equivalent
+            BeatType enum index of this value. */
         juce::Atomic<int> beatDivisor;
 
         /** Current sample rate in Hz. */
@@ -59,7 +63,8 @@ public:
         /** Current playhead position in audio frames (samples). */
         juce::Atomic<int64_t> positionFrames;
 
-        /** Returns the ratio of beat type to beat divisor. */
+        /** Returns the length of one beat relative to a quarter note, i.e.
+            beatDivisor / 4 (whole = 0.25, quarter = 1.0, sixteenth = 4.0). */
         double beatRatio() const noexcept;
 
         /** Returns the current position in seconds. */
@@ -85,7 +90,8 @@ public:
     /** Returns beats per bar from the current time signature. */
     int getBeatsPerBar() const { return beatsPerBar; }
 
-    /** Returns beat type (denominator) from the current time signature. */
+    /** Returns the beat type (time signature denominator as a BeatType enum
+        index) from the current time signature. */
     int getBeatType() const { return beatType; }
 
     /** Requests a play state change (thread-safe).
@@ -153,7 +159,7 @@ public:
 private:
     AtomicValue<bool> playState, recordState;
     AtomicValue<double> nextTempo;
-    juce::Atomic<int> nextBeatsPerBar, nextBeatDivisor;
+    juce::Atomic<int> nextBeatsPerBar, nextBeatType;
     juce::Atomic<bool> seekWanted;
     AtomicValue<int64_t> seekFrame;
     MonitorPtr monitor;

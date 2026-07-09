@@ -66,8 +66,8 @@ protected:
     float tempo;       // tempo in beats per minute
     double sampleRate; // sample rate in frames/sec
     int beatsPerBar;   // time signature numerator
-    int beatType;      // beat type index
-    int beatDivisor;   // time signature denominator exponent (1 << beatDivisor)
+    int beatType;      // time signature denominator as a BeatType enum index
+    int beatDivisor;   // time signature denominator (2, 4, 8, 16 …)
     bool playing, recording, looping;
 
 private:

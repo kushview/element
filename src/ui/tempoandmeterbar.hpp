@@ -157,7 +157,7 @@ public:
             if (! meter->isEnabled())
             {
                 meter->updateMeter (monitor->beatsPerBar.get(),
-                                    monitor->beatDivisor.get(),
+                                    monitor->beatType.get(),
                                     false);
             }
         }

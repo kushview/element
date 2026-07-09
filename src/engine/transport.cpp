@@ -13,7 +13,7 @@ Transport::Monitor::Monitor()
     sampleRate.set (44100.0);
     beatsPerBar.set (4);
     beatType.set (2);
-    beatDivisor.set (2);
+    beatDivisor.set (4);
 }
 
 double Transport::Monitor::beatRatio() const noexcept
@@ -69,7 +69,7 @@ Transport::Transport()
     seekFrame.set (0);
 
     nextBeatsPerBar.set (getBeatsPerBar());
-    nextBeatDivisor.set (getBeatType());
+    nextBeatType.set (getBeatType());
 
     setLengthFrames (0);
 }
@@ -117,11 +117,14 @@ void Transport::postProcess (int nframes)
         monitor->beatsPerBar.set (getBeatsPerBar());
     }
 
-    if (beatDivisor != nextBeatDivisor.get())
+    if (beatType != nextBeatType.get())
     {
-        beatType = nextBeatDivisor.get();
-        beatDivisor = nextBeatDivisor.get();
-        monitor->beatDivisor.set (nextBeatDivisor.get());
+        beatType = nextBeatType.get();
+        // beatType is the BeatType enum index; beatDivisor is the raw
+        // time signature denominator (1 << index): quarter (2) -> 4.
+        beatDivisor = BeatType (static_cast<BeatType::ID> (beatType)).divisor();
+        monitor->beatDivisor.set (beatDivisor);
+        monitor->beatType.set (beatType);
     }
 
     if (seekWanted.get())
@@ -143,7 +146,7 @@ void Transport::requestMeter (int beatsPerBar, int beatType)
     if (beatType > BeatType::SixteenthNote)
         beatType = BeatType::SixteenthNote;
     nextBeatsPerBar.set (beatsPerBar);
-    nextBeatDivisor.set (beatType);
+    nextBeatType.set (beatType);
 }
 
 void Transport::requestAudioFrame (const int64_t frame)

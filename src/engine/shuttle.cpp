@@ -21,8 +21,8 @@ Shuttle::Shuttle()
     tempo = 120.0f;
     sampleRate = 44100.0;
     beatsPerBar = 4;
-    beatType = 2;
-    beatDivisor = 2;
+    beatType = BeatType::QuarterNote;
+    beatDivisor = 4;
 
     duration = 0;
     framePos = 0;
@@ -45,7 +45,7 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> Shuttle::getPosition() const
     info.setBpm ((double) tempo);
     juce::AudioPlayHead::TimeSignature timesig;
     timesig.numerator = beatsPerBar;
-    timesig.denominator = (1 << beatDivisor);
+    timesig.denominator = beatDivisor;
     info.setTimeSignature (timesig);
     juce::AudioPlayHead::LoopPoints loops;
     loops.ppqEnd = 0.0;
