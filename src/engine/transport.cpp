@@ -138,19 +138,18 @@ void Transport::postProcess (int nframes)
     }
 }
 
-void Transport::requestMeter (int beatsPerBar, int beatDivisor)
+void Transport::requestMeter (int beatsPerBar, int beatType)
 {
-    // std::clog << "request meter: " << beatsPerBar << "/" << (1 << beatDivisor) << std::endl;
     if (beatsPerBar < 1)
         beatsPerBar = 1;
     if (beatsPerBar > 99)
         beatsPerBar = 99;
-    if (beatDivisor < 0)
-        beatDivisor = 0;
-    if (beatDivisor > BeatType::SixteenthNote)
-        beatDivisor = BeatType::SixteenthNote;
+    if (beatType < 0)
+        beatType = 0;
+    if (beatType > BeatType::SixteenthNote)
+        beatType = BeatType::SixteenthNote;
     nextBeatsPerBar.set (beatsPerBar);
-    nextBeatDivisor.set (beatDivisor);
+    nextBeatDivisor.set (beatType);
 }
 
 void Transport::requestAudioFrame (const int64_t frame)

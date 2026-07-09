@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/context.hpp>
+#include <element/audioengine.hpp>
 
 #include "nodes/midisetlist.hpp"
 #include "engine/trace.hpp"
+#include "tempo.hpp"
 
 using namespace juce;
 
@@ -111,6 +113,16 @@ void MidiSetListProcessor::maybeSendTempoAndPosition (int program)
     {
         if (entry->tempo >= 20.0)
             s->getValueTree().setProperty (tags::tempo, entry->tempo, nullptr);
+
+        if (entry->tsNum > 0 && entry->tsDen > 0)
+        {
+            const int div = BeatType::fromDivisor (entry->tsDen); // raw denom -> BeatType enum
+            s->getValueTree().setProperty (tags::beatsPerBar, entry->tsNum, nullptr);
+            s->getValueTree().setProperty (tags::beatDivisor, div, nullptr);
+            if (auto e = _context.audio())
+                e->setMeter (entry->tsNum, div);
+        }
+
         if (auto e = _context.audio())
             e->seekToAudioFrame (0);
     }
@@ -148,6 +160,8 @@ void MidiSetListProcessor::addProgramEntry (const String& name, int programIn, i
     entry->in = programIn;
     entry->out = programOut;
     entry->tempo = 0.0;
+    entry->tsNum = 0;
+    entry->tsDen = 0;
     sendChangeMessage();
 
     ScopedLock sl (lock);
@@ -158,15 +172,32 @@ void MidiSetListProcessor::editProgramEntry (int index,
                                              const String& name,
                                              int inProgram,
                                              int outProgram,
-                                             double tempo)
+                                             double tempo,
+                                             int tsNum,
+                                             int tsDen)
 {
     tempo = (tempo <= 0) ? 0.0 : std::max (20.0, std::min (999.0, tempo));
+
+    // A valid signature needs both a numerator and a power-of-two divisor; otherwise unset (0/0).
+    if (tsNum <= 0 || tsDen <= 0)
+    {
+        tsNum = tsDen = 0;
+    }
+    else
+    {
+        tsNum = jlimit (1, 99, tsNum);
+        // Snap the denominator to the nearest supported divisor via the BeatType enum.
+        tsDen = (int) BeatType ((BeatType::ID) BeatType::fromDivisor (tsDen)).divisor();
+    }
+
     if (auto* entry = entries[index])
     {
         entry->name = name.isNotEmpty() ? name : entry->name;
         entry->in = inProgram;
         entry->out = outProgram;
         entry->tempo = tempo;
+        entry->tsNum = tsNum;
+        entry->tsDen = tsDen;
         ScopedLock sl (lock);
         programMap[entry->in] = entry->out;
         sendChangeMessage();

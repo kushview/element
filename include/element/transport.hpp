@@ -120,7 +120,7 @@ public:
 
     /** Requests a time signature change (thread-safe).
         @param beatsPerBar Numerator of time signature
-        @param beatType    Denominator of time signature
+        @param beatType    Beat type enum
     */
     void requestMeter (int beatsPerBar, int beatType);
 

@@ -24,6 +24,8 @@ public:
         int in;
         int out;
         double tempo { 0.0 };
+        int tsNum { 0 };
+        int tsDen { 0 };
     };
 
     MidiSetListProcessor (Context&);
@@ -59,7 +61,9 @@ public:
                            const juce::String& name,
                            int inProgram,
                            int outProgram,
-                           double tempo);
+                           double tempo,
+                           int tsNum = 0,
+                           int tsDen = 0);
     ProgramEntry getProgramEntry (int index) const;
 
     inline int getWidth() const { return width; }
@@ -103,6 +107,8 @@ public:
             entry->in = (int) e["in"];
             entry->out = (int) e["out"];
             entry->tempo = (double) e["tempo"];
+            entry->tsNum = (int) e["tsNum"];
+            entry->tsDen = (int) e["tsDen"];
         }
 
         {
@@ -127,7 +133,9 @@ public:
             e.setProperty ("name", entry->name, nullptr)
                 .setProperty ("in", entry->in, nullptr)
                 .setProperty ("out", entry->out, nullptr)
-                .setProperty ("tempo", entry->tempo, nullptr);
+                .setProperty ("tempo", entry->tempo, nullptr)
+                .setProperty ("tsNum", entry->tsNum, nullptr)
+                .setProperty ("tsDen", entry->tsDen, nullptr);
             tree.appendChild (e, nullptr);
         }
 

@@ -25,6 +25,8 @@ public:
 
         tempoLabel.tempoValue.addListener (this);
         extButton.getToggleStateValue().addListener (this);
+        beatsPerBarValue.addListener (this);
+        beatDivisorValue.addListener (this);
 
         meter = std::make_unique<TopMeter> (*this);
         addAndMakeVisible (meter.get());
@@ -34,9 +36,16 @@ public:
 
     ~TempoAndMeterBar()
     {
+        beatDivisorValue.removeListener (this);
+        beatsPerBarValue.removeListener (this);
         extButton.getToggleStateValue().removeListener (this);
         tempoLabel.tempoValue.removeListener (this);
     }
+
+    /** The meter numerator/divisor values, bound to the session so the widget
+        tracks external changes (e.g. from the MIDI Set List node). */
+    Value& getBeatsPerBarValue() { return beatsPerBarValue; }
+    Value& getBeatDivisorValue() { return beatDivisorValue; }
 
     void resized() override
     {
@@ -72,6 +81,14 @@ public:
     void valueChanged (Value& v) override
     {
         stabilize();
+
+        if (v.refersToSameSourceAs (beatsPerBarValue) || v.refersToSameSourceAs (beatDivisorValue))
+        {
+            // notify=false: display-only sync, so we don't re-broadcast to engine/session.
+            meter->updateMeter ((int) beatsPerBarValue.getValue(),
+                                (int) beatDivisorValue.getValue(),
+                                false);
+        }
 
         if (extButton.isVisible() && v.refersToSameSourceAs (extButton.getToggleStateValue()))
         {
@@ -160,6 +177,8 @@ private:
     Transport::MonitorPtr monitor;
     AudioEnginePtr engine;
     SessionPtr session;
+    Value beatsPerBarValue;
+    Value beatDivisorValue;
 
     void stabilize()
     {
