@@ -317,7 +317,7 @@ public:
     TimeSignatureSetting()
     {
         beatsPerBar.setValue (4);
-        beatDivisor.setValue (BeatType::QuarterNote);
+        beatType.setValue (BeatType::QuarterNote);
     }
 
     ~TimeSignatureSetting() {}
@@ -329,7 +329,7 @@ public:
         g.fillAll (isOn ? Colors::toggleOrange : element::Colors::widgetBackgroundColor.brighter());
 
         String text = beatsPerBar.toString();
-        text << " / " << String (BeatType ((BeatType::ID) (int) beatDivisor.getValue()).divisor());
+        text << " / " << String (BeatType ((BeatType::ID) (int) beatType.getValue()).divisor());
 
         if (text.isNotEmpty())
         {
@@ -349,11 +349,11 @@ public:
         if (bpb > 99)
             bpb = 99;
 
-        if (bpb == (int) beatsPerBar.getValue() && (int) beatDivisor.getValue() == div)
+        if (bpb == (int) beatsPerBar.getValue() && (int) beatType.getValue() == div)
             return;
 
         beatsPerBar.setValue (bpb);
-        beatDivisor.setValue (div);
+        beatType.setValue (div);
         if (notify)
             meterChanged();
 
@@ -362,8 +362,7 @@ public:
 
     virtual void meterChanged() {}
     int getBeatsPerBar() const { return (int) beatsPerBar.getValue(); }
-    int getBeatType() const { return (int) BeatType::QuarterNote; } // quarter note
-    int getBeatDivisor() const { return (int) beatDivisor.getValue(); }
+    int getBeatType() const { return (int) beatType.getValue(); }
 
     void mouseDown (const MouseEvent& ev) override
     {
@@ -374,7 +373,7 @@ public:
         lastY = ev.getDistanceFromDragStartY();
     }
 
-    Value& getDraggedValue() { return isDraggingBeatDivisor ? beatDivisor : beatsPerBar; }
+    Value& getDraggedValue() { return isDraggingBeatDivisor ? beatType : beatsPerBar; }
 
     void mouseDrag (const MouseEvent& ev) override
     {
@@ -408,7 +407,7 @@ public:
 
 private:
     Value beatsPerBar;
-    Value beatDivisor;
+    Value beatType;
     bool isDraggingBeatDivisor = false;
     [[maybe_unused]] int stickyValue = 0;
     [[maybe_unused]] int decimalPlaces = 0;

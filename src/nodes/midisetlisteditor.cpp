@@ -204,7 +204,7 @@ public:
     {
         String text;
         text << getBeatsPerBar() << " / "
-             << (int) BeatType ((BeatType::ID) getBeatDivisor()).divisor();
+             << (int) BeatType ((BeatType::ID) getBeatType()).divisor();
         g.setFont (Font (FontOptions (editor.getFontSize())));
         ViewHelpers::drawBasicTextRow (text, g, getWidth(), getHeight(), selected, 0, Justification::centred);
     }
@@ -223,7 +223,7 @@ protected:
 
         auto program = editor.getProgram (row);
         program.tsNum = getBeatsPerBar();
-        program.tsDen = (int) BeatType ((BeatType::ID) getBeatDivisor()).divisor();
+        program.tsDen = (int) BeatType ((BeatType::ID) getBeatType()).divisor();
         editor.setProgram (row, program);
     }
 

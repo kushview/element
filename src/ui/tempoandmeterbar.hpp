@@ -488,11 +488,12 @@ private:
             if (owner.checkMonitor())
             {
                 if (auto e = owner.engine)
-                    e->setMeter (getBeatsPerBar(), getBeatDivisor());
+                    e->setMeter (getBeatsPerBar(), getBeatType());
                 if (auto s = owner.session)
                 {
                     s->data().setProperty (tags::beatsPerBar, getBeatsPerBar(), 0);
-                    s->data().setProperty (tags::beatDivisor, getBeatDivisor(), 0);
+                    // session uses the wrong key for beat type.
+                    s->data().setProperty (tags::beatDivisor, getBeatType(), 0);
                 }
             }
         }
