@@ -83,10 +83,10 @@ public:
     ~Transport();
 
     /** Returns beats per bar from the current time signature. */
-    int getBeatsPerBar() const { return getTimeScale().beatsPerBar(); }
+    int getBeatsPerBar() const { return beatsPerBar; }
 
     /** Returns beat type (denominator) from the current time signature. */
-    int getBeatType() const { return getTimeScale().beatType(); }
+    int getBeatType() const { return beatType; }
 
     /** Requests a play state change (thread-safe).
         @param p True to play, false to stop

@@ -111,24 +111,18 @@ void Transport::postProcess (int nframes)
     monitor->recording.set (recording);
     monitor->positionFrames.set (getPositionFrames());
 
-    bool updateTimeScale = false;
     if (getBeatsPerBar() != nextBeatsPerBar.get())
     {
-        ts.setBeatsPerBar ((unsigned short) nextBeatsPerBar.get());
+        beatsPerBar = nextBeatsPerBar.get();
         monitor->beatsPerBar.set (getBeatsPerBar());
-        updateTimeScale = true;
     }
 
-    if (ts.beatDivisor() != nextBeatDivisor.get())
+    if (beatDivisor != nextBeatDivisor.get())
     {
-        ts.setBeatType ((unsigned short) nextBeatDivisor.get());
-        ts.setBeatDivisor ((unsigned short) nextBeatDivisor.get());
+        beatType = nextBeatDivisor.get();
+        beatDivisor = nextBeatDivisor.get();
         monitor->beatDivisor.set (nextBeatDivisor.get());
-        updateTimeScale = true;
     }
-
-    if (updateTimeScale)
-        ts.updateScale();
 
     if (seekWanted.get())
     {

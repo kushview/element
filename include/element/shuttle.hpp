@@ -6,7 +6,6 @@
 #include <cstdint>
 
 #include <element/juce/audio_processors.hpp>
-#include <element/timescale.hpp>
 
 namespace element {
 
@@ -49,7 +48,6 @@ public:
 
     void resetRecording();
 
-    const TimeScale& getTimeScale() const;
     float getTempo() const;
     void setTempo (float bpm);
 
@@ -65,7 +63,11 @@ public:
     juce::Optional<juce::AudioPlayHead::PositionInfo> getPosition() const override;
 
 protected:
-    TimeScale ts;
+    float tempo;       // tempo in beats per minute
+    double sampleRate; // sample rate in frames/sec
+    int beatsPerBar;   // time signature numerator
+    int beatType;      // beat type index
+    int beatDivisor;   // time signature denominator exponent (1 << beatDivisor)
     bool playing, recording, looping;
 
 private:
@@ -74,7 +76,6 @@ private:
 
     int64_t framePos;
     uint32_t duration;
-    double sampleRate;
 };
 
 } // namespace element

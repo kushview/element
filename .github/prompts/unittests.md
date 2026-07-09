@@ -89,7 +89,6 @@ The following 51 header files in `include/element/` are **WITHOUT dedicated unit
 - [x] `atombuffer.hpp` - Atom buffer (has tests: `atomtests.cpp`)
 - [ ] `linkedlist.hpp` - Linked list implementation
 - [ ] `symbolmap.hpp` - Symbol mapping
-- [ ] `timescale.hpp` - Time scale operations
 - [ ] `transport.hpp` - Transport control
 
 #### MIDI
@@ -197,7 +196,6 @@ Files without dedicated tests:
 - `settings.cpp` - Settings implementation
 - `strings.cpp` - String utilities
 - `tempo.hpp` - Tempo handling
-- `timescale.cpp` - Time scale operations
 - `utils.cpp/hpp` - Utility functions
 
 #### Engine Components (`src/engine/`) - **PARTIAL COVERAGE**
