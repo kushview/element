@@ -120,6 +120,8 @@ public:
             tempoBar.setUseExtButton (showExt);
             tempoBar.getTempoValue().referTo (session->getPropertyAsValue (tags::tempo));
             tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue (tags::externalSync));
+            tempoBar.getBeatsPerBarValue().referTo (session->getPropertyAsValue (tags::beatsPerBar));
+            tempoBar.getBeatDivisorValue().referTo (session->getPropertyAsValue (tags::beatDivisor));
             tempoBar.stabilizeWithSession (false);
         }
 

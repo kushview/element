@@ -925,10 +925,10 @@ Transport::MonitorPtr AudioEngine::getTransportMonitor() const
     return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
 }
 
-void AudioEngine::setMeter (int beatsPerBar, int beatDivisor)
+void AudioEngine::setMeter (int beatsPerBar, int beatType)
 {
     auto& transport (priv->transport);
-    transport.requestMeter (beatsPerBar, beatDivisor);
+    transport.requestMeter (beatsPerBar, beatType);
 }
 
 void AudioEngine::togglePlayPause()

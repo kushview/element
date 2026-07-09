@@ -5,7 +5,9 @@
 
 #include "nodes/midisetlist.hpp"
 #include "nodes/midisetlisteditor.hpp"
+#include "ui/buttons.hpp"
 #include "ui/viewhelpers.hpp"
+#include "tempo.hpp"
 
 namespace element {
 
@@ -168,6 +170,69 @@ private:
     int row = -1;
 };
 
+class MidiSetListProgramSignatureWidget : public TimeSignatureSetting
+{
+public:
+    MidiSetListProgramSignatureWidget (MidiSetListEditor& e)
+        : editor (e) {}
+
+    ~MidiSetListProgramSignatureWidget() {}
+
+    void setRow (int r) { row = r; }
+
+    void setSelected (bool s)
+    {
+        if (selected != s)
+        {
+            selected = s;
+            repaint();
+        }
+    }
+
+    /** Populate the widget from a program entry, defaulting to 4/4 when unset. */
+    void setSignature (int tsNum, int tsDen)
+    {
+        const int bpb = tsNum > 0 ? tsNum : 4;
+        const int div = tsDen > 0 ? BeatType::fromDivisor (tsDen)
+                                  : (int) BeatType::QuarterNote;
+        updateMeter (bpb, div, false);
+    }
+
+    /** Render like the surrounding table cells (transparent, light text over the
+        row background) instead of the base class's boxed look. */
+    void paint (Graphics& g) override
+    {
+        String text;
+        text << getBeatsPerBar() << " / "
+             << (int) BeatType ((BeatType::ID) getBeatDivisor()).divisor();
+        g.setFont (Font (FontOptions (editor.getFontSize())));
+        ViewHelpers::drawBasicTextRow (text, g, getWidth(), getHeight(), selected, 0, Justification::centred);
+    }
+
+    void mouseDown (const MouseEvent& ev) override
+    {
+        editor.selectRow (row);
+        TimeSignatureSetting::mouseDown (ev);
+    }
+
+protected:
+    void meterChanged() override
+    {
+        if (row < 0)
+            return;
+
+        auto program = editor.getProgram (row);
+        program.tsNum = getBeatsPerBar();
+        program.tsDen = (int) BeatType ((BeatType::ID) getBeatDivisor()).divisor();
+        editor.setProgram (row, program);
+    }
+
+private:
+    MidiSetListEditor& editor;
+    int row = -1;
+    bool selected = false;
+};
+
 class MSLE::TableModel : public TableListBoxModel
 {
 public:
@@ -177,6 +242,7 @@ public:
         InProgram = 1,
         Name,
         Tempo,
+        Signature,
         OutProgram
     };
 
@@ -210,7 +276,12 @@ public:
                 text = String (1 + program.in);
                 break;
             case TableModel::Tempo:
-                text = String (120.00, 2) + " bpm";
+                text = program.tempo >= 20.0 ? String (program.tempo, 2) + " bpm" : "N/A";
+                break;
+            case TableModel::Signature:
+                text = (program.tsNum > 0 && program.tsDen > 0)
+                           ? String (program.tsNum) + "/" + String (program.tsDen)
+                           : "N/A";
                 break;
             case TableModel::OutProgram:
                 text = String (1 + program.out);
@@ -266,6 +337,17 @@ public:
                 label = t;
                 break;
             }
+
+            case TableModel::Signature: {
+                auto* sig = existing == nullptr
+                                ? new MidiSetListProgramSignatureWidget (editor)
+                                : dynamic_cast<MidiSetListProgramSignatureWidget*> (existing);
+                sig->setSignature (program.tsNum, program.tsDen);
+                sig->setRow (rowNumber);
+                sig->setSelected (isRowSelected);
+                sig->repaint();
+                return sig;
+            }
         }
 
         if (label == nullptr)
@@ -304,6 +386,7 @@ MidiSetListEditor::MidiSetListEditor (const Node& node)
     header.addColumn ("IN", TableModel::InProgram, 50, 50, -1, flags, -1);
     header.addColumn ("NAME", TableModel::Name, 100, 100, -1, flags, -1);
     header.addColumn ("TEMPO", TableModel::Tempo, 70, 70, -1, flags, -1);
+    header.addColumn ("SIG", TableModel::Signature, 60, 60, -1, flags, -1);
     header.addColumn ("OUT", TableModel::OutProgram, 50, 50, -1, flags, -1);
     model.reset (new TableModel (*this));
     table.setModel (model.get());
@@ -453,7 +536,9 @@ void MidiSetListEditor::setProgram (int index, MidiSetListProcessor::ProgramEntr
                                 entry.name,
                                 entry.in,
                                 entry.out,
-                                entry.tempo);
+                                entry.tempo,
+                                entry.tsNum,
+                                entry.tsDen);
         table.updateContent();
     }
 }
@@ -551,10 +636,16 @@ void MidiSetListEditor::updateTableHeaderSizes()
     const auto tempoSize = (int) glyphs.getBoundingBox (0, -1, true).getWidth() + 4;
     header.setColumnWidth (TableModel::Tempo, tempoSize);
 
+    GlyphArrangement sigGlyphs;
+    sigGlyphs.addLineOfText (Font (FontOptions (getFontSize())), "99 / 16", 0, 0);
+    const auto sigSize = (int) sigGlyphs.getBoundingBox (0, -1, true).getWidth() + 4;
+    header.setColumnWidth (TableModel::Signature, sigSize);
+
     // clang-format on
     const auto fixedTotalSize = header.getColumnWidth (TableModel::InProgram)
                                 + header.getColumnWidth (TableModel::OutProgram)
-                                + header.getColumnWidth (TableModel::Tempo);
+                                + header.getColumnWidth (TableModel::Tempo)
+                                + header.getColumnWidth (TableModel::Signature);
 
     header.setColumnWidth (TableModel::Name, table.getWidth() - fixedTotalSize);
     // clang-format off
