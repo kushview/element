@@ -14,11 +14,11 @@
 
 #include "utils.hpp"
 #include "urls.hpp"
+#include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/mainmenu.hpp"
 #include "ui/viewhelpers.hpp"
 #include "ui/pluginwindow.hpp"
-
 namespace element {
 
 MainMenu::MainMenu (MainWindow& parent, Commands& c)
