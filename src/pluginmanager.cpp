@@ -41,7 +41,8 @@ static File pluginMetadataXmlFile() { return DataPath::applicationDataDir().getC
 static FileSearchPath readSearchPath (const PropertiesFile& props, const String& f)
 {
     const auto key = String (Settings::lastPluginScanPathPrefix) + f;
-    return FileSearchPath (props.getValue (key));
+    FileSearchPath sp (props.getValue (key));
+    return sp;
 }
 
 static File scannerExeFullPath()
@@ -402,7 +403,7 @@ File PluginScanner::scannerExeFile() const noexcept { return _scannerExe; }
 void PluginScanner::scanAudioFormat (const String& formatName)
 {
     detail::applyBlacklistingsFromDeadMansPedal (list);
-
+    auto paths (detail::readSearchPath (*_manager.props, formatName));
     StringArray identifiers;
     std::function<String (const String&)> pluginName = [] (const String& ID) -> juce::String { return ID; };
 
@@ -412,17 +413,17 @@ void PluginScanner::scanAudioFormat (const String& formatName)
             return format->getNameOfPluginFromIdentifier (ID);
         };
 
-        identifiers = format->searchPathsForPlugins (
-            detail::readSearchPath (*_manager.props, formatName),
-            true,
-            false);
+        if (paths.getNumPaths() <= 0)
+            paths = format->getDefaultLocationsToSearch();
+
+        identifiers = format->searchPathsForPlugins (paths, true, false);
     }
     else if (auto* provider = _manager.getProvider (formatName))
     {
-        identifiers = provider->findTypes (
-            detail::readSearchPath (*_manager.props, formatName),
-            true,
-            false);
+        if (paths.getNumPaths() <= 0)
+            paths = provider->defaultSearchPath();
+
+        identifiers = provider->findTypes (paths, true, false);
     }
 
     listeners.call (&Listener::audioPluginScanProgress, 0.0f);
