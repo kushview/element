@@ -13,6 +13,51 @@ using namespace juce;
 
 namespace element {
 
+namespace detail {
+
+void migrateControllerMaps (ValueTree session)
+{
+    if (! session.isValid())
+        return;
+
+    auto controllers = session.getChildWithName (tags::controllers);
+    auto maps = session.getChildWithName (tags::maps);
+    auto mappings = session.getOrCreateChildWithName (tags::midiMappings, nullptr);
+
+    for (int i = 0; i < maps.getNumChildren(); ++i)
+    {
+        const auto map = maps.getChild (i);
+        if (! map.hasType (types::ControllerMap))
+            continue;
+
+        const auto controllerId = map.getProperty (tags::controller).toString();
+        const auto controlId = map.getProperty (tags::control).toString();
+
+        auto controller = controllers.getChildWithProperty (tags::uuid, controllerId);
+        if (! controller.isValid())
+            continue;
+        auto control = controller.getChildWithProperty (tags::uuid, controlId);
+        if (! control.isValid())
+            continue;
+
+        MidiMapping mapping (String {});
+        mapping.setProperty (tags::device, controller.getProperty (tags::inputDevice).toString());
+        mapping.setProperty (tags::name, control.getProperty (tags::name).toString());
+        mapping.setProperty (tags::eventType, control.getProperty ("eventType").toString());
+        mapping.setProperty (tags::eventId, (int) control.getProperty ("eventId", 0));
+        mapping.setProperty (tags::midiChannel, (int) control.getProperty (tags::midiChannel, 0));
+        mapping.setProperty (tags::toggle, ! (bool) control.getProperty ("momentary", false));
+        mapping.setProperty (tags::targetType, "parameter");
+        mapping.setProperty (tags::node, map.getProperty (tags::node).toString());
+        mapping.setProperty (tags::parameter, (int) map.getProperty (tags::parameter, -1));
+
+        mappings.addChild (mapping.data(), -1, nullptr);
+    }
+
+    session.removeChild (controllers, nullptr);
+    session.removeChild (maps, nullptr);
+}
+
 static Node findNodeRecursive (const Node& start, const Uuid& uuid)
 {
     if (! uuid.isNull() && uuid == start.getUuid())
@@ -27,6 +72,8 @@ static Node findNodeRecursive (const Node& start, const Uuid& uuid)
 
     return Node();
 }
+
+} // namespace detail
 
 class Session::Impl
 {
@@ -98,7 +145,7 @@ bool Session::loadData (const ValueTree& data)
     objectData.removeListener (this);
     objectData = data;
     setMissingProperties();
-    migrateControllerMaps (objectData);
+    detail::migrateControllerMaps (objectData);
     cleanOrphanMidiMappings();
     objectData.addListener (this);
     return true;
@@ -183,7 +230,7 @@ Node Session::findNodeById (const Uuid& uuid)
 
     for (int i = getNumGraphs(); --i >= 0;)
     {
-        node = findNodeRecursive (getGraph (i), uuid);
+        node = detail::findNodeRecursive (getGraph (i), uuid);
         if (node.isValid())
             break;
     }
@@ -258,46 +305,6 @@ void Session::forEach (const ValueTree tree, ValueTreeFunction handler) const
     handler (tree);
     for (int i = 0; i < tree.getNumChildren(); ++i)
         forEach (tree.getChild (i), handler);
-}
-
-void migrateControllerMaps (ValueTree session)
-{
-    if (! session.isValid())
-        return;
-
-    auto controllers = session.getChildWithName (tags::controllers);
-    auto maps = session.getChildWithName (tags::maps);
-    auto mappings = session.getOrCreateChildWithName (tags::midiMappings, nullptr);
-
-    for (int i = 0; i < maps.getNumChildren(); ++i)
-    {
-        const auto map = maps.getChild (i);
-        if (! map.hasType (types::ControllerMap))
-            continue;
-
-        const auto controllerId = map.getProperty (tags::controller).toString();
-        const auto controlId = map.getProperty (tags::control).toString();
-
-        auto controller = controllers.getChildWithProperty (tags::uuid, controllerId);
-        if (! controller.isValid())
-            continue;
-        auto control = controller.getChildWithProperty (tags::uuid, controlId);
-        if (! control.isValid())
-            continue;
-
-        MidiMapping mapping (String {});
-        mapping.setProperty (tags::device, controller.getProperty (tags::inputDevice).toString());
-        mapping.setProperty (tags::name, control.getProperty (tags::name).toString());
-        mapping.setProperty (tags::eventType, control.getProperty ("eventType").toString());
-        mapping.setProperty (tags::eventId, (int) control.getProperty ("eventId", 0));
-        mapping.setProperty (tags::midiChannel, (int) control.getProperty (tags::midiChannel, 0));
-        mapping.setProperty (tags::toggle, ! (bool) control.getProperty ("momentary", false));
-        mapping.setProperty (tags::targetType, "parameter");
-        mapping.setProperty (tags::node, map.getProperty (tags::node).toString());
-        mapping.setProperty (tags::parameter, (int) map.getProperty (tags::parameter, -1));
-
-        mappings.addChild (mapping.data(), -1, nullptr);
-    }
 }
 
 void Session::setActiveGraph (int index)

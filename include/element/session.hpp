@@ -139,10 +139,4 @@ private:
 typedef juce::ReferenceCountedObjectPtr<Session> SessionPtr;
 typedef SessionPtr SessionRef;
 
-/** Convert legacy <controllers> + <maps> data into flat <midiMappings>.
-    Operates directly on a session value tree so it can be unit tested.
-    Appends one MidiMapping per resolvable ControllerMap; legacy trees are
-    left untouched. Safe to call repeatedly only on freshly loaded data. */
-void migrateControllerMaps (juce::ValueTree session);
-
 } // namespace element
