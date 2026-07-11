@@ -314,6 +314,8 @@ public:
         // Show up to maxVisibleRows rows before scrolling.
         const int rows = jlimit (1, maxVisibleRows, jmax (1, programs.size()));
         setPreferredHeight (rows * rowHeight + 2);
+
+        selectCurrentProgramRow();
     }
 
     /** Draw the full-width table with no property label. PropertyComponent
@@ -339,6 +341,7 @@ public:
         fetchPrograms();
         list.setVisible (! programs.isEmpty());
         list.updateContent();
+        selectCurrentProgramRow();
         list.repaint();
         repaint();
     }
@@ -400,9 +403,33 @@ private:
             return;
         if (ProcessorPtr ptr = node.getObject())
         {
-            node.setMidiProgram (programs.getReference (rowNumber).program);
+            const int program = programs.getReference (rowNumber).program;
+            if (program == ptr->getMidiProgram())
+                return; // already loaded — don't discard live edits by reloading
+            node.setMidiProgram (program);
             ptr->reloadMidiProgram(); // fires midiProgramChanged -> panel refreshes
         }
+    }
+
+    /** Highlights the row matching the node's currently-loaded MIDI program.
+        The current program can change from a table click, the slider selector,
+        or a Program Change message received externally. All three update the
+        Processor's program (the single source of truth here — the Node model
+        property is not touched by externally-received program changes), and all
+        funnel through midiProgramChanged, which rebuilds this component. */
+    void selectCurrentProgramRow()
+    {
+        ProcessorPtr ptr = node.getObject();
+        const int current = ptr != nullptr ? ptr->getMidiProgram() : -1;
+        for (int i = 0; i < programs.size(); ++i)
+        {
+            if (programs.getReference (i).program == current)
+            {
+                list.selectRow (i);
+                return;
+            }
+        }
+        list.deselectAllRows();
     }
 
     void renameRow (int rowNumber, const String& newName)
@@ -501,7 +528,11 @@ private:
             name.setBounds (r);
         }
 
-        void mouseDown (const MouseEvent&) override { owner.selectRow (row); }
+        void mouseDown (const MouseEvent&) override
+        {
+            owner.selectRow (row); // instant highlight before the async reload completes
+            owner.loadRow (row);
+        }
         void mouseDoubleClick (const MouseEvent& e) override
         {
             // Double-clicking the name edits it (handled by the Label); only

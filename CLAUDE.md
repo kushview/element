@@ -72,3 +72,7 @@
 - When adding IONodes, ensure the parent graph has a valid port count first using `graph->setNumPorts()`.
 - Default port counts: 2 channels for audio (stereo), 1 channel for MIDI.
 - Message flow for adding nodes: `AddPluginMessage` → `AddPluginAction::perform()` → `EngineService::addPlugin()` → `GraphManager::addNode()`.
+
+## Comments in Code
+
+- Don't write comments when it is obvious what the code is doing.

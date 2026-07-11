@@ -1331,7 +1331,7 @@ void Node::setMidiProgram (int program)
         if (obj->getMidiProgram() == program)
             return;
         obj->setMidiProgram (program);
-        setProperty (tags::midiProgram, obj->areMidiProgramsEnabled());
+        setProperty (tags::midiProgram, obj->getMidiProgram());
     }
 }
 
