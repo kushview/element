@@ -11,6 +11,10 @@
 using namespace element;
 using namespace juce;
 
+namespace element::detail {
+extern void migrateControllerMaps (ValueTree session);
+}
+
 BOOST_AUTO_TEST_SUITE (MidiMappingSessionTests)
 
 BOOST_AUTO_TEST_CASE (AddRemoveFind)
@@ -79,8 +83,11 @@ BOOST_AUTO_TEST_CASE (MigrateLegacyControllerMaps)
     map.setProperty (tags::parameter, 5, nullptr);
     maps.addChild (map, -1, nullptr);
 
-    migrateControllerMaps (session);
+    element::detail::migrateControllerMaps (session);
 
+    BOOST_REQUIRE(! session.getChildWithName(tags::controllers).isValid());
+    BOOST_REQUIRE(! session.getChildWithName(tags::maps).isValid());
+    
     auto mappings = session.getChildWithName (tags::midiMappings);
     BOOST_REQUIRE (mappings.isValid());
     BOOST_REQUIRE_EQUAL (mappings.getNumChildren(), 1);
