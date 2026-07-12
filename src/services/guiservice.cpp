@@ -6,8 +6,6 @@
 #include <element/engine.hpp>
 #include <element/services.hpp>
 #include <element/settings.hpp>
-#include <element/version.hpp>
-
 #include <element/ui.hpp>
 #include <element/ui/commands.hpp>
 #include <element/ui/content.hpp>
@@ -16,8 +14,8 @@
 #include <element/ui/standard.hpp>
 #include <element/ui/style.hpp>
 #include <element/ui/updater.hpp>
+#include <element/version.hpp>
 
-#include "appinfo.hpp"
 #include "auth.hpp"
 #include "engine/midipanic.hpp"
 #include "messages.hpp"
@@ -30,8 +28,8 @@
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/windowmanager.hpp"
 
-#ifndef EL_USE_SYSTEM_TRAY
-#define EL_USE_SYSTEM_TRAY 1
+#ifndef ELEMENT_USE_SYSTEM_TRAY
+#define ELEMENT_USE_SYSTEM_TRAY 1
 #endif
 
 namespace element {
@@ -1124,7 +1122,7 @@ void GuiService::refreshSystemTray()
 {
     // stabilize systray
     auto& settings = context().settings();
-#if EL_USE_SYSTEM_TRAY
+#if ELEMENT_USE_SYSTEM_TRAY
     SystemTray::setEnabled (settings.isSystrayEnabled());
 #else
     juce::ignoreUnused (settings);

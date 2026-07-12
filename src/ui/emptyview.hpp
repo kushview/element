@@ -16,7 +16,7 @@ public:
         setName ("EmptyView");
     }
 
-    inline void paint (Graphics& g) override
+    inline void paint (juce::Graphics& g) override
     {
         g.fillAll (Colors::contentBackgroundColor);
         g.setColour (Colors::textColor);
@@ -27,7 +27,7 @@ public:
 #else
         const String msg ("Session is empty.\nPress Shift+Ctl+N to add a graph.");
 #endif
-        g.drawFittedText (msg, 0, 0, getWidth(), getHeight(), Justification::centred, 2);
+        g.drawFittedText (msg, 0, 0, getWidth(), getHeight(), juce::Justification::centred, 2);
     }
 };
 

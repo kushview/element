@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include <element/juce/audio_devices.hpp>
 #include <element/services.hpp>
 #include <element/signals.hpp>
-#include <element/juce/audio_devices.hpp>
 
 namespace element {
 

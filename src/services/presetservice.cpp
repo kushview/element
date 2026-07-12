@@ -1,13 +1,13 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <element/context.hpp>
+#include <element/datapath.hpp>
+#include <element/session.hpp>
 #include <element/ui.hpp>
 #include <element/ui/content.hpp>
-#include <element/session.hpp>
-#include "presetmanager.hpp"
-#include <element/context.hpp>
 
-#include <element/datapath.hpp>
+#include "presetmanager.hpp"
 #include "services/presetservice.hpp"
 
 using juce::String;

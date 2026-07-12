@@ -3,16 +3,15 @@
 
 #include <element/juce/osc.hpp>
 
-#include <element/ui/commands.hpp>
-
 #include <element/context.hpp>
 #include <element/devices.hpp>
 #include <element/settings.hpp>
+#include <element/ui/commands.hpp>
 
 #include "services/oscservice.hpp"
 
-#define EL_OSC_ADDRESS_COMMAND "/element/command"
-#define EL_OSC_ADDRESS_ENGINE "/element/engine"
+#define ELEMENT_OSC_ADDRESS_COMMAND "/element/command"
+#define ELEMENT_OSC_ADDRESS_ENGINE "/element/engine"
 
 using namespace juce;
 
@@ -137,10 +136,10 @@ public:
             return;
 
         application.reset (new CommandOSCListener (owner.context()));
-        receiver.addListener (application.get(), EL_OSC_ADDRESS_COMMAND);
+        receiver.addListener (application.get(), ELEMENT_OSC_ADDRESS_COMMAND);
 
         engine.reset (new EngineOSCListener (owner.context()));
-        receiver.addListener (engine.get(), EL_OSC_ADDRESS_ENGINE);
+        receiver.addListener (engine.get(), ELEMENT_OSC_ADDRESS_ENGINE);
 
         listenersReady = true;
     }

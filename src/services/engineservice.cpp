@@ -3,17 +3,17 @@
 
 #include <element/context.hpp>
 #include <element/devices.hpp>
+#include <element/engine.hpp>
 #include <element/graph.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
 #include <element/services.hpp>
 #include <element/settings.hpp>
+#include <element/ui.hpp>
 
 #include "engine/graphmanager.hpp"
-#include "nodes/mididevice.hpp"
 #include "engine/rootgraph.hpp"
-#include <element/engine.hpp>
-#include <element/ui.hpp>
+#include "nodes/mididevice.hpp"
 
 #define ELEMENT_TRACE_SESSION_LOAD 0
 
