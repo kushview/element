@@ -5,12 +5,12 @@
 
 #include <element/juce/gui_basics.hpp>
 
-#define EL_GENERAL_SETTINGS_NAME      "General"
-#define EL_AUDIO_SETTINGS_NAME        "Audio"
-#define EL_MIDI_SETTINGS_NAME         "MIDI"
-#define EL_OSC_SETTINGS_NAME          "OSC"
-#define EL_PLUGINS_PREFERENCE_NAME    "Plugins"
-#define EL_REPOSITORY_PREFERENCE_NAME "Updates"
+#define ELEMENT_GENERAL_SETTINGS_NAME      "General"
+#define ELEMENT_AUDIO_SETTINGS_NAME        "Audio"
+#define ELEMENT_MIDI_SETTINGS_NAME         "MIDI"
+#define ELEMENT_OSC_SETTINGS_NAME          "OSC"
+#define ELEMENT_PLUGINS_PREFERENCE_NAME    "Plugins"
+#define ELEMENT_REPOSITORY_PREFERENCE_NAME "Updates"
 
 namespace element {
 

@@ -1394,28 +1394,28 @@ void Preferences::addPage (const String& name)
 
 Component* Preferences::createPageForName (const String& name)
 {
-    if (name == EL_GENERAL_SETTINGS_NAME)
+    if (name == ELEMENT_GENERAL_SETTINGS_NAME)
     {
         return new GeneralSettingsPage (_context, _ui);
     }
-    else if (name == EL_AUDIO_SETTINGS_NAME)
+    else if (name == ELEMENT_AUDIO_SETTINGS_NAME)
     {
         return new AudioSettingsComponent (_context.devices());
     }
-    else if (name == EL_PLUGINS_PREFERENCE_NAME)
+    else if (name == ELEMENT_PLUGINS_PREFERENCE_NAME)
     {
         return new PluginSettingsComponent (_context);
     }
-    else if (name == EL_MIDI_SETTINGS_NAME)
+    else if (name == ELEMENT_MIDI_SETTINGS_NAME)
     {
         return new MidiSettingsPage (_context);
     }
-    else if (name == EL_OSC_SETTINGS_NAME)
+    else if (name == ELEMENT_OSC_SETTINGS_NAME)
     {
         return new OSCSettingsPage (_context, _ui);
     }
 #if ELEMENT_UPDATER
-    else if (name == EL_REPOSITORY_PREFERENCE_NAME)
+    else if (name == ELEMENT_REPOSITORY_PREFERENCE_NAME)
     {
         return new UpdatesSettingsPage (_context);
     }
@@ -1428,17 +1428,17 @@ void Preferences::addDefaultPages()
     if (pageList->getNumRows() > 0)
         return;
 
-    addPage (EL_GENERAL_SETTINGS_NAME);
-    addPage (EL_AUDIO_SETTINGS_NAME);
-    addPage (EL_MIDI_SETTINGS_NAME);
+    addPage (ELEMENT_GENERAL_SETTINGS_NAME);
+    addPage (ELEMENT_AUDIO_SETTINGS_NAME);
+    addPage (ELEMENT_MIDI_SETTINGS_NAME);
 #if ! ELEMENT_SE
-    addPage (EL_OSC_SETTINGS_NAME);
+    addPage (ELEMENT_OSC_SETTINGS_NAME);
 #endif
 #if ELEMENT_UPDATER
-    addPage (EL_REPOSITORY_PREFERENCE_NAME);
+    addPage (ELEMENT_REPOSITORY_PREFERENCE_NAME);
 #endif
 
-    setPage (EL_GENERAL_SETTINGS_NAME);
+    setPage (ELEMENT_GENERAL_SETTINGS_NAME);
 }
 
 void Preferences::setPage (const String& name)

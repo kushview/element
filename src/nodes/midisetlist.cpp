@@ -112,15 +112,15 @@ void MidiSetListProcessor::maybeSendTempoAndPosition (int program)
     if (auto* entry = entries[program])
     {
         if (entry->tempo >= 20.0)
-            s->getValueTree().setProperty (tags::tempo, entry->tempo, nullptr);
+            s->setProperty (tags::tempo, entry->tempo);
 
         if (entry->tsNum > 0 && entry->tsDen > 0)
         {
-            const int div = BeatType::fromDivisor (entry->tsDen); // raw denom -> BeatType enum
-            s->getValueTree().setProperty (tags::beatsPerBar, entry->tsNum, nullptr);
-            s->getValueTree().setProperty (tags::beatDivisor, div, nullptr);
+            const auto beatType = BeatType::fromDivisor (entry->tsDen);
+            s->setProperty (tags::beatsPerBar, entry->tsNum);
+            s->setProperty (tags::beatDivisor, beatType);
             if (auto e = _context.audio())
-                e->setMeter (entry->tsNum, div);
+                e->setMeter (entry->tsNum, beatType);
         }
 
         if (auto e = _context.audio())

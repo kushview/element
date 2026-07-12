@@ -1,15 +1,17 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "services/mappingservice.hpp"
-#include "services/deviceservice.hpp"
-#include "services/sessionservice.hpp"
-#include <element/ui.hpp>
-#include "engine/mappingengine.hpp"
+#include <element/juce/audio_devices.hpp>
+
 #include <element/context.hpp>
 #include <element/session.hpp>
 #include <element/signals.hpp>
-#include <element/juce/audio_devices.hpp>
+#include <element/ui.hpp>
+
+#include "engine/mappingengine.hpp"
+#include "services/deviceservice.hpp"
+#include "services/mappingservice.hpp"
+#include "services/sessionservice.hpp"
 
 using namespace juce;
 
@@ -349,7 +351,7 @@ void MappingService::tapTempo()
 {
     if (auto bpm = context().mapping().tapTempo (Time::getMillisecondCounterHiRes()))
         if (auto session = context().session())
-            session->data().setProperty (tags::tempo, *bpm, nullptr);
+            session->setProperty (tags::tempo, *bpm);
 }
 
 void MappingService::learnTempo()

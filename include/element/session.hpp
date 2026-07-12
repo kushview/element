@@ -107,9 +107,6 @@ protected:
     Session();
     friend class Context;
 
-    /** Set a property. */
-    inline void setProperty (const juce::Identifier& prop, const juce::var& val) { objectData.setProperty (prop, val, nullptr); }
-
     friend class juce::ValueTree;
     virtual void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property);
     virtual void valueTreeChildAdded (juce::ValueTree& parentTree, juce::ValueTree& childWhichHasBeenAdded);

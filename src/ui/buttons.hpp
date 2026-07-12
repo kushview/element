@@ -6,7 +6,6 @@
 #include <element/ui/style.hpp>
 #include <element/node.hpp>
 
-// #include "ElementApp.h"
 #include "ui/icons.hpp"
 #include "tempo.hpp"
 

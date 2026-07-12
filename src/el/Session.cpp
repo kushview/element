@@ -6,6 +6,8 @@
 // @classmod el.Session
 // @pragma nostrip
 
+#include <algorithm>
+
 #include <element/element.h>
 #include <element/node.hpp>
 #include <element/session.hpp>
@@ -31,12 +33,23 @@ int luaopen_el_Session (lua_State* L)
                        : std::shared_ptr<Node>();
         },
 
-        /// The sessions name.
+        /// The session's name.
         // @tfield string Session.name
         // @within Attributes
         "name", sol::property (
             [](Session& self) { return self.getName().toStdString(); },
             [](Session& self, const char* name) { self.setName (name); }
+        ),
+
+        /// The session's current tempo.
+        // @tfield string Session.tempo
+        // @within Attributes
+        "tempo", sol::property (
+            [](Session& self) { return self.getProperty(tags::tempo).toString().toStdString(); },
+            [](Session& self, double tempo) { 
+                tempo = std::clamp (tempo, 20.0, 999.0);
+                self.setProperty (tags::tempo, tempo); 
+            }
         ),
 
         /// Convert to an XML string.

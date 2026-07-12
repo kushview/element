@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <element/services.hpp>
-#include <element/processor.hpp>
 #include <element/midimapping.hpp>
+#include <element/processor.hpp>
+#include <element/services.hpp>
 #include <element/signals.hpp>
 
 namespace element {
