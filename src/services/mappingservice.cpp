@@ -349,7 +349,7 @@ void MappingService::tapTempo()
 {
     if (auto bpm = context().mapping().tapTempo (Time::getMillisecondCounterHiRes()))
         if (auto session = context().session())
-            session->data().setProperty (tags::tempo, *bpm, nullptr);
+            session->setProperty (tags::tempo, *bpm);
 }
 
 void MappingService::learnTempo()
