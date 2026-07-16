@@ -330,6 +330,19 @@ public:
     /** Sets the MIDI program's name */
     void setMidiProgramName (const int program, const String& name);
 
+    /** Changes the number of a saved local MIDI program.
+
+        Moves the saved program (its state and name) from one program number
+        to another. Not supported for global MIDI programs.
+
+        @param from  The zero-based program number to move (0-127)
+        @param to    The zero-based destination program number (0-127)
+        @return true if the program was renumbered, false if the operation was
+                not possible (global mode, out of range, no saved program at
+                @p from, or a saved program already occupies @p to)
+    */
+    bool changeMidiProgramNumber (int from, int to);
+
     /** Gets the MIDI program's name */
     juce::String getMidiProgramName (const int program) const;
 

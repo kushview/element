@@ -601,6 +601,43 @@ void Processor::setMidiProgramName (const int program, const String& name)
         pr->name = name;
 }
 
+bool Processor::changeMidiProgramNumber (int from, int to)
+{
+    if (useGlobalMidiPrograms())
+        return false; // renumbering not supported for global programs.
+    if (! isPositiveAndBelow (from, 128) || ! isPositiveAndBelow (to, 128))
+        return false;
+    if (from == to)
+        return true;
+
+    MidiProgram* source = nullptr;
+    for (auto* const p : midiPrograms)
+    {
+        if (p->program == to && p->state.getSize() > 0)
+            return false; // target slot already has a saved program.
+        if (p->program == from)
+            source = p;
+    }
+
+    if (source == nullptr || source->state.getSize() == 0)
+        return false; // nothing saved to move.
+
+    // Drop any empty placeholder occupying the destination.
+    for (int i = midiPrograms.size(); --i >= 0;)
+    {
+        auto* const p = midiPrograms.getUnchecked (i);
+        if (p != source && p->program == to)
+            midiPrograms.remove (i);
+    }
+
+    source->program = to;
+
+    if (midiProgram.get() == from)
+        midiProgram.set (to);
+
+    return true;
+}
+
 String Processor::getMidiProgramName (const int program) const
 {
     if (useGlobalMidiPrograms())

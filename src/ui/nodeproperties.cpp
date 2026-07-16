@@ -441,6 +441,28 @@ private:
         programs.getReference (rowNumber).name = newName;
     }
 
+    /** Renumbers a row's saved program. @p newProgram is zero-based (0-127). */
+    void changeRowNumber (int rowNumber, int newProgram)
+    {
+        if (isGlobal || ! isPositiveAndBelow (rowNumber, programs.size()))
+            return;
+        const auto oldProgram = programs.getReference (rowNumber).program;
+        if (newProgram == oldProgram)
+            return;
+        if (ProcessorPtr ptr = node.getObject())
+        {
+            if (! ptr->changeMidiProgramNumber (oldProgram, newProgram))
+                return;
+            // Refresh reorders/rebuilds rows, deleting the row we're called
+            // from — defer so we don't tear it down mid-callback.
+            Component::SafePointer<NodeMidiProgramsListPropertyComponent> safe (this);
+            MessageManager::callAsync ([safe]() {
+                if (safe != nullptr)
+                    safe->refresh();
+            });
+        }
+    }
+
     void deleteRow (int rowNumber)
     {
         if (! isPositiveAndBelow (rowNumber, programs.size()))
@@ -461,6 +483,31 @@ private:
         ProgramRow (NodeMidiProgramsListPropertyComponent& o)
             : owner (o)
         {
+            addAndMakeVisible (number);
+            number.setFont (Font (FontOptions (12.f)));
+            number.setColour (Label::textColourId, Colors::textColor.withAlpha (0.6f));
+            number.setJustificationType (Justification::centredLeft);
+            number.setEditable (false, true, false); // edit on double-click
+            // Forward the label's clicks so single-clicking selects the row.
+            number.addMouseListener (this, false);
+
+            number.onEditorShow = [this]() {
+                if (auto* ed = number.getCurrentTextEditor())
+                {
+                    ed->setInputRestrictions (3, "0123456789");
+                    ed->setText (String (programNumber + 1), false);
+                    ed->selectAll();
+                }
+            };
+            number.onTextChange = [this]() {
+                const int entered = number.getText().getIntValue();
+                if (entered >= 1 && entered <= 128 && (entered - 1) != programNumber)
+                    owner.changeRowNumber (row, entered - 1);
+                // Revert the display; a valid change refreshes the list, an
+                // invalid one just restores the current number.
+                number.setText (String (programNumber + 1), dontSendNotification);
+            };
+
             addAndMakeVisible (name);
             name.setFont (Font (FontOptions (12.f)));
             name.setEditable (false, true, false);
@@ -491,7 +538,9 @@ private:
         void update (int newRow, const Processor::MidiProgramInfo& info, bool global)
         {
             row = newRow;
-            numberText = String (info.program + 1);
+            programNumber = info.program;
+            number.setText (String (info.program + 1), dontSendNotification);
+            number.setEditable (false, ! global, false);
             realName = info.name;
             placeholder = "Program " + String (info.program + 1);
             name.setEditable (false, ! global, false);
@@ -514,15 +563,12 @@ private:
             // Query live selection so the highlight follows ListBox::selectRow.
             if (owner.list.isRowSelected (row))
                 g.fillAll (Colors::widgetBackgroundColor.brighter (0.15f));
-            g.setColour (Colors::textColor.withAlpha (0.6f));
-            g.setFont (Font (FontOptions (12.f)));
-            g.drawText (numberText, 4, 0, numberWidth - 4, getHeight(), Justification::centredLeft);
         }
 
         void resized() override
         {
             auto r = getLocalBounds();
-            r.removeFromLeft (numberWidth);
+            number.setBounds (r.removeFromLeft (numberWidth).withTrimmedLeft (4));
             trashButton.setBounds (r.removeFromRight (20).reduced (0, 1));
             r.removeFromRight (2);
             name.setBounds (r);
@@ -535,9 +581,9 @@ private:
         }
         void mouseDoubleClick (const MouseEvent& e) override
         {
-            // Double-clicking the name edits it (handled by the Label); only
-            // double-clicks elsewhere on the row load the program.
-            if (e.eventComponent == &name)
+            // Double-clicking the number or name edits it (handled by the
+            // Label); only double-clicks elsewhere on the row load the program.
+            if (e.eventComponent == &name || e.eventComponent == &number)
                 return;
             owner.loadRow (row);
         }
@@ -546,9 +592,10 @@ private:
         static constexpr int numberWidth = 30;
         NodeMidiProgramsListPropertyComponent& owner;
         int row = -1;
-        String numberText;
+        int programNumber = -1;
         String realName;
         String placeholder;
+        Label number;
         Label name;
         IconButton trashButton;
     };
