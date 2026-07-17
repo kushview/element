@@ -1,6 +1,8 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <algorithm>
+
 #include <element/context.hpp>
 #include <element/ui/style.hpp>
 #include <element/ui/commands.hpp>
@@ -158,6 +160,7 @@ private:
 NavigationConcertinaPanel::NavigationConcertinaPanel (Context& g)
     : globals (g), headerHeight (22), defaultPanelHeight (80)
 {
+    registerBuiltInPanels();
 }
 
 NavigationConcertinaPanel::~NavigationConcertinaPanel()
@@ -247,18 +250,36 @@ void NavigationConcertinaPanel::insertPanel (juce::Component* comp, int index)
 
 void NavigationConcertinaPanel::showPanel (const juce::String& name)
 {
-    namesHidden.removeString (name);
-    updateContent();
+    setPanelHidden (name, false);
 }
 
 void NavigationConcertinaPanel::hidePanel (const juce::String& name)
 {
-    namesHidden.addIfNotAlreadyThere (name);
-    updateContent();
+    setPanelHidden (name, true);
+}
+
+void NavigationConcertinaPanel::setPanelHidden (const juce::String& name, bool hidden)
+{
+    bool changed = false;
+    for (auto& entry : registered)
+    {
+        if (entry.desc.name == name && entry.desc.hidden != hidden)
+        {
+            entry.desc.hidden = hidden;
+            changed = true;
+        }
+    }
+
+    if (changed)
+        updateContent();
 }
 
 void NavigationConcertinaPanel::setPanelName (const String& panel, const String& newName)
 {
+    for (auto& entry : registered)
+        if (entry.desc.name == panel)
+            entry.desc.name = newName;
+
     if (auto ptr = findPanelByName (panel))
     {
         ptr->setName (newName);
@@ -273,60 +294,97 @@ void NavigationConcertinaPanel::clearPanels()
     comps.clearQuick (true);
 }
 
-void NavigationConcertinaPanel::updateContent()
+void NavigationConcertinaPanel::registerBuiltInPanels()
 {
-    clearPanels();
+    // Register only; updateContent() creates them. Going through addPanel() here
+    // would construct each panel eagerly, only for the first updateContent() to
+    // clear and rebuild them.
+    auto reg = [this] (PanelDescription desc, PanelFactory factory, PanelHeaderFactory header = nullptr) {
+        registered.push_back ({ std::move (desc), std::move (factory), std::move (header) });
+    };
 
-    if (! namesHidden.contains ("Session"))
-    {
-        auto* sess = new SessionTreePanel();
-        sess->setName ("Session");
-        sess->setComponentID ("Session");
-        addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
-    }
+    reg (
+        { "Session" },
+        [] { return new SessionTreePanel(); },
+        [this] (Component& panel) { return new ElementsHeader (*this, panel); });
 
-    if (! namesHidden.contains ("Graph"))
-    {
+    reg ({ "Graph" }, [] {
         auto* gv = new GraphSettingsView();
-        gv->setName ("Graph");
-        gv->setComponentID ("Graph");
         gv->setGraphButtonVisible (false);
         gv->setUpdateOnActiveGraphChange (true);
         gv->setPropertyPanelHeaderVisible (false);
-        addPanelInternal (-1, gv, "Graph", nullptr);
-    }
+        return gv;
+    });
 
-    if (! namesHidden.contains ("Node"))
-    {
-        auto* mv = new NodePropertiesView();
-        mv->setName ("Node");
-        mv->setComponentID ("Node");
-        addPanelInternal (-1, mv, "Node", nullptr);
-    }
+    reg ({ "Node" }, [] { return new NodePropertiesView(); });
 
-    if (! namesHidden.contains ("Editor"))
-    {
-        auto* nv = new NodeEditorView();
-        nv->setName ("Editor");
-        nv->setComponentID ("Editor");
-        addPanelInternal (-1, nv, "Editor", nullptr);
-    }
+    reg ({ "Editor" }, [] { return new NodeEditorView(); });
 
-    if (! namesHidden.contains ("Plugins"))
-    {
-        auto* pv = new PluginsPanelView (ViewHelpers::getGlobals (this)->plugins());
-        pv->setName ("Plugins");
-        pv->setComponentID ("Plugins");
-        addPanelInternal (-1, pv, "Plugins", 0);
-    }
+    reg ({ "Plugins" }, [this] { return new PluginsPanelView (globals.plugins()); });
 
-    if (! namesHidden.contains ("Data Path"))
+    reg (
+        { "Data Path", "UserDataPath" },
+        [] {
+            auto* dp = new DataPathTreeComponent();
+            dp->getFileTree().setDragAndDropDescription ("ccNavConcertinaPanel");
+            return dp;
+        },
+        [this] (Component& panel) {
+            return new UserDataPathHeader (*this, static_cast<DataPathTreeComponent&> (panel));
+        });
+}
+
+void NavigationConcertinaPanel::updateContent()
+{
+    clearPanels();
+    createRegisteredPanels();
+}
+
+void NavigationConcertinaPanel::createRegisteredPanels()
+{
+    for (const auto& entry : registered)
+        createPanel (entry);
+}
+
+void NavigationConcertinaPanel::createPanel (const RegisteredPanel& entry)
+{
+    if (entry.desc.hidden || ! entry.factory)
+        return;
+
+    auto* comp = entry.factory();
+    if (comp == nullptr)
+        return;
+
+    comp->setComponentID (entry.desc.componentID.isNotEmpty() ? entry.desc.componentID
+                                                              : entry.desc.name);
+
+    Component* header = entry.header ? entry.header (*comp) : nullptr;
+    addPanelInternal (entry.desc.index, comp, entry.desc.name, header);
+
+    if (entry.desc.preferredSize > 0)
+        setPanelSize (comp, entry.desc.preferredSize, false);
+}
+
+void NavigationConcertinaPanel::addPanel (PanelDescription desc, PanelFactory factory, PanelHeaderFactory header)
+{
+    if (! factory || findPanelByName (desc.name) != nullptr)
+        return;
+
+    registered.push_back ({ std::move (desc), std::move (factory), std::move (header) });
+    createPanel (registered.back());
+}
+
+void NavigationConcertinaPanel::removePanel (const String& name)
+{
+    registered.erase (std::remove_if (registered.begin(),
+                                      registered.end(),
+                                      [&name] (const RegisteredPanel& p) { return p.desc.name == name; }),
+                      registered.end());
+
+    if (auto* comp = findPanelByName (name))
     {
-        auto* dp = new DataPathTreeComponent();
-        dp->setName ("UserDataPath");
-        dp->setComponentID ("UserDataPath");
-        dp->getFileTree().setDragAndDropDescription ("ccNavConcertinaPanel");
-        addPanelInternal (-1, dp, "Data Path", new UserDataPathHeader (*this, *dp));
+        ConcertinaPanel::removePanel (comp);
+        comps.removeObject (comp);
     }
 }
 
