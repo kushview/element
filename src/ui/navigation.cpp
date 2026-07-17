@@ -13,7 +13,6 @@
 #include "ui/graphsettingsview.hpp"
 #include "ui/nodepropertiesview.hpp"
 #include "ui/pluginspanelview.hpp"
-#include "ui/audioiopanelview.hpp"
 #include "ui/sessiontreepanel.hpp"
 #include "ui/viewhelpers.hpp"
 
