@@ -352,6 +352,29 @@ public:
     /** Save the current MIDI program */
     void saveMidiProgram();
 
+    /** Saves the node's current live state into a specific local program slot.
+
+        Unlike saveMidiProgram(), this targets an arbitrary program number
+        rather than the active one, and does not change the active program.
+        Not supported for global MIDI programs.
+
+        @param program  The zero-based program number to store into (0-127)
+    */
+    void saveMidiProgram (int program);
+
+    /** Returns the next unused MIDI program number.
+
+        Searches upward from @p after (exclusive), wrapping around from 127
+        back to 0, for the first program slot that has no saved program.
+        Follows the current mode (global files or local in-memory programs).
+
+        @param after  The zero-based program to search from (typically the
+                      currently active program)
+        @return the next unused program number (0-127), or -1 if all 128
+                slots are occupied
+    */
+    int nextAvailableMidiProgram (int after) const;
+
     /** Removes a MIDI Program */
     void removeMidiProgram (int program, bool global);
 

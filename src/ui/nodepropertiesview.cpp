@@ -21,6 +21,20 @@ static inline String ioNodeMessage (const Node& node)
     msg << ": " << TRANS ("see preferences") << "...";
     return msg;
 }
+
+/** Depth-first search for the first descendant of the given type. */
+template <typename T>
+static T* findDescendantOfType (Component& parent)
+{
+    for (auto* child : parent.getChildren())
+    {
+        if (auto* typed = dynamic_cast<T*> (child))
+            return typed;
+        if (auto* found = findDescendantOfType<T> (*child))
+            return found;
+    }
+    return nullptr;
+}
 } // namespace detail
 
 class NodePropertiesView::NodeWatcher : private ValueTree::Listener
@@ -362,7 +376,20 @@ void NodePropertiesView::updateProperties()
 
 void NodePropertiesView::updateMidiProgram()
 {
+    // Loading a program rebuilds this whole panel (see updateProperties), which
+    // destroys the programs ListBox. If the user was navigating that list with
+    // the keyboard, hand focus back to the rebuilt list so arrow keys keep
+    // working — but not while they're editing a program's name or number.
+    auto* focused = Component::getCurrentlyFocusedComponent();
+    const bool restoreListFocus = focused != nullptr
+                                  && props.isParentOf (focused)
+                                  && dynamic_cast<TextEditor*> (focused) == nullptr;
+
     updateProperties();
+
+    if (restoreListFocus)
+        if (auto* list = detail::findDescendantOfType<ListBox> (props))
+            list->grabKeyboardFocus();
 }
 
 } // namespace element

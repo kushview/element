@@ -9,13 +9,9 @@ namespace element {
 
 struct NodeMidiProgramComponent : public Component
 {
-    Label name;
-    Slider slider;
-    IconButton loadButton;
-    IconButton saveButton;
+    juce::TextButton addButton;
     IconButton globalButton;
     IconButton powerButton;
-    IconButton trashButton;
 
     NodeMidiProgramComponent();
     void resized() override;

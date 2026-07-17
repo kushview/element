@@ -66,8 +66,31 @@ inline static bool showMidiFilters (const Node& node)
     return true;
 }
 // clang-format on
+
+/** Snapshots the node's current live state into the given program slot,
+    handling both global (on-disk) and local (in-memory) program modes. Does
+    not change the active program. */
+inline static void saveNodeStateToProgram (Node node, int program)
+{
+    ProcessorPtr ptr = node.getObject();
+    if (ptr == nullptr || ! isPositiveAndBelow (program, 128))
+        return;
+
+    if (ptr->useGlobalMidiPrograms())
+    {
+        node.savePluginState();
+        node.writeToFile (ptr->getMidiProgramFile (program));
+    }
+    else
+    {
+        ptr->saveMidiProgram (program);
+    }
+}
 } // namespace detail
 
+/** Header bar for the MIDI Programs section: an "add program" button plus the
+    global-programs and enable toggles. Selecting, loading, renaming, renumbering
+    and deleting individual programs all happen in the table below. */
 class NodeMidiProgramPropertyComponent : public PropertyComponent
 {
 public:
@@ -75,82 +98,16 @@ public:
         : PropertyComponent (propertyName),
           node (n)
     {
-        setPreferredHeight (40);
+        setPreferredHeight (26);
+
+        // Match the right (content) half's fill to the left (label) half so the
+        // header reads as one continuous bar. See LookAndFeel_E1::drawPropertyComponentBackground.
+        setColour (PropertyComponent::backgroundColourId, Colors::widgetBackgroundColor.darker (0.0015f));
 
         addAndMakeVisible (program);
 
-        program.name.onTextChange = [this]() {
-            if (program.name.getText().isEmpty())
-                program.name.setText (EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
-            auto theText = program.name.getText();
-            if (theText == EL_PROGRAM_NAME_PLACEHOLDER)
-                theText = "";
-
-            const auto programNumber = roundToInt (program.slider.getValue()) - 1;
-            node.setMidiProgramName (programNumber, theText);
-            updateMidiProgram();
-        };
-
-        program.slider.textFromValueFunction = [this] (double value) -> String {
-            if (! node.areMidiProgramsEnabled())
-                return "Off";
-            return String (roundToInt (value));
-        };
-        program.slider.valueFromTextFunction = [] (const String& text) -> double {
-            return text.getDoubleValue();
-        };
-
-        program.slider.onValueChange = [this]() {
-            const auto newProgram = roundToInt (program.slider.getValue()) - 1;
-            node.setMidiProgram (newProgram);
-            updateMidiProgram();
-        };
-
-        program.slider.updateText();
-
-        program.trashButton.setTooltip ("Delete MIDI program");
-        program.trashButton.onClick = [this]() {
-            if (ProcessorPtr ptr = node.getObject())
-            {
-                if (! ptr->areMidiProgramsEnabled())
-                    return;
-                ptr->removeMidiProgram (ptr->getMidiProgram(),
-                                        ptr->useGlobalMidiPrograms());
-                notifyProgramsChanged (ptr);
-            }
-        };
-
-        program.saveButton.setTooltip ("Save MIDI program");
-        program.saveButton.onClick = [this]() {
-            if (ProcessorPtr ptr = node.getObject())
-            {
-                if (node.useGlobalMidiPrograms())
-                {
-                    if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
-                    {
-                        node.savePluginState();
-                        node.writeToFile (ptr->getMidiProgramFile());
-                    }
-                }
-                else
-                {
-                    ptr->saveMidiProgram();
-                }
-                notifyProgramsChanged (ptr);
-            }
-        };
-
-        program.loadButton.setTooltip ("Reload saved MIDI program");
-        program.loadButton.onClick = [this]() {
-            if (ProcessorPtr ptr = node.getObject())
-            {
-                if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
-                {
-                    ptr->reloadMidiProgram();
-                    stabilizeContent();
-                }
-            }
-        };
+        program.addButton.setTooltip ("Add a MIDI program from the current state");
+        program.addButton.onClick = [this]() { addProgram(); };
 
         program.globalButton.onClick = [this]() {
             node.setUseGlobalMidiPrograms (program.globalButton.getToggleState());
@@ -172,12 +129,23 @@ private:
     Node node;
     NodeMidiProgramComponent program;
 
-    /** Refreshes the properties panel (including the Programs table) after the
-        set of saved programs changes. Deferred so we don't rebuild the panel —
-        and destroy this component — from within a button callback. */
-    static void notifyProgramsChanged (ProcessorPtr ptr)
+    /** Snapshots the current node state into the next free program number
+        (searching upward from the active program) and selects it. The reload
+        fires midiProgramChanged, which rebuilds the panel and highlights the
+        new row — deferred, so this component isn't torn down mid-callback. */
+    void addProgram()
     {
-        MessageManager::callAsync ([ptr]() { ptr->midiProgramChanged(); });
+        ProcessorPtr ptr = node.getObject();
+        if (ptr == nullptr || ! ptr->areMidiProgramsEnabled())
+            return;
+
+        const int next = ptr->nextAvailableMidiProgram (ptr->getMidiProgram());
+        if (next < 0)
+            return; // all 128 slots are in use.
+
+        detail::saveNodeStateToProgram (node, next);
+        node.setMidiProgram (next);
+        ptr->reloadMidiProgram();
     }
 
     void updateMidiProgram()
@@ -190,42 +158,11 @@ private:
 
         setEnabled (true);
         const bool enabled = node.areMidiProgramsEnabled();
-        String programName;
-        if (ProcessorPtr object = node.getObject())
-        {
-            const bool global = object->useGlobalMidiPrograms();
-            // use the object because there isn't a notifaction directly back to node model
-            // in all cases
-            const auto programNumber = object->getMidiProgram();
-            program.slider.setValue (1 + object->getMidiProgram(), dontSendNotification);
-            if (isPositiveAndNotGreaterThan (roundToInt (program.slider.getValue()), 128))
-            {
-                programName = node.getMidiProgramName (programNumber);
-                program.name.setEnabled (global ? false : enabled);
-                program.loadButton.setEnabled (enabled);
-                program.saveButton.setEnabled (enabled);
-                program.trashButton.setEnabled (enabled);
-                program.powerButton.setToggleState (enabled, dontSendNotification);
-            }
-            else
-            {
-                program.name.setEnabled (false);
-                program.loadButton.setEnabled (false);
-                program.saveButton.setEnabled (false);
-                program.trashButton.setEnabled (false);
-                program.powerButton.setToggleState (false, dontSendNotification);
-            }
-        }
-
-        program.name.setText (programName.isNotEmpty() ? programName : EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
-        program.powerButton.setToggleState (node.areMidiProgramsEnabled(), dontSendNotification);
+        program.addButton.setEnabled (enabled);
+        program.powerButton.setToggleState (enabled, dontSendNotification);
         program.globalButton.setToggleState (node.useGlobalMidiPrograms(), dontSendNotification);
         program.globalButton.setEnabled (enabled);
-        program.slider.updateText();
-        program.slider.setEnabled (enabled);
     }
-
-    void stabilizeContent() {}
 };
 
 class NodeMidiChannelsPropertyComponent : public MidiMultiChannelPropertyComponent
@@ -309,6 +246,7 @@ public:
         list.setRowHeight (rowHeight);
         list.getViewport()->setScrollBarsShown (true, false);
         list.setVisible (! programs.isEmpty()); // let the empty hint show through
+        list.onLoadRow = [this] (int row) { loadRow (row); };
         addChildComponent (list);
 
         // Show up to maxVisibleRows rows before scrolling.
@@ -373,8 +311,26 @@ public:
     }
 
 private:
+    /** ListBox that loads the selected program when the Right arrow is pressed,
+        in addition to the base up/down row navigation. */
+    struct ProgramListBox : public ListBox
+    {
+        std::function<void (int)> onLoadRow;
+
+        bool keyPressed (const KeyPress& key) override
+        {
+            if (key.isKeyCode (KeyPress::rightKey) && isRowSelected (getSelectedRow()))
+            {
+                if (onLoadRow != nullptr)
+                    onLoadRow (getSelectedRow());
+                return true;
+            }
+            return ListBox::keyPressed (key);
+        }
+    };
+
     Node node;
-    ListBox list;
+    ProgramListBox list;
     Array<Processor::MidiProgramInfo> programs;
     bool isGlobal = false;
 
@@ -439,6 +395,14 @@ private:
         const auto program = programs.getReference (rowNumber).program;
         node.setMidiProgramName (program, newName);
         programs.getReference (rowNumber).name = newName;
+    }
+
+    /** Overwrites a row's saved program with the node's current live state. */
+    void saveRow (int rowNumber)
+    {
+        if (! isPositiveAndBelow (rowNumber, programs.size()))
+            return;
+        detail::saveNodeStateToProgram (node, programs.getReference (rowNumber).program);
     }
 
     /** Renumbers a row's saved program. @p newProgram is zero-based (0-127). */
@@ -529,10 +493,20 @@ private:
                 updateNameDisplay();
             };
 
+            addAndMakeVisible (saveButton);
+            saveButton.setTooltip ("Save current state to this MIDI program");
+            saveButton.setIcon (Icon (getIcons().farSave, Colors::textColor));
+            saveButton.onClick = [this]() { owner.saveRow (row); };
+
             addAndMakeVisible (trashButton);
             trashButton.setTooltip ("Delete MIDI program");
             trashButton.setIcon (Icon (getIcons().farTrashAlt, Colors::textColor));
             trashButton.onClick = [this]() { owner.deleteRow (row); };
+
+            // Keep keyboard focus on the list so arrow-key navigation survives
+            // clicking a row's buttons.
+            saveButton.setWantsKeyboardFocus (false);
+            trashButton.setWantsKeyboardFocus (false);
         }
 
         void update (int newRow, const Processor::MidiProgramInfo& info, bool global)
@@ -570,6 +544,8 @@ private:
             auto r = getLocalBounds();
             number.setBounds (r.removeFromLeft (numberWidth).withTrimmedLeft (4));
             trashButton.setBounds (r.removeFromRight (20).reduced (0, 1));
+            r.removeFromRight (1);
+            saveButton.setBounds (r.removeFromRight (20).reduced (0, 1));
             r.removeFromRight (2);
             name.setBounds (r);
         }
@@ -597,6 +573,7 @@ private:
         String placeholder;
         Label number;
         Label name;
+        IconButton saveButton;
         IconButton trashButton;
     };
 };

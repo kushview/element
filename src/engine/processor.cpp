@@ -443,17 +443,38 @@ File Processor::getMidiProgramFile (int program) const
 
 void Processor::saveMidiProgram()
 {
+    saveMidiProgram (midiProgram.get());
+}
+
+void Processor::saveMidiProgram (int program)
+{
     if (useGlobalMidiPrograms())
         return; // don't save global programs here.
 
-    int progamNumber = midiProgram.get();
-    if (! isPositiveAndBelow (progamNumber, 128))
+    if (! isPositiveAndBelow (program, 128))
         return;
-    if (auto* const program = getMidiProgram (progamNumber))
+    if (auto* const pr = getMidiProgram (program))
     {
-        program->state = MemoryBlock();
-        getState (program->state);
+        pr->state = MemoryBlock();
+        getState (pr->state);
     }
+}
+
+int Processor::nextAvailableMidiProgram (int after) const
+{
+    bool used[128] = { false };
+    for (const auto& info : getMidiPrograms())
+        if (isPositiveAndBelow (info.program, 128))
+            used[info.program] = true;
+
+    for (int i = 1; i <= 128; ++i)
+    {
+        const int candidate = (after + i) % 128;
+        if (! used[candidate])
+            return candidate;
+    }
+
+    return -1; // all 128 slots occupied.
 }
 
 void Processor::removeMidiProgram (int program, bool global)
