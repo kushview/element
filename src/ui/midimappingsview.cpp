@@ -5,6 +5,7 @@
 #include "ui/viewhelpers.hpp"
 #include <element/juce/audio_devices.hpp>
 #include <element/ui/content.hpp>
+#include <element/ui/style.hpp>
 #include <element/session.hpp>
 #include <element/midimapping.hpp>
 #include <element/node.hpp>
@@ -576,7 +577,7 @@ int MidiMappingsView::getNumRows()
 void MidiMappingsView::paintRowBackground (Graphics& g, int, int, int, bool selected)
 {
     if (selected)
-        g.fillAll (Colours::darkgrey.withAlpha (0.4f));
+        g.fillAll (Colors::highlightRow);
 }
 
 void MidiMappingsView::paintCell (Graphics& g, int row, int columnId, int w, int h, bool)

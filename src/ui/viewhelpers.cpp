@@ -26,7 +26,7 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
 
     if (selected)
     {
-        g.setColour (Colors::elemental.darker (0.6000006f));
+        g.setColour (Colors::highlightRow);
         g.setOpacity (1.0f);
         g.fillRect (0, 0, w, h);
     }

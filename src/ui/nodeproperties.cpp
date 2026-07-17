@@ -536,7 +536,7 @@ private:
         {
             // Query live selection so the highlight follows ListBox::selectRow.
             if (owner.list.isRowSelected (row))
-                g.fillAll (Colors::widgetBackgroundColor.brighter (0.15f));
+                g.fillAll (Colors::highlightRow);
         }
 
         void resized() override

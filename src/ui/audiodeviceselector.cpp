@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/devices.hpp>
+#include <element/ui/style.hpp>
 
 #include "ui/audiodeviceselector.hpp"
 
@@ -83,8 +84,7 @@ public:
         if (isPositiveAndBelow (row, items.size()))
         {
             if (rowIsSelected)
-                g.fillAll (findColour (TextEditor::highlightColourId)
-                               .withMultipliedAlpha (0.3f));
+                g.fillAll (Colors::highlightRow);
 
             auto item = items[row];
             bool enabled = deviceManager.isMidiInputDeviceEnabled (item.identifier);

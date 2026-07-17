@@ -32,6 +32,7 @@ const Colour Colors::textColor = Colour ((uint32) LookAndFeel_E1::defaultTextCol
 const Colour Colors::textActiveColor = Colour ((uint32) LookAndFeel_E1::defaultTextActiveColor);
 const Colour Colors::textBoldColor = Colour ((uint32) LookAndFeel_E1::defaultTextBoldColor);
 const Colour Colors::highlightBackgroundColor = Colors::textColor.darker (0.6000006f).withAlpha (0.6f);
+const Colour Colors::highlightRow = Colors::widgetBackgroundColor.brighter (0.15f);
 
 //==============================================================================
 void Style::drawVerticalText (juce::Graphics& g,
@@ -309,7 +310,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (TreeView::backgroundColourId, Colour (0x00000000));
     setColour (TreeView::linesColourId, Colors::textColor);
     setColour (TreeView::dragAndDropIndicatorColourId, Colours::orange.darker());
-    setColour (TreeView::selectedItemBackgroundColourId, Colors::elemental.darker (0.6000006f));
+    setColour (TreeView::selectedItemBackgroundColourId, Colors::highlightRow);
 
     // Carrot
     setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
@@ -400,7 +401,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (MidiBlinker::outlineColourId, Colors::widgetBackgroundColor.brighter().brighter());
 
     // Tree View
-    setColour (TreeView::selectedItemBackgroundColourId, Colors::elemental.darker (0.6000006f));
+    setColour (TreeView::selectedItemBackgroundColourId, Colors::highlightRow);
     setColour (TreeView::backgroundColourId, Colors::backgroundColor);
 
     // Keymap Editor
@@ -409,7 +410,7 @@ LookAndFeel_E1::LookAndFeel_E1()
 
     // Directory Contents Display
     setColour (DirectoryContentsDisplayComponent::textColourId, Colors::textColor);
-    setColour (DirectoryContentsDisplayComponent::highlightColourId, Colors::elemental.darker (0.6000006f));
+    setColour (DirectoryContentsDisplayComponent::highlightColourId, Colors::highlightRow);
 
     // List Box
     setColour (ListBox::textColourId, Colors::textColor);

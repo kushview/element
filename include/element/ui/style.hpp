@@ -26,6 +26,9 @@ struct Colors {
     static const juce::Colour textBoldColor;
 
     static const juce::Colour highlightBackgroundColor;
+
+    /** Canonical background for a selected list/table/tree row. */
+    static const juce::Colour highlightRow;
 };
 
 struct Style {
