@@ -12,6 +12,7 @@ waf3-*
 .waf3-*
 .lock*
 build/
+build*/
 *.pyc
 .DS_Store
 *.autosave

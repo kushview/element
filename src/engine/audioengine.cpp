@@ -544,7 +544,15 @@ public:
         const int newBlockSize = device->getCurrentBufferSizeSamples();
         const int numChansIn = device->getActiveInputChannels().countNumberOfSetBits();
         const int numChansOut = device->getActiveOutputChannels().countNumberOfSetBits();
+
+        // Capture the device's audio workgroup (macOS) so parallel render workers
+        // can be scheduled together with the device's audio thread.
+        deviceWorkgroup = device->getWorkgroup();
+
         audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
+
+        // Called before the first IO callback, so no render is in flight here.
+        applyParallelToGraphs();
     }
 
     void audioAboutToStart (const double newSampleRate, const int newBlockSize, const int numChansIn, const int numChansOut)
@@ -633,12 +641,19 @@ public:
         jassert (graph);
         if (isPrepared)
             prepareGraph (graph, sampleRate, blockSize);
-        ScopedLock sl (lock);
-        if (graphs.addGraph (graph))
         {
-            graph->renderingSequenceChanged.connect (
-                std::bind (&AudioEngine::updateExternalLatencySamples, &engine));
+            ScopedLock sl (lock);
+            if (graphs.addGraph (graph))
+            {
+                graph->renderingSequenceChanged.connect (
+                    std::bind (&AudioEngine::updateExternalLatencySamples, &engine));
+            }
         }
+
+        // Match the new graph to the current parallel-rendering setting.
+        graph->setAudioWorkgroup (deviceWorkgroup);
+        graph->setParallelRendering (parallelSettingEnabled
+                                     && engine.getRunMode() == RunMode::Standalone);
     }
 
     void removeGraph (RootGraph* graph)
@@ -771,7 +786,24 @@ private:
     Atomic<double> midiOutLatency { 0.0 };
     std::atomic<bool> audioStarted { false };
 
+    bool parallelSettingEnabled = false;
+    juce::AudioWorkgroup deviceWorkgroup;
+
     ReferenceCountedArray<AudioEngine::LevelMeter> inMeters, outMeters;
+
+    /** Pushes the parallel-rendering setting and the device audio workgroup to
+        every root graph. Parallel rendering is only enabled in standalone mode;
+        hosted (plugin) mode stays sequential. */
+    void applyParallelToGraphs()
+    {
+        const bool enable = parallelSettingEnabled
+                            && engine.getRunMode() == RunMode::Standalone;
+        for (auto* const graph : graphs.getGraphs())
+        {
+            graph->setAudioWorkgroup (deviceWorkgroup);
+            graph->setParallelRendering (enable);
+        }
+    }
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -867,6 +899,9 @@ void AudioEngine::applySettings (Settings& settings)
     }
 
     priv->startStopCont.set (settings.transportRespondToStartStopContinue() ? 1 : 0);
+
+    priv->parallelSettingEnabled = settings.parallelRendering();
+    priv->applyParallelToGraphs();
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

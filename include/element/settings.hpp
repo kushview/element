@@ -53,6 +53,7 @@ public:
     static const char* authPreviewUpdatesKey;
     static const char* authAppcastUrlKey;
     static const char* transportStartStopContinue;
+    static const char* parallelRenderingKey;
 
     bool getBool (std::string_view key, bool fallback = false) const noexcept;
 
@@ -176,6 +177,12 @@ public:
 
     void setTransportRespondToStartStopContinue (bool shouldRespond);
     bool transportRespondToStartStopContinue() const;
+
+    /** Returns true if multi-threaded (parallel) audio graph rendering is enabled. */
+    bool parallelRendering() const;
+
+    /** Enables or disables multi-threaded (parallel) audio graph rendering. */
+    void setParallelRendering (bool shouldBeParallel);
 
 private:
     juce::PropertiesFile* getProps() const;

@@ -12,6 +12,8 @@
 namespace element {
 
 class Context;
+class RenderPool;
+struct ParallelSchedule;
 
 class GraphNode : public Processor,
                   private AsyncUpdater
@@ -186,6 +188,30 @@ public:
     /** Rebuild rendering ops immediately. */
     void rebuild() noexcept;
 
+    /** Enables or disables multi-threaded (parallel) rendering of this graph.
+
+        When enabled, the graph is rendered from a parallel schedule that runs
+        independent nodes concurrently; when disabled, the original single-threaded
+        op loop is used. Triggers a rebuild of the rendering sequence.
+    */
+    void setParallelRendering (bool shouldBeParallel);
+
+    /** Returns true if parallel rendering is enabled for this graph. */
+    bool isParallelRendering() const noexcept { return parallelEnabled.load (std::memory_order_relaxed); }
+
+    /** Sets the OS audio workgroup (macOS) that parallel render worker threads
+        should join, so they are scheduled with the device's audio thread. Safe to
+        pass a disengaged workgroup. Forwarded to the worker pool when present. */
+    void setAudioWorkgroup (juce::AudioWorkgroup workgroup);
+
+    /** Returns the number of scheduled render tasks, or 0 when not rendering in
+        parallel. Intended for testing/diagnostics. */
+    int getNumRenderTasks() const noexcept;
+
+    /** Returns the number of scheduled tasks pinned to the audio thread.
+        Intended for testing/diagnostics. */
+    int getNumAudioThreadOnlyTasks() const noexcept;
+
 protected:
     //==========================================================================
     virtual void preRenderNodes() {}
@@ -217,6 +243,13 @@ private:
     Array<void*> renderingOps;
     bool _prepared = false;
 
+    std::atomic<bool> parallelEnabled { false };
+    std::unique_ptr<ParallelSchedule> parallelSchedule;
+    std::unique_ptr<RenderPool> renderPool;
+    double poolSampleRate = 0.0;
+    int poolBlockSize = 0;
+    juce::AudioWorkgroup graphWorkgroup;
+
     AudioSampleBuffer* currentAudioInputBuffer;
     AudioSampleBuffer currentAudioOutputBuffer;
     MidiBuffer* currentMidiInputBuffer;
@@ -233,6 +266,28 @@ private:
 
     CriticalSection seqLock;
     friend class ScriptNode; // workaround so parameter connections work when params change.
+
+    /** Sets up per-block render state (input/output buffers, MIDI filtering)
+        shared by both the sequential and parallel render paths. */
+    void renderPrologue (RenderContext&);
+
+    /** Copies the graph's output buffers back into the render context. Shared by
+        both render paths. */
+    void renderEpilogue (RenderContext&);
+
+    /** Walks the flat renderingOps list on the calling thread. Assumes seqLock is
+        held and the render prologue has run. Original single-threaded path. */
+    void performSequential (int numSamples);
+
+    /** Renders the parallel schedule (via the worker pool, or on the calling
+        thread when threading isn't worthwhile). Assumes seqLock is held and the
+        render prologue has run. */
+    void performParallel (int numSamples);
+
+    /** Creates or resizes the worker pool to match the current sample rate and
+        block size when parallel rendering is active. Runs on the message thread. */
+    void ensureRenderPool();
+
     void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();

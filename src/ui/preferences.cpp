@@ -419,6 +419,14 @@ public:
         systray.setToggleState (settings.isSystrayEnabled(), dontSendNotification);
         systray.getToggleStateValue().addListener (this);
 
+        addAndMakeVisible (parallelRenderingLabel);
+        parallelRenderingLabel.setText ("Multicore audio", dontSendNotification);
+        parallelRenderingLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+        addAndMakeVisible (parallelRendering);
+        parallelRendering.setClickingTogglesState (true);
+        parallelRendering.setToggleState (settings.parallelRendering(), dontSendNotification);
+        parallelRendering.getToggleStateValue().addListener (this);
+
         addAndMakeVisible (desktopScaleLabel);
         desktopScaleLabel.setText ("Desktop scale", dontSendNotification);
         desktopScaleLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -538,6 +546,7 @@ public:
         mainContentBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
 
         layoutSetting (r, systrayLabel, systray);
+        layoutSetting (r, parallelRenderingLabel, parallelRendering);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
 
 #if ! ELEMENT_SE
@@ -607,6 +616,11 @@ public:
             settings.setSystrayEnabled (systray.getToggleState());
             gui.refreshSystemTray();
         }
+        else if (value.refersToSameSourceAs (parallelRendering.getToggleStateValue()))
+        {
+            settings.setParallelRendering (parallelRendering.getToggleState());
+            engine->applySettings (settings);
+        }
         else if (value.refersToSameSourceAs (mainContentBox.getSelectedIdAsValue()))
         {
             auto uitype = settings.getMainContentType();
@@ -667,6 +681,9 @@ private:
 
     Label systrayLabel;
     SettingButton systray;
+
+    Label parallelRenderingLabel;
+    SettingButton parallelRendering;
 
     Label desktopScaleLabel;
     Slider desktopScale;

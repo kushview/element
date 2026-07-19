@@ -11,6 +11,8 @@
 #include "engine/ionode.hpp"
 #include "nodes/audioprocessor.hpp"
 #include "engine/graphnode.hpp"
+#include "engine/renderschedule.hpp"
+#include "engine/renderpool.hpp"
 
 #ifndef EL_GRAPH_NODE_NAME
 #define EL_GRAPH_NODE_NAME "Graph"
@@ -403,37 +405,61 @@ bool GraphNode::isAnInputTo (const uint32 possibleInputId,
 
 void GraphNode::buildRenderingSequence()
 {
+    Array<void*> orderedNodes;
+    {
+        const LookupTable table (connections);
+
+        for (int i = 0; i < nodes.size(); ++i)
+        {
+            Processor* const node = nodes.getUnchecked (i);
+
+            int j = 0;
+            for (; j < orderedNodes.size(); ++j)
+                if (table.isAnInputTo (node->nodeId, ((Processor*) orderedNodes.getUnchecked (j))->nodeId))
+                    break;
+
+            orderedNodes.insert (j, node);
+        }
+    }
+
+    if (parallelEnabled.load (std::memory_order_relaxed))
+    {
+        // Build a parallel schedule instead of the sequential op list. Only one
+        // is live at a time so control-port BindParameterOps aren't double-bound.
+        auto schedule = buildParallelSchedule (*this, orderedNodes, getBlockSize());
+        setLatencySamples (schedule->totalLatency);
+        ensureRenderPool();
+
+        Array<void*> oldOps;
+        std::unique_ptr<ParallelSchedule> oldSchedule;
+        {
+            // Only quick pointer swaps happen under the lock; the old schedule and
+            // ops are freed below, outside it, so the audio thread never blocks on
+            // a deallocation while acquiring seqLock.
+            const ScopedLock sl (seqLock);
+            renderingOps.swapWith (oldOps);
+            oldSchedule = std::move (parallelSchedule);
+            parallelSchedule = std::move (schedule);
+        }
+
+        oldSchedule.reset();
+        deleteRenderOpArray (oldOps);
+        renderingSequenceChanged();
+        return;
+    }
+
     Array<void*> newRenderingOps;
     int numRenderingBuffersNeeded = 2;
     int numMidiBuffersNeeded = 1;
-    int numAtomBuffersNeeded = 1;
 
     {
-        Array<void*> orderedNodes;
-
-        {
-            const LookupTable table (connections);
-
-            for (int i = 0; i < nodes.size(); ++i)
-            {
-                Processor* const node = nodes.getUnchecked (i);
-
-                int j = 0;
-                for (; j < orderedNodes.size(); ++j)
-                    if (table.isAnInputTo (node->nodeId, ((Processor*) orderedNodes.getUnchecked (j))->nodeId))
-                        break;
-
-                orderedNodes.insert (j, node);
-            }
-        }
-
         GraphBuilder builder (*this, orderedNodes, newRenderingOps);
         numRenderingBuffersNeeded = builder.buffersNeeded (PortType::Audio);
         numMidiBuffersNeeded = builder.buffersNeeded (PortType::Midi);
-        numAtomBuffersNeeded = builder.buffersNeeded (PortType::Atom);
         setLatencySamples (builder.getTotalLatencySamples());
     }
 
+    std::unique_ptr<ParallelSchedule> oldSchedule;
     {
         // swap over to the new rendering sequence..
         {
@@ -450,6 +476,7 @@ void GraphNode::buildRenderingSequence()
 
         ScopedLock sl (seqLock);
         renderingOps.swapWith (newRenderingOps);
+        oldSchedule = std::move (parallelSchedule);
     }
 
     // delete the old ones..
@@ -517,6 +544,10 @@ void GraphNode::releaseResources()
 
     _prepared = false;
 
+    renderPool.reset();
+    poolSampleRate = 0.0;
+    poolBlockSize = 0;
+
     renderingBuffers.setSize (1, 1);
     midiBuffers.clear();
 
@@ -537,6 +568,25 @@ void GraphNode::reset()
 // MARK: Process Graph
 
 void GraphNode::render (RenderContext& rc)
+{
+    const int32 numSamples = rc.audio.getNumSamples();
+
+    renderPrologue (rc);
+
+    {
+        // Decide the render path under seqLock so the message thread's schedule
+        // swap (also under seqLock) can never race the pointer read here.
+        ScopedLock sl (seqLock);
+        if (parallelEnabled.load (std::memory_order_relaxed) && parallelSchedule != nullptr)
+            performParallel (numSamples);
+        else
+            performSequential (numSamples);
+    }
+
+    renderEpilogue (rc);
+}
+
+void GraphNode::renderPrologue (RenderContext& rc)
 {
     const int32 numSamples = rc.audio.getNumSamples();
     auto& midiMessages = *rc.midi.getWriteBuffer (0);
@@ -574,21 +624,53 @@ void GraphNode::render (RenderContext& rc)
     }
 
     currentMidiOutputBuffer.clear();
+}
 
-    {
-        ScopedLock sl (seqLock);
-        for (auto ptr : renderingOps)
-        {
-            GraphOp* const op = static_cast<GraphOp*> (ptr);
-            op->perform (renderingBuffers, midiBuffers, numSamples);
-        }
-    }
+void GraphNode::renderEpilogue (RenderContext& rc)
+{
+    const int32 numSamples = rc.audio.getNumSamples();
+    auto& midiMessages = *rc.midi.getWriteBuffer (0);
 
     for (int i = 0; i < rc.audio.getNumChannels(); ++i)
         rc.audio.copyFrom (i, 0, currentAudioOutputBuffer, i, 0, numSamples);
 
     midiMessages.clear();
     midiMessages.addEvents (currentMidiOutputBuffer, 0, numSamples, 0);
+}
+
+void GraphNode::performSequential (int numSamples)
+{
+    float* const* sharedAudio = renderingBuffers.getArrayOfWritePointers();
+    for (auto ptr : renderingOps)
+    {
+        GraphOp* const op = static_cast<GraphOp*> (ptr);
+        op->perform (sharedAudio, midiBuffers, numSamples);
+    }
+}
+
+void GraphNode::performParallel (int numSamples)
+{
+    auto& sched = *parallelSchedule;
+
+    if (renderPool != nullptr && renderPool->getNumThreads() > 1 && sched.numTasks > 1)
+    {
+        // Dispatch across the worker pool; the calling thread participates.
+        renderPool->render (sched, numSamples);
+    }
+    else
+    {
+        // Not worth threading (or no pool): drain on the calling thread in
+        // topological order.
+        float* const* sharedAudio = sched.audioBuffers.getArrayOfWritePointers();
+        for (int t = 0; t < sched.numTasks; ++t)
+        {
+            auto* task = sched.tasks.getUnchecked (t);
+            for (int p = 0; p < task->numPrelude; ++p)
+                sched.preludeOps.getUnchecked (task->preludeStart + p)
+                    ->perform (sharedAudio, sched.midiBuffers, numSamples);
+            task->kernel->perform (sharedAudio, sched.midiBuffers, numSamples);
+        }
+    }
 }
 
 void GraphNode::getPluginDescription (PluginDescription& d) const
@@ -663,6 +745,61 @@ void GraphNode::rebuild() noexcept
 {
     cancelPendingUpdate();
     handleAsyncUpdate();
+}
+
+void GraphNode::setParallelRendering (bool shouldBeParallel)
+{
+    if (parallelEnabled.load (std::memory_order_relaxed) == shouldBeParallel)
+        return;
+
+    parallelEnabled.store (shouldBeParallel, std::memory_order_relaxed);
+
+    if (prepared())
+        rebuild();
+}
+
+int GraphNode::getNumRenderTasks() const noexcept
+{
+    return parallelSchedule != nullptr ? parallelSchedule->numTasks : 0;
+}
+
+int GraphNode::getNumAudioThreadOnlyTasks() const noexcept
+{
+    if (parallelSchedule == nullptr)
+        return 0;
+    int n = 0;
+    for (int i = 0; i < parallelSchedule->tasks.size(); ++i)
+        if (parallelSchedule->tasks.getUnchecked (i)->audioThreadOnly)
+            ++n;
+    return n;
+}
+
+void GraphNode::ensureRenderPool()
+{
+    if (! parallelEnabled.load (std::memory_order_relaxed) || ! prepared())
+    {
+        renderPool.reset();
+        return;
+    }
+
+    const double sr = getSampleRate();
+    const int bs = getBlockSize();
+
+    if (renderPool != nullptr && poolSampleRate == sr && poolBlockSize == bs)
+        return;
+
+    const int numThreads = jlimit (1, 32, SystemStats::getNumCpus());
+    renderPool.reset (new RenderPool (numThreads, sr, bs));
+    renderPool->setWorkgroup (graphWorkgroup);
+    poolSampleRate = sr;
+    poolBlockSize = bs;
+}
+
+void GraphNode::setAudioWorkgroup (juce::AudioWorkgroup workgroup)
+{
+    graphWorkgroup = std::move (workgroup);
+    if (renderPool != nullptr)
+        renderPool->setWorkgroup (graphWorkgroup);
 }
 
 } // namespace element

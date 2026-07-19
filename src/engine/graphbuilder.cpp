@@ -34,7 +34,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>&, const int) override {}
+    void perform (float* const*, const OwnedArray<MidiBuffer>&, const int) override {}
 
 private:
     ParameterPtr param1, param2;
@@ -49,9 +49,9 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
-        sharedBufferChans.clear (channelNum, 0, numSamples);
+        FloatVectorOperations::clear (sharedAudio[channelNum], numSamples);
     }
 
 private:
@@ -69,9 +69,9 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
-        sharedBufferChans.copyFrom (dstChannelNum, 0, sharedBufferChans, srcChannelNum, 0, numSamples);
+        FloatVectorOperations::copy (sharedAudio[dstChannelNum], sharedAudio[srcChannelNum], numSamples);
     }
 
 private:
@@ -89,9 +89,9 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
-        sharedBufferChans.addFrom (dstChannelNum, 0, sharedBufferChans, srcChannelNum, 0, numSamples);
+        FloatVectorOperations::add (sharedAudio[dstChannelNum], sharedAudio[srcChannelNum], numSamples);
     }
 
 private:
@@ -108,7 +108,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
     {
         sharedMidiBuffers.getUnchecked (bufferNum)->clear();
     }
@@ -128,7 +128,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
     {
         *sharedMidiBuffers.getUnchecked (dstBufferNum) = *sharedMidiBuffers.getUnchecked (srcBufferNum);
     }
@@ -148,7 +148,7 @@ public:
     {
     }
 
-    void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
     {
         sharedMidiBuffers.getUnchecked (dstBufferNum)
             ->addEvents (*sharedMidiBuffers.getUnchecked (srcBufferNum), 0, numSamples, 0);
@@ -172,9 +172,9 @@ public:
         buffer.calloc ((size_t) bufferSize);
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
     {
-        float* data = sharedBufferChans.getWritePointer (channel, 0);
+        float* data = sharedAudio[channel];
 
         for (int i = numSamples; --i >= 0;)
         {
@@ -230,11 +230,11 @@ public:
         tempMidi.ensureSize (128);
     }
 
-    void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
     {
         for (int i = totalChans; --i >= 0;)
         {
-            channels[i] = sharedBufferChans.getWritePointer (audioChannelsToUse.getUnchecked (i), 0);
+            channels[i] = sharedAudio[audioChannelsToUse.getUnchecked (i)];
         }
 
         AudioSampleBuffer buffer (channels, totalChans, numSamples);
@@ -473,9 +473,11 @@ private:
 
 GraphBuilder::GraphBuilder (GraphNode& graph_,
                             const Array<void*>& orderedNodes_,
-                            Array<void*>& renderingOps)
+                            Array<void*>& renderingOps,
+                            bool parallel_)
     : graph (graph_),
       orderedNodes (orderedNodes_),
+      parallel (parallel_),
       totalLatency (0)
 {
     for (int i = 0; i < PortType::Unknown; ++i)
@@ -490,6 +492,7 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
                                    renderingOps,
                                    i);
         markUnusedBuffersFree (i);
+        nodeOpEnds.add (renderingOps.size());
     }
 }
 
@@ -614,7 +617,10 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
         if (sourceNodes.size() == 0)
         {
             // unconnected input channel
-            if (portType == PortType::Audio && inputChan >= (int) numOuts)
+            // The shared read-only zero buffer can only be used serially: a node
+            // applies its input gain across every channel, so in parallel mode an
+            // input-only channel still needs its own private cleared buffer.
+            if (! parallel && portType == PortType::Audio && inputChan >= (int) numOuts)
             {
                 bufIndex = getReadOnlyEmptyBuffer();
                 jassert (bufIndex >= 0);
@@ -643,11 +649,28 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
             bufIndex = getBufferContaining (portType, srcNode, srcPort);
 
+            bool privatized = false;
             if (bufIndex < 0)
             {
                 // if not found, this is probably a feedback loop
-                bufIndex = getReadOnlyEmptyBuffer();
-                jassert (bufIndex >= 0);
+                if (parallel && portType != PortType::Control)
+                {
+                    // give the node its own cleared buffer to read/write; reading
+                    // the shared zero buffer would be fine but the node also writes
+                    // this channel, so it must be private.
+                    bufIndex = getFreeBuffer (portType);
+                    markBufferAsContaining (bufIndex, portType, anonymousNodeID, 0);
+                    if (portType == PortType::Audio)
+                        renderingOps.add (new ClearChannelOp (bufIndex));
+                    else if (portType == PortType::Midi)
+                        renderingOps.add (new ClearMidiBufferOp (bufIndex));
+                    privatized = true;
+                }
+                else
+                {
+                    bufIndex = getReadOnlyEmptyBuffer();
+                    jassert (bufIndex >= 0);
+                }
             }
 
             const bool bufNeededLater = isBufferNeededLater (ourRenderingIndex, port, srcNode, srcPort);
@@ -657,6 +680,18 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 renderingOps.add (new BindParameterOp (
                     src->getParameter ((int) srcPort),
                     node->getParameter ((int) port)));
+            }
+            else if (parallel && ! privatized)
+            {
+                // parallel: never process in place on a producer's buffer, so copy
+                // the source into a private buffer that this node alone will touch.
+                const int newFreeBuffer = getFreeBuffer (portType);
+                markBufferAsContaining (newFreeBuffer, portType, anonymousNodeID, 0);
+                if (portType == PortType::Audio)
+                    renderingOps.add (new CopyChannelOp (bufIndex, newFreeBuffer));
+                else if (portType == PortType::Midi)
+                    renderingOps.add (new CopyMidiBufferOp (bufIndex, newFreeBuffer));
+                bufIndex = newFreeBuffer;
             }
             else if (bufNeededLater && (inputChan < (int) numOuts || portType == PortType::Midi))
             {
@@ -693,30 +728,34 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             // try to find a re-usable channel from our inputs..
             int reusableInputIndex = -1;
 
-            for (int i = 0; i < sourceNodes.size(); ++i)
-            {
-                const int sourceBufIndex = getBufferContaining (portType, sourceNodes.getUnchecked (i), sourcePorts.getUnchecked (i));
-
-                if (sourceBufIndex >= 0
-                    && ! isBufferNeededLater (ourRenderingIndex,
-                                              inputChan,
-                                              sourceNodes.getUnchecked (i),
-                                              sourcePorts.getUnchecked (i)))
+            // In parallel mode we never re-use a producer's buffer as the mix
+            // accumulator (that would write another node's output in place);
+            // instead we always allocate a fresh private accumulator below.
+            if (! parallel)
+                for (int i = 0; i < sourceNodes.size(); ++i)
                 {
-                    // we've found one of our input chans that can be re-used..
-                    reusableInputIndex = i;
-                    bufIndex = sourceBufIndex;
+                    const int sourceBufIndex = getBufferContaining (portType, sourceNodes.getUnchecked (i), sourcePorts.getUnchecked (i));
 
-                    if (portType == PortType::Audio)
+                    if (sourceBufIndex >= 0
+                        && ! isBufferNeededLater (ourRenderingIndex,
+                                                  inputChan,
+                                                  sourceNodes.getUnchecked (i),
+                                                  sourcePorts.getUnchecked (i)))
                     {
-                        const int nodeDelay = getNodeDelay (sourceNodes.getUnchecked (i));
-                        if (nodeDelay < maxLatency)
-                            renderingOps.add (new DelayChannelOp (sourceBufIndex, maxLatency - nodeDelay));
-                    }
+                        // we've found one of our input chans that can be re-used..
+                        reusableInputIndex = i;
+                        bufIndex = sourceBufIndex;
 
-                    break;
+                        if (portType == PortType::Audio)
+                        {
+                            const int nodeDelay = getNodeDelay (sourceNodes.getUnchecked (i));
+                            if (nodeDelay < maxLatency)
+                                renderingOps.add (new DelayChannelOp (sourceBufIndex, maxLatency - nodeDelay));
+                        }
+
+                        break;
+                    }
                 }
-            }
 
             if (reusableInputIndex < 0)
             {
@@ -766,7 +805,9 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
 
                             if (nodeDelay < maxLatency)
                             {
-                                if (! isBufferNeededLater (ourRenderingIndex, port, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j)))
+                                // in parallel mode srcIndex is a producer buffer we must
+                                // not mutate, so always copy-then-delay into a fresh one.
+                                if (! parallel && ! isBufferNeededLater (ourRenderingIndex, port, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j)))
                                 {
                                     renderingOps.add (new DelayChannelOp (srcIndex, maxLatency - nodeDelay));
                                 }
@@ -815,11 +856,22 @@ int GraphBuilder::getFreeBuffer (PortType type)
     jassert (type.id() < PortType::Unknown);
 
     Array<uint32>& nodes = allNodes[type.id()];
-    for (int i = 1; i < nodes.size(); ++i)
-        if (nodes.getUnchecked (i) == freeNodeID)
-            return i;
+    Array<uint32>& ports = allPorts[type.id()];
 
+    // In parallel mode buffers are never recycled: each request gets a fresh
+    // slot so no two nodes ever share a buffer, which is what makes concurrent
+    // execution of independent nodes safe.
+    if (! parallel)
+    {
+        for (int i = 1; i < nodes.size(); ++i)
+            if (nodes.getUnchecked (i) == freeNodeID)
+                return i;
+    }
+
+    // Keep the node/port slot arrays the same length; getBufferContaining reads
+    // both by index, so a size mismatch is an out-of-bounds read.
     nodes.add ((uint32) freeNodeID);
+    ports.add (EL_INVALID_PORT);
     return nodes.size() - 1;
 }
 
@@ -843,6 +895,11 @@ int GraphBuilder::getBufferContaining (const PortType type, const uint32 nodeId,
 
 void GraphBuilder::markUnusedBuffersFree (const int stepIndex)
 {
+    // Never reclaim buffers in parallel mode; every buffer is live for the whole
+    // block so that concurrently-running nodes cannot alias each other's data.
+    if (parallel)
+        return;
+
     for (uint32 type = 0; type < PortType::Unknown; ++type)
     {
         Array<uint32>& nodes = allNodes[type];

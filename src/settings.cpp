@@ -43,6 +43,7 @@ const char* Settings::updateKeyUserKey = "updateKeyUserKey";
 const char* Settings::authPreviewUpdatesKey = "authPreviewUpdates";
 const char* Settings::authAppcastUrlKey = "authAppcastUrl";
 const char* Settings::transportStartStopContinue = "transportStartStopContinueKey";
+const char* Settings::parallelRenderingKey = "parallelRendering";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -558,6 +559,19 @@ bool Settings::transportRespondToStartStopContinue() const
 {
     if (auto* p = getProps())
         return p->getBoolValue (transportStartStopContinue, false);
+    return false;
+}
+
+void Settings::setParallelRendering (bool shouldBeParallel)
+{
+    if (auto* p = getProps())
+        p->setValue (parallelRenderingKey, shouldBeParallel);
+}
+
+bool Settings::parallelRendering() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (parallelRenderingKey, false);
     return false;
 }
 

@@ -51,6 +51,7 @@ add_test(NAME "PluginMetadataTests" COMMAND test_element --run_test=PluginMetada
 add_test(NAME "PortListTests" COMMAND test_element --run_test=PortListTests)
 add_test(NAME "PresetScriptsTest" COMMAND test_element --run_test=PresetScriptsTest)
 add_test(NAME "PortTypeTests" COMMAND test_element --run_test=PortTypeTests)
+add_test(NAME "ParallelRenderTests" COMMAND test_element --run_test=ParallelRenderTests)
 add_test(NAME "RootGraphTests" COMMAND test_element --run_test=RootGraphTests)
 add_test(NAME "ScriptInfoTest" COMMAND test_element --run_test=ScriptInfoTest)
 add_test(NAME "ScriptLoaderTest" COMMAND test_element --run_test=ScriptLoaderTest)
