@@ -6,15 +6,8 @@
 #include <element/engine.hpp>
 
 #include "nodes/audiofileplayer.hpp"
-
 #include "ui/buttons.hpp"
-#include "ui/datapathbrowser.hpp"
-#include "ui/viewhelpers.hpp"
-#include "ui/audioiopanelview.hpp"
-#include "ui/sessiontreepanel.hpp"
-#include "ui/pluginspanelview.hpp"
 #include "ui/filecombobox.hpp"
-
 #include "utils.hpp"
 
 using namespace juce;

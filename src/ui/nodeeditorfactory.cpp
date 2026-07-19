@@ -5,6 +5,7 @@
 #include <element/processor.hpp>
 #include <element/ui/grapheditor.hpp>
 
+#include "nodes/baseprocessor.hpp"
 #include "nodes/nodetypes.hpp"
 #include "nodes/ionodeeditor.hpp"
 #include "nodes/audioroutereditor.hpp"
@@ -219,13 +220,18 @@ std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEdi
 {
     std::unique_ptr<AudioProcessorEditor> editor = nullptr;
     ProcessorPtr object = node.getObject();
-    AudioProcessor* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    auto* const base = dynamic_cast<BaseProcessor*> (proc);
 
     if (proc == nullptr)
         return nullptr;
 
-    editor.reset (proc->hasEditor() ? proc->createEditorAndMakeActive()
-                                    : new GenericAudioProcessorEditor (*proc));
+    // clang-format off
+    editor.reset (
+        base != nullptr && base->hasEditor() ? base->createEditor() :
+            proc->hasEditor() ? proc->createEditorAndMakeActive()
+                            : new GenericAudioProcessorEditor (*proc));
+    // clang-format on
 
     return editor;
 }

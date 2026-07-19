@@ -4,6 +4,7 @@
 #pragma once
 
 #include <element/juce/core.hpp>
+#include "juce_audio_processors_headless/juce_audio_processors_headless.h"
 #include "nodes/nodetypes.hpp"
 #include "ElementApp.h" // FIXME
 
@@ -19,6 +20,8 @@ public:
     BaseProcessor (const BusesProperties& ioLayouts)
         : juce::AudioPluginInstance (ioLayouts) {}
     virtual ~BaseProcessor() {}
+
+    virtual AudioProcessorEditor* createEditor() { return nullptr; }
 
 protected:
     /** This is for backward compatibility with juce 6. Don't use in new processors */
