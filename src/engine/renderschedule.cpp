@@ -11,6 +11,10 @@
 
 namespace element {
 
+/** Minimum number of tasks off the critical path before threading a graph is
+    considered worthwhile; below this the fork-join overhead dominates. */
+static constexpr int kMinParallelSlack = 2;
+
 RenderSchedule::RenderSchedule() = default;
 RenderSchedule::~RenderSchedule() = default;
 
@@ -125,6 +129,21 @@ std::unique_ptr<RenderSchedule> RenderSchedule::build (GraphNode& graph,
         if (task->predecessorCount == 0)
             schedule->initialReady.add (t);
     }
+
+    // 5. Decide whether threading this graph is worthwhile. depth[t] is the
+    //    length, in tasks, of the longest dependency chain ending at t; its max
+    //    is the critical path, which the pool cannot shorten. Tasks off that path
+    //    are parallelizable slack -- with too little of it the fork-join overhead
+    //    outweighs any speedup, so the schedule is drained serially instead.
+    std::vector<int> depth (numTasks, 1);
+    int criticalPath = numTasks > 0 ? 1 : 0;
+    for (int t = 0; t < numTasks; ++t) // tasks are in topological order
+    {
+        for (int d : succ[t])
+            depth[d] = juce::jmax (depth[d], depth[t] + 1);
+        criticalPath = juce::jmax (criticalPath, depth[t]);
+    }
+    schedule->parallelBeneficial = (numTasks - criticalPath) >= kMinParallelSlack;
 
     return schedule;
 }

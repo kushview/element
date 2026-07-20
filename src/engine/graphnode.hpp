@@ -214,6 +214,12 @@ public:
         Intended for testing/diagnostics. */
     int getNumAudioThreadOnlyTasks() const noexcept;
 
+    /** Returns true when a parallel schedule is built and has enough independent
+        work off its critical path to be worth threading. When false, a multicore
+        graph still renders on the audio thread to avoid fork-join overhead.
+        Intended for testing/diagnostics. */
+    bool isParallelRenderBeneficial() const noexcept;
+
 protected:
     //==========================================================================
     virtual void preRenderNodes() {}

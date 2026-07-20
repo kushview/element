@@ -652,15 +652,17 @@ void GraphNode::performParallel (int numSamples)
 {
     auto& sched = *parallelSchedule;
 
-    if (renderPool != nullptr && renderPool->getNumThreads() > 1 && sched.numTasks > 1)
+    if (renderPool != nullptr && renderPool->getNumThreads() > 1 && sched.numTasks > 1
+        && sched.parallelBeneficial)
     {
         // Dispatch across the worker pool; the calling thread participates.
         renderPool->render (sched, numSamples);
     }
     else
     {
-        // Not worth threading (or no pool): drain on the calling thread in
-        // topological order.
+        // No pool, nothing to thread, or a mostly serial graph whose critical
+        // path leaves too little independent work to beat the fork-join
+        // overhead: drain on the calling thread in topological order.
         float* const* sharedAudio = sched.audioBuffers.getArrayOfWritePointers();
         for (int t = 0; t < sched.numTasks; ++t)
         {
@@ -772,6 +774,11 @@ int GraphNode::getNumAudioThreadOnlyTasks() const noexcept
         if (parallelSchedule->tasks.getUnchecked (i)->audioThreadOnly)
             ++n;
     return n;
+}
+
+bool GraphNode::isParallelRenderBeneficial() const noexcept
+{
+    return parallelSchedule != nullptr && parallelSchedule->parallelBeneficial;
 }
 
 void GraphNode::ensureRenderPool()

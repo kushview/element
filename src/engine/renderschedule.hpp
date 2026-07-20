@@ -110,6 +110,13 @@ struct RenderSchedule
     int numTasks = 0;
     int totalLatency = 0;
 
+    /** True when the graph has enough independent work off its critical path
+        that rendering across the worker pool is expected to beat a plain serial
+        drain. Decided once at build time (see RenderSchedule::build). When false,
+        GraphNode renders this schedule on the audio thread instead, so a mostly
+        serial graph never pays fork-join overhead it cannot recoup. */
+    bool parallelBeneficial = false;
+
     /** Per-block count of completed tasks; reset by the dispatcher each block and
         used to detect when the whole schedule has finished. */
     std::atomic<int> completionCount { 0 };

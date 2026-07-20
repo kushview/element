@@ -478,4 +478,58 @@ BOOST_AUTO_TEST_CASE (MultiOutputIONoRace)
     BOOST_REQUIRE_LT (worst, 1.0e-6);
 }
 
+BOOST_AUTO_TEST_CASE (ParallelBenefitGate)
+{
+    // A mostly-serial chain has no independent work off its critical path, so the
+    // build-time gate marks it not worth threading: multicore still renders it on
+    // the audio thread and never pays fork-join overhead it cannot recoup.
+    {
+        PreparedGraph g (44100.0, kBlockSize);
+        auto* in = new IONode (IONode::audioInputNode);
+        g.graph.addNode (in);
+        Processor* prev = in;
+        for (int i = 0; i < 6; ++i) {
+            auto* gain = new GainNode (2, 0.9f);
+            g.graph.addNode (gain);
+            for (int ch = 0; ch < 2; ++ch)
+                g.graph.connectChannels (PortType::Audio, prev->nodeId, ch, gain->nodeId, ch);
+            prev = gain;
+        }
+        auto* out = new IONode (IONode::audioOutputNode);
+        g.graph.addNode (out);
+        for (int ch = 0; ch < 2; ++ch)
+            g.graph.connectChannels (PortType::Audio, prev->nodeId, ch, out->nodeId, ch);
+
+        g.graph.setMulticore (true);
+        g.graph.rebuild();
+        BOOST_REQUIRE_GT (g.graph.getNumRenderTasks(), 1);    // a schedule was built
+        BOOST_CHECK (! g.graph.isParallelRenderBeneficial()); // ...but it won't be threaded
+    }
+
+    // Many independent generator chains give the pool plenty of concurrent work,
+    // so the gate marks the schedule worth threading.
+    {
+        PreparedGraph g (44100.0, kBlockSize);
+        auto* out = new IONode (IONode::audioOutputNode);
+        g.graph.addNode (out);
+        for (int c = 0; c < 8; ++c) {
+            auto* gen = new GenNode (2, 0.2f);
+            auto* a = new GainNode (2, 0.7f);
+            auto* b = new GainNode (2, 0.5f);
+            g.graph.addNode (gen);
+            g.graph.addNode (a);
+            g.graph.addNode (b);
+            for (int ch = 0; ch < 2; ++ch) {
+                g.graph.connectChannels (PortType::Audio, gen->nodeId, ch, a->nodeId, ch);
+                g.graph.connectChannels (PortType::Audio, a->nodeId, ch, b->nodeId, ch);
+                g.graph.connectChannels (PortType::Audio, b->nodeId, ch, out->nodeId, ch);
+            }
+        }
+
+        g.graph.setMulticore (true);
+        g.graph.rebuild();
+        BOOST_CHECK (g.graph.isParallelRenderBeneficial());
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
