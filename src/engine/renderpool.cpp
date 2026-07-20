@@ -9,6 +9,7 @@
 namespace element {
 
 namespace {
+
 /** Spin-loop hint so a waiting lane doesn't hammer the bus / starve its sibling
     hyper-thread. Falls back to nothing on unknown architectures. */
 inline void cpuPause() noexcept
@@ -19,6 +20,29 @@ inline void cpuPause() noexcept
     __asm__ __volatile__ ("yield");
 #endif
 }
+
+/** Bounded spin: pause-spin for a budget of iterations, then yield the thread.
+    Keeps dependency stalls cheap while guaranteeing a stalled lane never
+    monopolizes a core (important when nested inside a plugin host callback). */
+struct BoundedSpin
+{
+    void wait() noexcept
+    {
+        cpuPause();
+        if (++spins >= kSpinsBeforeYield)
+        {
+            spins = 0;
+            juce::Thread::yield();
+        }
+    }
+
+    void reset() noexcept { spins = 0; }
+
+private:
+    static constexpr int kSpinsBeforeYield = 1500;
+    int spins = 0;
+};
+
 } // namespace
 
 class RenderPool::Worker : public juce::Thread
@@ -59,12 +83,18 @@ public:
             }
 
             // Denormal flushing is per-thread; worker threads don't inherit the
-            // audio thread's setting, so enable it for the duration of the drain.
+            // audio thread's setting, so enable it while helping.
+            const juce::ScopedNoDenormals noDenormals;
+            BoundedSpin idle;
+
+            while (! threadShouldExit()
+                   && pool.numActiveJobs.load (std::memory_order_acquire) > 0)
             {
-                const juce::ScopedNoDenormals noDenormals;
-                pool.drain (false);
+                if (pool.helpSomeJob())
+                    idle.reset();
+                else
+                    idle.wait();
             }
-            pool.workersActive.fetch_sub (1, std::memory_order_release);
         }
     }
 
@@ -72,7 +102,8 @@ public:
     RenderPool& pool;
 };
 
-RenderPool::RenderPool (int numThreads_, double sampleRate, int blockSize)
+RenderPool::RenderPool (int numThreads_, double sampleRate_, int blockSize_)
+    : sampleRate (sampleRate_), blockSize (blockSize_)
 {
     const int requested = juce::jmax (1, numThreads_);
 
@@ -86,10 +117,8 @@ RenderPool::RenderPool (int numThreads_, double sampleRate, int blockSize)
 
         // Only keep workers that actually started. If the OS denies a realtime
         // thread (e.g. a Linux host with no RLIMIT_RTPRIO privilege), run() never
-        // executes and the worker would never decrement workersActive, hanging the
-        // audio thread at the fork-join barrier. Stop adding lanes instead; the
-        // render path counts only the workers that came up and degrades toward the
-        // calling thread doing the work sequentially.
+        // executes and rendering would degrade incorrectly. Stop adding lanes
+        // instead; render() degrades toward the calling thread doing the work.
         if (! w->startRealtimeThread (options))
             break;
 
@@ -97,6 +126,26 @@ RenderPool::RenderPool (int numThreads_, double sampleRate, int blockSize)
     }
 
     numThreads = 1 + workers.size();
+}
+
+std::shared_ptr<RenderPool> RenderPool::acquireShared (double sampleRate, int blockSize)
+{
+    // Process-wide registry: one live pool shared by every acquirer. Guarded by
+    // a mutex; only called from the message thread (prepare/rebuild), never the
+    // audio thread.
+    static juce::CriticalSection sharedLock;
+    static std::weak_ptr<RenderPool> sharedPool;
+
+    const juce::ScopedLock sl (sharedLock);
+
+    if (auto existing = sharedPool.lock())
+        if (existing->getSampleRate() == sampleRate && existing->getBlockSize() == blockSize)
+            return existing;
+
+    const int numThreads = juce::jlimit (1, 32, juce::SystemStats::getNumCpus());
+    auto created = std::make_shared<RenderPool> (numThreads, sampleRate, blockSize);
+    sharedPool = created;
+    return created;
 }
 
 RenderPool::~RenderPool()
@@ -112,9 +161,9 @@ RenderPool::~RenderPool()
     workers.clear();
 }
 
-void RenderPool::pushTo (std::atomic<int>& head, int taskId) noexcept
+void RenderPool::pushTo (std::atomic<int>& head, RenderSchedule& s, int taskId) noexcept
 {
-    auto& tasks = current->tasks;
+    auto& tasks = s.tasks;
     int old = head.load (std::memory_order_relaxed);
     do
     {
@@ -122,9 +171,9 @@ void RenderPool::pushTo (std::atomic<int>& head, int taskId) noexcept
     } while (! head.compare_exchange_weak (old, taskId, std::memory_order_release, std::memory_order_relaxed));
 }
 
-int RenderPool::popFrom (std::atomic<int>& head) noexcept
+int RenderPool::popFrom (std::atomic<int>& head, RenderSchedule& s) noexcept
 {
-    auto& tasks = current->tasks;
+    auto& tasks = s.tasks;
     int old = head.load (std::memory_order_acquire);
     while (old >= 0)
     {
@@ -135,87 +184,138 @@ int RenderPool::popFrom (std::atomic<int>& head) noexcept
     return -1;
 }
 
-void RenderPool::pushReady (int taskId) noexcept
+void RenderPool::pushReady (Job& job, RenderSchedule& s, int taskId) noexcept
 {
-    if (current->tasks.getUnchecked (taskId)->audioThreadOnly)
-        pushTo (audioReadyHead, taskId);
+    if (s.tasks.getUnchecked (taskId)->audioThreadOnly)
+        pushTo (job.audioReadyHead, s, taskId);
     else
-        pushTo (readyHead, taskId);
+        pushTo (job.readyHead, s, taskId);
 }
 
-void RenderPool::drain (bool isAudioThread)
+void RenderPool::runTask (Job& job, RenderSchedule& s, int taskId) noexcept
 {
-    RenderSchedule& s = *current;
-    const int numSamples = currentNumSamples;
+    RenderTask* const task = s.tasks.getUnchecked (taskId);
+    for (int p = 0; p < task->numPrelude; ++p)
+        s.preludeOps.getUnchecked (task->preludeStart + p)
+            ->perform (job.audio, s.midiBuffers, job.numSamples);
+    task->kernel->perform (job.audio, s.midiBuffers, job.numSamples);
 
-    for (;;)
+    // Release each newly-ready successor onto the appropriate stack.
+    for (int k = 0; k < task->numSuccessors; ++k)
     {
-        // The calling audio thread services its exclusive queue first; workers
-        // only ever touch the shared queue.
-        int t = isAudioThread ? popFrom (audioReadyHead) : -1;
-        if (t < 0)
-            t = popFrom (readyHead);
+        const int succ = s.successors.getUnchecked (task->firstSuccessor + k);
+        if (s.tasks.getUnchecked (succ)->pendingPreds.fetch_sub (1, std::memory_order_acq_rel) == 1)
+            pushReady (job, s, succ);
+    }
 
-        if (t < 0)
+    s.completionCount.fetch_add (1, std::memory_order_acq_rel);
+}
+
+bool RenderPool::helpSomeJob() noexcept
+{
+    for (auto& job : jobs)
+    {
+        RenderSchedule* const s = job.schedule.load (std::memory_order_acquire);
+        if (s == nullptr)
+            continue;
+
+        // Pin the job so its submitter cannot retire the schedule while this
+        // thread is inside it, then re-check publication under the pin.
+        job.inFlight.fetch_add (1, std::memory_order_acquire);
+        if (job.schedule.load (std::memory_order_acquire) != s)
         {
-            if (s.completionCount.load (std::memory_order_acquire) == s.numTasks)
-                return;
-            cpuPause();
+            job.inFlight.fetch_sub (1, std::memory_order_release);
             continue;
         }
 
-        RenderTask* const task = s.tasks.getUnchecked (t);
-        for (int p = 0; p < task->numPrelude; ++p)
-            s.preludeOps.getUnchecked (task->preludeStart + p)
-                ->perform (currentAudio, s.midiBuffers, numSamples);
-        task->kernel->perform (currentAudio, s.midiBuffers, numSamples);
+        const int t = popFrom (job.readyHead, *s);
+        if (t >= 0)
+            runTask (job, *s, t);
 
-        // Release each newly-ready successor onto the appropriate stack.
-        for (int k = 0; k < task->numSuccessors; ++k)
-        {
-            const int succ = s.successors.getUnchecked (task->firstSuccessor + k);
-            if (s.tasks.getUnchecked (succ)->pendingPreds.fetch_sub (1, std::memory_order_acq_rel) == 1)
-                pushReady (succ);
-        }
-
-        s.completionCount.fetch_add (1, std::memory_order_acq_rel);
+        job.inFlight.fetch_sub (1, std::memory_order_release);
+        if (t >= 0)
+            return true;
     }
+
+    return false;
 }
 
 void RenderPool::render (RenderSchedule& schedule, int numSamples)
 {
-    // Per-block reset (single-threaded here, before any worker is woken).
+    // Claim a free job slot; if every slot is busy (more concurrent submitters
+    // than slots), render serially on this thread -- correct, just unassisted.
+    Job* job = nullptr;
+    for (auto& candidate : jobs)
+    {
+        bool expected = false;
+        if (candidate.claimed.compare_exchange_strong (expected, true, std::memory_order_acq_rel))
+        {
+            job = &candidate;
+            break;
+        }
+    }
+
+    if (job == nullptr || numThreads <= 1 || schedule.numTasks <= 1)
+    {
+        if (job != nullptr)
+            job->claimed.store (false, std::memory_order_release);
+        schedule.renderOnThisThread (numSamples);
+        return;
+    }
+
+    // Per-block init, single-threaded: the job isn't visible to workers until
+    // the schedule pointer is published below.
     for (int t = 0; t < schedule.numTasks; ++t)
     {
         auto* task = schedule.tasks.getUnchecked (t);
         task->pendingPreds.store (task->predecessorCount, std::memory_order_relaxed);
     }
     schedule.completionCount.store (0, std::memory_order_relaxed);
-    readyHead.store (-1, std::memory_order_relaxed);
-    audioReadyHead.store (-1, std::memory_order_relaxed);
-
-    current = &schedule;
-    // Resolve channel pointers once here (single-threaded) so worker ops never
-    // touch the shared AudioBuffer's bookkeeping concurrently.
-    currentAudio = schedule.audioBuffers.getArrayOfWritePointers();
-    currentNumSamples = numSamples;
+    job->readyHead.store (-1, std::memory_order_relaxed);
+    job->audioReadyHead.store (-1, std::memory_order_relaxed);
+    // Resolve channel pointers once here so worker ops never touch the shared
+    // AudioBuffer's bookkeeping concurrently.
+    job->audio = schedule.audioBuffers.getArrayOfWritePointers();
+    job->numSamples = numSamples;
 
     for (int i = 0; i < schedule.initialReady.size(); ++i)
-        pushReady (schedule.initialReady.getUnchecked (i));
+        pushReady (*job, schedule, schedule.initialReady.getUnchecked (i));
 
-    // Wake the workers, then join the drain ourselves as the audio thread.
-    workersActive.store (numThreads - 1, std::memory_order_release);
+    job->schedule.store (&schedule, std::memory_order_release);
+    numActiveJobs.fetch_add (1, std::memory_order_release);
     for (auto* w : workers)
         w->wake.signal();
 
-    drain (true);
+    // Drain this job as one lane: this thread exclusively services the
+    // audio-thread-only stack, and shares the rest with the workers.
+    BoundedSpin idle;
+    for (;;)
+    {
+        int t = popFrom (job->audioReadyHead, schedule);
+        if (t < 0)
+            t = popFrom (job->readyHead, schedule);
 
-    // Fork-join barrier: no worker touches pool/schedule state past this point,
-    // so the next block's reset cannot race a straggling worker.
-    while (workersActive.load (std::memory_order_acquire) != 0)
-        cpuPause();
+        if (t < 0)
+        {
+            if (schedule.completionCount.load (std::memory_order_acquire) == schedule.numTasks)
+                break;
+            idle.wait();
+            continue;
+        }
 
-    current = nullptr;
+        idle.reset();
+        runTask (*job, schedule, t);
+    }
+
+    // Retire: unpublish first so no new worker can join, then wait for any
+    // worker still pinned inside the job. After this the schedule may be freed.
+    job->schedule.store (nullptr, std::memory_order_release);
+    idle.reset();
+    while (job->inFlight.load (std::memory_order_acquire) != 0)
+        idle.wait();
+
+    numActiveJobs.fetch_sub (1, std::memory_order_release);
+    job->claimed.store (false, std::memory_order_release);
 }
 
 void RenderPool::setWorkgroup (juce::AudioWorkgroup newWorkgroup)

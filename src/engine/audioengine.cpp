@@ -11,6 +11,8 @@
 #include "engine/midichannelmap.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/miditranspose.hpp"
+#include "engine/renderpool.hpp"
+#include "engine/renderschedule.hpp"
 #include "engine/rootgraph.hpp"
 #include "engine/midipanic.hpp"
 #include "engine/trace.hpp"
@@ -30,10 +32,13 @@ struct RootGraphRender : public AsyncUpdater
 
     void handleAsyncUpdate() override
     {
-        if (onActiveGraphChanged)
+        if (activeGraphChangedFlag.exchange (false) && onActiveGraphChanged)
         {
             onActiveGraphChanged();
         }
+
+        if (mergedDirty.exchange (false))
+            rebuildMerged();
     }
 
     const int setCurrentGraph (const int index)
@@ -41,6 +46,7 @@ struct RootGraphRender : public AsyncUpdater
         if (index == currentGraph)
             return currentGraph;
         currentGraph = index;
+        activeGraphChangedFlag.store (true);
         triggerAsyncUpdate();
         return currentGraph;
     }
@@ -53,10 +59,12 @@ struct RootGraphRender : public AsyncUpdater
                                                                 : nullptr;
     }
 
-    void prepareBuffers (const int numIns, const int numOuts, const int numSamples)
+    void prepareBuffers (const int numIns, const int numOuts, const int numSamples, const double newSampleRate)
     {
         numInputChans = numIns;
         numOutputChans = numOuts;
+        blockSize = numSamples;
+        sampleRate = newSampleRate;
         audioTemp.setSize (jmax (numIns, numOuts), numSamples);
         audioOut.setSize (audioTemp.getNumChannels(), audioTemp.getNumSamples());
     }
@@ -64,10 +72,132 @@ struct RootGraphRender : public AsyncUpdater
     void releaseBuffers()
     {
         numInputChans = numOutputChans = 0;
+        blockSize = 0;
         midiOut.clear();
         midiTemp.clear();
         audioTemp.setSize (1, 1);
         audioOut.setSize (1, 1);
+
+        std::unique_ptr<RenderSchedule> oldMerged;
+        ReferenceCountedArray<RootGraph> oldMergedGraphs;
+        std::shared_ptr<RenderPool> oldPool;
+        OwnedArray<AudioSampleBuffer> oldAudioTemp;
+        OwnedArray<MidiBuffer> oldMidiTemp;
+        {
+            const ScopedLock sl (mergedLock);
+            oldMerged = std::move (merged);
+            oldMergedGraphs.swapWith (mergedGraphs);
+            oldPool.swap (pool);
+            graphAudioTemp.swapWith (oldAudioTemp);
+            graphMidiTemp.swapWith (oldMidiTemp);
+        }
+        // Freed outside the lock; releasing the last pool reference stops the
+        // shared worker threads.
+        oldMerged.reset();
+        oldMergedGraphs.clear();
+        oldPool.reset();
+        oldAudioTemp.clear();
+        oldMidiTemp.clear();
+    }
+
+    /** Enables or disables the unified multicore render path. Message thread;
+        call rebuildMerged (or invalidateMerged) afterwards to (re)build. */
+    void setMulticore (const bool enabled) { multicore = enabled; }
+    bool isMulticore() const noexcept { return multicore; }
+
+    /** Stores the device audio workgroup and forwards it to the shared pool. */
+    void setWorkgroup (juce::AudioWorkgroup wg)
+    {
+        workgroup = std::move (wg);
+        std::shared_ptr<RenderPool> p;
+        {
+            const ScopedLock sl (mergedLock);
+            p = pool;
+        }
+        if (p != nullptr)
+            p->setWorkgroup (workgroup);
+    }
+
+    /** Marks the merged schedule dirty; it is rebuilt asynchronously on the
+        message thread. Safe to call from any thread. */
+    void invalidateMerged()
+    {
+        mergedDirty.store (true);
+        triggerAsyncUpdate();
+    }
+
+    /** Builds the unified schedule spanning every warm (prepared, non-suspended)
+        graph and swaps it in. Message thread only.
+
+        Invariant #0: membership depends only on prepared/suspended state, never
+        on the current graph or render mode — unheard graphs keep processing so
+        graph switching stays seamless. */
+    void rebuildMerged()
+    {
+        cancelPendingUpdate();
+        mergedDirty.store (false);
+
+        std::unique_ptr<RenderSchedule> newMerged;
+        ReferenceCountedArray<RootGraph> warm;
+        std::shared_ptr<RenderPool> newPool;
+        OwnedArray<AudioSampleBuffer> newAudioTemp;
+        OwnedArray<MidiBuffer> newMidiTemp;
+
+        if (multicore && blockSize > 0)
+        {
+            for (auto* const g : graphs)
+                if (g->prepared() && ! g->isSuspended())
+                    warm.add (g);
+
+            if (! warm.isEmpty())
+            {
+                OwnedArray<RenderSchedule> parts;
+                for (auto* const g : warm)
+                {
+                    auto part = g->buildParallelSchedule (blockSize);
+                    g->setLatencySamples (part->totalLatency);
+                    parts.add (part.release());
+                }
+                newMerged = RenderSchedule::merge (parts);
+            }
+
+            newPool = RenderPool::acquireShared (sampleRate, blockSize);
+            newPool->setWorkgroup (workgroup);
+
+            // Per-graph scratch, indexed alongside `graphs`. Allocated here on
+            // the message thread, then swapped in below; never allocated in the
+            // render callback.
+            const int chans = jmax (1, jmax (numInputChans, numOutputChans));
+            for (int i = 0; i < graphs.size(); ++i)
+            {
+                auto* const b = newAudioTemp.add (new AudioSampleBuffer());
+                b->setSize (chans, blockSize);
+                b->clear();
+                newMidiTemp.add (new MidiBuffer());
+            }
+        }
+
+        std::unique_ptr<RenderSchedule> oldMerged;
+        ReferenceCountedArray<RootGraph> oldMergedGraphs;
+        std::shared_ptr<RenderPool> oldPool;
+        {
+            // Quick pointer swaps only; frees happen below, outside the lock,
+            // so the audio thread never blocks on a deallocation.
+            const ScopedLock sl (mergedLock);
+            oldMerged = std::move (merged);
+            merged = std::move (newMerged);
+            oldMergedGraphs.swapWith (mergedGraphs);
+            mergedGraphs.swapWith (warm);
+            oldPool.swap (pool);
+            pool = std::move (newPool);
+            graphAudioTemp.swapWith (newAudioTemp);
+            graphMidiTemp.swapWith (newMidiTemp);
+        }
+        oldMerged.reset();
+        oldMergedGraphs.clear();
+        oldPool.reset();
+        newAudioTemp.clear();
+        newMidiTemp.clear();
     }
 
     void dumpGraphs()
@@ -111,56 +241,67 @@ struct RootGraphRender : public AsyncUpdater
                 audioOut.clear (i, 0, numSamples);
             midiOut.clear();
 
-            for (auto* const graph : graphs)
+            bool unified = false;
             {
-                // copy inputs, clear outs if more than input count
-                for (int i = 0; i < numInputChans; ++i)
-                    audioTemp.copyFrom (i, 0, buffer, i, 0, numSamples);
-                for (int i = numInputChans; i < numChans; ++i)
-                    audioTemp.clear (i, 0, numSamples);
-
-                // avoids feedback loop when IO node ins are
-                // connected to IO node outs
-                midiTemp.clear (0, numSamples);
-
-                if ((last == graph && graphChanged && last->isSingle())
-                    || (graphChanged && current != nullptr && current->isSingle() && graph != current))
+                const ScopedLock rl (mergedLock);
+                if (multicore && merged != nullptr)
                 {
-                    // send kill messages to the last graph(s) when the graph changes
-                    // see http://nickfever.com/music/midi-cc-list
-                    for (int i = 0; i < 16; ++i)
-                    {
-                        // sustain pedal off
-                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 64, 0), 0);
-                        // Sostenuto off
-                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 66, 0), 0);
-                        // Hold off
-                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 69, 0), 0);
-
-                        midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
-                    }
+                    unified = true;
+                    renderWarmUnified (buffer, midi, current, last, graphChanged, modeChanged);
                 }
-                else if ((current == graph && graph->isSingle())
-                         || (current != nullptr && ! current->isSingle() && ! graph->isSingle()))
+            }
+
+            if (! unified)
+                for (auto* const graph : graphs)
                 {
-                    // current single graph or parallel graphs get MIDI always
-                    midiTemp.addEvents (midi, 0, numSamples, 0);
-                }
+                    // copy inputs, clear outs if more than input count
+                    for (int i = 0; i < numInputChans; ++i)
+                        audioTemp.copyFrom (i, 0, buffer, i, 0, numSamples);
+                    for (int i = numInputChans; i < numChans; ++i)
+                        audioTemp.clear (i, 0, numSamples);
 
-                {
-                    RenderContext rc (audioTemp, cvTemp, midiTemp, numSamples);
-                    const ScopedLock sl (graph->getPropertyLock());
-                    if (graph->isSuspended())
-                    {
-                        graph->renderBypassed (rc);
-                    }
-                    else
-                    {
-                        graph->render (rc);
-                    }
-                }
+                    // avoids feedback loop when IO node ins are
+                    // connected to IO node outs
+                    midiTemp.clear (0, numSamples);
 
-                // clang-format off
+                    if ((last == graph && graphChanged && last->isSingle())
+                        || (graphChanged && current != nullptr && current->isSingle() && graph != current))
+                    {
+                        // send kill messages to the last graph(s) when the graph changes
+                        // see http://nickfever.com/music/midi-cc-list
+                        for (int i = 0; i < 16; ++i)
+                        {
+                            // sustain pedal off
+                            midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 64, 0), 0);
+                            // Sostenuto off
+                            midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 66, 0), 0);
+                            // Hold off
+                            midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 69, 0), 0);
+
+                            midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
+                        }
+                    }
+                    else if ((current == graph && graph->isSingle())
+                             || (current != nullptr && ! current->isSingle() && ! graph->isSingle()))
+                    {
+                        // current single graph or parallel graphs get MIDI always
+                        midiTemp.addEvents (midi, 0, numSamples, 0);
+                    }
+
+                    {
+                        RenderContext rc (audioTemp, cvTemp, midiTemp, numSamples);
+                        const ScopedLock sl (graph->getPropertyLock());
+                        if (graph->isSuspended())
+                        {
+                            graph->renderBypassed (rc);
+                        }
+                        else
+                        {
+                            graph->render (rc);
+                        }
+                    }
+
+                    // clang-format off
                 if (graphChanged && ((current->isSingle() && graph == last) || 
                                      (modeChanged && ! current->isSingle() && graph->isSingle() && graph == last)))
 
@@ -186,8 +327,8 @@ struct RootGraphRender : public AsyncUpdater
 
                     midiOut.addEvents (midiTemp, 0, numSamples, 0);
                 }
-                // clang-format on
-            }
+                    // clang-format on
+                }
 
             for (int i = 0; i < numChans; ++i)
                 buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
@@ -215,6 +356,129 @@ struct RootGraphRender : public AsyncUpdater
         }
 
         lastGraph = currentGraph;
+    }
+
+    /** Renders every warm graph through the unified merged schedule, then sums
+        per the render modes. Assumes mergedLock is held and merged != nullptr.
+
+        Invariant #0: all warm graphs are fully processed regardless of mode or
+        which graph is current — only the summing below is mode-gated — so
+        switching graphs stays seamless. */
+    void renderWarmUnified (AudioSampleBuffer& buffer, MidiBuffer& midi, RootGraph* const current, RootGraph* const last, const bool graphChanged, const bool modeChanged)
+    {
+        const int numSamples = buffer.getNumSamples();
+
+        // PHASE 1: per-graph input scratch + prologue (audio thread).
+        for (int i = 0; i < graphs.size(); ++i)
+        {
+            auto* const graph = graphs.getUnchecked (i);
+            if (i >= graphAudioTemp.size() || i >= graphMidiTemp.size())
+                continue; // scratch not allocated yet; rebuild is pending
+
+            auto& atemp = *graphAudioTemp.getUnchecked (i);
+            auto& mtemp = *graphMidiTemp.getUnchecked (i);
+            const bool warm = mergedGraphs.contains (graph);
+
+            if (! warm && ! graph->isSuspended())
+            {
+                // Just-added graph not yet in the merged schedule: stay silent
+                // until the pending rebuild lands rather than passing input
+                // through at unity.
+                atemp.clear();
+                mtemp.clear();
+                continue;
+            }
+
+            // copy inputs, clear outs if more than input count
+            const int chans = atemp.getNumChannels();
+            for (int c = 0; c < jmin (chans, numInputChans); ++c)
+                atemp.copyFrom (c, 0, buffer, c, 0, numSamples);
+            for (int c = numInputChans; c < chans; ++c)
+                atemp.clear (c, 0, numSamples);
+
+            // avoids feedback loop when IO node ins are connected to IO node outs
+            mtemp.clear (0, numSamples);
+
+            if ((last == graph && graphChanged && last->isSingle())
+                || (graphChanged && current != nullptr && current->isSingle() && graph != current))
+            {
+                // send kill messages to the last graph(s) when the graph changes
+                for (int ch = 0; ch < 16; ++ch)
+                {
+                    // sustain, sostenuto, then hold off
+                    mtemp.addEvent (MidiMessage::controllerEvent (ch + 1, 64, 0), 0);
+                    mtemp.addEvent (MidiMessage::controllerEvent (ch + 1, 66, 0), 0);
+                    mtemp.addEvent (MidiMessage::controllerEvent (ch + 1, 69, 0), 0);
+                    mtemp.addEvent (MidiMessage::allNotesOff (ch + 1), 0);
+                }
+            }
+            else if ((current == graph && graph->isSingle())
+                     || (current != nullptr && ! current->isSingle() && ! graph->isSingle()))
+            {
+                // current single graph or parallel graphs get MIDI always
+                mtemp.addEvents (midi, 0, numSamples, 0);
+            }
+
+            if (warm)
+            {
+                const ScopedLock pl (graph->getPropertyLock());
+                graph->renderPrologue (atemp, mtemp, numSamples);
+            }
+            // Suspended graphs keep their input in scratch: the summing stage
+            // then passes it through, matching renderBypassed in the serial path.
+        }
+
+        // PHASE 2: one fork-join across every warm graph's tasks.
+        if (pool != nullptr && pool->getNumThreads() > 1 && merged->numTasks > 1)
+            pool->render (*merged, numSamples);
+        else
+            merged->renderOnThisThread (numSamples);
+
+        // PHASE 3: epilogues copy each graph's output into its scratch (audio thread).
+        for (int i = 0; i < graphs.size(); ++i)
+        {
+            auto* const graph = graphs.getUnchecked (i);
+            if (i >= graphAudioTemp.size() || i >= graphMidiTemp.size() || ! mergedGraphs.contains (graph))
+                continue;
+            const ScopedLock pl (graph->getPropertyLock());
+            graph->renderEpilogue (*graphAudioTemp.getUnchecked (i), *graphMidiTemp.getUnchecked (i), numSamples);
+        }
+
+        // PHASE 4: mode-gated summing, mirroring the serial loop.
+        for (int i = 0; i < graphs.size(); ++i)
+        {
+            auto* const graph = graphs.getUnchecked (i);
+            if (i >= graphAudioTemp.size() || i >= graphMidiTemp.size())
+                continue;
+
+            auto& atemp = *graphAudioTemp.getUnchecked (i);
+            auto& mtemp = *graphMidiTemp.getUnchecked (i);
+            const int sumChans = jmin (numOutputChans, atemp.getNumChannels(), audioOut.getNumChannels());
+
+            // clang-format off
+            if (graphChanged && ((current->isSingle() && graph == last) ||
+                                 (modeChanged && ! current->isSingle() && graph->isSingle() && graph == last)))
+            {
+                for (int c = 0; c < sumChans; ++c)
+                    audioOut.addFromWithRamp (c, 0, atemp.getReadPointer (c), numSamples, 1.f, 0.f);
+            }
+            else if ((graph == current && graph->isSingle()) || (! graph->isSingle() && (current != nullptr) && ! current->isSingle()))
+            {
+                if (graphChanged && (graph->isSingle() || (modeChanged && ! graph->isSingle() && ! current->isSingle())))
+                {
+                    for (int c = 0; c < sumChans; ++c)
+                        audioOut.addFromWithRamp (c, 0, atemp.getReadPointer (c), numSamples, 0.f, 1.f);
+                }
+                else
+                {
+                    for (int c = 0; c < sumChans; ++c)
+                        audioOut.addFrom (c, 0, atemp, c, 0, numSamples);
+                }
+
+                midiOut.addEvents (mtemp, 0, numSamples, 0);
+            }
+            // clang-format on
+        }
     }
 
     /** not realtime safe! */
@@ -270,8 +534,25 @@ private:
 
     int numInputChans = -1;
     int numOutputChans = -1;
+    int blockSize = 0;
+    double sampleRate = 0.0;
     AudioSampleBuffer audioOut, audioTemp, cvTemp;
     MidiBuffer midiOut, midiTemp;
+
+    std::atomic<bool> activeGraphChangedFlag { false };
+    std::atomic<bool> mergedDirty { false };
+
+    // Unified multicore render state. `merged` spans every warm graph;
+    // `mergedGraphs` pins those graphs alive (ref-counted) so rendering a stale
+    // schedule between rebuilds is always safe. Guarded by mergedLock.
+    bool multicore = false;
+    juce::CriticalSection mergedLock;
+    std::unique_ptr<RenderSchedule> merged;
+    ReferenceCountedArray<RootGraph> mergedGraphs;
+    std::shared_ptr<RenderPool> pool;
+    juce::AudioWorkgroup workgroup;
+    OwnedArray<AudioSampleBuffer> graphAudioTemp;
+    OwnedArray<MidiBuffer> graphMidiTemp;
 
     void updateIndexes()
     {
@@ -569,7 +850,7 @@ public:
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
 
-        graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
+        graphs.prepareBuffers (numInputChans, numOutputChans, blockSize, sampleRate);
 
         while (inMeters.size() < numInputChans)
             inMeters.add (new AudioEngine::LevelMeter());
@@ -647,13 +928,17 @@ public:
             {
                 graph->renderingSequenceChanged.connect (
                     std::bind (&AudioEngine::updateExternalLatencySamples, &engine));
+                graph->renderingSequenceChanged.connect (
+                    std::bind (&RootGraphRender::invalidateMerged, &graphs));
             }
         }
 
-        // Match the new graph to the current parallel-rendering setting.
+        // Match the new graph to the current multicore setting.
+        const bool enable = multicoreEnabled;
         graph->setAudioWorkgroup (deviceWorkgroup);
-        graph->setMulticore (multicoreEnabled
-                             && engine.getRunMode() == RunMode::Standalone);
+        graph->setEngineManaged (enable);
+        graph->setMulticore (enable);
+        graphs.invalidateMerged();
     }
 
     void removeGraph (RootGraph* graph)
@@ -666,6 +951,7 @@ public:
         graph->renderingSequenceChanged.disconnect_all_slots();
         if (isPrepared)
             graph->releaseResources();
+        graphs.invalidateMerged();
     }
 
     void connectSessionValues()
@@ -791,18 +1077,28 @@ private:
 
     ReferenceCountedArray<AudioEngine::LevelMeter> inMeters, outMeters;
 
-    /** Pushes the multicore setting and the device audio workgroup to every root
-        graph. Multicore rendering is only enabled in standalone mode; hosted
-        (plugin) mode stays sequential. */
+    /** Pushes the multicore setting and the audio workgroup to every root graph
+        and (re)builds the engine's unified schedule. Works in both standalone
+        and hosted (plugin) mode: all engine instances share one process-wide
+        worker pool, and each instance's audio thread submits its own job.
+        Message thread. */
     void applyMulticoreToGraphs()
     {
-        const bool enable = multicoreEnabled
-                            && engine.getRunMode() == RunMode::Standalone;
+        const bool enable = multicoreEnabled;
+
+        graphs.setWorkgroup (deviceWorkgroup);
+        graphs.setMulticore (enable);
+
         for (auto* const graph : graphs.getGraphs())
         {
             graph->setAudioWorkgroup (deviceWorkgroup);
+            graph->setEngineManaged (enable);
             graph->setMulticore (enable);
         }
+
+        // Build synchronously so enabling never leaves a gap where graphs have
+        // released their op lists but no merged schedule exists yet.
+        graphs.rebuildMerged();
     }
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
@@ -904,6 +1200,13 @@ void AudioEngine::applySettings (Settings& settings)
     priv->applyMulticoreToGraphs();
 }
 
+void AudioEngine::setMulticore (bool enabled)
+{
+    jassert (priv);
+    priv->multicoreEnabled = enabled;
+    priv->applyMulticoreToGraphs();
+}
+
 bool AudioEngine::removeGraph (RootGraph* graph)
 {
     jassert (priv && graph);
@@ -993,7 +1296,23 @@ void AudioEngine::seekToAudioFrame (const int64_t frame)
 void AudioEngine::prepareExternalPlayback (const double sampleRate, const int blockSize, const int numIns, const int numOuts)
 {
     if (priv)
+    {
         priv->audioAboutToStart (sampleRate, blockSize, numIns, numOuts);
+
+        // Mirrors the device path: applied before the first process callback,
+        // so no render is in flight here.
+        priv->applyMulticoreToGraphs();
+    }
+}
+
+void AudioEngine::setAudioWorkgroup (juce::AudioWorkgroup workgroup)
+{
+    if (priv == nullptr)
+        return;
+    // Called from the host's audio thread (plugin) or the message thread; must
+    // stay light. Workers re-join the group on their next wake.
+    priv->deviceWorkgroup = workgroup;
+    priv->graphs.setWorkgroup (std::move (workgroup));
 }
 
 void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi)

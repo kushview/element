@@ -42,6 +42,16 @@ public:
 
     void applySettings (Settings&);
 
+    /** Enables or disables multicore graph rendering and applies it to every
+        root graph. Message thread. */
+    void setMulticore (bool enabled);
+
+    /** Sets the OS audio workgroup render workers should join (macOS). In
+        standalone mode this comes from the audio device; in plugin mode from
+        the host via AudioProcessor::audioWorkgroupContextChanged. Realtime
+        safe. */
+    void setAudioWorkgroup (juce::AudioWorkgroup workgroup);
+
     bool isUsingExternalClock() const;
 
     void setSession (SessionPtr);

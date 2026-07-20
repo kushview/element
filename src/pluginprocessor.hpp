@@ -99,6 +99,10 @@ public:
     void releaseResources() override;
     void reset() override;
 
+    /** Forwards the host's audio workgroup to the engine's render workers so
+        multicore rendering is co-scheduled with the host audio thread (macOS). */
+    void audioWorkgroupContextChanged (const juce::AudioWorkgroup& workgroup) override;
+
     bool isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const;
     PopupMenu getPerformanceParameterMenu (int perfParam);
     void handlePerformanceParameterResult (int result, int perfParam);

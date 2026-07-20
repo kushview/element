@@ -575,6 +575,12 @@ void PluginProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi)
     engine->processExternalBuffers (buffer, midi);
 }
 
+void PluginProcessor::audioWorkgroupContextChanged (const juce::AudioWorkgroup& workgroup)
+{
+    if (engine != nullptr)
+        engine->setAudioWorkgroup (workgroup);
+}
+
 bool PluginProcessor::hasEditor() const { return true; }
 
 AudioProcessorEditor* PluginProcessor::createEditor()

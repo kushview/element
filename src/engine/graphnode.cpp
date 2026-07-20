@@ -374,12 +374,17 @@ static void deleteRenderOpArray (Array<void*>& ops)
 void GraphNode::clearRenderingSequence()
 {
     Array<void*> oldOps;
+    std::unique_ptr<RenderSchedule> oldSchedule;
 
     {
         const ScopedLock sl (seqLock);
         renderingOps.swapWith (oldOps);
+        oldSchedule = std::move (parallelSchedule);
     }
 
+    // Freed outside the lock so the audio thread never blocks on a
+    // deallocation while acquiring seqLock.
+    oldSchedule.reset();
     deleteRenderOpArray (oldOps);
 }
 
@@ -403,24 +408,27 @@ bool GraphNode::isAnInputTo (const uint32 possibleInputId,
     return false;
 }
 
+void GraphNode::computeOrderedNodes (Array<void*>& orderedNodes)
+{
+    const LookupTable table (connections);
+
+    for (int i = 0; i < nodes.size(); ++i)
+    {
+        Processor* const node = nodes.getUnchecked (i);
+
+        int j = 0;
+        for (; j < orderedNodes.size(); ++j)
+            if (table.isAnInputTo (node->nodeId, ((Processor*) orderedNodes.getUnchecked (j))->nodeId))
+                break;
+
+        orderedNodes.insert (j, node);
+    }
+}
+
 void GraphNode::buildRenderingSequence()
 {
     Array<void*> orderedNodes;
-    {
-        const LookupTable table (connections);
-
-        for (int i = 0; i < nodes.size(); ++i)
-        {
-            Processor* const node = nodes.getUnchecked (i);
-
-            int j = 0;
-            for (; j < orderedNodes.size(); ++j)
-                if (table.isAnInputTo (node->nodeId, ((Processor*) orderedNodes.getUnchecked (j))->nodeId))
-                    break;
-
-            orderedNodes.insert (j, node);
-        }
-    }
+    computeOrderedNodes (orderedNodes);
 
     if (multicoreEnabled.load (std::memory_order_relaxed))
     {
@@ -545,8 +553,6 @@ void GraphNode::releaseResources()
     _prepared = false;
 
     renderPool.reset();
-    poolSampleRate = 0.0;
-    poolBlockSize = 0;
 
     renderingBuffers.setSize (1, 1);
     midiBuffers.clear();
@@ -588,10 +594,18 @@ void GraphNode::render (RenderContext& rc)
 
 void GraphNode::renderPrologue (RenderContext& rc)
 {
-    const int32 numSamples = rc.audio.getNumSamples();
-    auto& midiMessages = *rc.midi.getWriteBuffer (0);
-    currentAudioInputBuffer = &rc.audio;
-    currentAudioOutputBuffer.setSize (jmax (1, rc.audio.getNumChannels()), numSamples);
+    renderPrologue (rc.audio, *rc.midi.getWriteBuffer (0), rc.audio.getNumSamples());
+}
+
+void GraphNode::renderEpilogue (RenderContext& rc)
+{
+    renderEpilogue (rc.audio, *rc.midi.getWriteBuffer (0), rc.audio.getNumSamples());
+}
+
+void GraphNode::renderPrologue (AudioSampleBuffer& audio, MidiBuffer& midiMessages, int numSamples)
+{
+    currentAudioInputBuffer = &audio;
+    currentAudioOutputBuffer.setSize (jmax (1, audio.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
 
     const bool applyVelocityCurve = (velocityCurve.getMode() != VelocityCurve::Linear);
@@ -626,13 +640,11 @@ void GraphNode::renderPrologue (RenderContext& rc)
     currentMidiOutputBuffer.clear();
 }
 
-void GraphNode::renderEpilogue (RenderContext& rc)
+void GraphNode::renderEpilogue (AudioSampleBuffer& audio, MidiBuffer& midiMessages, int numSamples)
 {
-    const int32 numSamples = rc.audio.getNumSamples();
-    auto& midiMessages = *rc.midi.getWriteBuffer (0);
-
-    for (int i = 0; i < rc.audio.getNumChannels(); ++i)
-        rc.audio.copyFrom (i, 0, currentAudioOutputBuffer, i, 0, numSamples);
+    const int numChans = jmin (audio.getNumChannels(), currentAudioOutputBuffer.getNumChannels());
+    for (int i = 0; i < numChans; ++i)
+        audio.copyFrom (i, 0, currentAudioOutputBuffer, i, 0, numSamples);
 
     midiMessages.clear();
     midiMessages.addEvents (currentMidiOutputBuffer, 0, numSamples, 0);
@@ -661,15 +673,7 @@ void GraphNode::performParallel (int numSamples)
     {
         // Not worth threading (or no pool): drain on the calling thread in
         // topological order.
-        float* const* sharedAudio = sched.audioBuffers.getArrayOfWritePointers();
-        for (int t = 0; t < sched.numTasks; ++t)
-        {
-            auto* task = sched.tasks.getUnchecked (t);
-            for (int p = 0; p < task->numPrelude; ++p)
-                sched.preludeOps.getUnchecked (task->preludeStart + p)
-                    ->perform (sharedAudio, sched.midiBuffers, numSamples);
-            task->kernel->perform (sharedAudio, sched.midiBuffers, numSamples);
-        }
+        sched.renderOnThisThread (numSamples);
     }
 }
 
@@ -747,6 +751,13 @@ void GraphNode::rebuild() noexcept
     handleAsyncUpdate();
 }
 
+std::unique_ptr<RenderSchedule> GraphNode::buildParallelSchedule (int blockSize)
+{
+    Array<void*> orderedNodes;
+    computeOrderedNodes (orderedNodes);
+    return RenderSchedule::build (*this, orderedNodes, blockSize);
+}
+
 void GraphNode::setMulticore (bool shouldUseMulticore)
 {
     if (multicoreEnabled.load (std::memory_order_relaxed) == shouldUseMulticore)
@@ -785,14 +796,14 @@ void GraphNode::ensureRenderPool()
     const double sr = getSampleRate();
     const int bs = getBlockSize();
 
-    if (renderPool != nullptr && poolSampleRate == sr && poolBlockSize == bs)
+    if (renderPool != nullptr && renderPool->getSampleRate() == sr && renderPool->getBlockSize() == bs)
         return;
 
-    const int numThreads = jlimit (1, 32, SystemStats::getNumCpus());
-    renderPool.reset (new RenderPool (numThreads, sr, bs));
+    // All graphs share one process-wide pool so the total worker thread count
+    // stays bounded no matter how many graphs enable multicore. Safe because
+    // graphs are rendered serially: only one submitter drains at a time.
+    renderPool = RenderPool::acquireShared (sr, bs);
     renderPool->setWorkgroup (graphWorkgroup);
-    poolSampleRate = sr;
-    poolBlockSize = bs;
 }
 
 void GraphNode::setAudioWorkgroup (juce::AudioWorkgroup workgroup)

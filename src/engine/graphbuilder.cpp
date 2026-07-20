@@ -36,6 +36,8 @@ public:
 
     void perform (float* const*, const OwnedArray<MidiBuffer>&, const int) override {}
 
+    void rebase (int, int) override {}
+
 private:
     ParameterPtr param1, param2;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BindParameterOp)
@@ -49,13 +51,15 @@ public:
     {
     }
 
-    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples) override
     {
         FloatVectorOperations::clear (sharedAudio[channelNum], numSamples);
     }
 
+    void rebase (int audioOffset, int) override { channelNum += audioOffset; }
+
 private:
-    const int channelNum;
+    int channelNum;
 
     JUCE_DECLARE_NON_COPYABLE (ClearChannelOp)
 };
@@ -69,13 +73,19 @@ public:
     {
     }
 
-    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples) override
     {
         FloatVectorOperations::copy (sharedAudio[dstChannelNum], sharedAudio[srcChannelNum], numSamples);
     }
 
+    void rebase (int audioOffset, int) override
+    {
+        srcChannelNum += audioOffset;
+        dstChannelNum += audioOffset;
+    }
+
 private:
-    const int srcChannelNum, dstChannelNum;
+    int srcChannelNum, dstChannelNum;
 
     JUCE_DECLARE_NON_COPYABLE (CopyChannelOp)
 };
@@ -89,13 +99,19 @@ public:
     {
     }
 
-    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples) override
     {
         FloatVectorOperations::add (sharedAudio[dstChannelNum], sharedAudio[srcChannelNum], numSamples);
     }
 
+    void rebase (int audioOffset, int) override
+    {
+        srcChannelNum += audioOffset;
+        dstChannelNum += audioOffset;
+    }
+
 private:
-    const int srcChannelNum, dstChannelNum;
+    int srcChannelNum, dstChannelNum;
 
     JUCE_DECLARE_NON_COPYABLE (AddChannelOp)
 };
@@ -108,13 +124,15 @@ public:
     {
     }
 
-    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int) override
     {
         sharedMidiBuffers.getUnchecked (bufferNum)->clear();
     }
 
+    void rebase (int, int midiOffset) override { bufferNum += midiOffset; }
+
 private:
-    const int bufferNum;
+    int bufferNum;
 
     JUCE_DECLARE_NON_COPYABLE (ClearMidiBufferOp)
 };
@@ -128,13 +146,19 @@ public:
     {
     }
 
-    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
+    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int) override
     {
         *sharedMidiBuffers.getUnchecked (dstBufferNum) = *sharedMidiBuffers.getUnchecked (srcBufferNum);
     }
 
+    void rebase (int, int midiOffset) override
+    {
+        srcBufferNum += midiOffset;
+        dstBufferNum += midiOffset;
+    }
+
 private:
-    const int srcBufferNum, dstBufferNum;
+    int srcBufferNum, dstBufferNum;
 
     JUCE_DECLARE_NON_COPYABLE (CopyMidiBufferOp)
 };
@@ -148,14 +172,20 @@ public:
     {
     }
 
-    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (float* const*, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples) override
     {
         sharedMidiBuffers.getUnchecked (dstBufferNum)
             ->addEvents (*sharedMidiBuffers.getUnchecked (srcBufferNum), 0, numSamples, 0);
     }
 
+    void rebase (int, int midiOffset) override
+    {
+        srcBufferNum += midiOffset;
+        dstBufferNum += midiOffset;
+    }
+
 private:
-    const int srcBufferNum, dstBufferNum;
+    int srcBufferNum, dstBufferNum;
 
     JUCE_DECLARE_NON_COPYABLE (AddMidiBufferOp)
 };
@@ -172,7 +202,7 @@ public:
         buffer.calloc ((size_t) bufferSize);
     }
 
-    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>&, const int numSamples) override
     {
         float* data = sharedAudio[channel];
 
@@ -188,9 +218,12 @@ public:
         }
     }
 
+    void rebase (int audioOffset, int) override { channel += audioOffset; }
+
 private:
     HeapBlock<float> buffer;
-    const int channel, bufferSize;
+    int channel;
+    const int bufferSize;
     int readIndex, writeIndex;
 
     JUCE_DECLARE_NON_COPYABLE (DelayChannelOp)
@@ -230,7 +263,7 @@ public:
         tempMidi.ensureSize (128);
     }
 
-    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
+    void perform (float* const* sharedAudio, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples) override
     {
         for (int i = totalChans; --i >= 0;)
         {
@@ -449,6 +482,15 @@ public:
 
         for (int i = 0; i < numAudioOuts; ++i)
             node->setOutputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
+    }
+
+    void rebase (int audioOffset, int midiOffset) override
+    {
+        for (int i = audioChannelsToUse.size(); --i >= 0;)
+            audioChannelsToUse.set (i, audioChannelsToUse.getUnchecked (i) + audioOffset);
+        for (int i = midiChannelsToUse.size(); --i >= 0;)
+            midiChannelsToUse.set (i, midiChannelsToUse.getUnchecked (i) + midiOffset);
+        midiBufferToUse += midiOffset;
     }
 
     const ProcessorPtr node;

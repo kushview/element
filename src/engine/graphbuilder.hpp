@@ -29,6 +29,19 @@ public:
                           const OwnedArray<MidiBuffer>& sharedMidiBuffers,
                           const int numSamples) = 0;
 
+    /** Offsets every audio and MIDI buffer index stored by this op.
+
+        Used when concatenating per-graph schedules into one merged schedule
+        whose buffer pools are laid end to end: each graph's ops are shifted by
+        that graph's base offset into the merged pools. Pure virtual so a new op
+        type cannot forget to implement it (a missed index would silently alias
+        another graph's buffers).
+
+        @param audioOffset  added to every audio channel/buffer index
+        @param midiOffset   added to every MIDI buffer index
+    */
+    virtual void rebase (int audioOffset, int midiOffset) = 0;
+
 private:
     JUCE_LEAK_DETECTOR (GraphOp)
 };

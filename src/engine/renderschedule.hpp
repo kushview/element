@@ -86,6 +86,26 @@ struct RenderSchedule
                                                   const juce::Array<void*>& orderedNodes,
                                                   int maxBlockSize);
 
+    /** Merges per-graph schedules into one schedule spanning all of them.
+
+        Runs on the message thread. Lays the parts' buffer pools end to end and
+        rebases every op's buffer indices by its graph's base offset, then
+        concatenates tasks with offset ids. The parts' graphs are independent so
+        no cross-graph dependency edges exist; each part's initial-ready tasks
+        stay initially ready. The merged schedule takes ownership of every op
+        and task; the drained parts are left empty.
+
+        All parts must have been built with the same maxBlockSize.
+
+        @param parts  the per-graph schedules to merge; emptied by this call
+        @return the merged schedule, never null
+    */
+    static std::unique_ptr<RenderSchedule> merge (juce::OwnedArray<RenderSchedule>& parts);
+
+    /** Drains every task in topological order on the calling thread.
+        Used when threading isn't worthwhile or no worker pool is available. */
+    void renderOnThisThread (int numSamples);
+
     /** Owns every rendering op (prelude ops and kernels). */
     juce::OwnedArray<GraphOp> ownedOps;
 

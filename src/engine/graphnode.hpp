@@ -214,6 +214,30 @@ public:
         Intended for testing/diagnostics. */
     int getNumAudioThreadOnlyTasks() const noexcept;
 
+    /** Builds a fresh parallel schedule for this graph's current topology.
+        Runs on the message thread. Used by the engine to compose the unified
+        multi-graph schedule.
+        @param blockSize  buffer pool width in samples */
+    std::unique_ptr<RenderSchedule> buildParallelSchedule (int blockSize);
+
+    /** Sets up per-block render state (input/output buffers, MIDI filtering).
+        Called by GraphNode::render, or by the engine before draining this
+        graph's tasks from the unified schedule. */
+    void renderPrologue (RenderContext&);
+
+    /** Prologue over persistent engine-owned buffers. The audio buffer must
+        outlive the whole block: IO node tasks read it (via
+        currentAudioInputBuffer) while the unified schedule renders. */
+    void renderPrologue (juce::AudioSampleBuffer& audio, juce::MidiBuffer& midi, int numSamples);
+
+    /** Copies the graph's output buffers back into the render context. Called
+        by GraphNode::render, or by the engine after the unified schedule's
+        fork-join completes. */
+    void renderEpilogue (RenderContext&);
+
+    /** Epilogue over persistent engine-owned buffers. */
+    void renderEpilogue (juce::AudioSampleBuffer& audio, juce::MidiBuffer& midi, int numSamples);
+
 protected:
     //==========================================================================
     virtual void preRenderNodes() {}
@@ -221,6 +245,15 @@ protected:
 
     //==========================================================================
     void initialize() override {}
+
+    /** Rebuilds the rendering sequence on the message thread. Subclasses (e.g.
+        RootGraph when scheduled by the engine) may override to suppress building
+        a private op list and defer scheduling to a higher level. */
+    void handleAsyncUpdate() override;
+
+    /** Discards the current rendering sequence (sequential ops and any parallel
+        schedule). */
+    void clearRenderingSequence();
 
 private:
     // TODO: techdebt. to many friend classes.
@@ -247,9 +280,7 @@ private:
 
     std::atomic<bool> multicoreEnabled { false };
     std::unique_ptr<RenderSchedule> parallelSchedule;
-    std::unique_ptr<RenderPool> renderPool;
-    double poolSampleRate = 0.0;
-    int poolBlockSize = 0;
+    std::shared_ptr<RenderPool> renderPool;
     juce::AudioWorkgroup graphWorkgroup;
 
     juce::AudioSampleBuffer* currentAudioInputBuffer;
@@ -269,14 +300,6 @@ private:
     juce::CriticalSection seqLock;
     friend class ScriptNode; // workaround so parameter connections work when params change.
 
-    /** Sets up per-block render state (input/output buffers, MIDI filtering)
-        shared by both the sequential and parallel render paths. */
-    void renderPrologue (RenderContext&);
-
-    /** Copies the graph's output buffers back into the render context. Shared by
-        both render paths. */
-    void renderEpilogue (RenderContext&);
-
     /** Walks the flat renderingOps list on the calling thread. Assumes seqLock is
         held and the render prologue has run. Original single-threaded path. */
     void performSequential (int numSamples);
@@ -290,9 +313,8 @@ private:
         block size when parallel rendering is active. Runs on the message thread. */
     void ensureRenderPool();
 
-    void handleAsyncUpdate() override;
-    void clearRenderingSequence();
     void buildRenderingSequence();
+    void computeOrderedNodes (juce::Array<void*>& orderedNodes);
     bool isAnInputTo (uint32 possibleInputId, uint32 possibleDestinationId, int recursionCheck) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)

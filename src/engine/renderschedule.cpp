@@ -129,4 +129,88 @@ std::unique_ptr<RenderSchedule> RenderSchedule::build (GraphNode& graph,
     return schedule;
 }
 
+void RenderSchedule::renderOnThisThread (int numSamples)
+{
+    float* const* sharedAudio = audioBuffers.getArrayOfWritePointers();
+    for (int t = 0; t < numTasks; ++t)
+    {
+        auto* task = tasks.getUnchecked (t);
+        for (int p = 0; p < task->numPrelude; ++p)
+            preludeOps.getUnchecked (task->preludeStart + p)
+                ->perform (sharedAudio, midiBuffers, numSamples);
+        task->kernel->perform (sharedAudio, midiBuffers, numSamples);
+    }
+}
+
+std::unique_ptr<RenderSchedule> RenderSchedule::merge (juce::OwnedArray<RenderSchedule>& parts)
+{
+    auto merged = std::make_unique<RenderSchedule>();
+
+    int totalAudio = 0, totalMidi = 0, totalTasks = 0, totalOps = 0, totalPrelude = 0, totalSucc = 0;
+    int width = 1;
+    for (auto* part : parts)
+    {
+        totalAudio += part->audioBuffers.getNumChannels();
+        totalMidi += part->midiBuffers.size();
+        totalTasks += part->numTasks;
+        totalOps += part->ownedOps.size();
+        totalPrelude += part->preludeOps.size();
+        totalSucc += part->successors.size();
+        width = juce::jmax (width, part->audioBuffers.getNumSamples());
+        merged->totalLatency = juce::jmax (merged->totalLatency, part->totalLatency);
+    }
+
+    merged->ownedOps.ensureStorageAllocated (totalOps);
+    merged->tasks.ensureStorageAllocated (totalTasks);
+    merged->preludeOps.ensureStorageAllocated (totalPrelude);
+    merged->successors.ensureStorageAllocated (totalSucc);
+
+    int audioBase = 0, midiBase = 0, taskBase = 0, preludeBase = 0, successorBase = 0;
+
+    for (auto* part : parts)
+    {
+        for (int i = 0; i < part->ownedOps.size(); ++i)
+        {
+            auto* op = part->ownedOps.getUnchecked (i);
+            op->rebase (audioBase, midiBase);
+            merged->ownedOps.add (op);
+        }
+        part->ownedOps.clearQuick (false);
+
+        for (int i = 0; i < part->preludeOps.size(); ++i)
+            merged->preludeOps.add (part->preludeOps.getUnchecked (i));
+
+        for (int i = 0; i < part->tasks.size(); ++i)
+        {
+            auto* task = part->tasks.getUnchecked (i);
+            task->preludeStart += preludeBase;
+            task->firstSuccessor += successorBase;
+            merged->tasks.add (task);
+        }
+        part->tasks.clearQuick (false);
+
+        for (int i = 0; i < part->successors.size(); ++i)
+            merged->successors.add (part->successors.getUnchecked (i) + taskBase);
+
+        for (int i = 0; i < part->initialReady.size(); ++i)
+            merged->initialReady.add (part->initialReady.getUnchecked (i) + taskBase);
+
+        audioBase += part->audioBuffers.getNumChannels();
+        midiBase += part->midiBuffers.size();
+        taskBase += part->numTasks;
+        preludeBase = merged->preludeOps.size();
+        successorBase = merged->successors.size();
+    }
+
+    merged->numTasks = merged->tasks.size();
+
+    // The pools are per-block scratch: allocate fresh and cleared, no data to carry over.
+    merged->audioBuffers.setSize (juce::jmax (1, totalAudio), width);
+    merged->audioBuffers.clear();
+    for (int i = 0; i < juce::jmax (1, totalMidi); ++i)
+        merged->midiBuffers.add (new juce::MidiBuffer());
+
+    return merged;
+}
+
 } // namespace element

@@ -43,6 +43,21 @@ public:
 
     void refreshPorts() override;
 
+    /** Marks this graph as scheduled by the audio engine's unified render
+        schedule.
+
+        Engine-managed graphs build no rendering ops of their own: the engine
+        composes one merged schedule spanning every managed graph (owning the
+        only copy of each control-port BindParameterOp) and drives the
+        prologue / task rendering / epilogue phases itself. The graph still
+        notifies renderingSequenceChanged so the engine rebuilds the merged
+        schedule when this graph's topology changes.
+    */
+    void setEngineManaged (bool managed);
+
+    /** Returns true when this graph is scheduled by the engine. */
+    bool isEngineManaged() const noexcept { return engineManaged; }
+
     void setPlayConfigFor (AudioIODevice* device);
     void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
     void setPlayConfigFor (DeviceManager&);
@@ -73,6 +88,9 @@ public:
      */
     inline constexpr int getEngineIndex() const noexcept { return engineIndex; }
 
+protected:
+    void handleAsyncUpdate() override;
+
 private:
     friend class AudioEngine;
     friend struct RootGraphRender;
@@ -82,6 +100,7 @@ private:
     int midiProgram = -1;
     int engineIndex = -1;
     RenderMode renderMode = Parallel;
+    bool engineManaged = false;
 };
 
 } // namespace element
