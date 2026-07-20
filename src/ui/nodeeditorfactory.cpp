@@ -6,6 +6,7 @@
 #include <element/ui/grapheditor.hpp>
 
 #include "nodes/baseprocessor.hpp"
+#include "nodes/genericeditor.hpp"
 #include "nodes/nodetypes.hpp"
 #include "nodes/ionodeeditor.hpp"
 #include "nodes/audioroutereditor.hpp"
@@ -203,6 +204,40 @@ private:
 NodeEditorFactory::NodeEditorFactory()
 {
     add<AudioRouterEditor> (EL_NODE_ID_AUDIO_ROUTER, NodeEditorPlacement::PluginWindow);
+}
+
+const Array<NodeEditorDescription>& NodeEditorFactory::getEditors() const { return editors; }
+
+const OwnedArray<NodeEditorSource>& NodeEditorFactory::getSources() const { return sources; }
+
+void NodeEditorFactory::add (NodeEditorSource* source)
+{
+    jassert (! sources.contains (source));
+    sources.add (source);
+    source->findEditors (editors);
+}
+
+std::unique_ptr<NodeEditor> NodeEditorFactory::instantiate (const Node& node, NodeEditorPlacement placement)
+{
+    std::unique_ptr<NodeEditor> ed;
+    for (auto* s : sources)
+        if (auto* e = s->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
+        {
+            ed.reset (e);
+            break;
+        }
+    if (ed == nullptr && fallback)
+        if (auto* e = fallback->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
+            ed.reset (e);
+    return ed;
+}
+
+std::unique_ptr<juce::Component> NodeEditorFactory::createEditor (const Node& node)
+{
+    if (auto obj = node.getObject())
+        if (obj->hasEditor())
+            return std::unique_ptr<juce::Component> (obj->createEditor());
+    return std::make_unique<GenericNodeEditor> (node);
 }
 
 NodeEditorFactory::NodeEditorFactory (GuiService& g)

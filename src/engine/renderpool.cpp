@@ -73,18 +73,30 @@ public:
 };
 
 RenderPool::RenderPool (int numThreads_, double sampleRate, int blockSize)
-    : numThreads (juce::jmax (1, numThreads_))
 {
+    const int requested = juce::jmax (1, numThreads_);
+
     juce::Thread::RealtimeOptions options;
     options = options.withApproximateAudioProcessingTime (juce::jmax (1, blockSize),
                                                           sampleRate > 0.0 ? sampleRate : 44100.0);
 
-    for (int i = 1; i < numThreads; ++i)
+    for (int i = 1; i < requested; ++i)
     {
-        auto* w = new Worker (*this, i);
-        workers.add (w);
-        w->startRealtimeThread (options);
+        auto w = std::make_unique<Worker> (*this, i);
+
+        // Only keep workers that actually started. If the OS denies a realtime
+        // thread (e.g. a Linux host with no RLIMIT_RTPRIO privilege), run() never
+        // executes and the worker would never decrement workersActive, hanging the
+        // audio thread at the fork-join barrier. Stop adding lanes instead; the
+        // render path counts only the workers that came up and degrades toward the
+        // calling thread doing the work sequentially.
+        if (! w->startRealtimeThread (options))
+            break;
+
+        workers.add (w.release());
     }
+
+    numThreads = 1 + workers.size();
 }
 
 RenderPool::~RenderPool()
@@ -133,7 +145,7 @@ void RenderPool::pushReady (int taskId) noexcept
 
 void RenderPool::drain (bool isAudioThread)
 {
-    ParallelSchedule& s = *current;
+    RenderSchedule& s = *current;
     const int numSamples = currentNumSamples;
 
     for (;;)
@@ -170,7 +182,7 @@ void RenderPool::drain (bool isAudioThread)
     }
 }
 
-void RenderPool::render (ParallelSchedule& schedule, int numSamples)
+void RenderPool::render (RenderSchedule& schedule, int numSamples)
 {
     // Per-block reset (single-threaded here, before any worker is woken).
     for (int t = 0; t < schedule.numTasks; ++t)

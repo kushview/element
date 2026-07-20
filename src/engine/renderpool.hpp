@@ -10,9 +10,9 @@
 
 namespace element {
 
-struct ParallelSchedule;
+struct RenderSchedule;
 
-/** A pool of real-time worker threads that renders a ParallelSchedule across
+/** A pool of real-time worker threads that renders a RenderSchedule across
     multiple cores.
 
     The audio (calling) thread participates as one worker, so a pool of N threads
@@ -33,12 +33,14 @@ public:
     RenderPool (int numThreads, double sampleRate, int blockSize);
     ~RenderPool();
 
-    /** Total number of execution lanes, including the calling thread. */
+    /** Total number of execution lanes actually available, including the calling
+        thread. May be less than requested if realtime worker threads could not be
+        started (e.g. a Linux host without realtime scheduling privileges). */
     int getNumThreads() const noexcept { return numThreads; }
 
     /** Renders the schedule to completion. Called on the audio thread; blocks
         until every task has finished. */
-    void render (ParallelSchedule& schedule, int numSamples);
+    void render (RenderSchedule& schedule, int numSamples);
 
     /** Sets the OS audio workgroup the worker threads should join so they are
         scheduled together with the device's audio thread (macOS). Safe to call
@@ -54,7 +56,7 @@ private:
     void pushTo (std::atomic<int>& head, int taskId) noexcept;
     int popFrom (std::atomic<int>& head) noexcept;
 
-    const int numThreads;
+    int numThreads { 1 };
     juce::OwnedArray<Worker> workers;
 
     // Tasks any lane may run. Separately, audioThreadOnly tasks go on their own
@@ -67,7 +69,7 @@ private:
     juce::AudioWorkgroup workgroup;
     std::atomic<uint32_t> workgroupGeneration { 0 };
 
-    ParallelSchedule* current = nullptr;
+    RenderSchedule* current = nullptr;
     float* const* currentAudio = nullptr;
     int currentNumSamples = 0;
 

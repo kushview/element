@@ -11,14 +11,14 @@
 
 namespace element {
 
-ParallelSchedule::ParallelSchedule() = default;
-ParallelSchedule::~ParallelSchedule() = default;
+RenderSchedule::RenderSchedule() = default;
+RenderSchedule::~RenderSchedule() = default;
 
-std::unique_ptr<ParallelSchedule> buildParallelSchedule (GraphNode& graph,
-                                                         const juce::Array<void*>& orderedNodes,
-                                                         int maxBlockSize)
+std::unique_ptr<RenderSchedule> RenderSchedule::build (GraphNode& graph,
+                                                       const juce::Array<void*>& orderedNodes,
+                                                       int maxBlockSize)
 {
-    auto schedule = std::make_unique<ParallelSchedule>();
+    auto schedule = std::make_unique<RenderSchedule>();
 
     // 1. Build the parallel (non-reused) op list and size the buffer pools.
     juce::Array<void*> ops;

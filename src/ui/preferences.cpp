@@ -419,13 +419,13 @@ public:
         systray.setToggleState (settings.isSystrayEnabled(), dontSendNotification);
         systray.getToggleStateValue().addListener (this);
 
-        addAndMakeVisible (parallelRenderingLabel);
-        parallelRenderingLabel.setText ("Multicore audio", dontSendNotification);
-        parallelRenderingLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (parallelRendering);
-        parallelRendering.setClickingTogglesState (true);
-        parallelRendering.setToggleState (settings.parallelRendering(), dontSendNotification);
-        parallelRendering.getToggleStateValue().addListener (this);
+        addAndMakeVisible (multicoreLabel);
+        multicoreLabel.setText ("Multicore audio", dontSendNotification);
+        multicoreLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+        addAndMakeVisible (multicore);
+        multicore.setClickingTogglesState (true);
+        multicore.setToggleState (settings.multicore(), dontSendNotification);
+        multicore.getToggleStateValue().addListener (this);
 
         addAndMakeVisible (desktopScaleLabel);
         desktopScaleLabel.setText ("Desktop scale", dontSendNotification);
@@ -546,7 +546,7 @@ public:
         mainContentBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
 
         layoutSetting (r, systrayLabel, systray);
-        layoutSetting (r, parallelRenderingLabel, parallelRendering);
+        layoutSetting (r, multicoreLabel, multicore);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
 
 #if ! ELEMENT_SE
@@ -616,9 +616,9 @@ public:
             settings.setSystrayEnabled (systray.getToggleState());
             gui.refreshSystemTray();
         }
-        else if (value.refersToSameSourceAs (parallelRendering.getToggleStateValue()))
+        else if (value.refersToSameSourceAs (multicore.getToggleStateValue()))
         {
-            settings.setParallelRendering (parallelRendering.getToggleState());
+            settings.setMulticore (multicore.getToggleState());
             engine->applySettings (settings);
         }
         else if (value.refersToSameSourceAs (mainContentBox.getSelectedIdAsValue()))
@@ -682,8 +682,8 @@ private:
     Label systrayLabel;
     SettingButton systray;
 
-    Label parallelRenderingLabel;
-    SettingButton parallelRendering;
+    Label multicoreLabel;
+    SettingButton multicore;
 
     Label desktopScaleLabel;
     Slider desktopScale;

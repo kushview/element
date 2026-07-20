@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// Validates that the parallel render path (GraphNode::setParallelRendering) with
+// Validates that the parallel render path (GraphNode::setMulticore) with
 // its non-reused, always-copy buffer model produces the same output as the
 // original sequential path across a range of routing topologies.
 
@@ -97,11 +97,11 @@ CompareResult runAndCompare (const std::function<void (GraphNode&)>& build)
 
     PreparedGraph par (44100.0, kBlockSize);
     build (par.graph);
-    par.graph.setParallelRendering (true);
+    par.graph.setMulticore (true);
     par.graph.rebuild();
 
-    BOOST_REQUIRE (! seq.graph.isParallelRendering());
-    BOOST_REQUIRE (par.graph.isParallelRendering());
+    BOOST_REQUIRE (! seq.graph.isMulticore());
+    BOOST_REQUIRE (par.graph.isMulticore());
 
     juce::AudioSampleBuffer aOut (input), bOut (input);
     juce::MidiBuffer ma, mb;
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE (IndependentChains)
     par.graph.addNode (out);
     par.graph.connectChannels (PortType::Audio, in->nodeId, 0, la->nodeId, 0);
     par.graph.connectChannels (PortType::Audio, la->nodeId, 0, out->nodeId, 0);
-    par.graph.setParallelRendering (true);
+    par.graph.setMulticore (true);
     par.graph.rebuild();
     BOOST_REQUIRE_GT (par.graph.getNumRenderTasks(), 0);
 }
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE (WideParallelStress)
 
     PreparedGraph par (44100.0, kBlockSize);
     build (par.graph);
-    par.graph.setParallelRendering (true);
+    par.graph.setMulticore (true);
     par.graph.rebuild();
     BOOST_REQUIRE_GT (par.graph.getNumRenderTasks(), 2);
 
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE (DisengagedWorkgroupTolerated)
 
     PreparedGraph par (44100.0, kBlockSize);
     build (par.graph);
-    par.graph.setParallelRendering (true);
+    par.graph.setMulticore (true);
     par.graph.setAudioWorkgroup (juce::AudioWorkgroup {}); // disengaged
     par.graph.rebuild();
 
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE (RuntimeToggle)
     double worst = 0.0;
     for (int blk = 0; blk < 40; ++blk) {
         // Flip parallel state every few blocks.
-        tog.graph.setParallelRendering ((blk / 3) % 2 == 1);
+        tog.graph.setMulticore ((blk / 3) % 2 == 1);
 
         juce::AudioSampleBuffer aOut (input), bOut (input);
         juce::MidiBuffer ma, mb;
@@ -456,7 +456,7 @@ BOOST_AUTO_TEST_CASE (MultiOutputIONoRace)
 
     PreparedGraph par (44100.0, kBlockSize);
     build (par.graph);
-    par.graph.setParallelRendering (true);
+    par.graph.setMulticore (true);
     par.graph.rebuild();
 
     // Both audio output IO nodes must be pinned to the audio thread.

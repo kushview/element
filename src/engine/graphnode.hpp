@@ -3,20 +3,22 @@
 
 #pragma once
 
-#include "ElementApp.h"
-#include <element/processor.hpp>
-#include "engine/velocitycurve.hpp"
 #include <element/arc.hpp>
+#include <element/processor.hpp>
 #include <element/signals.hpp>
+
+#include "engine/velocitycurve.hpp"
+
+#include "ElementApp.h"
 
 namespace element {
 
 class Context;
 class RenderPool;
-struct ParallelSchedule;
+struct RenderSchedule;
 
 class GraphNode : public Processor,
-                  private AsyncUpdater
+                  private juce::AsyncUpdater
 {
 public:
     Signal<void()> renderingSequenceChanged;
@@ -38,7 +40,7 @@ public:
     {
     public:
         Connection (uint32 sourceNode, uint32 sourcePort, uint32 destNode, uint32 destPort) noexcept;
-        Connection (const ValueTree props);
+        Connection (const juce::ValueTree props);
 
     private:
         friend class GraphNode;
@@ -188,16 +190,16 @@ public:
     /** Rebuild rendering ops immediately. */
     void rebuild() noexcept;
 
-    /** Enables or disables multi-threaded (parallel) rendering of this graph.
+    /** Enables or disables multicore (multi-threaded) rendering of this graph.
 
         When enabled, the graph is rendered from a parallel schedule that runs
         independent nodes concurrently; when disabled, the original single-threaded
         op loop is used. Triggers a rebuild of the rendering sequence.
     */
-    void setParallelRendering (bool shouldBeParallel);
+    void setMulticore (bool shouldUseMulticore);
 
-    /** Returns true if parallel rendering is enabled for this graph. */
-    bool isParallelRendering() const noexcept { return parallelEnabled.load (std::memory_order_relaxed); }
+    /** Returns true if multicore rendering is enabled for this graph. */
+    bool isMulticore() const noexcept { return multicoreEnabled.load (std::memory_order_relaxed); }
 
     /** Sets the OS audio workgroup (macOS) that parallel render worker threads
         should join, so they are scheduled with the device's audio thread. Safe to
@@ -233,38 +235,38 @@ private:
     Context& _context;
 
     typedef ArcTable<Connection> LookupTable;
-    ReferenceCountedArray<Processor> nodes;
-    OwnedArray<Connection> connections;
-    uint32 ioNodes[10];
+    juce::ReferenceCountedArray<Processor> nodes;
+    juce::OwnedArray<Connection> connections;
+    juce::uint32 ioNodes[10];
 
-    uint32 lastNodeId;
-    AudioSampleBuffer renderingBuffers;
-    OwnedArray<MidiBuffer> midiBuffers;
-    Array<void*> renderingOps;
+    juce::uint32 lastNodeId;
+    juce::AudioSampleBuffer renderingBuffers;
+    juce::OwnedArray<MidiBuffer> midiBuffers;
+    juce::Array<void*> renderingOps;
     bool _prepared = false;
 
-    std::atomic<bool> parallelEnabled { false };
-    std::unique_ptr<ParallelSchedule> parallelSchedule;
+    std::atomic<bool> multicoreEnabled { false };
+    std::unique_ptr<RenderSchedule> parallelSchedule;
     std::unique_ptr<RenderPool> renderPool;
     double poolSampleRate = 0.0;
     int poolBlockSize = 0;
     juce::AudioWorkgroup graphWorkgroup;
 
-    AudioSampleBuffer* currentAudioInputBuffer;
-    AudioSampleBuffer currentAudioOutputBuffer;
-    MidiBuffer* currentMidiInputBuffer;
-    MidiBuffer currentMidiOutputBuffer;
+    juce::AudioSampleBuffer* currentAudioInputBuffer;
+    juce::AudioSampleBuffer currentAudioOutputBuffer;
+    juce::MidiBuffer* currentMidiInputBuffer;
+    juce::MidiBuffer currentMidiOutputBuffer;
 
     MidiChannels midiChannels;
     VelocityCurve velocityCurve;
-    MidiBuffer filteredMidi;
+    juce::MidiBuffer filteredMidi;
 
-    std::atomic<AudioPlayHead*> playhead { nullptr };
+    std::atomic<juce::AudioPlayHead*> playhead { nullptr };
 
     bool customPortsSet = false;
     PortList userPorts;
 
-    CriticalSection seqLock;
+    juce::CriticalSection seqLock;
     friend class ScriptNode; // workaround so parameter connections work when params change.
 
     /** Sets up per-block render state (input/output buffers, MIDI filtering)

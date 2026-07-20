@@ -4,7 +4,7 @@
 #pragma once
 
 #include <element/processor.hpp>
-#include "nodes/genericeditor.hpp"
+#include <element/ui/nodeeditor.hpp>
 
 namespace element {
 
@@ -19,9 +19,9 @@ enum struct NodeEditorPlacement : uint32_t
 
 struct NodeEditorDescription
 {
-    String ID;
+    juce::String ID;
     NodeEditorPlacement placement;
-    StringArray nodes;
+    juce::StringArray nodes;
 };
 
 class NodeEditorSource
@@ -29,8 +29,8 @@ class NodeEditorSource
 public:
     NodeEditorSource() = default;
     virtual ~NodeEditorSource() = default;
-    virtual NodeEditor* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) = 0;
-    virtual void findEditors (Array<NodeEditorDescription>&) = 0;
+    virtual NodeEditor* instantiate (const juce::String& identifier, const Node& node, NodeEditorPlacement placement) = 0;
+    virtual void findEditors (juce::Array<NodeEditorDescription>&) = 0;
 };
 
 class NodeEditorFactory final
@@ -40,76 +40,52 @@ public:
     NodeEditorFactory (GuiService& g);
     ~NodeEditorFactory();
 
-    const Array<NodeEditorDescription>& getEditors() const { return editors; }
+    const juce::Array<NodeEditorDescription>& getEditors() const;
 
-    void add (NodeEditorSource* source)
-    {
-        jassert (! sources.contains (source));
-        sources.add (source);
-        source->findEditors (editors);
-    }
+    void add (NodeEditorSource* source);
 
     /** Register an explicit editor for the given node and editor types */
     template <class ET>
-    void add (const String& editorType, const String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
+    void add (const juce::String& editorType, const juce::String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
     {
         add (new Single<ET> (editorType, nodeType, placement));
     }
 
     /** Register a default editor for the given node and editor types */
     template <class ET>
-    void add (const String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
+    void add (const juce::String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
     {
         add (new Single<ET> (EL_NODE_EDITOR_DEFAULT_ID, nodeType, placement));
     }
 
     /** Create the active or default editor for the given node and placement */
-    std::unique_ptr<NodeEditor> instantiate (const Node& node, NodeEditorPlacement placement)
-    {
-        std::unique_ptr<NodeEditor> ed;
-        for (auto* s : sources)
-            if (auto* e = s->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
-            {
-                ed.reset (e);
-                break;
-            }
-        if (ed == nullptr && fallback)
-            if (auto* e = fallback->instantiate (EL_NODE_EDITOR_DEFAULT_ID, node, placement))
-                ed.reset (e);
-        return ed;
-    }
+    std::unique_ptr<NodeEditor> instantiate (const Node& node, NodeEditorPlacement placement);
 
-    static std::unique_ptr<Component> createEditor (const Node& node)
-    {
-        if (auto obj = node.getObject())
-            if (obj->hasEditor())
-                return std::unique_ptr<Component> (obj->createEditor());
-        return std::make_unique<GenericNodeEditor> (node);
-    }
+    static std::unique_ptr<juce::Component> createEditor (const Node& node);
 
     /** Returns the editor sources used by this factory */
-    const OwnedArray<NodeEditorSource>& getSources() const { return sources; }
+    const juce::OwnedArray<NodeEditorSource>& getSources() const;
 
     /** Create an AudioProcessorEditor if the node has one */
-    static std::unique_ptr<AudioProcessorEditor> createAudioProcessorEditor (const Node&);
+    static std::unique_ptr<juce::AudioProcessorEditor> createAudioProcessorEditor (const Node&);
 
 private:
-    OwnedArray<NodeEditorSource> sources;
+    juce::OwnedArray<NodeEditorSource> sources;
     std::unique_ptr<NodeEditorSource> fallback;
-    Array<NodeEditorDescription> editors;
+    juce::Array<NodeEditorDescription> editors;
 
     template <class ET>
     class Single : public NodeEditorSource
     {
     public:
-        Single (const String& inID, const String& nodeID, NodeEditorPlacement placement)
+        Single (const juce::String& inID, const juce::String& nodeID, NodeEditorPlacement placement)
         {
             desc.ID = inID;
             desc.placement = placement;
             desc.nodes.add (nodeID);
         }
 
-        NodeEditor* instantiate (const String& identifier, const Node& node, NodeEditorPlacement placement) override
+        NodeEditor* instantiate (const juce::String& identifier, const Node& node, NodeEditorPlacement placement) override
         {
             if (desc.placement == placement && desc.ID == identifier && desc.nodes.contains (node.getIdentifier().toString()))
             {
@@ -120,7 +96,7 @@ private:
             return nullptr;
         }
 
-        void findEditors (Array<NodeEditorDescription>& out) override
+        void findEditors (juce::Array<NodeEditorDescription>& out) override
         {
             out.add (desc);
         }

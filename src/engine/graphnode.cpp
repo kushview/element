@@ -422,16 +422,16 @@ void GraphNode::buildRenderingSequence()
         }
     }
 
-    if (parallelEnabled.load (std::memory_order_relaxed))
+    if (multicoreEnabled.load (std::memory_order_relaxed))
     {
         // Build a parallel schedule instead of the sequential op list. Only one
         // is live at a time so control-port BindParameterOps aren't double-bound.
-        auto schedule = buildParallelSchedule (*this, orderedNodes, getBlockSize());
+        auto schedule = RenderSchedule::build (*this, orderedNodes, getBlockSize());
         setLatencySamples (schedule->totalLatency);
         ensureRenderPool();
 
         Array<void*> oldOps;
-        std::unique_ptr<ParallelSchedule> oldSchedule;
+        std::unique_ptr<RenderSchedule> oldSchedule;
         {
             // Only quick pointer swaps happen under the lock; the old schedule and
             // ops are freed below, outside it, so the audio thread never blocks on
@@ -459,7 +459,7 @@ void GraphNode::buildRenderingSequence()
         setLatencySamples (builder.getTotalLatencySamples());
     }
 
-    std::unique_ptr<ParallelSchedule> oldSchedule;
+    std::unique_ptr<RenderSchedule> oldSchedule;
     {
         // swap over to the new rendering sequence..
         {
@@ -577,7 +577,7 @@ void GraphNode::render (RenderContext& rc)
         // Decide the render path under seqLock so the message thread's schedule
         // swap (also under seqLock) can never race the pointer read here.
         ScopedLock sl (seqLock);
-        if (parallelEnabled.load (std::memory_order_relaxed) && parallelSchedule != nullptr)
+        if (multicoreEnabled.load (std::memory_order_relaxed) && parallelSchedule != nullptr)
             performParallel (numSamples);
         else
             performSequential (numSamples);
@@ -747,12 +747,12 @@ void GraphNode::rebuild() noexcept
     handleAsyncUpdate();
 }
 
-void GraphNode::setParallelRendering (bool shouldBeParallel)
+void GraphNode::setMulticore (bool shouldUseMulticore)
 {
-    if (parallelEnabled.load (std::memory_order_relaxed) == shouldBeParallel)
+    if (multicoreEnabled.load (std::memory_order_relaxed) == shouldUseMulticore)
         return;
 
-    parallelEnabled.store (shouldBeParallel, std::memory_order_relaxed);
+    multicoreEnabled.store (shouldUseMulticore, std::memory_order_relaxed);
 
     if (prepared())
         rebuild();
@@ -776,7 +776,7 @@ int GraphNode::getNumAudioThreadOnlyTasks() const noexcept
 
 void GraphNode::ensureRenderPool()
 {
-    if (! parallelEnabled.load (std::memory_order_relaxed) || ! prepared())
+    if (! multicoreEnabled.load (std::memory_order_relaxed) || ! prepared())
     {
         renderPool.reset();
         return;

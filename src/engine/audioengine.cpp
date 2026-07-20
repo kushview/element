@@ -552,7 +552,7 @@ public:
         audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
 
         // Called before the first IO callback, so no render is in flight here.
-        applyParallelToGraphs();
+        applyMulticoreToGraphs();
     }
 
     void audioAboutToStart (const double newSampleRate, const int newBlockSize, const int numChansIn, const int numChansOut)
@@ -652,8 +652,8 @@ public:
 
         // Match the new graph to the current parallel-rendering setting.
         graph->setAudioWorkgroup (deviceWorkgroup);
-        graph->setParallelRendering (parallelSettingEnabled
-                                     && engine.getRunMode() == RunMode::Standalone);
+        graph->setMulticore (multicoreEnabled
+                             && engine.getRunMode() == RunMode::Standalone);
     }
 
     void removeGraph (RootGraph* graph)
@@ -786,22 +786,22 @@ private:
     Atomic<double> midiOutLatency { 0.0 };
     std::atomic<bool> audioStarted { false };
 
-    bool parallelSettingEnabled = false;
+    bool multicoreEnabled = false;
     juce::AudioWorkgroup deviceWorkgroup;
 
     ReferenceCountedArray<AudioEngine::LevelMeter> inMeters, outMeters;
 
-    /** Pushes the parallel-rendering setting and the device audio workgroup to
-        every root graph. Parallel rendering is only enabled in standalone mode;
-        hosted (plugin) mode stays sequential. */
-    void applyParallelToGraphs()
+    /** Pushes the multicore setting and the device audio workgroup to every root
+        graph. Multicore rendering is only enabled in standalone mode; hosted
+        (plugin) mode stays sequential. */
+    void applyMulticoreToGraphs()
     {
-        const bool enable = parallelSettingEnabled
+        const bool enable = multicoreEnabled
                             && engine.getRunMode() == RunMode::Standalone;
         for (auto* const graph : graphs.getGraphs())
         {
             graph->setAudioWorkgroup (deviceWorkgroup);
-            graph->setParallelRendering (enable);
+            graph->setMulticore (enable);
         }
     }
 
@@ -900,8 +900,8 @@ void AudioEngine::applySettings (Settings& settings)
 
     priv->startStopCont.set (settings.transportRespondToStartStopContinue() ? 1 : 0);
 
-    priv->parallelSettingEnabled = settings.parallelRendering();
-    priv->applyParallelToGraphs();
+    priv->multicoreEnabled = settings.multicore();
+    priv->applyMulticoreToGraphs();
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

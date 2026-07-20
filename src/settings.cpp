@@ -43,7 +43,7 @@ const char* Settings::updateKeyUserKey = "updateKeyUserKey";
 const char* Settings::authPreviewUpdatesKey = "authPreviewUpdates";
 const char* Settings::authAppcastUrlKey = "authAppcastUrl";
 const char* Settings::transportStartStopContinue = "transportStartStopContinueKey";
-const char* Settings::parallelRenderingKey = "parallelRendering";
+const char* Settings::multicoreKey = "multicore";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -562,17 +562,17 @@ bool Settings::transportRespondToStartStopContinue() const
     return false;
 }
 
-void Settings::setParallelRendering (bool shouldBeParallel)
+void Settings::setMulticore (bool shouldUseMulticore)
 {
     if (auto* p = getProps())
-        p->setValue (parallelRenderingKey, shouldBeParallel);
+        p->setValue (multicoreKey, shouldUseMulticore);
 }
 
-bool Settings::parallelRendering() const
+bool Settings::multicore() const
 {
     if (auto* p = getProps())
-        return p->getBoolValue (parallelRenderingKey, false);
-    return false;
+        return p->getBoolValue (multicoreKey, true);
+    return true;
 }
 
 //=============================================================================

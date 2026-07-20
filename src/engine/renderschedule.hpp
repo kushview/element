@@ -28,12 +28,12 @@ struct RenderTask
     /** The node's process op (a ProcessBufferOp). Not owned. */
     GraphOp* kernel = nullptr;
 
-    /** Half-open range into ParallelSchedule::preludeOps for this task's gather
+    /** Half-open range into RenderSchedule::preludeOps for this task's gather
         ops, run before the kernel. */
     int preludeStart = 0;
     int numPrelude = 0;
 
-    /** Half-open range into ParallelSchedule::successors listing the tasks that
+    /** Half-open range into RenderSchedule::successors listing the tasks that
         depend on this one. */
     int firstSuccessor = 0;
     int numSuccessors = 0;
@@ -64,12 +64,27 @@ struct RenderTask
 
     Owns the rendering ops and a non-reused buffer pool where every buffer index
     has exactly one writer, so independent tasks can execute concurrently without
-    aliasing each other's data. Built on the message thread by buildParallelSchedule.
+    aliasing each other's data. Built on the message thread by RenderSchedule::build.
 */
-struct ParallelSchedule
+struct RenderSchedule
 {
-    ParallelSchedule();
-    ~ParallelSchedule();
+    RenderSchedule();
+    ~RenderSchedule();
+
+    /** Builds a parallel render schedule for a graph.
+
+        Runs on the message thread. Uses GraphBuilder in parallel mode to lay out a
+        non-reused buffer pool, partitions the resulting op list into per-node tasks,
+        and derives the forward-edge dependency DAG from the graph's connections.
+
+        @param graph            the graph to schedule
+        @param orderedNodes     topologically ordered Processor* pointers
+        @param maxBlockSize     buffer pool width in samples
+        @return the baked schedule, never null
+    */
+    static std::unique_ptr<RenderSchedule> build (GraphNode& graph,
+                                                  const juce::Array<void*>& orderedNodes,
+                                                  int maxBlockSize);
 
     /** Owns every rendering op (prelude ops and kernels). */
     juce::OwnedArray<GraphOp> ownedOps;
@@ -99,20 +114,5 @@ struct ParallelSchedule
         used to detect when the whole schedule has finished. */
     std::atomic<int> completionCount { 0 };
 };
-
-/** Builds a parallel render schedule for a graph.
-
-    Runs on the message thread. Uses GraphBuilder in parallel mode to lay out a
-    non-reused buffer pool, partitions the resulting op list into per-node tasks,
-    and derives the forward-edge dependency DAG from the graph's connections.
-
-    @param graph            the graph to schedule
-    @param orderedNodes     topologically ordered Processor* pointers
-    @param maxBlockSize     buffer pool width in samples
-    @return the baked schedule, never null
-*/
-std::unique_ptr<ParallelSchedule> buildParallelSchedule (GraphNode& graph,
-                                                         const juce::Array<void*>& orderedNodes,
-                                                         int maxBlockSize);
 
 } // namespace element
