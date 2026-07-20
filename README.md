@@ -14,8 +14,8 @@ Element currently loads most major plugin formats.
 | OS       | Version       | Formats         |
 | -------- |:-------------:| ---------------:|
 | Linux*   |       -       | LADSPA/LV2/VST3/CLAP |
-| Mac OSX  | 10.8 and up   | AU/VST/VST3/LV2/CLAP |
-| Windows  | XP and up     | VST/VST3/LV2/CLAP    |
+| macOS  | 10.13 and up   | AU/VST/VST3/LV2/CLAP |
+| Windows  | 10 and up     | VST/VST3/LV2/CLAP    |
 
 _*Ubuntu is the most tested, but should run on any major distribution_
 
