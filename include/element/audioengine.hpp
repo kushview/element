@@ -107,6 +107,21 @@ public:
     LevelMeterPtr getLevelMeter (int channel, bool input);
     int getNumChannels (bool input) const noexcept;
 
+    /** Returns the engine's realtime processing load as a fraction of the audio
+        block deadline (0.0–1.0, where 1.0 means a block took the entire buffer
+        period to render and dropouts are imminent).
+
+        Unlike juce::AudioIODevice::getCpuUsage(), this is measured at the graph
+        render boundary rather than the device callback, so it excludes driver
+        overhead and reflects only Element's own DSP. It is meaningful in both
+        standalone and plugin modes and correctly falls as multicore rendering
+        spreads a block across cores (the realtime headroom genuinely grows).
+
+        @return the smoothed load fraction; may briefly exceed 1.0 when the
+                engine is over budget.
+    */
+    double getCpuUsage() const noexcept;
+
 private:
     class Private;
     std::unique_ptr<Private> priv;

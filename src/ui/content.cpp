@@ -323,7 +323,8 @@ public:
             String strText = streamingStatus.getValue().toString();
             if (strText.isEmpty())
                 strText = "Running";
-            text << "Engine: " << strText << ":  CPU: " << String (devices.getCpuUsage() * 100.f, 1) << "%";
+            const float cpu = engine != nullptr ? (float) engine->getCpuUsage() : 0.f;
+            text << "Engine: " << strText << ":  CPU: " << String (cpu * 100.f, 1) << "%";
             streamingStatusLabel.setText (text, dontSendNotification);
 
             statusLabel.setText (String ("Device: ") + dev->getName(), dontSendNotification);

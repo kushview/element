@@ -731,6 +731,23 @@ public:
             outMeters.getObjectPointerUnchecked (c)->updateLevel (outputChannelData, c, numSamples);
     }
 
+    /** Folds one block's render time into the smoothed realtime-load estimate.
+        Fast attack / slow release so brief overloads stay visible while the
+        reading settles quickly once load drops. Audio thread only. */
+    void updateCpuUsage (int64 renderTicks, int numSamples) noexcept
+    {
+        if (sampleRate <= 0.0 || numSamples <= 0)
+            return;
+
+        const double elapsed = Time::highResolutionTicksToSeconds (renderTicks);
+        const double period = (double) numSamples / sampleRate;
+        const double target = period > 0.0 ? elapsed / period : 0.0;
+
+        const double prev = cpuUsage.load (std::memory_order_relaxed);
+        const double alpha = target > prev ? 0.6 : 0.05;
+        cpuUsage.store (prev + alpha * (target - prev), std::memory_order_relaxed);
+    }
+
     void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
     {
         const int numSamples = buffer.getNumSamples();
@@ -778,7 +795,9 @@ public:
         {
             graphs.setCurrentGraph (nextGraph);
         }
+        const auto renderStart = Time::getHighResolutionTicks();
         graphs.renderGraphs (buffer, midi); // user requested index can be cancelled by program changed
+        updateCpuUsage (Time::getHighResolutionTicks() - renderStart, numSamples);
         if (nextGraph != graphs.getCurrentGraphIndex())
         {
             currentGraph.set (graphs.getCurrentGraphIndex());
@@ -1071,6 +1090,10 @@ private:
 
     Atomic<double> midiOutLatency { 0.0 };
     std::atomic<bool> audioStarted { false };
+
+    /** Smoothed realtime render load, as a fraction of the block deadline.
+        Written on the audio thread, read (relaxed) by the UI. */
+    std::atomic<double> cpuUsage { 0.0 };
 
     bool multicoreEnabled = false;
     juce::AudioWorkgroup deviceWorkgroup;
@@ -1399,6 +1422,11 @@ MidiIOMonitorPtr AudioEngine::getMidiIOMonitor() const
 int AudioEngine::getNumChannels (bool input) const noexcept
 {
     return input ? priv->numInputChans : priv->numOutputChans;
+}
+
+double AudioEngine::getCpuUsage() const noexcept
+{
+    return priv != nullptr ? priv->cpuUsage.load (std::memory_order_relaxed) : 0.0;
 }
 
 AudioEngine::LevelMeterPtr AudioEngine::getLevelMeter (int channel, bool input)

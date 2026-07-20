@@ -312,4 +312,29 @@ BOOST_AUTO_TEST_CASE (MulticoreToggleRuntime)
     BOOST_REQUIRE_EQUAL (worst, 0.0);
 }
 
+BOOST_AUTO_TEST_CASE (CpuUsageReported)
+{
+    // The engine reports its own realtime render load (measured at the graph
+    // boundary), independent of any audio device. Kept to sanity bounds -- not
+    // a timing-ratio assertion -- so it can't flake under CI load.
+    EngineDuo duo (3);
+    duo.setRenderMode (RootGraph::Parallel);
+
+    // Nothing rendered yet: no load accumulated.
+    BOOST_CHECK_EQUAL (duo.serial->getCpuUsage(), 0.0);
+
+    for (int blk = 0; blk < 50; ++blk)
+        duo.renderBlockAndCompare();
+
+    const double serialCpu = duo.serial->getCpuUsage();
+    const double unifiedCpu = duo.unified->getCpuUsage();
+    BOOST_TEST_MESSAGE ("CpuUsage serial=" << serialCpu << " unified=" << unifiedCpu);
+
+    // A real graph rendered: both engines report a positive, finite fraction.
+    BOOST_CHECK_GT (serialCpu, 0.0);
+    BOOST_CHECK_GT (unifiedCpu, 0.0);
+    BOOST_CHECK_LT (serialCpu, 10.0);
+    BOOST_CHECK_LT (unifiedCpu, 10.0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
