@@ -279,7 +279,7 @@ public:
         }
 
         for (int i = numAudioIns; --i >= 0;)
-            node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
+            node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples), numSamples);
 
         // Begin MIDI filters
         {
@@ -448,7 +448,7 @@ public:
         lastMute = muted;
 
         for (int i = 0; i < numAudioOuts; ++i)
-            node->setOutputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
+            node->setOutputRMS (i, buffer.getRMSLevel (i, 0, numSamples), numSamples);
     }
 
     const ProcessorPtr node;

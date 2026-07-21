@@ -205,16 +205,34 @@ bool Processor::isMidiDeviceNode() const
 int Processor::getNumAudioInputs() const { return ports.size (PortType::Audio, true); }
 int Processor::getNumAudioOutputs() const { return ports.size (PortType::Audio, false); }
 
-void Processor::setInputRMS (int chan, float val)
+void Processor::updateRMSMeter (RMSMeter& meter, float blockRMS, int numSamples)
 {
-    if (chan < inRMS.size())
-        inRMS.getUnchecked (chan)->set (val);
+    // Integrate the block mean-square with a one-pole filter whose coefficient
+    // scales with the block length. This yields a fixed integration window
+    // regardless of the host buffer size, so the metered level (and its
+    // ballistics) no longer change when the audio device block size changes.
+    static constexpr double integrationSeconds = 0.3;
+
+    if (numSamples <= 0)
+        return;
+
+    const double fs = sampleRate > 0.0 ? sampleRate : 44100.0;
+    const float ms = blockRMS * blockRMS;
+    const float alpha = (float) (1.0 - std::exp (-(double) numSamples / (integrationSeconds * fs)));
+    meter.meanSquare += (ms - meter.meanSquare) * alpha;
+    meter.value.set (std::sqrt (meter.meanSquare));
 }
 
-void Processor::setOutputRMS (int chan, float val)
+void Processor::setInputRMS (int chan, float rms, int numSamples)
+{
+    if (chan < inRMS.size())
+        updateRMSMeter (*inRMS.getUnchecked (chan), rms, numSamples);
+}
+
+void Processor::setOutputRMS (int chan, float rms, int numSamples)
 {
     if (chan < outRMS.size())
-        outRMS.getUnchecked (chan)->set (val);
+        updateRMSMeter (*outRMS.getUnchecked (chan), rms, numSamples);
 }
 
 bool Processor::isSuspended() const
@@ -339,19 +357,11 @@ void Processor::prepare (const double newSampleRate,
 
         inRMS.clearQuick (true);
         for (int i = 0; i < getNumAudioInputs(); ++i)
-        {
-            AtomicValue<float>* avf = new AtomicValue<float>();
-            avf->set (0);
-            inRMS.add (avf);
-        }
+            inRMS.add (new RMSMeter());
 
         outRMS.clearQuick (true);
         for (int i = 0; i < getNumAudioOutputs(); ++i)
-        {
-            AtomicValue<float>* avf = new AtomicValue<float>();
-            avf->set (0);
-            outRMS.add (avf);
-        }
+            outRMS.add (new RMSMeter());
     }
 }
 
@@ -778,18 +788,10 @@ void Processor::setPorts (const PortList& newPorts)
     if (isPrepared)
     {
         for (int i = inRMS.size(); i < getNumAudioInputs(); ++i)
-        {
-            auto* avf = new AtomicValue<float>();
-            avf->set (0);
-            inRMS.add (avf);
-        }
+            inRMS.add (new RMSMeter());
 
         for (int i = outRMS.size(); i < getNumAudioOutputs(); ++i)
-        {
-            auto* avf = new AtomicValue<float>();
-            avf->set (0);
-            outRMS.add (avf);
-        }
+            outRMS.add (new RMSMeter());
     }
 }
 
