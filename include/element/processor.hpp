@@ -263,10 +263,10 @@ public:
      */
     GraphNode* getParentGraph() const;
 
-    void setInputRMS (int chan, float val);
-    float getInputRMS (int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked (chan)->get() : 0.0f; }
-    void setOutputRMS (int chan, float val);
-    float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked (chan)->get() : 0.0f; }
+    void setInputRMS (int chan, float rms, int numSamples);
+    float getInputRMS (int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked (chan)->value.get() : 0.0f; }
+    void setOutputRMS (int chan, float rms, int numSamples);
+    float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked (chan)->value.get() : 0.0f; }
 
     //=========================================================================
     /** Connect this node's output audio to another node's input audio */
@@ -553,7 +553,18 @@ private:
     PatchParameterArray _patches;
 
     juce::Atomic<float> gain, lastGain, inputGain, lastInputGain;
-    juce::OwnedArray<AtomicValue<float>> inRMS, outRMS;
+
+    /** Per-channel RMS meter integrator. Accumulates the block mean-square with a
+        fixed time constant so the metered level is independent of the host's
+        buffer size (see updateRMSMeter). */
+    struct RMSMeter {
+        float meanSquare = 0.0f;  // running mean-square, audio thread only
+        AtomicValue<float> value; // smoothed linear RMS handed to the UI thread
+    };
+    juce::OwnedArray<RMSMeter> inRMS, outRMS;
+
+    /** Integrates a block's RMS into the given meter with a fixed time window. */
+    void updateRMSMeter (RMSMeter& meter, float blockRMS, int numSamples);
 
     juce::Atomic<int> keyRangeLow { 0 };
     juce::Atomic<int> keyRangeHigh { 127 };

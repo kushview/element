@@ -6,6 +6,10 @@
 // Meter level limits (in dB).
 #define DIGITAL_METER_MAX_DB (+4.0f)
 #define DIGITAL_METER_MIN_DB (-70.0f)
+// AES-17 dBFS calibration: the incoming value is a linear RMS amplitude, whose
+// level for a sine sits 3.01 dB below its peak. Adding this offset defines 0 dBFS
+// as a full-scale sine, so a -20 dBFS sine reads -20 dB rather than -23 dB.
+#define DIGITAL_METER_RMS_CAL_DB (+3.0103f)
 // The decay rates (magic goes here :).
 // - value decay rate (faster)
 #define DIGITAL_METER_DECAY_RATE1 (1.0f - 3E-2f)
@@ -78,7 +82,7 @@ void SimpleMeterValue::paint (Graphics& g)
 
     float dB = DIGITAL_METER_MIN_DB;
     if (value > 0.0f)
-        dB = 20.0f * log10f (value);
+        dB = 20.0f * log10f (value) + DIGITAL_METER_RMS_CAL_DB;
 
     if (dB < DIGITAL_METER_MIN_DB)
         dB = DIGITAL_METER_MIN_DB;
