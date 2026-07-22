@@ -19,10 +19,10 @@ inline constexpr const char* clientId = "element-desktop";
 inline constexpr const char* redirectUri = "element://auth/callback";
 
 #if ELEMENT_LOCAL_AUTH
-inline constexpr const char* apiBaseEndpoint = "https://scratch-woo.local/wp-json/kv-auth/v1";
-inline constexpr const char* authorizeEndpoint = "https://scratch-woo.local/auth/authorize";
-inline constexpr const char* tokenEndpoint = "https://scratch-woo.local/wp-json/kv-auth/v1/token";
-inline constexpr const char* refreshEndpoint = "https://scratch-woo.local/wp-json/kv-auth/v1/token/refresh";
+inline constexpr const char* apiBaseEndpoint = "https://kushview.local/wp-json/kv-auth/v1";
+inline constexpr const char* authorizeEndpoint = "https://kushview.local/auth/authorize";
+inline constexpr const char* tokenEndpoint = "https://kushview.local/wp-json/kv-auth/v1/token";
+inline constexpr const char* refreshEndpoint = "https://kushview.local/wp-json/kv-auth/v1/token/refresh";
 #else
 inline constexpr const char* apiBaseEndpoint = "https://kushview.net/wp-json/kv-auth/v1";
 inline constexpr const char* authorizeEndpoint = "https://kushview.net/auth/authorize";
