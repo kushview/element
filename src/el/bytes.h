@@ -4,6 +4,9 @@
 #ifndef EL_LUA_BYTES_H
 #define EL_LUA_BYTES_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

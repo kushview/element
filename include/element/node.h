@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
+// Copyright 2023-2026 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once

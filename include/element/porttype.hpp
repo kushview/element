@@ -125,7 +125,7 @@ public:
             (sourceType == PortType::Control && destType == PortType::CV) ||
             (sourceType == PortType::Atom && destType == PortType::Midi) ||
             (sourceType == PortType::Midi && destType == PortType::Atom));
-        // clang-forman on
+        // clang-format on
     }
 
     /** Return true if this port type can connect to another
@@ -302,10 +302,10 @@ public:
     inline uint32_t getInputPort (const PortType type, const int channel) const { return inputs.getPort (type, channel); }
     inline uint32_t getOutputPort (const PortType type, const int channel) const { return outputs.getPort (type, channel); }
 
-    inline uint32_t getAtomPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
+    inline uint32_t getAtomPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAtomPort (channel); }
     inline uint32_t getAudioPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
-    inline uint32_t getControlPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
-    inline uint32_t getCVPort (int channel, bool isInput) const { return getChannelMapping (isInput).getAudioPort (channel); }
+    inline uint32_t getControlPort (int channel, bool isInput) const { return getChannelMapping (isInput).getControlPort (channel); }
+    inline uint32_t getCVPort (int channel, bool isInput) const { return getChannelMapping (isInput).getCVPort (channel); }
 
     inline uint32_t getAudioInputPort (const int channel) const { return inputs.getAudioPort (channel); }
     inline uint32_t getAudioOutputPort (const int channel) const { return outputs.getAudioPort (channel); }

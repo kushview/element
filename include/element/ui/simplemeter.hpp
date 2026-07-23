@@ -25,10 +25,10 @@ public:
     /** Reset peak holder. */
     void resetPeak();
 
-    virtual void paint (juce::Graphics& g);
+    void paint (juce::Graphics& g) override;
 
     /** @internal */
-    void resized();
+    void resized() override;
 
 protected:
     int getIECScale (const float dB) const;

@@ -96,7 +96,7 @@ public:
 
     inline void lock()
     {
-        a_locks.set (a_locks.get() + 1);
+        a_locks.exchange (a_locks.get() + 1);
         if (a_locks.get() == 1)
             while (! acquire())
                 ; // spin
@@ -104,9 +104,9 @@ public:
 
     inline void unlock()
     {
-        a_locks.set (a_locks.get() - 1);
+        a_locks.exchange (a_locks.get() - 1);
         if (a_locks.get() < 1) {
-            a_locks.set (0);
+            a_locks.exchange (0);
             release();
         }
     }

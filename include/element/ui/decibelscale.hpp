@@ -32,9 +32,9 @@ public:
     int iecLevel (const int index) const;
 
     /** @internal */
-    void paint (juce::Graphics& g);
+    void paint (juce::Graphics& g) override;
     /** @internal */
-    void resized();
+    void resized() override;
 
 protected:
     void drawLabel (juce::Graphics& g, const int y, const juce::String& label);

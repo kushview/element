@@ -4,8 +4,6 @@
 #ifndef ELEMENT_H_INCLUDED
 #define ELEMENT_H_INCLUDED
 
-#include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,16 +41,6 @@ extern "C" {
 #ifndef EL_EXPORT
     #define EL_EXPORT
 #endif
-
-//=============================================================================
-typedef enum {
-    EL_PORT_TYPE_AUDIO,
-    EL_PORT_TYPE_CV,
-    EL_PORT_TYPE_ATOM,
-    EL_PORT_TYPE_MIDI,
-    EL_PORT_TYPE_VIDEO,
-    EL_PORT_TYPE_UNKNOWN
-} elPortType;
 
 //==============================================================================
 #define EL_MT_AUDIO_BUFFER_64 "el.AudioBuffer64"

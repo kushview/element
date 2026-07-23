@@ -1,12 +1,12 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#pragma once
+
 #include <boost/signals2.hpp>
 
 #include <element/juce/core.hpp>
 #include <element/porttype.hpp>
-
-#pragma once
 
 namespace element {
 
