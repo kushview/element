@@ -195,6 +195,8 @@ static const juce::Identifier eventType = "eventType";
 static const juce::Identifier eventId = "eventId";
 static const juce::Identifier toggle = "toggle";
 static const juce::Identifier targetType = "targetType";
+static const juce::Identifier triggerMode = "triggerMode";
+static const juce::Identifier triggerValue = "triggerValue";
 } // namespace tags
 
 } // namespace element

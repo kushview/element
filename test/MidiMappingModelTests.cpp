@@ -22,8 +22,38 @@ BOOST_AUTO_TEST_CASE (DefaultsStabilize)
     BOOST_REQUIRE_EQUAL (m.getEventId(), 0);
     BOOST_REQUIRE_EQUAL (m.getMidiChannel(), 0);
     BOOST_REQUIRE (! m.isToggle());
+    BOOST_REQUIRE (m.getTriggerMode() == "above");
+    BOOST_REQUIRE_EQUAL (m.getTriggerValue(), 67);
     BOOST_REQUIRE (m.getTargetType() == "parameter");
     BOOST_REQUIRE_EQUAL (m.getParameterIndex(), -1);
+}
+
+BOOST_AUTO_TEST_CASE (TriggerEdgeAbove)
+{
+    // Rising crossing only, so a knob held past the threshold fires once.
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, -1, 80)); // no history: counts
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("above", 67, -1, 20));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, 20, 67)); // at the threshold counts
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("above", 67, 80, 100)); // already above
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("above", 67, 100, 20)); // falling
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, 20, 90));
+
+    // An unknown mode string behaves as "above".
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("bogus", 67, 20, 90));
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("bogus", 67, 80, 100));
+}
+
+BOOST_AUTO_TEST_CASE (TriggerEdgeEndpoints)
+{
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("zero", 67, 64, 0));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("zero", 67, -1, 0));
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("zero", 67, 0, 0)); // parked at 0
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("zero", 67, 0, 127));
+
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("max", 67, 64, 127));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("max", 67, -1, 127));
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("max", 67, 127, 127)); // parked at 127
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("max", 67, 127, 64));
 }
 
 BOOST_AUTO_TEST_CASE (FromCaptureController)

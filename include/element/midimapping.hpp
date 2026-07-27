@@ -8,7 +8,7 @@
 #include <element/model.hpp>
 #include <element/tags.hpp>
 
-#define EL_MIDIMAPPING_VERSION 1
+#define EL_MIDIMAPPING_VERSION 2
 
 namespace element {
 
@@ -54,8 +54,38 @@ public:
     /** For note events: latch on each note-on vs momentary. */
     bool isToggle() const { return (bool) objectData.getProperty (tags::toggle, false); }
 
+    /** For controller events on a trigger-style target (tap tempo): what counts as
+        a trigger. One of "above" (the value crosses up to or through
+        getTriggerValue()), "zero" (the value reaches 0) or "max" (the value
+        reaches 127). Meaningless for note events. */
+    juce::String getTriggerMode() const { return objectData.getProperty (tags::triggerMode, "above").toString(); }
+    /** Threshold used by the "above" trigger mode, 0-127. */
+    int getTriggerValue() const { return (int) objectData.getProperty (tags::triggerValue, 67); }
+
     bool isNoteEvent() const { return getEventType() == "note"; }
     bool isControllerEvent() const { return getEventType() == "controller"; }
+
+    /** Decides whether a controller value transition fires a trigger.
+
+        A continuous controller has no note-on, so a trigger is an edge: the value
+        has to arrive at the mode's condition from somewhere that did not satisfy
+        it. Holding a knob past the threshold therefore fires once, not on every
+        message, and a footswitch sending 127 then 0 fires once per press.
+
+        @param mode          "above", "zero" or "max"; anything else behaves as "above".
+        @param triggerValue  Threshold for "above" mode; ignored by the other modes.
+        @param lastValue     Previously seen controller value, or < 0 if none yet.
+        @param value         The incoming controller value.
+        @return true if this transition should fire the trigger.
+    */
+    static bool isTriggerEdge (const juce::String& mode, int triggerValue, int lastValue, int value)
+    {
+        if (mode == "zero")
+            return value == 0 && lastValue != 0;
+        if (mode == "max")
+            return value == 127 && lastValue != 127;
+        return value >= triggerValue && (lastValue < 0 || lastValue < triggerValue);
+    }
 
     //=========================================================================
     juce::String getTargetType() const { return objectData.getProperty (tags::targetType).toString(); }
@@ -142,6 +172,8 @@ private:
         stabilizePropertyPOD (tags::eventId, 0);
         stabilizePropertyPOD (tags::midiChannel, 0);
         stabilizePropertyPOD (tags::toggle, false);
+        stabilizePropertyString (tags::triggerMode, "above");
+        stabilizePropertyPOD (tags::triggerValue, 67);
         stabilizePropertyString (tags::targetType, "parameter");
         stabilizePropertyString (tags::node, juce::String());
         stabilizePropertyPOD (tags::parameter, -1);

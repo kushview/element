@@ -216,8 +216,23 @@ private:
 
         // Latch is meaningful for notes only.
         if (mapping.isNoteEvent())
+        {
             comps.add (new BooleanPropertyComponent (
                 mapping.getPropertyAsValue (tags::toggle), TRANS ("Latch"), TRANS ("Toggle on each note-on")));
+        }
+        else if (mapping.isTempoTarget())
+        {
+            // A knob or switch has no note-on, so the user picks what counts as a tap.
+            comps.add (new ChoicePropertyComponent (
+                mapping.getPropertyAsValue (tags::triggerMode),
+                TRANS ("Trigger"),
+                { TRANS ("At or Above"), TRANS ("Touched 0"), TRANS ("Touched 127") },
+                { var ("above"), var ("zero"), var ("max") }));
+
+            if (mapping.getTriggerMode() == "above")
+                comps.add (new SliderPropertyComponent (
+                    mapping.getPropertyAsValue (tags::triggerValue), TRANS ("Threshold"), 1.0, 127.0, 1.0));
+        }
 
         // Node + parameter only apply to parameter targets; a tempo mapping
         // drives the session tempo (tap tempo) and has no node/parameter.
@@ -323,9 +338,10 @@ private:
         if (onEdited)
             onEdited();
 
-        // Event type flips the CC/Note label and Latch row; node changes the
-        // parameter list. Rebuild async so we never delete the editor mid-callback.
-        if (property == tags::eventType || property == tags::node)
+        // Event type flips the CC/Note label and the Latch/Trigger rows; the
+        // trigger mode shows or hides Threshold; node changes the parameter list.
+        // Rebuild async so we never delete the editor mid-callback.
+        if (property == tags::eventType || property == tags::node || property == tags::triggerMode)
         {
             juce::Component::SafePointer<MidiMappingProperties> self (this);
             juce::MessageManager::callAsync ([self]() mutable {

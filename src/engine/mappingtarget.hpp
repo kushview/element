@@ -62,9 +62,10 @@ private:
 };
 
 //=============================================================================
-/** Targets the session tempo as a tap-tempo control: each matching note-on
-    counts as a tap and the averaged BPM is written to the session, which the
-    audio engine picks up on the message thread. */
+/** Targets the session tempo as a tap-tempo control: each matching note-on, or
+    each recognised controller edge, counts as a tap and the averaged BPM is
+    written to the session, which the audio engine picks up on the message
+    thread. */
 class TempoTarget : public MappingTarget
 {
 public:
@@ -73,8 +74,14 @@ public:
                                 so UI and MIDI taps contribute to the same state.
         @param tempoTapApplied  Fired on every recognised tap so the UI can flash
                                 the TAP button; owned by MappingEngine, so it
-                                outlives this target. */
-    TempoTarget (const juce::ValueTree& sessionData, TapTempo& tapTempo, Signal<void()>& tempoTapApplied);
+                                outlives this target.
+        @param triggerMode      Controller trigger mode, see MidiMapping::isTriggerEdge().
+        @param triggerValue     Threshold for the "above" trigger mode. */
+    TempoTarget (const juce::ValueTree& sessionData,
+                 TapTempo& tapTempo,
+                 Signal<void()>& tempoTapApplied,
+                 const juce::String& triggerMode = "above",
+                 int triggerValue = 67);
     ~TempoTarget() override = default;
 
     bool isValid() const override;
@@ -84,6 +91,9 @@ private:
     juce::ValueTree session;
     TapTempo& tapTempo;
     Signal<void()>& tempoTapApplied;
+    juce::String triggerMode;
+    int triggerValue;
+    int lastControllerValue { -1 }; // edge state, so a held knob taps only once
 };
 
 //=============================================================================

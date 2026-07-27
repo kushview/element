@@ -167,8 +167,16 @@ void ParameterTarget::applyGain (const juce::MidiMessage& message, bool toggle)
 }
 
 //=============================================================================
-TempoTarget::TempoTarget (const juce::ValueTree& sessionData, TapTempo& shared, Signal<void()>& applied)
-    : session (sessionData), tapTempo (shared), tempoTapApplied (applied)
+TempoTarget::TempoTarget (const juce::ValueTree& sessionData,
+                          TapTempo& shared,
+                          Signal<void()>& applied,
+                          const juce::String& mode,
+                          int value)
+    : session (sessionData),
+      tapTempo (shared),
+      tempoTapApplied (applied),
+      triggerMode (mode),
+      triggerValue (value)
 {
 }
 
@@ -179,8 +187,21 @@ bool TempoTarget::isValid() const
 
 void TempoTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
 {
-    if (! isValid() || ! message.isNoteOn())
-        return; // note-on only: each press is a tap
+    if (! isValid())
+        return;
+
+    if (message.isController())
+    {
+        const int value = message.getControllerValue();
+        const bool fire = MidiMapping::isTriggerEdge (triggerMode, triggerValue, lastControllerValue, value);
+        lastControllerValue = value;
+        if (! fire)
+            return;
+    }
+    else if (! message.isNoteOn())
+    {
+        return; // notes: each press is a tap
+    }
 
     // Flash on every recognised tap (including the seeding first tap of a run,
     // which produces no BPM yet), so the UI feedback matches how a parameter
@@ -211,7 +232,7 @@ std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session
 
     if (targetType == "tempo")
     {
-        auto target = std::make_unique<TempoTarget> (session.data(), tapTempo, tempoTapApplied);
+        auto target = std::make_unique<TempoTarget> (session.data(), tapTempo, tempoTapApplied, mapping.getTriggerMode(), mapping.getTriggerValue());
         if (! target->isValid())
             return nullptr;
         return target;

@@ -162,14 +162,120 @@ BOOST_AUTO_TEST_CASE (TempoTargetTapsFromNoteOn)
     BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 120.0, 0.0001);
     BOOST_REQUIRE_EQUAL (flashes, 2);
 
-    // Note-off and CC never tap: tempo stays put and the flash does not fire.
+    // Note-off never taps: tempo stays put and the flash does not fire.
     session.setProperty (tags::tempo, 100.0, nullptr);
     target.apply (MidiMessage::noteOff (1, 60), false);
-    target.apply (MidiMessage::controllerEvent (1, 7, 127), false);
     BOOST_REQUIRE_CLOSE ((double) session.getProperty (tags::tempo), 100.0, 0.0001);
     BOOST_REQUIRE_EQUAL (flashes, 2);
 
     conn.disconnect();
+}
+
+namespace {
+
+/** A tempo target plus the session tree and flash counter it writes to, so the
+    controller cases below stay about the trigger rule and nothing else. */
+struct TempoFixture
+{
+    TempoFixture (const juce::String& mode = "above", int value = 67)
+        : target (session, shared, tapped, mode, value)
+    {
+        session.setProperty (tags::tempo, 100.0, nullptr);
+        conn = tapped.connect ([this] { ++flashes; });
+    }
+
+    ~TempoFixture() { conn.disconnect(); }
+
+    /** Apply a CC on the mapped controller at the given arrival time. */
+    void cc (int value, double ms = 0.0)
+    {
+        auto m = MidiMessage::controllerEvent (1, 7, value);
+        m.setTimeStamp (ms);
+        target.apply (m, false);
+    }
+
+    double tempo() const { return (double) session.getProperty (tags::tempo); }
+
+    ValueTree session { types::Session };
+    TapTempo shared;
+    Signal<void()> tapped;
+    SignalConnection conn;
+    int flashes = 0;
+    TempoTarget target;
+};
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE (TempoTargetTapsFromCCAboveThreshold)
+{
+    // Default rule: a tap fires when the value crosses up to or through 67.
+    // Twisting back and forth taps once per upward pass, so 500 ms between
+    // crossings is 120 BPM.
+    TempoFixture f;
+
+    f.cc (0, 0.0); // below the threshold: not a tap
+    BOOST_REQUIRE_EQUAL (f.flashes, 0);
+
+    f.cc (80, 100.0); // crossed up: seeds the run
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+    BOOST_REQUIRE_CLOSE (f.tempo(), 100.0, 0.0001);
+
+    f.cc (100, 200.0); // still above: no second tap
+    f.cc (20, 400.0); // falling back down: no tap
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+
+    f.cc (90, 600.0); // crossed up again, 500 ms after the first tap
+    BOOST_REQUIRE_EQUAL (f.flashes, 2);
+    BOOST_REQUIRE_CLOSE (f.tempo(), 120.0, 0.0001);
+}
+
+BOOST_AUTO_TEST_CASE (TempoTargetCCThresholdIsConfigurable)
+{
+    TempoFixture f ("above", 100);
+
+    f.cc (80, 0.0); // above 67 but below the configured threshold
+    BOOST_REQUIRE_EQUAL (f.flashes, 0);
+
+    f.cc (100, 100.0); // exactly at the threshold counts
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+}
+
+BOOST_AUTO_TEST_CASE (TempoTargetCCTouchedZero)
+{
+    TempoFixture f ("zero");
+
+    f.cc (127, 0.0); // never taps: only arriving at 0 does
+    BOOST_REQUIRE_EQUAL (f.flashes, 0);
+
+    f.cc (0, 100.0);
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+
+    f.cc (0, 200.0); // parked at 0: no repeat
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+
+    f.cc (64, 500.0);
+    f.cc (0, 600.0); // back to 0, 500 ms after the first tap
+    BOOST_REQUIRE_EQUAL (f.flashes, 2);
+    BOOST_REQUIRE_CLOSE (f.tempo(), 120.0, 0.0001);
+}
+
+BOOST_AUTO_TEST_CASE (TempoTargetCCTouchedMax)
+{
+    TempoFixture f ("max");
+
+    f.cc (0, 0.0);
+    BOOST_REQUIRE_EQUAL (f.flashes, 0);
+
+    f.cc (127, 100.0);
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+
+    f.cc (127, 200.0); // parked at 127: no repeat
+    BOOST_REQUIRE_EQUAL (f.flashes, 1);
+
+    f.cc (10, 500.0);
+    f.cc (127, 600.0);
+    BOOST_REQUIRE_EQUAL (f.flashes, 2);
+    BOOST_REQUIRE_CLOSE (f.tempo(), 120.0, 0.0001);
 }
 
 BOOST_AUTO_TEST_CASE (InvalidTargets)
