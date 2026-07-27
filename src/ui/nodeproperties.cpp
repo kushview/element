@@ -6,6 +6,7 @@
 #include "ui/midimultichannelproperty.hpp"
 #include "ui/nodeproperties.hpp"
 #include "ui/nodemidiprogramcomponent.hpp"
+#include "ui/viewhelpers.hpp"
 #include "utils.hpp"
 
 #ifndef EL_PROGRAM_NAME_PLACEHOLDER
@@ -233,7 +234,8 @@ public:
     mode: local in-memory programs or global program files on disk.
 */
 class NodeMidiProgramsListPropertyComponent : public PropertyComponent,
-                                              public ListBoxModel
+                                              public ListBoxModel,
+                                              public FillingProperty
 {
 public:
     NodeMidiProgramsListPropertyComponent (const Node& n)
@@ -249,9 +251,7 @@ public:
         list.onLoadRow = [this] (int row) { loadRow (row); };
         addChildComponent (list);
 
-        // Show up to maxVisibleRows rows before scrolling.
-        const int rows = jlimit (1, maxVisibleRows, jmax (1, programs.size()));
-        setPreferredHeight (rows * rowHeight + 2);
+        setPreferredHeight (minimumHeight()); // FillingPropertyPanel grows this to fit
 
         selectCurrentProgramRow();
     }
@@ -265,7 +265,7 @@ public:
         {
             g.setColour (Colors::textColor.withAlpha (0.5f));
             g.setFont (Font (FontOptions (12.f)));
-            g.drawText ("No saved programs", getLocalBounds().reduced (6, 0), Justification::centredLeft);
+            g.drawText ("No saved programs", getLocalBounds().reduced (6, 0), Justification::centred);
         }
     }
 
@@ -282,6 +282,13 @@ public:
         selectCurrentProgramRow();
         list.repaint();
         repaint();
+    }
+
+    /** Never shrink below the height that shows the programs without
+        scrolling, up to maxVisibleRows. */
+    int minimumHeight() const override
+    {
+        return jlimit (1, maxVisibleRows, jmax (1, programs.size())) * rowHeight + 2;
     }
 
     //==========================================================================
@@ -577,6 +584,28 @@ private:
         IconButton trashButton;
     };
 };
+
+//==============================================================================
+void FillingPropertyPanel::resized()
+{
+    PropertyPanel::resized();
+
+    // Measuring only makes sense once the base class has finished: PropertyPanel
+    // sizes its holder component after laying out every section, so the content
+    // height read mid-layout is the previous one.
+    auto* filling = ViewHelpers::findDescendantOfType<FillingProperty> (*this);
+    auto* property = dynamic_cast<PropertyComponent*> (filling);
+    if (property == nullptr)
+        return;
+
+    const int slack = getHeight() - getTotalContentHeight();
+    const int height = jmax (filling->minimumHeight(), property->getPreferredHeight() + slack);
+    if (height == property->getPreferredHeight())
+        return;
+
+    property->setPreferredHeight (height);
+    PropertyPanel::resized();
+}
 
 //==============================================================================
 NodeProperties::NodeProperties (const Node& n, int groups)

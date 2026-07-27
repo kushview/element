@@ -21,20 +21,6 @@ static inline String ioNodeMessage (const Node& node)
     msg << ": " << TRANS ("see preferences") << "...";
     return msg;
 }
-
-/** Depth-first search for the first descendant of the given type. */
-template <typename T>
-static T* findDescendantOfType (Component& parent)
-{
-    for (auto* child : parent.getChildren())
-    {
-        if (auto* typed = dynamic_cast<T*> (child))
-            return typed;
-        if (auto* found = findDescendantOfType<T> (*child))
-            return found;
-    }
-    return nullptr;
-}
 } // namespace detail
 
 class NodePropertiesView::NodeWatcher : private ValueTree::Listener
@@ -347,6 +333,11 @@ void NodePropertiesView::nodeMenuCallback (int result, NodePropertiesView* view)
 //==============================================================================
 void NodePropertiesView::updateProperties()
 {
+    // Rebuilding drops which sections the user had collapsed and where they had
+    // scrolled to. Saving/restoring matters because the panel is rebuilt for
+    // every MIDI program change, not just when a different node is selected.
+    auto openness = props.getOpennessState();
+
     props.clear();
     if (_node.isValid())
     {
@@ -370,7 +361,17 @@ void NodePropertiesView::updateProperties()
             props.setMessageWhenEmpty ("");
         }
     }
+
+    if (openness != nullptr)
+        props.restoreOpennessState (*openness);
+
     resized();
+
+    // addSection() lays the panel's contents out but never calls resized(), and
+    // the setBounds() above does nothing when the view hasn't changed size — ask
+    // for the pass that gives the programs table its share of the height.
+    props.resized();
+
     repaint();
 }
 
@@ -388,7 +389,7 @@ void NodePropertiesView::updateMidiProgram()
     updateProperties();
 
     if (restoreListFocus)
-        if (auto* list = detail::findDescendantOfType<ListBox> (props))
+        if (auto* list = ViewHelpers::findDescendantOfType<ListBox> (props))
             list->grabKeyboardFocus();
 }
 

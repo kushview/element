@@ -6,6 +6,7 @@
 #include <element/ui/content.hpp>
 
 #include "ui/midichannelselectcomponent.hpp"
+#include "ui/nodeproperties.hpp"
 #include "ui/nodemidiprogramcomponent.hpp"
 #include "ui/nodelistcombobox.hpp"
 
@@ -54,7 +55,7 @@ private:
     };
 
     NodeListComboBox combo;
-    PropertyPanel props;
+    FillingPropertyPanel props;
     NodeObjectSync nodeSync;
     IconButton menuButton;
     bool sticky = false;

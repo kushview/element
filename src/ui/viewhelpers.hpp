@@ -67,6 +67,26 @@ void closePluginWindows (Component*, const bool visible = true);
 
 void closePluginWindowsFor (Component*, Node& node, const bool visible = true);
 
+/** Depth-first search for the first descendant of the given type.
+
+    @param parent The component whose children are searched. The parent itself
+                  is not tested.
+    @return The first matching descendant, or nullptr if there isn't one.
+*/
+template <typename T>
+T* findDescendantOfType (juce::Component& parent)
+{
+    for (auto* child : parent.getChildren())
+    {
+        if (auto* typed = dynamic_cast<T*> (child))
+            return typed;
+        if (auto* found = findDescendantOfType<T> (*child))
+            return found;
+    }
+
+    return nullptr;
+}
+
 } // namespace ViewHelpers
 
 class ViewHelperMixin
