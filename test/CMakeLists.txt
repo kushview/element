@@ -13,7 +13,48 @@ target_include_directories(test_element
         ${Boost_INCLUDE_DIRS})
 target_compile_definitions(test_element
     PRIVATE
-        EL_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
+        EL_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+        EL_TEST_SCANNER_EXE_PATH="$<TARGET_FILE:element_app>")
+
+# Deliberately misbehaving "plugins" for PluginScannerTests: modules that
+# crash or hang on load, laid out as VST3s so the scanner worker loads them.
+# Opt-in at runtime via EL_TEST_SCANNER_INTEGRATION=1. The $<1:...> generator
+# expressions stop multi-config generators appending a per-config directory.
+foreach(_kind IN ITEMS crasher hanger)
+    add_library(el_test_${_kind} MODULE fixture/badplugin.c)
+    set(_dir "${CMAKE_CURRENT_BINARY_DIR}/badplugins/${_kind}")
+    if(WIN32)
+        # Single-file VST3: a renamed DLL.
+        set_target_properties(el_test_${_kind} PROPERTIES
+            PREFIX "" OUTPUT_NAME "${_kind}" SUFFIX ".vst3"
+            LIBRARY_OUTPUT_DIRECTORY "$<1:${_dir}>")
+    elseif(APPLE)
+        set(_contents "${_dir}/${_kind}.vst3/Contents")
+        set_target_properties(el_test_${_kind} PROPERTIES
+            PREFIX "" OUTPUT_NAME "${_kind}" SUFFIX ""
+            LIBRARY_OUTPUT_DIRECTORY "$<1:${_contents}/MacOS>")
+        file(WRITE "${_contents}/Info.plist"
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+    <key>CFBundleExecutable</key><string>${_kind}</string>
+    <key>CFBundleIdentifier</key><string>net.kushview.test.${_kind}</string>
+    <key>CFBundlePackageType</key><string>BNDL</string>
+</dict>
+</plist>
+")
+    else()
+        set_target_properties(el_test_${_kind} PROPERTIES
+            PREFIX "" OUTPUT_NAME "${_kind}" SUFFIX ".so"
+            LIBRARY_OUTPUT_DIRECTORY
+                "$<1:${_dir}/${_kind}.vst3/Contents/${CMAKE_SYSTEM_PROCESSOR}-linux>")
+    endif()
+    add_dependencies(test_element el_test_${_kind})
+endforeach()
+target_compile_definitions(el_test_hanger PRIVATE EL_TEST_HANG=1)
+target_compile_definitions(test_element PRIVATE
+    EL_TEST_BADPLUGINS_DIR="${CMAKE_CURRENT_BINARY_DIR}/badplugins")
 
 # Register all test suites with CTest
 add_test(NAME "AtomicValueTests" COMMAND test_element --run_test=AtomicValueTests)
@@ -48,6 +89,7 @@ add_test(NAME "NodeTests" COMMAND test_element --run_test=NodeTests)
 add_test(NAME "OversamplerTests" COMMAND test_element --run_test=OversamplerTests)
 add_test(NAME "PluginManagerTests" COMMAND test_element --run_test=PluginManagerTests)
 add_test(NAME "PluginMetadataTests" COMMAND test_element --run_test=PluginMetadataTests)
+add_test(NAME "PluginScannerTests" COMMAND test_element --run_test=PluginScannerTests)
 add_test(NAME "PortListTests" COMMAND test_element --run_test=PortListTests)
 add_test(NAME "PresetScriptsTest" COMMAND test_element --run_test=PresetScriptsTest)
 add_test(NAME "PortTypeTests" COMMAND test_element --run_test=PortTypeTests)

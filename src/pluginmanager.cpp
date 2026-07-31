@@ -28,6 +28,15 @@
 #include <errno.h>
 extern char* program_invocation_name;
 
+#if JUCE_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <process.h>
+#include <windows.h>
+#else
+#include <signal.h>
+#include <unistd.h>
+#endif
+
 namespace element {
 using namespace juce;
 
@@ -93,26 +102,118 @@ static void applyBlacklistingsFromDeadMansPedal (KnownPluginList& list)
         list.addToBlacklist (crashedPlugin);
 }
 
+static juce::int64 currentProcessId()
+{
+#if JUCE_WINDOWS
+    return static_cast<juce::int64> (_getpid());
+#else
+    return static_cast<juce::int64> (getpid());
+#endif
+}
+
+/** Forcibly terminates a process by ID. Used as a last resort on scanner
+    workers that a misbehaving plugin has left unable to exit on their own
+    (e.g. a load that never returns while holding the dynamic linker lock). */
+static void terminateProcess (juce::int64 pid)
+{
+    if (pid <= 0)
+        return;
+#if JUCE_WINDOWS
+    if (auto handle = OpenProcess (PROCESS_TERMINATE, FALSE, static_cast<DWORD> (pid)))
+    {
+        TerminateProcess (handle, 1);
+        CloseHandle (handle);
+    }
+#else
+    ::kill (static_cast<pid_t> (pid), SIGKILL);
+#endif
+}
+
 } // namespace detail
 
 //==============================================================================
-class PluginScannerCoordinator : public juce::ChildProcessCoordinator
+class PluginScannerCoordinator : public juce::ChildProcessCoordinator,
+                                 public std::enable_shared_from_this<PluginScannerCoordinator>
 {
 public:
     explicit PluginScannerCoordinator (PluginScanner& o)
-        : owner (o)
-    {
-        if (! launchScanner (EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, 0))
-        {
-            o.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
-            juce::AlertWindow::showMessageBoxAsync (
-                juce::MessageBoxIconType::WarningIcon,
-                "Plugin Scanner",
-                "Could not launch plugin scanner.");
-        }
-    }
+        : owner (o) {}
 
     ~PluginScannerCoordinator() {}
+
+    bool isLaunched() const noexcept { return launched.load(); }
+
+    /** Launches the worker process. Must be called on a shared_ptr managed
+        instance.  launchWorkerProcess uses ChildProcessManager on Linux which
+        is only safe on the message thread, so the launch is marshalled there
+        when called from the scan thread.
+
+        @param timeoutMs   IPC ping timeout handed to the worker connection
+        @param abortCheck  polled while waiting; return true to abandon
+        @return true if the worker process launched and connected
+    */
+    bool launch (int timeoutMs, std::function<bool()> abortCheck)
+    {
+        auto scannerExe = owner.scannerExeFile();
+        if (! scannerExe.existsAsFile())
+        {
+            Logger::writeToLog ("Failed to launch plugin scanner: exe not found.");
+            return false;
+        }
+
+        auto doLaunch = [this, scannerExe, timeoutMs]() -> bool {
+            Logger::writeToLog (String ("launching plugin scanner: ") + scannerExe.getFullPathName());
+            return launchWorkerProcess (scannerExe, EL_PLUGIN_SCANNER_PROCESS_ID, timeoutMs, 0);
+        };
+
+        if (MessageManager::getInstance()->isThisTheMessageThread())
+        {
+            if (! doLaunch())
+                return false;
+
+            if (! waitForWorkerReady (timeoutMs, abortCheck))
+            {
+                killWorkerProcess();
+                return false;
+            }
+
+            return launched = true;
+        }
+
+        struct LaunchState
+        {
+            juce::WaitableEvent done;
+            std::atomic<bool> ok { false };
+        };
+
+        auto state = std::make_shared<LaunchState>();
+
+        MessageManager::callAsync ([state, weak = std::weak_ptr<PluginScannerCoordinator> (shared_from_this()), doLaunch]() {
+            if (auto self = weak.lock())
+                state->ok = doLaunch();
+            state->done.signal();
+        });
+
+        const auto deadline = Time::getMillisecondCounter() + static_cast<uint32> (timeoutMs) + 5000;
+        while (! state->done.wait (50))
+            if (abortCheck() || Time::getMillisecondCounter() > deadline)
+                return false;
+
+        if (! state->ok.load())
+            return false;
+
+        // The pipe exists as soon as the process starts, so wait for the
+        // worker's ready handshake to confirm it actually connected. A lost
+        // connection after this point means the scanned plugin took the
+        // worker down; before it, the scanner itself is unavailable.
+        if (! waitForWorkerReady (timeoutMs, abortCheck))
+        {
+            killWorkerProcess(); // safe: launchWorkerProcess has completed
+            return false;
+        }
+
+        return launched = true;
+    }
 
     enum class State
     {
@@ -144,9 +245,29 @@ public:
     void handleMessageFromWorker (const MemoryBlock& mb) override
     {
         const std::lock_guard<std::mutex> lock { mutex };
-        pluginDescription = juce::parseXML (mb.toString());
+
+        const auto message = mb.toString();
+        if (message.startsWith (EL_PLUGIN_SCANNER_READY_ID))
+        {
+            // "ready:<pid>" — the pid enables force-killing a hung worker.
+            workerPid = message.fromFirstOccurrenceOf (":", false, false).getLargeIntValue();
+            workerReady = true;
+            condvar.notify_one();
+            return;
+        }
+
+        pluginDescription = juce::parseXML (message);
         gotResult = true;
         condvar.notify_one();
+    }
+
+    /** Kills the worker connection and forcibly terminates the worker
+        process. A worker hung inside a plugin's load code cannot process the
+        kill message or exit on its own, so the OS process must be killed. */
+    void terminateWorkerProcess()
+    {
+        killWorkerProcess();
+        detail::terminateProcess (workerPid.exchange (0));
     }
 
     void handleConnectionLost() override
@@ -165,21 +286,28 @@ private:
     std::unique_ptr<XmlElement> pluginDescription;
     bool connectionLost = false;
     bool gotResult = false;
+    bool workerReady = false;
+    std::atomic<bool> launched { false };
+    std::atomic<juce::int64> workerPid { 0 };
 
-    bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
+    bool waitForWorkerReady (int timeoutMs, const std::function<bool()>& abortCheck)
     {
-        auto scannerExe = owner.scannerExeFile();
-        if (! scannerExe.existsAsFile())
-        {
-            Logger::writeToLog ("Failed to launch plugin scanner.");
-            return false;
-        }
+        const auto deadline = Time::getMillisecondCounter() + static_cast<uint32> (timeoutMs);
+        std::unique_lock<std::mutex> lock { mutex };
 
-        Logger::writeToLog (String ("launching plugin scanner: ") + scannerExe.getFullPathName());
-        return launchWorkerProcess (scannerExe,
-                                    EL_PLUGIN_SCANNER_PROCESS_ID,
-                                    timeout,
-                                    flags);
+        for (;;)
+        {
+            if (condvar.wait_for (lock, std::chrono::milliseconds { 50 }, [&] { return workerReady || connectionLost; }))
+            {
+                if (workerReady)
+                    return true;
+                connectionLost = false; // consumed here: launch failure, not a crash
+                return false;
+            }
+
+            if (abortCheck() || Time::getMillisecondCounter() >= deadline)
+                return false;
+        }
     }
 };
 
@@ -318,6 +446,10 @@ public:
         nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
+
+        logger->logMessage ("[scanner] ready");
+        const auto msg = String (EL_PLUGIN_SCANNER_READY_ID) + ":" + String (detail::currentProcessId());
+        sendMessageToCoordinator ({ msg.toRawUTF8(), msg.getNumBytesAsUTF8() });
     }
 
     void handleConnectionLost() override
@@ -339,12 +471,22 @@ private:
 
 //==============================================================================
 PluginScanner::PluginScanner (PluginManager& manager)
-    : _manager (manager),
+    : juce::Thread ("elscan"),
+      _manager (manager),
       list (manager.getKnownPlugins()),
-      _scannerExe (detail::scannerExeFullPath()) {}
+      _scannerExe (detail::scannerExeFullPath()),
+      launchTimeoutMs (EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT)
+{
+    // Force-create the master weak reference on this thread so copies made
+    // from the scan thread never race its lazy initialization.
+    juce::WeakReference<PluginScanner> (this);
+}
 
 PluginScanner::~PluginScanner()
 {
+    cancel();
+    stopThread (5000);
+    masterReference.clear();
     listeners.clear();
     superprocess.reset();
 }
@@ -354,14 +496,72 @@ void PluginScanner::cancel()
     cancelFlag = 1;
 }
 
-bool PluginScanner::isScanning() const { return superprocess != nullptr; }
+bool PluginScanner::isScanning() const { return scanning.load(); }
 
-bool PluginScanner::retrieveDescriptions (const String& formatName,
-                                          const String& fileOrIdentifier,
-                                          OwnedArray<PluginDescription>& result)
+bool PluginScanner::shouldAbort() const noexcept
+{
+    return cancelFlag.get() != 0 || threadShouldExit();
+}
+
+bool PluginScanner::waitForScanToFinish (int timeoutMs)
+{
+    const auto deadline = Time::getMillisecondCounter() + static_cast<uint32> (timeoutMs);
+    const bool onMessageThread = MessageManager::getInstance()->isThisTheMessageThread();
+
+    while (isScanning())
+    {
+        if (Time::getMillisecondCounter() >= deadline)
+            return false;
+
+        if (onMessageThread)
+            MessageManager::getInstance()->runDispatchLoopUntil (20);
+        else
+            Thread::sleep (20);
+    }
+
+    // Deliver the queued audioPluginScanFinished callback.
+    if (onMessageThread)
+        MessageManager::getInstance()->runDispatchLoopUntil (20);
+
+    return true;
+}
+
+juce::String PluginScanner::getLastScanError() const
+{
+    ScopedLock sl (stateLock);
+    return lastScanError;
+}
+
+void PluginScanner::resetWorker (bool alsoKill)
+{
+    if (superprocess != nullptr && alsoKill && superprocess->isLaunched())
+        superprocess->terminateWorkerProcess();
+    superprocess.reset();
+}
+
+void PluginScanner::notifyOnMessageThread (std::function<void (PluginScanner&)> fn)
+{
+    MessageManager::callAsync ([weak = juce::WeakReference<PluginScanner> (this), fn = std::move (fn)]() {
+        if (auto* self = weak.get())
+            fn (*self);
+    });
+}
+
+PluginScanner::ScanResult PluginScanner::retrieveDescriptions (const String& formatName,
+                                                               const String& fileOrIdentifier,
+                                                               OwnedArray<PluginDescription>& result)
 {
     if (superprocess == nullptr)
-        superprocess = std::make_unique<PluginScannerCoordinator> (*this);
+    {
+        superprocess = std::make_shared<PluginScannerCoordinator> (*this);
+        if (! superprocess->launch (launchTimeoutMs, [this]() { return shouldAbort(); }))
+        {
+            // Don't kill: an abandoned launch may still be in flight on the
+            // message thread. Dropping the reference is enough.
+            resetWorker (false);
+            return shouldAbort() ? ScanResult::cancelled : ScanResult::unavailable;
+        }
+    }
 
     MemoryBlock block;
     MemoryOutputStream stream { block, true };
@@ -369,19 +569,38 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
     stream.writeString (fileOrIdentifier);
 
     if (! superprocess->sendMessageToWorker (block))
-        return false;
+    {
+        resetWorker (true);
+        return ScanResult::unavailable;
+    }
 
     using State = PluginScannerCoordinator::State;
+    const auto deadline = Time::getMillisecondCounter() + static_cast<uint32> (perPluginTimeoutMs);
 
     for (;;)
     {
-        if (cancelFlag.get() != 0)
-            return true;
+        if (shouldAbort())
+            return ScanResult::cancelled;
 
         const auto response = superprocess->getResponse();
 
         if (response.state == State::timeout)
+        {
+            if (Time::getMillisecondCounter() >= deadline)
+            {
+                Logger::writeToLog (String ("plugin scan timed out: ") + fileOrIdentifier);
+                resetWorker (true);
+                return ScanResult::crashed;
+            }
             continue;
+        }
+
+        if (response.state == State::connectionLost)
+        {
+            Logger::writeToLog (String ("plugin scanner crashed on: ") + fileOrIdentifier);
+            resetWorker (true);
+            return ScanResult::crashed;
+        }
 
         if (response.xml != nullptr)
         {
@@ -394,7 +613,7 @@ bool PluginScanner::retrieveDescriptions (const String& formatName,
             }
         }
 
-        return (response.state == State::gotResult);
+        return ScanResult::ok;
     }
 }
 
@@ -403,7 +622,9 @@ File PluginScanner::scannerExeFile() const noexcept { return _scannerExe; }
 void PluginScanner::scanAudioFormat (const String& formatName)
 {
     detail::applyBlacklistingsFromDeadMansPedal (list);
-    auto paths (detail::readSearchPath (*_manager.props, formatName));
+    auto paths = _manager.props != nullptr
+                     ? detail::readSearchPath (*_manager.props, formatName)
+                     : FileSearchPath();
     StringArray identifiers;
     std::function<String (const String&)> pluginName = [] (const String& ID) -> juce::String { return ID; };
 
@@ -426,42 +647,91 @@ void PluginScanner::scanAudioFormat (const String& formatName)
         identifiers = provider->findTypes (paths, true, false);
     }
 
-    listeners.call (&Listener::audioPluginScanProgress, 0.0f);
+    notifyOnMessageThread ([] (PluginScanner& s) {
+        s.listeners.call (&Listener::audioPluginScanProgress, 0.0f);
+    });
 
-    float step = 1.f;
-    for (const auto& ID : identifiers)
+    const auto total = static_cast<float> (identifiers.size());
+    for (int i = 0; i < identifiers.size(); ++i)
     {
-        if (cancelFlag.get() != 0)
+        const auto& ID = identifiers.getReference (i);
+
+        const auto reportProgress = [this, i, total]() {
+            const float progress = static_cast<float> (i + 1) / total;
+            notifyOnMessageThread ([progress] (PluginScanner& s) {
+                s.listeners.call (&Listener::audioPluginScanProgress, progress);
+            });
+        };
+
+        if (shouldAbort())
             return;
 
-        listeners.call (&Listener::audioPluginScanStarted, pluginName (ID));
+        notifyOnMessageThread ([name = pluginName (ID)] (PluginScanner& s) {
+            s.listeners.call (&Listener::audioPluginScanStarted, name);
+        });
 
         if (list.getTypeForFile (ID) || list.getBlacklistedFiles().contains (ID))
+        {
+            reportProgress();
             continue;
+        }
 
         OwnedArray<PluginDescription> descriptions;
 
+        // Add to the dead-man's-pedal before scanning so the entry survives
+        // if this plugin takes down the whole application.
         auto crashed = detail::readDeadMansPedalFile();
         crashed.removeString (ID);
         crashed.add (ID);
         detail::setDeadMansPedalFile (crashed);
 
-        if (retrieveDescriptions (formatName, ID, descriptions))
-        {
-            for (auto* desc : descriptions)
-                list.addType (*desc);
-
-            // Managed to load without crashing, so remove it from the dead-man's-pedal..
+        const auto removeFromPedal = [&crashed, &ID]() {
             crashed.removeString (ID);
             detail::setDeadMansPedalFile (crashed);
+        };
+
+        switch (retrieveDescriptions (formatName, ID, descriptions))
+        {
+            case ScanResult::ok:
+                consecutiveFailures = 0;
+                for (auto* desc : descriptions)
+                    list.addType (*desc);
+                // Managed to load without crashing, so remove it from the dead-man's-pedal..
+                removeFromPedal();
+                if (descriptions.size() == 0 && ! list.getBlacklistedFiles().contains (ID))
+                    failedIdentifiers.add (ID);
+                break;
+
+            case ScanResult::crashed:
+                // Leave the ID on the dead-man's-pedal so it gets blacklisted.
+                consecutiveFailures = 0;
+                if (! list.getBlacklistedFiles().contains (ID))
+                    failedIdentifiers.add (ID);
+                break;
+
+            case ScanResult::unavailable:
+                // The scanner process itself failed. Not the plugin's fault:
+                // never blacklist it.
+                removeFromPedal();
+                if (++consecutiveFailures >= maxConsecutiveFailures)
+                {
+                    abortedByFailure = true;
+                    {
+                        ScopedLock sl (stateLock);
+                        lastScanError = TRANS ("Plugin scanning stopped early because the "
+                                               "scanner process could not be started or "
+                                               "kept failing.");
+                    }
+                    return;
+                }
+                break;
+
+            case ScanResult::cancelled:
+                removeFromPedal();
+                return;
         }
 
-        if (descriptions.size() == 0 && ! list.getBlacklistedFiles().contains (ID))
-            failedIdentifiers.add (ID);
-
-        listeners.call (&Listener::audioPluginScanProgress,
-                        step / static_cast<float> (identifiers.size()));
-        step += 1.f;
+        reportProgress();
     }
 }
 
@@ -473,35 +743,59 @@ void PluginScanner::scanForAudioPlugins (const juce::String& formatName)
 
 void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 {
-    if (! scannerExeFile().existsAsFile())
+    if (isThreadRunning() || scanning.load())
         return;
 
-    detail::setDeadMansPedalFile ({});
+    formatsToScan = formats;
     cancelFlag = 0;
-
-    for (const auto& format : formats)
+    abortedByFailure = false;
+    consecutiveFailures = 0;
+    failedIdentifiers.clearQuick();
     {
-        scanAudioFormat (format);
-        if (cancelFlag.get() != 0)
-            break;
+        ScopedLock sl (stateLock);
+        lastScanError.clear();
     }
 
-    superprocess.reset();
-    cancelFlag = 0;
+    // Set before startThread so isScanning() is true immediately.
+    scanning = true;
+    startThread();
+}
 
-    auto crashed = detail::readDeadMansPedalFile();
-    for (const auto& c : failedIdentifiers)
-        crashed.add (c);
-    crashed.removeDuplicates (false);
-    crashed.removeEmptyStrings();
-    detail::setDeadMansPedalFile (crashed);
-    detail::applyBlacklistingsFromDeadMansPedal (list);
-    detail::setDeadMansPedalFile ({});
-    failedIdentifiers.clearQuick(); // FIXME: this is a workaround that
-    // prevents the UI from showing to
-    // many errors about known-crashed
-    // plugins
-    listeners.call (&Listener::audioPluginScanFinished);
+void PluginScanner::run()
+{
+    if (scannerExeFile().existsAsFile())
+    {
+        detail::setDeadMansPedalFile ({});
+
+        for (const auto& format : formatsToScan)
+        {
+            scanAudioFormat (format);
+            if (shouldAbort() || abortedByFailure)
+                break;
+        }
+
+        resetWorker (true);
+
+        auto crashed = detail::readDeadMansPedalFile();
+        for (const auto& c : failedIdentifiers)
+            crashed.add (c);
+        crashed.removeDuplicates (false);
+        crashed.removeEmptyStrings();
+        detail::setDeadMansPedalFile (crashed);
+        detail::applyBlacklistingsFromDeadMansPedal (list);
+        detail::setDeadMansPedalFile ({});
+    }
+    else
+    {
+        ScopedLock sl (stateLock);
+        lastScanError = TRANS ("The plugin scanner executable is missing.");
+    }
+
+    cancelFlag = 0;
+    scanning = false;
+    notifyOnMessageThread ([] (PluginScanner& s) {
+        s.listeners.call (&Listener::audioPluginScanFinished);
+    });
 }
 
 //==============================================================================
@@ -882,6 +1176,15 @@ bool PluginManager::isScanningAudioPlugins()
 {
     return (priv && priv->scanner) ? priv->scanner->isScanning()
                                    : false;
+}
+
+void PluginManager::stopScanningAudioPlugins (int timeoutMs)
+{
+    if (priv != nullptr && priv->scanner != nullptr && priv->scanner->isScanning())
+    {
+        priv->scanner->cancel();
+        priv->scanner->waitForScanToFinish (timeoutMs);
+    }
 }
 
 AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& desc, String& errorMsg)

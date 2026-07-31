@@ -290,6 +290,7 @@ void Application::shutdown()
     auto& settings (world->settings());
     auto& midi (world->midi());
     auto* props = settings.getUserSettings();
+    plugins.stopScanningAudioPlugins(); // the scan thread reads the properties file
     plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
 
     srvs.deactivate();

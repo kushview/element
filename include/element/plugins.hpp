@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <atomic>
+#include <functional>
+#include <memory>
+
 #include <element/juce/audio_processors.hpp>
 
 #define EL_PLUGIN_SCANNER_PROCESS_ID "pspelbg"
@@ -78,6 +82,12 @@ public:
 
     /** Returns true if a scan is in progress using the child process */
     bool isScanningAudioPlugins();
+
+    /** Cancels a running background scan and waits for it to finish.
+
+        @param timeoutMs maximum time to wait in milliseconds
+    */
+    void stopScanningAudioPlugins (int timeoutMs = 5000);
 
     /** Returns the name of the currently scanned plugin. This value
 	    is not suitable for use in loading plugins */
@@ -188,11 +198,13 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager)
 };
 
-class PluginScanner final {
+class PluginScanner final : private juce::Thread {
 public:
     PluginScanner (PluginManager& manager);
     ~PluginScanner();
 
+    /** Receives scan events. Callbacks are always delivered on the
+        message thread. */
     class Listener {
     public:
         Listener() {}
@@ -205,10 +217,14 @@ public:
 
     static const juce::File& getWorkerPluginListFile();
 
-    /** scan for plugins of type */
+    /** Starts an asynchronous scan for plugins of type on a background
+        thread. Returns immediately. Does nothing if a scan is already
+        in progress. */
     void scanForAudioPlugins (const juce::String& formatName);
 
-    /** Scan for plugins of multiple types */
+    /** Starts an asynchronous scan for plugins of multiple types on a
+        background thread. Returns immediately. Does nothing if a scan
+        is already in progress. */
     void scanForAudioPlugins (const juce::StringArray& formats);
 
     /** Cancels the current scan operation if possible. */
@@ -217,14 +233,29 @@ public:
     /** is scanning */
     bool isScanning() const;
 
+    /** Blocks until the scan completes, pumping the message queue when
+        called from the message thread so marshalled callbacks are
+        delivered.
+
+        @param timeoutMs maximum time to wait in milliseconds
+        @return true if the scan finished, false on timeout
+    */
+    bool waitForScanToFinish (int timeoutMs = 60000);
+
     /** Add a listener */
     void addListener (Listener* listener) { listeners.add (listener); }
 
     /** Remove a listener */
     void removeListener (Listener* listener) { listeners.remove (listener); }
 
-    /** Returns a list of plugins that failed to load */
+    /** Returns a list of plugins that failed to load. Only valid when
+        not scanning. */
     const juce::StringArray& getFailedFiles() const { return failedIdentifiers; }
+
+    /** Returns a message describing why the last scan aborted early, or
+        an empty string. Set when the scanner process repeatedly could
+        not be launched or contacted. Cleared when a new scan starts. */
+    juce::String getLastScanError() const;
 
     /** Returns the scanner exe to use for out-of-process scanning. */
     juce::File scannerExeFile() const noexcept;
@@ -232,20 +263,53 @@ public:
     /** Set a specific scanner exe. */
     void setScannerExe (const juce::File& exe) { _scannerExe = exe; }
 
+    /** Set the timeout used when launching the scanner process. */
+    void setLaunchTimeout (int ms) { launchTimeoutMs = ms; }
+
+    /** Set how long a single plugin may take before the scanner process
+        is killed and the plugin treated as crashed. */
+    void setPerPluginTimeout (int ms) { perPluginTimeoutMs = ms; }
+
+    /** Set how many consecutive scanner-process failures abort the scan. */
+    void setMaxConsecutiveFailures (int n) { maxConsecutiveFailures = n; }
+
 private:
     friend class PluginScannerCoordinator;
+
+    enum class ScanResult {
+        ok,          ///> The worker responded. The result may be empty.
+        crashed,     ///> The worker crashed or hung loading this plugin.
+        unavailable, ///> The worker could not be launched or contacted.
+        cancelled    ///> The scan was cancelled.
+    };
+
     PluginManager& _manager;
-    std::unique_ptr<PluginScannerCoordinator> superprocess;
+    std::shared_ptr<PluginScannerCoordinator> superprocess;
     juce::ListenerList<Listener> listeners;
-    juce::StringArray identifiers, failedIdentifiers;
+    juce::StringArray failedIdentifiers;
     juce::KnownPluginList& list;
     juce::Atomic<int> cancelFlag { 0 };
     juce::File _scannerExe;
+    juce::StringArray formatsToScan;
+    std::atomic<bool> scanning { false };
+    int launchTimeoutMs;
+    int perPluginTimeoutMs { 90000 };
+    int maxConsecutiveFailures { 3 };
+    int consecutiveFailures { 0 };
+    bool abortedByFailure { false };
+    juce::String lastScanError;
+    juce::CriticalSection stateLock;
 
+    void run() override;
+    bool shouldAbort() const noexcept;
+    void resetWorker (bool alsoKill);
+    void notifyOnMessageThread (std::function<void (PluginScanner&)> fn);
     void scanAudioFormat (const juce::String& formatName);
-    bool retrieveDescriptions (const juce::String& formatName,
-                               const juce::String& fileOrIdentifier,
-                               juce::OwnedArray<juce::PluginDescription>& result);
+    ScanResult retrieveDescriptions (const juce::String& formatName,
+                                     const juce::String& fileOrIdentifier,
+                                     juce::OwnedArray<juce::PluginDescription>& result);
+
+    JUCE_DECLARE_WEAK_REFERENCEABLE (PluginScanner)
 };
 
 } // namespace element
