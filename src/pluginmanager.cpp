@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <array>
+#include <thread>
 
 #include <element/datapath.hpp>
 #include <element/node.hpp>
@@ -228,8 +229,6 @@ public:
     {
         State state;
         std::unique_ptr<XmlElement> xml;
-        int current = 0;
-        int total = 0;
     };
 
     Response getResponse()
@@ -253,7 +252,7 @@ public:
         }
 
         gotProgress = false;
-        return { State::progress, nullptr, progressCurrent, progressTotal };
+        return { State::progress, nullptr };
     }
 
     void handleMessageFromWorker (const MemoryBlock& mb) override
@@ -272,12 +271,9 @@ public:
 
         if (message.startsWith (EL_PLUGIN_SCANNER_PROGRESS_ID))
         {
-            // "progress:<current>:<total>" — heartbeat while scanning a
-            // shell plugin that houses many sub-plugins.
-            StringArray toks;
-            toks.addTokens (message, ":", "");
-            progressCurrent = toks[1].getIntValue();
-            progressTotal = toks[2].getIntValue();
+            // Heartbeat sent while the worker is still inside a single,
+            // possibly slow findAllTypesForFile call (e.g. a VST3 shell
+            // plugin enumerating many housed sub-plugins).
             gotProgress = true;
             condvar.notify_one();
             return;
@@ -314,8 +310,6 @@ private:
     bool connectionLost = false;
     bool gotResult = false;
     bool gotProgress = false;
-    int progressCurrent = 0;
-    int progressTotal = 0;
     bool workerReady = false;
     std::atomic<bool> launched { false };
     std::atomic<juce::int64> workerPid { 0 };
@@ -420,7 +414,31 @@ public:
             && (MessageManager::getInstance()->isThisTheMessageThread()
                 || matchingFormat->requiresUnblockedMessageThreadDuringCreation (pd)))
         {
+            // findAllTypesForFile can block for a long time with no feedback
+            // in between (e.g. a VST3 shell plugin such as WaveShell
+            // enumerating many housed sub-plugins), so send heartbeats to
+            // let the coordinator tell a slow scan from a wedged one.
+            std::mutex hbMutex;
+            std::condition_variable hbCondvar;
+            bool scanning = true;
+
+            std::thread heartbeat ([this, &hbMutex, &hbCondvar, &scanning] {
+                std::unique_lock<std::mutex> lock { hbMutex };
+                while (! hbCondvar.wait_for (lock, std::chrono::seconds (1), [&] { return ! scanning; }))
+                {
+                    const String msg (EL_PLUGIN_SCANNER_PROGRESS_ID);
+                    sendMessageToCoordinator ({ msg.toRawUTF8(), msg.getNumBytesAsUTF8() });
+                }
+            });
+
             matchingFormat->findAllTypesForFile (results, identifier);
+
+            {
+                const std::lock_guard<std::mutex> lock { hbMutex };
+                scanning = false;
+            }
+            hbCondvar.notify_one();
+            heartbeat.join();
         }
 
         return results;
@@ -476,17 +494,6 @@ public:
         nf.add (new CLAPProvider());
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
-
-        // Heartbeat while iterating a shell plugin's factory (e.g. WaveShell)
-        // so the coordinator can tell a slow scan from a wedged one.
-        if (auto* vst3 = dynamic_cast<VST3PluginFormatHeadless*> (plugins->getAudioPluginFormat ("VST3")))
-        {
-            vst3->scanProgressCallback = [this] (int current, int total) {
-                const auto msg = String (EL_PLUGIN_SCANNER_PROGRESS_ID) + ":"
-                                 + String (current) + ":" + String (total);
-                sendMessageToCoordinator ({ msg.toRawUTF8(), msg.getNumBytesAsUTF8() });
-            };
-        }
 
         logger->logMessage ("[scanner] ready");
         const auto msg = String (EL_PLUGIN_SCANNER_READY_ID) + ":" + String (detail::currentProcessId());
@@ -638,14 +645,11 @@ PluginScanner::ScanResult PluginScanner::retrieveDescriptions (const String& for
 
         if (response.state == State::progress)
         {
-            // The worker is alive and moving through a shell plugin's
-            // sub-plugins, so the timeout applies per sub-plugin.
+            // The worker is still alive and working on this plugin, so
+            // push the deadline out rather than treating it as wedged.
             deadline = Time::getMillisecondCounter() + static_cast<uint32> (perPluginTimeoutMs);
-            notifyOnMessageThread ([name = File::createFileWithoutCheckingPath (fileOrIdentifier).getFileName(),
-                                    current = response.current,
-                                    total = response.total] (PluginScanner& s) {
-                s.listeners.call (&Listener::audioPluginScanStarted,
-                                  name + " [" + String (current + 1) + "/" + String (total) + "]");
+            notifyOnMessageThread ([name = File::createFileWithoutCheckingPath (fileOrIdentifier).getFileName()] (PluginScanner& s) {
+                s.listeners.call (&Listener::audioPluginScanStarted, name + "…");
             });
             continue;
         }
