@@ -22,6 +22,7 @@
 #define EL_PLUGIN_SCANNER_READY_ID "ready"
 #define EL_PLUGIN_SCANNER_START_ID "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID "finished"
+#define EL_PLUGIN_SCANNER_PROGRESS_ID "progress"
 
 #define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT 24000 // 24 Seconds
 
@@ -219,6 +220,7 @@ public:
     {
         timeout,
         gotResult,
+        progress,
         connectionLost,
     };
 
@@ -226,20 +228,32 @@ public:
     {
         State state;
         std::unique_ptr<XmlElement> xml;
+        int current = 0;
+        int total = 0;
     };
 
     Response getResponse()
     {
         std::unique_lock<std::mutex> lock { mutex };
 
-        if (! condvar.wait_for (lock, std::chrono::milliseconds { 50 }, [&] { return gotResult || connectionLost; }))
+        if (! condvar.wait_for (lock, std::chrono::milliseconds { 50 }, [&] { return gotResult || gotProgress || connectionLost; }))
             return { State::timeout, nullptr };
 
-        const auto state = connectionLost ? State::connectionLost : State::gotResult;
-        connectionLost = false;
-        gotResult = false;
+        if (connectionLost)
+        {
+            connectionLost = false;
+            gotResult = gotProgress = false;
+            return { State::connectionLost, nullptr };
+        }
 
-        return { state, std::move (pluginDescription) };
+        if (gotResult)
+        {
+            gotResult = gotProgress = false;
+            return { State::gotResult, std::move (pluginDescription) };
+        }
+
+        gotProgress = false;
+        return { State::progress, nullptr, progressCurrent, progressTotal };
     }
 
     void handleMessageFromWorker (const MemoryBlock& mb) override
@@ -252,6 +266,19 @@ public:
             // "ready:<pid>" — the pid enables force-killing a hung worker.
             workerPid = message.fromFirstOccurrenceOf (":", false, false).getLargeIntValue();
             workerReady = true;
+            condvar.notify_one();
+            return;
+        }
+
+        if (message.startsWith (EL_PLUGIN_SCANNER_PROGRESS_ID))
+        {
+            // "progress:<current>:<total>" — heartbeat while scanning a
+            // shell plugin that houses many sub-plugins.
+            StringArray toks;
+            toks.addTokens (message, ":", "");
+            progressCurrent = toks[1].getIntValue();
+            progressTotal = toks[2].getIntValue();
+            gotProgress = true;
             condvar.notify_one();
             return;
         }
@@ -286,6 +313,9 @@ private:
     std::unique_ptr<XmlElement> pluginDescription;
     bool connectionLost = false;
     bool gotResult = false;
+    bool gotProgress = false;
+    int progressCurrent = 0;
+    int progressTotal = 0;
     bool workerReady = false;
     std::atomic<bool> launched { false };
     std::atomic<juce::int64> workerPid { 0 };
@@ -447,6 +477,17 @@ public:
         plugins->addDefaultFormats();
         plugins->setPlayConfig (48000.0, 1024);
 
+        // Heartbeat while iterating a shell plugin's factory (e.g. WaveShell)
+        // so the coordinator can tell a slow scan from a wedged one.
+        if (auto* vst3 = dynamic_cast<VST3PluginFormatHeadless*> (plugins->getAudioPluginFormat ("VST3")))
+        {
+            vst3->scanProgressCallback = [this] (int current, int total) {
+                const auto msg = String (EL_PLUGIN_SCANNER_PROGRESS_ID) + ":"
+                                 + String (current) + ":" + String (total);
+                sendMessageToCoordinator ({ msg.toRawUTF8(), msg.getNumBytesAsUTF8() });
+            };
+        }
+
         logger->logMessage ("[scanner] ready");
         const auto msg = String (EL_PLUGIN_SCANNER_READY_ID) + ":" + String (detail::currentProcessId());
         sendMessageToCoordinator ({ msg.toRawUTF8(), msg.getNumBytesAsUTF8() });
@@ -575,7 +616,7 @@ PluginScanner::ScanResult PluginScanner::retrieveDescriptions (const String& for
     }
 
     using State = PluginScannerCoordinator::State;
-    const auto deadline = Time::getMillisecondCounter() + static_cast<uint32> (perPluginTimeoutMs);
+    auto deadline = Time::getMillisecondCounter() + static_cast<uint32> (perPluginTimeoutMs);
 
     for (;;)
     {
@@ -592,6 +633,20 @@ PluginScanner::ScanResult PluginScanner::retrieveDescriptions (const String& for
                 resetWorker (true);
                 return ScanResult::crashed;
             }
+            continue;
+        }
+
+        if (response.state == State::progress)
+        {
+            // The worker is alive and moving through a shell plugin's
+            // sub-plugins, so the timeout applies per sub-plugin.
+            deadline = Time::getMillisecondCounter() + static_cast<uint32> (perPluginTimeoutMs);
+            notifyOnMessageThread ([name = File::createFileWithoutCheckingPath (fileOrIdentifier).getFileName(),
+                                    current = response.current,
+                                    total = response.total] (PluginScanner& s) {
+                s.listeners.call (&Listener::audioPluginScanStarted,
+                                  name + " [" + String (current + 1) + "/" + String (total) + "]");
+            });
             continue;
         }
 
