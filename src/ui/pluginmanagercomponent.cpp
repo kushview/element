@@ -223,6 +223,11 @@ private:
         startTimer (20);
         progressWindow.setVisible (true);
 
+        // JUCE modality is process-wide: in the plugin version it would also
+        // block input to other Element instances' editors in the same host.
+        if (! owner.isPluginVersion())
+            progressWindow.enterModalState (true, nullptr, false);
+
         if (! scanner->isScanning())
         {
             if (formatsToScan.size() > 0)
@@ -230,10 +235,9 @@ private:
             else
                 scanner->scanForAudioPlugins (formatToScan.getName());
         }
-        else
-        {
-            finishedScan();
-        }
+
+        // If a scan was already running the listener added above tracks it,
+        // and audioPluginScanFinished drives finishedScan().
     }
 
     void finishedScan()
@@ -241,8 +245,10 @@ private:
         progressWindow.getButton (TRANS ("Cancel"))->onClick = nullptr;
         stopTimer();
 
+        String scanError;
         if (scanner)
         {
+            scanError = scanner->getLastScanError();
             scanner->removeListener (this);
             scanner.reset();
         }
@@ -251,10 +257,14 @@ private:
         progressWindow.setVisible (false);
         progressWindow.removeFromDesktop();
 
-        MessageManager::getInstance()->runDispatchLoopUntil (14);
         StringArray failedFiles; // TODO
 
         owner.scanFinished (failedFiles);
+
+        if (scanError.isNotEmpty())
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                              TRANS ("Plugin Scanner"),
+                                              scanError);
     }
 
     void timerCallback() override
@@ -275,7 +285,6 @@ private:
     {
         pluginBeingScanned = File::createFileWithoutCheckingPath (pluginName.trim())
                                  .getFileName();
-        MessageManager::getInstance()->runDispatchLoopUntil (14);
     }
 
     void audioPluginScanProgress (const float reportedProgress) override
@@ -791,6 +800,12 @@ void PluginListComponent::optionsMenuCallback (int result)
             removeMissingPlugins();
             saveSettings (this);
             break;
+        case 5:
+            list.clearBlacklistedFiles();
+            plugins.getDeadAudioPluginsFile().deleteFile();
+            saveSettings (this);
+            updateList();
+            break;
 
         case 99:
             editPluginPath ("CLAP");
@@ -864,6 +879,7 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addItem (2, TRANS ("Remove selected plug-in from list"), table.getNumSelectedRows() > 0);
         menu.addItem (3, TRANS ("Show folder containing selected plug-in"), canShowSelectedFolder());
         menu.addItem (4, TRANS ("Remove any plug-ins whose files no longer exist"));
+        menu.addItem (5, TRANS ("Clear blacklisted plug-ins"), plugins.getKnownPlugins().getBlacklistedFiles().size() > 0);
         menu.addSeparator();
         menu.addItem (8, "Scan for new or updated CLAP plugins");
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
