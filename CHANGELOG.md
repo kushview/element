@@ -1,5 +1,35 @@
 # Change Log
 
+## [1.2.0]
+
+### Added
+- Rewritten MIDI mapping engine with a dedicated editing panel, filters, and device/node/parameter display names.
+- Tap tempo mapping, including mapping tap tempo via CC.
+- Mapping directly to plugin parameters, with persistence and application improvements and a blink indicator when engaged by MIDI.
+- Node panel listing of MIDI Programs, with in-place program number editing and selection kept in sync when the program changes externally.
+- Plugin favorites and visibility options.
+- Per-program time signature support in the MIDI Set List.
+- Read/write access to the session tempo from Lua scripts.
+- UI feedback and heartbeat-based progress checks for large shell plugin scans.
+- Registration of custom panels with the navigation panel.
+
+### Changed
+- Tighten symbol visibility globally via CMake to avoid crashing plugins that don't hide their own symbol visibility and are also built with JUCE.
+- Improve meter accuracy: stabilize the RMS time window in node processing and apply calibration dB so a -20dB test tone reads -20dB.
+- Purge old mapping data once migrated to the new mapping format.
+- Decouple mapping actions out of the device service and into a dedicated mapping service.
+- Use a consistent grey for table/list/tree highlight colors.
+- Clean up public API headers and fix typos.
+- Update minimum supported OS in the README.
+
+### Fixed
+- Scanner: better handling of plugin crashes, avoiding blacklisting of otherwise good scans.
+- CLAP: use default plugin paths correctly on first run.
+- CLAP: store the CLAP transport on the processor type; avoid a thread warning when deactivating.
+- Silence a `-Wstringop-overflow` warning in `AudioEngine::prepareToPlay`.
+- Subgraphs no longer have their name overwritten when loading.
+- Expose the pre-JUCE-8.0.13 public `AudioProcessor::createEditor` so internal audio processor types can still instantiate multiple UIs.
+
 ## [1.1.1]
 
 ### Added

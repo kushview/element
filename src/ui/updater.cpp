@@ -22,7 +22,9 @@ std::unique_ptr<Updater> Updater::create()
 }
 #endif
 
-Updater::Updater() {}
+Updater::Updater()
+{
+}
 Updater::~Updater() {}
 
 void Updater::check (bool background) { juce::ignoreUnused (background); }

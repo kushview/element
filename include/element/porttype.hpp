@@ -101,7 +101,7 @@ public:
     inline bool operator!= (const ID& id) const { return (type != id); }
     inline bool operator== (const PortType& t) const { return (type == t.type); }
     inline bool operator!= (const PortType& t) const { return (type != t.type); }
-    inline bool operator< (const PortType& t) const { return (type < t.type); }
+    inline bool operator<(const PortType& t) const { return (type < t.type); }
 
     inline operator int() const { return (int) this->type; }
 

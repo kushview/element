@@ -370,7 +370,9 @@ protected:
             pfds.reserve (fds.size());
             for (const auto& f : fds)
             {
-                struct pollfd p {};
+                struct pollfd p
+                {
+                };
                 p.fd = f.first;
                 if (f.second & CLAP_POSIX_FD_READ)
                     p.events |= POLLIN;
