@@ -68,6 +68,25 @@ static bool makeFSRefFromPath (FSRef* destFSRef, const String& path)
 }
 #endif
 
+/** Returns true if a clap_window carries a usable native handle.
+
+    Guards the attach path: a plugin parented onto a null handle detaches itself
+    from our window hierarchy entirely.
+
+    @param w the window handed to clap_plugin_gui.set_parent
+    @return true if the platform handle is non-null
+*/
+static bool isValidWindow (const clap_window_t& w) noexcept
+{
+#if JUCE_MAC
+    return w.cocoa != nullptr;
+#elif JUCE_WINDOWS
+    return w.win32 != nullptr;
+#else
+    return w.x11 != 0;
+#endif
+}
+
 static bool isCLAP (const File& f)
 {
 #if JUCE_MAC
@@ -1183,27 +1202,30 @@ public:
           _timer ((const clap_plugin_timer_support_t*) plugin->get_extension (plugin, CLAP_EXT_TIMER_SUPPORT))
     {
         setOpaque (true);
-        _view = std::make_unique<ViewComponent> (*this);
-        addAndMakeVisible (_view.get());
+
+        // Non-zero before the view exists. An embedded native view pushes its bounds
+        // straight through to the window system as it is created and parented, and
+        // X11 rejects a zero width or height with BadValue on X_ConfigureWindow.
+        setSize (minViewSize, minViewSize);
 
         _created = _gui->create (_plugin, EL_WINDOW_API, false);
 
         if (_created)
         {
+            if (_gui->set_scale != nullptr)
+                _gui->set_scale (_plugin, Desktop::getInstance().getGlobalScaleFactor());
+
+            _canResize = _gui->can_resize != nullptr && _gui->can_resize (_plugin);
+            setResizable (_canResize);
+
             uint32_t w = 0, h = 0;
             if (_gui->get_size (_plugin, &w, &h))
-                setSize ((int) w, (int) h);
-            else
-                setSize (1, 1);
-
-            setResizable (false);
-
-            auto window = _view->hostWindow();
-            _gui->set_parent (_plugin, &window);
-
-            setVisible (false);
-            setVisible (true);
+                applySize ((int) w, (int) h);
         }
+
+        _view = std::make_unique<ViewComponent> (*this);
+        _view->setBounds (getLocalBounds());
+        addAndMakeVisible (_view.get());
 
 #if JUCE_LINUX
         if (_timer != nullptr)
@@ -1216,14 +1238,22 @@ public:
         if (onEditorDestroyed)
             onEditorDestroyed();
 
-        _view->prepareForDestruction();
-        _view.reset();
+        stopTimer();
+
+        // Detach the plugin's native window from ours before either side tears
+        // down, so the plugin's own teardown never touches a window we have
+        // already destroyed.
+        if (_view != nullptr)
+            _view->prepareForDestruction();
 
         if (_created)
         {
             _gui->hide (_plugin);
             _gui->destroy (_plugin);
+            _created = false;
         }
+
+        _view.reset();
     }
 
     /** Called when the editor is destroyed so the owner can drop its reference. */
@@ -1232,7 +1262,7 @@ public:
     /** Applies a size the plugin requested via clap_host_gui.request_resize. */
     void hostRequestedResize (uint32_t width, uint32_t height)
     {
-        setSize ((int) width, (int) height);
+        applySize ((int) width, (int) height);
     }
 
     /** Shows or hides the editor in response to request_show / request_hide. */
@@ -1243,9 +1273,9 @@ public:
 
     void viewRequestedResizeInPhysicalPixels (int width, int height) override
     {
-        _view->setSize (width, height);
-        _view->forceViewToSize();
-        resized();
+        // A CLAP plugin asks to be resized through clap_host_gui.request_resize,
+        // which arrives at hostRequestedResize(). Nothing else drives our size.
+        juce::ignoreUnused (width, height);
     }
 
     void paint (Graphics& g) override
@@ -1255,12 +1285,29 @@ public:
 
     void resized() override
     {
-        if (_view != nullptr)
-            _view->setBounds (getLocalBounds());
+        if (_view == nullptr || _inResize)
+            return;
+
+        const ScopedValueSetter<bool> guard (_inResize, true);
+        _view->setBounds (getLocalBounds());
+        _view->forceViewToSize();
+
+        if (_attached && _canResize && _gui->set_size != nullptr)
+            _gui->set_size (_plugin, (uint32_t) getWidth(), (uint32_t) getHeight());
+    }
+
+    void parentHierarchyChanged() override
+    {
+        attachPluginWindow();
     }
 
     void visibilityChanged() override
     {
+        attachPluginWindow();
+
+        if (! _created)
+            return;
+
         if (isVisible())
             _gui->show (_plugin);
         else
@@ -1268,9 +1315,49 @@ public:
     }
 
 private:
+    /** Parents the plugin's native view onto ours.
+
+        Deferred until this editor is actually on screen. The embed window only
+        becomes a child of a real peer once the editor has been added to a window
+        and shown; handing it to the plugin any earlier parents the plugin onto a
+        detached window, which then floats at the screen origin and receives no
+        mouse input from our window.
+    */
+    void attachPluginWindow()
+    {
+        if (_attached || ! _created || _view == nullptr || ! isShowing())
+            return;
+
+        _view->setBounds (getLocalBounds());
+
+        auto window = _view->hostWindow();
+        if (! detail::isValidWindow (window))
+            return;
+
+        if (_gui->set_parent (_plugin, &window))
+        {
+            _attached = true;
+            _view->forceViewToSize();
+        }
+    }
+
+    /** Smallest size we will ever hand to X11. Zero width or height is rejected
+        with BadValue on X_ConfigureWindow, and a scale factor below 1.0 can round a
+        small size down to zero, so this keeps a little headroom. */
+    static constexpr int minViewSize = 10;
+
     const clap_plugin_t* _plugin { nullptr };
     const clap_plugin_gui_t* _gui { nullptr };
     const clap_plugin_timer_support_t* _timer { nullptr };
+    bool _inResize = false;
+    bool _attached = false;
+    bool _canResize = false;
+
+    /** Resizes this editor, and through it the embedded view, exactly once. */
+    void applySize (int width, int height)
+    {
+        setSize (jmax (minViewSize, width), jmax (minViewSize, height));
+    }
 
     void timerCallback() override
     {
@@ -1282,59 +1369,56 @@ private:
     }
 
 #if JUCE_LINUX || JUCE_BSD
-    struct InnerHolder
+    /** Host-initiated XEmbed container for the plugin's X11 window.
+
+        A single component, added as an ordinary child of the editor — the same
+        shape JUCE's own VST3 host uses. An earlier version nested a second
+        XEmbedComponent that had been put on the desktop with addToDesktop(); the
+        plugin then parented onto a window that was not part of this window's
+        hierarchy, so its UI floated at the screen origin and never saw our mouse
+        events.
+
+        The embedded client must not drive our size either: allowing it runs
+        XEmbedComponent's configureNotify() path, which writes the client's geometry
+        back into this Component, which reconfigures the client, which notifies
+        again — an unbounded resize spiral that floods X with BadValue once a size
+        reaches zero. Plugin-initiated resizes belong on clap_host_gui.request_resize.
+        A JUCE-built client also never publishes _XEMBED_INFO, so the mapped flag has
+        to be ignored or the window is never mapped.
+    */
+    struct ViewComponent : public XEmbedComponent
     {
-        struct Inner : public XEmbedComponent
-        {
-            Inner() : XEmbedComponent (true, true)
-            {
-                setOpaque (true);
-                addToDesktop (0);
-            }
-
-            void paint (Graphics& g) override
-            {
-                g.fillAll (Colours::black);
-            }
-        };
-
-        Inner inner;
-    };
-
-    struct ViewComponent : public InnerHolder,
-                           public XEmbedComponent,
-                           public ComponentMovementWatcher
-    {
-        explicit ViewComponent (PhysicalResizeListener& l)
-            : XEmbedComponent ((unsigned long) inner.getPeer()->getNativeHandle(), true, false),
-              ComponentMovementWatcher (&inner),
-              listener (inner, l)
+        explicit ViewComponent (PhysicalResizeListener&)
+            : XEmbedComponent (XEmbedComponentOptions {}
+                                   .withWantsKeyboardFocus (true)
+                                   .withAllowForeignWidgetToResizeComponent (false)
+                                   .withIgnoreXembedMapped())
         {
             setOpaque (true);
+            setSize (minViewSize, minViewSize);
         }
 
         ~ViewComponent()
         {
             prepareForDestruction();
-            removeClient();
         }
 
         void prepareForDestruction()
         {
-            inner.removeClient();
+            removeClient();
         }
 
         clap_window_t hostWindow()
         {
             clap_window_t win;
             win.api = CLAP_WINDOW_API_X11;
-            win.x11 = inner.getHostWindowID();
+            win.x11 = getHostWindowID();
             return win;
         }
 
         void forceViewToSize()
         {
-            inner.setSize (getWidth(), getHeight());
+            updateEmbeddedBounds();
         }
 
         void fitToView()
@@ -1345,21 +1429,6 @@ private:
         {
             g.fillAll (Colours::black);
         }
-
-        //==============================================================================
-        void componentMovedOrResized (bool wasMoved, bool wasResized) override
-        {
-            if (wasResized)
-            {
-                if (auto pc = findParentComponentOfClass<CLAPEditor>())
-                    pc->setSize (inner.getWidth(), inner.getHeight());
-            }
-        }
-
-        void componentPeerChanged() override {}
-        void componentVisibilityChanged() override {};
-
-        ViewSizeListener listener;
     };
 
 #elif JUCE_MAC
