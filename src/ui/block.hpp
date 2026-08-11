@@ -75,13 +75,13 @@ public:
     inline static DisplayMode getDisplayModeFromString (const String& str)
     {
         auto s = str.toLowerCase().trim();
-        if (str == "normal")
+        if (s == "normal")
             return Normal;
-        if (str == "compact")
+        if (s == "compact")
             return Compact;
-        if (str == "small")
+        if (s == "small")
             return Small;
-        if (str == "embed")
+        if (s == "embed")
             return Embed;
         return Normal;
     }
@@ -274,7 +274,8 @@ private:
     Value nodeEnabled,
         nodeName,
         hiddenPorts,
-        displayModeValue;
+        displayModeValue,
+        windowVisibleValue;
 
     int numIns = 0, numOuts = 0;
 
@@ -406,6 +407,21 @@ private:
 
     void setDisplayModeInternal (DisplayMode, bool);
     void clearEmbedded();
+
+    /** Steps out of Embed mode so this node's editor can be shown in a plugin window.
+
+        A node's editor can only live in one place at a time, so an embedded block has to
+        give up its editor before a plugin window can create one. The mode being left is
+        remembered on the node so it can be returned to when the window closes.
+    */
+    void stashDisplayModeForWindow();
+
+    /** Returns to the display mode stashed by stashDisplayModeForWindow().
+
+        Does nothing if no mode was stashed, which is the case for blocks that were never
+        embedded when their plugin window was opened.
+    */
+    void restoreDisplayModeAfterWindow();
 
     void componentMovedOrResized (Component& component,
                                   bool wasMoved,

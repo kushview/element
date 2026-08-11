@@ -102,6 +102,7 @@ static const juce::Identifier controllers = "controllers";
 static const juce::Identifier collapsed = "collapsed";
 static const juce::Identifier delayCompensation = "delayCompensation";
 static const juce::Identifier displayMode = "displayMode";
+static const juce::Identifier lastDisplayMode = "lastDisplayMode";
 static const juce::Identifier enabled = "enabled";
 static const juce::Identifier gain = "gain";
 static const juce::Identifier graphs = "graphs";

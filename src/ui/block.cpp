@@ -216,6 +216,14 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     auto blockData = node.getBlockValueTree();
     displayModeValue = blockData.getPropertyAsValue (tags::displayMode, nullptr);
     displayModeValue.addListener (this);
+
+    // Updates synchronously: GuiService flags the window visible before building it, and
+    // this block has to give up its embedded editor before the window creates its own.
+    windowVisibleValue = node.getPropertyAsValue (tags::windowVisible, true);
+    windowVisibleValue.addListener (this);
+    if (! (bool) node.getProperty (tags::windowVisible, false))
+        blockData.removeProperty (tags::lastDisplayMode, nullptr);
+
     const auto idm = getDisplayModeFromString (displayModeValue.getValue());
     setDisplayModeInternal (idm, false);
     if (idm == Embed)
@@ -263,6 +271,7 @@ BlockComponent::~BlockComponent() noexcept
     nodeName.removeListener (this);
     hiddenPorts.removeListener (this);
     displayModeValue.removeListener (this);
+    windowVisibleValue.removeListener (this);
     deleteAllPins();
 }
 
@@ -384,6 +393,27 @@ void BlockComponent::setDisplayMode (DisplayMode mode)
     setDisplayModeInternal (mode, false);
 }
 
+void BlockComponent::stashDisplayModeForWindow()
+{
+    if (displayMode != Embed)
+        return;
+
+    node.getBlockValueTree().setProperty (
+        tags::lastDisplayMode, getDisplayModeKey (displayMode), nullptr);
+    setDisplayMode (Small);
+}
+
+void BlockComponent::restoreDisplayModeAfterWindow()
+{
+    auto blockData = node.getBlockValueTree();
+    const auto stashed = blockData.getProperty (tags::lastDisplayMode).toString();
+    if (stashed.isEmpty())
+        return;
+
+    blockData.removeProperty (tags::lastDisplayMode, nullptr);
+    setDisplayMode (getDisplayModeFromString (stashed));
+}
+
 void BlockComponent::setPortAlignment (PortAlignment newAlign)
 {
     node.getBlockValueTree().setProperty (
@@ -427,7 +457,14 @@ void BlockComponent::valueChanged (Value& value)
     {
         update (false, false);
     }
-    else if (nodeObject.refersToSameSourceAs (nodeObject))
+    else if (windowVisibleValue.refersToSameSourceAs (value))
+    {
+        if ((bool) value.getValue())
+            stashDisplayModeForWindow();
+        else
+            restoreDisplayModeAfterWindow();
+    }
+    else if (nodeObject.refersToSameSourceAs (value))
     {
         willRemoveConn.disconnect();
         clearEmbedded();
@@ -752,10 +789,7 @@ void BlockComponent::makeEditorActive()
     }
     else if (node.isValid())
     {
-        if (displayMode == Embed)
-        {
-            setDisplayMode (Small);
-        }
+        stashDisplayModeForWindow();
         ViewHelpers::presentPluginWindow (this, node);
     }
 }
@@ -1361,12 +1395,15 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
         const auto m = static_cast<BlockComponent::DisplayMode> (i);
         const bool enabled = m == BlockComponent::Embed ? detail::supportsEmbed (node) : true;
         dMenu.addItem (BlockComponent::getDisplayModeName (m), enabled, mode == m, [this, block, m]() {
+            // Choosing a mode explicitly abandons any mode stashed for a plugin window.
             auto b = block;
+            b.removeProperty (tags::lastDisplayMode, nullptr);
             b.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
                 auto sb = sibling.node.getBlockValueTree();
+                sb.removeProperty (tags::lastDisplayMode, nullptr);
                 sb.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             });
 

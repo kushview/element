@@ -95,7 +95,7 @@ public:
     inline bool operator== (const Version& o) const noexcept { return _hex == o._hex; }
     inline bool operator!= (const Version& o) const noexcept { return _hex != o._hex; }
     inline bool operator> (const Version& o) const noexcept { return _hex > o._hex; }
-    inline bool operator<(const Version& o) const noexcept { return _hex < o._hex; }
+    inline bool operator< (const Version& o) const noexcept { return _hex < o._hex; }
     inline bool operator>= (const Version& o) const noexcept { return _hex >= o._hex; }
     inline bool operator<= (const Version& o) const noexcept { return _hex <= o._hex; }
 

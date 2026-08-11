@@ -590,7 +590,7 @@ void GuiService::showPluginWindowsFor (const Node& node, const bool recursive, c
 {
     if (! node.isGraph())
     {
-        if (force || (bool) node.getProperty ("windowVisible", false))
+        if (force || (bool) node.getProperty (tags::windowVisible, false))
             presentPluginWindow (node, force);
         return;
     }
@@ -613,7 +613,17 @@ void GuiService::presentPluginWindow (const Node& node, const bool focus)
 
     auto* window = windowManager->getPluginWindowFor (node);
     if (! window)
+    {
+        // Flag the window visible up front. A graph block embedding this node's editor
+        // watches this property and releases the editor synchronously, freeing the node's
+        // single editor slot so the window can create the node's real UI instead of
+        // falling back to a generic one.
+        Node target (node);
+        target.setProperty (tags::windowVisible, true);
         window = windowManager->createPluginWindowFor (node);
+        if (window == nullptr)
+            target.setProperty (tags::windowVisible, false);
+    }
 
     if (window != nullptr)
     {
