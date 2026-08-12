@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.2.x]
+
+### Fixed
+- Blocks embedded in the graph return to their embedded state when the plugin window is closed.
+
 ## [1.2.0]
 
 ### Added
