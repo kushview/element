@@ -310,56 +310,62 @@ public:
             stopThread (1000);
         }
 
-        CloseHandle (folderHandle);
+        if (folderHandle != INVALID_HANDLE_VALUE)
+            CloseHandle (folderHandle);
     }
 
     void run() override
     {
-        constexpr int heapSize = 16 * 1024;
+        constexpr DWORD bufferSize = 16 * 1024;
+        constexpr DWORD filter = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME
+                                 | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE
+                                 | FILE_NOTIFY_CHANGE_CREATION;
 
-        DWORD bytesOut = 0;
+        // ReadDirectoryChangesW requires the buffer to be DWORD aligned.
+        alignas (DWORD) uint8_t buffer[bufferSize];
 
         while (! threadShouldExit())
         {
-            uint8_t buffer[heapSize] = {};
-            const BOOL success = ReadDirectoryChangesW (folderHandle, buffer, heapSize, true, FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION, &bytesOut, nullptr, nullptr);
+            DWORD bytesOut = 0;
+            const BOOL success = ReadDirectoryChangesW (folderHandle, buffer, bufferSize, TRUE, filter, &bytesOut, nullptr, nullptr);
 
-            if (success && bytesOut > 0)
+            if (threadShouldExit())
+                break;
+
+            if (! success)
             {
-                juce::ScopedLock sl (lock);
-
-                uint8_t* rawData = buffer;
-                while (true)
+                // Too many changes arrived at once and the buffer contents were
+                // discarded.  Nothing is known about what changed, so ask the
+                // listeners to re-read the whole folder.
+                if (GetLastError() == ERROR_NOTIFY_ENUM_DIR)
                 {
-                    const FILE_NOTIFY_INFORMATION* fni = reinterpret_cast<FILE_NOTIFY_INFORMATION*> (rawData);
+                    triggerAsyncUpdate();
+                    continue;
+                }
 
-                    auto eventType = FileSystemEvent::undefined;
-                    switch (fni->Action)
-                    {
-                        case FILE_ACTION_ADDED:
-                            eventType = fileCreated;
-                            break;
-                        case FILE_ACTION_RENAMED_NEW_NAME:
-                            eventType = fileRenamedNewName;
-                            break;
-                        case FILE_ACTION_MODIFIED:
-                            eventType = fileUpdated;
-                            break;
-                        case FILE_ACTION_REMOVED:
-                            eventType = fileDeleted;
-                            break;
-                        case FILE_ACTION_RENAMED_OLD_NAME:
-                            eventType = fileRenamedOldName;
-                            break;
-                        default:
-                            break;
-                    }
+                // The handle was closed, the io cancelled, or the folder went
+                // away.  Retrying would spin, so stop watching.
+                break;
+            }
 
-                    if (eventType == undefined)
-                    {
-                        continue;
-                    }
+            if (bytesOut == 0)
+                continue;
 
+            juce::ScopedLock sl (lock);
+
+            const uint8_t* rawData = buffer;
+            const uint8_t* const bufferEnd = buffer + juce::jmin (bytesOut, bufferSize);
+
+            for (;;)
+            {
+                if (rawData + sizeof (FILE_NOTIFY_INFORMATION) > bufferEnd)
+                    break;
+
+                const auto* const fni = reinterpret_cast<const FILE_NOTIFY_INFORMATION*> (rawData);
+                const auto eventType = eventTypeForAction (fni->Action);
+
+                if (eventType != FileSystemEvent::undefined)
+                {
                     Event e { folder.getChildFile (juce::String (fni->FileName, fni->FileNameLength / sizeof (wchar_t))), eventType };
 
                     if (std::ranges::none_of (events, [&] (const auto& event) {
@@ -368,16 +374,45 @@ public:
                     {
                         events.add (std::move (e));
                     }
-
-                    if (fni->NextEntryOffset > 0)
-                        rawData += fni->NextEntryOffset;
-                    else
-                        break;
                 }
 
-                if (! events.isEmpty())
-                    triggerAsyncUpdate();
+                if (fni->NextEntryOffset == 0)
+                    break;
+
+                rawData += fni->NextEntryOffset;
             }
+
+            triggerAsyncUpdate();
+        }
+    }
+
+    /** Maps a FILE_NOTIFY_INFORMATION action to a watcher event.
+
+        Windows defines actions beyond the five handled here (alternate data
+        stream and file id notifications, for example).  They carry no file
+        event of interest, but the entry they arrived in still has to be
+        skipped over.
+
+        @param action  the FILE_NOTIFY_INFORMATION::Action to convert
+        @return the matching event, or undefined when the action is not one
+                that listeners care about
+    */
+    static FileSystemEvent eventTypeForAction (DWORD action) noexcept
+    {
+        switch (action)
+        {
+            case FILE_ACTION_ADDED:
+                return fileCreated;
+            case FILE_ACTION_RENAMED_NEW_NAME:
+                return fileRenamedNewName;
+            case FILE_ACTION_MODIFIED:
+                return fileUpdated;
+            case FILE_ACTION_REMOVED:
+                return fileDeleted;
+            case FILE_ACTION_RENAMED_OLD_NAME:
+                return fileRenamedOldName;
+            default:
+                return FileSystemEvent::undefined;
         }
     }
 
