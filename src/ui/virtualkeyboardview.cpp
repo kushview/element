@@ -4,6 +4,7 @@
 #include <element/audioengine.hpp>
 #include "ui/guicommon.hpp"
 #include "ui/virtualkeyboardview.hpp"
+#include "utils.hpp"
 
 namespace element {
 
@@ -36,6 +37,7 @@ static int getOctaveOffsetForKeyPress (const KeyPress& key, const int fallback =
 VirtualKeyboardComponent::VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o)
     : MidiKeyboardComponent (s, o)
 {
+    setOctaveForMiddleC (Util::middleCOctave);
 }
 
 void VirtualKeyboardComponent::setKeypressOctaveOffset (int offset)

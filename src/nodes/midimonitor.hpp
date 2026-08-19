@@ -58,6 +58,14 @@ public:
 
     const StringArray& logger() const { return midiLog; }
 
+    /** Formats a MIDI message the way it appears in the monitor log.
+
+        @param msg the message to describe
+        @return the display text, or an empty string for messages that are not
+                logged (MIDI clock)
+    */
+    static juce::String describe (const juce::MidiMessage& msg);
+
 private:
     friend class MidiMonitorNodeEditor;
     friend class MidiMonitorBlock;

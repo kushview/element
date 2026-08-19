@@ -34,22 +34,36 @@ inline static String secondsToString (const double input)
     return minutesToString (input / 60.0);
 }
 
+/** The octave number given to middle C (MIDI note 60) everywhere note names are
+    displayed or parsed.
+
+    Element uses scientific pitch notation, middle C = C4, which is what most DAWs
+    show. Anything naming a MIDI note should go through noteValueToString() or use
+    this constant rather than passing its own number to juce::MidiMessage.
+*/
+inline constexpr int middleCOctave = 4;
+
+/** Converts a MIDI note number to its note name, e.g. "C4", "F#2", "A0".
+
+    @param value the MIDI note number, rounded to the nearest integer
+    @return the note name including its octave number
+*/
 inline static String noteValueToString (double value)
 {
-    return juce::MidiMessage::getMidiNoteName (juce::roundToInt (value), true, true, 3);
+    return juce::MidiMessage::getMidiNoteName (juce::roundToInt (value), true, true, middleCOctave);
 }
 
-/** Parses a note name (e.g. "C3", "F#2", "Eb4") or a raw MIDI number into a
+/** Parses a note name (e.g. "C4", "F#2", "Eb4") or a raw MIDI number into a
     MIDI note number 0-127.
 
-    Uses the same octave-for-middle-C convention as noteValueToString (middle C = C3),
+    Uses the same octave-for-middle-C convention as noteValueToString (middle C = C4),
     so this is the inverse of that function.
 
     @param text             the text to parse
     @param octaveForMiddleC the octave number assigned to middle C (note 60)
     @return the MIDI note number 0-127, or -1 if the text cannot be parsed
 */
-inline static int noteValueFromString (const juce::String& text, int octaveForMiddleC = 3)
+inline static int noteValueFromString (const juce::String& text, int octaveForMiddleC = middleCOctave)
 {
     const auto trimmed = text.trim();
     if (trimmed.isEmpty())
