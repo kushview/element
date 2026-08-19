@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "nodes/midimonitor.hpp"
+#include "utils.hpp"
 
 namespace element {
 
@@ -72,6 +73,32 @@ void MidiMonitorNode::clearMessages()
     messagesLogged();
 }
 
+String MidiMonitorNode::describe (const MidiMessage& msg)
+{
+    if (msg.isMidiClock())
+        return {};
+
+    if (msg.isMidiStart())
+        return "Start";
+    if (msg.isMidiStop())
+        return "Stop";
+    if (msg.isMidiContinue())
+        return "Continue";
+
+    if (msg.isNoteOn() || msg.isNoteOff())
+    {
+        String text;
+        text << (msg.isNoteOn() ? "Note On " : "Note Off ")
+             << Util::noteValueToString (msg.getNoteNumber())
+             << " (" << msg.getNoteNumber() << ")"
+             << " Velocity " << (int) msg.getVelocity()
+             << " Channel " << msg.getChannel();
+        return text;
+    }
+
+    return msg.getDescription();
+}
+
 void MidiMonitorNode::timerCallback()
 {
     midiTemp.clear();
@@ -80,48 +107,13 @@ void MidiMonitorNode::timerCallback()
         return;
 
     int numLogged = 0;
-    String text;
     for (auto m : midiTemp)
     {
-        auto msg = m.getMessage();
-        if (msg.isMidiClock())
-        {
-            text.clear();
+        const auto text = describe (m.getMessage());
+        if (text.isEmpty())
             continue;
-        }
 
-        if (msg.isMidiStart())
-            text << "Start";
-        else if (msg.isMidiStop())
-            text << "Stop";
-        else if (msg.isMidiContinue())
-            text << "Continue";
-
-        if (text.isNotEmpty())
-        {
-            midiLog.add (text);
-        }
-        else if (msg.isNoteOn())
-        {
-            text.clear();
-            text << "Note On "
-                 << msg.getMidiNoteName (msg.getNoteNumber(), true, true, 5)
-                 << " (" << msg.getNoteNumber() << ") "
-                 << " Velocity " << msg.getVelocity()
-                 << " Channel " << msg.getChannel();
-        }
-        else if (msg.isNoteOff())
-        {
-            text.clear();
-            text << "Note Off "
-                 << msg.getMidiNoteName (msg.getNoteNumber(), true, true, 5)
-                 << " (" << msg.getNoteNumber() << ") "
-                 << " Velocity " << msg.getVelocity()
-                 << " Channel " << msg.getChannel();
-        }
-
-        midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
-        text.clear();
+        midiLog.add (text);
         ++numLogged;
     }
 

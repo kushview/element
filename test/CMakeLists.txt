@@ -77,6 +77,7 @@ add_test(NAME "MidiMappingSessionTests" COMMAND test_element --run_test=MidiMapp
 add_test(NAME "MappingEngineTests" COMMAND test_element --run_test=MappingEngineTests)
 add_test(NAME "MappingLearnTests" COMMAND test_element --run_test=MappingLearnTests)
 add_test(NAME "MidiClockTest" COMMAND test_element --run_test=MidiClockTest)
+add_test(NAME "MidiMonitorTests" COMMAND test_element --run_test=MidiMonitorTests)
 add_test(NAME "MidiProgramMapTests" COMMAND test_element --run_test=MidiProgramMapTests)
 add_test(NAME "MidiProgramTests" COMMAND test_element --run_test=MidiProgramTests)
 add_test(NAME "MidiScriptTests" COMMAND test_element --run_test=MidiScriptTests)

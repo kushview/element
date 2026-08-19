@@ -2,8 +2,13 @@
 
 ## [1.2.x]
 
+### Changed
+- Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.
+
 ### Fixed
 - Blocks embedded in the graph return to their embedded state when the plugin window is closed.
+- MIDI Monitor note names displayed two octaves too high.
+- MIDI Monitor logged Start/Stop/Continue messages twice.
 
 ## [1.2.0]
 
