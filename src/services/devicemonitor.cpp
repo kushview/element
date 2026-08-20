@@ -179,10 +179,22 @@ void AudioDeviceMonitor::onChangeEvent()
         }
 
         case State::waiting: {
-            if (device.open && ! matchesDesired (device))
+            if (device.open)
             {
-                // Something opened a device we didn't ask for.
-                backend.closeDevice();
+                // A user-chosen setup updates the manager's explicit
+                // settings; adopt it. A device opened behind our back does
+                // not, and gets closed to keep the no-substitution policy.
+                updateDesiredFromBackend();
+                if (matchesDesired (device))
+                {
+                    lastTicks = backend.ioTicks();
+                    staleCount = pollCount = 0;
+                    setState (State::active, desiredDisplayName());
+                }
+                else
+                {
+                    backend.closeDevice();
+                }
                 break;
             }
 
@@ -237,6 +249,9 @@ void AudioDeviceMonitor::onTimerTick()
         }
 
         case State::waiting: {
+            if (backend.currentDevice().open)
+                break; // change event pending; onChangeEvent decides
+
             if (++pollCount < reconnectPollTicks)
                 break;
             pollCount = 0;
@@ -258,7 +273,7 @@ void AudioDeviceMonitor::onResume()
     staleCount = 0;
     lastTicks = backend.ioTicks();
 
-    if (current.state == State::waiting)
+    if (current.state == State::waiting && ! backend.currentDevice().open)
     {
         pollCount = 0;
         if (! backend.presenceDetectable (desiredType) || desiredPresent (true))

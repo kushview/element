@@ -356,4 +356,54 @@ BOOST_FIXTURE_TEST_CASE (ResumeRestoresWhileWaiting, MonitorFixture)
     BOOST_CHECK_EQUAL (backend.openCalls, 1);
 }
 
+BOOST_FIXTURE_TEST_CASE (UserPickAdoptedWhileWaiting, MonitorFixture)
+{
+    makeWaiting();
+    const auto closesBefore = backend.closeCalls;
+
+    // A user pick goes through setAudioDeviceSetup (treatAsChosenDevice),
+    // so the manager's explicit settings reflect the new device.
+    auto chosen = makeSetup ("TestType", "Other Device", "Other Device");
+    backend.openFromSetup (*chosen);
+    monitor.onChangeEvent();
+
+    BOOST_CHECK (monitor.status().state == AudioDeviceMonitor::State::active);
+    BOOST_CHECK_EQUAL (monitor.status().deviceName.toStdString(), "Other Device");
+    BOOST_CHECK_EQUAL (backend.closeCalls, closesBefore);
+    BOOST_CHECK_EQUAL (backend.persistCalls, 1);
+    BOOST_REQUIRE (backend.persisted != nullptr);
+    BOOST_CHECK_EQUAL (backend.persisted->getStringAttribute ("audioOutputDeviceName").toStdString(),
+                       "Other Device");
+
+    // A later disconnect waits for the adopted device, not the old one.
+    backend.present = false;
+    monitor.onChangeEvent();
+    BOOST_CHECK (monitor.status().state == AudioDeviceMonitor::State::waiting);
+    BOOST_CHECK_EQUAL (monitor.status().deviceName.toStdString(), "Other Device");
+}
+
+BOOST_FIXTURE_TEST_CASE (NoRestoreAttemptWhilePickPending, MonitorFixture)
+{
+    makeWaiting();
+    backend.detectable = false; // blind-restore path (e.g. ALSA)
+    const auto closesBefore = backend.closeCalls;
+
+    // The user picked a device but its change event hasn't run yet.
+    auto chosen = makeSetup ("TestType", "Other Device", "Other Device");
+    backend.openFromSetup (*chosen);
+
+    for (int i = 0; i < AudioDeviceMonitor::reconnectPollTicks * 2; ++i)
+        monitor.onTimerTick();
+    BOOST_CHECK_EQUAL (backend.openCalls, 0);
+    BOOST_CHECK_EQUAL (backend.closeCalls, closesBefore);
+
+    monitor.onResume();
+    BOOST_CHECK_EQUAL (backend.openCalls, 0);
+
+    // The deferred change event then adopts the pick.
+    monitor.onChangeEvent();
+    BOOST_CHECK (monitor.status().state == AudioDeviceMonitor::State::active);
+    BOOST_CHECK_EQUAL (monitor.status().deviceName.toStdString(), "Other Device");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -402,7 +402,11 @@ void Application::suspended() {}
 void Application::resumed()
 {
     auto& devices (world->devices());
-    devices.restartLastAudioDevice();
+    // Restarting with an empty setup asserts; if nothing was ever open the
+    // device monitor owns any restore that might be needed.
+    const auto setup = devices.getAudioDeviceSetup();
+    if (setup.inputDeviceName.isNotEmpty() || setup.outputDeviceName.isNotEmpty())
+        devices.restartLastAudioDevice();
     if (auto* const deviceService = world->services().find<DeviceService>())
         deviceService->onResume();
 }
