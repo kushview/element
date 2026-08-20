@@ -273,7 +273,6 @@ public:
         addAndMakeVisible (streamingStatusLabel);
         addAndMakeVisible (statusLabel);
 
-        statusLabel.setMouseCursor (MouseCursor::PointingHandCursor);
         statusLabel.setTooltip ("Double-click to open audio settings");
         statusLabel.onDoubleClicked = [this]() {
             if (auto* const ui = world.services().find<UI>())
@@ -379,7 +378,7 @@ public:
             if (deviceStatus.state == AudioDeviceMonitor::State::waiting
                 && deviceStatus.deviceName.isNotEmpty())
             {
-                statusLabel.setText (String ("Disconnected - waiting for ") + deviceStatus.deviceName,
+                statusLabel.setText (String ("Disconnected: ") + deviceStatus.deviceName,
                                      dontSendNotification);
             }
             else
