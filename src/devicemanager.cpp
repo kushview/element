@@ -1,8 +1,21 @@
 // Copyright 2014-2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <functional>
+
 #include <element/devices.hpp>
 #include "engine/jack.hpp"
+
+#if JUCE_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <dbt.h>
+#endif
 
 namespace element {
 
@@ -96,6 +109,105 @@ private:
     std::unique_ptr<AudioIODeviceType> inner;
 };
 
+#if JUCE_WINDOWS
+
+/** Watches WM_DEVICECHANGE for audio-class hardware arrival and removal.
+
+    ASIO device types never report list changes on hot plug — their scan only
+    reads the registry — so this is the sole signal that ASIO hardware
+    actually appeared or disappeared. Registration is filtered to
+    KSCATEGORY_AUDIO device interfaces so unrelated hardware (USB sticks,
+    mice) does not trigger callbacks.
+
+    The window is created on the message thread and JUCE pumps all messages
+    there, so the WndProc and the debounced callback both run on the message
+    thread; no cross-thread marshalling is needed.
+
+    A hidden top-level window is required: message-only (HWND_MESSAGE)
+    windows never receive WM_DEVICECHANGE broadcasts.
+*/
+class AudioHardwareWatcher : private Timer
+{
+public:
+    explicit AudioHardwareWatcher (std::function<void()> callback)
+        : onChange (std::move (callback))
+    {
+        JUCE_ASSERT_MESSAGE_THREAD
+
+        const auto className = "ElementHWWatch_"
+                               + String::toHexString (Time::getHighResolutionTicks());
+        instance = (HINSTANCE) Process::getCurrentModuleInstanceHandle();
+
+        WNDCLASSEXW wc = {};
+        wc.cbSize = sizeof (wc);
+        wc.lpfnWndProc = wndProc;
+        wc.hInstance = instance;
+        wc.lpszClassName = className.toWideCharPointer();
+        atom = RegisterClassExW (&wc);
+        if (atom == 0)
+            return;
+
+        hwnd = CreateWindowExW (0, className.toWideCharPointer(), L"", 0, 0, 0, 0, 0, nullptr, nullptr, instance, nullptr);
+        if (hwnd == nullptr)
+            return;
+
+        SetWindowLongPtrW (hwnd, GWLP_USERDATA, (LONG_PTR) this);
+
+        // KSCATEGORY_AUDIO: the device interface class registered by audio
+        // hardware drivers.
+        static const GUID kscategoryAudio = {
+            0x6994AD04, 0x93EF, 0x11D0, { 0xA3, 0xCC, 0x00, 0xA0, 0xC9, 0x22, 0x31, 0x96 }
+        };
+
+        DEV_BROADCAST_DEVICEINTERFACE_W filter = {};
+        filter.dbcc_size = sizeof (filter);
+        filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+        filter.dbcc_classguid = kscategoryAudio;
+        notify = RegisterDeviceNotificationW (hwnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
+    }
+
+    ~AudioHardwareWatcher() override
+    {
+        stopTimer();
+        if (notify != nullptr)
+            UnregisterDeviceNotification (notify);
+        if (hwnd != nullptr)
+            DestroyWindow (hwnd);
+        if (atom != 0)
+            UnregisterClassW ((LPCWSTR) MAKEINTATOM (atom), instance);
+    }
+
+private:
+    static LRESULT CALLBACK wndProc (HWND h, UINT message, WPARAM wParam, LPARAM lParam)
+    {
+        if (message == WM_DEVICECHANGE
+            && (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE))
+        {
+            // Restarting the timer coalesces bursts, e.g. composite devices
+            // exposing several interfaces.
+            if (auto* const self = reinterpret_cast<AudioHardwareWatcher*> (
+                    GetWindowLongPtrW (h, GWLP_USERDATA)))
+                self->startTimer (500);
+        }
+
+        return DefWindowProcW (h, message, wParam, lParam);
+    }
+
+    void timerCallback() override
+    {
+        stopTimer();
+        onChange();
+    }
+
+    std::function<void()> onChange;
+    HINSTANCE instance {};
+    ATOM atom {};
+    HWND hwnd {};
+    HDEVNOTIFY notify {};
+};
+
+#endif // JUCE_WINDOWS
+
 } // namespace
 
 class DeviceManager::Private
@@ -115,6 +227,10 @@ public:
     // Owned by the base class' device type list. Kept for direct access to
     // the unwrapped hardware lists (see isDevicePresent).
     juce::Array<WatchedDeviceType*> watched;
+
+#if JUCE_WINDOWS
+    std::unique_ptr<AudioHardwareWatcher> hardwareWatcher;
+#endif
 };
 
 DeviceManager::DeviceManager()
@@ -181,6 +297,14 @@ void DeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& list)
 #endif
 
     addWatched (AudioIODeviceType::createAudioIODeviceType_ASIO());
+
+#if JUCE_WINDOWS
+    // ASIO cannot report hot plug itself; watch the OS instead.
+    if (impl->hardwareWatcher == nullptr)
+        impl->hardwareWatcher = std::make_unique<AudioHardwareWatcher> (
+            [this] { sigDeviceListChanged(); });
+#endif
+
     addWatched (AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::exclusive));
     addWatched (AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::sharedLowLatency));
     addWatched (AudioIODeviceType::createAudioIODeviceType_DirectSound());

@@ -112,6 +112,7 @@ void AudioDeviceMonitor::enterWaiting()
 {
     staleCount = 0;
     pollCount = 0;
+    fastRetries = retryCooldown = 0;
     if (backend.currentDevice().open)
         backend.closeDevice();
     setState (State::waiting, desiredDisplayName());
@@ -140,6 +141,7 @@ void AudioDeviceMonitor::attemptRestore()
         }
         lastTicks = backend.ioTicks();
         staleCount = 0;
+        fastRetries = retryCooldown = 0;
         setState (State::active, desiredDisplayName());
     }
     else
@@ -198,7 +200,11 @@ void AudioDeviceMonitor::onChangeEvent()
                 break;
             }
 
-            if (desiredPresent (false))
+            // Never blind-restore an event-driven type from a generic change
+            // broadcast: its cached list always claims the device exists, and
+            // a failed open stalls the message thread for seconds.
+            if (backend.reconnectPolicy (desiredType) != ReconnectPolicy::eventDriven
+                && desiredPresent (false))
                 attemptRestore();
             break;
         }
@@ -213,6 +219,38 @@ void AudioDeviceMonitor::onChangeEvent()
             break;
         }
     }
+}
+
+void AudioDeviceMonitor::onHardwareEvent()
+{
+    if (restoring)
+        return;
+
+    if (current.state == State::waiting
+        && ! backend.currentDevice().open
+        && backend.reconnectPolicy (desiredType) == ReconnectPolicy::eventDriven)
+    {
+        if (retryCooldown > 0)
+            return; // a recent attempt already failed; the fast retries cover it
+        if (! desiredPresent (false))
+            return;
+
+        attemptRestore();
+
+        if (current.state == State::waiting)
+        {
+            // The attempt failed; the driver may just need a moment after
+            // the OS announced arrival. Retry a few times at the fast
+            // cadence before falling back to the safety net.
+            retryCooldown = reconnectPollTicks;
+            fastRetries = hardwareEventRetries;
+            pollCount = 0;
+        }
+        return;
+    }
+
+    // All other states and policies: same handling as a manager change.
+    onChangeEvent();
 }
 
 void AudioDeviceMonitor::onTimerTick()
@@ -242,7 +280,10 @@ void AudioDeviceMonitor::onTimerTick()
             }
             else if (staleCount >= staleTicksBeforeConfirm)
             {
-                if (! desiredPresent (true))
+                // Only pollPresence lists can actually report absence;
+                // registry/cached lists always claim the device exists.
+                if (backend.reconnectPolicy (desiredType) == ReconnectPolicy::pollPresence
+                    && ! desiredPresent (true))
                     enterWaiting();
             }
             break;
@@ -252,14 +293,34 @@ void AudioDeviceMonitor::onTimerTick()
             if (backend.currentDevice().open)
                 break; // change event pending; onChangeEvent decides
 
-            if (++pollCount < reconnectPollTicks)
+            if (retryCooldown > 0)
+                --retryCooldown;
+
+            const auto policy = backend.reconnectPolicy (desiredType);
+            const int interval = policy == ReconnectPolicy::eventDriven && fastRetries <= 0
+                                     ? safetyNetPollTicks
+                                     : reconnectPollTicks;
+            if (++pollCount < interval)
                 break;
             pollCount = 0;
 
-            if (! backend.presenceDetectable (desiredType))
-                attemptRestore(); // a failed open of a missing device fails fast
-            else if (desiredPresent (true))
-                attemptRestore();
+            switch (policy)
+            {
+                case ReconnectPolicy::pollPresence:
+                    if (desiredPresent (true))
+                        attemptRestore();
+                    break;
+                case ReconnectPolicy::pollBlind:
+                    attemptRestore(); // a failed open of a missing device fails fast
+                    break;
+                case ReconnectPolicy::eventDriven:
+                    // Fast retry after a hardware event, else the slow
+                    // safety net in case a notification was missed.
+                    if (fastRetries > 0)
+                        --fastRetries;
+                    attemptRestore();
+                    break;
+            }
             break;
         }
 
@@ -276,7 +337,9 @@ void AudioDeviceMonitor::onResume()
     if (current.state == State::waiting && ! backend.currentDevice().open)
     {
         pollCount = 0;
-        if (! backend.presenceDetectable (desiredType) || desiredPresent (true))
+        // One attempt on wake is acceptable even for event-driven types.
+        const auto policy = backend.reconnectPolicy (desiredType);
+        if (policy != ReconnectPolicy::pollPresence || desiredPresent (true))
             attemptRestore();
     }
 }

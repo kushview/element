@@ -19,7 +19,11 @@ namespace element {
     Policy: when the desired device disconnects, close it and wait — never
     auto-select a replacement. When the desired device reappears, restore it
     with the last saved setup. User-initiated setup changes are persisted
-    immediately.
+    immediately. How reconnection is attempted depends on the device type's
+    ReconnectPolicy: by polling presence, by polling opens when presence is
+    undetectable but cheap to try, or — where a failed open stalls the
+    message thread (ASIO) — only on platform hardware events plus a slow
+    safety-net poll.
 
     All methods must be called from the message thread.
 */
@@ -48,6 +52,16 @@ public:
         juce::String inputName, outputName;
     };
 
+    /** How the monitor tries to reconnect a lost device of a given type. */
+    enum class ReconnectPolicy
+    {
+        pollPresence, //!< Presence is detectable by rescanning; poll it, open when found.
+        pollBlind, //!< Presence undetectable but a failed open is cheap (ALSA).
+        eventDriven //!< Presence undetectable and a failed open blocks the message
+        //!< thread for seconds (ASIO); open only on hardware events
+        //!< plus a slow safety-net poll.
+    };
+
     /** Bridge to the real device manager, engine, and settings. */
     struct Backend
     {
@@ -62,9 +76,8 @@ public:
                                       const juce::String& deviceName,
                                       bool rescan) = 0;
 
-        /** Returns false when the platform cannot report device presence
-            reliably (e.g. ALSA's device list is cached forever). */
-        virtual bool presenceDetectable (const juce::String& typeName) = 0;
+        /** Returns the reconnect policy for a device type. */
+        virtual ReconnectPolicy reconnectPolicy (const juce::String& typeName) = 0;
 
         /** Tries to open the device described by a DEVICESETUP element.
             @return an empty string on success, otherwise the error */
@@ -94,6 +107,13 @@ public:
     static constexpr int staleTicksBeforeForce = 8;
     /** Timer ticks between reconnect attempts while waiting. */
     static constexpr int reconnectPollTicks = 3;
+    /** Timer ticks between safety-net reconnect attempts for event-driven
+        types, in case a hardware notification was missed. */
+    static constexpr int safetyNetPollTicks = 30;
+    /** Fast retries (at reconnectPollTicks cadence) after a hardware event
+        whose restore attempt failed — drivers often need a moment after
+        the OS announces arrival. */
+    static constexpr int hardwareEventRetries = 2;
 
     explicit AudioDeviceMonitor (Backend& backendToUse);
 
@@ -103,6 +123,11 @@ public:
 
     /** Call (deferred) when the device manager broadcasts any change. */
     void onChangeEvent();
+
+    /** Call (deferred) when the platform reported audio hardware arrival or
+        removal. Unlike onChangeEvent, this may attempt a restore even when
+        presence cannot be verified (event-driven policy). */
+    void onHardwareEvent();
 
     /** Call about once per second from a timer. */
     void onTimerTick();
@@ -124,6 +149,8 @@ private:
     uint64_t lastTicks { 0 };
     int staleCount { 0 };
     int pollCount { 0 };
+    int fastRetries { 0 };
+    int retryCooldown { 0 };
 
     bool hasDesired() const noexcept;
     juce::String desiredDisplayName() const;

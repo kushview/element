@@ -22,7 +22,9 @@ public:
     void attach (AudioEnginePtr engine);
 
     /** Fires on the message thread whenever an audio device type reports that
-        its device list changed, e.g. an interface was plugged in or removed. */
+        its device list changed, e.g. an interface was plugged in or removed —
+        or, on Windows, when audio-class hardware arrived or was removed
+        (ASIO cannot report this itself). */
     Signal<void()> sigDeviceListChanged;
 
     /** Checks whether a device is physically present in a device type's list.

@@ -1,6 +1,8 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <utility>
+
 #include <element/audioengine.hpp>
 #include <element/context.hpp>
 #include <element/devices.hpp>
@@ -42,11 +44,18 @@ public:
         return context.devices().isDevicePresent (typeName, deviceName, rescan);
     }
 
-    bool presenceDetectable (const juce::String& typeName) override
+    AudioDeviceMonitor::ReconnectPolicy reconnectPolicy (const juce::String& typeName) override
     {
+        // ASIO's scan only reads the registry, so absence is undetectable,
+        // and a failed open blocks the message thread for seconds.
+        if (typeName == "ASIO")
+            return AudioDeviceMonitor::ReconnectPolicy::eventDriven;
         // ALSA's device list is scanned once and cached for the lifetime of
-        // the type object, so absence can never be re-detected there.
-        return typeName != "ALSA";
+        // the type object, so absence can never be re-detected there — but a
+        // failed open of a missing device fails fast.
+        if (typeName == "ALSA")
+            return AudioDeviceMonitor::ReconnectPolicy::pollBlind;
+        return AudioDeviceMonitor::ReconnectPolicy::pollPresence;
     }
 
     juce::String attemptOpenDesired (const juce::XmlElement& xml) override
@@ -134,7 +143,7 @@ public:
         statusConnection = monitor->sigStatusChanged.connect (
             [this] (const AudioDeviceMonitor::Status& status) { owner.sigAudioDeviceStatus (status); });
         listChangedConnection = context.devices().sigDeviceListChanged.connect (
-            [this]() { triggerAsyncUpdate(); });
+            [this]() { hardwareEvent = true; triggerAsyncUpdate(); });
 
         // Kept for detach: the device manager outlives the services in
         // Context teardown, but context() itself is not reachable there.
@@ -153,6 +162,7 @@ public:
     {
         stopTimer();
         cancelPendingUpdate();
+        hardwareEvent = false;
         listChangedConnection.disconnect();
         statusConnection.disconnect();
 
@@ -187,7 +197,12 @@ private:
 
     void handleAsyncUpdate() override
     {
-        if (monitor != nullptr)
+        const bool hardware = std::exchange (hardwareEvent, false);
+        if (monitor == nullptr)
+            return;
+        if (hardware)
+            monitor->onHardwareEvent();
+        else
             monitor->onChangeEvent();
     }
 
@@ -202,6 +217,7 @@ private:
     std::unique_ptr<AudioDeviceMonitor> monitor;
     SignalConnection statusConnection, listChangedConnection;
     DeviceManager* devices { nullptr };
+    bool hardwareEvent { false };
 };
 
 DeviceService::DeviceService()
