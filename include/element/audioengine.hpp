@@ -68,6 +68,24 @@ public:
     juce::AudioIODeviceCallback& getAudioIODeviceCallback();
     juce::MidiInputCallback& getMidiInputCallback();
 
+    /** Returns the total number of audio IO callbacks processed so far.
+
+        Increments once per audio block while the device is running. Poll it
+        from a timer to detect a device whose callbacks have silently stopped.
+
+        @return the number of audio IO callbacks processed
+    */
+    uint64_t ioCallbackTicks() const;
+
+    /** Returns and clears the last device error reported by the audio device.
+
+        Errors are reported by some backends (e.g. CoreAudio) when a device
+        fails mid-stream. Safe to call from the message thread.
+
+        @return the last error message, or an empty string if none occurred
+    */
+    juce::String lastDeviceErrorMessage();
+
     /** For use by external systems only! e.g. the AU/VST version of Element and
         possibly things like rendering in the future
      */

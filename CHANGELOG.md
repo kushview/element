@@ -3,12 +3,16 @@
 ## [1.2.x]
 
 ### Changed
+- Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.
 - Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.
 
 ### Fixed
+- Freeze on Windows when an ASIO audio interface is disconnected. Reconnection is now driven by system hardware notifications instead of repeatedly probing the driver.
 - Blocks embedded in the graph return to their embedded state when the plugin window is closed.
 - MIDI Monitor note names displayed two octaves too high.
 - MIDI Monitor logged Start/Stop/Continue messages twice.
+- CLAP: plugin UIs displaying incorrectly on Linux.
+- Windows: the file watcher spun at 100% CPU and could prevent a clean shutdown when unhandled file change notifications were delivered (e.g. by OneDrive).
 
 ## [1.2.0]
 

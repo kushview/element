@@ -7,10 +7,13 @@
 #include <element/devices.hpp>
 #include <element/node.hpp>
 #include <element/plugins.hpp>
+#include <element/ui.hpp>
 #include <element/ui/commands.hpp>
 #include <element/ui/content.hpp>
+#include <element/ui/preferences.hpp>
 #include <element/ui/style.hpp>
 
+#include "services/deviceservice.hpp"
 #include "services/mappingservice.hpp"
 #include "services/sessionservice.hpp"
 #include "ui/midiblinker.hpp"
@@ -243,6 +246,21 @@ class Content::StatusBar : public Component,
                            private Timer
 {
 public:
+    /** Label that invokes a handler when double-clicked. */
+    class ClickableLabel : public Label
+    {
+    public:
+        std::function<void()> onDoubleClicked;
+
+        void mouseDoubleClick (const MouseEvent& ev) override
+        {
+            if (onDoubleClicked)
+                onDoubleClicked();
+            else
+                Label::mouseDoubleClick (ev);
+        }
+    };
+
     StatusBar (Context& g)
         : world (g),
           devices (world.devices()),
@@ -254,6 +272,16 @@ public:
         addAndMakeVisible (sampleRateLabel);
         addAndMakeVisible (streamingStatusLabel);
         addAndMakeVisible (statusLabel);
+
+        statusLabel.setTooltip ("Double-click to open audio settings");
+        statusLabel.onDoubleClicked = [this]() {
+            if (auto* const ui = world.services().find<UI>())
+                ui->showPreferencesDialog (ELEMENT_AUDIO_SETTINGS_NAME);
+        };
+
+        if (auto* const deviceService = world.services().find<DeviceService>())
+            deviceStatusConnection = deviceService->sigAudioDeviceStatus.connect (
+                [this] (const AudioDeviceMonitor::Status&) { updateLabels(); });
 
         const Font font (FontOptions (12.0f));
 
@@ -273,6 +301,7 @@ public:
 
     ~StatusBar()
     {
+        deviceStatusConnection.disconnect();
         latencySamplesChangedConnection.disconnect();
         sampleRate.removeListener (this);
         streamingStatus.removeListener (this);
@@ -341,7 +370,22 @@ public:
         {
             sampleRateLabel.setText ("N/A", dontSendNotification);
             streamingStatusLabel.setText ("N/A", dontSendNotification);
-            statusLabel.setText ("No Device", dontSendNotification);
+
+            AudioDeviceMonitor::Status deviceStatus;
+            if (auto* const deviceService = world.services().find<DeviceService>())
+                deviceStatus = deviceService->audioDeviceStatus();
+
+            if (deviceStatus.state == AudioDeviceMonitor::State::waiting
+                && deviceStatus.deviceName.isNotEmpty())
+            {
+                statusLabel.setText (String ("Disconnected: ") + deviceStatus.deviceName,
+                                     dontSendNotification);
+            }
+            else
+            {
+                statusLabel.setText ("No Device", dontSendNotification);
+            }
+
             statusLabel.setColour (Label::textColourId, Colors::toggleRed);
         }
 
@@ -362,11 +406,13 @@ private:
     DeviceManager& devices;
     PluginManager& plugins;
 
-    Label sampleRateLabel, streamingStatusLabel, statusLabel;
+    Label sampleRateLabel, streamingStatusLabel;
+    ClickableLabel statusLabel;
     ValueTree node;
     Value sampleRate, streamingStatus, status;
 
     SignalConnection latencySamplesChangedConnection;
+    SignalConnection deviceStatusConnection;
 
     friend class Timer;
     void timerCallback() override
