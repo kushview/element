@@ -381,6 +381,7 @@ public:
                                            const AudioIODeviceCallbackContext& context) override
     {
         jassert (sampleRate > 0 && blockSize > 0);
+        ioTicks.fetch_add (1, std::memory_order_relaxed);
         int totalNumChans = 0;
         ScopedNoDenormals denormals;
 
@@ -584,6 +585,14 @@ public:
         audioStopped();
     }
 
+    void audioDeviceError (const String& errorMessage) override
+    {
+        // Can arrive on arbitrary threads (e.g. CoreAudio HAL). Only stash
+        // the message; the device monitor polls it from the message thread.
+        const ScopedLock sl (deviceErrorLock);
+        deviceErrorMessage = errorMessage;
+    }
+
     void audioStopped()
     {
         const ScopedLock sl (lock);
@@ -771,6 +780,10 @@ private:
     Atomic<double> midiOutLatency { 0.0 };
     std::atomic<bool> audioStarted { false };
 
+    std::atomic<uint64_t> ioTicks { 0 };
+    CriticalSection deviceErrorLock;
+    String deviceErrorMessage;
+
     ReferenceCountedArray<AudioEngine::LevelMeter> inMeters, outMeters;
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
@@ -834,6 +847,21 @@ AudioIODeviceCallback& AudioEngine::getAudioIODeviceCallback()
 {
     jassert (priv != nullptr);
     return *priv;
+}
+
+uint64_t AudioEngine::ioCallbackTicks() const
+{
+    jassert (priv != nullptr);
+    return priv->ioTicks.load (std::memory_order_relaxed);
+}
+
+String AudioEngine::lastDeviceErrorMessage()
+{
+    jassert (priv != nullptr);
+    const ScopedLock sl (priv->deviceErrorLock);
+    auto message = priv->deviceErrorMessage;
+    priv->deviceErrorMessage.clear();
+    return message;
 }
 MidiInputCallback& AudioEngine::getMidiInputCallback()
 {
