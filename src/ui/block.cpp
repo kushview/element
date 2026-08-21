@@ -832,7 +832,7 @@ void BlockComponent::paint (Graphics& g)
 
     if (isSelected())
     {
-        bgc = bgc.brighter (0.55f);
+        bgc = bgc.brighter (0.1f);
     }
 
     if (colorize)
@@ -841,7 +841,7 @@ void BlockComponent::paint (Graphics& g)
         {
             case Compact:
             case Small: {
-                g.setColour (selected ? barColor.brighter (0.275f) : barColor);
+                g.setColour (selected ? barColor.brighter (0.1f) : barColor);
                 g.fillRoundedRectangle (box.toFloat(), cornerSize);
                 break;
             }
@@ -872,6 +872,12 @@ void BlockComponent::paint (Graphics& g)
     {
         g.setColour (bgc.darker (0.6f));
         g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.3f);
+    }
+
+    if (isSelected())
+    {
+        g.setColour (Colors::toggleBlue);
+        g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.5f);
     }
 
     auto displayName = node.getDisplayName();

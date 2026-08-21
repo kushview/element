@@ -901,9 +901,18 @@ public:
         ScopedLock sl (lock);
         if (plugins.contains (format))
         {
+            const auto types = list.getTypes();
             for (const auto& file : plugins.getReference (format))
             {
-                if (nullptr != list.getTypeForFile (file))
+                bool known = nullptr != list.getTypeForFile (file);
+                // Provider formats (e.g. CLAP) store types as "pluginID:filePath".
+                for (int i = types.size(); --i >= 0 && ! known;)
+                {
+                    const auto& d = types.getReference (i);
+                    known = d.pluginFormatName == format
+                            && d.fileOrIdentifier.fromFirstOccurrenceOf (":", false, false) == file;
+                }
+                if (known)
                     continue;
                 auto* const desc = plugs.add (new PluginDescription());
                 desc->pluginFormatName = format;
@@ -931,6 +940,7 @@ private:
         cancelFlag.set (0);
 
         PluginManager pluginManager;
+        pluginManager.getNodeFactory().add (new CLAPProvider());
         pluginManager.addDefaultFormats();
         auto& manager (pluginManager.getAudioPluginFormats());
 
@@ -951,9 +961,21 @@ private:
 
         // Element Node Providers
         auto& factory = pluginManager.getNodeFactory();
-        for (auto provider : factory.providers())
+        for (auto* const provider : factory.providers())
         {
-            // FIXME: CLAP and other unverified support.
+            if (threadShouldExit() || cancelFlag.get() != 0)
+                break;
+
+            const auto formatName = provider->format();
+            FileSearchPath path = paths[formatName];
+            path.addPath (provider->defaultSearchPath());
+            // Providers with no search path (e.g. internal nodes) aren't file-based.
+            if (path.getNumPaths() <= 0)
+                continue;
+            const auto found = provider->findTypes (path, true, false);
+
+            ScopedLock sl (lock);
+            plugins.set (formatName, found);
         }
 
         cancelFlag.set (0);

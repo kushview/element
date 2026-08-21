@@ -31,29 +31,29 @@ public:
 
     inline void setPower (const bool powerOn, const bool notify = true)
     {
-        if (powerOn == mute.getToggleState())
+        if (powerOn == powerButton.getToggleState())
             return;
-        mute.setToggleState (powerOn, notify ? juce::sendNotification : juce::dontSendNotification);
+        powerButton.setToggleState (powerOn, notify ? juce::sendNotification : juce::dontSendNotification);
         if (notify)
             powerChanged();
     }
 
     inline void setMuted (const bool muted, const bool notify = true)
     {
-        if (muted == mute2.getToggleState())
+        if (muted == muteButton.getToggleState())
             return;
-        mute2.setToggleState (muted, notify ? juce::sendNotification : juce::dontSendNotification);
+        muteButton.setToggleState (muted, notify ? juce::sendNotification : juce::dontSendNotification);
         if (notify)
             muteChanged();
     }
 
-    inline bool isPowerOn() const { return mute.getToggleState(); }
+    inline bool isPowerOn() const { return powerButton.getToggleState(); }
     inline bool isPowerOff() const { return ! isPowerOn(); }
-    inline bool isMuted() const { return mute2.getToggleState(); }
+    inline bool isMuted() const { return muteButton.getToggleState(); }
 
     inline void setMuteButtonVisible (bool visible)
     {
-        mute2.setVisible (visible);
+        muteButton.setVisible (visible);
         resized();
     }
 
@@ -63,6 +63,9 @@ public:
     }
 
     void setMinMaxDecibels (double minDb, double maxDb);
+
+    /** Returns the minimum decibel value of the fader. */
+    double getMinDecibels() const { return fader.getMinimum(); }
 
     void addButton (Component*);
 
@@ -87,7 +90,6 @@ private:
     Slider fader;
     SimpleMeter meter;
     DecibelScale scale;
-    Label name;
     struct FaderStyle;
     std::unique_ptr<FaderStyle> _fstyle;
 
@@ -99,8 +101,8 @@ private:
         void settingLabelDoubleClicked() override;
     } volume;
 
-    PowerButton mute;
-    SettingButton mute2;
+    PowerButton powerButton;
+    SettingButton muteButton;
 
     OwnedArray<Component> extraButtons;
 

@@ -36,6 +36,16 @@ BOOST_AUTO_TEST_CASE (DefaultGraph)
     BOOST_REQUIRE (node.getName().isEmpty());
 }
 
+BOOST_AUTO_TEST_CASE (HiddenInMixer)
+{
+    Node node (types::Node);
+    BOOST_REQUIRE (! node.isHiddenInMixer());
+    node.setHiddenInMixer (true);
+    BOOST_REQUIRE (node.isHiddenInMixer());
+    node.setHiddenInMixer (false);
+    BOOST_REQUIRE (! node.isHiddenInMixer());
+}
+
 BOOST_AUTO_TEST_CASE (HiddenBlockPorts)
 {
     Node node (types::Node);

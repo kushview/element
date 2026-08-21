@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/ui/decibelscale.hpp>
+#include <element/ui/style.hpp>
 
 using namespace juce;
 
 namespace element {
 
 DecibelScale::DecibelScale()
-    : font (FontOptions (7.0f)), scale (0.0f), lastY (0)
+    : font (FontOptions (Style::fontSizeSmall)), scale (0.0f), lastY (0)
 {
     zeromem (levels, sizeof (int) * LevelCount);
-    setColour (markerColourId, Colour (0xFFCCCCCC));
+    setColour (markerColourId, Colors::textColor);
 }
 
 DecibelScale::~DecibelScale()

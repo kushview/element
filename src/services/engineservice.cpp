@@ -6,6 +6,7 @@
 #include <element/engine.hpp>
 #include <element/graph.hpp>
 #include <element/node.hpp>
+#include <element/nodefactory.hpp>
 #include <element/plugins.hpp>
 #include <element/services.hpp>
 #include <element/settings.hpp>
@@ -34,6 +35,42 @@ static void initializeRootGraphPorts (RootGraph* root, const Node& model)
     model.getPorts (ins, outs, PortType::Midi);
     root->setNumPorts (PortType::Midi, ins.size(), true, false);
     root->setNumPorts (PortType::Midi, outs.size(), false, false);
+}
+
+/** Scans an unverified plugin and registers it with the known plugins list.
+
+    Handles both JUCE audio plugin formats and Element node providers such
+    as CLAP, whose identifiers from the unverified scan are bare file paths.
+
+    @param plugins the plugin manager to verify against.
+    @param desc description of the unverified plugin to scan.
+    @param out receives the full descriptions produced by the scan.
+    @return true if at least one description was found and added.
+*/
+static bool verifyPlugin (PluginManager& plugins, const PluginDescription& desc, OwnedArray<PluginDescription>& out)
+{
+    auto& list = plugins.getKnownPlugins();
+
+    if (auto* const format = plugins.getAudioPluginFormat (desc.pluginFormatName))
+    {
+        list.removeFromBlacklist (desc.fileOrIdentifier);
+        list.removeType (desc);
+        return list.scanAndAddFile (desc.fileOrIdentifier, false, out, *format);
+    }
+
+    if (auto* const provider = plugins.getProvider (desc.pluginFormatName))
+    {
+        list.removeFromBlacklist (desc.fileOrIdentifier);
+        provider->scan (desc.fileOrIdentifier, out);
+        for (auto* const d : out)
+        {
+            list.removeType (*d);
+            list.addType (*d);
+        }
+        return ! out.isEmpty();
+    }
+
+    return false;
 }
 } // namespace detail
 
@@ -596,12 +633,7 @@ Node EngineService::addPlugin (const PluginDescription& desc, const bool verifie
     OwnedArray<PluginDescription> plugs;
     if (! verified)
     {
-        auto* format = context().plugins().getAudioPluginFormat (desc.pluginFormatName);
-        jassert (format != nullptr);
-        auto& list (context().plugins().getKnownPlugins());
-        list.removeFromBlacklist (desc.fileOrIdentifier);
-        list.removeType (desc);
-        if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
+        if (detail::verifyPlugin (context().plugins(), desc, plugs))
         {
             context().plugins().saveUserPlugins (context().settings());
         }
@@ -875,12 +907,7 @@ Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc,
         }
         else
         {
-            auto* format = context().plugins().getAudioPluginFormat (desc.pluginFormatName);
-            jassert (format != nullptr);
-
-            list.removeFromBlacklist (desc.fileOrIdentifier);
-
-            if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format))
+            if (detail::verifyPlugin (context().plugins(), desc, plugs))
             {
                 context().plugins().saveUserPlugins (context().settings());
             }

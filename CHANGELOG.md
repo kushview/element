@@ -2,8 +2,16 @@
 
 ## [1.2.x]
 
+### Added
+- CLAP plugins now appear in the Unverified plugin menu and can be added to a graph without a prior scan.
+- Graph Mixer: channel strips can be hidden via right-click and restored from the mixer background's right-click menu.
+
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.
+- Graph Mixer: larger fonts for node names, dB readouts and the meter scale, plus a higher-contrast layout.
+- Graph Mixer: channel strip name headers now use the node's block color from the graph editor.
+- Double-clicking a channel strip fader resets it to 0 dB.
+- Selected nodes now show the same accent outline in both the graph editor and the Graph Mixer.
 - Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.
 
 ### Fixed

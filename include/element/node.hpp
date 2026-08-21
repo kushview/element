@@ -199,7 +199,7 @@ public:
     juce::Value getMutedValue() { return getPropertyAsValue (tags::mute); }
 
     /** Returns true if inputs are muted */
-    bool isMutingInputs() const { return (bool) getProperty ("muteInput", false); }
+    bool isMutingInputs() const { return (bool) getProperty (tags::muteInput, false); }
 
     /** Change the mute status of this Node */
     void setMuted (bool);
@@ -456,6 +456,18 @@ public:
     juce::Colour getColor (juce::Colour fallback) const noexcept
     {
         return getUIValueTree().hasProperty ("color") ? getColor() : fallback;
+    }
+
+    /** Change whether this node's strip is hidden in the graph mixer. */
+    void setHiddenInMixer (bool hidden)
+    {
+        getUIValueTree().setProperty (tags::hiddenInMixer, hidden, nullptr);
+    }
+
+    /** Returns true if this node's strip should be hidden in the graph mixer. */
+    bool isHiddenInMixer() const noexcept
+    {
+        return (bool) getUIValueTree().getProperty (tags::hiddenInMixer, false);
     }
 
     /** Add a script to this node.

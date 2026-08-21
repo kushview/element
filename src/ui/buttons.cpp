@@ -55,7 +55,7 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
 
         if (text.isEmpty() && getClickingTogglesState())
             text = (getToggleState()) ? yes : no;
-        g.setFont (12.f);
+        g.setFont (Style::fontSizeDefault);
         g.setColour (getTextColour());
         g.drawText (text, getLocalBounds(), Justification::centred);
     }
