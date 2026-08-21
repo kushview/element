@@ -201,7 +201,7 @@ public:
 
         if (text.isNotEmpty())
         {
-            g.setFont (12.f);
+            g.setFont (fontSize);
             g.setColour (isEnabled() ? Colours::black : Colours::darkgrey);
             g.drawText (text, getLocalBounds(), Justification::centred);
         }
@@ -246,6 +246,13 @@ public:
     virtual void settingLabelDoubleClicked() {}
 
     void setDragable (const bool yn) { dragable = yn; }
+
+    /** Change the font size used to draw the value. */
+    void setFontSize (float newSize)
+    {
+        fontSize = newSize;
+        repaint();
+    }
 
     inline void setValue (double value)
     {
@@ -298,6 +305,7 @@ public:
     int places = 0;
     bool useMinMax = false;
     double minValue = 0.0, maxValue = 0.0;
+    float fontSize = Style::fontSizeDefault;
 
 private:
     bool dragable = true;
@@ -332,7 +340,7 @@ public:
 
         if (text.isNotEmpty())
         {
-            g.setFont (12.f);
+            g.setFont (Style::fontSizeDefault);
             g.setColour (isEnabled() ? Colours::black : Colours::darkgrey);
             g.drawText (text, getLocalBounds(), Justification::centred);
         }

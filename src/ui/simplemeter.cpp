@@ -254,9 +254,11 @@ void SimpleMeter::resized()
     }
 }
 
+static const Colour simpleMeterBackgroundColor (0xFF141414);
+
 void SimpleMeter::paint (Graphics& g)
 {
-    g.setColour (Colour (0xFF202020));
+    g.setColour (simpleMeterBackgroundColor);
     g.fillAll();
 }
 
@@ -265,7 +267,7 @@ void SimpleMeter::paintOverChildren (juce::Graphics& g)
     if (portCount < 2)
         return;
 
-    g.setColour (Colour (0xFF202020).darker (0.2f));
+    g.setColour (simpleMeterBackgroundColor.darker (0.2f));
     const int size = (horizontal ? getHeight() : getWidth()) / portCount;
     if (! horizontal)
     {

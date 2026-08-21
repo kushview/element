@@ -49,30 +49,27 @@ ChannelStripComponent::ChannelStripComponent()
     fader.setSkewFactor (2);
     fader.addListener (this);
     fader.setColour (Slider::trackColourId, Colours::black);
-    setColour (Slider::thumbColourId, Colours::black.brighter (0.2f));
+    fader.setColour (Slider::thumbColourId, Colours::black.brighter (0.2f));
+    fader.setDoubleClickReturnValue (true, 0.0);
     fader.setLookAndFeel (_fstyle.get());
 
     addAndMakeVisible (meter, 100);
     addAndMakeVisible (scale, 101);
 
-    addAndMakeVisible (name);
-    name.setFont (name.getFont().withHeight (14));
-    name.setJustificationType (Justification::centred);
-    name.setText ("Name", dontSendNotification);
+    addAndMakeVisible (powerButton);
+    powerButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
+    powerButton.setButtonText ("M");
+    powerButton.addListener (this);
 
-    addAndMakeVisible (mute);
-    mute.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
-    mute.setButtonText ("M");
-    mute.addListener (this);
-
-    addAndMakeVisible (mute2);
-    mute2.setYesNoText ("M", "M");
-    mute2.setButtonText ("M");
-    mute2.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
-    mute2.setColour (SettingButton::textColourId, Colours::black);
-    mute2.addListener (this);
+    addAndMakeVisible (muteButton);
+    muteButton.setYesNoText ("M", "M");
+    muteButton.setButtonText ("M");
+    muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
+    muteButton.setColour (SettingButton::textColourId, Colours::black);
+    muteButton.addListener (this);
 
     addAndMakeVisible (volume);
+    volume.setFontSize (Style::fontSizeLarge);
     volume.setNumDecimalPlaces (1);
     volume.setMinMax (fader.getMinimum(), fader.getMaximum());
     volume.setValue (fader.getValue());
@@ -112,7 +109,7 @@ void ChannelStripComponent::resized()
     auto r2 = r1.removeFromRight (r1.getWidth() / 2);
 
     r1.removeFromTop (4);
-    volume.setBounds (r1.removeFromTop (18).withSizeKeepingCentre (30, 18));
+    volume.setBounds (r1.removeFromTop (18).withSizeKeepingCentre (40, 18));
     r1.removeFromBottom (4);
 
     for (auto* const button : extraButtons)
@@ -121,12 +118,12 @@ void ChannelStripComponent::resized()
         r1.removeFromBottom (1);
     }
 
-    mute.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
+    powerButton.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
 
-    if (mute2.isVisible())
+    if (muteButton.isVisible())
     {
         r1.removeFromBottom (1);
-        mute2.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
+        muteButton.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
     }
 
     const int quarter = r2.getWidth() / 2;
@@ -140,14 +137,14 @@ void ChannelStripComponent::resized()
 
 void ChannelStripComponent::buttonClicked (Button* b)
 {
-    if (b == &mute)
+    if (b == &powerButton)
     {
-        mute.setToggleState (! mute.getToggleState(), juce::dontSendNotification);
+        powerButton.setToggleState (! powerButton.getToggleState(), juce::dontSendNotification);
         powerChanged();
     }
-    else if (b == &mute2)
+    else if (b == &muteButton)
     {
-        mute2.setToggleState (! mute2.getToggleState(), juce::dontSendNotification);
+        muteButton.setToggleState (! muteButton.getToggleState(), juce::dontSendNotification);
         muteChanged();
     }
 }

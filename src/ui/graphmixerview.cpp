@@ -18,7 +18,7 @@ class GraphMixerChannelStrip : public NodeChannelStripComponent,
                                public ComponentListener
 {
 public:
-    std::function<void()> onReordered;
+    std::function<void()> onRefreshNeeded;
 
     GraphMixerChannelStrip (GuiService& gui) : NodeChannelStripComponent (gui, false)
     {
@@ -43,12 +43,29 @@ public:
 
     void mouseDown (const MouseEvent& ev) override
     {
+        if (ev.mods.isPopupMenu())
+            return;
+
         if (! down)
         {
             down = true;
             dragging = false;
             selectInGuiController();
         }
+    }
+
+    void showContextMenu()
+    {
+        PopupMenu menu;
+        menu.addItem (1, TRANS ("Hide from mixer"));
+        menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this).withMousePosition(),
+                            [strip = Component::SafePointer<GraphMixerChannelStrip> (this)] (int result) {
+                                if (strip == nullptr || result != 1)
+                                    return;
+                                strip->getNode().setHiddenInMixer (true);
+                                if (strip->onRefreshNeeded)
+                                    strip->onRefreshNeeded();
+                            });
     }
 
     void mouseDrag (const MouseEvent& ev) override
@@ -106,7 +123,7 @@ public:
         if (selected || (hover && ! dragging && ! down))
         {
             g.setColour (Colors::toggleBlue);
-            g.drawRect (0.f, 0.f, (float) getWidth(), (float) getHeight(), selected ? 1.4 : 1.0);
+            g.drawRect (0.f, 0.f, (float) getWidth(), (float) getHeight(), selected ? 1.5f : 1.0f);
         }
     }
 
@@ -129,8 +146,8 @@ public:
             if (myIndex >= 0 && dIndex >= 0)
             {
                 parent.moveChild (dIndex, myIndex, nullptr);
-                if (onReordered)
-                    onReordered();
+                if (onRefreshNeeded)
+                    onRefreshNeeded();
             }
         }
 
@@ -157,19 +174,16 @@ private:
         ChildListener (GraphMixerChannelStrip& o) : owner (o) {}
         void mouseDown (const MouseEvent& ev) override
         {
-            owner.selectInGuiController();
+            if (ev.mods.isPopupMenu())
+                owner.showContextMenu();
+            else
+                owner.selectInGuiController();
         }
 
         GraphMixerChannelStrip& owner;
     };
 
     std::unique_ptr<ChildListener> listener;
-
-#if 0
-    virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
-    virtual void itemDragMove (const SourceDetails& dragSourceDetails);
-    virtual void itemDragExit (const SourceDetails& dragSourceDetails);
-#endif
 };
 
 class GraphMixerListBoxModel : public ListBoxModel
@@ -198,14 +212,14 @@ public:
         GraphMixerChannelStrip* const strip = existing == nullptr
                                                   ? new GraphMixerChannelStrip (gui)
                                                   : dynamic_cast<GraphMixerChannelStrip*> (existing);
-        strip->onReordered = std::bind (&GraphMixerListBoxModel::onReordered, this);
+        strip->onRefreshNeeded = std::bind (&GraphMixerListBoxModel::refresh, this);
         auto node = getNode (rowNumber);
         strip->setNode (node);
         strip->setSelected (node == gui.getSelectedNode());
         return strip;
     }
 
-    void onReordered()
+    void refresh()
     {
         refreshNodes();
         box.updateContent();
@@ -230,7 +244,8 @@ public:
             // clang-format off
             if (n.isMidiIONode() || 
                 n.getIdentifier() == EL_NODE_ID_MIDI_INPUT_DEVICE || 
-                n.getIdentifier() == EL_NODE_ID_MIDI_OUTPUT_DEVICE)
+                n.getIdentifier() == EL_NODE_ID_MIDI_OUTPUT_DEVICE ||
+                n.isHiddenInMixer())
             {
                 continue;
             }
@@ -239,18 +254,48 @@ public:
             nodes.add (n);
         }
     }
-#if 0
-    virtual void listBoxItemClicked (int row, const MouseEvent&);
-    virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
-    virtual void backgroundClicked (const MouseEvent&);
-    virtual void selectedRowsChanged (int lastRowSelected);
-    virtual void deleteKeyPressed (int lastRowSelected);
-    virtual void returnKeyPressed (int lastRowSelected);
-    virtual void listWasScrolled();
-    virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe);
-    virtual String getTooltipForRow (int row);
-    virtual MouseCursor getMouseCursorForRow (int row);
-#endif
+
+    void backgroundClicked (const MouseEvent& ev) override
+    {
+        if (! ev.mods.isPopupMenu())
+            return;
+
+        const auto graph = _node.isGraph() ? _node
+                                           : gui.context().session()->getActiveGraph();
+        NodeArray hidden;
+        for (int i = 0; i < graph.getNumNodes(); ++i)
+        {
+            const auto n = graph.getNode (i);
+            if (n.isHiddenInMixer())
+                hidden.add (n);
+        }
+
+        PopupMenu menu;
+        for (int i = 0; i < hidden.size(); ++i)
+            menu.addItem (i + 2, TRANS ("Show") + " " + hidden.getReference (i).getDisplayName());
+        if (hidden.size() > 1)
+        {
+            menu.addSeparator();
+            menu.addItem (1, TRANS ("Show all"));
+        }
+        else if (hidden.isEmpty())
+        {
+            menu.addItem (1, TRANS ("No hidden channels"), false);
+        }
+
+        menu.showMenuAsync (PopupMenu::Options(),
+                            [safeBox = Component::SafePointer<Component> (&box), this, hidden] (int result) {
+                                if (safeBox == nullptr || result <= 0)
+                                    return;
+                                if (result == 1)
+                                    for (auto n : hidden)
+                                        n.setHiddenInMixer (false);
+                                else if (result - 2 < hidden.size())
+                                    hidden[result - 2].setHiddenInMixer (false);
+                                refresh();
+                            });
+    }
+
 private:
     GuiService& gui;
     HorizontalListBox& box;
@@ -304,7 +349,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (Colors::widgetBackgroundColor.darker());
+        g.setColour (Colors::contentBackgroundColor);
         g.fillAll();
 
         if (model->getNumRows() <= 0)
@@ -329,7 +374,6 @@ private:
     SessionPtr session;
     [[maybe_unused]] GraphMixerView& view;
     std::unique_ptr<GraphMixerListBoxModel> model;
-    ChannelStripComponent channelStrip;
     HorizontalListBox box;
     std::vector<SignalConnection> _conns;
 };

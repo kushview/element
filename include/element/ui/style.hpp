@@ -48,6 +48,12 @@ struct Style {
         e.g. standard Labels, Textboxes, ComboBoxes, etc etc */
     static constexpr float fontSizeDefault = 12.0f;
 
+    /** Font size for fine print such as scales and small annotations. */
+    static constexpr float fontSizeSmall = 9.0f;
+
+    /** Font size for emphasized readouts such as the channel strip's dB value. */
+    static constexpr float fontSizeLarge = 14.0f;
+
     /** Draws text rotated by 90 or -90 degrees */
     static void drawVerticalText (juce::Graphics& g,
                                   const juce::String& text,
