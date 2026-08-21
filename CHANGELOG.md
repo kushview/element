@@ -2,6 +2,9 @@
 
 ## [1.2.x]
 
+### Added
+- CLAP plugins now appear in the Unverified plugin menu and can be added to a graph without a prior scan.
+
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.
 - Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.

@@ -97,6 +97,18 @@ public:
                 for (int i = lastSize; i < unverified.size(); ++i)
                     menu.addItem (i + 20000, unverified[i]->name);
             }
+            else
+            {
+                // Provider formats (e.g. CLAP): identifiers are file paths.
+                for (int i = lastSize; i < unverified.size(); ++i)
+                {
+                    const auto& fid = unverified.getUnchecked (i)->fileOrIdentifier;
+                    menu.addItem (i + 20000,
+                                  juce::File::isAbsolutePath (fid)
+                                      ? juce::File (fid).getFileNameWithoutExtension()
+                                      : fid);
+                }
+            }
 
             if (menu.getNumItems() > 0)
                 unvMenu.addSubMenu (name, menu);
