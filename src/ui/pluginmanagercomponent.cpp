@@ -37,7 +37,7 @@ public:
         pathList.setPath (path); // set this so it is ALWAYS up-to-date in ::startScan()
         scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
 
-        const StringArray withPath { "VST", "VST3", "CLAP" };
+        const StringArray withPath { "VST", "VST3", "CLAP", "LV2" };
         if (path.getNumPaths() <= 0 && withPath.contains (formatToScan.getName()))
         {
             pathList.setSize (500, 300);
@@ -819,6 +819,10 @@ void PluginListComponent::optionsMenuCallback (int result)
             editPluginPath ("VST3");
             saveSettings (this, true);
             break;
+        case 102:
+            editPluginPath ("LV2");
+            saveSettings (this, true);
+            break;
 
         case 8: {
             if (auto* world = ViewHelpers::getGlobals (this))
@@ -870,6 +874,8 @@ void PluginListComponent::buttonClicked (Button* button)
             paths.addItem (100, TRANS ("VST Path"));
         if (plugins.isAudioPluginFormatSupported ("VST3"))
             paths.addItem (101, TRANS ("VST3 Path"));
+        if (plugins.isAudioPluginFormatSupported ("LV2"))
+            paths.addItem (102, TRANS ("LV2 Path"));
         if (paths.getNumItems() > 0)
         {
             menu.addSubMenu ("Search Paths", paths);
