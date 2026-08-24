@@ -237,86 +237,58 @@ void ScriptNode::setParameter (int index, float value)
 }
 
 //==============================================================================
+struct BuiltInScripts
+{
+    const char* name;
+    const char* dspScript;
+    const int   dspSize;
+    const char* uiScript;
+    const int   uiSize;
+};
+
+const BuiltInScripts builtInScripts[] =
+{
+    {"Amp", scripts::amp_lua, scripts::amp_luaSize, scripts::ampui_lua, scripts::ampui_luaSize},
+    {"Channelizer", scripts::channelize_lua, scripts::channelize_luaSize, "", 0},
+    {"Spoton Scale Chooser", scripts::spontonchordchooser_lua, scripts::spontonchordchooser_luaSize, "", 0},
+    {"MIDI Timecode (MTC) Generator", scripts::mtc_generator_lua, scripts::mtc_generator_luaSize, "", 0},
+    {"Value", scripts::dial_lua, scripts::dial_luaSize, "", 0},
+    {"MIDI CC", scripts::midicc_lua, scripts::midicc_luaSize, "", 0},
+    {"Tremolo", scripts::tremolo_lua, scripts::tremolo_luaSize, "", 0},
+    {"Test Tone", scripts::testtone_lua, scripts::testtone_luaSize, "", 0},
+    {"MIDI Transpose", scripts::miditranspose_lua, scripts::miditranspose_luaSize, "", 0}
+};
+
+int ScriptNode::getNumPrograms() const
+{
+     return std::size(builtInScripts);
+}
+
 const String ScriptNode::getProgramName (int index) const
 {
     if (! juce::isPositiveAndBelow (index, getNumPrograms()))
         return {};
 
-    switch (index)
-    {
-        case 0:
-            return "Amp";
-            break;
-        case 1:
-            return "Channelizer";
-            break;
-        case 2:
-            return "Spoton Scale Chooser";
-            break;
-        case 3:
-            return "MIDI Timecode (MTC) Generator";
-            break;
-        case 4:
-            return "Value";
-            break;
-        case 5:
-            return "MIDI CC";
-            break;
-        case 6:
-            return "Tremolo";
-            break;
-        case 7:
-            return "Test Tone";
-            break;
-    }
-
-    String name = TRANS ("Program");
-    name << " " << int (index + 1);
-    return name;
+    return builtInScripts[index].name;
 }
 
 void ScriptNode::setCurrentProgram (int index)
 {
     if (! juce::isPositiveAndBelow (index, getNumPrograms()))
         return;
+
     _program = index;
 
     String newDspCode, newUiCode;
 
-    switch (index)
+    newDspCode = String::fromUTF8 (builtInScripts[index].dspScript, builtInScripts[index].dspSize);
+    if (builtInScripts[index].uiSize > 0)
     {
-        case 0:
-            newDspCode = String::fromUTF8 (scripts::amp_lua, scripts::amp_luaSize);
-            newUiCode = String::fromUTF8 (scripts::ampui_lua, scripts::ampui_luaSize);
-            break;
-        case 1:
-            newDspCode = String::fromUTF8 (scripts::channelize_lua, scripts::channelize_luaSize);
-            newUiCode.clear();
-            break;
-        case 2:
-            newDspCode = String::fromUTF8 (scripts::spontonchordchooser_lua, scripts::spontonchordchooser_luaSize);
-            newUiCode.clear();
-            break;
-        case 3:
-            newDspCode = String::fromUTF8 (scripts::mtc_generator_lua, scripts::mtc_generator_luaSize);
-            newUiCode.clear();
-            break;
-        case 4:
-            newDspCode = String::fromUTF8 (scripts::dial_lua, scripts::dial_luaSize);
-            newUiCode.clear();
-            break;
-        case 5:
-            newDspCode = String::fromUTF8 (scripts::midicc_lua, scripts::midicc_luaSize);
-            newUiCode.clear();
-            break;
-        case 6:
-            newDspCode = String::fromUTF8 (scripts::tremolo_lua, scripts::tremolo_luaSize);
-            newUiCode.clear();
-            break;
-        case 7:
-            newDspCode = String::fromUTF8 (scripts::testtone_lua, scripts::testtone_luaSize);
-            newUiCode.clear();
-            break;
+        newUiCode = String::fromUTF8 (builtInScripts[index].uiScript, builtInScripts[index].uiSize);
+    }
+    else
+    {
+        newUiCode.clear();
     }
 
     dspCode.replaceAllContent (newDspCode);
