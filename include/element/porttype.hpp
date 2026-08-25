@@ -15,7 +15,7 @@
 #endif
 
 #ifndef EL_INVALID_PORT
-    #define EL_INVALID_PORT ((uint32_t) - 1)
+    #define EL_INVALID_PORT ((uint32_t) -1)
 #endif
 
 #ifndef EL_INVALID_NODE
