@@ -11,6 +11,7 @@
 #include "engine/ionode.hpp"
 #include "nodes/audioprocessor.hpp"
 #include "engine/graphnode.hpp"
+#include "tracer.hpp"
 
 #ifndef EL_GRAPH_NODE_NAME
 #define EL_GRAPH_NODE_NAME "Graph"
@@ -61,7 +62,7 @@ Processor* GraphNode::getNodeForId (const uint32 nodeId) const
     return nullptr;
 }
 
-Processor* GraphNode::addNode (Processor* newNode, uint32 nodeId)
+Processor* GraphNode::addNode (Processor* newNode, uint32 nodeId, bool deferPrepare)
 {
     if (newNode == nullptr || (void*) newNode->getAudioProcessor() == (void*) this)
     {
@@ -109,7 +110,7 @@ Processor* GraphNode::addNode (Processor* newNode, uint32 nodeId)
     newNode->setPlayHead (playhead);
     newNode->setParentGraph (this);
     newNode->refreshPorts();
-    if (prepared())
+    if (! deferPrepare && prepared())
         newNode->prepare (getSampleRate(), getBlockSize(), this);
     triggerAsyncUpdate();
     return added;
@@ -117,28 +118,44 @@ Processor* GraphNode::addNode (Processor* newNode, uint32 nodeId)
 
 bool GraphNode::removeNode (const uint32 nodeId)
 {
-    disconnectNode (nodeId);
-    for (int i = nodes.size(); --i >= 0;)
+    Array<uint32> nodeIds;
+    nodeIds.add (nodeId);
+    return removeNodes (nodeIds);
+}
+
+bool GraphNode::removeNodes (const Array<uint32>& nodeIds)
+{
+    ReferenceCountedArray<Processor> removed;
+
+    for (const auto& nodeId : nodeIds)
     {
-        ProcessorPtr n = nodes.getUnchecked (i);
-        if (n->nodeId == nodeId)
+        disconnectNode (nodeId);
+        for (int i = nodes.size(); --i >= 0;)
         {
+            ProcessorPtr n = nodes.getUnchecked (i);
+            if (n->nodeId != nodeId)
+                continue;
             nodes.remove (i);
-
-            handleAsyncUpdate();
-            n->setParentGraph (nullptr);
-            n->setPlayHead (nullptr);
-
-            if (n->isSubGraph())
-            {
-                DBG ("[element] sub graph removed");
-            }
-
-            return true;
+            removed.add (n.get());
+            break;
         }
     }
 
-    return false;
+    if (removed.isEmpty())
+        return false;
+
+    // Rebuild synchronously before detaching: the current rendering ops hold
+    // raw pointers to the removed nodes, so they must stay alive and attached
+    // until the sequence no longer references them.
+    handleAsyncUpdate();
+
+    for (auto* n : removed)
+    {
+        n->setParentGraph (nullptr);
+        n->setPlayHead (nullptr);
+    }
+
+    return true;
 }
 
 const GraphNode::Connection*
@@ -403,6 +420,8 @@ bool GraphNode::isAnInputTo (const uint32 possibleInputId,
 
 void GraphNode::buildRenderingSequence()
 {
+    EL_LOAD_TRACE (String ("buildRenderingSequence: ") + getName());
+    EL_LOAD_TRACE_COUNT ("buildRenderingSequence");
     Array<void*> newRenderingOps;
     int numRenderingBuffersNeeded = 2;
     int numMidiBuffersNeeded = 1;

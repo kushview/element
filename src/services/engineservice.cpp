@@ -15,8 +15,9 @@
 #include "engine/graphmanager.hpp"
 #include "engine/rootgraph.hpp"
 #include "nodes/mididevice.hpp"
+#include "tracer.hpp"
 
-#define ELEMENT_TRACE_SESSION_LOAD 0
+#define ELEMENT_TRACE_SESSION_LOAD EL_TRACE_SESSION_LOAD
 
 using namespace juce;
 
@@ -100,6 +101,7 @@ struct RootGraphHolder
      */
     bool attach (AudioEnginePtr engine)
     {
+        EL_LOAD_TRACE (String ("RootGraphHolder::attach: ") + model.getName());
         jassert (engine);
         if (! engine)
         {
@@ -936,6 +938,7 @@ Node EngineService::addPlugin (const Node& graph, const PluginDescription& desc,
 
 void EngineService::sessionReloaded()
 {
+    EL_LOAD_TRACE ("EngineService::sessionReloaded");
     graphs->clear();
 
     auto session = context().session();

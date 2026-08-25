@@ -37,6 +37,9 @@ PresetService::~PresetService()
 
 void PresetService::activate()
 {
+    // Scan the preset library once at startup. Session loads no longer
+    // refresh it; in-app preset writes go through add() which does.
+    context().presets().refresh();
 }
 
 void PresetService::deactivate()

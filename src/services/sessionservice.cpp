@@ -302,7 +302,6 @@ void SessionService::refreshOtherControllers()
     sibling<EngineService>()->sessionReloaded();
     sibling<MappingService>()->refresh();
     sibling<MappingService>()->learn (false);
-    sibling<PresetService>()->refresh();
     sigSessionLoaded();
 }
 

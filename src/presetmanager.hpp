@@ -8,6 +8,8 @@
 
 #include <element/datapath.hpp>
 
+#include "tracer.hpp"
+
 namespace element {
 
 class PresetManager
@@ -50,6 +52,7 @@ public:
 
     inline void refresh()
     {
+        EL_LOAD_TRACE ("PresetManager::refresh");
         clear();
 
         StringArray files;
@@ -58,22 +61,36 @@ public:
         for (const auto& filename : files)
         {
             const File file (filename);
-            const Node node (Node::parse (file), false);
-            if (node.isValid())
+
+            auto item = std::make_unique<PresetInfo>();
+            item->file = file.getFullPathName().toStdString();
+
+            // Only the root element's attributes are needed here, so for XML
+            // presets skip materializing the node state as a ValueTree.
+            if (auto xml = juce::XmlDocument::parse (file))
             {
-                std::unique_ptr<PresetInfo> item;
-                item.reset (new PresetInfo());
-                item->file = file.getFullPathName().toStdString();
+                if (! xml->hasTagName (types::Node.toString()))
+                    continue;
+                item->name = xml->getStringAttribute (tags::name.toString()).toStdString();
+                item->format = xml->getStringAttribute (tags::format.toString()).toStdString();
+                item->ID = xml->getStringAttribute (tags::identifier.toString()).toStdString();
+            }
+            else
+            {
+                const Node node (Node::parse (file), false);
+                if (! node.isValid())
+                    continue;
                 item->name = node.getName().toStdString();
-                if (item->name.empty())
-                    item->name = file.getFileNameWithoutExtension().toStdString();
                 item->format = node.getFormat().toString().toStdString();
                 item->ID = node.getIdentifier().toString().toStdString();
-                if (item->format.empty() || item->ID.empty())
-                    continue;
-
-                presets.add (item.release());
             }
+
+            if (item->name.empty())
+                item->name = file.getFileNameWithoutExtension().toStdString();
+            if (item->format.empty() || item->ID.empty())
+                continue;
+
+            presets.add (item.release());
         }
 
         presets.minimiseStorageOverheads();

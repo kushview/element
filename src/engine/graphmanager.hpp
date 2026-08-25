@@ -54,6 +54,13 @@ public:
     /** Remove a node by ID */
     void removeNode (const uint32 nodeId);
 
+    /** Removes several nodes by ID, rebuilding the rendering sequence and the
+        arcs model once for the whole batch.
+
+        @param nodeIds  the IDs of the nodes to remove
+    */
+    void removeNodes (const juce::Array<uint32>& nodeIds);
+
     /** Disconnect a node from other nodes */
     void disconnectNode (const uint32 nodeId, const bool inputs = true, const bool outputs = true, const bool audio = true, const bool midi = true);
 

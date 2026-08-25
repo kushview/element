@@ -101,6 +101,7 @@ add_test(NAME "ScriptLoaderTest" COMMAND test_element --run_test=ScriptLoaderTes
 add_test(NAME "ScriptManagerTest" COMMAND test_element --run_test=ScriptManagerTest)
 add_test(NAME "ScriptPlayground" COMMAND test_element --run_test=ScriptPlayground)
 add_test(NAME "SessionChangedTest" COMMAND test_element --run_test=SessionChangedTest)
+add_test(NAME "SessionLoadBenchTests" COMMAND test_element --run_test=SessionLoadBenchTests)
 add_test(NAME "ShuttleTests" COMMAND test_element --run_test=ShuttleTests)
 add_test(NAME "TapTempoTests" COMMAND test_element --run_test=TapTempoTests)
 add_test(NAME "TransportTests" COMMAND test_element --run_test=TransportTests)
