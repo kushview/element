@@ -13,6 +13,7 @@
 #include "nodes/placeholder.hpp"
 #include "engine/rootgraph.hpp"
 
+#include "tracer.hpp"
 #include "utils.hpp"
 
 namespace element {
@@ -149,8 +150,7 @@ private:
             jassert (ioNodes[t] != nullptr);
         }
 
-        for (const auto& nodeId : nodesToRemove)
-            manager.removeNode (nodeId);
+        manager.removeNodes (nodesToRemove);
 
         model.resetPorts();
     }
@@ -238,7 +238,6 @@ public:
 
             manager = std::make_unique<GraphManager> (*sub, owner.pluginManager);
             manager->setNodeModel (node);
-            IONodeEnforcer addIO (*manager);
         }
         else
         {
@@ -344,6 +343,7 @@ bool GraphManager::contains (const uint32 nodeId) const
 
 Processor* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
+    EL_LOAD_TRACE (String ("createFilter: ") + desc->name);
     String errorMessage;
     auto node = std::unique_ptr<Processor> (
         pluginManager.createGraphNode (*desc, errorMessage));
@@ -360,7 +360,9 @@ Processor* GraphManager::createFilter (const PluginDescription* desc, double x, 
         errorMessage = "Could not find node";
     }
 
-    return node != nullptr ? processor.addNode (node.release(), nodeId) : nullptr;
+    // Defer the prepare: the caller configures buses and restores plugin
+    // state first, then prepares once the configuration is final.
+    return node != nullptr ? processor.addNode (node.release(), nodeId, true) : nullptr;
 }
 
 Processor* GraphManager::createPlaceholder (const Node& node)
@@ -490,16 +492,27 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
 
             if (tryStereo != nullptr && proc->checkBusesLayoutSupported (*tryStereo))
             {
-                proc->suspendProcessing (true);
-                proc->releaseResources();
+                if (object->isPrepared)
+                {
+                    proc->suspendProcessing (true);
+                    proc->releaseResources();
 
-                if (! proc->setBusesLayout (*tryStereo))
+                    if (! proc->setBusesLayout (*tryStereo))
+                        proc->setBusesLayout (oldLayout);
+
+                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                    proc->suspendProcessing (false);
+                }
+                else if (! proc->setBusesLayout (*tryStereo))
+                {
                     proc->setBusesLayout (oldLayout);
-
-                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-                proc->suspendProcessing (false);
+                }
             }
         }
+
+        // Deferred by createFilter: prepare once the bus layout is final.
+        if (processor.prepared() && ! object->isPrepared)
+            object->prepare (processor.getSampleRate(), processor.getBlockSize(), &processor);
 
         nodes.addChild (data, -1, nullptr);
         changed();
@@ -515,34 +528,45 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
 
 void GraphManager::removeNode (const uint32 uid)
 {
-    if (! processor.removeNode (uid))
+    Array<uint32> uids;
+    uids.add (uid);
+    removeNodes (uids);
+}
+
+void GraphManager::removeNodes (const juce::Array<uint32>& uids)
+{
+    if (! processor.removeNodes (uids))
         return;
-    for (int i = 0; i < nodes.getNumChildren(); ++i)
+
+    for (const auto& uid : uids)
     {
-        const Node node (nodes.getChild (i), false);
-        if (node.getNodeId() == uid)
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
         {
-            // the model was probably referencing the node ptr
-            ProcessorPtr obj = node.getObject();
-            if (obj)
+            const Node node (nodes.getChild (i), false);
+            if (node.getNodeId() == uid)
             {
-                obj->willBeRemoved();
-                obj->releaseResources();
-            }
+                // the model was probably referencing the node ptr
+                ProcessorPtr obj = node.getObject();
+                if (obj)
+                {
+                    obj->willBeRemoved();
+                    obj->releaseResources();
+                }
 
-            for (int i = bindings.size(); --i >= 0;)
-            {
-                auto binding = bindings.getUnchecked (i);
-                if (binding->object == obj)
-                    bindings.remove (i, true);
-            }
+                for (int j = bindings.size(); --j >= 0;)
+                {
+                    auto binding = bindings.getUnchecked (j);
+                    if (binding->object == obj)
+                        bindings.remove (j, true);
+                }
 
-            auto data = node.data();
-            nodes.removeChild (data, nullptr);
-            // clear all referecnce counted objects
-            Node::sanitizeProperties (data, true);
-            // finally delete the node + plugin instance.
-            obj = nullptr;
+                auto data = node.data();
+                nodes.removeChild (data, nullptr);
+                // clear all referecnce counted objects
+                Node::sanitizeProperties (data, true);
+                // finally delete the node + plugin instance.
+                obj = nullptr;
+            }
         }
     }
 
@@ -626,6 +650,7 @@ void GraphManager::removeConnection (uint32 sourceNode, uint32 sourcePort, uint3
 
 void GraphManager::setNodeModel (const Node& node)
 {
+    EL_LOAD_TRACE (String ("setNodeModel: ") + node.getName());
     loaded = false;
 
     processor.clear();
@@ -675,9 +700,9 @@ void GraphManager::setNodeModel (const Node& node)
     // If you hit this, then failed nodes didn't get handled properly
     jassert (nodes.getNumChildren() == processor.getNumNodes());
 
-    // Cheap way to refresh engine-side nodes
+    // Refresh engine-side nodes. Coalesced: the render sequence would be
+    // invalidated again by the arc loop below, so don't force a build here.
     processor.triggerAsyncUpdate();
-    processor.handleUpdateNowIfNeeded();
 
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
@@ -726,8 +751,11 @@ void GraphManager::setNodeModel (const Node& node)
     jassert (arcs.getNumChildren() == processor.getNumConnections());
     failed.clearQuick();
 
-    IONodeEnforcer enforceIONodes (*this);
-    processorArcsChanged();
+    {
+        EL_LOAD_TRACE ("setNodeModel: enforce IO + sync arcs");
+        IONodeEnforcer enforceIONodes (*this);
+        processorArcsChanged();
+    }
 }
 
 void GraphManager::savePluginStates()
@@ -812,6 +840,7 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 
     if (auto* const proc = obj->getAudioProcessor())
     {
+        EL_LOAD_TRACE (String ("setupNode: buses: ") + node.getName());
         bool busesConfigured = false;
         {
             // try to load buses layout.
@@ -836,11 +865,20 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 
                 if (proc->checkBusesLayoutSupported (layout))
                 {
-                    proc->suspendProcessing (true);
-                    proc->releaseResources();
-                    busesConfigured = proc->setBusesLayoutWithoutEnabling (layout);
-                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-                    proc->suspendProcessing (false);
+                    if (obj->isPrepared)
+                    {
+                        proc->suspendProcessing (true);
+                        proc->releaseResources();
+                        busesConfigured = proc->setBusesLayoutWithoutEnabling (layout);
+                        proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                        proc->suspendProcessing (false);
+                    }
+                    else
+                    {
+                        // Not prepared yet (deferred by createFilter): the
+                        // layout can be applied directly.
+                        busesConfigured = proc->setBusesLayoutWithoutEnabling (layout);
+                    }
                 }
             }
         }
@@ -855,19 +893,44 @@ void GraphManager::setupNode (const ValueTree& data, ProcessorPtr obj)
 
             if (proc->checkBusesLayoutSupported (layout))
             {
-                proc->suspendProcessing (true);
-                proc->releaseResources();
-                proc->setBusesLayoutWithoutEnabling (layout);
-                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-                proc->suspendProcessing (false);
+                if (obj->isPrepared)
+                {
+                    proc->suspendProcessing (true);
+                    proc->releaseResources();
+                    proc->setBusesLayoutWithoutEnabling (layout);
+                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                    proc->suspendProcessing (false);
+                }
+                else
+                {
+                    proc->setBusesLayoutWithoutEnabling (layout);
+                }
             }
 
             resetPorts = true;
         }
     }
 
-    node.restorePluginState();
-    node.resetPorts();
+    {
+        EL_LOAD_TRACE (String ("setupNode: restore state: ") + node.getName());
+        // A subgraph's descendants were already restored one-by-one by the
+        // child GraphManager the Binding created above — restoring them again
+        // here would call setStateInformation twice per nesting level.
+        if (obj->isSubGraph())
+            node.restoreOwnPluginState();
+        else
+            node.restorePluginState();
+    }
+    {
+        EL_LOAD_TRACE (String ("setupNode: reset ports: ") + node.getName());
+        node.resetPorts();
+    }
+
+    // Deferred by createFilter: prepare only now that the bus layout and
+    // plugin state are final, so the plugin is prepared exactly once.
+    if (processor.prepared() && ! obj->isPrepared)
+        obj->prepare (processor.getSampleRate(), processor.getBlockSize(), &processor);
+
     if (node.isA ("Element", EL_NODE_ID_MIDI_INPUT_DEVICE) || node.isA ("Element", EL_NODE_ID_MIDI_OUTPUT_DEVICE))
     {
         jassert (node.getNumPorts() == 1);

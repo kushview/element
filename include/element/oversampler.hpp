@@ -22,6 +22,19 @@ public:
     float getLatencySamples (int index) const;
     int getFactor (int index) const;
     void prepare (int numChannels, int blockSize);
+
+    /** Returns the oversampling chain for the given index, creating and
+        initializing it on demand with the spec given to prepare().
+
+        Chains are expensive to build (IIR filter design + buffers), so they
+        are only created here, never in prepare(). Must be called on the
+        message thread, and only after prepare() has set a valid spec.
+
+        @param index  the processor index; the oversample factor is 2^(index + 1)
+        @return the chain, or nullptr if the index or spec is invalid
+    */
+    ProcessorType* ensureProcessor (int index);
+
     void reset();
 
 private:

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/session.hpp>
+#include "tracer.hpp"
 #include "ui/sessiondocument.hpp"
 
 namespace element {
@@ -27,6 +28,7 @@ String SessionDocument::getDocumentTitle()
 
 Result SessionDocument::loadDocument (const File& file)
 {
+    EL_LOAD_TRACE (String ("SessionDocument::loadDocument: ") + file.getFileName());
     if (nullptr == session)
         return Result::fail ("No session data target");
 

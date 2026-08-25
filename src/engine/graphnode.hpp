@@ -75,15 +75,30 @@ public:
         The optional nodeId parameter lets you specify an ID to use for the node, but
         if the value is already in use, this new node will overwrite the old one.
 
+        When deferPrepare is true the node is registered but not prepared, even
+        if this graph is already prepared. The caller must prepare it once its
+        configuration (bus layout, plugin state) is final.
+
         If this succeeds, it returns a pointer to the newly-created node.
     */
-    Processor* addNode (Processor* newNode, uint32 nodeId = 0);
+    Processor* addNode (Processor* newNode, uint32 nodeId = 0, bool deferPrepare = false);
 
     /** Deletes a node within the graph which has the specified ID.
 
         This will also delete any connections that are attached to this node.
     */
     bool removeNode (uint32 nodeId);
+
+    /** Deletes several nodes in one pass.
+
+        Connections attached to the removed nodes are also deleted. The
+        rendering sequence is rebuilt once for the whole batch instead of once
+        per node.
+
+        @param nodeIds  the IDs of the nodes to delete
+        @return true if at least one node was removed
+    */
+    bool removeNodes (const Array<uint32>& nodeIds);
 
     /** Builds an array of ordered nodes */
     void getOrderedNodes (ReferenceCountedArray<Processor>& res);

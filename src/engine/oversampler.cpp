@@ -1,6 +1,7 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <element/juce/events.hpp>
 #include <element/oversampler.hpp>
 
 namespace element {
@@ -36,22 +37,44 @@ void Oversampler<T>::prepare (int numChannels, int blockSize)
     channels = numChannels;
     buffer = blockSize;
 
-    if (processors.size() <= 0 || procSpecChanged)
+    if (procSpecChanged)
     {
+        // Existing chains were built for the old spec. Drop them; chains are
+        // (re)built on demand by ensureProcessor().
         processors.clear();
-        for (int f = 0; f < maxProc; ++f)
-            processors.add (new ProcessorType (channels, f + 1, ProcessorType::FilterType::filterHalfBandPolyphaseIIR));
     }
 
     for (auto* proc : processors)
-        proc->initProcessing (buffer);
+        if (proc != nullptr)
+            proc->initProcessing ((size_t) buffer);
+}
+
+template <typename T>
+typename Oversampler<T>::ProcessorType* Oversampler<T>::ensureProcessor (int index)
+{
+    JUCE_ASSERT_MESSAGE_THREAD
+
+    if (index < 0 || index >= maxProc || channels <= 0 || buffer <= 0)
+        return nullptr;
+
+    while (processors.size() <= index)
+        processors.add (nullptr);
+
+    if (auto* const existing = processors.getUnchecked (index))
+        return existing;
+
+    auto* const proc = new ProcessorType (channels, index + 1, ProcessorType::FilterType::filterHalfBandPolyphaseIIR);
+    proc->initProcessing ((size_t) buffer);
+    processors.set (index, proc, true);
+    return proc;
 }
 
 template <typename T>
 void Oversampler<T>::reset()
 {
     for (auto* const proc : processors)
-        proc->reset();
+        if (proc != nullptr)
+            proc->reset();
 }
 
 template class Oversampler<float>;

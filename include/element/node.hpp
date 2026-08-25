@@ -383,8 +383,16 @@ public:
     /** Saves the node state from Processor to state property */
     void savePluginState();
 
-    /** Reads state property and applies to Processor */
+    /** Reads state property and applies to Processor.
+        Recurses into child nodes; use restoreOwnPluginState() when children
+        are restored elsewhere.
+    */
     void restorePluginState();
+
+    /** Reads state property and applies to Processor for this node only,
+        without recursing into child nodes.
+    */
+    void restoreOwnPluginState();
 
     //=========================================================================
     /** Get the number of factory presets */

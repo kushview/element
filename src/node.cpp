@@ -486,7 +486,9 @@ ValueTree Node::addScript (const Script& script)
 
 void Node::setMissingProperties()
 {
-    stabilizePropertyString (tags::uuid, Uuid().toString());
+    // Generating a Uuid isn't free: only make one when actually missing.
+    if (! objectData.hasProperty (tags::uuid))
+        objectData.setProperty (tags::uuid, Uuid().toString(), nullptr);
     stabilizePropertyString (tags::type, types::Node.toString());
     stabilizePropertyString (tags::name, "Node");
     stabilizeProperty (tags::bypass, false);
@@ -823,6 +825,13 @@ MidiChannels Node::getMidiChannels() const
 
 void Node::restorePluginState()
 {
+    restoreOwnPluginState();
+    for (int i = 0; i < getNumNodes(); ++i)
+        getNode (i).restorePluginState();
+}
+
+void Node::restoreOwnPluginState()
+{
     if (! isValid())
         return;
 
@@ -930,9 +939,6 @@ void Node::restorePluginState()
     const bool clearStateProperty = false;
     if (clearStateProperty)
         objectData.removeProperty (tags::state, 0);
-
-    for (int i = 0; i < getNumNodes(); ++i)
-        getNode (i).restorePluginState();
 }
 
 void Node::savePluginState()
