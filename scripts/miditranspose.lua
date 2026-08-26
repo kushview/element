@@ -82,7 +82,8 @@ return {
     parameters  = parameters,
     prepare     = prepare,
     process     = process,
-    release     = release
+    release     = release,
+    dspName     = 'MIDI Transpose'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.

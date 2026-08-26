@@ -13,6 +13,7 @@
 #include "scripting/bindings.hpp"
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
+#include "scripting/scriptregistry.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -237,31 +238,9 @@ void ScriptNode::setParameter (int index, float value)
 }
 
 //==============================================================================
-struct BuiltInScripts
-{
-    const char* name;
-    const char* dspScript;
-    const int   dspSize;
-    const char* uiScript;
-    const int   uiSize;
-};
-
-const BuiltInScripts builtInScripts[] =
-{
-    {"Amp", scripts::amp_lua, scripts::amp_luaSize, scripts::ampui_lua, scripts::ampui_luaSize},
-    {"Channelizer", scripts::channelize_lua, scripts::channelize_luaSize, "", 0},
-    {"Spoton Scale Chooser", scripts::spontonchordchooser_lua, scripts::spontonchordchooser_luaSize, "", 0},
-    {"MIDI Timecode (MTC) Generator", scripts::mtc_generator_lua, scripts::mtc_generator_luaSize, "", 0},
-    {"Value", scripts::dial_lua, scripts::dial_luaSize, "", 0},
-    {"MIDI CC", scripts::midicc_lua, scripts::midicc_luaSize, "", 0},
-    {"Tremolo", scripts::tremolo_lua, scripts::tremolo_luaSize, "", 0},
-    {"Test Tone", scripts::testtone_lua, scripts::testtone_luaSize, "", 0},
-    {"MIDI Transpose", scripts::miditranspose_lua, scripts::miditranspose_luaSize, "", 0}
-};
-
 int ScriptNode::getNumPrograms() const
 {
-     return std::size(builtInScripts);
+    return (int)ScriptRegistry::instance().getScripts().size();
 }
 
 const String ScriptNode::getProgramName (int index) const
@@ -269,7 +248,7 @@ const String ScriptNode::getProgramName (int index) const
     if (! juce::isPositiveAndBelow (index, getNumPrograms()))
         return {};
 
-    return builtInScripts[index].name;
+    return ScriptRegistry::instance().getScripts()[index].name;
 }
 
 void ScriptNode::setCurrentProgram (int index)
@@ -280,11 +259,12 @@ void ScriptNode::setCurrentProgram (int index)
     _program = index;
 
     String newDspCode, newUiCode;
+    const BuiltInScripts& scriptInfo = ScriptRegistry::instance().getScripts()[index];
 
-    newDspCode = String::fromUTF8 (builtInScripts[index].dspScript, builtInScripts[index].dspSize);
-    if (builtInScripts[index].uiSize > 0)
+    newDspCode = String::fromUTF8 (scriptInfo.dspScript, scriptInfo.dspSize);
+    if (scriptInfo.uiSize > 0)
     {
-        newUiCode = String::fromUTF8 (builtInScripts[index].uiScript, builtInScripts[index].uiSize);
+        newUiCode = String::fromUTF8 (scriptInfo.uiScript, scriptInfo.uiSize);
     }
     else
     {

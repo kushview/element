@@ -59,7 +59,8 @@ return {
     type    = 'DSP',
     layout  = layout,
     prepare = prepare,
-    process = process
+    process = process,
+    dspName = 'MIDI CC'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.

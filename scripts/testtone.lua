@@ -65,7 +65,8 @@ return {
     type    = 'DSP',
     layout  = layout,
     prepare = prepare,
-    process = process
+    process = process,
+    dspName = 'Test Tone'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.

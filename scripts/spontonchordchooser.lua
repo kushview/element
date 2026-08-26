@@ -203,6 +203,7 @@ return {
     type    = 'DSP',
     layout  = layout,
     process = process,
+    dspName = 'Spoton Scale Chooser'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Lokki.
