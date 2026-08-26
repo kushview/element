@@ -698,17 +698,24 @@ void GuiService::run()
 
     mainWindow->setContentNonOwned (content(), true);
     mainWindow->centreWithSize (_content->getWidth(), _content->getHeight());
-    mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commands().getKeyMappings());
     _content->restoreState (pf);
 
+    const auto windowState = pf->getValue ("mainWindowState");
     if (! shouldStartHidden (settings))
     {
+        // Create the native peer before restoring bounds so the window frame is
+        // known and the title bar is kept clear of docked taskbars.
+        mainWindow->addToDesktop();
+        mainWindow->restoreWindowStateFromString (windowState);
         mainWindow->setVisible (true);
         if (pf->getBoolValue ("mainWindowFullScreen", false))
             mainWindow->setFullScreen (true);
-        mainWindow->addToDesktop();
+    }
+    else
+    {
+        mainWindow->restoreWindowStateFromString (windowState);
     }
 
     sibling<SessionService>()->resetChanges();
@@ -1021,6 +1028,9 @@ bool GuiService::perform (const InvocationInfo& info)
                 else
                 {
                     window->addToDesktop();
+                    // Re-run the constrainer now the native frame is known so
+                    // the title bar isn't left under a docked taskbar.
+                    window->setBoundsConstrained (window->getBounds());
                     window->toFront (true);
                     if (session)
                         showPluginWindowsFor (session->getActiveGraph(), true, false);
