@@ -177,7 +177,41 @@ void SessionService::importGraph (const File& file)
 
 void SessionService::closeSession()
 {
-    DBG ("[SC] close session");
+    jassert (document && currentSession);
+    if (! saveIfNeededAndUserAgrees())
+        return;
+
+    sibling<GuiService>()->closeAllPluginWindows();
+    currentSession->clear();
+    refreshOtherControllers();
+    sibling<GuiService>()->stabilizeContent();
+    resetChanges (true);
+}
+
+bool SessionService::saveIfNeededAndUserAgrees()
+{
+    jassert (document);
+    if (! document->hasChangedSinceSaved())
+        return true;
+
+    // - 0 if the third button was pressed ('cancel')
+    // - 1 if the first button was pressed ('yes')
+    // - 2 if the middle button was pressed ('no')
+    const int res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon,
+                                                     "Save Session?",
+                                                     "The current session has changes. Would you like to save it?",
+                                                     "Save Session",
+                                                     "Don't Save",
+                                                     "Cancel");
+    switch (res)
+    {
+        case 1: // save: only proceed if the save actually completed
+            return document->save (true, true) == FileBasedDocument::savedOk;
+        case 2: // don't save
+            return true;
+        default: // cancel
+            return false;
+    }
 }
 
 bool SessionService::hasSessionChanged()
@@ -245,28 +279,14 @@ void SessionService::saveSession (const bool saveAs, const bool askForFile, cons
 void SessionService::newSession()
 {
     jassert (document && currentSession);
-    // - 0 if the third button was pressed ('cancel')
-    // - 1 if the first button was pressed ('yes')
-    // - 2 if the middle button was pressed ('no')
-    int res = 2;
-    if (document->hasChangedSinceSaved())
-        res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon,
-                                               "Save Session?",
-                                               "The current session has changes. Would you like to save it?",
-                                               "Save Session",
-                                               "Don't Save",
-                                               "Cancel");
-    if (res == 1)
-        document->save (true, true);
+    if (! saveIfNeededAndUserAgrees())
+        return;
 
-    if (res == 1 || res == 2)
-    {
-        sibling<GuiService>()->closeAllPluginWindows();
-        loadNewSessionData();
-        refreshOtherControllers();
-        sibling<GuiService>()->stabilizeContent();
-        resetChanges (true);
-    }
+    sibling<GuiService>()->closeAllPluginWindows();
+    loadNewSessionData();
+    refreshOtherControllers();
+    sibling<GuiService>()->stabilizeContent();
+    resetChanges (true);
 }
 
 void SessionService::loadNewSessionData()

@@ -22,6 +22,12 @@ public:
     void openDefaultSession();
     void openFile (const File& file);
     const File getSessionFile() const;
+
+    /** Closes the current session, leaving an empty, untitled session.
+
+        Prompts to save first if the session has unsaved changes. Does nothing
+        if the user cancels.
+    */
     void closeSession();
     void saveSession (const bool saveAs = false,
                       const bool askForFile = true,
@@ -45,6 +51,13 @@ private:
 
     void loadNewSessionData();
     void refreshOtherControllers();
+
+    /** Asks the user to save the session if it has unsaved changes.
+
+        @return true if it is ok to discard or replace the current session,
+                false if the user cancelled
+    */
+    bool saveIfNeededAndUserAgrees();
 };
 
 } // namespace element
