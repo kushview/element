@@ -2,10 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "utils.hpp"
-
-#if JUCE_WINDOWS
-#include <windows.h>
-#endif
+#include "win32.hpp"
 
 namespace element {
 namespace Util {

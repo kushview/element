@@ -2,15 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/spinlock.hpp>
+#include "win32.hpp"
 
-#if _WIN32
-#define WINDOWS_LWAN
-#define WIN32_LEAN_AND_MEAN 1
-#include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
-#undef min
-#undef max
-#else
+#if ! JUCE_WINDOWS
 #include <sched.h>
 #endif
 

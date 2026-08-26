@@ -28,12 +28,39 @@
 #include "ui/systemtray.hpp"
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/windowmanager.hpp"
+#include "win32.hpp"
 
 #ifndef ELEMENT_USE_SYSTEM_TRAY
 #define ELEMENT_USE_SYSTEM_TRAY 1
 #endif
 
 namespace element {
+
+/** Returns true if the main window should not be shown at launch and instead
+    wait in the system tray. Honours the "start hidden" setting, a `--hidden`
+    command line flag, and on Windows the shortcut "Run: Minimized" option. */
+static bool shouldStartHidden (Settings& settings)
+{
+    if (! SystemTray::isAvailable() || ! settings.isSystrayEnabled())
+        return false;
+
+    if (settings.isStartHiddenEnabled())
+        return true;
+
+    if (JUCEApplicationBase::getCommandLineParameterArray().contains ("--hidden"))
+        return true;
+
+#if JUCE_WINDOWS
+    STARTUPINFOW info = {};
+    info.cb = sizeof (info);
+    GetStartupInfoW (&info);
+    if ((info.dwFlags & STARTF_USESHOWWINDOW) != 0
+        && (info.wShowWindow == SW_SHOWMINIMIZED || info.wShowWindow == SW_SHOWMINNOACTIVE || info.wShowWindow == SW_MINIMIZE))
+        return true;
+#endif
+
+    return false;
+}
 
 //=============================================================================
 class DefaultContentFactory : public ContentFactory
@@ -343,7 +370,6 @@ void GuiService::saveProperties (PropertiesFile* props)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
         props->setValue ("mainWindowFullScreen", mainWindow->isFullScreen());
-        props->setValue ("mainWindowVisible", mainWindow->isOnDesktop() && mainWindow->isVisible());
     }
 
     if (_content)
@@ -673,17 +699,24 @@ void GuiService::run()
 
     mainWindow->setContentNonOwned (content(), true);
     mainWindow->centreWithSize (_content->getWidth(), _content->getHeight());
-    mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commands().getKeyMappings());
     _content->restoreState (pf);
 
-    if (pf->getBoolValue ("mainWindowVisible", true))
+    const auto windowState = pf->getValue ("mainWindowState");
+    if (! shouldStartHidden (settings))
     {
+        // Create the native peer before restoring bounds so the window frame is
+        // known and the title bar is kept clear of docked taskbars.
+        mainWindow->addToDesktop();
+        mainWindow->restoreWindowStateFromString (windowState);
         mainWindow->setVisible (true);
         if (pf->getBoolValue ("mainWindowFullScreen", false))
             mainWindow->setFullScreen (true);
-        mainWindow->addToDesktop();
+    }
+    else
+    {
+        mainWindow->restoreWindowStateFromString (windowState);
     }
 
     sibling<SessionService>()->resetChanges();
@@ -996,6 +1029,9 @@ bool GuiService::perform (const InvocationInfo& info)
                 else
                 {
                     window->addToDesktop();
+                    // Re-run the constrainer now the native frame is known so
+                    // the title bar isn't left under a docked taskbar.
+                    window->setBoundsConstrained (window->getBounds());
                     window->toFront (true);
                     if (session)
                         showPluginWindowsFor (session->getActiveGraph(), true, false);

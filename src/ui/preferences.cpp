@@ -94,6 +94,44 @@ private:
 };
 
 //==============================================================================
+/** A labelled on/off setting: a bold label on the left and a SettingButton on
+    the right. Owned by a SettingsPage and laid out with layoutSetting(). */
+class BoolSettingRow
+{
+public:
+    /** Adds the label and button to the parent and wires the change callback.
+
+        @param parent    The page that owns this row.
+        @param text      The label text.
+        @param initial   The initial toggle state.
+        @param onChange  Called after the user toggles the button.
+    */
+    void init (Component& parent, const String& text, bool initial, std::function<void()> onChange)
+    {
+        parent.addAndMakeVisible (label);
+        label.setText (text, dontSendNotification);
+        label.setFont (Font (FontOptions (12.0, Font::bold)));
+        parent.addAndMakeVisible (button);
+        button.setClickingTogglesState (true);
+        button.setToggleState (initial, dontSendNotification);
+        button.onClick = std::move (onChange);
+    }
+
+    bool get() const { return button.getToggleState(); }
+    void set (bool state) { button.setToggleState (state, dontSendNotification); }
+    void setYesNoText (const String& yes, const String& no) { button.setYesNoText (yes, no); }
+
+    void setEnabled (bool enabled)
+    {
+        label.setEnabled (enabled);
+        button.setEnabled (enabled);
+    }
+
+    Label label;
+    SettingButton button;
+};
+
+//==============================================================================
 class SettingsPage : public Component
 {
 public:
@@ -101,6 +139,11 @@ public:
     virtual ~SettingsPage() {}
 
 protected:
+    void layoutSetting (Rectangle<int>& r, BoolSettingRow& row)
+    {
+        layoutSetting (r, row.label, row.button);
+    }
+
     virtual void layoutSetting (Rectangle<int>& r, Label& label, Component& setting, const int valueWidth = -1, const int keyWidth = -1)
     {
         const int spacingBetweenSections = 6;
@@ -128,17 +171,11 @@ public:
         : world (w), gui (g)
     {
         auto& settings = world.settings();
-        addAndMakeVisible (enabledLabel);
-        enabledLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        enabledLabel.setText ("OSC Host Enabled?", dontSendNotification);
-        addAndMakeVisible (enabledButton);
-        enabledButton.setYesNoText ("Yes", "No");
-        enabledButton.setClickingTogglesState (true);
-        enabledButton.setToggleState (settings.isOscHostEnabled(), dontSendNotification);
-        enabledButton.onClick = [this]() {
+        enabled.init (*this, "OSC Host Enabled?", settings.isOscHostEnabled(), [this]() {
             updateEnablement();
             triggerAsyncUpdate();
-        };
+        });
+        enabled.setYesNoText ("Yes", "No");
 
         addAndMakeVisible (hostLabel);
         hostLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -169,7 +206,7 @@ public:
     void resized() override
     {
         auto r = getLocalBounds();
-        layoutSetting (r, enabledLabel, enabledButton);
+        layoutSetting (r, enabled);
         layoutSetting (r, hostLabel, hostField, getWidth() / 2);
         layoutSetting (r, portLabel, portSlider, getWidth() / 4);
     }
@@ -177,8 +214,7 @@ public:
 private:
     Context& world;
     GuiService& gui;
-    Label enabledLabel;
-    SettingButton enabledButton;
+    BoolSettingRow enabled;
     Label hostLabel;
     TextEditor hostField;
     Label portLabel;
@@ -197,9 +233,9 @@ private:
 
     void updateEnablement()
     {
-        world.settings().setOscHostEnabled (enabledButton.getToggleState());
-        hostField.setEnabled (enabledButton.getToggleState());
-        portSlider.setEnabled (enabledButton.getToggleState());
+        world.settings().setOscHostEnabled (enabled.get());
+        hostField.setEnabled (enabled.get());
+        portSlider.setEnabled (enabled.get());
     }
 };
 
@@ -316,8 +352,7 @@ private:
 //==============================================================================
 class GeneralSettingsPage : public SettingsPage,
                             public Value::Listener,
-                            public FilenameComponentListener,
-                            public Button::Listener
+                            public FilenameComponentListener
 {
 public:
     enum ComboBoxIDs
@@ -338,6 +373,12 @@ public:
           engine (world.audio()),
           gui (g)
     {
+#if ! ELEMENT_SE
+        const String sessionStr = "session";
+#else
+        const String sessionStr = "graph";
+#endif
+
         addAndMakeVisible (clockSourceLabel);
         clockSourceLabel.setText ("Clock Source", dontSendNotification);
         clockSourceLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -345,79 +386,48 @@ public:
         clockSourceBox.addItem ("Internal", ClockSourceInternal);
         clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
         clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
+
 #if ELEMENT_UPDATER
-        addAndMakeVisible (checkForUpdatesLabel);
-        checkForUpdatesLabel.setText ("Check for updates on startup", dontSendNotification);
-        checkForUpdatesLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (checkForUpdates);
-        checkForUpdates.setClickingTogglesState (true);
-        checkForUpdates.setToggleState (settings.checkForUpdates(), dontSendNotification);
-        checkForUpdates.getToggleStateValue().addListener (this);
+        checkForUpdates.init (*this, "Check for updates on startup", settings.checkForUpdates(), [this]() {
+            settings.setCheckForUpdates (checkForUpdates.get());
+            settingChanged();
+        });
 #endif
-        addAndMakeVisible (scanForPlugsLabel);
-        scanForPlugsLabel.setText ("Scan plugins on startup", dontSendNotification);
-        scanForPlugsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (scanForPlugins);
-        scanForPlugins.setClickingTogglesState (true);
-        scanForPlugins.setToggleState (settings.scanForPluginsOnStartup(), dontSendNotification);
-        scanForPlugins.getToggleStateValue().addListener (this);
-
-        addAndMakeVisible (showPluginWindowsLabel);
-        showPluginWindowsLabel.setText ("Automatically show plugin windows", dontSendNotification);
-        showPluginWindowsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (showPluginWindows);
-        showPluginWindows.setClickingTogglesState (true);
-        showPluginWindows.setToggleState (settings.showPluginWindowsWhenAdded(), dontSendNotification);
-        showPluginWindows.getToggleStateValue().addListener (this);
-
-        addAndMakeVisible (pluginWindowsOnTopLabel);
-        pluginWindowsOnTopLabel.setText ("Plugin windows on top by default", dontSendNotification);
-        pluginWindowsOnTopLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (pluginWindowsOnTop);
-        pluginWindowsOnTop.setClickingTogglesState (true);
-        pluginWindowsOnTop.setToggleState (settings.pluginWindowsOnTop(), dontSendNotification);
-        pluginWindowsOnTop.getToggleStateValue().addListener (this);
-
-        addAndMakeVisible (hidePluginWindowsLabel);
-        hidePluginWindowsLabel.setText ("Hide plugin windows when app inactive", dontSendNotification);
-        hidePluginWindowsLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (hidePluginWindows);
-        hidePluginWindows.setClickingTogglesState (true);
-        hidePluginWindows.setToggleState (settings.hidePluginWindowsWhenFocusLost(), dontSendNotification);
-        hidePluginWindows.getToggleStateValue().addListener (this);
-
-        addAndMakeVisible (openLastSessionLabel);
-
-#if ! ELEMENT_SE
-        const String sessionStr = "session";
-#else
-        const String sessionStr = "graph";
-#endif
-
-        openLastSessionLabel.setText (String ("Open last used XXX").replace ("XXX", sessionStr),
-                                      dontSendNotification);
-        openLastSessionLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (openLastSession);
-        openLastSession.setClickingTogglesState (true);
-        openLastSession.setToggleState (settings.openLastUsedSession(), dontSendNotification);
-        openLastSession.getToggleStateValue().addListener (this);
-
-        addAndMakeVisible (askToSaveSessionLabel);
-        askToSaveSessionLabel.setText (String ("Ask to save XXXs on exit").replace ("XXX", sessionStr),
-                                       dontSendNotification);
-        askToSaveSessionLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (askToSaveSession);
-        askToSaveSession.setClickingTogglesState (true);
-        askToSaveSession.setToggleState (settings.askToSaveSession(), dontSendNotification);
-        askToSaveSession.getToggleStateValue().addListener (this);
-
-        addAndMakeVisible (systrayLabel);
-        systrayLabel.setText ("Show system tray", dontSendNotification);
-        systrayLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        addAndMakeVisible (systray);
-        systray.setClickingTogglesState (true);
-        systray.setToggleState (settings.isSystrayEnabled(), dontSendNotification);
-        systray.getToggleStateValue().addListener (this);
+        scanForPlugins.init (*this, "Scan plugins on startup", settings.scanForPluginsOnStartup(), [this]() {
+            settings.setScanForPluginsOnStartup (scanForPlugins.get());
+            settingChanged();
+        });
+        showPluginWindows.init (*this, "Automatically show plugin windows", settings.showPluginWindowsWhenAdded(), [this]() {
+            settings.setShowPluginWindowsWhenAdded (showPluginWindows.get());
+            settingChanged();
+        });
+        pluginWindowsOnTop.init (*this, "Plugin windows on top by default", settings.pluginWindowsOnTop(), [this]() {
+            settings.setPluginWindowsOnTop (pluginWindowsOnTop.get());
+            settingChanged();
+        });
+        hidePluginWindows.init (*this, "Hide plugin windows when app inactive", settings.hidePluginWindowsWhenFocusLost(), [this]() {
+            settings.setHidePluginWindowsWhenFocusLost (hidePluginWindows.get());
+            settingChanged();
+        });
+        openLastSession.init (*this, "Open last used " + sessionStr, settings.openLastUsedSession(), [this]() {
+            settings.setOpenLastUsedSession (openLastSession.get());
+            settingChanged();
+        });
+        askToSaveSession.init (*this, "Ask to save " + sessionStr + "s on exit", settings.askToSaveSession(), [this]() {
+            settings.setAskToSaveSession (askToSaveSession.get());
+            settingChanged();
+        });
+        systray.init (*this, "Show system tray", settings.isSystrayEnabled(), [this]() {
+            settings.setSystrayEnabled (systray.get());
+            startHidden.setEnabled (systray.get());
+            gui.refreshSystemTray();
+            settingChanged();
+        });
+        startHidden.init (*this, "Start hidden in system tray", settings.isStartHiddenEnabled(), [this]() {
+            settings.setStartHiddenEnabled (startHidden.get());
+            settingChanged();
+        });
+        startHidden.setEnabled (systray.get());
 
         addAndMakeVisible (desktopScaleLabel);
         desktopScaleLabel.setText ("Desktop scale", dontSendNotification);
@@ -449,7 +459,9 @@ public:
         defaultSessionFile.addListener (this);
         addAndMakeVisible (defaultSessionClearButton);
         defaultSessionClearButton.setButtonText ("X");
-        defaultSessionClearButton.addListener (this);
+        defaultSessionClearButton.onClick = [this]() {
+            defaultSessionFile.setCurrentFile (File(), false, sendNotificationAsync);
+        };
 #if ELEMENT_SE
         defaultSessionFileLabel.setVisible (false);
         defaultSessionFile.setVisible (false);
@@ -467,13 +479,8 @@ public:
         mainContentLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (mainContentBox);
         mainContentBox.addItem ("Standard", 1);
-        // mainContentBox.addItem ("Workspace", 2);
-        if (settings.getMainContentType() == "standard")
-            mainContentBox.setSelectedId (1, dontSendNotification);
-        else
-        {
-            jassertfalse;
-        } // invalid content type
+        jassert (settings.getMainContentType() == "standard");
+        mainContentBox.setSelectedId (1, dontSendNotification);
         mainContentBox.getSelectedIdAsValue().addListener (this);
     }
 
@@ -496,48 +503,26 @@ public:
         settings.saveIfNeeded();
     }
 
-    void buttonClicked (Button* b) override
-    {
-        if (b == &defaultSessionClearButton)
-            defaultSessionFile.setCurrentFile (File(), false, sendNotificationAsync);
-    }
-
     void resized() override
     {
         const int spacingBetweenSections = 6;
         const int settingHeight = 22;
-        const int toggleWidth = 40;
-        const int toggleHeight = 18;
+        const int comboWidth = getWidth() / 2;
 
         Rectangle<int> r (getLocalBounds());
-        auto r2 = r.removeFromTop (settingHeight);
-        clockSourceLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
-        clockSourceBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+        layoutSetting (r, clockSourceLabel, clockSourceBox, comboWidth);
 #if ELEMENT_UPDATER
-        r.removeFromTop (spacingBetweenSections);
-        r2 = r.removeFromTop (settingHeight);
-        checkForUpdatesLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
-        checkForUpdates.setBounds (r2.removeFromLeft (toggleWidth)
-                                       .withSizeKeepingCentre (toggleWidth, toggleHeight));
+        layoutSetting (r, checkForUpdates);
 #endif
-        r.removeFromTop (spacingBetweenSections);
-        r2 = r.removeFromTop (settingHeight);
-        scanForPlugsLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
-        scanForPlugins.setBounds (r2.removeFromLeft (toggleWidth)
-                                      .withSizeKeepingCentre (toggleWidth, toggleHeight));
-
-        layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
-        layoutSetting (r, pluginWindowsOnTopLabel, pluginWindowsOnTop);
-        layoutSetting (r, hidePluginWindowsLabel, hidePluginWindows);
-        layoutSetting (r, openLastSessionLabel, openLastSession);
-        layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
-
-        r.removeFromTop (spacingBetweenSections);
-        r2 = r.removeFromTop (settingHeight);
-        mainContentLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
-        mainContentBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-
-        layoutSetting (r, systrayLabel, systray);
+        layoutSetting (r, scanForPlugins);
+        layoutSetting (r, showPluginWindows);
+        layoutSetting (r, pluginWindowsOnTop);
+        layoutSetting (r, hidePluginWindows);
+        layoutSetting (r, openLastSession);
+        layoutSetting (r, askToSaveSession);
+        layoutSetting (r, mainContentLabel, mainContentBox, comboWidth);
+        layoutSetting (r, systray);
+        layoutSetting (r, startHidden);
         layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
 
 #if ! ELEMENT_SE
@@ -557,18 +542,6 @@ public:
 
     void valueChanged (Value& value) override
     {
-#if ELEMENT_UPDATER
-        if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
-        {
-            settings.setCheckForUpdates (checkForUpdates.getToggleState());
-            jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
-            settings.saveIfNeeded();
-            gui.stabilizeViews();
-            gui.refreshMainMenu();
-            return;
-        }
-#endif
-        // clock source
         if (value.refersToSameSourceAs (clockSource))
         {
             const var val = ClockSourceInternal == (int) clockSource.getValue() ? "internal" : "midiClock";
@@ -577,60 +550,17 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent())
                 cc->refreshToolbar();
         }
-
-        else if (value.refersToSameSourceAs (scanForPlugins.getToggleStateValue()))
-        {
-            settings.setScanForPluginsOnStartup (scanForPlugins.getToggleState());
-        }
-        else if (value.refersToSameSourceAs (showPluginWindows.getToggleStateValue()))
-        {
-            settings.setShowPluginWindowsWhenAdded (showPluginWindows.getToggleState());
-        }
-        else if (value.refersToSameSourceAs (openLastSession.getToggleStateValue()))
-        {
-            settings.setOpenLastUsedSession (openLastSession.getToggleState());
-        }
-        else if (value.refersToSameSourceAs (pluginWindowsOnTop.getToggleStateValue()))
-        {
-            settings.setPluginWindowsOnTop (pluginWindowsOnTop.getToggleState());
-        }
-        else if (value.refersToSameSourceAs (askToSaveSession.getToggleStateValue()))
-        {
-            settings.setAskToSaveSession (askToSaveSession.getToggleState());
-        }
-        else if (value.refersToSameSourceAs (hidePluginWindows.getToggleStateValue()))
-        {
-            settings.setHidePluginWindowsWhenFocusLost (hidePluginWindows.getToggleState());
-        }
-        else if (value.refersToSameSourceAs (systray.getToggleStateValue()))
-        {
-            settings.setSystrayEnabled (systray.getToggleState());
-            gui.refreshSystemTray();
-        }
         else if (value.refersToSameSourceAs (mainContentBox.getSelectedIdAsValue()))
         {
-            auto uitype = settings.getMainContentType();
-            if (1 == mainContentBox.getSelectedId())
-                uitype = "standard";
-
+            const String uitype = "standard";
             if (uitype != settings.getMainContentType())
             {
-                bool changeType = true;
-                if (changeType)
-                {
-                    settings.setMainContentType (uitype);
-                    ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
-                }
-                else
-                {
-                    mainContentBox.setSelectedId (1, dontSendNotification);
-                }
+                settings.setMainContentType (uitype);
+                ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
             }
         }
 
-        settings.saveIfNeeded();
-        gui.stabilizeViews();
-        gui.refreshMainMenu();
+        settingChanged();
     }
 
 private:
@@ -638,35 +568,23 @@ private:
     ComboBox clockSourceBox;
     Value clockSource;
 
-    Label checkForUpdatesLabel;
-    SettingButton checkForUpdates;
-
-    Label scanForPlugsLabel;
-    SettingButton scanForPlugins;
+    BoolSettingRow checkForUpdates;
+    BoolSettingRow scanForPlugins;
 
     PluginSettingsComponent pluginSettings;
 
-    Label showPluginWindowsLabel;
-    SettingButton showPluginWindows;
-
-    Label pluginWindowsOnTopLabel;
-    SettingButton pluginWindowsOnTop;
-
-    Label hidePluginWindowsLabel;
-    SettingButton hidePluginWindows;
-
-    Label openLastSessionLabel;
-    SettingButton openLastSession;
-
-    Label askToSaveSessionLabel;
-    SettingButton askToSaveSession;
+    BoolSettingRow showPluginWindows;
+    BoolSettingRow pluginWindowsOnTop;
+    BoolSettingRow hidePluginWindows;
+    BoolSettingRow openLastSession;
+    BoolSettingRow askToSaveSession;
 
     Label defaultSessionFileLabel;
     FilenameComponent defaultSessionFile;
     TextButton defaultSessionClearButton;
 
-    Label systrayLabel;
-    SettingButton systray;
+    BoolSettingRow systray;
+    BoolSettingRow startHidden;
 
     Label desktopScaleLabel;
     Slider desktopScale;
@@ -677,6 +595,13 @@ private:
     Settings& settings;
     AudioEnginePtr engine;
     GuiService& gui;
+
+    void settingChanged()
+    {
+        settings.saveIfNeeded();
+        gui.stabilizeViews();
+        gui.refreshMainMenu();
+    }
 };
 
 //==============================================================================
@@ -707,7 +632,6 @@ private:
 //==============================================================================
 class MidiSettingsPage : public SettingsPage,
                          public ComboBox::Listener,
-                         public Button::Listener,
                          public ChangeListener,
                          public Timer
 {
@@ -749,23 +673,19 @@ public:
         midiOutLatency.setEnabled (false);
 #endif
 
-        addAndMakeVisible (generateClockLabel);
-        generateClockLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
-        addAndMakeVisible (generateClock);
+        generateClock.init (*this, "Generate MIDI Clock", settings.generateMidiClock(), [this]() {
+            settings.setGenerateMidiClock (generateClock.get());
+            generateClock.set (settings.generateMidiClock());
+            applyEngineSettings();
+        });
         generateClock.setYesNoText ("Yes", "No");
-        generateClock.setClickingTogglesState (true);
-        generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
-        generateClock.addListener (this);
 
-        addAndMakeVisible (sendClockToInputLabel);
-        sendClockToInputLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        sendClockToInputLabel.setText ("Send Clock to MIDI Input?", dontSendNotification);
-        addAndMakeVisible (sendClockToInput);
+        sendClockToInput.init (*this, "Send Clock to MIDI Input?", settings.sendMidiClockToInput(), [this]() {
+            settings.setSendMidiClockToInput (sendClockToInput.get());
+            sendClockToInput.set (settings.sendMidiClockToInput());
+            applyEngineSettings();
+        });
         sendClockToInput.setYesNoText ("Yes", "No");
-        sendClockToInput.setClickingTogglesState (true);
-        sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
-        sendClockToInput.addListener (this);
 
         addAndMakeVisible (panicLabel);
         panicLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -773,16 +693,12 @@ public:
         addAndMakeVisible (panic);
         panic.stabilize();
 
-        addAndMakeVisible (startStopContLabel);
-        startStopContLabel.setFont (Font (FontOptions (12.0, Font::bold)));
-        startStopContLabel.setText (TRANS ("Transport: MIDI Start/Stop"),
-                                    juce::dontSendNotification);
-        addAndMakeVisible (startStopCont);
+        startStopCont.init (*this, TRANS ("Transport: MIDI Start/Stop"), settings.transportRespondToStartStopContinue(), [this]() {
+            settings.setTransportRespondToStartStopContinue (startStopCont.get());
+            startStopCont.set (settings.transportRespondToStartStopContinue());
+            applyEngineSettings();
+        });
         startStopCont.setYesNoText ("Yes", "No");
-        startStopCont.setClickingTogglesState (true);
-        startStopCont.setToggleState (settings.transportRespondToStartStopContinue(),
-                                      dontSendNotification);
-        startStopCont.addListener (this);
 
         addAndMakeVisible (midiInputHeader);
         midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
@@ -801,7 +717,6 @@ public:
 
     ~MidiSettingsPage()
     {
-        startStopCont.removeListener (this);
         devices.removeChangeListener (this);
         midiInputs = nullptr;
         midiOutput.removeListener (this);
@@ -825,9 +740,9 @@ public:
         midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
         midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
         layoutSetting (r, midiOutLatencyLabel, midiOutLatency, getWidth() / 4);
-        layoutSetting (r, generateClockLabel, generateClock);
-        layoutSetting (r, sendClockToInputLabel, sendClockToInput);
-        layoutSetting (r, startStopContLabel, startStopCont);
+        layoutSetting (r, generateClock);
+        layoutSetting (r, sendClockToInput);
+        layoutSetting (r, startStopCont);
         layoutSetting (r, panicLabel, panic, getWidth() / 2);
 
         r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
@@ -837,35 +752,10 @@ public:
         midiInputs->updateSize();
     }
 
-    void buttonClicked (Button* button) override
+    void applyEngineSettings()
     {
-        bool sendChanges = true;
-
-        if (button == &generateClock)
-        {
-            settings.setGenerateMidiClock (generateClock.getToggleState());
-            generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
-        }
-        else if (button == &sendClockToInput)
-        {
-            settings.setSendMidiClockToInput (sendClockToInput.getToggleState());
-            sendClockToInput.setToggleState (settings.sendMidiClockToInput(),
-                                             dontSendNotification);
-        }
-        else if (button == &startStopCont)
-        {
-            settings.setTransportRespondToStartStopContinue (startStopCont.getToggleState());
-            startStopCont.setToggleState (settings.transportRespondToStartStopContinue(),
-                                          dontSendNotification);
-        }
-        else
-        {
-            sendChanges = false;
-        }
-
-        if (sendChanges)
-            if (auto engine = world.audio())
-                engine->applySettings (settings);
+        if (auto engine = world.audio())
+            engine->applySettings (settings);
     }
 
     void comboBoxChanged (ComboBox* box) override
@@ -893,12 +783,9 @@ private:
     ComboBox midiOutput;
     Label midiOutLatencyLabel;
     Slider midiOutLatency;
-    Label generateClockLabel;
-    SettingButton generateClock;
-    Label sendClockToInputLabel;
-    SettingButton sendClockToInput;
-    Label startStopContLabel;
-    SettingButton startStopCont;
+    BoolSettingRow generateClock;
+    BoolSettingRow sendClockToInput;
+    BoolSettingRow startStopCont;
 
     Label midiInputHeader;
     Array<MidiDeviceInfo> outputs;

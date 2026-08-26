@@ -30,10 +30,10 @@
 #include <errno.h>
 extern char* program_invocation_name;
 
+#include "win32.hpp"
+
 #if JUCE_WINDOWS
-#define WIN32_LEAN_AND_MEAN
 #include <process.h>
-#include <windows.h>
 #else
 #include <signal.h>
 #include <unistd.h>

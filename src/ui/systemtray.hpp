@@ -13,6 +13,10 @@ public:
     static SystemTray* getInstance() { return instance; }
     static void setEnabled (bool enabled);
 
+    /** Returns true if a tray icon can be shown in this run mode and
+        environment, regardless of whether the user has enabled it. */
+    static bool isAvailable();
+
     void mouseDown (const MouseEvent&) override;
     void mouseUp (const MouseEvent&) override;
 

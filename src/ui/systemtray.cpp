@@ -71,9 +71,14 @@ void SystemTray::init (GuiService& gui)
     canUseSystemTray = gui.getRunMode() == RunMode::Standalone;
 }
 
+bool SystemTray::isAvailable()
+{
+    return initialized && canUseSystemTray && ! element::Util::isRunningInWine();
+}
+
 void SystemTray::setEnabled (bool enabled)
 {
-    if (element::Util::isRunningInWine() || ! initialized || ! canUseSystemTray)
+    if (! isAvailable())
         return;
 
     if (enabled)

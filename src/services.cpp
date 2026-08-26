@@ -8,6 +8,7 @@
 
 #include <element/engine.hpp>
 #include <element/ui.hpp>
+#include <element/ui/mainwindow.hpp>
 
 #include "engine/graphmanager.hpp"
 #include "presetmanager.hpp"
@@ -182,14 +183,11 @@ void Services::run()
     {
         gui->stabilizeContent();
         const Node graph (session->getCurrentGraph());
-        auto* const props = context().settings().getUserSettings();
+        auto* const window = gui->getMainWindow();
 
-        if (graph.isValid())
-        {
-            // don't show plugin windows on load if the UI was hidden
-            if (props->getBoolValue ("mainWindowVisible", true))
-                gui->showPluginWindowsFor (graph);
-        }
+        // don't show plugin windows on load if the UI is hidden
+        if (graph.isValid() && window != nullptr && window->isOnDesktop())
+            gui->showPluginWindowsFor (graph);
     }
 }
 
