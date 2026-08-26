@@ -28,6 +28,7 @@
 #include "ui/systemtray.hpp"
 #include "ui/virtualkeyboardview.hpp"
 #include "ui/windowmanager.hpp"
+#include "win32.hpp"
 
 #ifndef ELEMENT_USE_SYSTEM_TRAY
 #define ELEMENT_USE_SYSTEM_TRAY 1
