@@ -171,11 +171,71 @@ void MidiEngine::MidiInputHolder::handleIncomingMidiMessage (MidiInput* source, 
 MidiEngine::MidiEngine()
 {
     callbackHandler.reset (new CallbackHandler (*this));
+    deviceListConnection = juce::MidiDeviceListConnection::make ([this] { handleDeviceListChanged(); });
 }
 
 MidiEngine::~MidiEngine()
 {
+    deviceListConnection.reset();
     callbackHandler.reset (nullptr);
+}
+
+void MidiEngine::handleDeviceListChanged()
+{
+    StringArray inputIDs;
+    for (const auto& dev : MidiInput::getAvailableDevices())
+        inputIDs.add (dev.identifier);
+
+    // Drop inputs that were unplugged, remembering the ones the user had enabled.
+    for (int i = openMidiInputs.size(); --i >= 0;)
+    {
+        auto* const holder = openMidiInputs.getUnchecked (i);
+        const auto id = holder->input->getIdentifier();
+        if (inputIDs.contains (id))
+            continue;
+        if (holder->active)
+            midiInsFromXml.addIfNotAlreadyThere (id);
+        openMidiInputs.remove (i);
+    }
+
+    // Reopen enabled inputs that came back.
+    for (const auto& id : midiInsFromXml)
+        if (inputIDs.contains (id))
+            if (auto* holder = getMidiInput (id, true))
+                holder->active = true;
+
+    // Reopen inputs wanted by consumers (e.g. MIDI Input nodes).
+    StringArray consumerIDs;
+    {
+        const ScopedLock sl (midiCallbackLock);
+        for (const auto& mc : midiCallbacks)
+            if (mc.consumer && mc.device.isNotEmpty())
+                consumerIDs.addIfNotAlreadyThere (mc.device);
+    }
+    for (const auto& id : consumerIDs)
+        if (inputIDs.contains (id))
+            getMidiInput (id, true);
+
+    // Re-evaluate the default output: close it if unplugged, reopen if it came back.
+    if (defaultMidiOutputID.isNotEmpty())
+    {
+        bool available = false;
+        for (const auto& dev : MidiOutput::getAvailableDevices())
+            if (dev.identifier == defaultMidiOutputID)
+                available = true;
+
+        if (available != (defaultMidiOutput != nullptr))
+        {
+            MidiDeviceInfo info;
+            info.name = defaultMidiOutputName;
+            info.identifier = defaultMidiOutputID;
+            defaultMidiOutputID.clear();
+            setDefaultMidiOutput (info);
+            return; // setDefaultMidiOutput sends the change message
+        }
+    }
+
+    sendChangeMessage();
 }
 
 //==============================================================================
@@ -227,11 +287,13 @@ void MidiEngine::setMidiInputEnabled (const MidiDeviceInfo& device, const bool e
         {
             if (auto* holder = getMidiInput (device.identifier, true))
                 holder->active = true;
+            midiInsFromXml.addIfNotAlreadyThere (device.identifier);
         }
         else
         {
             if (auto* holder = getMidiInput (device.identifier, false))
                 holder->active = false;
+            midiInsFromXml.removeString (device.identifier);
         }
 
         sendChangeMessage();
