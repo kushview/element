@@ -149,11 +149,27 @@ MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput, MidiEngine& me)
       midi (me)
 {
     setPlayConfigDetails (0, 0, 44100.0, 1024);
+    deviceListConnection = juce::MidiDeviceListConnection::make ([this] { handleDeviceListChanged(); });
 }
 
 MidiDeviceProcessor::~MidiDeviceProcessor() noexcept
 {
+    deviceListConnection.reset();
     closeDevice();
+}
+
+void MidiDeviceProcessor::handleDeviceListChanged()
+{
+    // Inputs are routed by identifier through the MidiEngine, which reopens
+    // them itself. Outputs hold the device directly, so close and retry.
+    if (inputDevice || deviceWanted.identifier.isEmpty())
+        return;
+    if (deviceIsAvailable (deviceWanted) && isDeviceOpen())
+        return;
+
+    const auto wanted = deviceWanted;
+    closeDevice();
+    setDevice (wanted);
 }
 
 void MidiDeviceProcessor::setLatency (double latencyMs)

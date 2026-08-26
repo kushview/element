@@ -162,6 +162,8 @@ private:
     void timerCallback() override;
     bool deviceIsAvailable (const String& name);
     bool deviceIsAvailable (const MidiDeviceInfo& dev);
+    void handleDeviceListChanged();
+    juce::MidiDeviceListConnection deviceListConnection;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiDeviceProcessor);
 };
 
