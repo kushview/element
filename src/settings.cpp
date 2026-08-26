@@ -29,6 +29,7 @@ const char* Settings::midiEngineKey = "midiEngine";
 const char* Settings::oscHostPortKey = "oscHostPortKey";
 const char* Settings::oscHostEnabledKey = "oscHostEnabledKey";
 const char* Settings::systrayKey = "systrayKey";
+const char* Settings::startHiddenKey = "startHidden";
 const char* Settings::midiOutLatencyKey = "midiOutLatency";
 const char* Settings::desktopScaleKey = "desktopScale";
 const char* Settings::mainContentTypeKey = "mainContentType";
@@ -113,22 +114,6 @@ Settings::Settings()
 Settings::~Settings() {}
 
 //=============================================================================
-bool Settings::checkForUpdates() const
-{
-    if (auto* props = getProps())
-        return props->getBoolValue (checkForUpdatesKey, true);
-    return false;
-}
-
-void Settings::setCheckForUpdates (const bool shouldCheck)
-{
-    if (shouldCheck == checkForUpdates())
-        return;
-    if (auto* p = getProps())
-        p->setValue (checkForUpdatesKey, shouldCheck);
-}
-
-//=============================================================================
 PropertiesFile* Settings::getProps() const
 {
     return (const_cast<Settings*> (this))->getUserSettings();
@@ -140,6 +125,24 @@ bool Settings::getBool (std::string_view key, bool fallback) const noexcept
     return p != nullptr ? p->getBoolValue (key.data(), fallback) : fallback;
 }
 
+int Settings::getInt (std::string_view key, int fallback) const noexcept
+{
+    auto p = getProps();
+    return p != nullptr ? p->getIntValue (key.data(), fallback) : fallback;
+}
+
+double Settings::getDouble (std::string_view key, double fallback) const noexcept
+{
+    auto p = getProps();
+    return p != nullptr ? p->getDoubleValue (key.data(), fallback) : fallback;
+}
+
+String Settings::getString (std::string_view key, const String& fallback) const
+{
+    auto p = getProps();
+    return p != nullptr ? p->getValue (key.data(), fallback) : fallback;
+}
+
 void Settings::set (std::string_view key, const var& value)
 {
     if (auto p = getProps())
@@ -147,10 +150,13 @@ void Settings::set (std::string_view key, const var& value)
 }
 
 //=============================================================================
+bool Settings::checkForUpdates() const { return getBool (checkForUpdatesKey, true); }
+void Settings::setCheckForUpdates (const bool shouldCheck) { set (checkForUpdatesKey, shouldCheck); }
+
 std::unique_ptr<XmlElement> Settings::getLastGraph() const
 {
     if (auto* p = getProps())
-        return p->getXmlValue ("lastGraph");
+        return p->getXmlValue (lastGraphKey);
     return nullptr;
 }
 
@@ -161,129 +167,41 @@ void Settings::setLastGraph (const ValueTree& data)
         return;
     if (auto* p = getProps())
         if (auto xml = data.createXml())
-            p->setValue ("lastGraph", xml.get());
+            p->setValue (lastGraphKey, xml.get());
 }
 
-//=============================================================================
-bool Settings::scanForPluginsOnStartup() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (scanForPluginsOnStartKey, false);
-    return false;
-}
+bool Settings::scanForPluginsOnStartup() const { return getBool (scanForPluginsOnStartKey, false); }
+void Settings::setScanForPluginsOnStartup (const bool shouldScan) { set (scanForPluginsOnStartKey, shouldScan); }
 
-void Settings::setScanForPluginsOnStartup (const bool shouldScan)
-{
-    if (shouldScan == scanForPluginsOnStartup())
-        return;
-    if (auto* p = getProps())
-        p->setValue (scanForPluginsOnStartKey, shouldScan);
-}
+bool Settings::showPluginWindowsWhenAdded() const { return getBool (showPluginWindowsKey, false); }
+void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow) { set (showPluginWindowsKey, shouldShow); }
 
-//=============================================================================
-bool Settings::showPluginWindowsWhenAdded() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (showPluginWindowsKey, false);
-    return false;
-}
+bool Settings::openLastUsedSession() const { return getBool (openLastUsedSessionKey, true); }
+void Settings::setOpenLastUsedSession (const bool shouldOpen) { set (openLastUsedSessionKey, shouldOpen); }
 
-void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow)
-{
-    if (shouldShow == showPluginWindowsWhenAdded())
-        return;
-    if (auto* p = getProps())
-        p->setValue (showPluginWindowsKey, shouldShow);
-}
+bool Settings::generateMidiClock() const { return getBool (generateMidiClockKey, false); }
+void Settings::setGenerateMidiClock (const bool generate) { set (generateMidiClockKey, generate); }
 
-//=============================================================================
-bool Settings::openLastUsedSession() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (openLastUsedSessionKey, true);
-    return true;
-}
+bool Settings::pluginWindowsOnTop() const { return getBool (pluginWindowOnTopDefault, true); }
+void Settings::setPluginWindowsOnTop (const bool onTop) { set (pluginWindowOnTopDefault, onTop); }
 
-void Settings::setOpenLastUsedSession (const bool shouldOpen)
-{
-    if (shouldOpen == openLastUsedSession())
-        return;
-    if (auto* p = getProps())
-        p->setValue (openLastUsedSessionKey, shouldOpen);
-}
+bool Settings::askToSaveSession() const { return getBool (askToSaveSessionKey, true); }
+void Settings::setAskToSaveSession (const bool value) { set (askToSaveSessionKey, value); }
 
-//=============================================================================
-void Settings::setGenerateMidiClock (const bool generate)
-{
-    if (auto* p = getProps())
-        return p->setValue (generateMidiClockKey, generate);
-}
-
-bool Settings::generateMidiClock() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (generateMidiClockKey, false);
-    return false;
-}
-
-bool Settings::pluginWindowsOnTop() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (pluginWindowOnTopDefault, true);
-    return false;
-}
-
-bool Settings::askToSaveSession()
-{
-    if (auto* props = getProps())
-        return props->getBoolValue (askToSaveSessionKey, true);
-    return false;
-}
-
-void Settings::setAskToSaveSession (const bool value)
-{
-    if (auto* props = getProps())
-        props->setValue (askToSaveSessionKey, value);
-}
-
-bool Settings::sendMidiClockToInput() const
-{
-    if (auto* props = getProps())
-        return props->getBoolValue (sendMidiClockToInputKey, false);
-    return false;
-}
-
-void Settings::setSendMidiClockToInput (const bool value)
-{
-    if (auto* props = getProps())
-        props->setValue (sendMidiClockToInputKey, value);
-}
-
-void Settings::setPluginWindowsOnTop (const bool onTop)
-{
-    if (onTop == pluginWindowsOnTop())
-        return;
-    if (auto* p = getProps())
-        p->setValue (pluginWindowOnTopDefault, onTop);
-}
+bool Settings::sendMidiClockToInput() const { return getBool (sendMidiClockToInputKey, false); }
+void Settings::setSendMidiClockToInput (const bool value) { set (sendMidiClockToInputKey, value); }
 
 const File Settings::getDefaultNewSessionFile() const
 {
-    if (auto* p = getProps())
-    {
-        const auto value = p->getValue (defaultNewSessionFile);
-        if (value.isNotEmpty() && File::isAbsolutePath (value))
-            return File (value);
-    }
-
+    const auto value = getString (defaultNewSessionFile);
+    if (value.isNotEmpty() && File::isAbsolutePath (value))
+        return File (value);
     return File();
 }
 
 void Settings::setDefaultNewSessionFile (const File& file)
 {
-    if (auto* p = getProps())
-        p->setValue (defaultNewSessionFile,
-                     file.existsAsFile() ? file.getFullPathName() : "");
+    set (defaultNewSessionFile, file.existsAsFile() ? file.getFullPathName() : String());
 }
 
 bool Settings::hidePluginWindowsWhenFocusLost() const
@@ -293,158 +211,62 @@ bool Settings::hidePluginWindowsWhenFocusLost() const
 #else
     const bool fallback = true;
 #endif
-
-    if (auto* p = getProps())
-        return p->getBoolValue (hidePluginWindowsWhenFocusLostKey, fallback);
-    return fallback;
+    return getBool (hidePluginWindowsWhenFocusLostKey, fallback);
 }
 
-void Settings::setHidePluginWindowsWhenFocusLost (const bool hideThem)
-{
-    if (hideThem == hidePluginWindowsWhenFocusLost())
-        return;
-    if (auto* p = getProps())
-        p->setValue (hidePluginWindowsWhenFocusLostKey, hideThem);
-}
+void Settings::setHidePluginWindowsWhenFocusLost (const bool hideThem) { set (hidePluginWindowsWhenFocusLostKey, hideThem); }
 
-bool Settings::useLegacyInterface() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (legacyInterfaceKey, false);
-    return false;
-}
-
-void Settings::setUseLegacyInterface (const bool useLegacy)
-{
-    if (useLegacy == useLegacyInterface())
-        return;
-    if (auto* p = getProps())
-        p->setValue (legacyInterfaceKey, useLegacy);
-}
-
-bool Settings::isOscHostEnabled() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (oscHostEnabledKey, false);
-    return false;
-}
-
-void Settings::setOscHostEnabled (bool enabled)
-{
-    if (isOscHostEnabled() == enabled)
-        return;
-    if (auto* p = getProps())
-        p->setValue (oscHostEnabledKey, enabled);
-}
+bool Settings::useLegacyInterface() const { return getBool (legacyInterfaceKey, false); }
+void Settings::setUseLegacyInterface (const bool useLegacy) { set (legacyInterfaceKey, useLegacy); }
 
 //=============================================================================
-int Settings::getOscHostPort() const
-{
-    if (auto* p = getProps())
-        return p->getIntValue (oscHostPortKey, 9000);
-    return 9000;
-}
+bool Settings::isOscHostEnabled() const { return getBool (oscHostEnabledKey, false); }
+void Settings::setOscHostEnabled (bool enabled) { set (oscHostEnabledKey, enabled); }
 
-void Settings::setOscHostPort (int port)
-{
-    if (getOscHostPort() == port)
-        return;
-    if (auto* p = getProps())
-        p->setValue (oscHostPortKey, port);
-}
+int Settings::getOscHostPort() const { return getInt (oscHostPortKey, 9000); }
+void Settings::setOscHostPort (int port) { set (oscHostPortKey, port); }
 
 //=============================================================================
 bool Settings::isSystrayEnabled() const
 {
 #if JUCE_LINUX
-    const bool defaultSysTrayEnabled = false;
+    const bool fallback = false;
 #else
-    const bool defaultSysTrayEnabled = true;
+    const bool fallback = true;
 #endif
-
-    if (auto* p = getProps())
-        return p->getBoolValue (systrayKey, defaultSysTrayEnabled);
-    return defaultSysTrayEnabled;
+    return getBool (systrayKey, fallback);
 }
 
-void Settings::setSystrayEnabled (bool enabled)
-{
-    if (isSystrayEnabled() == enabled)
-        return;
-    if (auto* p = getProps())
-        p->setValue (systrayKey, enabled);
-}
+void Settings::setSystrayEnabled (bool enabled) { set (systrayKey, enabled); }
+
+bool Settings::isStartHiddenEnabled() const { return getBool (startHiddenKey, false); }
+void Settings::setStartHiddenEnabled (bool enabled) { set (startHiddenKey, enabled); }
 
 //=============================================================================
-double Settings::getMidiOutLatency() const
-{
-    if (auto* p = getProps())
-        return p->getDoubleValue (midiOutLatencyKey, true);
-    return 0.0;
-}
+double Settings::getMidiOutLatency() const { return getDouble (midiOutLatencyKey, 0.0); }
+void Settings::setMidiOutLatency (double latencyMs) { set (midiOutLatencyKey, latencyMs); }
 
-void Settings::setMidiOutLatency (double latencyMs)
-{
-    if (latencyMs == getMidiOutLatency())
-        return;
-    if (auto* p = getProps())
-        p->setValue (midiOutLatencyKey, latencyMs);
-}
+double Settings::getDesktopScale() const { return getDouble (desktopScaleKey, 1.0); }
+void Settings::setDesktopScale (double scale) { set (desktopScaleKey, jlimit (0.1, 8.0, scale)); }
 
 //=============================================================================
-double Settings::getDesktopScale() const
-{
-    if (auto* p = getProps())
-        return p->getDoubleValue (desktopScaleKey, 1.0);
-    return 1.0;
-}
+String Settings::getMainContentType() const { return "standard"; }
+void Settings::setMainContentType (const String& tp) { ignoreUnused (tp); }
 
-void Settings::setDesktopScale (double scale)
-{
-    if (scale == getDesktopScale())
-        return;
-    scale = jlimit (0.1, 8.0, scale);
-    if (auto* p = getProps())
-        p->setValue (desktopScaleKey, scale);
-}
+String Settings::getClockSource() const { return getString (clockSourceKey, "internal"); }
 
-//=============================================================================
-String Settings::getMainContentType() const
-{
-    return "standard";
-}
-
-void Settings::setMainContentType (const String& tp)
-{
-    ignoreUnused (tp);
-}
-
-//=============================================================================
-juce::String Settings::getClockSource() const
-{
-    if (auto* p = getProps())
-        return p->getValue (clockSourceKey, "internal");
-    return "internal";
-}
-
-void Settings::setClockSource (const juce::String& src)
+void Settings::setClockSource (const String& src)
 {
     if (src != "internal" && src != "midiClock")
     {
         jassertfalse;
         return;
     }
-
-    if (auto p = getProps())
-        p->setValue (clockSourceKey, src);
+    set (clockSourceKey, src);
 }
 
-juce::String Settings::getUpdateKeyType() const
-{
-    if (auto* p = getProps())
-        return p->getValue (updateKeyTypeKey, "element-v1");
-    return "element-v1";
-}
+//=============================================================================
+String Settings::getUpdateKeyType() const { return getString (updateKeyTypeKey, "element-v1"); }
 
 void Settings::setUpdateKeyType (const String& slug)
 {
@@ -453,113 +275,58 @@ void Settings::setUpdateKeyType (const String& slug)
         jassertfalse;
         return;
     }
-
-    if (auto p = getProps())
-        p->setValue (updateKeyTypeKey, slug);
+    set (updateKeyTypeKey, slug);
 }
 
-juce::String Settings::getUpdateKeyUser() const
-{
-    if (auto* p = getProps())
-        return p->getValue (updateKeyUserKey, "");
-    return "";
-}
+String Settings::getUpdateKeyUser() const { return getString (updateKeyUserKey); }
+void Settings::setUpdateKeyUser (const String& user) { set (updateKeyUserKey, user.trim()); }
 
-void Settings::setUpdateKeyUser (const String& user)
-{
-    if (auto p = getProps())
-        p->setValue (updateKeyUserKey, user.trim());
-}
-
-juce::String Settings::getUpdateKey() const
-{
-    if (auto* p = getProps())
-        return p->getValue (updateKeyKey, "");
-    return "";
-}
+String Settings::getUpdateKey() const { return getString (updateKeyKey); }
 
 void Settings::setUpdateKey (const String& slug)
 {
-    if (auto p = getProps())
-        p->setValue (updateKeyKey, slug.trim());
+    set (updateKeyKey, slug.trim());
     sendChangeMessage();
 }
 
-juce::String Settings::getUpdateChannel() const
-{
-    if (auto* p = getProps())
-        return p->getValue (updateChannelKey, "");
-    return "";
-}
+String Settings::getUpdateChannel() const { return getString (updateChannelKey); }
+void Settings::setUpdateChannel (const String& channel) { set (updateChannelKey, channel.trim()); }
 
-void Settings::setUpdateChannel (const String& channel)
-{
-    if (auto p = getProps())
-        p->setValue (updateChannelKey, channel.trim());
-}
-
-bool Settings::getAuthPreviewUpdates() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (authPreviewUpdatesKey, false);
-    return false;
-}
+bool Settings::getAuthPreviewUpdates() const { return getBool (authPreviewUpdatesKey, false); }
 
 void Settings::setAuthPreviewUpdates (bool enabled)
 {
-    if (auto* p = getProps())
-        p->setValue (authPreviewUpdatesKey, enabled);
+    set (authPreviewUpdatesKey, enabled);
     sendChangeMessage();
 }
 
-juce::String Settings::getAuthAppcastUrl() const
-{
-    if (auto* p = getProps())
-        return p->getValue (authAppcastUrlKey);
-    return {};
-}
+String Settings::getAuthAppcastUrl() const { return getString (authAppcastUrlKey); }
 
-void Settings::setAuthAppcastUrl (const juce::String& url)
+void Settings::setAuthAppcastUrl (const String& url)
 {
-    if (auto* p = getProps())
-        p->setValue (authAppcastUrlKey, url);
+    set (authAppcastUrlKey, url);
     sendChangeMessage();
 }
 
+//=============================================================================
 void Settings::setMidiPanicParams (MidiPanicParams params)
 {
-    if (auto p = getProps())
-    {
-        p->setValue ("midiPanicCCEnabled", params.enabled);
-        p->setValue ("midiPanicCCNumber", params.ccNumber);
-        p->setValue ("midiPanicChannel", params.channel);
-    }
+    set ("midiPanicCCEnabled", params.enabled);
+    set ("midiPanicCCNumber", params.ccNumber);
+    set ("midiPanicChannel", params.channel);
 }
 
 MidiPanicParams Settings::getMidiPanicParams() const
 {
     MidiPanicParams params;
-    if (auto p = getProps())
-    {
-        params.enabled = p->getBoolValue ("midiPanicCCEnabled", false);
-        params.ccNumber = p->getIntValue ("midiPanicCCNumber", -1);
-        params.channel = p->getIntValue ("midiPanicChannel", 1);
-    }
+    params.enabled = getBool ("midiPanicCCEnabled", false);
+    params.ccNumber = getInt ("midiPanicCCNumber", -1);
+    params.channel = getInt ("midiPanicChannel", 1);
     return params;
 }
 
-void Settings::setTransportRespondToStartStopContinue (bool shouldRespond)
-{
-    if (auto p = getProps())
-        p->setValue (transportStartStopContinue, shouldRespond);
-}
-
-bool Settings::transportRespondToStartStopContinue() const
-{
-    if (auto* p = getProps())
-        return p->getBoolValue (transportStartStopContinue, false);
-    return false;
-}
+bool Settings::transportRespondToStartStopContinue() const { return getBool (transportStartStopContinue, false); }
+void Settings::setTransportRespondToStartStopContinue (bool shouldRespond) { set (transportStartStopContinue, shouldRespond); }
 
 //=============================================================================
 void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
