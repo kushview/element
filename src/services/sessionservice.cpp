@@ -221,9 +221,11 @@ bool SessionService::hasSessionChanged()
 
 void SessionService::resetChanges (const bool resetDocumentFile)
 {
-    jassert (document);
+    jassert (document && currentSession);
     if (resetDocumentFile)
         document->setFile ({});
+    // flush pending change messages so they don't re-flag the document afterwards
+    currentSession->dispatchPendingMessages();
     document->setChangedFlag (false);
     jassert (! document->hasChangedSinceSaved());
 }
