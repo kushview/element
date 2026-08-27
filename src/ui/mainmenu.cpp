@@ -244,6 +244,7 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 void MainMenu::buildFileMenu (PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
+    menu.addCommandItem (&cmd, Commands::sessionClose, "Close Session");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
     addRecentFiles (menu);
@@ -331,6 +332,7 @@ void MainMenu::buildHelpMenu (PopupMenu& menu)
 void MainMenu::buildSessionMenu (Commands& cmd, PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
+    menu.addCommandItem (&cmd, Commands::sessionClose, "Close Session");
     menu.addSeparator();
 
     menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
