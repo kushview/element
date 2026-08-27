@@ -125,6 +125,9 @@ public:
     /** Clears the current content component */
     void clearContentComponent();
 
+    /** Show or hide the main window according to the persisted UI Type. */
+    void applyUiTypeToMainWindow();
+
     // TODO: content manager on selected nodes
     Node getSelectedNode() const { return selectedNode; }
     // TODO: content manager on selected nodes.

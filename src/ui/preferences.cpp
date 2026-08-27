@@ -479,8 +479,12 @@ public:
         mainContentLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         addAndMakeVisible (mainContentBox);
         mainContentBox.addItem ("Standard", 1);
-        jassert (settings.getMainContentType() == "standard");
-        mainContentBox.setSelectedId (1, dontSendNotification);
+        mainContentBox.addItem ("Menu-bar only", 2);
+        {
+            const auto uitype = settings.getMainContentType();
+            const int selectedId = uitype == "menubarOnly" ? 2 : 1;
+            mainContentBox.setSelectedId (selectedId, dontSendNotification);
+        }
         mainContentBox.getSelectedIdAsValue().addListener (this);
     }
 
@@ -552,11 +556,16 @@ public:
         }
         else if (value.refersToSameSourceAs (mainContentBox.getSelectedIdAsValue()))
         {
-            const String uitype = "standard";
+            const String uitype = mainContentBox.getSelectedId() == 2
+                                      ? String ("menubarOnly")
+                                      : String ("standard");
             if (uitype != settings.getMainContentType())
             {
                 settings.setMainContentType (uitype);
-                ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
+                if (uitype == "menubarOnly" && ! settings.isSystrayEnabled())
+                    settings.setSystrayEnabled (true);
+                gui.applyUiTypeToMainWindow();
+                gui.refreshSystemTray();
             }
         }
 

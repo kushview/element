@@ -250,8 +250,23 @@ double Settings::getDesktopScale() const { return getDouble (desktopScaleKey, 1.
 void Settings::setDesktopScale (double scale) { set (desktopScaleKey, jlimit (0.1, 8.0, scale)); }
 
 //=============================================================================
-String Settings::getMainContentType() const { return "standard"; }
-void Settings::setMainContentType (const String& tp) { ignoreUnused (tp); }
+String Settings::getMainContentType() const
+{
+    auto value = getString (mainContentTypeKey, "standard");
+    if (value != "standard" && value != "menubarOnly")
+        return "standard";
+    return value;
+}
+
+void Settings::setMainContentType (const String& tp)
+{
+    if (tp != "standard" && tp != "menubarOnly")
+    {
+        jassertfalse;
+        return;
+    }
+    set (mainContentTypeKey, tp);
+}
 
 String Settings::getClockSource() const { return getString (clockSourceKey, "internal"); }
 

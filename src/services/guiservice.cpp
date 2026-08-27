@@ -41,7 +41,18 @@ namespace element {
     command line flag, and on Windows the shortcut "Run: Minimized" option. */
 static bool shouldStartHidden (Settings& settings)
 {
-    if (! SystemTray::isAvailable() || ! settings.isSystrayEnabled())
+    if (! SystemTray::isAvailable())
+        return false;
+
+    if (settings.getMainContentType() == "menubarOnly")
+    {
+        // Auto-enable the tray so the mode is actually reachable.
+        if (! settings.isSystrayEnabled())
+            settings.setSystrayEnabled (true);
+        return true;
+    }
+
+    if (! settings.isSystrayEnabled())
         return false;
 
     if (settings.isStartHiddenEnabled())
@@ -1179,6 +1190,31 @@ void GuiService::refreshSystemTray()
 #endif
 }
 
+void GuiService::applyUiTypeToMainWindow()
+{
+    if (! mainWindow)
+        return;
+
+    const bool menubarOnly = context().settings().getMainContentType() == "menubarOnly";
+
+    if (menubarOnly)
+    {
+        if (mainWindow->isOnDesktop())
+        {
+            mainWindow->removeFromDesktop();
+            closeAllPluginWindows (true);
+        }
+    }
+    else if (! mainWindow->isOnDesktop())
+    {
+        mainWindow->addToDesktop();
+        mainWindow->setBoundsConstrained (mainWindow->getBounds());
+        mainWindow->toFront (true);
+        if (auto session = context().session())
+            showPluginWindowsFor (session->getActiveGraph(), true, false);
+    }
+}
+
 void GuiService::setMainWindowTitler (std::function<juce::String()> f)
 {
     if (mainWindow)
@@ -1262,6 +1298,7 @@ bool GuiService::handleMessage (const AppMessage& msg)
             stabilizeContent();
             refreshMainMenu();
             refreshSystemTray();
+            applyUiTypeToMainWindow();
         }
 
         return true;

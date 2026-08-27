@@ -119,6 +119,14 @@ void MainWindow::nameChangedSession()
 
 void MainWindow::closeButtonPressed()
 {
+    auto& settings = world.settings();
+    if (settings.getMainContentType() == "menubarOnly")
+    {
+        auto& gui = *world.services().find<GuiService>();
+        gui.commands().invokeDirectly (Commands::toggleUserInterface, true);
+        return;
+    }
+
     JUCEApplication* app (JUCEApplication::getInstance());
     app->systemRequestedQuit();
 }

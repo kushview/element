@@ -5,6 +5,7 @@
 ### Added
 - CLAP plugins now appear in the Unverified plugin menu and can be added to a graph without a prior scan.
 - Graph Mixer: channel strips can be hidden via right-click and restored from the mixer background's right-click menu.
+- "Menu-bar only" UI Type in Preferences: the main window starts hidden and Element is reachable exclusively through the system tray icon. The systray menu now includes a Preferences item.
 
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.
@@ -15,6 +16,9 @@
 - Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.
 
 ### Fixed
+- The Preferences UI Type dropdown is now wired up: selecting an option persists and is applied. Previously the value was silently ignored.
+- Switching UI Type no longer rebuilds the main content, which previously reset graph layout and node positions.
+- In Menu-bar only mode, closing the main window now hides to the tray instead of quitting the app.
 - Freeze on Windows when an ASIO audio interface is disconnected. Reconnection is now driven by system hardware notifications instead of repeatedly probing the driver.
 - Blocks embedded in the graph return to their embedded state when the plugin window is closed.
 - MIDI Monitor note names displayed two octaves too high.

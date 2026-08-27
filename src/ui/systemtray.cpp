@@ -110,6 +110,7 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     {
         PopupMenu menu;
         menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+        menu.addCommandItem (cmd, Commands::showPreferences, "Preferences...");
         menu.addSeparator();
         menu.addCommandItem (cmd, Commands::quit, "Exit");
 #if JUCE_MAC
@@ -139,6 +140,7 @@ void SystemTray::runMenu()
 
     PopupMenu menu;
     menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+    menu.addCommandItem (cmd, Commands::showPreferences, "Preferences...");
     menu.addSeparator();
     menu.addCommandItem (cmd, Commands::quit, "Exit");
 #if JUCE_MAC
