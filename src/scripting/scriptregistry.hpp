@@ -25,6 +25,13 @@ namespace element {
     That return block may also optionally declare `dspName = '...'`, which
     overrides the display name (otherwise the DSP resource's filename, minus
     the .lua extension, is used).
+
+    A "<name>ui" resource is only ever treated as <name>'s UI companion if it
+    itself declares `type = 'DSPUI'` in its own return block. This means a
+    <name>ui resource that happens to exist for some unrelated reason (or is
+    itself a standalone DSP script, or declares some other type entirely) is
+    never mistakenly swallowed as a companion -- see scriptregistry.cpp for
+    the full pairing rules.
 */
 struct BuiltInScripts
 {
@@ -41,19 +48,24 @@ struct BuiltInScripts
 
     The script list is discovered entirely at runtime:
       1. Every embedded resource is enumerated from scripts::namedResourceList.
-      2. Resources are paired up using the "<name>" / "<name>ui" naming
-         convention (the ui one becomes a companion, not its own entry).
-      3. Each remaining candidate's source is scanned for a `type = 'DSP'`
-         return block; candidates without one, or whose `type` is something
-         else (e.g. view.lua's `type = 'View'`), are dropped entirely.
-      4. If that return block also declares `dspName = '...'`, it is used as
-         the entry's display name; otherwise the filename-derived name is used.
+      2. Each resource's declared `type` (if any) is determined by scanning
+         its trailing return block -- 'DSP', 'DSPUI', or anything else
+         (which is dropped, e.g. view.lua's `type = 'View'`).
+      3. Resources named "<name>ui" are paired to "<name>" as a UI companion
+         only when <name> is a valid DSP script AND "<name>ui" is itself a
+         valid DSPUI script -- never merely by name existing.
+      4. If a DSP script's return block declares `dspName = '...'`, it is
+         used as the entry's display name; otherwise the filename-derived
+         name is used.
 
     Nothing is hardcoded, so new scripts dropped into scripts/ are picked up
     automatically without touching this class.
 
     Populated lazily on first access. Thread-safe by virtue of C++11
-    function-local static initialization guarantees.
+    function-local static initialization guarantees (construction only --
+    the underlying vectors are populated once during construction and never
+    mutated afterward, so concurrent reads via getScripts()/findByName()
+    after that first call are safe).
 */
 class ScriptRegistry
 {
@@ -66,6 +78,10 @@ public:
 
     /** Looks up a script by its display name (e.g. "amp", or its dspName
         override if one was declared). Returns nullptr if not found.
+
+        The returned pointer refers to storage owned by the registry and
+        remains valid for the lifetime of the application (the registry is
+        a function-local static that is never destroyed until program exit).
     */
     const BuiltInScripts* findByName (const char* name) const noexcept;
 
