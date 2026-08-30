@@ -545,7 +545,7 @@ void GraphSettingsView::stabilizeContent()
         auto& ui = *srvc.find<UI>();
 
         if (! props->node().isValid())
-            props->setNode (world->session()->getCurrentGraph());
+            props->setNode (world->session()->getActiveGraph());
 
         if (! props->node().isValid())
             props->setNode (detail::findGraph (ui.getSelectedNode()));

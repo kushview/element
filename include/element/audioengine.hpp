@@ -50,9 +50,8 @@ public:
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
 
-    void setCurrentGraph (const int index) { setActiveGraph (index); }
-    void setActiveGraph (const int index);
-    int getActiveGraph() const;
+    void setActiveGraphIndex (const int index);
+    int getActiveGraphIndex() const;
 
     RootGraph* getGraph (const int index);
 

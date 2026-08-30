@@ -88,7 +88,7 @@ void GraphEditorView::stabilizeContent()
     if (! getGraph().isValid() || ! getGraph().isGraph())
     {
         if (auto session = ViewHelpers::getSession (this))
-            setNode (session->getCurrentGraph());
+            setNode (session->getActiveGraph());
     }
 
     const auto g = getGraph();
