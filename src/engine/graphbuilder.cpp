@@ -605,8 +605,14 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
             const auto* const c = graph.getConnection (i);
             if (c->destNode == node->nodeId && c->destPort == port)
             {
-                sourceNodes.add (c->sourceNode);
-                sourcePorts.add (c->sourcePort);
+                // A connection can go stale between a node changing its ports
+                // and removeIllegalConnections() running; feeding one to
+                // BindParameterOp below dereferences a null parameter.
+                if (graph.isConnectionLegal (c))
+                {
+                    sourceNodes.add (c->sourceNode);
+                    sourcePorts.add (c->sourcePort);
+                }
             }
         }
 
