@@ -272,7 +272,7 @@ include(CPack)
 # Clean CPack staging directory before and after packaging to prevent macOS relocation issues
 add_custom_target(installer
     COMMAND ${CMAKE_COMMAND} -E rm -rf "${PROJECT_BINARY_DIR}/_CPack_Packages"
-    COMMAND ${CMAKE_COMMAND} --build "${PROJECT_BINARY_DIR}" --target package
+    COMMAND ${CMAKE_COMMAND} --build "${PROJECT_BINARY_DIR}" --target package --config $<CONFIG>
     COMMAND ${CMAKE_COMMAND} -E rm -rf "${PROJECT_BINARY_DIR}/_CPack_Packages"
     COMMENT "Cleaning CPack staging and building package"
     VERBATIM
