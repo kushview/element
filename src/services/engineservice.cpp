@@ -228,7 +228,7 @@ public:
         auto engine = owner.context().audio();
         if (! engine)
             return 0;
-        const int currentIndex = engine->getActiveGraph();
+        const int currentIndex = engine->getActiveGraphIndex();
         if (currentIndex >= 0)
             for (auto* h : graphs)
                 if (auto* root = h->getRootGraph())
@@ -313,7 +313,7 @@ EngineService::~EngineService()
 void EngineService::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
     if (auto session = context().session())
-        if (auto* h = graphs->findFor (session->getCurrentGraph()))
+        if (auto* h = graphs->findFor (session->getActiveGraph()))
             if (auto* c = h->getController())
                 c->addConnection (s, sp, d, dp);
 }
@@ -403,7 +403,7 @@ void EngineService::duplicateGraph()
     auto& world = context();
     auto engine = world.audio();
     auto session = world.session();
-    const Node current (session->getCurrentGraph());
+    const Node current (session->getActiveGraph());
     duplicateGraph (current);
 }
 
@@ -451,7 +451,7 @@ void EngineService::removeGraph (int index)
                     index = session->getNumGraphs() - 1;
 
                 sgraphs.setProperty (tags::active, index, 0);
-                const Node nextGraph = session->getCurrentGraph();
+                const Node nextGraph = session->getActiveGraph();
 
                 if (nextGraph.isRootGraph())
                 {
@@ -846,7 +846,7 @@ void EngineService::setRootNode (const Node& newRootNode)
             r->setNodeModel (newRootNode);
         }
 
-        engine->setCurrentGraph (index);
+        engine->setActiveGraphIndex (index);
     }
     else
     {

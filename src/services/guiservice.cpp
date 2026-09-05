@@ -247,7 +247,7 @@ void GuiService::ForegroundCheck::timerCallback()
     if (foreground)
     {
         if (session)
-            ui.showPluginWindowsFor (session->getCurrentGraph(), true, false);
+            ui.showPluginWindowsFor (session->getActiveGraph(), true, false);
         ui.getMainWindow()->toFront (true);
     }
     else if (! foreground)
@@ -1084,7 +1084,7 @@ bool GuiService::perform (const InvocationInfo& info)
         }
         case Commands::exportGraph: {
             auto session = context().session();
-            auto node = session->getCurrentGraph();
+            auto node = session->getActiveGraph();
             node.savePluginState();
 
             if (! impl->lastExportedGraph.isDirectory())
