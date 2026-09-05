@@ -182,7 +182,7 @@ void Services::run()
     if (auto* gui = find<GuiService>())
     {
         gui->stabilizeContent();
-        const Node graph (session->getCurrentGraph());
+        const Node graph (session->getActiveGraph());
         auto* const window = gui->getMainWindow();
 
         // don't show plugin windows on load if the UI is hidden

@@ -36,20 +36,20 @@ struct RootGraphRender : public AsyncUpdater
         }
     }
 
-    const int setCurrentGraph (const int index)
+    const int setActiveGraph (const int index)
     {
-        if (index == currentGraph)
-            return currentGraph;
-        currentGraph = index;
+        if (index == activeGraphIndex)
+            return activeGraphIndex;
+        activeGraphIndex = index;
         triggerAsyncUpdate();
-        return currentGraph;
+        return activeGraphIndex;
     }
 
-    constexpr const int getCurrentGraphIndex() const noexcept { return currentGraph; }
+    constexpr const int getActiveGraphIndex() const noexcept { return activeGraphIndex; }
 
-    RootGraph* getCurrentGraph() const
+    RootGraph* getActiveGraph() const
     {
-        return isPositiveAndBelow (currentGraph, graphs.size()) ? graphs.getUnchecked (currentGraph)
+        return isPositiveAndBelow (activeGraphIndex, graphs.size()) ? graphs.getUnchecked (activeGraphIndex)
                                                                 : nullptr;
     }
 
@@ -79,15 +79,15 @@ struct RootGraphRender : public AsyncUpdater
         if (program.wasRequested())
         {
             const int nextGraph = findGraphForProgram (program);
-            if (nextGraph != currentGraph)
-                setCurrentGraph (nextGraph);
+            if (nextGraph != activeGraphIndex)
+                setActiveGraph (nextGraph);
             program.reset();
         }
 
-        auto* const current = getCurrentGraph();
-        auto* const last = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph (lastGraph) : nullptr;
+        auto* const activeGraph = getActiveGraph();
+        auto* const activeGraphLastRenderPass = (priorActiveGraphIndex >= 0 && priorActiveGraphIndex < graphs.size()) ? getGraph (priorActiveGraphIndex) : nullptr;
 
-        if (current == nullptr || last == nullptr)
+        if (activeGraph == nullptr || activeGraphLastRenderPass == nullptr)
         {
             buffer.clear();
             midi.clear();
@@ -96,125 +96,114 @@ struct RootGraphRender : public AsyncUpdater
 
         const int numSamples = buffer.getNumSamples();
         const int numChans = buffer.getNumChannels();
-        const bool graphChanged = lastGraph != currentGraph;
-        const bool shouldProcess = true;
-        const RootGraph::RenderMode mode = current->getRenderMode();
-        const bool modeChanged = graphChanged && mode != last->getRenderMode();
+        const bool activeGraphChanged = priorActiveGraphIndex != activeGraphIndex;
+        const RootGraph::RenderMode mode = activeGraph->getRenderMode();
+        const bool modeChanged = activeGraphChanged && mode != activeGraphLastRenderPass->getRenderMode();
 
-        if (shouldProcess)
+        audioOut.setSize (numChans, numSamples, false, false, true);
+        audioTemp.setSize (numChans, numSamples, false, false, true);
+
+        // clear the mixing area
+        for (int i = numChans; --i >= 0;)
+            audioOut.clear (i, 0, numSamples);
+        midiOut.clear();
+
+        for (auto* const graph : graphs)
         {
-            audioOut.setSize (numChans, numSamples, false, false, true);
-            audioTemp.setSize (numChans, numSamples, false, false, true);
+            // copy inputs, clear outs if more than input count
+            for (int i = 0; i < numInputChans; ++i)
+                audioTemp.copyFrom (i, 0, buffer, i, 0, numSamples);
+            for (int i = numInputChans; i < numChans; ++i)
+                audioTemp.clear (i, 0, numSamples);
 
-            // clear the mixing area
-            for (int i = numChans; --i >= 0;)
-                audioOut.clear (i, 0, numSamples);
-            midiOut.clear();
+            // avoids feedback loop when IO node ins are
+            // connected to IO node outs
+            midiTemp.clear (0, numSamples);
 
-            for (auto* const graph : graphs)
+            if ((activeGraphLastRenderPass == graph && activeGraphChanged && activeGraphLastRenderPass->isSingle())
+                || (activeGraphChanged && activeGraph != nullptr && activeGraph->isSingle() && graph != activeGraph))
             {
-                // copy inputs, clear outs if more than input count
-                for (int i = 0; i < numInputChans; ++i)
-                    audioTemp.copyFrom (i, 0, buffer, i, 0, numSamples);
-                for (int i = numInputChans; i < numChans; ++i)
-                    audioTemp.clear (i, 0, numSamples);
-
-                // avoids feedback loop when IO node ins are
-                // connected to IO node outs
-                midiTemp.clear (0, numSamples);
-
-                if ((last == graph && graphChanged && last->isSingle())
-                    || (graphChanged && current != nullptr && current->isSingle() && graph != current))
+                // send kill messages to the last graph(s) when the graph changes
+                // see http://nickfever.com/music/midi-cc-list
+                for (int i = 0; i < 16; ++i)
                 {
-                    // send kill messages to the last graph(s) when the graph changes
-                    // see http://nickfever.com/music/midi-cc-list
-                    for (int i = 0; i < 16; ++i)
-                    {
-                        // sustain pedal off
-                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 64, 0), 0);
-                        // Sostenuto off
-                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 66, 0), 0);
-                        // Hold off
-                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 69, 0), 0);
+                    // sustain pedal off
+                    midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 64, 0), 0);
+                    // Sostenuto off
+                    midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 66, 0), 0);
+                    // Hold off
+                    midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 69, 0), 0);
 
-                        midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
-                    }
+                    midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
                 }
-                else if ((current == graph && graph->isSingle())
-                         || (current != nullptr && ! current->isSingle() && ! graph->isSingle()))
+            }
+            else if ((activeGraph == graph && graph->isSingle())
+                        || (activeGraph != nullptr && ! activeGraph->isSingle() && ! graph->isSingle()))
+            {
+                // active single graph or parallel graphs get MIDI always
+                midiTemp.addEvents (midi, 0, numSamples, 0);
+            }
+
+            {
+                RenderContext rc (audioTemp, cvTemp, midiTemp, numSamples);
+                const ScopedLock sl (graph->getPropertyLock());
+                if (graph->isSuspended())
                 {
-                    // current single graph or parallel graphs get MIDI always
-                    midiTemp.addEvents (midi, 0, numSamples, 0);
+                    graph->renderBypassed (rc);
                 }
-
+                else
                 {
-                    RenderContext rc (audioTemp, cvTemp, midiTemp, numSamples);
-                    const ScopedLock sl (graph->getPropertyLock());
-                    if (graph->isSuspended())
-                    {
-                        graph->renderBypassed (rc);
-                    }
-                    else
-                    {
-                        graph->render (rc);
-                    }
+                    graph->render (rc);
                 }
+            }
 
-                // clang-format off
-                if (graphChanged && ((current->isSingle() && graph == last) || 
-                                     (modeChanged && ! current->isSingle() && graph->isSingle() && graph == last)))
+            // clang-format off
+            if (activeGraphChanged && ((activeGraph->isSingle() && graph == activeGraphLastRenderPass) || 
+                                    (modeChanged && ! activeGraph->isSingle() && graph->isSingle() && graph == activeGraphLastRenderPass)))
 
+            {
+                for (int i = 0; i < numOutputChans; ++i)
+                    audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), numSamples, 1.f, 0.f);
+            }
+            else if ((graph == activeGraph && graph->isSingle()) || (! graph->isSingle() && (activeGraph != nullptr) && ! activeGraph->isSingle()))
+            {
+                // if it's the active single graph or both are parallel...
+                if (activeGraphChanged && (graph->isSingle() || (modeChanged && ! graph->isSingle() && ! activeGraph->isSingle())))
                 {
-                    // DBG("  FADE OUT LAST GRAPH: " << graph->engineIndex);
+                    // DBG("  FADE IN NEW GRAPH: " << graph->engineIndex);
                     for (int i = 0; i < numOutputChans; ++i)
-                        audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), numSamples, 1.f, 0.f);
+                        audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), numSamples, 0.f, 1.f);
                 }
-                else if ((graph == current && graph->isSingle()) || (! graph->isSingle() && (current != nullptr) && ! current->isSingle()))
+                else
                 {
-                    // if it's the current single graph or both are parallel...
-                    if (graphChanged && (graph->isSingle() || (modeChanged && ! graph->isSingle() && ! current->isSingle())))
-                    {
-                        // DBG("  FADE IN NEW GRAPH: " << graph->engineIndex);
-                        for (int i = 0; i < numOutputChans; ++i)
-                            audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), numSamples, 0.f, 1.f);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < numOutputChans; ++i)
-                            audioOut.addFrom (i, 0, audioTemp, i, 0, numSamples);
-                    }
-
-                    midiOut.addEvents (midiTemp, 0, numSamples, 0);
+                    for (int i = 0; i < numOutputChans; ++i)
+                        audioOut.addFrom (i, 0, audioTemp, i, 0, numSamples);
                 }
-                // clang-format on
+
+                midiOut.addEvents (midiTemp, 0, numSamples, 0);
             }
-
-            for (int i = 0; i < numChans; ++i)
-                buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
-
-            // setup a program change if present
-            for (auto m : midi)
-            {
-                auto msg = m.getMessage();
-                if (m.samplePosition >= numSamples)
-                    break;
-                if (! msg.isProgramChange())
-                    continue;
-                program.program = msg.getProgramChangeNumber();
-                program.channel = msg.getChannel();
-            }
-
-            // done with input, swap it with the rendered output
-            midi.swapWith (midiOut);
+            // clang-format on
         }
-        else
+
+        for (int i = 0; i < numChans; ++i)
+            buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
+
+        // setup a program change if present
+        for (auto m : midi)
         {
-            midi.clear();
-            for (int i = 0; i < buffer.getNumChannels(); ++i)
-                zeromem (buffer.getWritePointer (i), sizeof (float) * (size_t) numSamples);
+            auto msg = m.getMessage();
+            if (m.samplePosition >= numSamples)
+                break;
+            if (! msg.isProgramChange())
+                continue;
+            program.program = msg.getProgramChangeNumber();
+            program.channel = msg.getChannel();
         }
 
-        lastGraph = currentGraph;
+        // done with input, swap it with the rendered output
+        midi.swapWith (midiOut);
+
+        priorActiveGraphIndex = activeGraphIndex;
     }
 
     /** not realtime safe! */
@@ -225,8 +214,8 @@ struct RootGraphRender : public AsyncUpdater
 
         if (graph->engineIndex == 0)
         {
-            setCurrentGraph (0);
-            lastGraph = 0;
+            setActiveGraph (0);
+            priorActiveGraphIndex = 0;
         }
 
         return true;
@@ -239,10 +228,10 @@ struct RootGraphRender : public AsyncUpdater
         graphs.removeFirstMatchingValue (graph);
         graph->engineIndex = -1;
         updateIndexes();
-        if (currentGraph >= graphs.size())
-            currentGraph = graphs.size() - 1;
-        if (lastGraph >= graphs.size())
-            lastGraph = graphs.size() - 1;
+        if (activeGraphIndex >= graphs.size())
+            activeGraphIndex = graphs.size() - 1;
+        if (priorActiveGraphIndex >= graphs.size())
+            priorActiveGraphIndex = graphs.size() - 1;
     }
 
     int size() const { return graphs.size(); }
@@ -252,8 +241,8 @@ struct RootGraphRender : public AsyncUpdater
 
 private:
     Array<RootGraph*> graphs;
-    int currentGraph = -1;
-    int lastGraph = -1;
+    int activeGraphIndex = -1;
+    int priorActiveGraphIndex = -1;
 
     struct ProgramRequest
     {
@@ -291,7 +280,7 @@ private:
             }
         }
 
-        return currentGraph;
+        return activeGraphIndex;
     }
 };
 
@@ -313,11 +302,11 @@ public:
     {
         tempoValue.addListener (this);
         externalClockValue.addListener (this);
-        currentGraph.set (-1);
+        activeGraphIndex.set (-1);
         processMidiClock.set (0);
         sessionWantsExternalClock.set (0);
         midiClock.addListener (this);
-        graphs.onActiveGraphChanged = std::bind (&AudioEngine::Private::onCurrentGraphChanged, this);
+        graphs.onActiveGraphChanged = std::bind (&AudioEngine::Private::onActiveGraphChanged, this);
         midiIOMonitor = new MidiIOMonitor();
 
         messageCollector.reset (sampleRate);
@@ -346,30 +335,30 @@ public:
         midiIOMonitor->notify();
     }
 
-    RootGraph* getCurrentGraph() const { return graphs.getCurrentGraph(); }
+    RootGraph* getActiveGraph() const { return graphs.getActiveGraph(); }
 
-    void onCurrentGraphChanged()
+    void onActiveGraphChanged()
     {
         int renderingIndex = -1;
         {
             ScopedLock sl (lock);
-            renderingIndex = graphs.getCurrentGraphIndex();
+            renderingIndex = graphs.getActiveGraphIndex();
         }
 
-        if (renderingIndex != currentGraph.get())
+        if (renderingIndex != activeGraphIndex.get())
         {
             // a change is about to happen next audio cycle.
             return;
         }
 
         auto session = engine.context().session();
-        if (currentGraph.get() >= 0 && currentGraph.get() != session->getActiveGraphIndex())
+        if (activeGraphIndex.get() >= 0 && activeGraphIndex.get() != session->getActiveGraphIndex())
         {
             // NOTE: this is a cheap way to refresh the GUI, in the future this
             // will need to be smarter by determining whether or not EC needs to
             // handle the change at the model layer.
             auto graphs = session->data().getChildWithName (tags::graphs);
-            graphs.setProperty (tags::active, currentGraph.get(), nullptr);
+            graphs.setProperty (tags::active, activeGraphIndex.get(), nullptr);
         }
     }
 
@@ -428,7 +417,7 @@ public:
 
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         tempMidi.clear();
-        processCurrentGraph (buffer, tempMidi);
+        processGraphs (buffer, tempMidi);
 
         {
             ScopedLock lockMidiOut (engine.world.midi().getMidiOutputLock());
@@ -451,7 +440,7 @@ public:
             outMeters.getObjectPointerUnchecked (c)->updateLevel (outputChannelData, c, numSamples);
     }
 
-    void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
+    void processGraphs (AudioBuffer<float>& buffer, MidiBuffer& midi)
     {
         const int numSamples = buffer.getNumSamples();
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
@@ -493,15 +482,15 @@ public:
             midiClockMaster.render (midi, numSamples);
         }
 
-        const auto nextGraph = currentGraph.get();
-        if (nextGraph != graphs.getCurrentGraphIndex())
+        const auto nextGraph = activeGraphIndex.get();
+        if (nextGraph != graphs.getActiveGraphIndex())
         {
-            graphs.setCurrentGraph (nextGraph);
+            graphs.setActiveGraph (nextGraph);
         }
         graphs.renderGraphs (buffer, midi); // user requested index can be cancelled by program changed
-        if (nextGraph != graphs.getCurrentGraphIndex())
+        if (nextGraph != graphs.getActiveGraphIndex())
         {
-            currentGraph.set (graphs.getCurrentGraphIndex());
+            activeGraphIndex.set (graphs.getActiveGraphIndex());
         }
 
         // MIDI Clock out.
@@ -656,9 +645,9 @@ public:
             ScopedLock sl (lock);
             graphs.removeGraph (graph);
             // keep the requested index valid, otherwise a stale index gets
-            // written back into the session model by onCurrentGraphChanged()
-            if (currentGraph.get() >= graphs.size())
-                currentGraph.set (graphs.size() - 1);
+            // written back into the session model by onActiveGraphChanged()
+            if (activeGraphIndex.get() >= graphs.size())
+                activeGraphIndex.set (graphs.size() - 1);
         }
 
         graph->renderingSequenceChanged.disconnect_all_slots();
@@ -751,7 +740,7 @@ private:
     double sampleRate = 44100.0;
     int blockSize = 1024;
     bool isPrepared = false;
-    Atomic<int> currentGraph;
+    Atomic<int> activeGraphIndex;
 
     int numInputChans, numOutputChans;
     HeapBlock<float*> channels;
@@ -927,13 +916,13 @@ void AudioEngine::addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueu
         priv->messageCollector.addMessageToQueue (msg);
 }
 
-void AudioEngine::setActiveGraph (const int index)
+void AudioEngine::setActiveGraphIndex (const int index)
 {
-    while (priv != nullptr && index != priv->currentGraph.get())
-        priv->currentGraph.set (index);
+    while (priv != nullptr && index != priv->activeGraphIndex.get())
+        priv->activeGraphIndex.set (index);
 }
 
-int AudioEngine::getActiveGraph() const { return (priv != nullptr) ? priv->currentGraph.get() : -1; }
+int AudioEngine::getActiveGraphIndex() const { return (priv != nullptr) ? priv->activeGraphIndex.get() : -1; }
 
 void AudioEngine::setSession (SessionPtr session)
 {
@@ -1000,7 +989,7 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
     {
         if (getRunMode() == RunMode::Plugin)
             world.midi().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
-        priv->processCurrentGraph (buffer, midi);
+        priv->processGraphs (buffer, midi);
     }
 }
 
@@ -1045,13 +1034,13 @@ void AudioEngine::updateExternalLatencySamples()
     {
         ScopedLock sl (priv->lock);
 
-        auto* current = priv->getCurrentGraph();
-        if (nullptr == current)
+        auto* activeGraph = priv->getActiveGraph();
+        if (nullptr == activeGraph)
             return;
 
-        if (current->getRenderMode() == RootGraph::SingleGraph)
+        if (activeGraph->getRenderMode() == RootGraph::SingleGraph)
         {
-            latencySamples = current->getLatencySamples();
+            latencySamples = activeGraph->getLatencySamples();
         }
         else
         {

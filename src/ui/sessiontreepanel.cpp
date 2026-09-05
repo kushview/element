@@ -577,7 +577,7 @@ public:
 
     void activateGraph()
     {
-        const bool nodeIsCurrent = node == session()->getCurrentGraph();
+        const bool nodeIsCurrent = node == session()->getActiveGraph();
         if (nodeIsCurrent)
             return;
 

@@ -100,7 +100,7 @@ void MainWindow::nameChangedSession()
     }
 
     auto sessionName = session->getName().trim();
-    auto graphName = session->getCurrentGraph().getName().trim();
+    auto graphName = session->getActiveGraph().getName().trim();
     if (sessionName.isEmpty())
     {
         const auto file = controller->getSessionFile();

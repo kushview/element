@@ -44,7 +44,6 @@ public:
 
     inline int getNumGraphs() const { return objectData.getChildWithName (tags::graphs).getNumChildren(); }
     inline Node getGraph (const int index) const { return Node (getGraphValueTree (index), false); }
-    Node getCurrentGraph() const { return getActiveGraph(); }
     Node getActiveGraph() const;
     int getActiveGraphIndex() const;
 

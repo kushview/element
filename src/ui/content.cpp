@@ -444,7 +444,7 @@ Content::Content (Context& ctx)
     toolBarVisible = true;
     toolBarSize = 32;
 
-    const Node node (context().session()->getCurrentGraph());
+    const Node node (context().session()->getActiveGraph());
     setCurrentNode (node);
 
     resized();

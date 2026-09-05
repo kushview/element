@@ -1031,6 +1031,6 @@ void ConnectionGrid::itemDropped (const SourceDetails& sd)
 void ConnectionGrid::didBecomeActive()
 {
     auto session = ViewHelpers::findContentComponent (this)->session();
-    setNode (session->getCurrentGraph());
+    setNode (session->getActiveGraph());
 }
 } // namespace element
