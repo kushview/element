@@ -1,4 +1,5 @@
-// Copyright 2026. Kushview, LLC
+// Copyright 2026 Kushview, LLC <info@kushview.net>
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Author: Buzz Burrowes
 
 #pragma once
