@@ -67,7 +67,8 @@ return {
     type    = 'DSP',
     layout  = layout,
     prepare = prepare,
-    process = process
+    process = process,
+    dspName = 'Tremolo'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.

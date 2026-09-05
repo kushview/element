@@ -13,6 +13,7 @@
 #include "scripting/bindings.hpp"
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
+#include "scripting/scriptregistry.hpp"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -237,86 +238,37 @@ void ScriptNode::setParameter (int index, float value)
 }
 
 //==============================================================================
+int ScriptNode::getNumPrograms() const
+{
+    return (int)ScriptRegistry::instance().getScripts().size();
+}
+
 const String ScriptNode::getProgramName (int index) const
 {
     if (! juce::isPositiveAndBelow (index, getNumPrograms()))
         return {};
 
-    switch (index)
-    {
-        case 0:
-            return "Amp";
-            break;
-        case 1:
-            return "Channelizer";
-            break;
-        case 2:
-            return "Spoton Scale Chooser";
-            break;
-        case 3:
-            return "MIDI Timecode (MTC) Generator";
-            break;
-        case 4:
-            return "Value";
-            break;
-        case 5:
-            return "MIDI CC";
-            break;
-        case 6:
-            return "Tremolo";
-            break;
-        case 7:
-            return "Test Tone";
-            break;
-    }
-
-    String name = TRANS ("Program");
-    name << " " << int (index + 1);
-    return name;
+    return ScriptRegistry::instance().getScripts()[index].name;
 }
 
 void ScriptNode::setCurrentProgram (int index)
 {
     if (! juce::isPositiveAndBelow (index, getNumPrograms()))
         return;
+
     _program = index;
 
     String newDspCode, newUiCode;
+    const BuiltInScripts& scriptInfo = ScriptRegistry::instance().getScripts()[index];
 
-    switch (index)
+    newDspCode = String::fromUTF8 (scriptInfo.dspScript, scriptInfo.dspSize);
+    if (scriptInfo.uiSize > 0)
     {
-        case 0:
-            newDspCode = String::fromUTF8 (scripts::amp_lua, scripts::amp_luaSize);
-            newUiCode = String::fromUTF8 (scripts::ampui_lua, scripts::ampui_luaSize);
-            break;
-        case 1:
-            newDspCode = String::fromUTF8 (scripts::channelize_lua, scripts::channelize_luaSize);
-            newUiCode.clear();
-            break;
-        case 2:
-            newDspCode = String::fromUTF8 (scripts::spontonchordchooser_lua, scripts::spontonchordchooser_luaSize);
-            newUiCode.clear();
-            break;
-        case 3:
-            newDspCode = String::fromUTF8 (scripts::mtc_generator_lua, scripts::mtc_generator_luaSize);
-            newUiCode.clear();
-            break;
-        case 4:
-            newDspCode = String::fromUTF8 (scripts::dial_lua, scripts::dial_luaSize);
-            newUiCode.clear();
-            break;
-        case 5:
-            newDspCode = String::fromUTF8 (scripts::midicc_lua, scripts::midicc_luaSize);
-            newUiCode.clear();
-            break;
-        case 6:
-            newDspCode = String::fromUTF8 (scripts::tremolo_lua, scripts::tremolo_luaSize);
-            newUiCode.clear();
-            break;
-        case 7:
-            newDspCode = String::fromUTF8 (scripts::testtone_lua, scripts::testtone_luaSize);
-            newUiCode.clear();
-            break;
+        newUiCode = String::fromUTF8 (scriptInfo.uiScript, scriptInfo.uiSize);
+    }
+    else
+    {
+        newUiCode.clear();
     }
 
     dspCode.replaceAllContent (newDspCode);

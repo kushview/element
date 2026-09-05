@@ -25,7 +25,8 @@ end
 return {
     type    = 'DSP',
     layout  = layout,
-    process = process
+    process = process,
+    dspName = 'Value'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.

@@ -50,7 +50,8 @@ end
 return {
     type        = 'DSP',
     layout      = amp_layout,
-    process     = amp_process
+    process     = amp_process,
+    dspName     = 'Amp'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.

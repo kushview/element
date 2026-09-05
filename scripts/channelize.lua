@@ -64,7 +64,8 @@ return {
     parameters  = parameters,
     prepare     = prepare,
     process     = process,
-    release     = release
+    release     = release,
+    dspName     = 'Channelizer'
 }
 
 -- SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
