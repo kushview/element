@@ -8,12 +8,9 @@
 
 #include "engine/internalformat.hpp"
 #include "engine/midiclock.hpp"
-#include "engine/midichannelmap.hpp"
 #include "engine/midiengine.hpp"
-#include "engine/miditranspose.hpp"
 #include "engine/rootgraph.hpp"
 #include "engine/midipanic.hpp"
-#include "engine/trace.hpp"
 
 #include "tempo.hpp"
 
@@ -50,7 +47,7 @@ struct RootGraphRender : public AsyncUpdater
     RootGraph* getActiveGraph() const
     {
         return isPositiveAndBelow (activeGraphIndex, graphs.size()) ? graphs.getUnchecked (activeGraphIndex)
-                                                                : nullptr;
+                                                                    : nullptr;
     }
 
     void prepareBuffers (const int numIns, const int numOuts, const int numSamples)
@@ -138,7 +135,7 @@ struct RootGraphRender : public AsyncUpdater
                 }
             }
             else if ((activeGraph == graph && graph->isSingle())
-                        || (activeGraph != nullptr && ! activeGraph->isSingle() && ! graph->isSingle()))
+                     || (activeGraph != nullptr && ! activeGraph->isSingle() && ! graph->isSingle()))
             {
                 // active single graph or parallel graphs get MIDI always
                 midiTemp.addEvents (midi, 0, numSamples, 0);
