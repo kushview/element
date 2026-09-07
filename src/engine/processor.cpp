@@ -337,6 +337,7 @@ void Processor::prepare (const double newSampleRate,
     sampleRate = newSampleRate;
     blockSize = newBlockSize;
     parent = parentGraph;
+    updateDelayCompensationSamples();
 
     if ((willBeEnabled || enabled.get() == 1) && ! isPrepared)
     {
@@ -891,13 +892,29 @@ int Processor::getOversamplingFactor()
 }
 
 //==============================================================================
+static int clampLatencySamples (const Processor& proc, int samples, const char* what)
+{
+    if (samples >= 0 && samples <= Processor::maxLatencySamples)
+        return samples;
+    Logger::writeToLog (String ("[element] ") + proc.getName() + ": clamping " + what
+                        + " of " + String (samples) + " samples");
+    return jlimit (0, Processor::maxLatencySamples, samples);
+}
+
 void Processor::setDelayCompensation (double delayMs)
 {
-    if (delayCompMillis == delayMs)
-        return;
     delayCompMillis = delayMs;
-    jassert (sampleRate > 0.0);
-    delayCompSamples = roundToInt (delayCompMillis * 0.001 * sampleRate);
+    updateDelayCompensationSamples();
+}
+
+void Processor::updateDelayCompensationSamples()
+{
+    // The sample rate may not be known yet (e.g. state restored before
+    // prepare); prepare() calls this again once it is.
+    if (sampleRate <= 0.0)
+        return;
+    delayCompSamples = clampLatencySamples (
+        *this, roundToInt (delayCompMillis * 0.001 * sampleRate), "delay compensation");
 }
 
 double Processor::getDelayCompensation() const { return delayCompMillis; }
@@ -987,9 +1004,7 @@ int Processor::getLatencySamples() const
 
 void Processor::setLatencySamples (int latency)
 {
-    if (latency == latencySamples)
-        return;
-    latencySamples = latency;
+    latencySamples = clampLatencySamples (*this, latency, "latency");
 }
 
 //=========================================================================

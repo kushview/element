@@ -228,6 +228,14 @@ public:
     /** Suspend processing */
     void suspendProcessing (const bool);
 
+    /** Upper bound applied to any latency value in samples.
+
+        Plugin-reported latency and delay compensation size per-channel delay
+        buffers in the graph builder, so a bogus value would otherwise allocate
+        gigabytes. About 21 seconds at 48 kHz.
+    */
+    static constexpr int maxLatencySamples = 1 << 20;
+
     /** Get latency audio samples */
     int getLatencySamples() const;
 
@@ -516,7 +524,7 @@ protected:
     }
 
     //==========================================================================
-    /** Set latency samples */
+    /** Set latency samples. Values are clamped to [0, maxLatencySamples]. */
     void setLatencySamples (int latency);
 
     //==========================================================================
@@ -621,6 +629,7 @@ private:
 
     double delayCompMillis = 0.0;
     int delayCompSamples = 0;
+    void updateDelayCompensationSamples();
 
     juce::AudioPlayHead* _playhead { nullptr };
 
