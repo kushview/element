@@ -22,8 +22,8 @@ void RootGraph::setPlayConfigFor (DeviceManager& devices)
 void RootGraph::setPlayConfigFor (AudioIODevice* device)
 {
     jassert (device != nullptr);
-    setRenderDetails (device->getCurrentBufferSizeSamples(),
-                      device->getCurrentSampleRate());
+    setRenderDetails (device->getCurrentSampleRate(),
+                      device->getCurrentBufferSizeSamples());
 }
 
 void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
