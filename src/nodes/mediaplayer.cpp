@@ -163,6 +163,10 @@ MediaPlayerProcessor::MediaPlayerProcessor()
     addLegacyParameter (playing = new AudioParameterBool (juce::ParameterID ("playing", 1), "Playing", false));
     addLegacyParameter (slave = new AudioParameterBool (juce::ParameterID ("slave", 1), "Slave", false));
     addLegacyParameter (volume = new AudioParameterFloat (juce::ParameterID ("volume", 1), "Volume", -60.f, 12.f, 0.f));
+
+    // Needed before prepareToPlay: state restore opens the file.
+    formats.registerBasicFormats();
+
     for (auto* const param : getParameters())
         param->addListener (this);
 }

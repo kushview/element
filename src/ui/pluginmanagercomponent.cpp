@@ -582,6 +582,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
 
 PluginListComponent::~PluginListComponent()
 {
+    plugins.removeChangeListener (this);
     list.removeChangeListener (this);
 }
 

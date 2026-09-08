@@ -457,7 +457,7 @@ void GraphNode::buildRenderingSequence()
         // swap over to the new rendering sequence..
         {
             const ScopedLock sl (getPropertyLock());
-            renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
+            renderingBuffers.setSize (numRenderingBuffersNeeded, jmax (4096, getBlockSize()));
             renderingBuffers.clear();
 
             for (int i = midiBuffers.size(); --i >= 0;)

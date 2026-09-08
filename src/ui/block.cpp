@@ -23,6 +23,12 @@
 
 namespace element {
 
+/** Upper bound on a block's custom size. The block is buffered to an image and
+    has a shadow effect, so an unclamped size read from a session would allocate
+    two enormous bitmaps. */
+static constexpr int maxBlockWidth = 8192;
+static constexpr int maxBlockHeight = 8192;
+
 namespace detail {
 inline static Context* context (juce::Component* comp)
 {
@@ -335,12 +341,17 @@ void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
         {
             struct EmbedBockAsync : MessageManager::MessageBase
             {
-                using PtrType = std::unique_ptr<juce::Component>;
-                EmbedBockAsync (BlockComponent& b, const Node& n, UI& u, PtrType& p, DisplayMode om)
-                    : block (b), node (n), ui (u), embedded (p), oldMode (om) {}
+                EmbedBockAsync (BlockComponent& b, const Node& n, UI& u, DisplayMode om)
+                    : block (&b), node (n), ui (u), oldMode (om) {}
 
                 void messageCallback() override
                 {
+                    // The block may have been deleted (session change, rebuild)
+                    // before this message was delivered.
+                    if (block == nullptr)
+                        return;
+
+                    auto& embedded = block->embedded;
                     ui.closePluginWindowsFor (node, false);
 
                     if (embedded == nullptr)
@@ -356,27 +367,26 @@ void BlockComponent::setDisplayModeInternal (DisplayMode mode, bool force)
 
                     if (embedded != nullptr)
                     {
-                        block.addAndMakeVisible (embedded.get());
-                        block.updateSize();
-                        block.resized();
-                        embedded->addComponentListener (&block);
+                        block->addAndMakeVisible (embedded.get());
+                        block->updateSize();
+                        block->resized();
+                        embedded->addComponentListener (block);
                     }
                     else
                     {
                         if (oldMode != Embed)
-                            block.setDisplayModeInternal (oldMode, true);
+                            block->setDisplayModeInternal (oldMode, true);
                     }
                 }
 
-                BlockComponent& block;
+                Component::SafePointer<BlockComponent> block;
                 Node node;
                 UI& ui;
-                PtrType& embedded;
                 DisplayMode oldMode;
             };
 
             if (auto* ui = ViewHelpers::getGuiController (this))
-                (new EmbedBockAsync (*this, node, *ui, this->embedded, oldMode))->post();
+                (new EmbedBockAsync (*this, node, *ui, oldMode))->post();
         }
         else
         {
@@ -1230,7 +1240,7 @@ void BlockComponent::updateSize()
             {
                 if (detail::canResize (*this) && customWidth > 0 && customHeight > 0)
                 {
-                    setSize (customWidth, customHeight);
+                    setSize (jmin (customWidth, maxBlockWidth), jmin (customHeight, maxBlockHeight));
                     resized();
                 }
                 else
@@ -1254,10 +1264,8 @@ void BlockComponent::setCustomSize (int width, int height)
 {
     int mw = width, mh = height;
     getMinimumSize (mw, mh);
-    if (width < mw)
-        width = mw;
-    if (height < mh)
-        height = mh;
+    width = jlimit (mw, maxBlockWidth, width);
+    height = jlimit (mh, maxBlockHeight, height);
 
     if (customWidth != width || customHeight != height)
     {
