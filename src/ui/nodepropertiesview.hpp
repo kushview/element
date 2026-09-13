@@ -58,6 +58,7 @@ private:
     FillingPropertyPanel props;
     NodeObjectSync nodeSync;
     IconButton menuButton;
+    juce::TextButton scriptButton;
     bool sticky = false;
 
     static void nodeMenuCallback (int, NodePropertiesView*);

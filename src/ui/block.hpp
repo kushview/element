@@ -408,6 +408,9 @@ private:
     void setDisplayModeInternal (DisplayMode, bool);
     void clearEmbedded();
 
+    /** Removes this block's node and every other selected node in the graph. */
+    void removeNodeAndSelection();
+
     /** Steps out of Embed mode so this node's editor can be shown in a plugin window.
 
         A node's editor can only live in one place at a time, so an embedded block has to

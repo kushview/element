@@ -16,7 +16,6 @@
 #include "services/sessionservice.hpp"
 #include "ui/audiodeviceselector.hpp"
 #include "ui/viewhelpers.hpp"
-#include "ui/contextmenus.hpp"
 #include "ui/nodeeditorfactory.hpp"
 #include "ui/nodeeditorview.hpp"
 
@@ -117,14 +116,8 @@ NodeEditorView::NodeEditorView()
                               findColour (TextButton::textColourOffId)));
     menuButton.setTriggeredOnMouseDown (true);
     menuButton.onClick = [this]() {
-#if 0
-        NodePopupMenu menu (node, [this](NodePopupMenu& nodeMenu) {
-            nodeMenu.addItem (1, "Sticky", true, isSticky());
-        });
-#else
         PopupMenu menu;
         menu.addItem (1, "Sticky", true, isSticky());
-#endif
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&menuButton),
                             ModalCallbackFunction::forComponent (nodeMenuCallback, this));
     };

@@ -7,6 +7,7 @@
 #include <element/ui/content.hpp>
 #include <element/ui/navigation.hpp>
 #include <element/node.hpp>
+#include <element/plugins.hpp>
 
 #include "ui/datapathbrowser.hpp"
 #include "ui/grapheditorview.hpp"
@@ -14,7 +15,6 @@
 #include "services/sessionservice.hpp"
 #include "nodes/nodetypes.hpp"
 #include "ui/guicommon.hpp"
-#include "ui/contextmenus.hpp"
 #include "ui/audioiopanelview.hpp"
 #include "ui/pluginspanelview.hpp"
 #include "ui/scripteditorview.hpp"
@@ -408,7 +408,6 @@ public:
     }
 
     Node node;
-    NodePopupMenu menu;
 };
 
 //=============================================================================
@@ -450,11 +449,7 @@ private:
 
         void showDocument() override
         {
-            if (auto* cc = content())
-            {
-                cc->presentView (std::unique_ptr<View> (
-                    new ScriptNodeScriptEditorView (cc->context(), node, forUI)));
-            }
+            ViewHelpers::presentScriptEditor (getOwnerView(), node, forUI);
         }
 
         String getDisplayName() const override
