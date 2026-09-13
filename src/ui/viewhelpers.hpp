@@ -67,6 +67,19 @@ void closePluginWindows (Component*, const bool visible = true);
 
 void closePluginWindowsFor (Component*, Node& node, const bool visible = true);
 
+/** Presents the script editor view for a Script node.
+
+    The view is presented asynchronously because presenting a main view
+    destroys the current one, and callers are often components that live
+    inside it (e.g. graph editor blocks). Does nothing if the node is not a
+    Script node or no Content can be found from the sender.
+
+    @param sender A component used to locate the Content
+    @param node   The Script node whose script should be edited
+    @param forUI  true to edit the UI script, false to edit the DSP script
+*/
+void presentScriptEditor (juce::Component* sender, const Node& node, bool forUI);
+
 /** Depth-first search for the first descendant of the given type.
 
     @param parent The component whose children are searched. The parent itself

@@ -577,20 +577,34 @@ void BlockComponent::mouseDown (const MouseEvent& e)
     if (e.mods.isPopupMenu())
     {
         auto* const world = ViewHelpers::getGlobals (this);
-        auto& plugins (world->plugins());
-        NodePopupMenu menu (node);
-        menu.addReplaceSubmenu (plugins);
+        Component::SafePointer<BlockComponent> safeThis (this);
+
+        NodePopupMenu menu (this, node, [safeThis]() {
+            if (auto* self = safeThis.getComponent())
+                self->removeNodeAndSelection();
+        });
+
+        if (world)
+            menu.addReplaceSubmenu (world->plugins());
+
+        menu.addScriptItems();
 
         if (! node.isMidiIONode() && ! node.isMidiDevice())
         {
             menu.addSeparator();
-            menu.addItem (10, "Ports...", true, false);
+            menu.addItem ("Ports...", [safeThis]() {
+                auto* self = safeThis.getComponent();
+                if (self == nullptr)
+                    return;
+                auto table = std::make_unique<NodePortsTable>();
+                table->setNode (self->node);
+                CallOutBox::launchAsynchronously (std::move (table), self->getScreenBounds(), nullptr);
+            });
         }
 
         menu.addSeparator();
         menu.addColorSubmenu (colorSelector);
         addDisplaySubmenu (menu);
-
         menu.addOptionsSubmenu();
 
         if (world)
@@ -599,59 +613,8 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         colorSelector.setCurrentColour (Colour::fromString (
             node.getUIValueTree().getProperty ("color", color.toString()).toString()));
         colorSelector.addChangeListener (this);
-        const int result = menu.show();
+        menu.show();
         colorSelector.removeChangeListener (this);
-
-        // Must match the array used by NodePopupMenu::addReplaceSubmenu so the
-        // menu index resolves to the correct plugin.
-        const auto types = plugins.getVisiblePluginTypes();
-
-        if (auto* message = menu.createMessageForResultCode (result))
-        {
-            const bool beingRemoved = nullptr != dynamic_cast<RemoveNodeMessage*> (message);
-            ViewHelpers::postMessageFor (this, message);
-            if (beingRemoved)
-                clearEmbedded();
-
-            for (const auto& nodeId : getGraphPanel()->selectedNodes)
-            {
-                if (nodeId == node.getNodeId())
-                    continue;
-                const Node selectedNode = graph.getNodeById (nodeId);
-                if (selectedNode.isValid())
-                {
-                    if (nullptr != dynamic_cast<RemoveNodeMessage*> (message))
-                    {
-                        if (auto panel = getGraphPanel())
-                            if (auto sb = panel->findBlock (selectedNode))
-                                sb->clearEmbedded();
-
-                        ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
-                    }
-                }
-            }
-        }
-        else if (KnownPluginList::getIndexChosenByMenu (types, result) >= 0)
-        {
-            auto index = KnownPluginList::getIndexChosenByMenu (types, result);
-            ViewHelpers::postMessageFor (this,
-                                         new ReplaceNodeMessage (node, types.getUnchecked (index)));
-        }
-        else
-        {
-            switch (result)
-            {
-                case 10: {
-                    auto* component = new NodePortsTable();
-                    component->setNode (node);
-                    CallOutBox::launchAsynchronously (
-                        std::unique_ptr<Component> (component),
-                        getScreenBounds(),
-                        nullptr);
-                    break;
-                }
-            }
-        }
     }
 
     repaint();
@@ -777,6 +740,28 @@ void BlockComponent::setSelectedInternal (bool status)
         return;
     selected = status;
     repaint();
+}
+
+void BlockComponent::removeNodeAndSelection()
+{
+    ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
+    clearEmbedded();
+
+    auto* const panel = getGraphPanel();
+    if (panel == nullptr)
+        return;
+
+    for (const auto& nodeId : panel->selectedNodes)
+    {
+        if (nodeId == node.getNodeId())
+            continue;
+        const Node selectedNode = graph.getNodeById (nodeId);
+        if (! selectedNode.isValid())
+            continue;
+        if (auto* sb = panel->findBlock (selectedNode))
+            sb->clearEmbedded();
+        ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
+    }
 }
 
 void BlockComponent::makeEditorActive()
