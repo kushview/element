@@ -5,6 +5,7 @@
 ### Added
 - CLAP plugins now appear in the Unverified plugin menu and can be added to a graph without a prior scan.
 - Graph Mixer: channel strips can be hidden via right-click and restored from the mixer background's right-click menu.
+- Script node DSP and UI scripts can be opened from the node's right-click menu in the graph editor and from a Script button in the Node panel.
 
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.
@@ -13,6 +14,7 @@
 - Double-clicking a channel strip fader resets it to 0 dB.
 - Selected nodes now show the same accent outline in both the graph editor and the Graph Mixer.
 - Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.
+- Node context menu (graph editor, connection grid, plugin window) rebuilt on JUCE menu actions; item actions now run asynchronously, which avoids crashes when an action replaces the view that showed the menu.
 
 ### Fixed
 - Freeze on Windows when an ASIO audio interface is disconnected. Reconnection is now driven by system hardware notifications instead of repeatedly probing the driver.
