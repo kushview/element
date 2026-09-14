@@ -613,8 +613,19 @@ void BlockComponent::mouseDown (const MouseEvent& e)
         colorSelector.setCurrentColour (Colour::fromString (
             node.getUIValueTree().getProperty ("color", color.toString()).toString()));
         colorSelector.addChangeListener (this);
-        menu.show();
-        colorSelector.removeChangeListener (this);
+
+        // Item actions may replace the main view and delete this block, so the
+        // menu must not block inside mouseDown and nothing after it may touch
+        // `this` without checking the safe pointer first.
+        menu.showMenuAsync (PopupMenu::Options().withDeletionCheck (*this), [safeThis] (int) {
+            auto* self = safeThis.getComponent();
+            if (self == nullptr)
+                return;
+            self->colorSelector.removeChangeListener (self);
+            self->repaint();
+            if (auto* gp = self->getGraphPanel())
+                gp->updateSelection();
+        });
     }
 
     repaint();
@@ -1276,15 +1287,15 @@ void BlockComponent::setNodePosition (const int x, const int y)
 {
     if (vertical)
     {
-        node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
-                                  (y + getHeight() / 2) / (double) getParentHeight());
+        node.setRelativePosition ((x + (double) getWidth() / 2) / (double) getParentWidth(),
+                                  (y + (double) getHeight() / 2) / (double) getParentHeight());
         node.setProperty (tags::x, (double) x);
         node.setProperty (tags::y, (double) y);
     }
     else
     {
-        node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
-                                  (x + getWidth() / 2) / (double) getParentWidth());
+        node.setRelativePosition ((y + (double) getHeight() / 2) / (double) getParentHeight(),
+                                  (x + (double) getWidth() / 2) / (double) getParentWidth());
         node.setProperty (tags::y, (double) x);
         node.setProperty (tags::x, (double) y);
     }
@@ -1316,8 +1327,8 @@ void BlockComponent::updatePosition()
     if (! node.hasPosition() && nullptr != parent)
     {
         node.getRelativePosition (x, y);
-        x = x * (parent->getWidth()) - (getWidth() / 2);
-        y = y * (parent->getHeight()) - (getHeight() / 2);
+        x = x * (parent->getWidth()) - ((double) getWidth() / 2);
+        y = y * (parent->getHeight()) - ((double) getHeight() / 2);
         node.setPosition (x, y);
     }
     else
@@ -1388,17 +1399,21 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
     const auto block = node.getBlockValueTree();
     const auto mode = BlockComponent::getDisplayModeFromString (
         block.getProperty (tags::displayMode).toString());
+    Component::SafePointer<BlockComponent> safeThis (this);
 
     for (int i = 0; i <= BlockComponent::Embed; ++i)
     {
         const auto m = static_cast<BlockComponent::DisplayMode> (i);
         const bool enabled = m == BlockComponent::Embed ? detail::supportsEmbed (node) : true;
-        dMenu.addItem (BlockComponent::getDisplayModeName (m), enabled, mode == m, [this, block, m]() {
+        dMenu.addItem (BlockComponent::getDisplayModeName (m), enabled, mode == m, [safeThis, block, m]() {
+            auto* self = safeThis.getComponent();
+            if (self == nullptr)
+                return;
             // Choosing a mode explicitly abandons any mode stashed for a plugin window.
             auto b = block;
             b.removeProperty (tags::lastDisplayMode, nullptr);
             b.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
-            forEachSibling ([m] (BlockComponent& sibling) {
+            self->forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
                 auto sb = sibling.node.getBlockValueTree();
@@ -1406,7 +1421,7 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
                 sb.setProperty (tags::displayMode, BlockComponent::getDisplayModeKey (m), nullptr);
             });
 
-            if (auto* gp = getGraphPanel())
+            if (auto* gp = self->getGraphPanel())
                 gp->updateConnectorComponents (true);
         });
     }
@@ -1417,12 +1432,15 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
     {
         const auto m = static_cast<BlockComponent::PortAlignment> (i);
         const bool enabled = true;
-        dMenu.addItem (portAlignmentName (m, vertical), enabled, m == _portAlign, [this, block, m]() {
+        dMenu.addItem (portAlignmentName (m, vertical), enabled, m == _portAlign, [safeThis, block, m]() {
+            auto* self = safeThis.getComponent();
+            if (self == nullptr)
+                return;
             auto b = block;
             b.setProperty (tags::portAlignment, portAlignmentKey (m), nullptr);
-            this->_portAlign = m;
-            resized();
-            forEachSibling ([m] (BlockComponent& sibling) {
+            self->_portAlign = m;
+            self->resized();
+            self->forEachSibling ([m] (BlockComponent& sibling) {
                 if (! sibling.isSelected())
                     return;
                 auto sb = sibling.node.getBlockValueTree();
@@ -1431,7 +1449,7 @@ void BlockComponent::addDisplaySubmenu (PopupMenu& menuToAddTo)
                 sibling.resized();
             });
 
-            if (auto* gp = getGraphPanel())
+            if (auto* gp = self->getGraphPanel())
                 gp->updateConnectorComponents (true);
         });
     }
