@@ -12,6 +12,7 @@ namespace element {
 class Context;
 
 struct MidiPanicParams;
+struct MultithreadingParams;
 
 class Settings : public juce::ApplicationProperties,
                  public juce::ChangeBroadcaster {
@@ -54,6 +55,8 @@ public:
     static const char* authPreviewUpdatesKey;
     static const char* authAppcastUrlKey;
     static const char* transportStartStopContinue;
+    static const char* multithreadingEnabled;
+    static const char* multithreadingCount;
 
     bool getBool (std::string_view key, bool fallback = false) const noexcept;
     int getInt (std::string_view key, int fallback = 0) const noexcept;
@@ -183,6 +186,12 @@ public:
 
     /** Get global midi panic settings. */
     MidiPanicParams getMidiPanicParams() const;
+
+    /** Set global midi panic settings. */
+    void setMultithreadingParams (MultithreadingParams);
+
+    /** Get global midi panic settings. */
+    MultithreadingParams getMultithreadingParams() const;
 
     void setTransportRespondToStartStopContinue (bool shouldRespond);
     bool transportRespondToStartStopContinue() const;

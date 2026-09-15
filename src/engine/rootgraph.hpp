@@ -50,6 +50,7 @@ public:
     inline constexpr RenderMode getRenderMode() const noexcept { return renderMode; }
     inline String getRenderModeSlug() const noexcept { return getSlugForRenderMode (renderMode); }
     inline constexpr bool isSingle() const noexcept { return getRenderMode() == SingleGraph; }
+    inline constexpr bool isParallel() const noexcept { return getRenderMode() == Parallel; }
 
     inline void setRenderMode (const RenderMode mode)
     {
