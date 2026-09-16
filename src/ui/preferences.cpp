@@ -618,6 +618,8 @@ public:
         addAndMakeVisible (devs);
         devs.setItemHeight (22);
 
+        addAndMakeVisible(experimentalLabel);
+        experimentalLabel.setText ("Experimental");
         addAndMakeVisible (multithreadingLabel);
         multithreadingLabel.setFont (Font (FontOptions (12.0, Font::bold)));
         multithreadingLabel.setText ("Multithreaded Rendering", juce::dontSendNotification);
@@ -635,7 +637,10 @@ public:
     {
         Rectangle<int> r (getLocalBounds());
         devs.setBounds (r.removeFromTop(devs.getHeight())); 
-        layoutSetting (r, multithreadingLabel, multithreadingConfig, getWidth() / 2);
+
+        experimentalLabel.setBounds (r.removeFromTop (60));
+        auto inner = experimentalLabel.getBounds().reduced (10).withTrimmedTop (10);
+        layoutSetting (inner, multithreadingLabel, multithreadingConfig, getWidth() / 2);
     }
 
 private:
@@ -643,6 +648,7 @@ private:
     juce::AudioDeviceSelectorComponent devs;
     [[maybe_unused]] DeviceManager& devices;
 
+    GroupComponent experimentalLabel;
     Label multithreadingLabel;
     class MultithreadingComponent : public Component
     {
