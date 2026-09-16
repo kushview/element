@@ -119,11 +119,11 @@ struct RootGraphRender : public AsyncUpdater
          * is audioOut and midiOut being the result of the render */
         if (! taskManager)
         {
-            RenderSingleThreaded (buffer, midi);
+            renderSingleThreaded (buffer, midi);
         }
         else
         {
-            RenderMultiThreaded (buffer, midi);
+            renderMultiThreaded (buffer, midi);
         }
 
         for (int i = 0; i < numOutputChans; ++i)
@@ -210,7 +210,7 @@ struct RootGraphRender : public AsyncUpdater
 
 private:
 
-    void ResetMidi (MidiBuffer& midiBuff)
+    void resetMidi (MidiBuffer& midiBuff)
     {
         // send kill messages to the last graph(s) when the graph changes
         // see http://nickfever.com/music/midi-cc-list
@@ -229,7 +229,7 @@ private:
         }
     }
 
-    void RenderSingleThreaded (AudioSampleBuffer& buffer, MidiBuffer& midi)
+    void renderSingleThreaded (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
         auto* const activeGraph = getActiveGraph();
         auto* const priorActiveGraph = getGraph (priorActiveGraphIndex);
@@ -259,7 +259,7 @@ private:
                     (graph != activeGraph && activeGraph != nullptr && activeGraph->isSingle()) //Tthe new active graph is single, and this graph is NOT the new active graph.
                 ))
             {
-                ResetMidi (midiTemp);
+                resetMidi (midiTemp);
             }
             else if ((graph == activeGraph) || // This graph IS the active graph. OR...
                      (! graph->isSingle() && activeGraph != nullptr && ! activeGraph->isSingle())) // This graph is NOT single mode AND the active graph is NOT single mode.
@@ -318,7 +318,7 @@ private:
         }
     }
 
-    void RenderMultiThreaded (AudioSampleBuffer& buffer, MidiBuffer& midi)
+    void renderMultiThreaded (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
         auto* const activeGraph = getActiveGraph();
         auto* const priorActiveGraph = getGraph (priorActiveGraphIndex);
@@ -355,7 +355,7 @@ private:
 
             if (thisGraphWasForegroundLastFrame && thisGraphIsBackgroundThisFrame)
             {
-                ResetMidi (task.midiTemp);
+                resetMidi (task.midiTemp);
             }
             else if (thisGraphIsForegroundThisFrame)
             {
@@ -367,7 +367,7 @@ private:
                 taskFunctions.push_back ([&task, thisGraphIsBackgroundThisFrame, renderBypassed]
                     () 
                     {
-                        task.Render (renderBypassed, thisGraphIsBackgroundThisFrame); 
+                        task.render (renderBypassed, thisGraphIsBackgroundThisFrame); 
                     });
             }
         }
@@ -413,7 +413,7 @@ private:
         }
     }
 
-    static bool BufferIsNearSilent (const juce::AudioBuffer<float>& buffer, float threshold = 0.00005f)
+    static bool bufferIsNearSilent (const juce::AudioBuffer<float>& buffer, float threshold = 0.00005f)
     {
         const int numChannels = buffer.getNumChannels();
         const int numSamples = buffer.getNumSamples();
@@ -491,7 +491,7 @@ private:
             audioTemp.setSize (numChannels, numSamples);
         }
 
-        void Render (bool bypassed, bool isInBackground)
+        void render (bool bypassed, bool isInBackground)
         {
             RenderContext rc (audioTemp, cvTemp, midiTemp, audioTemp.getNumSamples());
             const ScopedLock sl (graph->getPropertyLock());
@@ -512,11 +512,11 @@ private:
             {
                 if (! graphWentSilentSinceGoingBackground)
                 {
-                    if (BufferIsNearSilent (audioTemp))
+                    if (bufferIsNearSilent (audioTemp))
                     {
                         DBG ("GRAPH (" << graph->engineIndex << ") went silent in the background. Will render bypassed until reactivated.");
                     }
-                    graphWentSilentSinceGoingBackground = BufferIsNearSilent (audioTemp);
+                    graphWentSilentSinceGoingBackground = bufferIsNearSilent (audioTemp);
                 }
             }
             else

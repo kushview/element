@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 Kushview, LLC
+// SPDX-FileCopyrightText: 2026 Kushview, LLC
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
