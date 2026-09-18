@@ -98,6 +98,7 @@ public:
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     void releaseResources() override;
     void reset() override;
+    void audioWorkgroupContextChanged (const juce::AudioWorkgroup& workgroup) override;
 
     bool isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const;
     PopupMenu getPerformanceParameterMenu (int perfParam);

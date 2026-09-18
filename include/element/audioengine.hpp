@@ -92,6 +92,16 @@ public:
     void processExternalBuffers (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi);
     void processExternalPlayhead (juce::AudioPlayHead* playhead, const int nframes);
     void releaseExternalResources();
+
+    /** Sets the audio workgroup that render worker threads should join.
+
+        For external systems that are handed a workgroup by their host. Safe to
+        call from the audio thread. Has no effect on platforms without workgroups.
+
+        @param workgroup the workgroup provided by the host
+    */
+    void setAudioWorkgroup (const juce::AudioWorkgroup& workgroup);
+
     void updateExternalLatencySamples();
     int getExternalLatencySamples() const;
 

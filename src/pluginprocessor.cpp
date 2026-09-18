@@ -523,6 +523,12 @@ void PluginProcessor::reset()
     PLUGIN_DBG ("[element] plugin reset");
 }
 
+void PluginProcessor::audioWorkgroupContextChanged (const juce::AudioWorkgroup& workgroup)
+{
+    if (engine)
+        engine->setAudioWorkgroup (workgroup);
+}
+
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     bool supported = false;

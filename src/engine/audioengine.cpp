@@ -60,10 +60,13 @@ struct RootGraphRender : public AsyncUpdater
         numOutputChans = numOuts;
         audioTemp.setSize (jmax (numIns, numOuts), numSamples);
         audioOut.setSize (audioTemp.getNumChannels(), audioTemp.getNumSamples());
+        midiOut.ensureSize (midiReserveBytes);
+        midiTemp.ensureSize (midiReserveBytes);
 
         for (auto& task : renderTaskList)
         {
             task.audioTemp.setSize (jmax (numIns, numOuts), numSamples);
+            task.midiTemp.ensureSize (midiReserveBytes);
         }
     }
 
@@ -191,24 +194,44 @@ struct RootGraphRender : public AsyncUpdater
     const Array<RootGraph*>& getGraphs() const { return graphs; }
 
     /** not realtime safe! AudioEngine's callback should be locked when you call this */
-    void setMultithreadingConfig (const MultithreadingParams& params)
+    void setMultithreadingConfig (const MultithreadingParams& params, const TaskManager::Options& options)
     {
-        if (params.enabled)
+        if (! params.enabled)
         {
             if (taskManager == nullptr)
-                taskManager = std::make_unique<TaskManager> (params.threadCount);
-            else
-                taskManager->setNumThreads (params.threadCount);
-        }
-        else if (taskManager)
-        {
+                return;
             taskManager = nullptr;
+        }
+        else if (taskManager == nullptr)
+        {
+            taskManager = std::make_unique<TaskManager> (options, [this] (int index) {
+                auto& task = renderTaskList.getReference (index);
+                task.render (task.bypassedThisBlock, task.backgroundThisBlock);
+            });
+            taskManager->setWorkgroup (workgroup);
+        }
+        else
+        {
+            taskManager->configure (options);
+            return;
         }
 
         setupGraphArrayForMultithreading();
     }
 
+    /** Sets the audio workgroup render workers should join. Safe to call from
+        the audio thread. AudioEngine's callback should be locked when you call this */
+    void setWorkgroup (const juce::AudioWorkgroup& newWorkgroup)
+    {
+        workgroup = newWorkgroup;
+        if (taskManager)
+            taskManager->setWorkgroup (workgroup);
+    }
+
 private:
+    // room for the resetMidi() burst plus regular traffic without allocating while rendering.
+    static constexpr size_t midiReserveBytes = 8192;
+
     void resetMidi (MidiBuffer& midiBuff)
     {
         // send kill messages to the last graph(s) when the graph changes
@@ -330,8 +353,7 @@ private:
         const int numOutputSamples = buffer.getNumSamples();
         const int numOutputChans = buffer.getNumChannels();
 
-        /** Loop over the list of tasks (there is one for every graph) and build the task functions*/
-        std::vector<Task::Function> taskFunctions;
+        /** Loop over the list of tasks (there is one for every graph) and set each up for this block */
         for (auto& task : renderTaskList)
         {
             task.audioTemp.setSize (numOutputChans, numOutputSamples, false, false, true);
@@ -359,17 +381,12 @@ private:
                 task.midiTemp.addEvents (midi, 0, numOutputSamples, 0);
             }
 
-            {
-                const bool renderBypassed = task.graph->isSuspended();
-                taskFunctions.push_back ([&task, thisGraphIsBackgroundThisFrame, renderBypassed]() {
-                    task.render (renderBypassed, thisGraphIsBackgroundThisFrame);
-                });
-            }
+            task.bypassedThisBlock = task.graph->isSuspended();
+            task.backgroundThisBlock = thisGraphIsBackgroundThisFrame;
         }
 
-        // now submit all the work to the task manager and wait for them to finish...
-        TaskHandle taskHandle = taskManager->postTasks (taskFunctions);
-        taskManager->wait (taskHandle);
+        // render every task across the workers and this thread, returning when all are done.
+        taskManager->run (renderTaskList.size());
 
         for (auto& task : renderTaskList)
         {
@@ -478,10 +495,15 @@ private:
         bool graphIsInBackground = false;
         bool graphWentSilentSinceGoingBackground = false;
 
+        // set on the audio thread each block before the task is run.
+        bool bypassedThisBlock = false;
+        bool backgroundThisBlock = false;
+
         RenderTask (RootGraph* inGraph, const int numChannels, const int numSamples)
         {
             graph = inGraph;
             audioTemp.setSize (numChannels, numSamples);
+            midiTemp.ensureSize (midiReserveBytes);
         }
 
         void render (bool bypassed, bool isInBackground)
@@ -521,6 +543,7 @@ private:
 
     Array<RenderTask> renderTaskList;
     std::unique_ptr<TaskManager> taskManager;
+    juce::AudioWorkgroup workgroup;
 
     void setupGraphArrayForMultithreading()
     {
@@ -789,6 +812,7 @@ public:
         const int newBlockSize = device->getCurrentBufferSizeSamples();
         const int numChansIn = device->getActiveInputChannels().countNumberOfSetBits();
         const int numChansOut = device->getActiveOutputChannels().countNumberOfSetBits();
+        setWorkgroup (device->getWorkgroup());
         audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
     }
 
@@ -807,6 +831,7 @@ public:
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
 
         graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
+        applyMultithreadingConfig();
 
         while (inMeters.size() < numInputChans)
             inMeters.add (new AudioEngine::LevelMeter());
@@ -984,7 +1009,14 @@ public:
     void setMultithreadingConfig (const MultithreadingParams& params)
     {
         ScopedLock sl (lock);
-        graphs.setMultithreadingConfig (params);
+        multithreading = params;
+        applyMultithreadingConfig();
+    }
+
+    void setWorkgroup (const juce::AudioWorkgroup& workgroup)
+    {
+        ScopedLock sl (lock);
+        graphs.setWorkgroup (workgroup);
     }
 
 private:
@@ -1001,6 +1033,23 @@ private:
     double sampleRate = 44100.0;
     int blockSize = 1024;
     bool isPrepared = false;
+    MultithreadingParams multithreading;
+
+    /** Pushes the multithreading params and current audio setup to the
+        renderer. The callback lock must be held. */
+    void applyMultithreadingConfig()
+    {
+        TaskManager::Options options;
+        options.numThreads = multithreading.threadCount;
+        options.blockSize = blockSize;
+        options.sampleRate = sampleRate;
+#if JUCE_WINDOWS
+        // JUCE raises the priority class of the whole process when starting a
+        // realtime thread on Windows, which a plugin must not do to its host.
+        options.allowRealtime = engine.getRunMode() != RunMode::Plugin;
+#endif
+        graphs.setMultithreadingConfig (multithreading, options);
+    }
     Atomic<int> activeGraphIndex;
 
     int numInputChans, numOutputChans;
@@ -1286,6 +1335,12 @@ void AudioEngine::releaseExternalResources()
 {
     if (priv)
         priv->audioStopped();
+}
+
+void AudioEngine::setAudioWorkgroup (const juce::AudioWorkgroup& workgroup)
+{
+    if (priv)
+        priv->setWorkgroup (workgroup);
 }
 
 Context& AudioEngine::context() const { return world; }

@@ -6,11 +6,10 @@
 #include <atomic>
 #include <functional>
 #include <memory>
-#include <queue>
-#include <vector>
 #include <semaphore>
+#include <vector>
 
-#include <element/juce.hpp>
+#include <element/juce/audio_basics.hpp>
 
 namespace element {
 
@@ -22,72 +21,97 @@ struct MultithreadingParams
     bool operator== (const MultithreadingParams&) const = default;
 };
 
-/** Lightweight work unit passed into TaskManager. */
-struct Task
-{
-    using Function = std::function<void()>;
+/** Runs a fixed job function across a pool of worker threads.
 
-    juce::String name;
-    Function work;
-};
-
-/** Shared completion state for individual or batched tasks. */
-struct TaskState
-{
-    std::atomic<int> remainingTasks { 0 };
-    juce::WaitableEvent doneEvent;
-};
-
-using TaskHandle = std::shared_ptr<TaskState>;
-
-/** Thread-safe queue and thread-pool manager that coordinates background tasks. */
+    This is a realtime "parallel for". The job is installed once at
+    construction, and each call to run() executes it for every index in
+    [0, numJobs). The thread calling run() takes part in the work, so dispatch
+    involves no allocation, no queue and no locks.
+*/
 class TaskManager
 {
 public:
-    explicit TaskManager (int numWorkerThreads = 4);
-    ~TaskManager();
+    /** The function executed for each job index. */
+    using Job = std::function<void (int jobIndex)>;
 
-    /** Sets the number of active worker threads in the pool. */
-    void setNumThreads (int numThreads);
-
-    /** Returns the current number of worker threads in the pool. */
-    int getNumThreads() const { return static_cast<int> (workers.size()); }
-
-    /** Enqueues a single task and returns a handle for polling or waiting. */
-    TaskHandle postTask (Task task);
-
-    /** Enqueues a single lambda function and returns a handle. */
-    TaskHandle postTask (Task::Function work, const juce::String& name = juce::String());
-
-    /** Enqueues a list of tasks sharing a single task handle. */
-    TaskHandle postTasks (std::vector<Task> tasks);
-
-    /** Enqueues a list of lambda functions sharing a single task handle. */
-    TaskHandle postTasks (const std::vector<Task::Function>& workItems, const juce::String& baseName = juce::String());
-
-    /** Polls a task handle to check if all associated work is complete. */
-    static bool isDone (const TaskHandle& handle);
-
-    /** Blocks the calling thread until all work associated with the handle is complete.
-        Pass millisecondsToWait = -1 to wait indefinitely. Returns true if completed. */
-    static bool wait (const TaskHandle& handle, int millisecondsToWait = -1);
-
-private:
-    struct InternalTask
+    /** Worker thread configuration. */
+    struct Options
     {
-        Task task;
-        TaskHandle handle;
+        /** Number of worker threads, not counting the thread that calls run(). */
+        int numThreads { 4 };
+
+        /** If true the workers are started as realtime threads, falling back
+            to the highest regular priority if the system refuses. */
+        bool allowRealtime { true };
+
+        /** The expected audio block size and sample rate. Used as a scheduling
+            hint for realtime threads. */
+        int blockSize { 512 };
+        double sampleRate { 44100.0 };
+
+        bool operator== (const Options&) const = default;
     };
 
+    /** Creates the pool and starts its workers.
+
+        @param options  the worker thread configuration
+        @param job      the function to run for each job index. It will be called
+                        concurrently from several threads with different indexes.
+    */
+    TaskManager (const Options& options, Job job);
+    ~TaskManager();
+
+    /** Applies new options, restarting the workers if anything changed.
+
+        Not realtime safe, and must not be called while run() is in progress.
+    */
+    void configure (const Options& options);
+
+    /** Returns the options currently in use. */
+    const Options& getOptions() const noexcept { return options; }
+
+    /** Returns the current number of worker threads in the pool. */
+    int getNumThreads() const noexcept { return static_cast<int> (workers.size()); }
+
+    /** Sets the audio workgroup the workers should join.
+
+        Safe to call from the audio thread. Workers pick up the change the next
+        time they wake. Has no effect on platforms without audio workgroups.
+    */
+    void setWorkgroup (const juce::AudioWorkgroup& workgroup);
+
+    /** Runs the job for each index in [0, numJobs) and returns once all are done.
+
+        Realtime safe. The calling thread runs jobs alongside the workers. Must
+        only be called from one thread at a time.
+    */
+    void run (int numJobs);
+
+private:
     class WorkerThread;
 
-    bool popTask (InternalTask& taskOut);
+    int claim() noexcept;
+    void runClaimedJobs();
+    void startWorkers();
     void stopWorkers();
+    juce::AudioWorkgroup getWorkgroup() const;
 
-    juce::CriticalSection lock;
-    std::queue<InternalTask> taskQueue;
+    Options options;
+    const Job job;
     std::vector<std::unique_ptr<WorkerThread>> workers;
     std::counting_semaphore<1024> workSemaphore { 0 };
+
+    // permits released to the semaphore that no worker has consumed yet.
+    std::atomic<int> wakeups { 0 };
+
+    // jobs not yet claimed, and jobs not yet finished, in the current run.
+    std::atomic<int> pending { 0 };
+    std::atomic<int> remaining { 0 };
+    juce::WaitableEvent doneEvent;
+
+    mutable juce::SpinLock workgroupLock;
+    juce::AudioWorkgroup workgroup;
+    std::atomic<int> workgroupGeneration { 0 };
 };
 
 } // namespace element
