@@ -123,9 +123,9 @@ TaskHandle TaskManager::postTasks (const std::vector<Task::Function>& workItems,
     int count = 0;
     for (const auto& work : workItems)
     {
-        const auto name = baseName.isNotEmpty() 
-                            ? baseName + "_" + juce::String (count++) 
-                            : juce::String();
+        const auto name = baseName.isNotEmpty()
+                              ? baseName + "_" + juce::String (count++)
+                              : juce::String();
         tasks.push_back ({ name, work });
     }
 

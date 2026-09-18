@@ -613,12 +613,12 @@ public:
         : devs (g.devices(), 1, DeviceManager::maxAudioChannels, 1, DeviceManager::maxAudioChannels, false, false, false, false),
           settings (g.settings()),
           devices (g.devices()),
-          multithreadingConfig(*this, g)
+          multithreadingConfig (*this, g)
     {
         addAndMakeVisible (devs);
         devs.setItemHeight (22);
 
-        addAndMakeVisible(experimentalLabel);
+        addAndMakeVisible (experimentalLabel);
         experimentalLabel.setText ("Experimental");
         addAndMakeVisible (multithreadingLabel);
         multithreadingLabel.setFont (Font (FontOptions (12.0, Font::bold)));
@@ -633,10 +633,10 @@ public:
     {
     }
 
-    void resized() override 
+    void resized() override
     {
         Rectangle<int> r (getLocalBounds());
-        devs.setBounds (r.removeFromTop(devs.getHeight())); 
+        devs.setBounds (r.removeFromTop (devs.getHeight()));
 
         experimentalLabel.setBounds (r.removeFromTop (60));
         auto inner = experimentalLabel.getBounds().reduced (10).withTrimmedTop (10);
@@ -653,7 +653,7 @@ private:
     class MultithreadingComponent : public Component
     {
     public:
-        MultithreadingComponent (AudioSettingsComponent& o, Context& g) 
+        MultithreadingComponent (AudioSettingsComponent& o, Context& g)
             : owner (o),
               world (g)
         {

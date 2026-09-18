@@ -209,7 +209,6 @@ struct RootGraphRender : public AsyncUpdater
     }
 
 private:
-
     void resetMidi (MidiBuffer& midiBuff)
     {
         // send kill messages to the last graph(s) when the graph changes
@@ -347,11 +346,9 @@ private:
             // connected to IO node outs
             task.midiTemp.clear (0, numOutputSamples);
 
-            const bool thisGraphIsForegroundThisFrame = task.graph == activeGraph ||
-                                                        (activeGraph->isParallel() && task.graph->isParallel());
+            const bool thisGraphIsForegroundThisFrame = task.graph == activeGraph || (activeGraph->isParallel() && task.graph->isParallel());
             const bool thisGraphIsBackgroundThisFrame = ! thisGraphIsForegroundThisFrame;
-            const bool thisGraphWasForegroundLastFrame = task.graph == priorActiveGraph ||
-                                                         (priorActiveGraph->isParallel() && task.graph->isParallel());
+            const bool thisGraphWasForegroundLastFrame = task.graph == priorActiveGraph || (priorActiveGraph->isParallel() && task.graph->isParallel());
 
             if (thisGraphWasForegroundLastFrame && thisGraphIsBackgroundThisFrame)
             {
@@ -364,11 +361,9 @@ private:
 
             {
                 const bool renderBypassed = task.graph->isSuspended();
-                taskFunctions.push_back ([&task, thisGraphIsBackgroundThisFrame, renderBypassed]
-                    () 
-                    {
-                        task.render (renderBypassed, thisGraphIsBackgroundThisFrame); 
-                    });
+                taskFunctions.push_back ([&task, thisGraphIsBackgroundThisFrame, renderBypassed]() {
+                    task.render (renderBypassed, thisGraphIsBackgroundThisFrame);
+                });
             }
         }
 
@@ -378,11 +373,9 @@ private:
 
         for (auto& task : renderTaskList)
         {
-            const bool thisGraphIsForegroundThisFrame = task.graph == activeGraph ||
-                                                        (activeGraph->isParallel() && task.graph->isParallel());
+            const bool thisGraphIsForegroundThisFrame = task.graph == activeGraph || (activeGraph->isParallel() && task.graph->isParallel());
             const bool thisGraphIsBackgroundThisFrame = ! thisGraphIsForegroundThisFrame;
-            const bool thisGraphWasForegroundLastFrame = task.graph == priorActiveGraph ||
-                                                         (priorActiveGraph->isParallel() && task.graph->isParallel());
+            const bool thisGraphWasForegroundLastFrame = task.graph == priorActiveGraph || (priorActiveGraph->isParallel() && task.graph->isParallel());
             const bool thisGraphWasBackgroundLastFrame = ! thisGraphWasForegroundLastFrame;
 
             // clang-format off
