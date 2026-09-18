@@ -17,7 +17,7 @@ namespace element {
 struct MultithreadingParams
 {
     bool enabled { false };
-    int threadCount { 2 };
+    int threadCount { 4 };
 
     bool operator== (const MultithreadingParams&) const = default;
 };

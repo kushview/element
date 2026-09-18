@@ -205,7 +205,7 @@ struct RootGraphRender : public AsyncUpdater
             taskManager = nullptr;
         }
 
-        setupGraphArrayForMultihreading();
+        setupGraphArrayForMultithreading();
     }
 
 private:
@@ -512,11 +512,11 @@ private:
             {
                 if (! graphWentSilentSinceGoingBackground)
                 {
-                    if (bufferIsNearSilent (audioTemp))
+                    graphWentSilentSinceGoingBackground = bufferIsNearSilent (audioTemp);
+                    if (graphWentSilentSinceGoingBackground)
                     {
                         DBG ("GRAPH (" << graph->engineIndex << ") went silent in the background. Will render bypassed until reactivated.");
                     }
-                    graphWentSilentSinceGoingBackground = bufferIsNearSilent (audioTemp);
                 }
             }
             else
@@ -529,7 +529,7 @@ private:
     Array<RenderTask> renderTaskList;
     std::unique_ptr<TaskManager> taskManager;
 
-    void setupGraphArrayForMultihreading()
+    void setupGraphArrayForMultithreading()
     {
         if (taskManager)
         {
@@ -988,7 +988,7 @@ public:
         return sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0;
     }
 
-    void SetMultithreadingConfig (const MultithreadingParams& params)
+    void setMultithreadingConfig (const MultithreadingParams& params)
     {
         ScopedLock sl (lock);
         graphs.setMultithreadingConfig (params);
@@ -1158,7 +1158,7 @@ void AudioEngine::applySettings (Settings& settings)
 
     priv->startStopCont.set (settings.transportRespondToStartStopContinue() ? 1 : 0);
 
-    priv->SetMultithreadingConfig (settings.getMultithreadingParams());
+    priv->setMultithreadingConfig (settings.getMultithreadingParams());
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

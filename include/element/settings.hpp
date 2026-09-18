@@ -187,10 +187,10 @@ public:
     /** Get global midi panic settings. */
     MidiPanicParams getMidiPanicParams() const;
 
-    /** Set global midi panic settings. */
+    /** Set global multithreaded rendering settings. */
     void setMultithreadingParams (MultithreadingParams);
 
-    /** Get global midi panic settings. */
+    /** Get global multithreaded rendering settings. */
     MultithreadingParams getMultithreadingParams() const;
 
     void setTransportRespondToStartStopContinue (bool shouldRespond);
