@@ -16,6 +16,7 @@
 
 #include "engine/midiengine.hpp"
 #include "engine/midipanic.hpp"
+#include "engine/tasksystem.hpp"
 #include "messages.hpp"
 #include "auth.hpp"
 #include "services/oscservice.hpp"
@@ -608,12 +609,23 @@ private:
 class AudioSettingsComponent : public SettingsPage
 {
 public:
-    AudioSettingsComponent (DeviceManager& d)
-        : devs (d, 1, DeviceManager::maxAudioChannels, 1, DeviceManager::maxAudioChannels, false, false, false, false),
-          devices (d)
+    AudioSettingsComponent (Context& g)
+        : devs (g.devices(), 1, DeviceManager::maxAudioChannels, 1, DeviceManager::maxAudioChannels, false, false, false, false),
+          settings (g.settings()),
+          devices (g.devices()),
+          multithreadingConfig (*this, g)
     {
         addAndMakeVisible (devs);
         devs.setItemHeight (22);
+
+        addAndMakeVisible (experimentalLabel);
+        experimentalLabel.setText ("Experimental");
+        addAndMakeVisible (multithreadingLabel);
+        multithreadingLabel.setFont (Font (FontOptions (12.0, Font::bold)));
+        multithreadingLabel.setText ("Multithreaded Rendering", juce::dontSendNotification);
+        addAndMakeVisible (multithreadingConfig);
+        multithreadingConfig.stabilize();
+
         setSize (300, 400);
     }
 
@@ -621,12 +633,87 @@ public:
     {
     }
 
-    void resized() override { devs.setBounds (getLocalBounds()); }
+    void resized() override
+    {
+        Rectangle<int> r (getLocalBounds());
+        devs.setBounds (r.removeFromTop (devs.getHeight()));
+
+        experimentalLabel.setBounds (r.removeFromTop (60));
+        auto inner = experimentalLabel.getBounds().reduced (10).withTrimmedTop (10);
+        layoutSetting (inner, multithreadingLabel, multithreadingConfig, getWidth() / 2);
+    }
 
 private:
-    // element::AudioDeviceSelectorComponent devs;
+    Settings& settings;
     juce::AudioDeviceSelectorComponent devs;
     [[maybe_unused]] DeviceManager& devices;
+
+    GroupComponent experimentalLabel;
+    Label multithreadingLabel;
+    class MultithreadingComponent : public Component
+    {
+    public:
+        MultithreadingComponent (AudioSettingsComponent& o, Context& g)
+            : owner (o),
+              world (g)
+        {
+            addAndMakeVisible (enabled);
+            enabled.setTooltip ("Enabled?");
+            enabled.setButtonText ("");
+            enabled.setToggleState (false, dontSendNotification);
+            enabled.onClick = [this]() { save(); };
+
+            addAndMakeVisible (threadCount);
+            threadCount.setTooltip ("Num. worker threads");
+            threadCount.setSliderStyle (Slider::IncDecButtons);
+            threadCount.setRange (2.0, 16.0, 1.0);
+            threadCount.setValue (4.0, juce::dontSendNotification);
+            threadCount.setTextBoxStyle (Slider::TextBoxLeft, false, 30, threadCount.getTextBoxHeight());
+            threadCount.setWantsKeyboardFocus (false);
+            threadCount.onValueChange = [this]() { save(); };
+
+            stabilize();
+        }
+
+        ~MultithreadingComponent()
+        {
+            enabled.onClick = nullptr;
+            threadCount.onValueChange = nullptr;
+        }
+
+        void resized() override
+        {
+            auto r1 = getLocalBounds();
+            enabled.setBounds (r1.removeFromLeft (r1.getHeight()));
+            threadCount.setBounds (r1);
+        }
+
+        void stabilize()
+        {
+            const auto params = owner.settings.getMultithreadingParams();
+            enabled.setToggleState (params.enabled, juce::dontSendNotification);
+            threadCount.setValue (params.threadCount, juce::dontSendNotification);
+        }
+
+    private:
+        ToggleButton enabled;
+        Slider threadCount;
+        AudioSettingsComponent& owner;
+        Context& world;
+
+        void save()
+        {
+            MultithreadingParams params = {
+                enabled.getToggleState(),
+                (int) threadCount.getValue(),
+            };
+
+            owner.settings.setMultithreadingParams (params);
+
+            if (auto e = world.audio())
+                e->applySettings (world.settings());
+        }
+    } multithreadingConfig;
 };
 
 //==============================================================================
@@ -1287,7 +1374,7 @@ Component* Preferences::createPageForName (const String& name)
     }
     else if (name == ELEMENT_AUDIO_SETTINGS_NAME)
     {
-        return new AudioSettingsComponent (_context.devices());
+        return new AudioSettingsComponent (_context);
     }
     else if (name == ELEMENT_PLUGINS_PREFERENCE_NAME)
     {

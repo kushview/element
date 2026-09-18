@@ -8,6 +8,7 @@
 #include "appinfo.hpp"
 #include "engine/midiengine.hpp"
 #include "engine/midipanic.hpp"
+#include "engine/tasksystem.hpp"
 
 namespace element {
 
@@ -44,6 +45,8 @@ const char* Settings::updateKeyUserKey = "updateKeyUserKey";
 const char* Settings::authPreviewUpdatesKey = "authPreviewUpdates";
 const char* Settings::authAppcastUrlKey = "authAppcastUrl";
 const char* Settings::transportStartStopContinue = "transportStartStopContinueKey";
+const char* Settings::multithreadingEnabled = "multithreadingEnabled";
+const char* Settings::multithreadingCount = "multithreadingCount";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -327,6 +330,20 @@ MidiPanicParams Settings::getMidiPanicParams() const
 
 bool Settings::transportRespondToStartStopContinue() const { return getBool (transportStartStopContinue, false); }
 void Settings::setTransportRespondToStartStopContinue (bool shouldRespond) { set (transportStartStopContinue, shouldRespond); }
+
+void Settings::setMultithreadingParams (MultithreadingParams params)
+{
+    set (multithreadingEnabled, params.enabled);
+    set (multithreadingCount, params.threadCount);
+}
+
+MultithreadingParams Settings::getMultithreadingParams() const
+{
+    MultithreadingParams params;
+    params.enabled = getBool (multithreadingEnabled, false);
+    params.threadCount = getInt (multithreadingCount, 4);
+    return params;
+}
 
 //=============================================================================
 void Settings::addItemsToMenu (Context& world, PopupMenu& menu)
