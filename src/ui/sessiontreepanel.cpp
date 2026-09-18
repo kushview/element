@@ -82,6 +82,21 @@ inline static void showGraphEditor (Component* c, const Node& node)
         }
     }
 }
+
+static const juce::String rootGraphDragType ("rootGraph");
+
+inline static bool isRootGraphDrag (const var& desc)
+{
+    return desc.isArray() && desc.size() >= 2 && desc[0].toString() == rootGraphDragType;
+}
+
+inline static Node findRootGraphByUuid (const Session& session, const String& uuid)
+{
+    for (int i = 0; i < session.getNumGraphs(); ++i)
+        if (auto graph = session.getGraph (i); graph.getUuidString() == uuid)
+            return graph;
+    return {};
+}
 } // namespace detail
 //=============================================================================
 class SessionBaseTreeItem : public TreeItemBase
@@ -437,7 +452,10 @@ private:
         TreeItem (const Node& n, bool isUI)
             : SessionNodeTreeItem (n),
               node (n),
-              forUI (isUI) {}
+              forUI (isUI)
+        {
+            setUniqueName (forUI ? "ui" : "dsp");
+        }
         ~TreeItem() = default;
 
         SessionScriptNodeTreeItem* getParent() const noexcept
@@ -467,6 +485,9 @@ public:
         : SessionBaseTreeItem(),
           script (s)
     {
+        // prefixed so it can't collide with the index names of sibling nodes
+        const auto parent = script.data().getParent();
+        setUniqueName ("script:" + String (parent.isValid() ? parent.indexOf (script.data()) : -1));
     }
 
     bool mightContainSubItems() override { return false; }
@@ -569,6 +590,18 @@ public:
     {
         const int index = node.data().getParent().indexOf (node.data());
         ViewHelpers::findContentComponent (getOwnerView())->services().find<EngineService>()->removeGraph (index);
+    }
+
+    var getDragSourceDescription() override
+    {
+        const auto uuid = node.getUuidString();
+        if (uuid.isEmpty())
+            return {};
+
+        var desc;
+        desc.append (detail::rootGraphDragType);
+        desc.append (uuid);
+        return desc;
     }
 
     void activateGraph()
@@ -727,17 +760,12 @@ public:
 
     void moveItem (int delta)
     {
-        // the tree rebuilds inside moveGraph() and destroys this item, so
+        // the tree rebuilds inside moveRootGraph() and destroys this item, so
         // capture everything needed before the call
         const Node graph (node);
-        auto* const tree = getSessionTreePanel();
         const int target = getIndexInParent() + delta;
-
-        content()->services().find<EngineService>()->moveGraph (graph, target);
-
-        if (tree != nullptr)
-            if (auto* item = tree->findItemForNode (graph))
-                item->setSelected (true, true, dontSendNotification);
+        if (auto* const tree = getSessionTreePanel())
+            tree->moveRootGraph (graph, target);
     }
 
     void handlePopupMenuResult (int result) override
@@ -848,21 +876,29 @@ public:
     bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
         const auto& desc (details.description);
-        return desc.toString() == "ccNavConcertinaPanel";
+        return desc.toString() == "ccNavConcertinaPanel" || detail::isRootGraphDrag (desc);
         // ||    (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
     }
 
-    void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
+    void itemDropped (const DragAndDropTarget::SourceDetails& details, int insertIndex) override
     {
-        // TODO: need to not directly bind index of graph in model from the actual
-        // index used in the engine.  After this, it will be less complicated to
-        // insert graphs anywhere from a visual standpoint.
-        ignoreUnused (index);
-        auto* world = ViewHelpers::getGlobals (getOwnerView());
-        auto session = world->session();
-        auto& app (ViewHelpers::findContentComponent (getOwnerView())->services());
         const auto& desc (details.description);
-        juce::ignoreUnused (session, app, desc);
+        if (! detail::isRootGraphDrag (desc))
+            return;
+
+        auto session = panel.session();
+        if (session == nullptr)
+            return;
+
+        const auto graph = detail::findRootGraphByUuid (*session, desc[1].toString());
+        if (! graph.isValid())
+            return;
+
+        // insertIndex is a slot in the list before the dragged graph is removed
+        const int from = graph.data().getParent().indexOf (graph.data());
+        const int target = jlimit (0, session->getNumGraphs() - 1, insertIndex > from ? insertIndex - 1 : insertIndex);
+        if (target != from)
+            panel.moveRootGraph (graph, target);
     }
 
 #if 0
@@ -951,6 +987,13 @@ void SessionTreePanel::setSession (SessionPtr s)
 
     panel->updateContent();
     refresh();
+
+    if (pendingOpenness != nullptr && ! showingNode())
+    {
+        panel->tree.restoreOpennessState (*pendingOpenness, false);
+        pendingOpenness.reset();
+    }
+
     selectActiveRootGraph();
 }
 
@@ -992,6 +1035,20 @@ SessionPtr SessionTreePanel::session() const
     return _session;
 }
 
+void SessionTreePanel::getState (juce::String& state) const
+{
+    if (showingNode())
+        return;
+
+    if (auto xml = panel->tree.getOpennessState (true))
+        state = xml->toString (juce::XmlElement::TextFormat().singleLine().withoutHeader());
+}
+
+void SessionTreePanel::setState (const juce::String& state)
+{
+    pendingOpenness = juce::XmlDocument::parse (state);
+}
+
 static TreeViewItem* findItemForNodeRecursive (TreeViewItem* item, const Node& node)
 {
     if (auto* const sitem = dynamic_cast<SessionNodeTreeItem*> (item))
@@ -1011,6 +1068,18 @@ TreeViewItem* SessionTreePanel::findItemForNode (const Node& node) const
     if (panel->rootItem != nullptr)
         return findItemForNodeRecursive (panel->rootItem.get(), node);
     return nullptr;
+}
+
+void SessionTreePanel::moveRootGraph (const Node& graph, int newIndex)
+{
+    auto* const content = ViewHelpers::findContentComponent (this);
+    if (content == nullptr)
+        return;
+
+    content->services().find<EngineService>()->moveGraph (graph, newIndex);
+
+    if (auto* const item = findItemForNode (graph))
+        item->setSelected (true, true, dontSendNotification);
 }
 
 void SessionTreePanel::onNodeSelected()

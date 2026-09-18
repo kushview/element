@@ -1230,6 +1230,14 @@ void StandardContent::getSessionState (String& state)
         }
     }
 
+    if (auto* const stp = nav->findPanel<SessionTreePanel>())
+    {
+        String stpState;
+        stp->getState (stpState);
+        if (stpState.isNotEmpty())
+            data.setProperty ("SessionTreePanel", stpState, nullptr);
+    }
+
     MemoryOutputStream mo;
     {
         GZIPCompressorOutputStream gzip (mo, 9);
@@ -1260,6 +1268,9 @@ void StandardContent::applySessionState (const String& state)
         String npvState = data.getProperty ("NodePropertiesView").toString();
         npv->setState (npvState);
     }
+
+    if (auto* const stp = nav->findPanel<SessionTreePanel>())
+        stp->setState (data.getProperty ("SessionTreePanel").toString());
 }
 
 void StandardContent::presentView (const juce::String& view)
