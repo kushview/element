@@ -49,6 +49,19 @@ public:
 
     bool addGraph (const Node& node, const bool setActive);
 
+    /** Moves a root graph to a new position in the session.
+
+        The active graph remains active after the move; the active index is
+        updated to follow it. This only changes the session model. Callers that
+        need the audio engine to follow should use EngineService::moveGraph.
+
+        @param from The current index of the graph to move.
+        @param to   The index the graph should be moved to.
+        @return true if the graph was moved, false if either index was out of
+                range or the indexes were equal.
+    */
+    bool moveGraph (const int from, const int to);
+
     juce::ValueTree getValueTree() const { return objectData; }
     bool loadData (const juce::ValueTree& data);
     void clear();

@@ -290,6 +290,11 @@ public:
         graphs.removeObject (g, true);
     }
 
+    void move (RootGraphHolder* g, int newIndex)
+    {
+        graphs.move (graphs.indexOf (g), newIndex);
+    }
+
     const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
 
 private:
@@ -482,6 +487,35 @@ void EngineService::removeGraph (int index)
         sigNodeRemoved (toRemove);
     // FIXME: dont notify the UI top-down
     sibling<UI>()->stabilizeContent();
+}
+
+void EngineService::moveGraph (const Node& graph, int newIndex)
+{
+    auto& world = context();
+    auto engine = world.audio();
+    auto session = world.session();
+
+    const auto sgraphs = session->data().getChildWithName (tags::graphs);
+    const int from = sgraphs.indexOf (graph.data());
+    if (from < 0 || from == newIndex || ! isPositiveAndBelow (newIndex, session->getNumGraphs()))
+        return;
+
+    if (auto* holder = graphs->findFor (graph))
+    {
+        if (auto* root = holder->getRootGraph())
+        {
+            if (root->getEngineIndex() >= 0)
+            {
+                jassert (root->getEngineIndex() == from);
+                engine->moveGraph (root->getEngineIndex(), newIndex);
+            }
+        }
+
+        graphs->move (holder, newIndex);
+    }
+
+    // model last: the tree rebuild this triggers must see the engine already moved
+    session->moveGraph (from, newIndex);
 }
 
 void EngineService::connectChannels (const Node& graph, const Node& src, const int sc, const Node& dst, const int dc)

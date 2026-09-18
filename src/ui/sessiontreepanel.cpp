@@ -377,8 +377,6 @@ public:
 
     bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
-        std::clog << "isInterestedInDragSource()\n";
-
         const auto& desc (details.description);
         if (! node.isGraph())
             return false;
@@ -562,6 +560,9 @@ public:
         : SessionGraphTreeItem (n)
     {
         jassert (n.isRootGraph());
+        // name by identity rather than index so openness survives a re-order
+        const auto uuid = n.getUuidString();
+        setUniqueName (uuid.isNotEmpty() ? uuid : String ((int64) n.getNodeId()));
     }
 
     void deleteItem() override
@@ -724,6 +725,21 @@ public:
         node.data().getParent().setProperty (tags::active, index, 0);
     }
 
+    void moveItem (int delta)
+    {
+        // the tree rebuilds inside moveGraph() and destroys this item, so
+        // capture everything needed before the call
+        const Node graph (node);
+        auto* const tree = getSessionTreePanel();
+        const int target = getIndexInParent() + delta;
+
+        content()->services().find<EngineService>()->moveGraph (graph, target);
+
+        if (tree != nullptr)
+            if (auto* item = tree->findItemForNode (graph))
+                item->setSelected (true, true, dontSendNotification);
+    }
+
     void handlePopupMenuResult (int result) override
     {
         switch (result)
@@ -748,6 +764,13 @@ public:
             case 6:
             case 7:
                 addScript (result);
+                break;
+            case 8:
+                moveItem (-1);
+                break;
+            case 9:
+                moveItem (1);
+                break;
             default:
                 break;
         }
@@ -781,6 +804,11 @@ public:
         menu.addSeparator();
 
         menu.addItem (2, "Duplicate");
+        menu.addSeparator();
+        const int index = getIndexInParent();
+        const int numGraphs = session() != nullptr ? session()->getNumGraphs() : 0;
+        menu.addItem (8, "Move Up", index > 0);
+        menu.addItem (9, "Move Down", index < numGraphs - 1);
         menu.addSeparator();
         menu.addItem (1, "Delete");
 
@@ -819,7 +847,6 @@ public:
 
     bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
-        std::clog << "isInterestedInDragSource() session root\n";
         const auto& desc (details.description);
         return desc.toString() == "ccNavConcertinaPanel";
         // ||    (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");

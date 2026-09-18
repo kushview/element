@@ -81,6 +81,17 @@ public:
     /** Ads a specific new graph */
     void duplicateGraph (const Node& graph);
 
+    /** Moves a root graph to a new position in the session.
+
+        Updates the audio engine's render order first, then the session model,
+        keeping engine indexes and session indexes in sync. The active graph
+        stays active.
+
+        @param graph    The root graph to move.
+        @param newIndex The index the graph should be moved to.
+    */
+    void moveGraph (const Node& graph, int newIndex);
+
     /** Add a connection on the active root graph */
     void addConnection (const uint32, const uint32, const uint32, const uint32);
 
