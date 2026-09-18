@@ -28,6 +28,24 @@ public:
 
     SessionPtr session() const;
 
+    /** Returns the tree's expand/collapse state as an XML string.
+
+        Nothing is written when every item is expanded or when the panel is
+        showing a single node instead of the session.
+
+        @param state Receives the state string, for persisting with the session.
+    */
+    void getState (juce::String& state) const;
+
+    /** Restores expand/collapse state produced by getState().
+
+        The state is applied the next time setSession() rebuilds the tree, so it
+        can be handed over before the loaded session reaches the panel.
+
+        @param state The state string; an empty string resets to the default.
+    */
+    void setState (const juce::String& state);
+
     void paint (juce::Graphics&) override;
     void resized() override;
     void mouseDown (const MouseEvent& event) override;
@@ -36,12 +54,14 @@ public:
 private:
     friend class SessionNodeTreeItem;
     friend class SessionRootGraphTreeItem;
+    friend class SessionRootTreeItem;
 
     class Panel;
     std::unique_ptr<Panel> panel;
 
     SessionPtr _session;
     ValueTree data;
+    std::unique_ptr<juce::XmlElement> pendingOpenness;
     Node node;
     SignalConnection nodeSelectedConnection;
 
@@ -49,6 +69,9 @@ private:
     void selectActiveRootGraph();
 
     TreeViewItem* findItemForNode (const Node& node) const;
+
+    /** Moves a root graph and re-selects its tree item afterwards. */
+    void moveRootGraph (const Node& graph, int newIndex);
 
     void onNodeSelected();
 

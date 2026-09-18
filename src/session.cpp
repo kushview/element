@@ -116,6 +116,20 @@ bool Session::addGraph (const Node& node, const bool setActive)
     return true;
 }
 
+bool Session::moveGraph (const int from, const int to)
+{
+    const int numGraphs = getNumGraphs();
+    if (from == to || ! isPositiveAndBelow (from, numGraphs) || ! isPositiveAndBelow (to, numGraphs))
+        return false;
+
+    auto graphs = getGraphsValueTree();
+    const auto active = graphs.getChild (getActiveGraphIndex());
+    graphs.moveChild (from, to, nullptr);
+    if (active.isValid())
+        graphs.setProperty (tags::active, graphs.indexOf (active), nullptr);
+    return true;
+}
+
 Node Session::getActiveGraph() const
 {
     const int index = getActiveGraphIndex();
@@ -271,7 +285,11 @@ void Session::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
     notifyChanged();
 }
 
-void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int) {}
+void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int)
+{
+    ignoreUnused (parent);
+    notifyChanged();
+}
 void Session::valueTreeParentChanged (ValueTree& tree) {}
 void Session::valueTreeRedirected (ValueTree& tree) {}
 

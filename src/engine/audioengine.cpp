@@ -231,6 +231,30 @@ struct RootGraphRender : public AsyncUpdater
             priorActiveGraphIndex = graphs.size() - 1;
     }
 
+    /** not realtime safe! AudioEngine's callback should be locked when you call this */
+    bool moveGraph (const int from, const int to)
+    {
+        if (from == to || ! isPositiveAndBelow (from, graphs.size()) || ! isPositiveAndBelow (to, graphs.size()))
+            return false;
+
+        auto* const active = getActiveGraph();
+        auto* const prior = isPositiveAndBelow (priorActiveGraphIndex, graphs.size())
+                                ? graphs.getUnchecked (priorActiveGraphIndex)
+                                : nullptr;
+
+        graphs.move (from, to);
+        updateIndexes();
+
+        // Assigned directly rather than via setActiveGraph(): the same graph is
+        // still active, so renderGraphs() must not see an active graph change.
+        if (active != nullptr)
+            activeGraphIndex = active->engineIndex;
+        if (prior != nullptr)
+            priorActiveGraphIndex = prior->engineIndex;
+
+        return true;
+    }
+
     int size() const { return graphs.size(); }
 
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked (i); }
@@ -652,6 +676,26 @@ public:
             graph->releaseResources();
     }
 
+    bool moveGraph (const int from, const int to)
+    {
+        ScopedLock sl (lock);
+
+        // The requested index can legitimately differ from the rendering index
+        // (a pending switch, or no device running), so remap it independently.
+        const int requestedIndex = activeGraphIndex.get();
+        auto* const requested = isPositiveAndBelow (requestedIndex, graphs.size())
+                                    ? graphs.getGraph (requestedIndex)
+                                    : nullptr;
+
+        if (! graphs.moveGraph (from, to))
+            return false;
+
+        if (requested != nullptr)
+            activeGraphIndex.set (requested->getEngineIndex());
+
+        return true;
+    }
+
     void connectSessionValues()
     {
         if (session)
@@ -893,6 +937,12 @@ bool AudioEngine::removeGraph (RootGraph* graph)
     jassert (priv && graph);
     priv->removeGraph (graph);
     return true;
+}
+
+bool AudioEngine::moveGraph (const int from, const int to)
+{
+    jassert (priv);
+    return priv != nullptr && priv->moveGraph (from, to);
 }
 
 RootGraph* AudioEngine::getGraph (const int index)

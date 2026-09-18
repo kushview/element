@@ -50,6 +50,19 @@ public:
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
 
+    /** Moves a root graph to a new position in the render order.
+
+        Engine indexes of all graphs are updated and the active graph stays
+        active. This is not an active graph change, so no crossfade or async
+        notification is triggered.
+
+        @param from The current engine index of the graph to move.
+        @param to   The engine index the graph should be moved to.
+        @return true if the graph was moved, false if either index was out of
+                range or the indexes were equal.
+    */
+    bool moveGraph (const int from, const int to);
+
     void setActiveGraphIndex (const int index);
     int getActiveGraphIndex() const;
 

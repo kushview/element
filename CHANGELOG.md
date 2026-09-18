@@ -6,6 +6,8 @@
 - CLAP plugins now appear in the Unverified plugin menu and can be added to a graph without a prior scan.
 - Graph Mixer: channel strips can be hidden via right-click and restored from the mixer background's right-click menu.
 - Script node DSP and UI scripts can be opened from the node's right-click menu in the graph editor and from a Script button in the Node panel.
+- Root graphs can be re-ordered in the session tree by drag and drop, or with Move Up and Move Down in the right-click menu.
+- The session tree's expanded/collapsed state is saved with the session and restored when it is reopened.
 
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.

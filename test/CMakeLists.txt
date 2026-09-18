@@ -107,6 +107,7 @@ add_test(NAME "SessionLoadBenchTests" COMMAND test_element --run_test=SessionLoa
 add_test(NAME "ShuttleTests" COMMAND test_element --run_test=ShuttleTests)
 add_test(NAME "TapTempoTests" COMMAND test_element --run_test=TapTempoTests)
 add_test(NAME "TransportTests" COMMAND test_element --run_test=TransportTests)
+add_test(NAME "SessionTests" COMMAND test_element --run_test=SessionTests)
 add_test(NAME "ToggleGridTest" COMMAND test_element --run_test=ToggleGridTest)
 add_test(NAME "UpdateTests" COMMAND test_element --run_test=UpdateTests)
 add_test(NAME "VelocityCurveTest" COMMAND test_element --run_test=VelocityCurveTest)
