@@ -1,14 +1,17 @@
 # `.element` Extension Format + App-Side Lua Runtime
 
-> **Phase 0 prerequisite:** [session-scripts.md](session-scripts.md) — session-embedded
-> hook scripts. `HookBus`, `el.hooks`, the restricted-environment/capability model, and
-> `ScriptingService` are built there first; Phase 3 below then reduces to wiring
-> `app.*` events and extension-owned registration. See also [luajit.md](luajit.md) for
-> the LuaJIT assessment.
+> **Phase 0 prerequisites:** [session-proxy.md](session-proxy.md) — the `SessionProxy`
+> through which every topology mutation (UI, undo, Lua, session load) flows and from which
+> hook events are dispatched — and [session-scripts.md](session-scripts.md) — console,
+> `HookBus`, `el.hooks`, mutation verbs on `el.Session`/`el.Graph`, the
+> restricted-environment/capability model, and `ScriptingService`. Those are built first;
+> Phase 2 below reduces to graph providers over the model verbs and Phase 3 to
+> extension-owned registration. [scripting-audit.md](scripting-audit.md) records the
+> starting state. See also [luajit.md](luajit.md) for the LuaJIT assessment.
 
 ## Context
 
-Element has a mature Lua substrate (embedded Lua 5.4, sol2 bindings under `src/el/`, a shared `ScriptingEngine` on `Context`) but the app-side surface is thin: no startup script execution (`ScriptingEngine::execute` is declared but never defined), no Lua graph-mutation API, no lifecycle hooks, and GUI scripting is limited to embedded View scripts. The goal is a new **`*.element` extension format** — a directory (like `.lv2`/`.vst3`) acting as a package/extension that can carry Lua modules, hook scripts, views/panels, DSP scripts, graphs (serialized data **or** Lua builder scripts — manifest decides), presets, resources, and bundled plugins (CLAP first) — plus the app-side Lua runtime it requires: graph building, lifecycle hooks, and GUI extensibility.
+Element has a mature Lua substrate (embedded Lua 5.4, sol2 bindings under `src/el/`, a shared `ScriptingEngine` on `Context`) but the app-side surface is thin (see [scripting-audit.md](scripting-audit.md)). Phase 0 supplies startup script execution (`ScriptingEngine::execute`, user `init.lua`), the Lua graph-mutation API (model verbs) and lifecycle hooks; GUI scripting remains limited to embedded View scripts until Phase 4. The goal is a new **`*.element` extension format** — a directory (like `.lv2`/`.vst3`) acting as a package/extension that can carry Lua modules, hook scripts, views/panels, DSP scripts, graphs (serialized data **or** Lua builder scripts — manifest decides), presets, resources, and bundled plugins (CLAP first) — plus the app-side Lua runtime it requires: graph building, lifecycle hooks, and GUI extensibility.
 
 **Decisions made with user:**
 - Terminology: **Extension** everywhere (classes, service, Lua modules). Directory suffix stays `.element`.
@@ -63,53 +66,52 @@ C++ side: `struct ExtensionManifest` — plain struct parsed once from the sol t
 |---|---|
 | `ExtensionManifest`, `Extension` | `src/scripting/extension.hpp/.cpp` |
 | `ExtensionManager` (scan/load/unload registry) | `src/scripting/extensionmanager.hpp/.cpp` |
-| `ScriptingService` (new `Service`) | `src/services/scriptingservice.hpp/.cpp` |
-| `HookBus` (C++ event dispatcher) | `src/scripting/hookbus.hpp/.cpp` |
-| `el.engine`, `el.hooks`, `el.ui` Lua modules | `src/el/Engine.cpp`, `Hooks.cpp`, `UI.cpp` |
+| `ScriptingService` (`Service`, **Phase 0**) | `src/services/scriptingservice.hpp/.cpp` |
+| `HookBus` (C++ event dispatcher, **Phase 0**, owned by `Context`) | `include/element/hooks.hpp`, `src/hooks.cpp` |
+| `SessionProxy` (**Phase 0**, see session-proxy.md) | `src/engine/sessionproxy.hpp/.cpp` |
+| `el.hooks` (**Phase 0**), `el.ui` Lua modules | `src/el/Hooks.cpp` + `hooks.lua`, `src/el/UI.cpp` |
 | `ViewFactory` (slug → ContentView registry) | `src/ui/viewfactory.hpp/.cpp`, owned by `GuiService` |
 | `ScriptContentView` + `MissingExtensionView` | `src/ui/scriptcontentview.hpp/.cpp` |
 
 Key existing seams to reuse (verified):
-- `ScriptingEngine::addPackage(name, loader)` runtime package registry ([scripting.cpp:118](src/scripting.cpp#L118)) — extension Lua modules register here (namespaced; no global `package.path` pollution).
-- `EngineService` mutation vocabulary ([engine.hpp](include/element/engine.hpp)): `addGraph/addNode/addPlugin/addConnection/connectChannels/connect(PortType,...)/removeNode/disconnectNode` — Lua rides the existing message/undo/engine-sync path.
-- `StandardContent::createContentView(const String&)` virtual, consulted first by `setMainView`/`setSecondaryView` ([standard.hpp:88](include/element/ui/standard.hpp#L88), [standard.cpp:541,633](src/ui/standard.cpp#L541)).
-- `NavigationConcertinaPanel::addPanel(desc, factory, header)` public ([navigation.hpp:73](include/element/ui/navigation.hpp#L73)); panel state keys by name — extension slugs must be stable.
-- `ScriptView` per-view `sol::environment` + descriptor pattern ([scriptview.cpp](src/ui/scriptview.cpp)) — the sandbox precedent for all extension script execution.
-- `SessionService::sigSessionLoaded/sigWillSave` ([sessionservice.hpp:37-38](src/services/sessionservice.hpp#L37-L38)), `EngineService::sigNodeRemoved`.
-- `Node::parse` tolerant multi-format graph reader ([node.cpp](src/node.cpp)) for `type="data"` providers.
+- `ScriptingEngine::addPackage(name, loader)` runtime package registry ([scripting.cpp:118](../../src/scripting.cpp#L118)) — extension Lua modules register here (namespaced; no global `package.path` pollution).
+- Mutation verbs on the models (`Session::addGraph/removeGraph/moveGraph/setActiveGraph`, `Graph::addNode/addPlugin/removeNode/connect/disconnect/connectChannels`), backed by `SessionProxy` ([session-proxy.md](session-proxy.md)) and already bound as `el.Session`/`el.Graph` in Phase 0. `EngineService` keeps its public signatures as thin forwards for UI/undo callers.
+- `StandardContent::createContentView(const String&)` virtual, consulted first by `setMainView`/`setSecondaryView` ([standard.hpp:88](../../include/element/ui/standard.hpp#L88), [standard.cpp:541,633](../../src/ui/standard.cpp#L541)).
+- `NavigationConcertinaPanel::addPanel(desc, factory, header)` public ([navigation.hpp:73](../../include/element/ui/navigation.hpp#L73)); panel state keys by name — extension slugs must be stable.
+- `ScriptView` per-view `sol::environment` + descriptor pattern ([scriptview.cpp](../../src/ui/scriptview.cpp)) — the sandbox precedent for all extension script execution.
+- `HookBus` events (`session.loaded`, `session.saving`, `session.closed`, `graph.*`, `node.*`, `connection.*`, `app.started`, `app.shutdown`) — all dispatched in Phase 0; `EngineService::sigNodeRemoved` is gone.
+- `Node::parse` tolerant multi-format graph reader ([node.cpp](../../src/node.cpp)) for `type="data"` providers.
 
-Ownership/lifetime rule: `ExtensionManager` is owned by `ScriptingEngine::Impl` (inside the Lua state's lifetime — sol::environment destruction order). `ScriptingService::deactivate()` unloads extensions **before** state teardown. `ScriptingService` registers in `Services` ctor ([services.cpp](src/services.cpp)) after `EngineService`, before `SessionService`, so extension views/graphs exist before the startup session restores.
+Ownership/lifetime rule: `ExtensionManager` is owned by `ScriptingEngine::Impl` (inside the Lua state's lifetime — sol::environment destruction order). `HookBus` is owned by `Context` and freed after `services` but before the Lua state ([session-scripts.md](session-scripts.md) § HookBus). `ScriptingService::deactivate()` unloads extensions **before** state teardown. `ScriptingService` already exists from Phase 0 and registers in `Services` ctor ([services.cpp](../../src/services.cpp)) after `EngineService`, before `SessionService`, so extension views/graphs exist before the startup session restores.
 
 ## Phases
 
 ### Phase 1 — Extension core: format, discovery, module/script loading
 - New: `extension.hpp/.cpp`, `extensionmanager.hpp/.cpp`, `scriptingservice.hpp/.cpp`, `test/scripting/extensiontests.cpp`, fixture `test/scripting/fixtures/TestPack.element/`.
-- Modified: `src/scripting.hpp/.cpp` (implement dead `ScriptingEngine::execute` as protected `lua.script()` in fresh env returning `Result`; expose `extensions()`), `src/datapath.cpp` + `include/element/datapath.hpp` (`defaultExtensionsDir()` = `~/Music/Element/Extensions`, create in `initializeUserLibrary`; also scan `applicationDataDir()/Extensions`; dev env var `ELEMENT_EXTENSIONS_PATH` mirroring `ELEMENT_SCRIPTS_PATH` handling in [bindings.cpp](src/scripting/bindings.cpp)), `src/services.cpp`, `src/scripting/scriptmanager.cpp/.hpp` (**additive** scan — current `scanDirectory` replaces the registry), `include/element/tags.hpp` (`EL_TAG(Extension)`, `tags::extensionId`, `tags::extensionVersion`, `tags::requires`), `src/CMakeLists.txt`, `test/CMakeLists.txt` (+ `add_test`).
+- Modified: `src/scripting.hpp/.cpp` (implement dead `ScriptingEngine::execute` as protected `lua.script()` in fresh env returning `Result`; expose `extensions()`), `src/datapath.cpp` + `include/element/datapath.hpp` (`defaultExtensionsDir()` = `~/Music/Element/Extensions`, create in `initializeUserLibrary`; also scan `applicationDataDir()/Extensions`; dev env var `ELEMENT_EXTENSIONS_PATH` mirroring `ELEMENT_SCRIPTS_PATH` handling in [bindings.cpp](../../src/scripting/bindings.cpp)), `src/services.cpp`, `src/scripting/scriptmanager.cpp/.hpp` (**additive** scan — current `scanDirectory` replaces the registry), `include/element/tags.hpp` (`EL_TAG(Extension)`, `tags::extensionId`, `tags::extensionVersion`, `tags::requires`), `src/CMakeLists.txt`, `test/CMakeLists.txt` (+ `add_test`).
 - Load sequence: scan (parse manifests only, no code) → for enabled extensions: register modules via `addPackage`, register DSP/View scripts with `ScriptManager`, run entry script in `sol::environment(lua, sol::create, lua.globals())`; every failure → `logError`, status `error`, never throws out. Enable/disable persisted in `Settings` (`extensionsDisabled` list). `Commands::reloadExtensions` for dev iteration.
 - Unload = disconnect hooks, drop env, clear `package.loaded` + registered packages, remove ScriptManager entries and view/panel registrations. Full hot-unload of usertypes is explicitly out of scope (documented).
 
-### Phase 2 — Graph-building Lua API + graph providers
-- New: `src/el/Engine.cpp` (`luaopen_el_Engine`), `test/scripting/enginescripttests.cpp`.
-- Modified: `src/scripting/bindings.cpp` (register module), `src/el/CMakeLists.txt`, `src/services/scriptingservice.cpp` (provider instantiation), `src/ui/mainmenu.cpp` + commands (File → New Graph From Extension ▸ submenu).
-- Facade binds a thin wrapper resolving `EngineService` per call (never bind the service class raw); assert message thread; Lua two-value `nil, "message"` error convention:
+### Phase 2 — Graph providers (the Lua graph API comes from Phase 0)
+- New: `test/scripting/graphprovidertests.cpp`.
+- Modified: `src/services/scriptingservice.cpp` (provider instantiation), `src/ui/mainmenu.cpp` + commands (File → New Graph From Extension ▸ submenu).
+- Builder scripts use the Phase 0 model verbs; no `el.engine` module exists. Lua two-value `nil, "message"` error convention:
   ```lua
-  local engine = require ("el.engine")
-  local g = engine.addGraph ("My Rig")
-  local n = engine.addNode (g, "element.volume")
-  local p = engine.addPlugin (g, { format = "CLAP", id = "org.surge..." })
-  engine.connect (g, p, 0, n, 0)          -- optional 5th arg "midi" for PortType
-  engine.remove (g, n); engine.saveGraph (g, path)
+  local s = require ('el.Context').instance():session()
+  local g = s:addGraph ("My Rig")
+  local n = g:addNode ("element.volume")
+  local p = g:addPlugin { format = "CLAP", id = "org.surge..." }
+  g:connectChannels (p, 0, n, 0)          -- optional 5th arg "midi" for PortType
+  g:removeNode (n); g:writeFile (path)
   ```
-  `addPlugin` looks up `context().plugins().getKnownPlugins()` by format + identifier/uid/name.
+  `addPlugin` looks up `context().plugins().getKnownPlugins()` by format + identifier/uid/name (bound in Phase 0).
 - Providers: `type="data"` → `Node::parse` → re-UUID (same as `.elg` import) → `EngineService::addGraph(node, true)`. `type="script"` → protected run in fresh env, wrapped in a **single UndoManager transaction** (fallback: per-op undo, documented, if bracketing proves infeasible).
 - Tests headless with existing `Context` + engine fixtures: builder script topology assertions, data-provider instantiation, plugin-miss returns nil+msg.
 
-### Phase 3 — Hook system
-- New: `src/scripting/hookbus.hpp/.cpp`, `src/el/Hooks.cpp`, `test/scripting/hooktests.cpp`.
-- Modified: `include/element/engine.hpp` + `src/services/engineservice.cpp` — add `sigNodeAdded`, `sigGraphAdded`, `sigGraphRemoved` at the same sites that fire `sigNodeRemoved`; `scriptingservice.cpp` wires all signals → `HookBus`.
-- Events: `app.started`, `app.shutdown`, `session.loaded`, `session.saving`, `graph.added`, `graph.removed`, `graph.changed`, `node.added`, `node.removed`; extensions can `hooks.emit` custom events.
-- `HookBus`: message-thread only; handlers are `sol::protected_function` tagged with owner extension id (ExtensionManager sets a "current extension" scope during entry scripts; console registrations = `"user"`); dispatch iterates a copy; reentrancy guard (`dispatching` flag + pending queue); auto-disable a handler after 3 consecutive errors; `removeOwner(id)` on unload.
-- Lua: `hooks.on(event, fn) → handle`, `hooks.off(handle)`, `hooks.emit(event, ...)`.
+### Phase 3 — Extension-owned hooks (the bus and events come from Phase 0)
+- Modified: `src/scripting/extensionmanager.cpp` — set the `HookBus` "current owner" to the extension id while running its entry script so `hooks.action` registrations are tagged automatically; `removeOwner (id)` on unload. `test/scripting/extensiontests.cpp` gains load→unload→load without duplicate handlers.
+- Extension default grant is friendlier than session scripts (trusted-but-isolated): `session`, `ui` granted without a prompt; `io` still declared.
+- Events and the `el.hooks` API (`hooks.action/filter/off/emit/owner`) are as defined in [session-scripts.md](session-scripts.md); extensions can `hooks.emit` custom events.
 
 ### Phase 4 — GUI extensibility
 - New: `viewfactory.hpp/.cpp`, `scriptcontentview.hpp/.cpp`, `src/el/UI.cpp`.
@@ -131,7 +133,7 @@ Ownership/lifetime rule: `ExtensionManager` is owned by `ScriptingEngine::Impl` 
 
 ## Verification
 
-- Per-phase Boost.Test suites in `test/scripting/` (each registered in `test/CMakeLists.txt` with `add_test`): manifest parse/reject, discovery, `require` resolution, entry-script error isolation (Phase 1); builder-script graph topology + undo-transaction rollback (Phase 2); hook dispatch/auto-disable/removeOwner/reentrancy (Phase 3); ViewFactory register/lookup/missing-placeholder + headless descriptor instantiation (Phase 4); search-path merge + preset discovery from fixture (Phase 5); requires-tree round-trip + missing-extension session load degradation + load→unload→load cycle without duplicate handlers (Phase 6).
+- Per-phase Boost.Test suites in `test/scripting/` (each registered in `test/CMakeLists.txt` with `add_test`): manifest parse/reject, discovery, `require` resolution, entry-script error isolation (Phase 1); builder-script graph topology + undo-transaction rollback (Phase 2); extension owner tagging + unload/reload without duplicate handlers (Phase 3, the bus itself is tested in Phase 0); ViewFactory register/lookup/missing-placeholder + headless descriptor instantiation (Phase 4); search-path merge + preset discovery from fixture (Phase 5); requires-tree round-trip + missing-extension session load degradation + load→unload→load cycle without duplicate handlers (Phase 6).
 - `cmake --build build && ctest --test-dir build --output-on-failure -R Extension...` per suite.
 - Manual end-to-end after Phase 4: drop `TestPack.element` into `~/Music/Element/Extensions`, launch app, confirm entry script runs, `New Graph From Extension` builds a graph, hooks fire in the Lua console, and the registered view opens via `presentView`.
 
