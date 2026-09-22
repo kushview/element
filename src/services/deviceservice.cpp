@@ -10,6 +10,7 @@
 #include <element/settings.hpp>
 
 #include "services/deviceservice.hpp"
+#include "engine/midiengine.hpp"
 
 namespace element {
 
@@ -149,6 +150,8 @@ public:
         // Context teardown, but context() itself is not reachable there.
         devices = &context.devices();
         devices->addChangeListener (this);
+        midi = &context.midi();
+        midi->addChangeListener (this);
 
         std::unique_ptr<juce::XmlElement> savedXml;
         if (auto* const props = context.settings().getUserSettings())
@@ -172,6 +175,12 @@ public:
             devices = nullptr;
         }
 
+        if (midi != nullptr)
+        {
+            midi->removeChangeListener (this);
+            midi = nullptr;
+        }
+
         monitor.reset();
         backend.reset();
     }
@@ -188,11 +197,27 @@ public:
     }
 
 private:
-    void changeListenerCallback (juce::ChangeBroadcaster*) override
+    void changeListenerCallback (juce::ChangeBroadcaster* source) override
     {
+        if (source == midi)
+        {
+            persistMidiSettings();
+            return;
+        }
+
         // Defer: change messages can arrive while the device manager is
         // still inside its own callback stack.
         triggerAsyncUpdate();
+    }
+
+    /** Writes the MIDI engine state to the settings file as soon as it
+        changes, so a crash or forced quit does not lose it. */
+    void persistMidiSettings()
+    {
+        auto& context = owner.context();
+        auto& settings = context.settings();
+        context.midi().writeSettings (settings);
+        settings.saveIfNeeded();
     }
 
     void handleAsyncUpdate() override
@@ -217,6 +242,7 @@ private:
     std::unique_ptr<AudioDeviceMonitor> monitor;
     SignalConnection statusConnection, listChangedConnection;
     DeviceManager* devices { nullptr };
+    MidiEngine* midi { nullptr };
     bool hardwareEvent { false };
 };
 

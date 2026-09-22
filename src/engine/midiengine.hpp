@@ -16,7 +16,18 @@ public:
     ~MidiEngine();
 
     //==============================================================================
+    /** Restores enabled inputs and the default output from the given properties.
+        Inputs that cannot be opened right now (unplugged or held by another
+        application) are still remembered, so they survive the next write.
+        @param props The property set holding the "midiEngine" value.
+    */
+    void applySettings (juce::PropertySet& props);
     void applySettings (Settings&);
+
+    /** Stores enabled inputs and the default output in the given properties.
+        @param props The property set to write the "midiEngine" value to.
+    */
+    void writeSettings (juce::PropertySet& props);
     void writeSettings (Settings&);
 
     //==============================================================================
@@ -91,7 +102,10 @@ public:
      */
     const String& getDefaultMidiOutputName() const noexcept { return defaultMidiOutputName; }
 
-    const String& getDefaultMidiOutputID() const noexcept { return defaultMidiOutputName; }
+    /** Returns the identifier of the default midi output.
+        @see setDefaultMidiOutput, getDefaultMidiOutputName
+     */
+    const String& getDefaultMidiOutputID() const noexcept { return defaultMidiOutputID; }
 
     /** Returns the current default midi output device.
         If no device has been selected, or the device can't be opened, this will return nullptr.
@@ -132,6 +146,7 @@ private:
     };
 
     StringArray midiInsFromXml;
+    juce::StringPairArray inputNames; // identifier -> last known device name
     OwnedArray<MidiInputHolder> openMidiInputs;
     Array<MidiCallbackInfo> midiCallbacks;
 
