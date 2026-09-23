@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.2.x]
+## [1.3.x]
 
 ### Added
 - CLAP plugins now appear in the Unverified plugin menu and can be added to a graph without a prior scan.
@@ -8,6 +8,11 @@
 - Script node DSP and UI scripts can be opened from the node's right-click menu in the graph editor and from a Script button in the Node panel.
 - Root graphs can be re-ordered in the session tree by drag and drop, or with Move Up and Move Down in the right-click menu.
 - The session tree's expanded/collapsed state is saved with the session and restored when it is reopened.
+- Multithreaded rendering: root graphs can be rendered across multiple cores. Off by default; enable it from the Experimental section in Preferences.
+- Crash logging: an uncaught exception or fatal signal on any thread now writes the error and a backtrace to `main.log` before the application exits.
+- Safe start: if Element died while opening the last session, the next launch asks whether to open it anyway or start with an empty session instead of failing again.
+- Session autosave: a recovery copy of an unsaved session is written every two minutes next to the session file (`<name>.els.recover`) and offered on the next launch if it is newer than the saved file. It is removed on save or close.
+- Lua console: `View > Console` has a default shortcut (F3); the console keeps its variables and command history when closed and reopened; results and `console.log` print to the console; `session()` returns the live session.
 
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.
@@ -17,6 +22,8 @@
 - Selected nodes now show the same accent outline in both the graph editor and the Graph Mixer.
 - Note names throughout the UI now use scientific pitch notation (middle C = C4), matching the convention used by most DAWs.
 - Node context menu (graph editor, connection grid, plugin window) rebuilt on JUCE menu actions; item actions now run asynchronously, which avoids crashes when an action replaces the view that showed the menu.
+- Script node: DSP scripts are validated before they are applied by running a few cycles in a scratch state; scripts that raise or produce non-finite audio are rejected with the error shown in the script editor and logged to the console.
+- Lua: `el.command` works again through `Context:commands()`; the unused `scripts/commands.lua` and dead scripting-engine members were removed.
 
 ### Fixed
 - Freeze on Windows when an ASIO audio interface is disconnected. Reconnection is now driven by system hardware notifications instead of repeatedly probing the driver.
@@ -25,6 +32,9 @@
 - MIDI Monitor logged Start/Stop/Continue messages twice.
 - CLAP: plugin UIs displaying incorrectly on Linux.
 - Windows: the file watcher spun at 100% CPU and could prevent a clean shutdown when unhandled file change notifications were delivered (e.g. by OneDrive).
+- A Lua error inside a Script node's `process` function terminated the application with no crash report. Errors now disable that script and are reported instead.
+- Enabled MIDI inputs and the default MIDI output were lost from settings across restarts, breaking external MIDI clock sync (#1181). MIDI settings are now saved when they change, remembered inputs whose device is unplugged are kept, and the plugin scanner and secondary instances no longer rewrite settings.
+- Lua console: the startup prelude failed silently in development builds, and log messages were appended to the console from the logging thread.
 
 ## [1.2.0]
 

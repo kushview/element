@@ -29,7 +29,18 @@ public:
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 
-    Result loadScript (const String&);
+    /** Validates and loads DSP script code, replacing the running script.
+
+        On failure the running script is left untouched, the error is recorded
+        (see getScriptError) and written to the application log.
+
+        @param code The Lua source to load.
+        @return ok, or the validation/instantiation error.
+    */
+    Result loadScript (const String& code);
+
+    /** Returns the error from the most recent loadScript, or empty if it succeeded. */
+    String getScriptError() const { return scriptError; }
 
     CodeDocument& getCodeDocument (bool forEditor = false) { return forEditor ? edCode : dspCode; }
 
@@ -61,12 +72,15 @@ private:
     std::unique_ptr<DSPScript> script;
     ParameterArray inParams, outParams;
     StringArray printMessages;
+    String scriptError;
 
     int _program = 0;
 
     int blockSize = 512;
     double sampleRate = 44100.0;
     bool prepared = false;
+
+    Result loadScriptInternal (const String& code);
 };
 
 } // namespace element

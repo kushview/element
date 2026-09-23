@@ -33,6 +33,9 @@ public:
     /** Returns the default Node MIDI Presets directory */
     static const juce::File defaultGlobalMidiProgramsDir();
 
+    /** Returns the directory holding autosaved recovery copies of unsaved sessions. */
+    static const juce::File recoveryDir();
+
     /** Returns the default User data path */
     static const juce::File defaultUserDataPath();
 

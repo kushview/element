@@ -21,6 +21,7 @@
 #include <element/datapath.hpp>
 #include "services/deviceservice.hpp"
 #include "services/sessionservice.hpp"
+#include "crashlog.hpp"
 #include "log.hpp"
 #include "messages.hpp"
 #include "auth.hpp"
@@ -222,6 +223,11 @@ void Application::initialise (const String& commandLine)
         return;
     }
 
+    // Only the real application gets crash logging: the scanner worker keeps
+    // its own no-op handler (installed by its constructor above), and a plugin
+    // never runs this code at all.
+    CrashLog::install (Log::getMainLogFile());
+
     world = std::make_unique<Context> (RunMode::Standalone, commandLine);
     initializeModulePath();
     printCopyNotice();
@@ -311,6 +317,9 @@ void Application::shutdown()
     Logger::setCurrentLogger (nullptr);
     world->setEngine (nullptr);
     world = nullptr;
+
+    // Last: crashes during engine/plugin teardown above are still logged.
+    CrashLog::uninstall();
 }
 
 void Application::systemRequestedQuit()
