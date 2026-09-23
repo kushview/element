@@ -68,8 +68,8 @@ public:
     /** Returns the default search path for a given format. */
     juce::FileSearchPath defaultSearchPath (juce::StringRef format) const noexcept;
 
-    /** creates a child process slave used in start up */
-    juce::ChildProcessWorker* createAudioPluginScannerWorker();
+    /** Creates the worker object used when this process runs as the plugin scanner. */
+    static juce::ChildProcessWorker* createAudioPluginScannerWorker();
 
     /** creates a new plugin scanner for use by a third party, e.g. plugin manager UI */
     PluginScanner* createAudioPluginScanner();

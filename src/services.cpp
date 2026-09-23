@@ -65,6 +65,9 @@ public:
 
     void deactivate()
     {
+        if (! activated)
+            return;
+
         for (auto* s : services)
             s->deactivate();
 
