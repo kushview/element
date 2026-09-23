@@ -26,10 +26,11 @@ end
 -- @tparam table env The environment to use or _ENV
 -- @tparam any ... Arguments passed to script
 -- @treturn any Return value from script or no value
+-- @raise When the script cannot be found or compiled
 -- @usage script.exec ('scriptname')
 function M.exec (path, env, ...)
     local invoke, err = M.load (path, env)
-    if err then return err end
+    if not invoke then error (err, 2) end
     return invoke (...)
 end
 

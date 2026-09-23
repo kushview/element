@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "luatest.hpp"
+#include "luascripts.hpp"
 #include "scripting/dspscript.hpp"
 #include "scripting/scriptloader.hpp"
 #include "testutil.hpp"
@@ -79,6 +80,89 @@ BOOST_AUTO_TEST_CASE (Basics)
     expect (Amp.get_or ("released", true) == false);
     dsp.release();
     expect (Amp.get_or ("released", false) == true);
+}
+
+static juce::String dspScriptWithProcess (const char* body)
+{
+    return juce::String (R"(
+--- Validate fixture.
+-- @script validate_fixture
+-- @type DSP
+local function layout() return { audio = { 2, 2 }, midi = { 1, 1 } } end
+local function process (a, m, p, c, t)
+)") + body
+           + R"(
+end
+return { type = 'DSP', layout = layout, process = process }
+)";
+}
+
+BOOST_AUTO_TEST_CASE (ValidateShippedAmp)
+{
+    const auto amp = String::fromUTF8 (scripts::amp_lua, scripts::amp_luaSize);
+    auto result = DSPScript::validate (amp);
+    BOOST_REQUIRE_MESSAGE (result.wasOk(), result.getErrorMessage().toStdString());
+}
+
+BOOST_AUTO_TEST_CASE (ValidateRejectsEmpty)
+{
+    BOOST_REQUIRE (DSPScript::validate ("").failed());
+}
+
+BOOST_AUTO_TEST_CASE (ValidateRejectsSyntaxError)
+{
+    BOOST_REQUIRE (DSPScript::validate ("return {").failed());
+}
+
+BOOST_AUTO_TEST_CASE (ValidateRejectsNonTable)
+{
+    BOOST_REQUIRE (DSPScript::validate ("return 42").failed());
+}
+
+BOOST_AUTO_TEST_CASE (ValidateRendersMidiAndAudio)
+{
+    auto result = DSPScript::validate (dspScriptWithProcess (R"(
+        local buf = m:get (1)
+        assert (buf:size() > 0, 'expected midi events')
+        a:fade (1.0, 0.5)
+    )"));
+    BOOST_REQUIRE_MESSAGE (result.wasOk(), result.getErrorMessage().toStdString());
+}
+
+BOOST_AUTO_TEST_CASE (ValidateRejectsProcessError)
+{
+    auto result = DSPScript::validate (dspScriptWithProcess ("error ('process exploded')"));
+    BOOST_REQUIRE (result.failed());
+    BOOST_REQUIRE_MESSAGE (result.getErrorMessage().contains ("process exploded"),
+                           result.getErrorMessage().toStdString());
+}
+
+BOOST_AUTO_TEST_CASE (ValidateRejectsNonFiniteOutput)
+{
+    auto result = DSPScript::validate (dspScriptWithProcess ("a:fade (math.huge, math.huge)"));
+    BOOST_REQUIRE (result.failed());
+    BOOST_REQUIRE_MESSAGE (result.getErrorMessage().contains ("non-finite"),
+                           result.getErrorMessage().toStdString());
+}
+
+BOOST_AUTO_TEST_CASE (ProcessErrorDisablesScriptInsteadOfAborting)
+{
+    LuaFixture fix;
+    sol::state_view lua (fix.luaState());
+    ScriptLoader loader (lua, dspScriptWithProcess ("error ('boom')"));
+    BOOST_REQUIRE_MESSAGE (! loader.hasError(), loader.getErrorMessage().toStdString());
+    sol::table descriptor = loader.call();
+    DSPScript dsp (descriptor);
+    BOOST_REQUIRE (dsp.isValid());
+
+    AudioSampleBuffer audio (2, 64);
+    MidiPipe midi;
+    dsp.process (audio, midi);
+    BOOST_REQUIRE (! dsp.isValid());
+    BOOST_REQUIRE (dsp.getLastError().contains ("boom"));
+
+    // A disabled script is a no-op afterwards, not a crash.
+    dsp.process (audio, midi);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

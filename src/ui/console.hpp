@@ -28,6 +28,12 @@ public:
     /** Show or hide the text prompt */
     void setPromptVisible (bool visible);
 
+    /** Returns the command history, oldest first. */
+    const StringArray& getHistory() const;
+
+    /** Replaces the command history. */
+    void setHistory (const StringArray& history);
+
     /** Override this to handle when text is entered on the prompt. The default
         implementation just adds entered text to the display buffer */
     virtual void textEntered (const String& text);

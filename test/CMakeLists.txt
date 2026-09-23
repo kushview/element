@@ -63,6 +63,7 @@ add_test(NAME "AudioRoutingTests" COMMAND test_element --run_test=AudioRoutingTe
 add_test(NAME "AuthTests" COMMAND test_element --run_test=AuthTests)
 add_test(NAME "BytesTest" COMMAND test_element --run_test=BytesTest)
 add_test(NAME "BusesLayoutTests" COMMAND test_element --run_test=BusesLayoutTests)
+add_test(NAME "ConsoleTests" COMMAND test_element --run_test=ConsoleTests)
 add_test(NAME "JuceIntegrationTests" COMMAND test_element --run_test=JuceIntegrationTests)
 add_test(NAME "DataPathTests" COMMAND test_element --run_test=DataPathTests)
 add_test(NAME "DeviceMonitorTests" COMMAND test_element --run_test=DeviceMonitorTests)

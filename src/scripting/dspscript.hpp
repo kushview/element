@@ -23,31 +23,38 @@ public:
     DSPScript (sol::table tbl);
     ~DSPScript();
 
-    void init()
-    {
-        if (sol::function f = DSP["init"])
-            f();
-    }
+    /** Calls the script's optional `init` function.
+        @return false if the script raised an error (see getLastError)
+    */
+    bool init();
 
+    /** Compiles and instantiates a DSP script in a scratch Lua state, then
+        runs a few cycles of prepare/process/release to catch runtime errors.
+
+        @param script The Lua source of the script.
+        @return ok when the script loads, returns a descriptor table, and
+                renders without raising or producing non-finite audio.
+    */
     static juce::Result validate (const juce::String& script);
 
     void setPlayHead (juce::AudioPlayHead* ph) noexcept { playhead = ph; }
 
-    /** Returns true if the script loaded ok */
+    /** Returns true if the script loaded ok and has not failed in process */
     bool isValid() const noexcept { return loaded; }
 
-    //==========================================================================
-    void prepare (double rate, int block)
-    {
-        if (sol::function f = DSP["prepare"])
-            f (rate, block);
-    }
+    /** Returns the message of the last error raised by the script, if any. */
+    juce::String getLastError() const { return lastError; }
 
-    void release()
-    {
-        if (sol::function f = DSP["release"])
-            f();
-    }
+    //==========================================================================
+    /** Calls the script's optional `prepare` function.
+        @return false if the script raised an error (see getLastError)
+    */
+    bool prepare (double rate, int block);
+
+    /** Calls the script's optional `release` function.
+        @return false if the script raised an error (see getLastError)
+    */
+    bool release();
 
     //==========================================================================
     void process (juce::AudioSampleBuffer& a, element::MidiPipe& m);
@@ -83,6 +90,7 @@ private:
 
     lua_State* L = nullptr;
     bool loaded = false;
+    juce::String lastError;
     int numParams = 0, // input params
         numControls = 0; // output params
     enum
@@ -109,6 +117,9 @@ private:
     void addParameterPorts();
     void unlinkParams();
     void setParameter (int, float, bool);
+
+    template <typename... Args>
+    bool callOptional (const char* name, Args&&... args);
 };
 
 } // namespace element

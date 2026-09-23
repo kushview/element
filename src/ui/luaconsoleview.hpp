@@ -7,7 +7,9 @@
 #include "ui/luaconsole.hpp"
 #include "log.hpp"
 
-#define EL_VIEW_CONSOLE "LuaConsoleViw"
+#define EL_VIEW_CONSOLE "LuaConsoleView"
+/** Misspelled view name persisted to settings by older builds. */
+#define EL_VIEW_CONSOLE_LEGACY "LuaConsoleViw"
 
 namespace element {
 
@@ -37,10 +39,8 @@ public:
         console.setBounds (getLocalBounds().reduced (2));
     }
 
-    void messageLogged (const String& msg) override
-    {
-        console.addText (msg, false);
-    }
+    /** Called from whichever thread logs the message, inside the Log's lock. */
+    void messageLogged (const String& msg) override;
 
 private:
     LuaConsole console;

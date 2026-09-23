@@ -20,10 +20,7 @@ LuaConsoleView::~LuaConsoleView()
 
 void LuaConsoleView::initializeView (Services& app)
 {
-    auto& se = app.context().scripting();
-    sol::state_view view (se.getLuaState());
-    console.setEnvironment (
-        sol::environment (view, sol::create, view.globals()));
+    console.initialize (app.context().scripting());
 
     log = &app.context().logger();
     log->addListener (this);
@@ -32,6 +29,14 @@ void LuaConsoleView::initializeView (Services& app)
     for (const auto& line : log->getHistory())
         buffer << line << juce::newLine;
     console.addText (buffer.trimEnd(), false);
+}
+
+void LuaConsoleView::messageLogged (const String& msg)
+{
+    juce::MessageManager::callAsync ([safe = juce::Component::SafePointer<LuaConsoleView> (this), msg]() {
+        if (safe != nullptr)
+            safe->console.addText (msg, false);
+    });
 }
 
 } // namespace element

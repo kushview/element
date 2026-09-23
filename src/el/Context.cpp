@@ -8,6 +8,8 @@
 
 #include <element/ui/commands.hpp>
 #include <element/context.hpp>
+#include <element/services.hpp>
+#include <element/ui.hpp>
 #include <element/devices.hpp>
 #include <element/plugins.hpp>
 #include <element/settings.hpp>
@@ -49,6 +51,14 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
         // @within Instance Methods
         "session",  &Context::session,
 
+        /// Returns the application's command manager.
+        // @function Context:commands
+        // @treturn el.Commands
+        // @within Instance Methods
+        "commands", [] (Context& ctx) -> element::Commands& {
+            return ctx.services().find<element::GuiService>()->commands();
+        },
+
         "audio",    &Context::audio,
         "devices",  &Context::devices,
         "mapping",  &Context::mapping,
@@ -58,6 +68,7 @@ EL_PLUGIN_EXPORT int luaopen_el_Context (lua_State* L)
         "settings", &Context::settings);
 
     lua.script (R"(
+        require ('el.Commands')
         require ('el.Node')
         require ('el.Session')
     )");
