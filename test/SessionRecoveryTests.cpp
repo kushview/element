@@ -39,11 +39,17 @@ void flushSessionChanges()
     et::context()->session()->dispatchPendingMessages();
 }
 
-/** openFile queues an async reset of the changed flag; let it run before
-    making changes the test expects to stick. */
+/** openFile queues an async reset of the changed flag. Drain it before
+    making changes the test expects to stick: a sentinel posted now sits
+    behind that reset in the FIFO message queue, so once the sentinel has
+    run the reset has too, however slow the machine. */
 void settleAfterOpen()
 {
-    pump (100);
+    bool settled = false;
+    MessageManager::callAsync ([&settled]() { settled = true; });
+    for (int i = 0; i < 500 && ! settled; ++i)
+        pump (10);
+    BOOST_REQUIRE (settled);
 }
 
 /** Adds a graph so the document becomes dirty. */
