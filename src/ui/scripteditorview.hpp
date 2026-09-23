@@ -144,7 +144,8 @@ private:
 };
 
 //==============================================================================
-class ScriptNodeScriptEditorView : public BaseScriptEditorView
+class ScriptNodeScriptEditorView : public BaseScriptEditorView,
+                                   private juce::ChangeListener
 {
 public:
     ScriptNodeScriptEditorView (Context& ctx, const Node& n, bool editUI);
@@ -164,7 +165,12 @@ private:
     Node node;
     bool editingUI;
     TextButton applyButton;
+    juce::Label errorLabel;
     std::vector<boost::signals2::connection> connections;
+
+    /** Shows the node's current script error below the editor, if any. */
+    void refreshError();
+    void changeListenerCallback (juce::ChangeBroadcaster*) override;
 };
 
 } // namespace element

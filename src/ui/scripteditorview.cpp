@@ -125,6 +125,7 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (Context& context, const 
     addAndMakeVisible (applyButton);
     applyButton.onClick = [this]() {
         auto r = updateScript();
+        refreshError();
         if (! r.wasOk())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
@@ -133,14 +134,46 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (Context& context, const 
         }
     };
 
+    errorLabel.setJustificationType (Justification::centredLeft);
+    errorLabel.setMinimumHorizontalScale (1.0f);
+    errorLabel.setColour (Label::textColourId, Colours::orangered);
+    addChildComponent (errorLabel);
+
+    if (auto* sn = dynamic_cast<ScriptNode*> (node.getObject()))
+        sn->addChangeListener (this);
+
     reload();
+    refreshError();
 }
 
 ScriptNodeScriptEditorView::~ScriptNodeScriptEditorView()
 {
+    if (auto* sn = dynamic_cast<ScriptNode*> (node.getObject()))
+        sn->removeChangeListener (this);
+
     for (auto& c : connections)
         c.disconnect();
     connections.clear();
+}
+
+void ScriptNodeScriptEditorView::refreshError()
+{
+    String error;
+    if (! editingUI)
+        if (auto* sn = dynamic_cast<ScriptNode*> (node.getObject()))
+            error = sn->getScriptError();
+
+    errorLabel.setText (error, dontSendNotification);
+    errorLabel.setTooltip (error);
+    const bool wasVisible = errorLabel.isVisible();
+    errorLabel.setVisible (error.isNotEmpty());
+    if (wasVisible != errorLabel.isVisible())
+        resized();
+}
+
+void ScriptNodeScriptEditorView::changeListenerCallback (ChangeBroadcaster*)
+{
+    refreshError();
 }
 
 Result ScriptNodeScriptEditorView::updateScript()
@@ -175,6 +208,14 @@ String ScriptNodeScriptEditorView::getScriptContent() const
 void ScriptNodeScriptEditorView::resized()
 {
     BaseScriptEditorView::resized();
+
+    if (errorLabel.isVisible())
+    {
+        auto r = getLocalBounds();
+        errorLabel.setBounds (r.removeFromBottom (24).reduced (4, 0));
+        getEditor().setBounds (r);
+    }
+
     applyButton.changeWidthToFitText (22);
     applyButton.setBounds (
         getWidth() - 16 - applyButton.getWidth(),

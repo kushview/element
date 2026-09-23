@@ -113,6 +113,23 @@ ParameterPtr ScriptNode::getParameter (const PortDescription& port)
 
 Result ScriptNode::loadScript (const String& newCode)
 {
+    const auto result = loadScriptInternal (newCode);
+    scriptError = result.failed() ? result.getErrorMessage() : String();
+
+    if (result.failed())
+    {
+        String msg ("[script node] ");
+        if (getName().isNotEmpty())
+            msg << getName() << ": ";
+        msg << scriptError;
+        Logger::writeToLog (msg);
+    }
+
+    return result;
+}
+
+Result ScriptNode::loadScriptInternal (const String& newCode)
+{
     auto result = DSPScript::validate (newCode);
     if (result.failed())
         return result;

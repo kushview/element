@@ -161,36 +161,33 @@ void Services::run()
     if (auto* gui = find<GuiService>())
         gui->run();
 
-    auto session = context().session();
-    Session::ScopedFrozenLock freeze (*session);
+    auto finish = [this]() {
+        auto session = context().session();
+        if (auto* gui = find<GuiService>())
+        {
+            gui->stabilizeContent();
+            const Node graph (session->getActiveGraph());
+            auto* const window = gui->getMainWindow();
+
+            // don't show plugin windows on load if the UI is hidden
+            if (graph.isValid() && window != nullptr && window->isOnDesktop())
+                gui->showPluginWindowsFor (graph);
+        }
+    };
 
     if (auto* sc = find<SessionService>())
     {
-        bool loadDefault = true;
-
-        if (context().settings().openLastUsedSession())
-        {
-            const auto lastSession = context().settings().getUserSettings()->getValue (Settings::lastSessionKey);
-            if (File::isAbsolutePath (lastSession) && File (lastSession).existsAsFile())
-            {
-                sc->openFile (File (lastSession));
-                loadDefault = false;
-            }
-        }
-
-        if (loadDefault)
-            sc->openDefaultSession();
+        // The freeze covers the synchronous load. The safe-start and recovery
+        // prompts resolve later on the message thread, outside this scope;
+        // those paths go through openFile/openDefaultSession, which take their
+        // own locks exactly like the File menu does.
+        auto session = context().session();
+        Session::ScopedFrozenLock freeze (*session);
+        sc->openStartupSession (finish);
     }
-
-    if (auto* gui = find<GuiService>())
+    else
     {
-        gui->stabilizeContent();
-        const Node graph (session->getActiveGraph());
-        auto* const window = gui->getMainWindow();
-
-        // don't show plugin windows on load if the UI is hidden
-        if (graph.isValid() && window != nullptr && window->isOnDesktop())
-            gui->showPluginWindowsFor (graph);
+        finish();
     }
 }
 

@@ -84,6 +84,11 @@ const File DataPath::defaultGlobalMidiProgramsDir()
     return applicationDataDir().getChildFile ("cache/midi/programs");
 }
 
+const File DataPath::recoveryDir()
+{
+    return applicationDataDir().getChildFile ("recovery");
+}
+
 const File DataPath::defaultScriptsDir() { return defaultUserDataPath().getChildFile ("Scripts"); }
 const File DataPath::defaultSessionDir() { return defaultUserDataPath().getChildFile ("Sessions"); }
 const File DataPath::defaultGraphDir() { return defaultUserDataPath().getChildFile ("Graphs"); }
