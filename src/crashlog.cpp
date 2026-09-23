@@ -8,15 +8,17 @@
 #include <exception>
 #include <fcntl.h>
 
-#if JUCE_WINDOWS
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
+// JUCE must come first: the platform macros below are defined by it.
 #include <element/juce/events.hpp>
 
 #include "crashlog.hpp"
+
+#if JUCE_WINDOWS
+#include <io.h>
+#include <sys/stat.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace element {
 
@@ -32,14 +34,14 @@ std::atomic<bool> installed { false };
 std::atomic<bool> terminateLogged { false };
 std::terminate_handler previousTerminate = nullptr;
 
-constexpr const char* signalPrefix = "\n[element] crash: fatal signal ";
-constexpr const char* exceptionPrefix = "\n[element] crash: fatal exception";
+[[maybe_unused]] constexpr const char* signalPrefix = "\n[element] crash: fatal signal ";
+[[maybe_unused]] constexpr const char* exceptionPrefix = "\n[element] crash: fatal exception";
 constexpr const char* afterTerminate = " (after terminate)";
 
 #if JUCE_WINDOWS
 int openAppend()
 {
-    return logPath[0] != 0 ? _open (logPath, _O_WRONLY | _O_APPEND | _O_CREAT, 0644) : -1;
+    return logPath[0] != 0 ? _open (logPath, _O_WRONLY | _O_APPEND | _O_CREAT, _S_IREAD | _S_IWRITE) : -1;
 }
 void writeRaw (int fd, const char* text, size_t length)
 {
@@ -127,6 +129,7 @@ void onTerminate()
     std::abort();
 }
 
+#if ! JUCE_WINDOWS
 /** Formats a non-negative integer without allocating. Returns the length. */
 size_t formatInt (int value, char* out, size_t capacity)
 {
@@ -144,6 +147,7 @@ size_t formatInt (int value, char* out, size_t capacity)
         out[written++] = digits[--n];
     return written;
 }
+#endif
 
 void onCrash (void* info)
 {
