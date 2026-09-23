@@ -1,29 +1,32 @@
 --- Console init.
--- Runs when the console is loaded in the GUI. This anonymous script sets global
--- variables, so be careful if you use it directly.
+-- Runs once in the persistent console environment when the console is first
+-- opened. It sets globals in that environment, so be careful if you use it
+-- directly.
 -- @script console
 -- @pragma nostrip
 -- @type Anonymous
 
-io      = require ('io')
 object  = require ('el.object')
 command = require ('el.command')
 script  = require ('el.script')
+Context = require ('el.Context')
+
+--- Returns the active session.
+-- A function rather than a value: the session object is replaced when a new
+-- session is loaded, so never cache the result.
+-- @function session
+-- @treturn el.Session
+function session()
+    return Context.instance():session()
+end
 
 console = {
-    --- Log to stdout.
-    -- Calls `tostring` on each argument then prints the combined result to 
-    -- stdout
+    --- Log to the console.
+    -- Calls `tostring` on each argument then prints the combined result.
     -- @function console.log
     -- @param ... Things to log
     log = function (...)
-        local out = ""
-        for i = 1, select ('#', ...) do
-            out = out .. tostring (select (i, ...)) .. "\t"
-        end
-        if string.len(out) > 0 then
-            io.stdout:write (out .. "\n")
-        end
+        print (...)
     end
 }
 

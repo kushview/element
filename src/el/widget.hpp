@@ -366,7 +366,7 @@ inline static sol::table defineWidget (lua_State* L, const char* name, Args&&...
         "y",
         "width",
         "height",
-        "visible"
+        "visible",
         "opaque");
 
     T_mt["__methods"] = view.create_table().add (

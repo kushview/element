@@ -9,6 +9,11 @@ namespace element {
 
 using ScriptArray = juce::Array<ScriptInfo>;
 
+/** Registry of scripts found on disk.
+
+    Not used by the application yet: nothing scans at startup, so it is only
+    exercised by tests. Extensions will drive it (see docs/plans/extensions.md).
+*/
 class ScriptManager final
 {
 public:

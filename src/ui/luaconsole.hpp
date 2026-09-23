@@ -10,6 +10,9 @@
 
 namespace element {
 
+/** Interactive console that evaluates Lua in the engine's persistent
+    console environment.
+*/
 class LuaConsole : public Console,
                    private juce::Timer
 {
@@ -17,15 +20,25 @@ public:
     LuaConsole();
     virtual ~LuaConsole();
 
+    /** Binds the console to a scripting engine.
+
+        Installs the console's `print`, `clear` and `os.exit` into the engine's
+        console environment and runs the console prelude the first time the
+        environment is used. Command history is restored from the engine.
+    */
+    void initialize (ScriptingEngine& engine);
+
     void textEntered (const String&) override;
-    void setEnvironment (const sol::environment& e);
 
 private:
-    using LuaResult = sol::protected_function_result;
+    ScriptingEngine* engine = nullptr;
     sol::environment env;
-    String lastError;
+    juce::CriticalSection printLock;
     StringArray printMessages;
-    LuaResult errorHandler (lua_State* L, LuaResult pfr);
+
+    void installEnvironment();
+    void runPrelude();
+    void addResultText (const juce::Result&);
 
     friend class juce::Timer;
     void timerCallback() override;

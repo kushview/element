@@ -106,8 +106,8 @@ Defects, in priority order:
 | `State::resolve_internal_package`, `packages`, `addPackage` | [scripting.cpp:64-126](../../src/scripting.cpp#L64) | **Live**, not dead: the searcher stays at position 3 of `package.searchers`. No callers yet; [extensions.md](extensions.md) Phase 1 registers extension modules through it. |
 | `EL_LUA_SPATH` | [scripting.cpp:10](../../src/scripting.cpp#L10) | Defined, never referenced. |
 | `ScriptManager` | [scriptmanager.cpp](../../src/scripting/scriptmanager.cpp) | Never scans in the app: `Application::setupScripting` is `ignoreUnused (scripts)`; `Impl::scanDefaultLoctaion` (sic) has no callers. Test-only. |
-| `ScriptInstance::object` | [scriptinstance.hpp](../../src/scripting/scriptinstance.hpp) | Private, no setter, so `cleanup()` is unreachable. |
-| `DSPUIScript`, `ScriptSource` | `src/scripting/` | Empty class / no users. |
+| `ScriptInstance::object` (keep the class) | [scriptinstance.hpp](../../src/scripting/scriptinstance.hpp) | Private, no setter, so `cleanup()` is unreachable. |
+| `DSPUIScript`, `ScriptSource` | `src/scripting/` | No users *yet*: intentional scaffolding for the script-type hierarchy and for where script code is sourced from (`ValueTreeScriptSource` → session scripts). Keep. |
 | `DSPScript::validate` | [dspscript.cpp:434-438](../../src/scripting/dspscript.cpp#L434) | Returns `ok()` for any non-empty string; real body is `#if 0`. |
 | `el.vector` | `src/el/vector.c` | Compiled, not registered in `searchInternalModules`. |
 | `widget.hpp` `__props` | `src/el/widget.hpp` | Missing comma fuses `"visible" "opaque"` into `"visibleopaque"`. |

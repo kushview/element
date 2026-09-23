@@ -127,6 +127,14 @@ public:
         historyPos = history.size();
     }
 
+    const StringArray& getHistory() const { return history; }
+
+    void setHistory (const StringArray& newHistory)
+    {
+        history = newHistory;
+        historyPos = history.size();
+    }
+
     void addText (const String& text, bool prefix)
     {
         String line = prefix ? prefixText : String();
@@ -236,6 +244,16 @@ void Console::setPromptVisible (bool visible)
 void Console::addText (const String& text, bool prefix)
 {
     content->addText (text, prefix);
+}
+
+const StringArray& Console::getHistory() const
+{
+    return content->getHistory();
+}
+
+void Console::setHistory (const StringArray& history)
+{
+    content->setHistory (history);
 }
 
 void Console::textEntered (const String& text)

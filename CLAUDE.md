@@ -57,6 +57,26 @@ You are an expert in JUCE and in desktop audio application UI. Element is a JUCE
 - Shared singletons are reached through `context()` — e.g. `context().session()`, `context().mapping()`, `context().midi()`.
 - Marshal state changes off the audio/MIDI thread to the message thread with `juce::AsyncUpdater`. Plugin parameter changes must be wrapped in `beginChangeGesture()` / `setValueNotifyingHost()` / `endChangeGesture()`.
 
+## Lua Bindings (`src/el/`)
+
+- **One entry point.** Lua reaches the application only through `el.Context.instance()`
+  (backed by `_G["el.context"]`, planted by `Lua::setGlobals`). Never plant additional
+  globals to reach other app objects. Expose them as methods on the owning usertype instead,
+  e.g. `Context:commands()` resolves per call via `ctx.services().find<GuiService>()`.
+- **Bind on the owner, resolve per call.** A binding returns a reference into the live
+  object graph; it does not cache it. Lua modules must not cache what they get back either
+  (a session is replaced on load), so resolve lazily inside functions.
+- **Register what you return.** If a method returns a usertype, `require` that module
+  in the `luaopen_*` of the module that returns it (see `luaopen_el_Context`).
+- **Bind less C++, write more Lua.** C++ binds a minimal handle; ergonomics go in a native
+  Lua module under `src/el/*.lua` (`command.lua`, `object.lua`, `script.lua`).
+- **Register modules in both places.** A new `el.*` module goes into
+  `searchInternalModules` in `src/scripting/bindings.cpp` and, for Lua sources, is picked
+  up by the `src/el/CMakeLists.txt` glob.
+- **No shortcuts.** If reaching an object needs plumbing (an accessor, a service lookup),
+  add the plumbing. Working around it with a global, a static or a cached pointer is a
+  defect, not a fix.
+
 ## Testing
 
 - Tests use **Boost.Test** and live in `test/` (built into the `test_element` console app). `test/CMakeLists.txt` globs all `*.cpp`, but each suite must ALSO be registered with an explicit `add_test(NAME "MySuite" COMMAND test_element --run_test=MySuite)` line — forgetting this is the usual reason a new test "doesn't run."

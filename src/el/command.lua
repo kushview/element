@@ -64,7 +64,7 @@ end
 for _,cmd in ipairs (Commands.standard()) do
     local strings = require ('el.strings')
     local s = Commands.toString (cmd)
-    if string.len(s) > 0 and strings.valid(s) then
+    if string.len(s) > 0 and strings.issymbol(s) then
         local k = strings.tosnake (s)
         M[string.upper (k)] = cmd
     end

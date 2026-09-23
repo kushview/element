@@ -177,10 +177,10 @@ to hooks instead (details in the proxy doc).
 - **Threading.** `LuaConsoleView::messageLogged` posts to the message thread with
   `juce::MessageManager::callAsync` and a `Component::SafePointer`; `printMessages` is
   guarded by a `juce::CriticalSection` (or replaced with an `AsyncUpdater`).
-- **`el.command`.** `GuiService::activate()` sets `_G["el.commands"]` to a
-  `std::ref<Commands>` (mirroring `el.context`, cleared in `deactivate()`);
-  `el.Commands.instance()` reads it; `command.lua` uses that instead of
-  `Context:commands()`. `scripts/commands.lua` is deleted.
+- **`el.command`.** `el.Context` gains `commands()`, resolved per call through
+  `ctx.services().find<GuiService>()->commands()`, so `command.lua`'s existing
+  `Context.instance():commands()` is correct as written. No new globals: `el.context` is
+  the single entry point into the app. `scripts/commands.lua` is deleted.
 - Cosmetic: `EL_VIEW_CONSOLE` becomes `"LuaConsoleView"` (accept the old
   `"LuaConsoleViw"` when restoring `ContentContainer_lastSecondaryView`); `showConsole`
   gets a default keypress alongside `showPatchBay`/`showGraphEditor`.
@@ -363,9 +363,8 @@ destructor.
 
 ### 12. Dead-code cleanup (same PR series)
 
-Delete: `ScriptingEngine::L`; `State::resolve_internal_package`, `builtins`,
-`packages` and `EL_LUA_SPATH`; `Impl::scanDefaultLoctaion`; `ScriptInstance::object` and
-`cleanup()`; `DSPUIScript`; `ScriptSource`/`ValueTreeScriptSource`; `scripts/commands.lua`;
+Delete: `ScriptingEngine::L`; `State::builtins` and `EL_LUA_SPATH`;
+`Impl::scanDefaultLoctaion`; `scripts/commands.lua`;
 the orphaned `test/snippets/sol3_parent.lua` and `stream_from_c.lua`. **Keep**
 `addPackage`, `State::packages` and `resolve_internal_package`: the searcher is live
 (position 3 of `package.searchers`, see the audit § 1) and [extensions.md](extensions.md)
@@ -375,7 +374,10 @@ comma in `widget.hpp` `__props`. Make `el/session.lua` resolve the session per c
 Restore the real body of `DSPScript::validate` (currently `#if 0`, returns `ok()` for
 any non-empty string) or delete the method and its callers. Leave `ScriptManager` with a
 comment that it is test-only until extensions land. Replace the hard-coded `== 13` in
-`ScriptManagerTest` with a lower bound.
+`ScriptManagerTest` with a lower bound. **Keep** `ScriptInstance` and `DSPUIScript` (base and
+placeholder for the script-type hierarchy: DSP, DSPUI, View, Hook…) and
+`ScriptSource`/`ValueTreeScriptSource` (where a script's code comes from;
+`ValueTreeScriptSource` is what session `Hook` scripts in §6 read their code through).
 
 ## Order of work
 
