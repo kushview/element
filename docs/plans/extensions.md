@@ -1,17 +1,17 @@
 # `.element` Extension Format + App-Side Lua Runtime
 
-> **Phase 0 prerequisites:** [session-proxy.md](session-proxy.md) — the `SessionProxy`
+> **Phase 0 prerequisites:** [session-proxy.md](session-proxy.md) — the `GraphController`
 > through which every topology mutation (UI, undo, Lua, session load) flows and from which
 > hook events are dispatched — and [session-scripts.md](session-scripts.md) — console,
 > `HookBus`, `el.hooks`, mutation verbs on `el.Session`/`el.Graph`, the
 > restricted-environment/capability model, and `ScriptingService`. Those are built first;
-> Phase 2 below reduces to graph providers over the model verbs and Phase 3 to
+> Phase 2 below reduces to graph providers over the `el.Session`/`el.Graph` bindings and Phase 3 to
 > extension-owned registration. [scripting-audit.md](scripting-audit.md) records the
 > starting state. See also [luajit.md](luajit.md) for the LuaJIT assessment.
 
 ## Context
 
-Element has a mature Lua substrate (embedded Lua 5.4, sol2 bindings under `src/el/`, a shared `ScriptingEngine` on `Context`) but the app-side surface is thin (see [scripting-audit.md](scripting-audit.md)). Phase 0 supplies startup script execution (`ScriptingEngine::execute`, user `init.lua`), the Lua graph-mutation API (model verbs) and lifecycle hooks; GUI scripting remains limited to embedded View scripts until Phase 4. The goal is a new **`*.element` extension format** — a directory (like `.lv2`/`.vst3`) acting as a package/extension that can carry Lua modules, hook scripts, views/panels, DSP scripts, graphs (serialized data **or** Lua builder scripts — manifest decides), presets, resources, and bundled plugins (CLAP first) — plus the app-side Lua runtime it requires: graph building, lifecycle hooks, and GUI extensibility.
+Element has a mature Lua substrate (embedded Lua 5.4, sol2 bindings under `src/el/`, a shared `ScriptingEngine` on `Context`) but the app-side surface is thin (see [scripting-audit.md](scripting-audit.md)). Phase 0 supplies startup script execution (`ScriptingEngine::execute`, user `init.lua`), the Lua graph-mutation API (`el.Session`/`el.Graph` over `GraphController`) and lifecycle hooks; GUI scripting remains limited to embedded View scripts until Phase 4. The goal is a new **`*.element` extension format** — a directory (like `.lv2`/`.vst3`) acting as a package/extension that can carry Lua modules, hook scripts, views/panels, DSP scripts, graphs (serialized data **or** Lua builder scripts — manifest decides), presets, resources, and bundled plugins (CLAP first) — plus the app-side Lua runtime it requires: graph building, lifecycle hooks, and GUI extensibility.
 
 **Decisions made with user:**
 - Terminology: **Extension** everywhere (classes, service, Lua modules). Directory suffix stays `.element`.
@@ -68,14 +68,14 @@ C++ side: `struct ExtensionManifest` — plain struct parsed once from the sol t
 | `ExtensionManager` (scan/load/unload registry) | `src/scripting/extensionmanager.hpp/.cpp` |
 | `ScriptingService` (`Service`, **Phase 0**) | `src/services/scriptingservice.hpp/.cpp` |
 | `HookBus` (C++ event dispatcher, **Phase 0**, owned by `Context`) | `include/element/hooks.hpp`, `src/hooks.cpp` |
-| `SessionProxy` (**Phase 0**, see session-proxy.md) | `src/engine/sessionproxy.hpp/.cpp` |
+| `GraphController` (**Phase 0**, see session-proxy.md) | `src/engine/graphcontroller.hpp/.cpp` |
 | `el.hooks` (**Phase 0**), `el.ui` Lua modules | `src/el/Hooks.cpp` + `hooks.lua`, `src/el/UI.cpp` |
 | `ViewFactory` (slug → ContentView registry) | `src/ui/viewfactory.hpp/.cpp`, owned by `GuiService` |
 | `ScriptContentView` + `MissingExtensionView` | `src/ui/scriptcontentview.hpp/.cpp` |
 
 Key existing seams to reuse (verified):
 - `ScriptingEngine::addPackage(name, loader)` runtime package registry ([scripting.cpp:118](../../src/scripting.cpp#L118)) — extension Lua modules register here (namespaced; no global `package.path` pollution).
-- Mutation verbs on the models (`Session::addGraph/removeGraph/moveGraph/setActiveGraph`, `Graph::addNode/addPlugin/removeNode/connect/disconnect/connectChannels`), backed by `SessionProxy` ([session-proxy.md](session-proxy.md)) and already bound as `el.Session`/`el.Graph` in Phase 0. `EngineService` keeps its public signatures as thin forwards for UI/undo callers.
+- `el.Session`/`el.Graph` mutation bindings (`addGraph/removeGraph/moveGraph/setActiveGraph`, `addNode/addPlugin/removeNode/connect/disconnect/connectChannels`) over `GraphController` ([session-proxy.md](session-proxy.md)), resolved per call through the services, landed in Phase 0. The model itself carries no engine verbs. `EngineService` keeps its public signatures as thin forwards for UI/undo callers.
 - `StandardContent::createContentView(const String&)` virtual, consulted first by `setMainView`/`setSecondaryView` ([standard.hpp:88](../../include/element/ui/standard.hpp#L88), [standard.cpp:541,633](../../src/ui/standard.cpp#L541)).
 - `NavigationConcertinaPanel::addPanel(desc, factory, header)` public ([navigation.hpp:73](../../include/element/ui/navigation.hpp#L73)); panel state keys by name — extension slugs must be stable.
 - `ScriptView` per-view `sol::environment` + descriptor pattern ([scriptview.cpp](../../src/ui/scriptview.cpp)) — the sandbox precedent for all extension script execution.
@@ -95,7 +95,7 @@ Ownership/lifetime rule: `ExtensionManager` is owned by `ScriptingEngine::Impl` 
 ### Phase 2 — Graph providers (the Lua graph API comes from Phase 0)
 - New: `test/scripting/graphprovidertests.cpp`.
 - Modified: `src/services/scriptingservice.cpp` (provider instantiation), `src/ui/mainmenu.cpp` + commands (File → New Graph From Extension ▸ submenu).
-- Builder scripts use the Phase 0 model verbs; no `el.engine` module exists. Lua two-value `nil, "message"` error convention:
+- Builder scripts use the Phase 0 `el.Session`/`el.Graph` bindings; no `el.engine` module exists. Lua two-value `nil, "message"` error convention:
   ```lua
   local s = require ('el.Context').instance():session()
   local g = s:addGraph ("My Rig")

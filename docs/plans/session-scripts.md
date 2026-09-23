@@ -8,11 +8,12 @@ scripts **embedded in the session file**, where DSP/DSPUI scripts already live t
 Prerequisites and companions:
 
 - [scripting-audit.md](scripting-audit.md) — what exists today and what is broken.
-- [session-proxy.md](session-proxy.md) — the `SessionProxy`: model-initiated engine
-  mutation and the single hook dispatch point. **Read it first**; this document assumes
-  it. Consequences here: hooks fire from the proxy, and Lua mutates the session through
-  model verbs on `el.Session`/`el.Graph`. The `el.engine` facade module previously
-  planned is dropped.
+- [session-proxy.md](session-proxy.md) — the `GraphController`: the engine-side
+  mutation path and the single hook dispatch point. **Read it first**; this document
+  assumes it. Consequences here: hooks fire from the controller; `el.Session`/`el.Graph`
+  reach it per call through `Context` → services → `EngineService` (CLAUDE.md *Lua
+  Bindings*); the model stays a data layer with no engine verbs. The `el.engine` facade
+  module previously planned is dropped.
 
 ## Context
 
@@ -45,7 +46,8 @@ change graph topology from Lua. There is no hook/event registry of any kind.
    `script.lua`. New surface (`el.hooks`) is Lua-first with a thin C core.
 
 4. **One mutation path.** Every topology change — UI, undo, Lua, session load — goes
-   through `SessionProxy`. Hooks are dispatched there and nowhere else for those events.
+   through `GraphController`. Hooks are dispatched there and nowhere else for those
+   events.
 
 ## What gets built
 
@@ -127,7 +129,7 @@ subscribe in `activate()`). In `freeAll()`
 before `lua`: Lua-backed handlers hold `sol::protected_function`s and must die while the
 state is alive.
 
-Proof-of-shape filter: `graph.defaultName`, applied in `SessionProxy::addGraph (name)`
+Proof-of-shape filter: `graph.defaultName`, applied in `GraphController::addGraph (name)`
 to the generated `"Graph N"` string. Single call site, no UI paint-path cost. Filters
 like `node.displayName` are deferred until a call site that is not in a paint loop is
 chosen.
@@ -135,14 +137,14 @@ chosen.
 ### 2. Dispatch sites
 
 See [session-proxy.md](session-proxy.md) § *Hook dispatch points*. Summary: every
-`SessionProxy` mutation fires its action; `reload()` runs under `ScopedSuspend`;
+`GraphController` mutation fires its action; `reload()` runs under `ScopedSuspend`;
 `SessionService::notifySessionLoaded()` fires `session.loaded` (replacing the direct
 `sigSessionLoaded()` at `pluginprocessor.cpp:800` too); `session.saving` beside
 `sigWillSave`; `session.closed` in `closeSession()`; `app.started` at the end of
 `Services::launch`; `app.shutdown` in `ScriptingService::deactivate()`.
 
 `EngineService::sigNodeRemoved` is deleted; `GuiService` and `GraphEditorView` subscribe
-to hooks instead (details in the proxy doc).
+to hooks instead (details in the controller doc).
 
 ### 3. Console foundation (`src/ui/luaconsole.*`, `luaconsoleview.*`, `src/scripting.*`)
 
@@ -187,8 +189,10 @@ to hooks instead (details in the proxy doc).
 
 ### 4. Lua surface for mutation (`src/el/Session.cpp`, `Graph.cpp`, `nodetype.hpp`)
 
-All of these forward to the model verbs defined in the proxy doc and therefore fire
-hooks and work headless (pure tree) when no proxy is installed.
+All of these resolve the `GraphController` per call through
+`Context` → services → `EngineService` (see the controller doc § *Lua reaches the
+controller through the services*) and therefore fire hooks. With no active engine they
+return `nil, "engine not running"`; nothing falls back to silently editing the tree.
 
 `el.Session`:
 
@@ -389,12 +393,14 @@ and give a working REPL for exercising every later step by hand.
    Touches `src/scripting*`, `src/ui/luaconsole*`, `src/el/`, `scripts/` only — not
    `EngineService`.
 2. `HookBus` + `HookBusTests` (no callers yet).
-3. `Session::Handle`, `findFor`, `*Data` primitives (no behaviour change).
+3. `GraphManager` stops showing alerts: failures return an invalid `Node`/`false`, the
+   alerts move to `EngineService`. Prerequisite for headless controller tests.
 4. The headless "real graphs through `attach` + `setRootNode`" test first (the untested
    path in [session-proxy.md](session-proxy.md) § Risks — a modal alert on that path
-   hangs the runner, so prove it before moving code). Then `SessionProxy` +
+   hangs the runner, so prove it before moving code). Then `GraphController` +
    `EngineService` forwards in one PR so all callers keep compiling;
-   `GuiService`/`GraphEditorView` hook handlers; `session.*` events; `SessionProxyTests`.
+   `GuiService`/`GraphEditorView` hook handlers; `session.*` events;
+   `GraphControllerTests`.
 5. Lua surface: `el.Session`/`el.Graph` verbs, `el.hooks`; `SessionLuaTests`.
 6. View-script `require` audit and the reporting pass (§8 *Compatibility*), then session
    `scripts` tree, `types::Hook`, restricted env, trust, `ScriptingService`, panel UI;
@@ -411,7 +417,7 @@ Register every suite in `test/CMakeLists.txt` with
 - `HookBusTests` (`test/HookBusTests.cpp`): priority order; filter value threading;
   `remove`/`removeOwner`; auto-disable after 3 errors and re-enable after success;
   nested `doAction` queued not recursed; `ScopedSuspend`; off-thread `doAction` asserts.
-- `SessionProxyTests` — see [session-proxy.md](session-proxy.md).
+- `GraphControllerTests` — see [session-proxy.md](session-proxy.md).
 - `ConsoleTests` (`test/scripting/consoletests.cpp`): `execute ("1+1")` prints `2`;
   `execute ("x = 5")` then `execute ("x")` prints `5` in the persistent env; a syntax
   error yields a failed `Result` whose message contains a traceback line; prelude loads
@@ -420,7 +426,8 @@ Register every suite in `test/CMakeLists.txt` with
   `test/snippets/session_mutate.lua`): state initialised with `test::context()`;
   `session():addGraph ('lua')`, `g:addNode ('element.volume')`, `hooks.action
   ('node.removed', …)`, `g:removeNode (n)` → handler ran once; `g:addNode ('bogus')`
-  returns `nil, msg`.
+  returns `nil, msg`; with services deactivated, `session():addGraph ('x')` returns
+  `nil, "engine not running"` and the tree is unchanged.
 - `HookScriptTests` (`test/scripting/hookscripttests.cpp`): session `scripts` tree
   round-trips through XML; descriptor with `requires = {'session'}` not granted →
   `attach` never called and no error spam; granted → `ctx.session` present and nothing
@@ -436,7 +443,7 @@ Register every suite in `test/CMakeLists.txt` with
 
 - `HookBus`, `el.hooks`, the restricted-env + capability machinery, `ScriptingService`
   and the mutation verbs all land here. [extensions.md](extensions.md) Phase 2 becomes
-  "reuse the model verbs"; Phase 3 reduces to wiring extension ownership and a
+  "reuse the `el.Session`/`el.Graph` bindings"; Phase 3 reduces to wiring extension ownership and a
   friendlier default grant; extension entry scripts reuse the same descriptor and
   capability conventions.
 - The capability model is also the answer to "extensions are trusted-but-isolated" —
@@ -451,10 +458,10 @@ Register every suite in `test/CMakeLists.txt` with
 3. Filter catalogue beyond `graph.defaultName`: candidates are `session.saving` payload
    and `node.displayName`, the latter only once a non-paint call site is identified.
 4. Undoable Lua mutations: needs `AppMessage`-based routing or an explicit
-   `UndoManager` transaction API on the proxy. Out of scope for Phase 0.
+   `UndoManager` transaction API on the controller. Out of scope for Phase 0.
 5. Engine-initiated active-graph changes (MIDI program change,
    [audioengine.cpp:657-665](../../src/engine/audioengine.cpp#L657), writes
-   `tags::active` from an async update) bypass the proxy, so `graph.activated` does
+   `tags::active` from an async update) bypass the controller, so `graph.activated` does
    **not** fire for them in Phase 0. Document it as such in the hook catalogue. Fix is a
-   `ValueTree::Listener` on the `graphs` child inside `SessionProxy` with a self-change
+   `ValueTree::Listener` on the `graphs` child inside `GraphController` with a self-change
    flag; follow-up after step 4.
