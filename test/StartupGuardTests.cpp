@@ -81,7 +81,10 @@ BOOST_AUTO_TEST_CASE (ScheduledConfirmClears)
     guard.beginOpening (sessionFile);
     guard.scheduleConfirm (20);
     BOOST_REQUIRE (guard.pendingSession() == sessionFile);
-    MessageManager::getInstance()->runDispatchLoopUntil (150);
+    // Timers are delivered through the message queue; wait for the effect
+    // rather than a fixed interval so a slow runner cannot fail this.
+    for (int i = 0; i < 500 && guard.pendingSession() != File(); ++i)
+        MessageManager::getInstance()->runDispatchLoopUntil (10);
     BOOST_REQUIRE (guard.pendingSession() == File());
 }
 
