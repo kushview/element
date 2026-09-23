@@ -97,6 +97,11 @@ public:
     /** Returns the content component for this instance */
     Content* content();
 
+    /** Returns the main content only if it has already been created.
+        Unlike content(), this never creates it, so it is safe to call from
+        persistence paths that may run without a GUI (e.g. tests, autosave). */
+    Content* existingContent() const noexcept { return _content.get(); }
+
     int getNumPluginWindows() const;
     PluginWindow* getPluginWindow (const int window) const;
     PluginWindow* getPluginWindow (const Node& node) const;

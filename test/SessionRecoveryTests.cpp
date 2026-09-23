@@ -32,11 +32,25 @@ void pump (int ms = 30)
     MessageManager::getInstance()->runDispatchLoopUntil (ms);
 }
 
+/** Delivers the session's queued change message synchronously, so the
+    document's changed flag does not depend on dispatch-loop timing. */
+void flushSessionChanges()
+{
+    et::context()->session()->dispatchPendingMessages();
+}
+
+/** openFile queues an async reset of the changed flag; let it run before
+    making changes the test expects to stick. */
+void settleAfterOpen()
+{
+    pump (100);
+}
+
 /** Adds a graph so the document becomes dirty. */
 void dirtySession()
 {
     et::context()->session()->addGraph (Node::createDefaultGraph ("Dirty"), true);
-    pump();
+    flushSessionChanges();
     BOOST_REQUIRE (sessions().hasSessionChanged());
 }
 
@@ -45,7 +59,7 @@ void renameActiveGraph (const String& name)
     auto graph = et::context()->session()->getActiveGraph();
     auto tree = graph.data();
     tree.setProperty (tags::name, name, nullptr);
-    pump();
+    flushSessionChanges();
 }
 
 /** Leaves the shared context with a clean, untitled session and no sidecars. */
@@ -160,7 +174,7 @@ BOOST_AUTO_TEST_CASE (RecoverFromRestoresAndMarksDirty)
     TempSession temp;
 
     svc.openFile (temp.file);
-    pump();
+    settleAfterOpen();
     BOOST_REQUIRE (svc.getSessionFile() == temp.file);
     BOOST_REQUIRE (! svc.hasSessionChanged());
 
@@ -191,7 +205,7 @@ BOOST_AUTO_TEST_CASE (SaveDeletesRecoveryFile)
     TempSession temp;
 
     svc.openFile (temp.file);
-    pump();
+    settleAfterOpen();
     renameActiveGraph ("Saved");
     BOOST_REQUIRE (svc.writeRecoveryFile());
     const auto sidecar = SessionService::recoveryFileFor (temp.file);
@@ -209,7 +223,7 @@ BOOST_AUTO_TEST_CASE (NewAndCloseDeleteRecoveryFile)
     TempSession temp;
 
     svc.openFile (temp.file);
-    pump();
+    settleAfterOpen();
     renameActiveGraph ("Pending");
     BOOST_REQUIRE (svc.writeRecoveryFile());
     const auto sidecar = SessionService::recoveryFileFor (temp.file);
