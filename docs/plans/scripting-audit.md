@@ -28,9 +28,12 @@ out of scope here.
   installs a searcher `resolve_internal_package` whose `builtins`/`packages` maps are
   **never filled** (`fill_builtins` is commented out, `addPackage` has no callers). Then
   `Lua::initializeState` ([bindings.cpp:413-435](../../src/scripting/bindings.cpp#L413))
-  opens *all* libraries, installs the real searcher `searchInternalModules` (a 160-line
-  if/else chain kept in sync by hand with ~30 `extern "C"` declarations), and sets
-  `package.path`, `package.cpath` (always empty) and the non-standard `package.spath`.
+  opens *all* libraries, inserts the real searcher `searchInternalModules` (a 160-line
+  if/else chain kept in sync by hand with ~30 `extern "C"` declarations) at position 2
+  of `package.searchers`, and sets `package.path`, `package.cpath` (always empty) and the
+  non-standard `package.spath`. Both searchers coexist: `resolve_internal_package` is
+  pushed to position 3, so anything registered through `addPackage` *does* resolve — the
+  map is simply empty because nothing calls it.
 - `_G["el.context"]` is a raw `std::ref<Context>` ([bindings.cpp:402-405](../../src/scripting/bindings.cpp#L402)),
   nilled in `~ScriptingEngine`. Nothing guards Lua values that captured it earlier.
 - No thread assertions anywhere in `src/scripting/`, `src/el/`, `src/scripting.cpp`.
@@ -99,7 +102,8 @@ Defects, in priority order:
 |---|---|---|
 | `ScriptingEngine::execute (const String&)` | [scripting.hpp:28](../../src/scripting.hpp#L28) | Declared, never defined. |
 | `lua_State* L` | [scripting.hpp:40](../../src/scripting.hpp#L40) | Never assigned. |
-| `State::resolve_internal_package`, `builtins`, `packages`, `addPackage` | [scripting.cpp:84-126](../../src/scripting.cpp#L84) | Searcher can never resolve; `addPackage` has no callers. |
+| `State::builtins`, `fill_builtins` | [scripting.cpp:84-126](../../src/scripting.cpp#L84) | Map never filled; the fill call is commented out. Dead. |
+| `State::resolve_internal_package`, `packages`, `addPackage` | [scripting.cpp:64-126](../../src/scripting.cpp#L64) | **Live**, not dead: the searcher stays at position 3 of `package.searchers`. No callers yet; [extensions.md](extensions.md) Phase 1 registers extension modules through it. |
 | `EL_LUA_SPATH` | [scripting.cpp:10](../../src/scripting.cpp#L10) | Defined, never referenced. |
 | `ScriptManager` | [scriptmanager.cpp](../../src/scripting/scriptmanager.cpp) | Never scans in the app: `Application::setupScripting` is `ignoreUnused (scripts)`; `Impl::scanDefaultLoctaion` (sic) has no callers. Test-only. |
 | `ScriptInstance::object` | [scriptinstance.hpp](../../src/scripting/scriptinstance.hpp) | Private, no setter, so `cleanup()` is unreachable. |

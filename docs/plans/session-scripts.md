@@ -151,6 +151,9 @@ to hooks instead (details in the proxy doc).
   `juce::Result execute (const juce::String& code, sol::environment env)`: the
   `"return <code>;"` compile probe, `sol::protected_function` with a `debug.traceback`
   handler, byte length from `toRawUTF8()`. Result message carries the traceback.
+  Asserts the message thread (`JUCE_ASSERT_MESSAGE_THREAD`); the shared state has no
+  other guard, and this is the entry point every later caller (console, hook scripts,
+  extension entry scripts) goes through.
   `LuaConsole::textEntered` becomes a thin caller; drop the `_G.print` swap, the dead
   `lastError`/`errorHandler`, and the unreachable error branch.
 - **Persistent environment.** `sol::environment& ScriptingEngine::consoleEnvironment()`,
@@ -309,6 +312,16 @@ The same restricted env (with the widget modules `el.View`, `el.Widget`, `el.Sli
 `ScriptView::setScript` via `loader.call (env)`, closing the "View scripts run in raw
 globals" hole.
 
+**Compatibility.** View scripts embedded in existing user sessions run with full globals
+today, so enforcing the allowlist is a behaviour change that can break a saved session
+silently. Before flipping it: audit what the shipped and example View scripts
+(`scripts/*.lua`, `docs/`, test snippets) actually `require` and which globals they
+touch; then ship one release where `ScriptView` runs the script in the restricted env
+with a *reporting* `require`/`__index` that logs each disallowed access to
+`ScriptingEngine::logError` but still resolves it; enforce only after that log is quiet.
+Anything a View script legitimately needs (e.g. `el.Context` read access) is added to
+the allowlist rather than worked around.
+
 ### 9. Trust
 
 - `Settings` gains `sessionScriptTrust`: map of *scripts-subtree SHA1* → `allow | deny`.
@@ -353,26 +366,37 @@ destructor.
 Delete: `ScriptingEngine::L`; `State::resolve_internal_package`, `builtins`,
 `packages` and `EL_LUA_SPATH`; `Impl::scanDefaultLoctaion`; `ScriptInstance::object` and
 `cleanup()`; `DSPUIScript`; `ScriptSource`/`ValueTreeScriptSource`; `scripts/commands.lua`;
-the orphaned `test/snippets/sol3_parent.lua` and `stream_from_c.lua`. Keep `addPackage`
-only if it is wired into `searchInternalModules` (extensions will want it); otherwise
-delete. Register `el.vector` or delete `vector.c`. Fix the missing comma in
-`widget.hpp` `__props`. Make `el/session.lua` resolve the session per call. Leave
-`ScriptManager` with a comment that it is test-only until extensions land. Replace the
-hard-coded `== 13` in `ScriptManagerTest` with a lower bound.
+the orphaned `test/snippets/sol3_parent.lua` and `stream_from_c.lua`. **Keep**
+`addPackage`, `State::packages` and `resolve_internal_package`: the searcher is live
+(position 3 of `package.searchers`, see the audit § 1) and [extensions.md](extensions.md)
+Phase 1 registers extension modules through it; delete only `State::builtins` and the
+commented-out `fill_builtins`. Register `el.vector` or delete `vector.c`. Fix the missing
+comma in `widget.hpp` `__props`. Make `el/session.lua` resolve the session per call.
+Restore the real body of `DSPScript::validate` (currently `#if 0`, returns `ok()` for
+any non-empty string) or delete the method and its callers. Leave `ScriptManager` with a
+comment that it is test-only until extensions land. Replace the hard-coded `== 13` in
+`ScriptManagerTest` with a lower bound.
 
 ## Order of work
 
-Each step builds and passes `ctest` before the next.
+Each step builds and passes `ctest` before the next. Steps 1 and 2 depend on nothing in
+[session-proxy.md](session-proxy.md) and land first: they fix what the audit found broken
+and give a working REPL for exercising every later step by hand.
 
-1. `HookBus` + `HookBusTests` (no callers yet).
-2. `Session::Handle`, `findFor`, `*Data` primitives (no behaviour change).
-3. `SessionProxy` + `EngineService` forwards in one PR so all callers keep compiling;
+1. Dead-code cleanup (§12) + console foundation (§3) + `el.command` fix; `ConsoleTests`.
+   Touches `src/scripting*`, `src/ui/luaconsole*`, `src/el/`, `scripts/` only — not
+   `EngineService`.
+2. `HookBus` + `HookBusTests` (no callers yet).
+3. `Session::Handle`, `findFor`, `*Data` primitives (no behaviour change).
+4. The headless "real graphs through `attach` + `setRootNode`" test first (the untested
+   path in [session-proxy.md](session-proxy.md) § Risks — a modal alert on that path
+   hangs the runner, so prove it before moving code). Then `SessionProxy` +
+   `EngineService` forwards in one PR so all callers keep compiling;
    `GuiService`/`GraphEditorView` hook handlers; `session.*` events; `SessionProxyTests`.
-4. Console foundation + `el.command` fix; `ConsoleTests`.
 5. Lua surface: `el.Session`/`el.Graph` verbs, `el.hooks`; `SessionLuaTests`.
-6. Session `scripts` tree, `types::Hook`, restricted env, trust, `ScriptingService`,
-   panel UI; `HookScriptTests`.
-7. Dead-code cleanup.
+6. View-script `require` audit and the reporting pass (§8 *Compatibility*), then session
+   `scripts` tree, `types::Hook`, restricted env, trust, `ScriptingService`, panel UI;
+   `HookScriptTests`.
 
 Format with `util/format.py`. Headers under `src/` first; `include/element/` only for
 the public model API (`hooks.hpp`, `session.hpp`, `graph.hpp`, `tags.hpp`).
@@ -426,3 +450,9 @@ Register every suite in `test/CMakeLists.txt` with
    and `node.displayName`, the latter only once a non-paint call site is identified.
 4. Undoable Lua mutations: needs `AppMessage`-based routing or an explicit
    `UndoManager` transaction API on the proxy. Out of scope for Phase 0.
+5. Engine-initiated active-graph changes (MIDI program change,
+   [audioengine.cpp:657-665](../../src/engine/audioengine.cpp#L657), writes
+   `tags::active` from an async update) bypass the proxy, so `graph.activated` does
+   **not** fire for them in Phase 0. Document it as such in the hook catalogue. Fix is a
+   `ValueTree::Listener` on the `graphs` child inside `SessionProxy` with a self-change
+   flag; follow-up after step 4.

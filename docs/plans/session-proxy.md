@@ -267,7 +267,8 @@ Existing `SessionTests` keep covering the pure-tree path unchanged. Remember: a
   [audioengine.cpp:657-665](../../src/engine/audioengine.cpp#L657), writes `tags::active`
   from an async update) bypass the proxy. If `graph.activated` must cover them, the
   proxy needs a `ValueTree::Listener` on the `graphs` child with a self-change flag.
-  Follow-up.
+  Follow-up, tracked as [session-scripts.md](session-scripts.md) open question 5; the
+  hook catalogue must say `graph.activated` excludes engine-initiated changes until then.
 - `PluginProcessor::reloadEngine` → `reload()` must keep the full detach/re-attach
   behaviour; `prepareExternalPlayback` re-preparation was not traced.
 - Re-entrant hooks (a handler adding a node from `node.added`) work through the depth
