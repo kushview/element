@@ -8,7 +8,6 @@ file = {
     exclude = {
         '../src/el/midi_buffer.hpp',
         '../src/el/sol_helpers.hpp',
-        '../src/el/vector.c',
         '../src/el/color.lua',
         '../src/el/session.lua',
         '../src/el/Parameter.cpp'
