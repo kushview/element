@@ -35,6 +35,7 @@
 - A Lua error inside a Script node's `process` function terminated the application with no crash report. Errors now disable that script and are reported instead.
 - Enabled MIDI inputs and the default MIDI output were lost from settings across restarts, breaking external MIDI clock sync (#1181). MIDI settings are now saved when they change, remembered inputs whose device is unplugged are kept, and the plugin scanner and secondary instances no longer rewrite settings.
 - Lua console: the startup prelude failed silently in development builds, and log messages were appended to the console from the logging thread.
+- Linux: plugins bridged through yabridge crashed the plugin scanner, or Element itself when loaded unverified, because Element ignored SIGCHLD process-wide (#1149).
 
 ## [1.2.0]
 
