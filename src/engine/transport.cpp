@@ -103,9 +103,6 @@ Transport::Transport()
     monitor = new Monitor();
     monitor->tempo.set (getTempo());
 
-    seekWanted.set (false);
-    seekFrame.set (0);
-
     nextBeatsPerBar.set (getBeatsPerBar());
     nextBeatType.set (getBeatType());
 
@@ -165,12 +162,9 @@ void Transport::postProcess (int nframes)
         monitor->beatType.set (beatType);
     }
 
-    if (seekWanted.get())
-    {
-        if (getPositionFrames() != seekFrame.get())
-            seekAudioFrame (seekFrame.get());
-        seekWanted.set (false);
-    }
+    const auto frame = seekRequest.exchange (noSeekRequested);
+    if (frame != noSeekRequested && getPositionFrames() != frame)
+        seekAudioFrame (frame);
 }
 
 void Transport::requestAction (TransportAction action)
@@ -214,8 +208,7 @@ void Transport::requestMeter (int beatsPerBar, int beatType)
 
 void Transport::requestAudioFrame (const int64_t frame)
 {
-    seekFrame.set (frame);
-    seekWanted.set (true);
+    seekRequest.store (juce::jmax ((int64_t) 0, frame));
 }
 
 } // namespace element

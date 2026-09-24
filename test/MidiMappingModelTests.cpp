@@ -67,6 +67,21 @@ BOOST_AUTO_TEST_CASE (TriggerEdgeAbove)
     BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("bogus", 67, 80, 100));
 }
 
+BOOST_AUTO_TEST_CASE (TriggerModeParsing)
+{
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("above") == TriggerMode::Above);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("zero") == TriggerMode::Zero);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("max") == TriggerMode::Max);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("bogus") == TriggerMode::Above);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ({}) == TriggerMode::Above);
+
+    // The enum and string forms agree.
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge (TriggerMode::Zero, 67, 64, 0));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge (TriggerMode::Max, 67, 64, 127));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge (TriggerMode::Above, 67, 20, 90));
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge (TriggerMode::Above, 67, 80, 100));
+}
+
 BOOST_AUTO_TEST_CASE (TriggerEdgeEndpoints)
 {
     BOOST_REQUIRE (MidiMapping::isTriggerEdge ("zero", 67, 64, 0));

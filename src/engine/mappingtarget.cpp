@@ -188,7 +188,7 @@ TempoTarget::TempoTarget (const juce::ValueTree& sessionData,
     : session (sessionData),
       tapTempo (shared),
       tempoTapApplied (applied),
-      trigger { mode, value }
+      trigger { MidiMapping::triggerModeFromString (mode), value }
 {
 }
 
@@ -220,7 +220,7 @@ TransportTarget::TransportTarget (TransportAction a,
                                   int value)
     : action (a),
       transportAction (signal),
-      trigger { mode, value }
+      trigger { MidiMapping::triggerModeFromString (mode), value }
 {
 }
 

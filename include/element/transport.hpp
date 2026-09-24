@@ -162,8 +162,9 @@ public:
     */
     void requestMeter (int beatsPerBar, int beatType);
 
-    /** Requests a seek to a specific audio frame (thread-safe).
-        @param frame Target position in samples
+    /** Requests a seek to a specific audio frame (thread-safe). The most
+        recent request before the next audio block wins.
+        @param frame Target position in samples; negative values seek to 0
     */
     void requestAudioFrame (const int64_t frame);
 
@@ -192,8 +193,14 @@ private:
     AtomicValue<bool> playState, recordState;
     AtomicValue<double> nextTempo;
     juce::Atomic<int> nextBeatsPerBar, nextBeatType;
-    juce::Atomic<bool> seekWanted;
-    AtomicValue<int64_t> seekFrame;
+
+    // Pending seek target, or noSeekRequested. A single atomic keeps the
+    // "wanted" flag and the frame together, so concurrent requesters can never
+    // leave a stale frame behind a set flag; the last request wins.
+    static constexpr int64_t noSeekRequested = -1;
+    std::atomic<int64_t> seekRequest { noSeekRequested };
+    static_assert (std::atomic<int64_t>::is_always_lock_free, "seek requests must be lock-free");
+
     MonitorPtr monitor;
 };
 

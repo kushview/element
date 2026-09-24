@@ -8,13 +8,13 @@
 #include <element/juce/audio_basics.hpp>
 #include <element/node.hpp>
 #include <element/parameter.hpp>
+#include <element/midimapping.hpp>
 #include <element/signals.hpp>
 #include <element/taptempo.hpp>
 #include <element/transport.hpp>
 
 namespace element {
 
-class MidiMapping;
 class Session;
 
 /** Applies an incoming MIDI message to some destination (a node parameter,
@@ -69,7 +69,7 @@ private:
     held knob fires only once. */
 struct TriggerDetector
 {
-    juce::String mode { "above" };
+    TriggerMode mode { TriggerMode::Above };
     int value { 67 };
     int lastControllerValue { -1 };
 

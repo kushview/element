@@ -12,6 +12,13 @@
 
 namespace element {
 
+/** How a continuous controller counts as a press, see MidiMapping::isTriggerEdge(). */
+enum class TriggerMode {
+    Above, ///< Value crosses up to or through the threshold.
+    Zero,  ///< Value arrives at 0.
+    Max    ///< Value arrives at 127.
+};
+
 /** A flat MIDI mapping: a single MIDI event (note or CC) on an input device
     bound directly to a target (a node parameter, tempo, transport, ...).
 
@@ -72,19 +79,40 @@ public:
         it. Holding a knob past the threshold therefore fires once, not on every
         message, and a footswitch sending 127 then 0 fires once per press.
 
-        @param mode          "above", "zero" or "max"; anything else behaves as "above".
-        @param triggerValue  Threshold for "above" mode; ignored by the other modes.
+        @param mode          The trigger mode.
+        @param triggerValue  Threshold for Above mode; ignored by the other modes.
         @param lastValue     Previously seen controller value, or < 0 if none yet.
         @param value         The incoming controller value.
         @return true if this transition should fire the trigger.
     */
-    static bool isTriggerEdge (const juce::String& mode, int triggerValue, int lastValue, int value)
+    static bool isTriggerEdge (TriggerMode mode, int triggerValue, int lastValue, int value)
+    {
+        switch (mode) {
+            case TriggerMode::Zero:
+                return value == 0 && lastValue != 0;
+            case TriggerMode::Max:
+                return value == 127 && lastValue != 127;
+            case TriggerMode::Above:
+                break;
+        }
+        return value >= triggerValue && (lastValue < 0 || lastValue < triggerValue);
+    }
+
+    /** Parses a stored trigger mode ("above", "zero" or "max"); anything else
+        is treated as "above". */
+    static TriggerMode triggerModeFromString (const juce::String& mode)
     {
         if (mode == "zero")
-            return value == 0 && lastValue != 0;
+            return TriggerMode::Zero;
         if (mode == "max")
-            return value == 127 && lastValue != 127;
-        return value >= triggerValue && (lastValue < 0 || lastValue < triggerValue);
+            return TriggerMode::Max;
+        return TriggerMode::Above;
+    }
+
+    /** String form of isTriggerEdge(), see triggerModeFromString(). */
+    static bool isTriggerEdge (const juce::String& mode, int triggerValue, int lastValue, int value)
+    {
+        return isTriggerEdge (triggerModeFromString (mode), triggerValue, lastValue, value);
     }
 
     //=========================================================================

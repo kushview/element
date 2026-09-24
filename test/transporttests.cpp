@@ -89,6 +89,29 @@ BOOST_AUTO_TEST_CASE (requestActionFollowsButtonRules)
     BOOST_REQUIRE_EQUAL (transport.getPositionFrames(), 0);
 }
 
+BOOST_AUTO_TEST_CASE (seekRequestsLastOneWinsAndIsConsumedOnce)
+{
+    Transport transport;
+
+    // Two requests before a block: the later one is applied.
+    transport.requestAudioFrame (100);
+    transport.requestAudioFrame (250);
+    cycle (transport);
+    BOOST_REQUIRE_EQUAL (transport.getPositionFrames(), 250);
+
+    // A consumed request does not re-seek after the transport has moved on.
+    transport.requestPlayState (true);
+    cycle (transport);
+    transport.advance (10);
+    cycle (transport);
+    BOOST_REQUIRE_EQUAL (transport.getPositionFrames(), 260);
+
+    // Negative frames clamp to the start.
+    transport.requestAudioFrame (-5);
+    cycle (transport);
+    BOOST_REQUIRE_EQUAL (transport.getPositionFrames(), 0);
+}
+
 BOOST_AUTO_TEST_CASE (transportActionStringsRoundTrip)
 {
     for (auto action : { TransportAction::Play, TransportAction::Stop, TransportAction::Record, TransportAction::SeekZero }) {
