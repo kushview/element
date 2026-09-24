@@ -1321,6 +1321,12 @@ void AudioEngine::togglePlayPause()
     transport.requestPlayPause();
 }
 
+void AudioEngine::performTransportAction (TransportAction action)
+{
+    auto& transport (priv->transport);
+    transport.requestAction (action);
+}
+
 void AudioEngine::setPlaying (const bool shouldBePlaying)
 {
     auto& transport (priv->transport);

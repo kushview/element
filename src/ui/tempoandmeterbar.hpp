@@ -446,36 +446,13 @@ private:
             if (maps == nullptr)
                 return;
 
-            const bool mapped = maps->hasTempoMapping();
-
-            PopupMenu menu;
-            enum
-            {
-                Learn = 1,
-                Clear
-            };
-
-            menu.addItem (Learn, mapped ? TRANS ("Re-learn MIDI Mapping") : TRANS ("MIDI Learn Tap Tempo"));
-
-            if (mapped)
-            {
-                const auto desc = maps->getTempoMappingDescription();
-                menu.addItem (Clear, TRANS ("Clear MIDI Mapping") + (desc.isNotEmpty() ? " (" + desc + ")" : String()));
-            }
-
-            Component::SafePointer<TapTempoButton> self (this);
-            menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this),
-                                [self] (int result) mutable {
-                                    if (self == nullptr)
-                                        return;
-                                    if (auto* svc = self->findMappingService())
-                                    {
-                                        if (result == Learn)
-                                            svc->learnTempo();
-                                        else if (result == Clear)
-                                            svc->clearTempoMapping();
-                                    }
-                                });
+            ViewHelpers::showMidiLearnMenu (
+                *this,
+                TRANS ("MIDI Learn Tap Tempo"),
+                maps->hasTempoMapping(),
+                maps->getTempoMappingDescription(),
+                [this] { if (auto* svc = findMappingService()) svc->learnTempo(); },
+                [this] { if (auto* svc = findMappingService()) svc->clearTempoMapping(); });
         }
     } tapTempoButton;
 

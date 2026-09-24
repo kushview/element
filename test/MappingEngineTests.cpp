@@ -172,4 +172,41 @@ BOOST_AUTO_TEST_CASE (TempoTapFiresFlashSignal)
     conn.disconnect();
 }
 
+BOOST_AUTO_TEST_CASE (TransportActionRoutesThroughBindings)
+{
+    Context context;
+    auto session = context.session();
+
+    session->addMidiMapping (MidiMapping::fromCaptureTransport (
+        "dev-A", MidiMessage::controllerEvent (1, 21, 127), "play"));
+    // An unknown action never binds and must not break the others.
+    session->addMidiMapping (MidiMapping::fromCaptureTransport (
+        "dev-A", MidiMessage::controllerEvent (1, 22, 127), "bogus"));
+
+    MappingEngine engine;
+    engine.rebuildBindings (session);
+
+    std::vector<TransportAction> fired;
+    auto conn = engine.transportActionSignal().connect ([&fired] (TransportAction a) { fired.push_back (a); });
+
+    engine.process ("dev-A", MidiMessage::controllerEvent (1, 21, 127));
+    BOOST_REQUIRE_EQUAL (fired.size(), 1u);
+    BOOST_REQUIRE (fired[0] == TransportAction::Play);
+
+    // Held value, wrong CC, wrong device and the unbound action do nothing.
+    engine.process ("dev-A", MidiMessage::controllerEvent (1, 21, 127));
+    engine.process ("dev-A", MidiMessage::controllerEvent (1, 20, 127));
+    engine.process ("dev-B", MidiMessage::controllerEvent (1, 21, 0));
+    engine.process ("dev-B", MidiMessage::controllerEvent (1, 21, 127));
+    engine.process ("dev-A", MidiMessage::controllerEvent (1, 22, 127));
+    BOOST_REQUIRE_EQUAL (fired.size(), 1u);
+
+    // Release and press again fires again.
+    engine.process ("dev-A", MidiMessage::controllerEvent (1, 21, 0));
+    engine.process ("dev-A", MidiMessage::controllerEvent (1, 21, 127));
+    BOOST_REQUIRE_EQUAL (fired.size(), 2u);
+
+    conn.disconnect();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -90,7 +90,12 @@ public:
     //=========================================================================
     juce::String getTargetType() const { return objectData.getProperty (tags::targetType).toString(); }
     bool isTempoTarget() const { return getTargetType() == "tempo"; }
+    bool isTransportTarget() const { return getTargetType() == "transport"; }
     bool isParameterTarget() const { return getTargetType() == "parameter"; }
+    /** True for any target that is not a node parameter (tempo, transport). */
+    bool isSessionTarget() const { return ! isParameterTarget(); }
+    /** The transport action id for a transport target, see transportActionFromString(). */
+    juce::String getAction() const { return objectData.getProperty (tags::action).toString(); }
     juce::Uuid getNodeUuid() const { return juce::Uuid (objectData.getProperty (tags::node).toString()); }
     int getParameterIndex() const { return (int) objectData.getProperty (tags::parameter, -1); }
 
@@ -149,6 +154,21 @@ public:
         return m;
     }
 
+    /** Build a session-level transport mapping from a captured message.
+        Has no node/parameter target.
+        @param action A transport action id, see toString (TransportAction). */
+    static MidiMapping fromCaptureTransport (const juce::String& device,
+                                             const juce::MidiMessage& msg,
+                                             const juce::String& action)
+    {
+        MidiMapping m { juce::String() };
+        m.setProperty (tags::device, device);
+        m.setEventFromMessage (msg);
+        m.setProperty (tags::targetType, "transport");
+        m.setProperty (tags::action, action);
+        return m;
+    }
+
 private:
     /** Populate eventType/eventId from a note or controller message. */
     void setEventFromMessage (const juce::MidiMessage& msg)
@@ -175,6 +195,7 @@ private:
         stabilizePropertyString (tags::triggerMode, "above");
         stabilizePropertyPOD (tags::triggerValue, 67);
         stabilizePropertyString (tags::targetType, "parameter");
+        stabilizePropertyString (tags::action, juce::String());
         stabilizePropertyString (tags::node, juce::String());
         stabilizePropertyPOD (tags::parameter, -1);
     }

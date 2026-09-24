@@ -75,6 +75,16 @@ public:
 
     void togglePlayPause();
 
+    /** Performs a transport bar action, see Transport::requestAction().
+
+        When hosted as a plugin the host playhead re-applies its own play and
+        record state every block, so the action is overridden there exactly as
+        the on-screen buttons are.
+
+        @param action The action to perform
+    */
+    void performTransportAction (TransportAction action);
+
     juce::MidiKeyboardState& getKeyboardState();
     Transport::MonitorPtr getTransportMonitor() const;
     juce::AudioIODeviceCallback& getAudioIODeviceCallback();

@@ -8,6 +8,44 @@ using namespace juce;
 
 namespace element {
 
+namespace {
+
+struct TransportActionInfo
+{
+    TransportAction action;
+    const char* id;
+    const char* name;
+};
+
+constexpr TransportActionInfo transportActions[] = {
+    { TransportAction::Play, "play", "Play" },
+    { TransportAction::Stop, "stop", "Stop" },
+    { TransportAction::Record, "record", "Record" },
+    { TransportAction::SeekZero, "seekZero", "Seek Start" },
+};
+
+const TransportActionInfo& infoFor (TransportAction action)
+{
+    for (const auto& info : transportActions)
+        if (info.action == action)
+            return info;
+    return transportActions[0];
+}
+
+} // namespace
+
+String toString (TransportAction action) { return infoFor (action).id; }
+
+std::optional<TransportAction> transportActionFromString (const String& id)
+{
+    for (const auto& info : transportActions)
+        if (id == info.id)
+            return info.action;
+    return std::nullopt;
+}
+
+String getTransportActionName (TransportAction action) { return infoFor (action).name; }
+
 Transport::Monitor::Monitor()
 {
     sampleRate.set (44100.0);
@@ -132,6 +170,31 @@ void Transport::postProcess (int nframes)
         if (getPositionFrames() != seekFrame.get())
             seekAudioFrame (seekFrame.get());
         seekWanted.set (false);
+    }
+}
+
+void Transport::requestAction (TransportAction action)
+{
+    switch (action)
+    {
+        case TransportAction::Play:
+            if (playState.get())
+                requestAudioFrame (0);
+            else
+                requestPlayState (true);
+            break;
+        case TransportAction::Stop:
+            if (playState.get())
+                requestPlayState (false);
+            else
+                requestAudioFrame (0);
+            break;
+        case TransportAction::Record:
+            requestRecordState (! recordState.get());
+            break;
+        case TransportAction::SeekZero:
+            requestAudioFrame (0);
+            break;
     }
 }
 

@@ -13,6 +13,7 @@
 - Safe start: if Element died while opening the last session, the next launch asks whether to open it anyway or start with an empty session instead of failing again.
 - Session autosave: a recovery copy of an unsaved session is written every two minutes next to the session file (`<name>.els.recover`) and offered on the next launch if it is newer than the saved file. It is removed on save or close.
 - Lua console: `View > Console` has a default shortcut (F3); the console keeps its variables and command history when closed and reopened; results and `console.log` print to the console; `session()` returns the live session.
+- MIDI mapping of the transport buttons: Play, Stop, Record and Seek Start can be learned like tap tempo (map mode + click the button, or right-click the button), from a note or a CC edge, and are listed and editable in the MIDI Mappings panel.
 
 ### Changed
 - Disconnected audio devices are no longer silently replaced with another device: Element closes the device, shows its status in the status bar, and automatically restores it when it reconnects. Double-click the status label to open audio settings.

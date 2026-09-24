@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <element/ui/style.hpp>
 #include <element/node.hpp>
 
@@ -54,10 +56,25 @@ public:
         pathReduction = juce::roundToInt (jmax (2.f, reduceby));
     }
 
+    /** Invoked instead of a click when the button is right-clicked. Leave
+        unset to keep right-clicks behaving as ordinary clicks. */
+    std::function<void()> onContextMenu;
+
 protected:
     virtual Colour getTextColour()
     {
         return findColour (isEnabled() ? textColourId : textDisabledColourId);
+    }
+
+    /** @internal */
+    void mouseDown (const juce::MouseEvent& ev) override
+    {
+        if (onContextMenu != nullptr && isEnabled() && ev.mods.isPopupMenu())
+        {
+            onContextMenu();
+            return;
+        }
+        Button::mouseDown (ev);
     }
 
     /** @internal */

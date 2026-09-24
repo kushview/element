@@ -175,8 +175,7 @@ namespace {
 
 /** A tempo target plus the session tree and flash counter it writes to, so the
     controller cases below stay about the trigger rule and nothing else. */
-struct TempoFixture
-{
+struct TempoFixture {
     TempoFixture (const juce::String& mode = "above", int value = 67)
         : target (session, shared, tapped, mode, value)
     {
@@ -221,7 +220,7 @@ BOOST_AUTO_TEST_CASE (TempoTargetTapsFromCCAboveThreshold)
     BOOST_REQUIRE_CLOSE (f.tempo(), 100.0, 0.0001);
 
     f.cc (100, 200.0); // still above: no second tap
-    f.cc (20, 400.0); // falling back down: no tap
+    f.cc (20, 400.0);  // falling back down: no tap
     BOOST_REQUIRE_EQUAL (f.flashes, 1);
 
     f.cc (90, 600.0); // crossed up again, 500 ms after the first tap
@@ -292,6 +291,73 @@ BOOST_AUTO_TEST_CASE (InvalidTargets)
     Node empty;
     ParameterTarget bad (empty, 0);
     BOOST_REQUIRE (! bad.isValid());
+}
+
+namespace {
+
+/** A transport target plus the signal it fires, recording every action so the
+    cases below stay about the trigger rule and dispatch. */
+struct TransportFixture {
+    TransportFixture (TransportAction action = TransportAction::Play, const juce::String& mode = "above", int value = 67)
+        : target (action, signal, mode, value)
+    {
+        conn = signal.connect ([this] (TransportAction a) { fired.push_back (a); });
+    }
+
+    ~TransportFixture() { conn.disconnect(); }
+
+    void cc (int value) { target.apply (MidiMessage::controllerEvent (1, 7, value), false); }
+
+    Signal<void (TransportAction)> signal;
+    SignalConnection conn;
+    std::vector<TransportAction> fired;
+    TransportTarget target;
+};
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE (TransportTargetFiresOnNoteOn)
+{
+    TransportFixture f (TransportAction::Record);
+    BOOST_REQUIRE (f.target.isValid());
+
+    f.target.apply (MidiMessage::noteOn (1, 60, (uint8) 100), false);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 1u);
+    BOOST_REQUIRE (f.fired[0] == TransportAction::Record);
+
+    // Note-off is a release, not a press; the toggle flag is irrelevant.
+    f.target.apply (MidiMessage::noteOff (1, 60), true);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 1u);
+
+    f.target.apply (MidiMessage::noteOn (1, 60, (uint8) 1), true);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE (TransportTargetCCEdge)
+{
+    // A held or slowly turned control fires once per upward crossing.
+    TransportFixture f (TransportAction::Stop);
+
+    f.cc (0);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 0u);
+    f.cc (80);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 1u);
+    BOOST_REQUIRE (f.fired[0] == TransportAction::Stop);
+    f.cc (100); // still above: no new press
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 1u);
+    f.cc (20);
+    f.cc (90);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE (TransportTargetCCTouchedZero)
+{
+    TransportFixture f (TransportAction::SeekZero, "zero");
+    f.cc (64);
+    f.cc (0);
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 1u);
+    f.cc (0); // parked
+    BOOST_REQUIRE_EQUAL (f.fired.size(), 1u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

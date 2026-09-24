@@ -167,6 +167,19 @@ void ParameterTarget::applyGain (const juce::MidiMessage& message, bool toggle)
 }
 
 //=============================================================================
+bool TriggerDetector::accept (const juce::MidiMessage& message)
+{
+    if (message.isController())
+    {
+        const int current = message.getControllerValue();
+        const bool fire = MidiMapping::isTriggerEdge (mode, value, lastControllerValue, current);
+        lastControllerValue = current;
+        return fire;
+    }
+    return message.isNoteOn();
+}
+
+//=============================================================================
 TempoTarget::TempoTarget (const juce::ValueTree& sessionData,
                           TapTempo& shared,
                           Signal<void()>& applied,
@@ -175,8 +188,7 @@ TempoTarget::TempoTarget (const juce::ValueTree& sessionData,
     : session (sessionData),
       tapTempo (shared),
       tempoTapApplied (applied),
-      triggerMode (mode),
-      triggerValue (value)
+      trigger { mode, value }
 {
 }
 
@@ -187,21 +199,8 @@ bool TempoTarget::isValid() const
 
 void TempoTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
 {
-    if (! isValid())
+    if (! isValid() || ! trigger.accept (message))
         return;
-
-    if (message.isController())
-    {
-        const int value = message.getControllerValue();
-        const bool fire = MidiMapping::isTriggerEdge (triggerMode, triggerValue, lastControllerValue, value);
-        lastControllerValue = value;
-        if (! fire)
-            return;
-    }
-    else if (! message.isNoteOn())
-    {
-        return; // notes: each press is a tap
-    }
 
     // Flash on every recognised tap (including the seeding first tap of a run,
     // which produces no BPM yet), so the UI feedback matches how a parameter
@@ -215,7 +214,28 @@ void TempoTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
 }
 
 //=============================================================================
-std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo, Signal<void()>& tempoTapApplied)
+TransportTarget::TransportTarget (TransportAction a,
+                                  Signal<void (TransportAction)>& signal,
+                                  const juce::String& mode,
+                                  int value)
+    : action (a),
+      transportAction (signal),
+      trigger { mode, value }
+{
+}
+
+void TransportTarget::apply (const juce::MidiMessage& message, bool /*toggle*/)
+{
+    if (trigger.accept (message))
+        transportAction (action);
+}
+
+//=============================================================================
+std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping,
+                                             Session& session,
+                                             TapTempo& tapTempo,
+                                             Signal<void()>& tempoTapApplied,
+                                             Signal<void (TransportAction)>& transportAction)
 {
     const auto targetType = mapping.getTargetType();
 
@@ -238,7 +258,13 @@ std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session
         return target;
     }
 
-    // TODO: "transport" targets (see docs/plans/midimapping.md open questions)
+    if (targetType == "transport")
+    {
+        if (auto action = transportActionFromString (mapping.getAction()))
+            return std::make_unique<TransportTarget> (*action, transportAction, mapping.getTriggerMode(), mapping.getTriggerValue());
+        return nullptr;
+    }
+
     return nullptr;
 }
 
