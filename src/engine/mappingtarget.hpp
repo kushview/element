@@ -8,12 +8,13 @@
 #include <element/juce/audio_basics.hpp>
 #include <element/node.hpp>
 #include <element/parameter.hpp>
+#include <element/midimapping.hpp>
 #include <element/signals.hpp>
 #include <element/taptempo.hpp>
+#include <element/transport.hpp>
 
 namespace element {
 
-class MidiMapping;
 class Session;
 
 /** Applies an incoming MIDI message to some destination (a node parameter,
@@ -62,6 +63,21 @@ private:
 };
 
 //=============================================================================
+/** Decides whether a note or controller message counts as a press for a
+    trigger-style target. Notes fire on note-on only; controllers fire on the
+    edge defined by MidiMapping::isTriggerEdge(), tracking the last value so a
+    held knob fires only once. */
+struct TriggerDetector
+{
+    TriggerMode mode { TriggerMode::Above };
+    int value { 67 };
+    int lastControllerValue { -1 };
+
+    /** @return true if the message counts as a press. */
+    bool accept (const juce::MidiMessage& message);
+};
+
+//=============================================================================
 /** Targets the session tempo as a tap-tempo control: each matching note-on, or
     each recognised controller edge, counts as a tap and the averaged BPM is
     written to the session, which the audio engine picks up on the message
@@ -91,16 +107,47 @@ private:
     juce::ValueTree session;
     TapTempo& tapTempo;
     Signal<void()>& tempoTapApplied;
-    juce::String triggerMode;
-    int triggerValue;
-    int lastControllerValue { -1 }; // edge state, so a held knob taps only once
+    TriggerDetector trigger;
+};
+
+//=============================================================================
+/** Targets the audio transport: each recognised press performs one
+    TransportAction. The action is delivered through a signal owned by
+    MappingEngine and routed to the AudioEngine by MappingService, so this
+    layer stays free of engine and hardware dependencies. */
+class TransportTarget : public MappingTarget
+{
+public:
+    /** @param action           The action performed on each press.
+        @param transportAction  Fired with the action on every recognised press;
+                                owned by MappingEngine, so it outlives this target.
+        @param triggerMode      Controller trigger mode, see MidiMapping::isTriggerEdge().
+        @param triggerValue     Threshold for the "above" trigger mode. */
+    TransportTarget (TransportAction action,
+                     Signal<void (TransportAction)>& transportAction,
+                     const juce::String& triggerMode = "above",
+                     int triggerValue = 67);
+    ~TransportTarget() override = default;
+
+    bool isValid() const override { return true; }
+    void apply (const juce::MidiMessage& message, bool toggle) override;
+
+private:
+    TransportAction action;
+    Signal<void (TransportAction)>& transportAction;
+    TriggerDetector trigger;
 };
 
 //=============================================================================
 /** Resolves a MidiMapping into a concrete target. Returns nullptr if the
     mapping cannot currently be resolved (e.g. missing node).
     @param tapTempo         Shared accumulator passed to a TempoTarget, if created.
-    @param tempoTapApplied  Flash signal forwarded to a TempoTarget, if created. */
-std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping, Session& session, TapTempo& tapTempo, Signal<void()>& tempoTapApplied);
+    @param tempoTapApplied  Flash signal forwarded to a TempoTarget, if created.
+    @param transportAction  Action signal forwarded to a TransportTarget, if created. */
+std::unique_ptr<MappingTarget> createTarget (const MidiMapping& mapping,
+                                             Session& session,
+                                             TapTempo& tapTempo,
+                                             Signal<void()>& tempoTapApplied,
+                                             Signal<void (TransportAction)>& transportAction);
 
 } // namespace element

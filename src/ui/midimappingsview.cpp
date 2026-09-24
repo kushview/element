@@ -11,6 +11,7 @@
 #include <element/node.hpp>
 #include <element/parameter.hpp>
 #include <element/processor.hpp>
+#include <element/transport.hpp>
 #include "services/mappingservice.hpp"
 
 namespace element {
@@ -220,9 +221,9 @@ private:
             comps.add (new BooleanPropertyComponent (
                 mapping.getPropertyAsValue (tags::toggle), TRANS ("Latch"), TRANS ("Toggle on each note-on")));
         }
-        else if (mapping.isTempoTarget())
+        else if (mapping.isSessionTarget())
         {
-            // A knob or switch has no note-on, so the user picks what counts as a tap.
+            // A knob or switch has no note-on, so the user picks what counts as a press.
             comps.add (new ChoicePropertyComponent (
                 mapping.getPropertyAsValue (tags::triggerMode),
                 TRANS ("Trigger"),
@@ -234,9 +235,9 @@ private:
                     mapping.getPropertyAsValue (tags::triggerValue), TRANS ("Threshold"), 1.0, 127.0, 1.0));
         }
 
-        // Node + parameter only apply to parameter targets; a tempo mapping
-        // drives the session tempo (tap tempo) and has no node/parameter.
-        if (! mapping.isTempoTarget())
+        // Node + parameter only apply to parameter targets; tempo and transport
+        // mappings drive the session and have no node/parameter.
+        if (! mapping.isSessionTarget())
         {
             // Target node.
             {
@@ -273,7 +274,10 @@ private:
             }
         }
 
-        addSection (mapping.isTempoTarget() ? TRANS ("Tap Tempo") : TRANS ("Mapping"), comps);
+        addSection (mapping.isTempoTarget()       ? TRANS ("Tap Tempo")
+                    : mapping.isTransportTarget() ? TRANS ("Transport")
+                                                  : TRANS ("Mapping"),
+                    comps);
     }
 
     /** Filter controls for the whole list. Bound to the owner's shared values so
@@ -627,6 +631,11 @@ void MidiMappingsView::paintCell (Graphics& g, int row, int columnId, int w, int
                 text = TRANS ("Tempo");
                 break;
             }
+            if (mapping.isTransportTarget())
+            {
+                text = TRANS ("Transport");
+                break;
+            }
             auto node = session->findNodeById (mapping.getNodeUuid());
             text = node.isValid() ? node.getDisplayName() : String ("(missing)");
             break;
@@ -635,6 +644,12 @@ void MidiMappingsView::paintCell (Graphics& g, int row, int columnId, int w, int
             if (mapping.isTempoTarget())
             {
                 text = TRANS ("Tap Tempo");
+                break;
+            }
+            if (mapping.isTransportTarget())
+            {
+                auto action = transportActionFromString (mapping.getAction());
+                text = action ? getTransportActionName (*action) : TRANS ("(unknown)");
                 break;
             }
             auto node = session->findNodeById (mapping.getNodeUuid());

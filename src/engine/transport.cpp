@@ -8,6 +8,44 @@ using namespace juce;
 
 namespace element {
 
+namespace {
+
+struct TransportActionInfo
+{
+    TransportAction action;
+    const char* id;
+    const char* name;
+};
+
+constexpr TransportActionInfo transportActions[] = {
+    { TransportAction::Play, "play", "Play" },
+    { TransportAction::Stop, "stop", "Stop" },
+    { TransportAction::Record, "record", "Record" },
+    { TransportAction::SeekZero, "seekZero", "Seek Start" },
+};
+
+const TransportActionInfo& infoFor (TransportAction action)
+{
+    for (const auto& info : transportActions)
+        if (info.action == action)
+            return info;
+    return transportActions[0];
+}
+
+} // namespace
+
+String toString (TransportAction action) { return infoFor (action).id; }
+
+std::optional<TransportAction> transportActionFromString (const String& id)
+{
+    for (const auto& info : transportActions)
+        if (id == info.id)
+            return info.action;
+    return std::nullopt;
+}
+
+String getTransportActionName (TransportAction action) { return infoFor (action).name; }
+
 Transport::Monitor::Monitor()
 {
     sampleRate.set (44100.0);
@@ -64,9 +102,6 @@ Transport::Transport()
 {
     monitor = new Monitor();
     monitor->tempo.set (getTempo());
-
-    seekWanted.set (false);
-    seekFrame.set (0);
 
     nextBeatsPerBar.set (getBeatsPerBar());
     nextBeatType.set (getBeatType());
@@ -127,11 +162,33 @@ void Transport::postProcess (int nframes)
         monitor->beatType.set (beatType);
     }
 
-    if (seekWanted.get())
+    const auto frame = seekRequest.exchange (noSeekRequested);
+    if (frame != noSeekRequested && getPositionFrames() != frame)
+        seekAudioFrame (frame);
+}
+
+void Transport::requestAction (TransportAction action)
+{
+    switch (action)
     {
-        if (getPositionFrames() != seekFrame.get())
-            seekAudioFrame (seekFrame.get());
-        seekWanted.set (false);
+        case TransportAction::Play:
+            if (playState.get())
+                requestAudioFrame (0);
+            else
+                requestPlayState (true);
+            break;
+        case TransportAction::Stop:
+            if (playState.get())
+                requestPlayState (false);
+            else
+                requestAudioFrame (0);
+            break;
+        case TransportAction::Record:
+            requestRecordState (! recordState.get());
+            break;
+        case TransportAction::SeekZero:
+            requestAudioFrame (0);
+            break;
     }
 }
 
@@ -151,8 +208,7 @@ void Transport::requestMeter (int beatsPerBar, int beatType)
 
 void Transport::requestAudioFrame (const int64_t frame)
 {
-    seekFrame.set (frame);
-    seekWanted.set (true);
+    seekRequest.store (juce::jmax ((int64_t) 0, frame));
 }
 
 } // namespace element

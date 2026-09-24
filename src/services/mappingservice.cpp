@@ -268,8 +268,10 @@ public:
     MidiMessage message;
     String device;
 
-    // Target for the armed capture: "parameter" (node + param) or "tempo".
+    // Target for the armed capture: "parameter" (node + param), "tempo" or
+    // "transport" (with pendingTransportAction).
     String pendingTargetType = "parameter";
+    TransportAction pendingTransportAction = TransportAction::Play;
 };
 
 MappingService::MappingService()
@@ -295,6 +297,10 @@ void MappingService::activate()
         std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
     tempoTapConnection = mapping.tempoTapAppliedSignal().connect (
         std::bind (&MappingService::onTempoTapApplied, this));
+    transportActionConnection = mapping.transportActionSignal().connect ([this] (TransportAction action) {
+        if (auto engine = context().audio())
+            engine->performTransportAction (action);
+    });
 
     // Refresh persisted device names (and repaint the table) when a MIDI device
     // is hot-plugged or removed, and when a session finishes loading.
@@ -322,6 +328,7 @@ void MappingService::deactivate()
     devicesChangedConnection.disconnect();
     sessionLoadedConnection.disconnect();
     tempoTapConnection.disconnect();
+    transportActionConnection.disconnect();
 }
 
 bool MappingService::isLearning() const
@@ -354,44 +361,24 @@ void MappingService::tapTempo()
             session->setProperty (tags::tempo, *bpm);
 }
 
-void MappingService::learnTempo()
+void MappingService::armSessionCapture (const String& targetType)
 {
-    auto& mapping (context().mapping());
-
-    // Skip the parameter-capture phase: arm MIDI capture directly and bind the
-    // next event to the session tempo.
     impl->capture.clear();
-    impl->pendingTargetType = "tempo";
+    impl->pendingTargetType = targetType;
     impl->learnState = CaptureControl;
-    mapping.captureMapping (true);
+    context().mapping().captureMapping (true);
 }
 
-bool MappingService::hasTempoMapping()
+MidiMapping MappingService::findMapping (const MappingPredicate& predicate)
 {
-    auto session = context().session();
-    if (session == nullptr)
-        return false;
-    for (int i = 0; i < session->getNumMidiMappings(); ++i)
-        if (session->getMidiMapping (i).isTempoTarget())
-            return true;
-    return false;
+    if (auto session = context().session())
+        for (int i = 0; i < session->getNumMidiMappings(); ++i)
+            if (auto m = session->getMidiMapping (i); predicate (m))
+                return m;
+    return MidiMapping();
 }
 
-String MappingService::getTempoMappingDescription()
-{
-    auto session = context().session();
-    if (session == nullptr)
-        return {};
-    for (int i = 0; i < session->getNumMidiMappings(); ++i)
-    {
-        auto m = session->getMidiMapping (i);
-        if (m.isTempoTarget())
-            return (m.isNoteEvent() ? String ("Note ") : String ("CC ")) + String (m.getEventId());
-    }
-    return {};
-}
-
-void MappingService::clearTempoMapping()
+void MappingService::removeMappings (const MappingPredicate& predicate)
 {
     auto session = context().session();
     if (session == nullptr)
@@ -401,7 +388,7 @@ void MappingService::clearTempoMapping()
     for (int i = session->getNumMidiMappings(); --i >= 0;)
     {
         auto m = session->getMidiMapping (i);
-        if (m.isTempoTarget())
+        if (predicate (m))
         {
             session->removeMidiMapping (m);
             removed = true;
@@ -414,6 +401,57 @@ void MappingService::clearTempoMapping()
         if (auto* gui = sibling<GuiService>())
             gui->stabilizeViews();
     }
+}
+
+String MappingService::describeTrigger (const MidiMapping& m)
+{
+    if (! m.isValid())
+        return {};
+    return (m.isNoteEvent() ? String ("Note ") : String ("CC ")) + String (m.getEventId());
+}
+
+void MappingService::addLearnedMapping (const MidiMapping& newMapping)
+{
+    auto session = context().session();
+    session->addMidiMapping (newMapping);
+    context().mapping().rebuildBindings (session); // live immediately
+    if (auto* gui = sibling<GuiService>())
+        gui->stabilizeViews();
+}
+
+static bool isTempo (const MidiMapping& m) { return m.isTempoTarget(); }
+
+static MappingService::MappingPredicate isTransport (TransportAction action)
+{
+    return [action] (const MidiMapping& m) {
+        return m.isTransportTarget() && m.getAction() == toString (action);
+    };
+}
+
+void MappingService::learnTempo() { armSessionCapture ("tempo"); }
+bool MappingService::hasTempoMapping() { return findMapping (isTempo).isValid(); }
+String MappingService::getTempoMappingDescription() { return describeTrigger (findMapping (isTempo)); }
+void MappingService::clearTempoMapping() { removeMappings (isTempo); }
+
+void MappingService::learnTransport (TransportAction action)
+{
+    impl->pendingTransportAction = action;
+    armSessionCapture ("transport");
+}
+
+bool MappingService::hasTransportMapping (TransportAction action)
+{
+    return findMapping (isTransport (action)).isValid();
+}
+
+String MappingService::getTransportMappingDescription (TransportAction action)
+{
+    return describeTrigger (findMapping (isTransport (action)));
+}
+
+void MappingService::clearTransportMapping (TransportAction action)
+{
+    removeMappings (isTransport (action));
 }
 
 void MappingService::onParameterCaptured (const Node& node, int parameter)
@@ -450,21 +488,17 @@ void MappingService::onControlCaptured()
 
         if (impl->pendingTargetType == "tempo" && haveMidi)
         {
-            session->addMidiMapping (MidiMapping::fromCaptureTempo (impl->device, impl->message));
-            mapping.rebuildBindings (session); // live immediately
-
-            if (auto* gui = sibling<GuiService>())
-                gui->stabilizeViews();
+            addLearnedMapping (MidiMapping::fromCaptureTempo (impl->device, impl->message));
         }
-        else if (impl->isCaptureComplete())
+        else if (impl->pendingTargetType == "transport" && haveMidi)
         {
-            auto newMapping = MidiMapping::fromCapture (
-                impl->device, impl->message, "parameter", impl->node.getUuid(), impl->parameter);
-            session->addMidiMapping (newMapping);
-            mapping.rebuildBindings (session); // live immediately
-
-            if (auto* gui = sibling<GuiService>())
-                gui->stabilizeViews();
+            addLearnedMapping (MidiMapping::fromCaptureTransport (
+                impl->device, impl->message, toString (impl->pendingTransportAction)));
+        }
+        else if (impl->pendingTargetType == "parameter" && impl->isCaptureComplete())
+        {
+            addLearnedMapping (MidiMapping::fromCapture (
+                impl->device, impl->message, "parameter", impl->node.getUuid(), impl->parameter));
         }
 
         impl->pendingTargetType = "parameter";

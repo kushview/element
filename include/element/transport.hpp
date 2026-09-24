@@ -4,11 +4,32 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 #include <element/atomic.hpp>
 #include <element/shuttle.hpp>
 
 namespace element {
+
+/** The actions offered by the transport bar buttons. Shared by the UI and by
+    MIDI mappings so both drive the transport through the same rules. */
+enum class TransportAction {
+    Play,
+    Stop,
+    Record,
+    SeekZero
+};
+
+/** Returns the persistent identifier of an action ("play", "stop", "record",
+    "seekZero"), as stored in MIDI mappings. */
+juce::String toString (TransportAction action);
+
+/** Parses a persistent action identifier.
+    @return The action, or nullopt if the string is not a known identifier. */
+std::optional<TransportAction> transportActionFromString (const juce::String& id);
+
+/** Returns the human readable name of an action ("Play", "Seek Start", ...). */
+juce::String getTransportActionName (TransportAction action);
 
 /** Audio transport with thread-safe state management.
     
@@ -106,6 +127,17 @@ public:
     /** Toggles between play and pause (thread-safe). */
     inline void requestPlayPause() { requestPlayState (! playState.get()); }
 
+    /** Performs a transport bar action (thread-safe).
+
+        Decided on the requested state rather than the applied state, so rapid
+        repeats behave as the buttons do: Play restarts from the beginning when
+        already playing, Stop rewinds when already stopped, Record toggles and
+        SeekZero rewinds.
+
+        @param action The action to perform
+    */
+    void requestAction (TransportAction action);
+
     /** Requests a record state change (thread-safe).
         @param r True to record, false to stop recording
     */
@@ -130,8 +162,9 @@ public:
     */
     void requestMeter (int beatsPerBar, int beatType);
 
-    /** Requests a seek to a specific audio frame (thread-safe).
-        @param frame Target position in samples
+    /** Requests a seek to a specific audio frame (thread-safe). The most
+        recent request before the next audio block wins.
+        @param frame Target position in samples; negative values seek to 0
     */
     void requestAudioFrame (const int64_t frame);
 
@@ -160,8 +193,14 @@ private:
     AtomicValue<bool> playState, recordState;
     AtomicValue<double> nextTempo;
     juce::Atomic<int> nextBeatsPerBar, nextBeatType;
-    juce::Atomic<bool> seekWanted;
-    AtomicValue<int64_t> seekFrame;
+
+    // Pending seek target, or noSeekRequested. A single atomic keeps the
+    // "wanted" flag and the frame together, so concurrent requesters can never
+    // leave a stale frame behind a set flag; the last request wins.
+    static constexpr int64_t noSeekRequested = -1;
+    std::atomic<int64_t> seekRequest { noSeekRequested };
+    static_assert (std::atomic<int64_t>::is_always_lock_free, "seek requests must be lock-free");
+
     MonitorPtr monitor;
 };
 

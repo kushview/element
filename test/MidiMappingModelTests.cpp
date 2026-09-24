@@ -26,6 +26,30 @@ BOOST_AUTO_TEST_CASE (DefaultsStabilize)
     BOOST_REQUIRE_EQUAL (m.getTriggerValue(), 67);
     BOOST_REQUIRE (m.getTargetType() == "parameter");
     BOOST_REQUIRE_EQUAL (m.getParameterIndex(), -1);
+    BOOST_REQUIRE (m.getAction().isEmpty());
+    BOOST_REQUIRE (! m.isSessionTarget());
+}
+
+BOOST_AUTO_TEST_CASE (FromCaptureTransport)
+{
+    auto note = MidiMapping::fromCaptureTransport ("dev-1", MidiMessage::noteOn (2, 60, (uint8) 90), "play");
+    BOOST_REQUIRE (note.isTransportTarget());
+    BOOST_REQUIRE (note.isSessionTarget());
+    BOOST_REQUIRE (! note.isTempoTarget());
+    BOOST_REQUIRE (! note.isParameterTarget());
+    BOOST_REQUIRE (note.isNoteEvent());
+    BOOST_REQUIRE_EQUAL (note.getEventId(), 60);
+    BOOST_REQUIRE (note.getAction() == "play");
+    BOOST_REQUIRE (note.getNodeUuid().isNull());
+
+    // A CC capture survives a serialize / reload round-trip with its action.
+    auto cc = MidiMapping::fromCaptureTransport ("dev-1", MidiMessage::controllerEvent (1, 21, 127), "seekZero");
+    MidiMapping loaded (ValueTree::fromXml (cc.data().toXmlString()));
+    BOOST_REQUIRE (loaded.isValid());
+    BOOST_REQUIRE (loaded.isTransportTarget());
+    BOOST_REQUIRE (loaded.isControllerEvent());
+    BOOST_REQUIRE_EQUAL (loaded.getEventId(), 21);
+    BOOST_REQUIRE (loaded.getAction() == "seekZero");
 }
 
 BOOST_AUTO_TEST_CASE (TriggerEdgeAbove)
@@ -33,7 +57,7 @@ BOOST_AUTO_TEST_CASE (TriggerEdgeAbove)
     // Rising crossing only, so a knob held past the threshold fires once.
     BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, -1, 80)); // no history: counts
     BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("above", 67, -1, 20));
-    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, 20, 67)); // at the threshold counts
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, 20, 67));    // at the threshold counts
     BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("above", 67, 80, 100)); // already above
     BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("above", 67, 100, 20)); // falling
     BOOST_REQUIRE (MidiMapping::isTriggerEdge ("above", 67, 20, 90));
@@ -41,6 +65,21 @@ BOOST_AUTO_TEST_CASE (TriggerEdgeAbove)
     // An unknown mode string behaves as "above".
     BOOST_REQUIRE (MidiMapping::isTriggerEdge ("bogus", 67, 20, 90));
     BOOST_REQUIRE (! MidiMapping::isTriggerEdge ("bogus", 67, 80, 100));
+}
+
+BOOST_AUTO_TEST_CASE (TriggerModeParsing)
+{
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("above") == TriggerMode::Above);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("zero") == TriggerMode::Zero);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("max") == TriggerMode::Max);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ("bogus") == TriggerMode::Above);
+    BOOST_REQUIRE (MidiMapping::triggerModeFromString ({}) == TriggerMode::Above);
+
+    // The enum and string forms agree.
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge (TriggerMode::Zero, 67, 64, 0));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge (TriggerMode::Max, 67, 64, 127));
+    BOOST_REQUIRE (MidiMapping::isTriggerEdge (TriggerMode::Above, 67, 20, 90));
+    BOOST_REQUIRE (! MidiMapping::isTriggerEdge (TriggerMode::Above, 67, 80, 100));
 }
 
 BOOST_AUTO_TEST_CASE (TriggerEdgeEndpoints)

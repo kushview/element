@@ -3,8 +3,10 @@
 
 #include <element/session.hpp>
 
+#include "services/mappingservice.hpp"
 #include "ui/guicommon.hpp"
 #include "ui/transportbar.hpp"
+#include "ui/viewhelpers.hpp"
 
 namespace element {
 
@@ -19,7 +21,7 @@ public:
     void settingLabelDoubleClicked() override
     {
         if (auto e = owner.engine)
-            e->seekToAudioFrame (0);
+            e->performTransportAction (TransportAction::SeekZero);
     }
 
     TransportBar& owner;
@@ -73,6 +75,12 @@ TransportBar::TransportBar()
     toZero->setPath (toZeroPath, 4.4f);
     toZero->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     toZero->addListener (this);
+
+    for (auto* button : { play.get(), stop.get(), record.get(), toZero.get() })
+        button->onContextMenu = [this, button] {
+            if (auto action = actionFor (button))
+                showLearnMenu (*button, *action);
+        };
 
     barLabel = std::make_unique<BarLabel> (*this);
     addAndMakeVisible (barLabel.get());
@@ -147,33 +155,54 @@ void TransportBar::resized()
     subLabel->setBounds (52, 0, 24, 16);
 }
 
+std::optional<TransportAction> TransportBar::actionFor (Button* button) const
+{
+    if (button == play.get())
+        return TransportAction::Play;
+    if (button == stop.get())
+        return TransportAction::Stop;
+    if (button == record.get())
+        return TransportAction::Record;
+    if (button == toZero.get())
+        return TransportAction::SeekZero;
+    return std::nullopt;
+}
+
+MappingService* TransportBar::findMappingService()
+{
+    if (auto* cc = ViewHelpers::findContentComponent (this))
+        return cc->services().find<MappingService>();
+    return nullptr;
+}
+
 void TransportBar::buttonClicked (Button* buttonThatWasClicked)
 {
-    if (! checkForMonitor())
+    const auto action = actionFor (buttonThatWasClicked);
+    if (! action || ! checkForMonitor())
         return;
 
-    if (buttonThatWasClicked == play.get())
-    {
-        if (monitor->playing.get())
-            engine->seekToAudioFrame (0);
-        else
-            engine->setPlaying (true);
-    }
-    else if (buttonThatWasClicked == toZero.get())
-    {
-        engine->seekToAudioFrame (0);
-    }
-    else if (buttonThatWasClicked == stop.get())
-    {
-        if (! monitor->playing.get())
-            engine->seekToAudioFrame (0);
-        else
-            engine->setPlaying (false);
-    }
-    else if (buttonThatWasClicked == record.get())
-    {
-        engine->setRecording (! monitor->recording.get());
-    }
+    // In MIDI-map mode a click arms capture for this button ("map, then click
+    // the thing to map") instead of driving the transport; the next MIDI
+    // event binds it.
+    if (auto* maps = findMappingService(); maps != nullptr && maps->isLearning())
+        maps->learnTransport (*action);
+    else
+        engine->performTransportAction (*action);
+}
+
+void TransportBar::showLearnMenu (SettingButton& button, TransportAction action)
+{
+    auto* maps = findMappingService();
+    if (maps == nullptr)
+        return;
+
+    ViewHelpers::showMidiLearnMenu (
+        button,
+        TRANS ("MIDI Learn ") + getTransportActionName (action),
+        maps->hasTransportMapping (action),
+        maps->getTransportMappingDescription (action),
+        [this, action] { if (auto* svc = findMappingService()) svc->learnTransport (action); },
+        [this, action] { if (auto* svc = findMappingService()) svc->clearTransportMapping (action); });
 }
 
 void TransportBar::setBeatTime (const float t)

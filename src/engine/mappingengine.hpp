@@ -12,6 +12,7 @@
 #include <element/session.hpp>
 #include <element/signals.hpp>
 #include <element/taptempo.hpp>
+#include <element/transport.hpp>
 
 namespace element {
 
@@ -21,12 +22,13 @@ class Node;
 class MidiEngine;
 
 /** Routes incoming MIDI to flat MidiMapping targets and drives the Learn
-    capture flow. See docs/plans/midimapping.md. */
+    capture flow. */
 class MappingEngine
 {
 public:
     using CapturedEventSignal = Signal<void()>;
     using TempoTapSignal = Signal<void()>;
+    using TransportActionSignal = Signal<void (TransportAction)>;
 
     MappingEngine();
     ~MappingEngine();
@@ -61,6 +63,11 @@ public:
         TAP button. Long-lived (outlives the per-rebuild targets that fire it). */
     TempoTapSignal& tempoTapAppliedSignal() { return tempoTapCallback; }
 
+    /** Fired on each recognised MIDI transport press with the action to
+        perform. MappingService routes it to the AudioEngine, keeping this class
+        free of engine dependencies. Long-lived, like tempoTapAppliedSignal(). */
+    TransportActionSignal& transportActionSignal() { return transportActionCallback; }
+
 private:
     struct Binding;
     class Router;
@@ -71,6 +78,7 @@ private:
     juce::MidiMessage capturedMessage;
     CapturedEventSignal mapCapturedCallback;
     TempoTapSignal tempoTapCallback;
+    TransportActionSignal transportActionCallback;
     TapTempo tempoTap; // shared by UI + MIDI tap tempo
 };
 

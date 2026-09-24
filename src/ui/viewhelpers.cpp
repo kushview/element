@@ -21,6 +21,36 @@
 namespace element {
 namespace ViewHelpers {
 
+void showMidiLearnMenu (Component& target,
+                        const String& learnLabel,
+                        bool mapped,
+                        const String& description,
+                        std::function<void()> onLearn,
+                        std::function<void()> onClear)
+{
+    enum
+    {
+        Learn = 1,
+        Clear
+    };
+
+    PopupMenu menu;
+    menu.addItem (Learn, mapped ? TRANS ("Re-learn MIDI Mapping") : learnLabel);
+    if (mapped)
+        menu.addItem (Clear, TRANS ("Clear MIDI Mapping") + (description.isNotEmpty() ? " (" + description + ")" : String()));
+
+    Component::SafePointer<Component> self (&target);
+    menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&target),
+                        [self, onLearn, onClear] (int result) {
+                            if (self == nullptr)
+                                return;
+                            if (result == Learn && onLearn != nullptr)
+                                onLearn();
+                            else if (result == Clear && onClear != nullptr)
+                                onClear();
+                        });
+}
+
 void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding, Justification alignment)
 {
     g.saveState();
