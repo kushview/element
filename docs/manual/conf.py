@@ -124,6 +124,18 @@ latex_elements = {
 \setcounter{tocdepth}{1}
 % Number parts and chapters only; sections carry their title alone.
 \setcounter{secnumdepth}{0}
+% Part openers: place the title near the top of the page and let the
+% part's introduction follow it on the same page. The report class centres
+% the title on a page of its own and pushes the text to the next page.
+\makeatletter
+\renewcommand\part{%
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{plain}%
+  \if@twocolumn\onecolumn\@tempswatrue\else\@tempswafalse\fi
+  \null\vskip 0.04\textheight
+  \secdef\@part\@spart}
+\def\@endpart{\vskip 2em\if@tempswa\twocolumn\fi\@afterindentfalse\@afterheading}
+\makeatother
 % :menuselection: emits U+2023 (triangular bullet), which Latin Modern lacks.
 \IfFileExists{newunicodechar.sty}{%
   \usepackage{newunicodechar}%
