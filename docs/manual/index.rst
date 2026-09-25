@@ -1,41 +1,27 @@
-.. Element documentation master file, created  on Wed Jul 14 13:56:01 2021.
-
 .. include:: /shortcuts.rstext
 
 .. _index:
 
-Element |version| User Manual
-=============================
+Element User Manual
+===================
 
-`This manual is under construction: This manual is a work in progress. Topics might be misplaced
-in the navigation. Some sections are more complete than others.`
+|El| is `free <https://www.gnu.org/philosophy/free-sw.html>`_ audio plugin
+host software for Linux, macOS and Windows. It is modular audio software for
+routing, control and scripting: you build instruments and effects racks by
+connecting nodes to each other, and control them with :term:`MIDI`, your
+computer's keyboard and mouse, or Lua scripts.
 
-Element is `free <https://www.gnu.org/philosophy/free-sw.html>`_ plugin software
-for Linux, macOS and Windows.  De facto modular audio software for routing,
-control, and scripting. Control Element with :term:`MIDI` or your
-computer's keyboard and mouse.
+This manual describes |El| |release|.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Manual
+   :numbered:
 
-   chapters/introduction
-   chapters/ui
-   chapters/preferences
-   chapters/scripting
-
-.. toctree::
-   :maxdepth: 3
-   :caption: Developers
-
-   developers/building
-   developers/code-style
-   developers/lua-style
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Appendix
-
-   appendix/osc-commands
-   appendix/plugin
-   glossary
+   getting-started/index
+   interface/index
+   using/index
+   nodes/index
+   scripting/index
+   plugin/index
+   developers/index
+   appendix/index

@@ -1,5 +1,5 @@
 # Building Element
-A simple guide on building Element with CMake.  Pease see [cmake.org](https://cmake.org/install/) for how to install CMake on your platform.
+A simple guide on building Element with CMake.  Please see [cmake.org](https://cmake.org/download/) for how to install CMake on your platform.
 
 ## Submodules
 This project uses git submodules. To get them, run:
@@ -13,7 +13,7 @@ The following packages are needed...
 sudo apt-get install git build-essential pkg-config libboost-dev \
     libfreetype-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev \
     libxinerama-dev libxrender-dev libxcursor-dev libxrender-dev libasound2-dev \
-    ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
+    ladspa-sdk lv2-dev liblilv-dev libsuil-dev libcurl4-openssl-dev fonts-roboto clang
 ```
 
 Optional, to build and install the user manual, put the Python packages from
@@ -73,7 +73,7 @@ docker run --rm -it --user $(id -u):$(id -g) -v $(pwd):/workspace element:archli
 ```
 
 
-## Mac OSX
+## macOS
 __Dependencies__
 
 Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
@@ -87,7 +87,7 @@ cmake -B build
 cmake --build build
 ```
 
-This will make an app bundle somwhere in the `build` dir.  Run it...
+This will make an app bundle somewhere in the `build` dir.  Run it...
 ```
 open $(find build -name "Element.app")
 ```
@@ -100,3 +100,15 @@ cmake --build build
 ```
 
 After this, you should have an `Element.exe` inside the `build` directory.
+
+## Documentation
+With the Python packages above on your PATH, `cmake --build build --target docs`
+builds the HTML manual into `build/docs/manual/html` (on Linux it is also part of
+the default build and installed). `--target docs-manual-pdf` typesets the manual
+as a PDF book; it needs a TeX distribution with `xelatex` (and `latexmk` if
+available) and the
+packages Sphinx relies on (`tabulary capt-of needspace framed titlesec varwidth
+wrapfig fncychap newunicodechar` and the Latin Modern OpenType fonts). A full
+TeX Live has all of them; on BasicTeX run `sudo tlmgr install latexmk tabulary
+capt-of needspace framed titlesec varwidth wrapfig fncychap newunicodechar`.
+`--target docs-lua` builds the Lua API reference with `ldoc`.
