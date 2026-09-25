@@ -16,6 +16,14 @@ sudo apt-get install git build-essential pkg-config libboost-dev \
     ladspa-sdk libcurl4-openssl-dev fonts-roboto clang clang++
 ```
 
+Optional, to build and install the user manual, put the Python packages from
+`docs/manual/requirements.txt` on your PATH (for example in a virtualenv):
+```bash
+python3 -m venv ~/.venvs/element-docs
+~/.venvs/element-docs/bin/pip install -r docs/manual/requirements.txt
+export PATH=~/.venvs/element-docs/bin:$PATH
+```
+
 __Compiling__
 ```
 cmake -B build -G Ninja
@@ -37,6 +45,8 @@ sudo pacman -S git base-devel cmake ninja pkgconf boost \
     libxinerama libxrender libxcursor alsa-lib jack2 \
     ladspa curl ttf-roboto clang
 ```
+
+The user manual is optional; see the virtualenv note under Debian/Ubuntu.
 
 ### Checking With Docker
 

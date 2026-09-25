@@ -1,0 +1,10 @@
+.. Shared substitutions for the Element manual.
+.. To use these on a page, add ``.. include:: /shortcuts.rstext`` near the top,
+.. then reference a substitution inline, e.g. ``|El|`` or ``File |rarr| Preferences``.
+
+.. Product name. Lets us restyle or rename in one place.
+.. |El| replace:: Element
+
+.. Right-pointing arrow for writing menu paths, e.g. ``File |rarr| Preferences``.
+.. |rarr| unicode:: U+2192
+   :trim:
