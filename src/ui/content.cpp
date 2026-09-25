@@ -67,11 +67,11 @@ public:
         addAndMakeVisible (tempoBar);
         addAndMakeVisible (transport);
 
-        mapButton.setButtonText (TRANS ("map"));
-        mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
-        mapButton.addListener (this);
-        addAndMakeVisible (mapButton);
-        mapButton.setVisible (false);
+        learnButton.setButtonText (TRANS ("learn"));
+        learnButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
+        learnButton.addListener (this);
+        addAndMakeVisible (learnButton);
+        learnButton.setVisible (false);
 
         pluginMenu.setIcon (Icon (getIcons().falBarsOutline,
                                   findColour (TextButton::textColourOffId)));
@@ -128,8 +128,8 @@ public:
             tempoBar.stabilizeWithSession (false);
         }
 
-        mapButton.setEnabled (true);
-        mapButton.setVisible (true);
+        learnButton.setEnabled (true);
+        learnButton.setVisible (true);
         if (! isTimerRunning())
             startTimer (600);
 
@@ -141,7 +141,7 @@ public:
                 const auto assigned = keys->getKeyPressesAssignedToCommand (Commands::toggleMidiLearn);
                 if (! assigned.isEmpty())
                     tip << " (" << assigned.getReference (0).getTextDescription() << ")";
-                mapButton.setTooltip (tip);
+                learnButton.setTooltip (tip);
             }
 
         resized();
@@ -178,10 +178,10 @@ public:
                                    .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
         }
 
-        if (mapButton.isVisible())
+        if (learnButton.isVisible())
         {
             r.removeFromRight (4);
-            mapButton.setBounds (r.removeFromRight (tempoBarHeight * 2)
+            learnButton.setBounds (r.removeFromRight (tempoBarHeight * 2)
                                      .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
         }
 
@@ -205,7 +205,7 @@ public:
         {
             ViewHelpers::invokeDirectly (this, Commands::rotateContentView, true);
         }
-        else if (btn == &mapButton)
+        else if (btn == &learnButton)
         {
             ViewHelpers::invokeDirectly (this, Commands::toggleMidiLearn, true);
         }
@@ -216,7 +216,7 @@ public:
         // Keep the button in sync with the learn state no matter how it was
         // toggled (header button, keyboard shortcut, or menu).
         if (auto* mapping = owner.services().find<MappingService>())
-            mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
+            learnButton.setToggleState (mapping->isLearning(), dontSendNotification);
     }
 
 private:
@@ -225,7 +225,7 @@ private:
     MidiIOMonitorPtr midiIOMonitor;
     MappingService* mappingService = nullptr;
     SettingButton viewBtn;
-    SettingButton mapButton;
+    SettingButton learnButton;
     TempoAndMeterBar tempoBar;
     TransportBar transport;
     IconButton pluginMenu;
