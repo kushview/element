@@ -1,0 +1,21 @@
+.. Shared substitutions and link targets for the Element manual.
+.. Every page includes this file near the top:
+..     .. include:: /shortcuts.rstext
+.. Substitutions: |El|, |rarr|, |cmd|.  Link targets: `Element website`_,
+.. `Element downloads`_, `scripting API`_, `source repository`_, `issue tracker`_,
+.. `Discord server`_, `online manual`_.
+
+.. |El| replace:: Element
+
+.. |rarr| unicode:: U+2192
+   :trim:
+
+.. |cmd| replace:: :kbd:`Cmd`
+
+.. _Element website: https://kushview.net/element/
+.. _Element downloads: https://kushview.net/element/download/
+.. _scripting API: https://kushview.github.io/element-ldoc/
+.. _source repository: https://github.com/kushview/element
+.. _issue tracker: https://github.com/kushview/element/issues
+.. _Discord server: https://discord.gg/fAsQ5fMuHy
+.. _online manual: https://element.readthedocs.io

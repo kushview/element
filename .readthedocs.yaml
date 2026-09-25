@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Kushview, LLC.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+version: 2
+
+sphinx:
+  configuration: docs/manual/conf.py
+
+build:
+  os: "ubuntu-24.04"
+  tools:
+    python: "3.12"
+
+python:
+  install:
+    - requirements: docs/manual/requirements.txt
