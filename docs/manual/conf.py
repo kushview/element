@@ -122,6 +122,8 @@ latex_elements = {
 ''',
     'preamble': r'''
 \setcounter{tocdepth}{1}
+% Number parts and chapters only; sections carry their title alone.
+\setcounter{secnumdepth}{0}
 % :menuselection: emits U+2023 (triangular bullet), which Latin Modern lacks.
 \IfFileExists{newunicodechar.sty}{%
   \usepackage{newunicodechar}%

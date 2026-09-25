@@ -8,6 +8,7 @@
 #   docs-manual  Sphinx user manual  -> <build>/docs/manual/html
 #   docs-manual-pdf  6x9 book via LaTeX -> <build>/docs/manual-latex/latex/element-manual.pdf
 #   docs-lua     ldoc Lua API docs   -> <build>/docs/lua
+#   docs-clean   removes the output of every target above
 #
 # On Linux the manual is part of the default build and is installed to
 # ${CMAKE_INSTALL_DOCDIR}/manual when Sphinx is available.
@@ -38,6 +39,16 @@ if(Python3_Interpreter_FOUND)
 endif()
 
 add_custom_target(docs)
+
+# Removes only the documentation output; the global 'clean' target would
+# also discard the compiled application.
+add_custom_target(docs-clean
+    COMMAND ${CMAKE_COMMAND} -E rm -rf
+        "${CMAKE_CURRENT_BINARY_DIR}/manual"
+        "${CMAKE_CURRENT_BINARY_DIR}/manual-latex"
+        "${CMAKE_CURRENT_BINARY_DIR}/lua"
+    COMMENT "Removing generated documentation"
+    VERBATIM)
 
 if(ELEMENT_HAVE_SPHINX)
     set(ELEMENT_MANUAL_SRCDIR "${CMAKE_CURRENT_SOURCE_DIR}/manual")

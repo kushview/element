@@ -27,63 +27,11 @@ Adding, duplicating and removing
 Graph settings
 --------------
 
-The :guilabel:`Graph` panel in the sidebar shows the settings of the graph in
-the editor. :guilabel:`View Settings...` on a graph's right-click menu shows
-the same settings in the main view.
-
-.. SCREENSHOT using/graphs-01: the Graph panel in the sidebar with every
-   property visible, MIDI Program set and a hotkey mapped
-.. .. figure:: /images/using/graphs-01.png
-..    :alt: Graph settings
-..
-..    Graph settings.
-
-:guilabel:`Name`
-   The graph's name, shown in the session tree and the window title.
-
-:guilabel:`Rendering Mode`
-   :guilabel:`Single`: only the active graph renders. A graph that has just
-   been deactivated keeps rendering until its output falls silent, so
-   reverb tails and held notes finish, and is then bypassed.
-   :guilabel:`Parallel`: every root graph renders all the time and all of
-   them receive MIDI. Use it for layered rigs where several graphs play at
-   once.
-
-:guilabel:`Velocity Curve`
-   A curve applied to the velocity of incoming notes before they reach the
-   nodes, to suit your keyboard or playing style:
-
-   =========== ===========================================
-   Mode        Description
-   =========== ===========================================
-   Linear      No change
-   Soft        Curves velocity down, for heavy hands
-   Softer      A stronger version of Soft
-   Softest     The strongest downward curve
-   Hard        Curves velocity up, for light hands
-   Harder      A stronger version of Hard
-   Hardest     The strongest upward curve
-   Max         Every note plays at maximum velocity (127)
-   =========== ===========================================
-
-:guilabel:`MIDI Channel`
-   The channels the graph accepts, or :guilabel:`Omni` for all of them.
-   Several channels can be ticked. Messages on other channels never enter the
-   graph.
-
-:guilabel:`MIDI Program`
-   :guilabel:`None`, or a program number from 1 to 128 that makes this graph
-   the active graph when a program change with that number arrives on one of
-   the graph's channels. The session tree shows the number next to the
-   graph.
-
-:guilabel:`Hotkey`
-   A computer key that activates the graph. Click :guilabel:`Map`, press the
-   key, and it is stored; :guilabel:`Clear` removes it.
-
-:guilabel:`Audio Ins`, :guilabel:`Audio Outs`, :guilabel:`MIDI Ins`, :guilabel:`MIDI Outs`
-   The number of ports on the graph's input and output nodes. A root graph
-   defaults to two audio channels and one MIDI port each way.
+Every root graph has a name, a rendering mode, a velocity curve, a MIDI
+channel filter, an optional MIDI program and hotkey that activate it, and a
+port count. They are edited in the :guilabel:`Graph` panel of the sidebar, or
+in the main view with :guilabel:`View Settings...` on the graph's right-click
+menu. Each setting is described in :ref:`interface-graph-panel`.
 
 Switching graphs
 ----------------

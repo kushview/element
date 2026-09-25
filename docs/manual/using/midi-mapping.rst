@@ -100,6 +100,6 @@ Notes
   on note-on and minimum on note-off, or toggles with :guilabel:`Latch`.
 - Mappings target a node, not a graph, so they keep working when the node's
   graph is inactive only if that graph still renders (see
-  :guilabel:`Rendering Mode` in :ref:`using-graphs`).
+  :guilabel:`Rendering Mode` in :ref:`interface-graph-panel`).
 - To switch graphs from a controller, use MIDI program changes rather than
   mappings (:ref:`using-graphs`).

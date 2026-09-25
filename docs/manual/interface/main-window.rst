@@ -66,19 +66,20 @@ The sidebar
 
 The sidebar is a stack of collapsible panels. Click a panel's header to open
 or close it, and drag the divider between the sidebar and the content area to
-resize it. Each panel has its own chapter or section:
+resize it. Each panel is described in :ref:`interface-sidebar-panels`:
 
-- :guilabel:`Session`: the session tree (:ref:`interface-session-tree`).
+- :guilabel:`Session`: the graphs and nodes of the open session
+  (:ref:`interface-session-panel`).
 - :guilabel:`Graph`: the settings of the graph in the editor
-  (:ref:`using-graphs`).
+  (:ref:`interface-graph-panel`).
 - :guilabel:`Node`: properties of the selected node
   (:ref:`interface-node-panel`).
 - :guilabel:`Editor`: the selected node's editor shown inline
-  (:ref:`interface-node-panel`).
-- :guilabel:`Plugins`: a searchable plugin browser. Type in
-  :guilabel:`Search...` to filter, then drag a plugin onto the graph editor.
+  (:ref:`interface-editor-panel`).
+- :guilabel:`Plugins`: a searchable plugin browser
+  (:ref:`interface-plugins-panel`).
 - :guilabel:`Data Path`: a file browser for your |El| library
-  (:ref:`interface-session-tree`).
+  (:ref:`interface-data-path-panel`).
 
 The content area
 ----------------

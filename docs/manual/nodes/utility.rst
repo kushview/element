@@ -15,8 +15,9 @@ subgraph's block in the parent.
 
 The number of ports on each is set by :guilabel:`Audio Ins`,
 :guilabel:`Audio Outs`, :guilabel:`MIDI Ins` and :guilabel:`MIDI Outs` in
-the graph settings (:ref:`using-graphs`). The nodes are added and removed
-with the :guilabel:`Graph I/O` items of the graph editor's background menu.
+the graph settings (:ref:`interface-graph-panel`). The nodes are added and
+removed with the :guilabel:`Graph I/O` items of the graph editor's background
+menu.
 They have no mute or bypass buttons and never open a plugin window.
 
 Graph
