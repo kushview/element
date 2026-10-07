@@ -643,6 +643,22 @@ public:
         layoutSetting (inner, multithreadingLabel, multithreadingConfig, getWidth() / 2);
     }
 
+   void childBoundsChanged (Component* child) override
+   {
+        // if the audio device selection changes the controls to
+        // configure it can change... so reset the position of the 
+        // experimental settings...
+        if (child == &devs)
+        {
+            Rectangle<int> r (getLocalBounds());
+            r.removeFromTop (devs.getHeight());
+
+            experimentalLabel.setBounds (r.removeFromTop (60));
+            auto inner = experimentalLabel.getBounds().reduced (10).withTrimmedTop (10);
+            layoutSetting (inner, multithreadingLabel, multithreadingConfig, getWidth() / 2);
+        }
+   }
+
 private:
     Settings& settings;
     juce::AudioDeviceSelectorComponent devs;
