@@ -96,6 +96,19 @@ String MidiMonitorNode::describe (const MidiMessage& msg)
         return text;
     }
 
+    if (msg.isController())
+    {
+        String name (MidiMessage::getControllerName (msg.getControllerNumber()));
+
+        if (name.isEmpty())
+        {
+            name = String (msg.getControllerNumber());
+            return "Controller " + name + ": " + String (msg.getControllerValue()) + " Channel " + String (msg.getChannel());
+        }
+
+        return "Controller " + String (msg.getControllerNumber()) + " - "  + name + ": " + String (msg.getControllerValue()) + " Channel " + String (msg.getChannel());
+    }
+
     return msg.getDescription();
 }
 
