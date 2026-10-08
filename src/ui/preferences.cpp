@@ -638,15 +638,35 @@ public:
         Rectangle<int> r (getLocalBounds());
         devs.setBounds (r.removeFromTop (devs.getHeight()));
 
-        experimentalLabel.setBounds (r.removeFromTop (60));
-        auto inner = experimentalLabel.getBounds().reduced (10).withTrimmedTop (10);
-        layoutSetting (inner, multithreadingLabel, multithreadingConfig, getWidth() / 2);
+        // this will cause the experimental settings to position correctly
+        layoutExperimentalSettings();
+    }
+
+    void childBoundsChanged (Component* child) override
+    {
+        if (child == &devs)
+        {
+            // if the audio device selection changes, the controls to
+            // configure it can change, so reset the position of the 
+            // experimental settings
+            layoutExperimentalSettings();
+        }
     }
 
 private:
     Settings& settings;
     juce::AudioDeviceSelectorComponent devs;
     [[maybe_unused]] DeviceManager& devices;
+
+    void layoutExperimentalSettings()
+    {
+        Rectangle<int> r (getLocalBounds());
+        r.removeFromTop (devs.getHeight());
+
+        experimentalLabel.setBounds (r.removeFromTop (60));
+        auto inner = experimentalLabel.getBounds().reduced (10).withTrimmedTop (10);
+        layoutSetting (inner, multithreadingLabel, multithreadingConfig, getWidth() / 2);
+    }
 
     GroupComponent experimentalLabel;
     Label multithreadingLabel;
