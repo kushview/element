@@ -5,7 +5,7 @@
 # This file executes ldoc to generate documentation for Lua source files.
 # It should be ran from the top level source directory.
 #
-# Usage: sh util/luadoc.sh [output_directory]
+# Usage: sh util/ldoc.sh [output_directory]
 
 srcdir="$(dirname "$(dirname "$(realpath "$0")")")"
 outdir="${1:-$(pwd)/build/lua-html}"

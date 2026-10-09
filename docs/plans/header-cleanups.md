@@ -96,6 +96,6 @@ why app internals have drifted into `include/` unchecked.
   the standard to match.)
 - [ ] Settle the getter naming convention for new code (`getName()` in
   `Node`/`Session` vs `name()` in `Model`/`Script`/`PortType`) and document it
-  in `docs/cppstyle.md`.
+  in `docs/manual/developers/code-style.md`.
 - [ ] Unify the remaining copyright-header variants when files are otherwise
   touched (don't rewrite years wholesale).

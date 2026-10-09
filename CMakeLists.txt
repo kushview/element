@@ -59,6 +59,11 @@ if (ELEMENT_BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
+## Documentation
+if(ELEMENT_BUILD_DOCS)
+    add_subdirectory(docs)
+endif()
+
 ## Standalone Application
 if(NOT APPLE)
     # For backward compatibility with the old meson build, not-Mac installs 

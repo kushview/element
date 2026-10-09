@@ -36,7 +36,7 @@ doubles errors on 5.3+ but not 5.1 — and vice-versa gotchas exist).
 
 **User impact:** any published promise that DSP scripts are "Lua 5.4" changes. If both
 engines are supported, scripts must target the intersection (5.1 + bit library), which
-should be documented in `docs/luastyle.md`.
+should be documented in `docs/manual/developers/lua-style.md`.
 
 ### C API: LuaJIT exposes the 5.1 C API
 
@@ -80,7 +80,7 @@ Dual-engine behind a CMake option, not a hard cutover:
 2. Vendor **compat-5.3** and switch the C modules/binding files listed above to include
    it (no-op for 5.4 builds).
 3. Script corpus audit (`src/el/*.lua`, `scripts/*.lua`, docs examples) down to the
-   5.1+bit intersection; update `docs/luastyle.md`.
+   5.1+bit intersection; update `docs/manual/developers/lua-style.md`.
 4. CI test matrix: run the full `test_element` scripting suites under both engines —
    the Boost tests in `test/scripting/` become the compatibility gate for free.
 5. Benchmark: a DSP-script stress fixture (existing test node pattern) timed under

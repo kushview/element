@@ -30,8 +30,17 @@ RUN pacman -Syu --noconfirm && \
         ttf-roboto \
         clang \
         pandoc \
+        python \
         ccache && \
     pacman -Scc --noconfirm
+
+# Python packages for building the user manual, in a venv on the PATH so
+# CMake picks them up.
+COPY docs/manual/requirements.txt /tmp/manual-requirements.txt
+RUN python -m venv /opt/element-docs && \
+    /opt/element-docs/bin/pip install --no-cache-dir -r /tmp/manual-requirements.txt && \
+    rm /tmp/manual-requirements.txt
+ENV PATH="/opt/element-docs/bin:${PATH}"
 
 # Set up working directory
 WORKDIR /workspace
