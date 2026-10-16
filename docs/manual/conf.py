@@ -118,7 +118,10 @@ latex_elements = {
   BoldItalicFont = lmmonolt10-boldoblique.otf]
 ''',
     'geometry': r'''
-\usepackage[paperwidth=6in,paperheight=9in,margin=0.74in]{geometry}
+% includeheadfoot keeps the running head and page number inside the margin
+% instead of placing them in it, so nothing prints closer than the margin
+% to the page edge.
+\usepackage[paperwidth=5in,paperheight=8.5in,margin=0.5in,includeheadfoot]{geometry}
 ''',
     'preamble': r'''
 \setcounter{tocdepth}{1}
@@ -135,6 +138,10 @@ latex_elements = {
   \null\vskip 0.04\textheight
   \secdef\@part\@spart}
 \def\@endpart{\vskip 2em\if@tempswa\twocolumn\fi\@afterindentfalse\@afterheading}
+% Blank versos inserted before a part or chapter get no running head or
+% page number.
+\renewcommand\cleardoublepage{\clearpage\if@twoside\ifodd\c@page\else
+  \hbox{}\thispagestyle{empty}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}
 \makeatother
 % :menuselection: emits U+2023 (triangular bullet), which Latin Modern lacks.
 \IfFileExists{newunicodechar.sty}{%
