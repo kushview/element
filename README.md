@@ -35,10 +35,10 @@ _*Ubuntu is the most tested, but should run on any major distribution_
 * And more...
 
 ### Building 
-See [building.md](./docs/building.md) for instructions and dependency details.
+See [building.md](./docs/manual/developers/building.md) for instructions and dependency details.
 
 ### Contributing
-If you'd like to contribute code please review the [code style](./docs/cppstyle.md) and [contributor notes](CONTRIBUTING.md) before submitting pull requests.  You may also want to join the [#element](https://discord.gg/fAsQ5fMuHy) channel on the Kushview [Discord](https://discord.gg/fAsQ5fMuHy) server.
+If you'd like to contribute code please review the [code style](./docs/manual/developers/code-style.md) and [contributor notes](CONTRIBUTING.md) before submitting pull requests.  You may also want to join the [#element](https://discord.gg/fAsQ5fMuHy) channel on the Kushview [Discord](https://discord.gg/fAsQ5fMuHy) server.
 
 ### Issue Reporting
 Please report bugs and feature requests on Gitlab. [Element issue tracker](https://gitlab.com/kushview/element/-/issues).

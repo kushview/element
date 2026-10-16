@@ -24,5 +24,7 @@ jobs:
         docker run --rm --user $(id -u):$(id -g) -v $(pwd):/workspace element:archlinux bash -c "
           cmake -B build-arch -G Ninja -DCMAKE_BUILD_TYPE=Release -DELEMENT_BUILD_PLUGINS=ON -DELEMENT_BUILD_TESTS=ON && \
           cmake --build build-arch && \
-          ctest --test-dir build-arch --output-on-failure
+          ctest --test-dir build-arch --output-on-failure && \
+          cmake --install build-arch --prefix build-arch/prefix && \
+          test -f build-arch/prefix/share/doc/element/manual/index.html
         "

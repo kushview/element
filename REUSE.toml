@@ -28,3 +28,8 @@ path = [ ".gitignore", "**/.gitignore",
          "**/element.desktop.in", "docs/config.ld" ]
 SPDX-FileCopyrightText = "Kushview, LLC."
 SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = [ "docs/manual/**", ".readthedocs.yaml" ]
+SPDX-FileCopyrightText = "Kushview, LLC."
+SPDX-License-Identifier = "GPL-3.0-or-later"

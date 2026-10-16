@@ -38,13 +38,13 @@ FEATURES
 - And more...
 
 BUILDING
-See docs/building.md for instructions and dependency details.
+See docs/manual/developers/building.md for instructions and dependency details.
 
 CONTRIBUTING
 If you'd like to contribute code please review the code style and contributor notes before
 submitting pull requests. You may also want to join the #element channel on the Kushview
 Discord server.
-Code style: docs/cppstyle.md
+Code style: docs/manual/developers/code-style.md
 Contributor notes: CONTRIBUTING.md
 Discord: https://discord.gg/fAsQ5fMuHy
 

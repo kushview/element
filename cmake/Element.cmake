@@ -8,6 +8,7 @@ option(ELEMENT_ENABLE_VST2 "Build with VST2 support" OFF)
 option(ELEMENT_ENABLE_LTO "Build with Link Time Optimization" OFF)
 option(ELEMENT_ENABLE_UPDATER "Build with updater support" OFF)
 option(ELEMENT_LOCAL_AUTH "Use local dev auth endpoints instead of production" OFF)
+option(ELEMENT_BUILD_DOCS "Enable documentation targets (skipped when tools are missing)" ON)
 
 set(ELEMENT_APP_PLIST_TO_MERGE "")
 
