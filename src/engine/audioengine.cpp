@@ -140,8 +140,12 @@ struct RootGraphRender : public AsyncUpdater
                 break;
             if (! msg.isProgramChange())
                 continue;
-            program.program = msg.getProgramChangeNumber();
-            program.channel = msg.getChannel();
+            
+            if (haveGraphForMidiProgramMsg (msg.getProgramChangeNumber(), msg.getChannel()))
+            {
+                program.program = msg.getProgramChangeNumber();
+                program.channel = msg.getChannel();
+            }
         }
 
         // done with input, swap it with the rendered output
@@ -505,6 +509,21 @@ private:
         }
 
         return activeGraphIndex;
+    }
+
+    bool haveGraphForMidiProgramMsg (int program, int channel) const
+    {
+        if (isPositiveAndBelow (program, 128))
+        {
+            for (int i = 0; i < graphs.size(); ++i)
+            {
+                auto* const g = graphs.getUnchecked (i);
+                if (g->midiProgram == program && g->acceptsMidiChannel (channel))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     struct RenderTask
