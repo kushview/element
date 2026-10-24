@@ -17,6 +17,17 @@
 
 using namespace element;
 
+namespace {
+
+class ActivationTrackingNode : public TestNode {
+public:
+    void graphActivated() override { ++activationCount; }
+
+    int activationCount = 0;
+};
+
+} // namespace
+
 BOOST_AUTO_TEST_SUITE (GraphNodeTests)
 
 BOOST_AUTO_TEST_CASE (IO)
@@ -25,6 +36,17 @@ BOOST_AUTO_TEST_CASE (IO)
     BOOST_REQUIRE_EQUAL (graph.getNumAudioInputs(), 2);
     BOOST_REQUIRE_EQUAL (graph.getNumAudioOutputs(), 2);
     graph.clear();
+}
+
+BOOST_AUTO_TEST_CASE (NotifiesProcessorsWhenActivated)
+{
+    GraphNode graph (*element::test::context());
+    auto* node = new ActivationTrackingNode();
+    graph.addNode (node);
+
+    graph.graphActivated();
+
+    BOOST_REQUIRE_EQUAL (node->activationCount, 1);
 }
 
 BOOST_AUTO_TEST_CASE (Connections)

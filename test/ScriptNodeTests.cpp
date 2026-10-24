@@ -75,4 +75,39 @@ BOOST_AUTO_TEST_CASE (SetStateWithBrokenScriptRecordsError)
     BOOST_REQUIRE (node->getCodeDocument().getAllContent().contains ("a2:fade"));
 }
 
+BOOST_AUTO_TEST_CASE (GraphActivationCallbackRunsAtRenderBoundary)
+{
+    ScriptNode::Ptr node = new ScriptNode();
+    const auto result = node->loadScript (R"(
+        local midi = require ('el.midi')
+        local function layout() return { audio = { 2, 2 }, midi = { 1, 1 } } end
+        local function on_graph_activated (a, m, p, c, t)
+            m:get (1):insertPacked (midi.controller (1, 74, 100), 1)
+        end
+        local function process (a, m, p, c, t) end
+        return {
+            type = 'DSP',
+            layout = layout,
+            on_graph_activated = on_graph_activated,
+            process = process
+        }
+    )");
+    BOOST_REQUIRE_MESSAGE (result.wasOk(), result.getErrorMessage().toStdString());
+
+    AudioSampleBuffer audio (2, 64), cv (1, 64);
+    MidiBuffer midi;
+    RenderContext rc (audio, cv, midi, 64);
+
+    node->graphActivated();
+    node->render (rc);
+    BOOST_REQUIRE_EQUAL (midi.getNumEvents(), 1);
+    const auto activationMessage = (*midi.begin()).getMessage();
+    BOOST_REQUIRE (activationMessage.isController());
+    BOOST_REQUIRE_EQUAL (activationMessage.getControllerNumber(), 74);
+
+    midi.clear();
+    node->render (rc);
+    BOOST_REQUIRE (midi.isEmpty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
