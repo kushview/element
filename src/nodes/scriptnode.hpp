@@ -54,6 +54,7 @@ public:
     void refreshPorts() override;
 
     void setPlayHead (juce::AudioPlayHead*) override;
+    void graphActivated() override { graphActivationPending.set (1); }
 
     //==========================================================================
     int getNumPrograms() const override { return 8; }
@@ -79,6 +80,7 @@ private:
     int blockSize = 512;
     double sampleRate = 44100.0;
     bool prepared = false;
+    juce::Atomic<int> graphActivationPending { 0 };
 
     Result loadScriptInternal (const String& code);
 };

@@ -57,7 +57,15 @@ public:
     bool release();
 
     //==========================================================================
-    void process (juce::AudioSampleBuffer& a, element::MidiPipe& m);
+    /** Calls `on_graph_activated` once before `process` when the owning graph
+        becomes active. Both callbacks receive the normal five process arguments
+        so activation handlers can add MIDI to the graph's output.
+
+        @param a              The audio buffer for this render block.
+        @param m              The MIDI buffers for this render block.
+        @param graphActivated Whether to call the optional activation callback.
+    */
+    void process (juce::AudioSampleBuffer& a, element::MidiPipe& m, bool graphActivated = false);
 
     //==========================================================================
     void save (juce::MemoryBlock& block);
@@ -78,12 +86,14 @@ public:
 private:
     sol::table DSP;
     sol::function processFunc;
+    sol::function graphActivatedFunc;
     juce::AudioBuffer<float>** audio = nullptr;
     LuaMidiPipe** midi = nullptr;
     juce::AudioPlayHead* playhead = nullptr;
     DSPScriptPosition** position = nullptr;
 
     int processRef = LUA_REFNIL;
+    int graphActivatedRef = LUA_REFNIL;
     int audioRef = LUA_REFNIL;
     int midiRef = LUA_REFNIL;
     int positionRef = LUA_REFNIL;

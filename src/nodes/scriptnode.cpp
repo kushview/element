@@ -201,7 +201,7 @@ void ScriptNode::releaseResources()
 void ScriptNode::render (RenderContext& rc)
 {
     ScopedLock sl (lock);
-    script->process (rc.audio, rc.midi);
+    script->process (rc.audio, rc.midi, graphActivationPending.exchange (0) != 0);
 }
 
 void ScriptNode::setState (const void* data, int size)
