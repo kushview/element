@@ -123,6 +123,9 @@ public:
     /** Render the buffers. */
     virtual void render (RenderContext&) {}
 
+    /** Notifies this processor that its owning graph has become active. */
+    virtual void graphActivated() {}
+
     /** Render when bypassed.  The default action is to clear all buffers, so
         this must also be implemented.
     */

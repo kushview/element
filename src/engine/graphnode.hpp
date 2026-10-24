@@ -170,6 +170,7 @@ public:
     bool wantsContext() const noexcept override { return true; }
     void render (RenderContext&) override;
     void renderBypassed (RenderContext&) override {}
+    void graphActivated() override;
 
     int getNumPrograms() const override { return 1; }
     int getCurrentProgram() const override { return 0; }

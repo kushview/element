@@ -104,9 +104,16 @@ struct RootGraphRender : public AsyncUpdater
 
         if (activeGraph == nullptr || activeGraphLastRenderPass == nullptr)
         {
+            lastActivatedGraph = nullptr;
             buffer.clear();
             midi.clear();
             return;
+        }
+
+        if (activeGraph != lastActivatedGraph)
+        {
+            activeGraph->graphActivated();
+            lastActivatedGraph = activeGraph;
         }
 
         const int numOutputSamples = buffer.getNumSamples();
@@ -177,6 +184,8 @@ struct RootGraphRender : public AsyncUpdater
     void removeGraph (RootGraph* graph)
     {
         jassert (graphs.contains (graph));
+        if (lastActivatedGraph == graph)
+            lastActivatedGraph = nullptr;
         graphs.removeFirstMatchingValue (graph);
         renderTaskList.removeIf ([=] (auto& info) { return info.graph == graph; });
 
@@ -468,6 +477,7 @@ private:
     }
 
     Array<RootGraph*> graphs;
+    RootGraph* lastActivatedGraph = nullptr;
     int activeGraphIndex = -1;
     int priorActiveGraphIndex = -1;
 
