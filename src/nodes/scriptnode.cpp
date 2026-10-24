@@ -285,6 +285,9 @@ const String ScriptNode::getProgramName (int index) const
         case 7:
             return "Test Tone";
             break;
+        case 8:
+            return "On Graph Activated";
+            break;
     }
 
     String name = TRANS ("Program");
@@ -332,6 +335,10 @@ void ScriptNode::setCurrentProgram (int index)
             break;
         case 7:
             newDspCode = String::fromUTF8 (scripts::testtone_lua, scripts::testtone_luaSize);
+            newUiCode.clear();
+            break;
+        case 8:
+            newDspCode = String::fromUTF8 (scripts::on_activated_lua, scripts::on_activated_luaSize);
             newUiCode.clear();
             break;
     }
