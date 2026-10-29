@@ -117,3 +117,6 @@ add_test(NAME "SessionTests" COMMAND test_element --run_test=SessionTests)
 add_test(NAME "ToggleGridTest" COMMAND test_element --run_test=ToggleGridTest)
 add_test(NAME "UpdateTests" COMMAND test_element --run_test=UpdateTests)
 add_test(NAME "VelocityCurveTest" COMMAND test_element --run_test=VelocityCurveTest)
+
+add_test(NAME "RenderLifecycleTests" COMMAND test_element --run_test=RenderLifecycleTests)
+set_tests_properties(RenderLifecycleTests PROPERTIES TIMEOUT 30)

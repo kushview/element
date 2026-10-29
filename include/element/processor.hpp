@@ -9,6 +9,7 @@
 #include <element/juce/audio_processors.hpp>
 
 #include <element/atomic.hpp>
+#include <atomic>
 #include <element/midipipe.hpp>
 #include <element/oversampler.hpp>
 #include <element/parameter.hpp>
@@ -547,6 +548,36 @@ private:
     GraphNode* parent = nullptr;
     bool isPrepared = false;
 
+    // High bit closes admission; low bits count in-flight render operations.
+    static constexpr unsigned renderClosed = 1u << 31;
+    std::atomic<unsigned> renderUsers { renderClosed };
+    void closeRenderAdmission();
+    struct RenderLease {
+        explicit RenderLease (Processor& p) : owner (p)
+        {
+            auto users = owner.renderUsers.load();
+            acquired = false;
+            while ((users & renderClosed) == 0) {
+                if (owner.renderUsers.compare_exchange_weak (users, users + 1)) {
+                    acquired = true;
+                    break;
+                }
+            }
+        }
+        ~RenderLease()
+        {
+            if (acquired)
+                owner.renderUsers.fetch_sub (1);
+        }
+        RenderLease (const RenderLease&) = delete;
+        RenderLease& operator= (const RenderLease&) = delete;
+        Processor& owner;
+        bool acquired;
+    };
+    std::atomic<bool> requestedEnabled { true };
+    std::atomic<int> requestedOversampling { 0 };
+    void applyEnabled (bool);
+    void applyOversamplingFactor (int);
     juce::Atomic<int> enabled { 1 };
     juce::Atomic<int> bypassed { 0 };
     juce::Atomic<int> mute { 0 };
