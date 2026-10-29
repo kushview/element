@@ -56,10 +56,12 @@ void EQFilterProcessor::updateParams()
 
 void EQFilterProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
 {
+    // Set the new rate before clamping the cutoff to its Nyquist limit.
+    for (auto& filter : eqFilter)
+        filter.reset (sampleRate);
     updateParams();
-
-    for (int ch = 0; ch < 2; ++ch)
-        eqFilter[ch].reset (sampleRate);
+    for (auto& filter : eqFilter)
+        filter.reset (sampleRate);
 
     setPlayConfigDetails (numChannels, numChannels, sampleRate, maximumExpectedSamplesPerBlock);
 }

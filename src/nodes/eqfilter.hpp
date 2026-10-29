@@ -54,37 +54,15 @@ public:
         if (eqShape == newShape)
             return;
 
+        // Finish an existing transition first; the processor retries the latest
+        // requested shape next block. This also handles rapid knob changes.
+        if (shapeFadeRemaining > 0)
+            return;
+        std::copy (std::begin (a), std::end (a), oldA);
+        std::copy (std::begin (b), std::end (b), oldB);
+        std::copy (std::begin (z), std::end (z), oldZ);
+        shapeFadeRemaining = shapeFadeLength;
         eqShape = newShape;
-
-        switch (eqShape) // Set calcCoefs lambda to correct function for this shape
-        {
-            case Bell:
-                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsBell (fc, Q, gain); };
-                break;
-
-            case Notch:
-                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsNotch (fc, Q, gain); };
-                break;
-
-            case LowShelf:
-                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsLowShelf (fc, Q, gain); };
-                break;
-
-            case HighShelf:
-                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsHighShelf (fc, Q, gain); };
-                break;
-
-            case LowPass:
-                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsLowPass (fc, Q, gain); };
-                break;
-
-            case HighPass:
-                calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsHighPass (fc, Q, gain); };
-                break;
-
-            default:
-                return;
-        }
 
         calcCoefs (freq.skip (smoothSteps), Q.skip (smoothSteps), gain.skip (smoothSteps));
     }
@@ -204,6 +182,14 @@ public:
         z[1] = z[2] + x * b[1] - y * a[1];
         z[2] = x * b[2] - y * a[2];
 
+        if (shapeFadeRemaining > 0)
+        {
+            const float previous = oldZ[1] + x * oldB[0];
+            oldZ[1] = oldZ[2] + x * oldB[1] - previous * oldA[1];
+            oldZ[2] = x * oldB[2] - previous * oldA[2];
+            const float mix = float (shapeFadeRemaining--) / float (shapeFadeLength);
+            return previous * mix + y * (1.0f - mix);
+        }
         return y;
     }
 
@@ -224,7 +210,19 @@ public:
             z[n] = 0.0f;
 
         fs = (float) sampleRate;
-        calcCoefs (freq.skip (smoothSteps), Q.skip (smoothSteps), gain.skip (smoothSteps));
+        smoothSteps = jmax (1, roundToInt (sampleRate * 0.01));
+        shapeFadeLength = smoothSteps;
+        shapeFadeRemaining = 0;
+        const float f = jlimit (1.0f, jmax (1.0f, fs * 0.5f - 100.0f), freq.getTargetValue());
+        const float q = jmax (0.1f, Q.getTargetValue());
+        const float g = jmax (0.000001f, gain.getTargetValue());
+        freq.reset (smoothSteps);
+        Q.reset (smoothSteps);
+        gain.reset (smoothSteps);
+        freq.setCurrentAndTargetValue (f);
+        Q.setCurrentAndTargetValue (q);
+        gain.setCurrentAndTargetValue (g);
+        calcCoefs (f, q, g);
     }
 
     /** Get the magnitude of the filter at this frequency, in units of linear gain */
@@ -304,11 +302,35 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> freq;
     SmoothedValue<float, ValueSmoothingTypes::Linear> Q;
     SmoothedValue<float, ValueSmoothingTypes::Linear> gain;
-    const int smoothSteps = 500;
+    int smoothSteps = 441;
+    int shapeFadeLength = 441, shapeFadeRemaining = 0;
+    float oldA[3] {}, oldB[3] {}, oldZ[3] {};
 
     Shape eqShape = Bell;
-    typedef std::function<void (float, float, float)> CalcCoefsLambda;
-    CalcCoefsLambda calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsBell (fc, Q, gain); }; // lambda function to calculate coefficients for any shape
+    void calcCoefs (float fc, float q, float g)
+    {
+        switch (eqShape)
+        {
+            case Bell:
+                calcCoefsBell (fc, q, g);
+                break;
+            case Notch:
+                calcCoefsNotch (fc, q, g);
+                break;
+            case LowShelf:
+                calcCoefsLowShelf (fc, q, g);
+                break;
+            case HighShelf:
+                calcCoefsHighShelf (fc, q, g);
+                break;
+            case LowPass:
+                calcCoefsLowPass (fc, q, g);
+                break;
+            case HighPass:
+                calcCoefsHighPass (fc, q, g);
+                break;
+        }
+    }
 
     float b[3] = { 1.0f, 0.0f, 0.0f };
     float a[3] = { 1.0f, 0.0f, 0.0f };
