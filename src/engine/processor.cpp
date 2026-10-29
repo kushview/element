@@ -365,11 +365,21 @@ void Processor::prepare (const double newSampleRate,
         outRMS.clearQuick (true);
         for (int i = 0; i < getNumAudioOutputs(); ++i)
             outRMS.add (new RMSMeter());
+        renderUsers.store (0);
     }
+}
+
+void Processor::closeRenderAdmission()
+{
+    renderUsers.fetch_or (renderClosed);
+    // The control/device lifecycle thread waits, never the audio callback.
+    while ((renderUsers.load() & ~renderClosed) != 0)
+        Thread::sleep (1);
 }
 
 void Processor::unprepare()
 {
+    closeRenderAdmission();
     if (isPrepared)
     {
         isPrepared = false;
@@ -382,15 +392,22 @@ void Processor::unprepare()
 
 void Processor::setEnabled (const bool shouldBeEnabled)
 {
-    if (shouldBeEnabled == isEnabled())
-        return;
-
+    requestedEnabled.store (shouldBeEnabled);
     if (! MessageManager::getInstance()->isThisTheMessageThread())
     {
         enablement.cancelPendingUpdate();
         enablement.triggerAsyncUpdate();
         return;
     }
+
+    applyEnabled (requestedEnabled.load());
+}
+
+void Processor::applyEnabled (bool shouldBeEnabled)
+{
+    jassert (MessageManager::getInstance()->isThisTheMessageThread());
+    if (shouldBeEnabled == isEnabled())
+        return;
 
     if (shouldBeEnabled)
     {
@@ -415,7 +432,9 @@ void Processor::setEnabled (const bool shouldBeEnabled)
 
 void Processor::EnablementUpdater::handleAsyncUpdate()
 {
-    graph.setEnabled (! graph.isEnabled());
+    if (const int factor = graph.requestedOversampling.exchange (0))
+        graph.applyOversamplingFactor (factor);
+    graph.applyEnabled (graph.requestedEnabled.load());
 }
 
 //=============================================================================
@@ -847,6 +866,19 @@ dsp::Oversampling<float>* Processor::getOversamplingProcessor()
 
 void Processor::setOversamplingFactor (int osFactor)
 {
+    requestedOversampling.store (osFactor);
+    if (! MessageManager::getInstance()->isThisTheMessageThread())
+    {
+        enablement.triggerAsyncUpdate();
+        return;
+    }
+    if (const int factor = requestedOversampling.exchange (0))
+        applyOversamplingFactor (factor);
+}
+
+void Processor::applyOversamplingFactor (int osFactor)
+{
+    jassert (MessageManager::getInstance()->isThisTheMessageThread());
     const auto newOsPow = (int) log2f ((float) osFactor);
 
     {
@@ -857,7 +889,7 @@ void Processor::setOversamplingFactor (int osFactor)
 
     {
         const auto wasEnabled = isEnabled();
-        setEnabled (false);
+        applyEnabled (false);
 
         if (osFactor > 1)
         {
@@ -873,7 +905,7 @@ void Processor::setOversamplingFactor (int osFactor)
             osLatency = 0.0f;
         }
 
-        setEnabled (wasEnabled);
+        applyEnabled (wasEnabled);
     }
 
     if (auto* g = getParentGraph())
