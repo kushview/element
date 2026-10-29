@@ -19,9 +19,6 @@
 
 namespace element {
 
-GraphNode::Connection::Connection (const uint32 sourceNode_, const uint32 sourcePort_, const uint32 destNode_, const uint32 destPort_) noexcept
-    : Arc (sourceNode_, sourcePort_, destNode_, destPort_) {}
-
 GraphNode::GraphNode (Context& c)
     : Processor (PortCount()
                      .with (PortType::Audio, 2, 2)

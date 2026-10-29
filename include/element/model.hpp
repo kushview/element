@@ -25,7 +25,12 @@ public:
     explicit Model (const juce::ValueTree& data = juce::ValueTree());
     Model (const juce::Identifier& slugId);
     Model (const juce::Identifier& slugId, int dataVersion);
-    virtual ~Model() {}
+    virtual ~Model() = default;
+
+    Model (const Model&) = default;
+    Model& operator= (const Model&) = default;
+    Model (Model&&) noexcept = default;
+    Model& operator= (Model&&) noexcept = default;
 
     int version() const noexcept;
 

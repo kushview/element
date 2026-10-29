@@ -13,7 +13,6 @@ namespace element {
 struct JUCE_API Arc {
 public:
     Arc (uint32_t sourceNode, uint32_t sourcePort, uint32_t destNode, uint32_t destPort) noexcept;
-    virtual ~Arc() {}
 
     /** The source node ID */
     uint32_t sourceNode;
@@ -26,15 +25,6 @@ public:
 
     /** The destination port index */
     uint32_t destPort;
-
-    inline Arc& operator= (const Arc& o)
-    {
-        this->sourceNode = o.sourceNode;
-        this->sourcePort = o.sourcePort;
-        this->destNode = o.destNode;
-        this->destPort = o.destPort;
-        return *this;
-    }
 
 private:
     JUCE_LEAK_DETECTOR (Arc)
