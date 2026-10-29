@@ -35,6 +35,9 @@ public:
             session.freezeChangeNotification = wasFrozen;
         }
 
+        ScopedFrozenLock (const ScopedFrozenLock&) = delete;
+        ScopedFrozenLock& operator= (const ScopedFrozenLock&) = delete;
+
     private:
         const Session& session;
         bool wasFrozen;

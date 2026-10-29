@@ -647,7 +647,7 @@ public:
         if (child == &devs)
         {
             // if the audio device selection changes, the controls to
-            // configure it can change, so reset the position of the 
+            // configure it can change, so reset the position of the
             // experimental settings
             layoutExperimentalSettings();
         }

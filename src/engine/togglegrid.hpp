@@ -21,6 +21,14 @@ public:
         clear();
     }
 
+    ToggleGrid (const ToggleGrid& o)
+    {
+        resize (o.numIns, o.numOuts);
+        operator= (o);
+    }
+
+    ToggleGrid (ToggleGrid&& o) noexcept { *this = std::move (o); }
+
     ToggleGrid (const MatrixState& matrix)
     {
         resize (matrix.getNumRows(), matrix.getNumColumns());
@@ -102,8 +110,14 @@ public:
         return *this;
     }
 
+    ToggleGrid& operator= (ToggleGrid&& other) noexcept
+    {
+        swapWith (other);
+        return *this;
+    }
+
 private:
-    int numIns, numOuts;
+    int numIns { 0 }, numOuts { 0 };
     bool** toggles = nullptr;
 
     void free()

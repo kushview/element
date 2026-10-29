@@ -72,6 +72,7 @@ private:
     std::unique_ptr<State> state;
 
     ScriptingEngine (const ScriptingEngine&) = delete;
+    ScriptingEngine& operator= (const ScriptingEngine&) = delete;
     void initialize (Context&);
 };
 
