@@ -69,6 +69,7 @@ add_test(NAME "JuceIntegrationTests" COMMAND test_element --run_test=JuceIntegra
 add_test(NAME "DataPathTests" COMMAND test_element --run_test=DataPathTests)
 add_test(NAME "DeviceMonitorTests" COMMAND test_element --run_test=DeviceMonitorTests)
 add_test(NAME "DSPScriptTest" COMMAND test_element --run_test=DSPScriptTest)
+add_test(NAME "EQTransitionTests" COMMAND test_element --run_test=EQTransitionTests)
 add_test(NAME "Element" COMMAND test_element --run_test=Element)
 add_test(NAME "GraphNodeTests" COMMAND test_element --run_test=GraphNodeTests)
 add_test(NAME "GzipTests" COMMAND test_element --run_test=GzipTests)
