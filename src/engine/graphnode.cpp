@@ -453,21 +453,23 @@ void GraphNode::buildRenderingSequence()
         setLatencySamples (builder.getTotalLatencySamples());
     }
 
+    // Allocate scratch storage before excluding the audio callback. The old
+    // storage is destroyed after releasing the publication locks.
+    AudioSampleBuffer nextBuffers (numRenderingBuffersNeeded, jmax (4096, getBlockSize()));
+    nextBuffers.clear();
+    OwnedArray<MidiBuffer> nextMidi;
+    for (int i = 0; i < numMidiBuffersNeeded; ++i)
+        nextMidi.add (new MidiBuffer())->ensureSize (65536);
+
     {
-        // swap over to the new rendering sequence..
-        {
-            const ScopedLock sl (getPropertyLock());
-            renderingBuffers.setSize (numRenderingBuffersNeeded, jmax (4096, getBlockSize()));
-            renderingBuffers.clear();
-
-            for (int i = midiBuffers.size(); --i >= 0;)
-                midiBuffers.getUnchecked (i)->clear();
-
-            while (midiBuffers.size() < numMidiBuffersNeeded)
-                midiBuffers.add (new MidiBuffer());
-        }
-
-        ScopedLock sl (seqLock);
+        const ScopedLock property (getPropertyLock());
+        const ScopedLock sequence (seqLock);
+        for (auto* next : newRenderingOps)
+            for (auto* previous : renderingOps)
+                if (static_cast<GraphOp*> (next)->takeHistoryFrom (*static_cast<GraphOp*> (previous)))
+                    break;
+        std::swap (renderingBuffers, nextBuffers);
+        midiBuffers.swapWith (nextMidi);
         renderingOps.swapWith (newRenderingOps);
     }
 
@@ -511,7 +513,9 @@ void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock
     }
 
     currentAudioInputBuffer = nullptr;
-    currentAudioOutputBuffer.setSize (jmax (1, getNumAudioOutputs()), estimatedSamplesPerBlock);
+    currentAudioOutputBuffer.setSize (jmax (1, jmax (getNumAudioInputs(), getNumAudioOutputs())), jmax (4096, estimatedSamplesPerBlock));
+    currentMidiOutputBuffer.ensureSize (65536);
+    filteredMidi.ensureSize (65536);
     currentMidiInputBuffer = nullptr;
     currentMidiOutputBuffer.clear();
     clearRenderingSequence();
@@ -560,7 +564,7 @@ void GraphNode::render (RenderContext& rc)
     const int32 numSamples = rc.audio.getNumSamples();
     auto& midiMessages = *rc.midi.getWriteBuffer (0);
     currentAudioInputBuffer = &rc.audio;
-    currentAudioOutputBuffer.setSize (jmax (1, rc.audio.getNumChannels()), numSamples);
+    currentAudioOutputBuffer.setSize (jmax (1, rc.audio.getNumChannels()), numSamples, false, false, true);
     currentAudioOutputBuffer.clear();
 
     const bool applyVelocityCurve = (velocityCurve.getMode() != VelocityCurve::Linear);
