@@ -182,7 +182,7 @@ public:
         {
             r.removeFromRight (4);
             learnButton.setBounds (r.removeFromRight (tempoBarHeight * 2)
-                                     .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
+                                       .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
         }
 
         if (transport.isVisible())

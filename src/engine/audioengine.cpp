@@ -140,7 +140,7 @@ struct RootGraphRender : public AsyncUpdater
                 break;
             if (! msg.isProgramChange())
                 continue;
-            
+
             if (haveGraphForMidiProgramMsg (msg.getProgramChangeNumber(), msg.getChannel()))
             {
                 program.program = msg.getProgramChangeNumber();
