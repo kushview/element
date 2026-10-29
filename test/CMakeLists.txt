@@ -94,6 +94,7 @@ add_test(NAME "NodeFactoryTests" COMMAND test_element --run_test=NodeFactoryTest
 add_test(NAME "NodeObjectTests" COMMAND test_element --run_test=NodeObjectTests)
 add_test(NAME "NodeTests" COMMAND test_element --run_test=NodeTests)
 add_test(NAME "OversamplerTests" COMMAND test_element --run_test=OversamplerTests)
+add_test(NAME "PluginSampleUnitsTests" COMMAND test_element --run_test=PluginSampleUnitsTests)
 add_test(NAME "PluginManagerTests" COMMAND test_element --run_test=PluginManagerTests)
 add_test(NAME "PluginMetadataTests" COMMAND test_element --run_test=PluginMetadataTests)
 add_test(NAME "PluginScannerTests" COMMAND test_element --run_test=PluginScannerTests)
@@ -117,5 +118,3 @@ add_test(NAME "SessionTests" COMMAND test_element --run_test=SessionTests)
 add_test(NAME "ToggleGridTest" COMMAND test_element --run_test=ToggleGridTest)
 add_test(NAME "UpdateTests" COMMAND test_element --run_test=UpdateTests)
 add_test(NAME "VelocityCurveTest" COMMAND test_element --run_test=VelocityCurveTest)
-
-add_test(NAME "PluginSampleUnitsTests" COMMAND test_element --run_test=PluginSampleUnitsTests)
