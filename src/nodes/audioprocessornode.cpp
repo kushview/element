@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "nodes/audioprocessor.hpp"
+#include <algorithm>
+#include <limits>
 #include "nodes/baseprocessor.hpp"
 #include "nodes/mididevice.hpp"
 #include "engine/graphnode.hpp"
@@ -123,6 +125,30 @@ AudioProcessorNode::~AudioProcessorNode()
 }
 
 //=============================================================================
+juce::Optional<juce::AudioPlayHead::PositionInfo> AudioProcessorNode::ScaledPlayHead::getPosition() const
+{
+    auto* source = node.getPlayHead();
+    auto position = source != nullptr ? source->getPosition() : juce::nullopt;
+    if (position.hasValue())
+        if (const auto samples = position->getTimeInSamples())
+        {
+            const auto factor = int64_t (node.processingFactor.load());
+            position->setTimeInSamples (std::clamp (int64_t (*samples),
+                                                    std::numeric_limits<int64_t>::min() / factor,
+                                                    std::numeric_limits<int64_t>::max() / factor)
+                                        * factor);
+        }
+    return position;
+}
+
+void AudioProcessorNode::updatePluginLatency()
+{
+    // Round up: integer graph delay lines must never under-report plugin delay.
+    const auto factor = processingFactor.load();
+    const auto latency = int64_t (jmax (0, proc->getLatencySamples()));
+    setLatencySamples (int ((latency + factor - 1) / factor));
+}
+
 void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
     if (! proc)
@@ -132,9 +158,10 @@ void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize)
         return;
     }
 
+    processingFactor.store (jmax (1, getOversamplingFactor()));
     proc->setRateAndBufferSizeDetails (sampleRate, maxBufferSize);
     proc->prepareToPlay (sampleRate, maxBufferSize);
-    setLatencySamples (proc->getLatencySamples());
+    updatePluginLatency();
 }
 
 void AudioProcessorNode::releaseResources()
@@ -152,7 +179,7 @@ void AudioProcessorNode::audioProcessorChanged (AudioProcessor*, const ChangeDet
 {
     if (details.latencyChanged)
     {
-        setLatencySamples (proc->getLatencySamples());
+        updatePluginLatency();
         if (auto g = getParentGraph())
             g->triggerAsyncUpdate();
     }

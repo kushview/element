@@ -9,6 +9,7 @@
 #include <element/juce/audio_processors.hpp>
 
 #include <element/atomic.hpp>
+#include <atomic>
 #include <element/midipipe.hpp>
 #include <element/oversampler.hpp>
 #include <element/parameter.hpp>
@@ -554,7 +555,7 @@ private:
 
     double sampleRate = 0.0;
     int blockSize = 0;
-    int latencySamples = 0;
+    std::atomic<int> latencySamples { 0 };
     juce::String name;
 
     ParameterArray parameters, parametersOut;
