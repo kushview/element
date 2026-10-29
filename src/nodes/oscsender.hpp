@@ -4,24 +4,24 @@
 
 #pragma once
 
-#include <element/midipipe.hpp>
-#include "nodes/baseprocessor.hpp"
-#include "nodes/midifilter.hpp"
-#include "nodes/nodetypes.hpp"
+#include <semaphore>
 
-#include "semaphore.hpp"
+#include <element/midipipe.hpp>
+
+#include "nodes/midifilter.hpp"
+#include "nodetypes.hpp"
 
 namespace element {
 
 class OSCSenderNode : public MidiFilterNode,
-                      public ChangeBroadcaster,
-                      public Thread
+                      public juce::ChangeBroadcaster,
+                      public juce::Thread
 {
 public:
     OSCSenderNode();
     virtual ~OSCSenderNode();
 
-    void getPluginDescription (PluginDescription& desc) const override
+    void getPluginDescription (juce::PluginDescription& desc) const override
     {
         desc.name = "OSC Sender";
         desc.fileOrIdentifier = EL_NODE_ID_OSC_SENDER;
@@ -36,7 +36,7 @@ public:
         desc.version = "1.0.0";
     }
 
-    void getState (MemoryBlock& block) override;
+    void getState (juce::MemoryBlock& block) override;
     void setState (const void* data, int size) override;
 
     /** OSC -> MIDI processing thread */
@@ -67,34 +67,34 @@ public:
     void setPortNumber (int port);
     void setHostName (String hostName);
 
-    std::vector<OSCMessage> getOscMessages();
+    std::vector<juce::OSCMessage> getOscMessages();
 
 private:
-    Semaphore sem;
-    CriticalSection lock;
+    std::counting_semaphore<> sem { 0 };
+    juce::CriticalSection lock;
 
     /** MIDI */
     bool createdPorts = false;
 
     /** OSC */
-    OSCSender oscSender;
+    juce::OSCSender oscSender;
 
     bool connected = false;
     bool paused = false;
 
     int currentPortNumber = 9002;
-    String currentHostName = "127.0.0.1";
+    juce::String currentHostName = "127.0.0.1";
 
     /** Max messages in queue before they start getting dropped */
     int maxOscMessages = 100;
 
     /** GUI */
-    std::vector<OSCMessage> oscMessagesToLog;
+    std::vector<juce::OSCMessage> oscMessagesToLog;
 
     /** To be processed and sent as OSC messages */
-    MidiMessageCollector midiMessageQueue;
+    juce::MidiMessageCollector midiMessageQueue;
 
-    Atomic<int> numSamples = 0;
+    juce::Atomic<int> numSamples = 0;
     double currentSampleRate = 0;
     bool midiMessageQueueInitDone = false;
 };
