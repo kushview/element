@@ -105,8 +105,8 @@ public:
     operator jack_client_t*() const { return client; }
 
 private:
-    JackClient (const JackClient&);
-    JackClient& operator= (const JackClient&);
+    JackClient (const JackClient&) = delete;
+    JackClient& operator= (const JackClient&) = delete;
     jack_client_t* client;
     juce::String name, mainInPrefix, mainOutPrefix;
     int numMainIns, numMainOuts;
