@@ -71,6 +71,7 @@ add_test(NAME "DeviceMonitorTests" COMMAND test_element --run_test=DeviceMonitor
 add_test(NAME "DSPScriptTest" COMMAND test_element --run_test=DSPScriptTest)
 add_test(NAME "Element" COMMAND test_element --run_test=Element)
 add_test(NAME "GraphNodeTests" COMMAND test_element --run_test=GraphNodeTests)
+add_test(NAME "GraphContinuityTests" COMMAND test_element --run_test=GraphContinuityTests)
 add_test(NAME "GzipTests" COMMAND test_element --run_test=GzipTests)
 add_test(NAME "LatencyClampTests" COMMAND test_element --run_test=LatencyClampTests)
 add_test(NAME "IONodeTests" COMMAND test_element --run_test=IONodeTests)

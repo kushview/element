@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <element/processor.hpp>
+#include <array>
 #include "engine/miditranspose.hpp"
 #include "engine/graphnode.hpp"
 #include "engine/graphbuilder.hpp"
@@ -163,11 +164,8 @@ private:
 class DelayChannelOp : public GraphOp
 {
 public:
-    DelayChannelOp (const int channel_, const int numSamplesDelay_)
-        : channel (channel_),
-          bufferSize (numSamplesDelay_ + 1),
-          readIndex (0),
-          writeIndex (numSamplesDelay_)
+    DelayChannelOp (const int channel_, const int numSamplesDelay_, uint32 source, uint32 sourcePort, uint32 dest, uint32 destPort)
+        : key { source, sourcePort, dest, destPort }, channel (channel_), bufferSize (numSamplesDelay_ + 1), readIndex (0), writeIndex (numSamplesDelay_)
     {
         buffer.calloc ((size_t) bufferSize);
     }
@@ -189,6 +187,17 @@ public:
     }
 
 private:
+    bool takeHistoryFrom (GraphOp& other) noexcept override
+    {
+        auto* old = dynamic_cast<DelayChannelOp*> (&other);
+        if (old == nullptr || key != old->key || bufferSize != old->bufferSize)
+            return false;
+        buffer.swapWith (old->buffer);
+        std::swap (readIndex, old->readIndex);
+        std::swap (writeIndex, old->writeIndex);
+        return true;
+    }
+    const std::array<uint32, 4> key;
     HeapBlock<float> buffer;
     const int channel, bufferSize;
     int readIndex, writeIndex;
@@ -227,7 +236,7 @@ public:
 
         osChanSize = totalChans;
         osChans.reset (new float*[osChanSize]);
-        tempMidi.ensureSize (128);
+        tempMidi.ensureSize (65536);
     }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int numSamples)
@@ -690,7 +699,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 const int nodeDelay = getNodeDelay (srcNode);
 
                 if (nodeDelay < maxLatency)
-                    renderingOps.add (new DelayChannelOp (bufIndex, maxLatency - nodeDelay));
+                    renderingOps.add (new DelayChannelOp (bufIndex, maxLatency - nodeDelay, srcNode, srcPort, node->nodeId, port));
             }
         }
         else
@@ -717,7 +726,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                     {
                         const int nodeDelay = getNodeDelay (sourceNodes.getUnchecked (i));
                         if (nodeDelay < maxLatency)
-                            renderingOps.add (new DelayChannelOp (sourceBufIndex, maxLatency - nodeDelay));
+                            renderingOps.add (new DelayChannelOp (sourceBufIndex, maxLatency - nodeDelay, sourceNodes[i], sourcePorts[i], node->nodeId, port));
                     }
 
                     break;
@@ -755,7 +764,7 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                 {
                     const int nodeDelay = getNodeDelay (sourceNodes.getFirst());
                     if (nodeDelay < maxLatency)
-                        renderingOps.add (new DelayChannelOp (bufIndex, maxLatency - nodeDelay));
+                        renderingOps.add (new DelayChannelOp (bufIndex, maxLatency - nodeDelay, sourceNodes[0], sourcePorts[0], node->nodeId, port));
                 }
             }
 
@@ -774,13 +783,13 @@ void GraphBuilder::createRenderingOpsForNode (Processor* const node,
                             {
                                 if (! isBufferNeededLater (ourRenderingIndex, port, sourceNodes.getUnchecked (j), sourcePorts.getUnchecked (j)))
                                 {
-                                    renderingOps.add (new DelayChannelOp (srcIndex, maxLatency - nodeDelay));
+                                    renderingOps.add (new DelayChannelOp (srcIndex, maxLatency - nodeDelay, sourceNodes[j], sourcePorts[j], node->nodeId, port));
                                 }
                                 else // buffer is reused elsewhere, can't be delayed
                                 {
                                     const int bufferToDelay = getFreeBuffer (PortType::Audio);
                                     renderingOps.add (new CopyChannelOp (srcIndex, bufferToDelay));
-                                    renderingOps.add (new DelayChannelOp (bufferToDelay, maxLatency - nodeDelay));
+                                    renderingOps.add (new DelayChannelOp (bufferToDelay, maxLatency - nodeDelay, sourceNodes[j], sourcePorts[j], node->nodeId, port));
                                     srcIndex = bufferToDelay;
                                 }
                             }

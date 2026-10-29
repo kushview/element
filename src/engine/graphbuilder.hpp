@@ -16,6 +16,9 @@ public:
     GraphOp() {}
     virtual ~GraphOp() {}
 
+    // Transfer matching DSP history at publication while rendering is excluded.
+    virtual bool takeHistoryFrom (GraphOp&) noexcept { return false; }
+
     virtual void perform (AudioSampleBuffer& sharedBufferChans,
                           const OwnedArray<MidiBuffer>& sharedMidiBuffers,
                           const int numSamples) = 0;
