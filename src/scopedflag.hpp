@@ -26,6 +26,7 @@ public:
 
     ScopedFlag (const ScopedFlag&) = delete;
     ScopedFlag& operator= (const ScopedFlag&) = delete;
+
 private:
     bool& valueToSet;
     bool previousValue;

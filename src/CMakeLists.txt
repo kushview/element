@@ -50,6 +50,13 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
     target_compile_options(element PRIVATE -Wno-sign-conversion -Wno-switch-enum -Wno-attributes)
+    # Rule of 0/3/5: warn when an implicit copy is generated for a class with
+    # a user-declared destructor.
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(element PRIVATE $<$<COMPILE_LANGUAGE:CXX,OBJCXX>:-Wdeprecated-copy-dtor>)
+    else()
+        target_compile_options(element PRIVATE $<$<COMPILE_LANGUAGE:CXX,OBJCXX>:-Wdeprecated-copy-with-dtor>)
+    endif()
 elseif(MSVC)
     # MSVC doesn't support -Wno-sign-conversion; disable a relevant warning if needed
     # e.g. /wd4244 or /wd4267 depending on the warning you want to suppress

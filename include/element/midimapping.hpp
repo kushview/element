@@ -40,8 +40,6 @@ public:
         setMissingProperties();
     }
 
-    ~MidiMapping() = default;
-
     bool isValid() const { return objectData.isValid() && objectData.hasType (types::MidiMapping); }
 
     juce::String getUuidString() const { return objectData.getProperty (tags::uuid).toString(); }

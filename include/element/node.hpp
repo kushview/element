@@ -40,8 +40,6 @@ public:
             .setProperty (tags::flow, flow.toString(), nullptr);
     }
 
-    ~Port() {}
-
     /** Returns the ValueTree of the Node containing this port
         will not always be valid 
      */
@@ -100,9 +98,6 @@ public:
 
     /** Creates a node with specific type */
     Node (const juce::Identifier& nodeType);
-
-    /** Destructor */
-    ~Node() noexcept;
 
     //=========================================================================
     /** Returns true if the underlying data is probably a node */
@@ -559,13 +554,11 @@ private:
 class PortArray : public juce::Array<Port> {
 public:
     PortArray() {}
-    ~PortArray() {}
 };
 
 class NodeArray : public juce::Array<Node> {
 public:
     NodeArray() {}
-    ~NodeArray() {}
     void sortByName();
 };
 
@@ -593,9 +586,6 @@ struct ConnectionBuilder {
         : arcs (tags::arcs), target (tgt)
     {
     }
-
-    ConnectionBuilder (ConnectionBuilder&& o) noexcept = delete;
-    ConnectionBuilder& operator= (ConnectionBuilder&& o) noexcept = delete;
 
     void setTarget (const Node& newTarget)
     {

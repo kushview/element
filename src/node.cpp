@@ -147,8 +147,6 @@ Node::Node (const Identifier& tp)
 }
 // clang-format on
 
-Node::~Node() noexcept {}
-
 //=============================================================================
 bool Node::isValid() const noexcept { return objectData.hasType (types::Node); }
 const String Node::getName() const noexcept { return getProperty (tags::name).toString(); }
