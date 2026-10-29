@@ -364,6 +364,8 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     asyncPrepare.reset (new AsyncPrepare (*this));
     _latency = std::make_unique<Latency> (*this);
 
+    // NOTE: MessageManager::getInstance() returns nullptr when loaded inside a
+    // non-JUCE host because the global JUCE message loop has not been initialized.
     if (MessageManager::getInstance()->isThisTheMessageThread())
         handleAsyncUpdate();
     else
