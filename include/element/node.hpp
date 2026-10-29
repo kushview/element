@@ -577,11 +577,14 @@ struct ConnectionBuilder {
 
     ConnectionBuilder& operator= (const ConnectionBuilder& o)
     {
-        this->arcs = o.arcs;
-        this->target = o.target;
-        this->lastError = o.lastError;
-        this->portChannelMap.addCopiesOf (
-            o.portChannelMap, 0, o.portChannelMap.size());
+        if (this != &o) {
+            this->arcs = o.arcs;
+            this->target = o.target;
+            this->lastError = o.lastError;
+            this->portChannelMap.clearQuick (true);
+            this->portChannelMap.addCopiesOf (
+                o.portChannelMap, 0, o.portChannelMap.size());
+        }
         return *this;
     }
 
@@ -590,6 +593,9 @@ struct ConnectionBuilder {
         : arcs (tags::arcs), target (tgt)
     {
     }
+
+    ConnectionBuilder (ConnectionBuilder&& o) noexcept = delete;
+    ConnectionBuilder& operator= (ConnectionBuilder&& o) noexcept = delete;
 
     void setTarget (const Node& newTarget)
     {
