@@ -7,6 +7,7 @@
 #include "engine/ionode.hpp"
 #include "nodes/audioprocessor.hpp"
 #include "nodes/eqfilter.hpp"
+#include "nodes/scriptnode.hpp"
 #include <limits>
 #include <algorithm>
 using namespace element;
@@ -145,5 +146,35 @@ BOOST_AUTO_TEST_CASE (NestedGraphsScaleEachBoundaryExactlyOnce)
     BOOST_CHECK (nested->getPlayHead() == nullptr);
     BOOST_CHECK (direct->getPlayHead() == nullptr);
     BOOST_CHECK (plugin->getPlayHead() == nullptr);
+}
+BOOST_AUTO_TEST_CASE (ScriptReceivesLocalClockBeforeAndAfterReloadOrRebind)
+{
+    PreparedGraph f (48000, 128); Head head; f.graph.setPlayHead (&head);
+    const String code = R"(
+-- @script clock_probe
+-- @type DSP
+local function layout() return { audio = { 2, 2 }, midi = { 0, 0 } } end
+local function process(a, m, p, c, t)
+    a:set(1, 1, t:frame())
+    a:set(2, 1, t:seconds())
+end
+return { type = 'DSP', layout = layout, process = process }
+)";
+    auto* node = new ScriptNode;
+    const auto loaded = node->loadScript (code);
+    BOOST_REQUIRE_MESSAGE (loaded.wasOk(), loaded.getErrorMessage().toStdString());
+    f.graph.addNode (node);
+    AudioBuffer<float> audio (2, 16), cv (1, 16); MidiBuffer midi;
+    RenderContext rc (audio, cv, midi, 16);
+    for (int factor : {1, 2, 4, 1}) {
+        node->setOversamplingFactor (factor);
+        for (int step = 0; step < 3; ++step) {
+            if (step == 1) BOOST_REQUIRE (node->loadScript (code).wasOk());
+            if (step == 2) f.graph.setPlayHead (&head);
+            audio.clear(); node->render (rc);
+            BOOST_CHECK_EQUAL (audio.getSample (0, 0), -48000 * factor);
+            BOOST_CHECK_EQUAL (audio.getSample (1, 0), -1);
+        }
+    }
 }
 BOOST_AUTO_TEST_SUITE_END()
