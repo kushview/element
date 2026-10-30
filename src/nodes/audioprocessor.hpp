@@ -25,7 +25,7 @@ public:
     {
         Processor::setPlayHead (playhead);
         if (auto* p = proc.get())
-            p->setPlayHead (playhead != nullptr ? &scaledPlayHead : nullptr);
+            p->setPlayHead (getPlayHead());
     }
 
     void getState (juce::MemoryBlock&) override;
@@ -45,14 +45,6 @@ protected:
     ParameterPtr getParameter (const PortDescription& port) override;
 
 private:
-    struct ScaledPlayHead : juce::AudioPlayHead
-    {
-        explicit ScaledPlayHead (AudioProcessorNode& n) : node (n) {}
-        juce::Optional<PositionInfo> getPosition() const override;
-        AudioProcessorNode& node;
-    } scaledPlayHead { *this };
-    std::atomic<int> processingFactor { 1 };
-    void updatePluginLatency();
     std::unique_ptr<juce::AudioProcessor> proc;
     juce::Atomic<int> enabled { 1 };
     juce::MemoryBlock pluginState;
