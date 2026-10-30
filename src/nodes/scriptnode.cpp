@@ -102,7 +102,7 @@ void ScriptNode::setPlayHead (juce::AudioPlayHead* playhead)
 {
     Processor::setPlayHead (playhead);
     if (script)
-        script->setPlayHead (playhead);
+        script->setPlayHead (getPlayHead());
 }
 
 ParameterPtr ScriptNode::getParameter (const PortDescription& port)

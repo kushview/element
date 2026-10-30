@@ -9,6 +9,7 @@
 #include <element/juce/audio_processors.hpp>
 
 #include <element/atomic.hpp>
+#include <atomic>
 #include <element/midipipe.hpp>
 #include <element/oversampler.hpp>
 #include <element/parameter.hpp>
@@ -114,7 +115,8 @@ public:
 
     /** Set the audio play head */
     virtual void setPlayHead (juce::AudioPlayHead* playhead) { _playhead = playhead; }
-    juce::AudioPlayHead* getPlayHead() const noexcept { return _playhead; }
+    /** Clock in this processor's rendering sample units. Musical/second fields are unchanged. */
+    juce::AudioPlayHead* getPlayHead() const noexcept { return _playhead != nullptr ? &scaledPlayHead : nullptr; }
 
     //==========================================================================
     virtual void prepareToRender (double sampleRate, int maxBufferSize) = 0;
@@ -524,7 +526,8 @@ protected:
     }
 
     //==========================================================================
-    /** Set latency samples. Values are clamped to [0, maxLatencySamples]. */
+    /** Set intrinsic latency in rendering-rate samples. Graph-facing latency is converted
+        to parent-rate samples by getLatencySamples(). Values are clamped to [0, maxLatencySamples]. */
     void setLatencySamples (int latency);
 
     //==========================================================================
@@ -554,7 +557,7 @@ private:
 
     double sampleRate = 0.0;
     int blockSize = 0;
-    int latencySamples = 0;
+    std::atomic<int> latencySamples { 0 };
     juce::String name;
 
     ParameterArray parameters, parametersOut;
@@ -631,6 +634,14 @@ private:
     int delayCompSamples = 0;
     void updateDelayCompensationSamples();
 
+    struct ScaledPlayHead : juce::AudioPlayHead
+    {
+        explicit ScaledPlayHead (const Processor& p) : processor (p) {}
+        juce::Optional<PositionInfo> getPosition() const override;
+        const Processor& processor;
+    };
+    mutable ScaledPlayHead scaledPlayHead { *this };
+    std::atomic<int> processingFactor { 1 };
     juce::AudioPlayHead* _playhead { nullptr };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Processor)

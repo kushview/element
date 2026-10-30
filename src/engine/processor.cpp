@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <iomanip>
+#include <algorithm>
+#include <limits>
 
 #include <element/audioengine.hpp>
 #include <element/midipipe.hpp>
@@ -329,6 +331,21 @@ int Processor::getNthPort (const PortType type, const int index, bool isInput, b
 uint32 Processor::getMidiInputPort() const { return getPortForChannel (PortType::Midi, 0, true); }
 uint32 Processor::getMidiOutputPort() const { return getPortForChannel (PortType::Midi, 0, false); }
 
+juce::Optional<juce::AudioPlayHead::PositionInfo> Processor::ScaledPlayHead::getPosition() const
+{
+    auto* source = processor._playhead;
+    auto position = source != nullptr ? source->getPosition() : juce::nullopt;
+    if (position.hasValue())
+        if (const auto samples = position->getTimeInSamples())
+        {
+            const auto factor = int64_t (processor.processingFactor.load());
+            position->setTimeInSamples (std::clamp (int64_t (*samples),
+                                                    std::numeric_limits<int64_t>::min() / factor,
+                                                    std::numeric_limits<int64_t>::max() / factor) * factor);
+        }
+    return position;
+}
+
 void Processor::prepare (const double newSampleRate,
                          const int newBlockSize,
                          GraphNode* const parentGraph,
@@ -356,6 +373,7 @@ void Processor::prepare (const double newSampleRate,
             osLatency = 0.0f;
 
         const int osFactor = jmax (1, getOversamplingFactor());
+        processingFactor.store (osFactor);
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
         inRMS.clearQuick (true);
@@ -999,7 +1017,11 @@ void Processor::triggerPortReset()
 //=========================================================================
 int Processor::getLatencySamples() const
 {
-    return latencySamples + delayCompSamples + roundToInt (osLatency);
+    // Intrinsic latency is reported in local rendering samples. Manual delay and
+    // the oversampling filter already use parent-rate units and are added once.
+    const auto factor = processingFactor.load();
+    const auto intrinsic = int64_t (latencySamples.load());
+    return int ((intrinsic + factor - 1) / factor) + delayCompSamples + roundToInt (osLatency);
 }
 
 void Processor::setLatencySamples (int latency)
