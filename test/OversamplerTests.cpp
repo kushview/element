@@ -3,6 +3,9 @@
 
 #include <boost/test/unit_test.hpp>
 #include <element/oversampler.hpp>
+#include "fixture/PreparedGraph.h"
+#include "fixture/TestNode.h"
+#include <limits>
 
 using namespace element;
 
@@ -54,6 +57,27 @@ BOOST_AUTO_TEST_CASE (EnsureWithoutPrepare)
 {
     Oversampler<float> os;
     BOOST_REQUIRE (os.ensureProcessor (0) == nullptr);
+}
+
+BOOST_AUTO_TEST_CASE (ProcessorRejectsUnsupportedFactors)
+{
+    PreparedGraph graph (48000, 128);
+    auto* node = new TestNode (2, 2, 0, 0);
+    graph.graph.addNode (node);
+    for (int valid : { 1, 2, 4, 8, 1 })
+    {
+        node->setOversamplingFactor (valid);
+        BOOST_REQUIRE_EQUAL (node->getOversamplingFactor(), valid);
+        const auto latency = node->getLatencySamples();
+        const auto enabled = node->isEnabled();
+        for (int invalid : { 0, -1, std::numeric_limits<int>::min(), 3, 5, 7, 9, 16, std::numeric_limits<int>::max() })
+        {
+            node->setOversamplingFactor (invalid);
+            BOOST_CHECK_EQUAL (node->getOversamplingFactor(), valid);
+            BOOST_CHECK_EQUAL (node->getLatencySamples(), latency);
+            BOOST_CHECK_EQUAL (node->isEnabled(), enabled);
+        }
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
