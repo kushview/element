@@ -117,3 +117,25 @@ add_test(NAME "SessionTests" COMMAND test_element --run_test=SessionTests)
 add_test(NAME "ToggleGridTest" COMMAND test_element --run_test=ToggleGridTest)
 add_test(NAME "UpdateTests" COMMAND test_element --run_test=UpdateTests)
 add_test(NAME "VelocityCurveTest" COMMAND test_element --run_test=VelocityCurveTest)
+
+# A real minimal CLAP module exercises the provider's render path without
+# requiring an installed third-party plugin or audio hardware.
+add_library(el_test_transport_probe MODULE fixture/transportprobe.c)
+target_include_directories(el_test_transport_probe PRIVATE
+    "${PROJECT_SOURCE_DIR}/deps/clap-juce-extensions/clap-libs/clap/include")
+set(_probe_dir "${CMAKE_CURRENT_BINARY_DIR}/transport-probe")
+if(APPLE)
+    set(_probe_path "${_probe_dir}/TransportProbe.clap")
+    set_target_properties(el_test_transport_probe PROPERTIES PREFIX "" SUFFIX ""
+        OUTPUT_NAME "TransportProbe"
+        LIBRARY_OUTPUT_DIRECTORY "$<1:${_probe_path}/Contents/MacOS>")
+    file(WRITE "${_probe_path}/Contents/Info.plist"
+        "<?xml version=\"1.0\"?><plist version=\"1.0\"><dict><key>CFBundleExecutable</key><string>TransportProbe</string><key>CFBundleIdentifier</key><string>net.kushview.test.transport</string><key>CFBundlePackageType</key><string>BNDL</string></dict></plist>")
+else()
+    set(_probe_path "${_probe_dir}/TransportProbe.clap")
+    set_target_properties(el_test_transport_probe PROPERTIES PREFIX "" SUFFIX ".clap"
+        OUTPUT_NAME "TransportProbe" LIBRARY_OUTPUT_DIRECTORY "$<1:${_probe_dir}>")
+endif()
+add_dependencies(test_element el_test_transport_probe)
+target_compile_definitions(test_element PRIVATE EL_TEST_TRANSPORT_PROBE="${_probe_path}")
+add_test(NAME "ClapTransportTests" COMMAND test_element --run_test=ClapTransportTests)

@@ -1644,7 +1644,8 @@ public:
         _proc.frames_count = (uint32_t) rc.audio.getNumSamples();
         _proc.transport = nullptr;
 
-        if (auto pos = getPlayHead()->getPosition())
+        auto* playhead = getPlayHead();
+        if (auto pos = playhead != nullptr ? playhead->getPosition() : juce::nullopt)
         {
             _transport = {};
             _transport.header.flags = 0;
