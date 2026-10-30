@@ -130,7 +130,16 @@ public:
 
     void perform (AudioSampleBuffer&, const OwnedArray<MidiBuffer>& sharedMidiBuffers, const int)
     {
-        *sharedMidiBuffers.getUnchecked (dstBufferNum) = *sharedMidiBuffers.getUnchecked (srcBufferNum);
+        auto& source = *sharedMidiBuffers.getUnchecked (srcBufferNum);
+        auto& destination = *sharedMidiBuffers.getUnchecked (dstBufferNum);
+        if (&source == &destination)
+            return;
+
+        // Copy assignment replaces backing storage, discarding reserved capacity.
+        // Append the opaque encoded bytes in one pass: no format assumptions and
+        // no repeated event insertion/sorting for dense MIDI buffers.
+        destination.clear();
+        destination.data.addArray (source.data);
     }
 
 private:
@@ -297,6 +306,13 @@ public:
                     auto& midi = *midiPipe.getWriteBuffer (i);
                     for (auto m : midi)
                     {
+                        // Long messages are not channel voice messages. Preserve
+                        // SysEx without constructing a heap-owning MidiMessage.
+                        if (m.numBytes > 3)
+                        {
+                            tempMidi.addEvent (m.data, m.numBytes, m.samplePosition);
+                            continue;
+                        }
                         auto msg = m.getMessage();
                         if (msg.isNoteOnOrOff())
                         {

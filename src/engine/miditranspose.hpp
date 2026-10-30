@@ -12,7 +12,7 @@ class MidiTranspose
 public:
     MidiTranspose()
     {
-        output.ensureSize (sizeof (uint8) * 3 * 16);
+        output.ensureSize (65536);
     }
 
     ~MidiTranspose()
@@ -51,6 +51,11 @@ public:
         {
             if (m.samplePosition >= numSamples)
                 break;
+            if (m.numBytes > 3)
+            {
+                output.addEvent (m.data, m.numBytes, m.samplePosition);
+                continue;
+            }
             msg = m.getMessage();
             if (msg.isNoteOnOrOff())
                 msg.setNoteNumber (offset.get() + msg.getNoteNumber());
