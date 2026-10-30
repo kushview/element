@@ -847,7 +847,17 @@ dsp::Oversampling<float>* Processor::getOversamplingProcessor()
 
 void Processor::setOversamplingFactor (int osFactor)
 {
-    const auto newOsPow = (int) log2f ((float) osFactor);
+    // Only the supported powers of two are meaningful. Reject invalid input
+    // before converting it to an exponent or changing the running processor.
+    int newOsPow = 0;
+    switch (osFactor)
+    {
+        case 1: break;
+        case 2: newOsPow = 1; break;
+        case 4: newOsPow = 2; break;
+        case 8: newOsPow = 3; break;
+        default: return;
+    }
 
     {
         ScopedLock sl (getPropertyLock());
