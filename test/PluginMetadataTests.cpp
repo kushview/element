@@ -34,6 +34,11 @@ struct MetadataFileGuard
         else
             file.deleteFile();
     }
+
+    MetadataFileGuard (const MetadataFileGuard&) = delete;
+    MetadataFileGuard (MetadataFileGuard&&) noexcept = delete;
+    MetadataFileGuard& operator= (const MetadataFileGuard&) = delete;
+    MetadataFileGuard& operator= (MetadataFileGuard&&) noexcept = delete;
 };
 
 PluginDescription makeDesc (const String& name, const String& fileOrId, int uid)
