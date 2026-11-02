@@ -241,7 +241,8 @@ public:
         RenderContext rc (buffer.getArrayOfWritePointers(), totalChans, dummyCV.getArrayOfWritePointers(), 0, sharedMidiBuffers, midiChannelsToUse, numSamples);
         MidiPipe& midiPipe (rc.midi);
 
-        if (! node->isEnabled())
+        const Processor::RenderLease lease (*node);
+        if (! lease.acquired || ! node->isEnabled())
         {
             for (int ch = numAudioIns; ch < numAudioOuts; ++ch)
                 buffer.clear (ch, 0, buffer.getNumSamples());
