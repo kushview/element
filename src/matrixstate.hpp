@@ -109,7 +109,7 @@ public:
         return this->numRows == o.numRows && this->numColumns == o.numColumns;
     }
 
-    const bool operator== (const MatrixState& o) const
+    bool operator== (const MatrixState& o) const
     {
         return this->sameSizeAs (o) && this->toggled == o.toggled;
     }

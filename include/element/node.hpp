@@ -437,8 +437,7 @@ public:
     juce::ValueTree getScriptsValueTree() const noexcept { return objectData.getChildWithName (tags::scripts); }
 
     //=========================================================================
-    const bool operator== (const Node& o) const { return this->objectData == o.objectData; }
-    const bool operator!= (const Node& o) const { return this->objectData != o.objectData; }
+    bool operator== (const Node& o) const { return this->objectData == o.objectData; }
 
     /** Iterate over all ValueTree's recursively */
     void forEach (std::function<void (const juce::ValueTree& tree)>) const;

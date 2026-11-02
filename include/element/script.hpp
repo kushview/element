@@ -37,7 +37,6 @@ public:
     Script (const juce::String& src);
 
     inline bool operator== (const Script& o) const noexcept { return objectData == o.objectData; }
-    inline bool operator!= (const Script& o) const noexcept { return objectData != o.objectData; }
 
     juce::String name() const noexcept;
     void setName (const juce::String& newName);
