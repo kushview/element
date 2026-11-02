@@ -1,18 +1,21 @@
 // Copyright 2026 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "ui/midimappingsview.hpp"
-#include "ui/viewhelpers.hpp"
+#include <algorithm>
+
 #include <element/juce/audio_devices.hpp>
-#include <element/ui/content.hpp>
-#include <element/ui/style.hpp>
-#include <element/session.hpp>
 #include <element/midimapping.hpp>
 #include <element/node.hpp>
 #include <element/parameter.hpp>
 #include <element/processor.hpp>
+#include <element/session.hpp>
 #include <element/transport.hpp>
+#include <element/ui/content.hpp>
+#include <element/ui/style.hpp>
+
 #include "services/mappingservice.hpp"
+#include "ui/midimappingsview.hpp"
+#include "ui/viewhelpers.hpp"
 
 namespace element {
 
@@ -542,7 +545,7 @@ void MidiMappingsView::updateRowOrder()
         }
     };
 
-    std::stable_sort (rowOrder.begin(), rowOrder.end(), [&] (int a, int b) {
+    std::ranges::stable_sort (rowOrder, [&] (int a, int b) {
         const int c = compare (a, b);
         return forwards ? c < 0 : c > 0;
     });

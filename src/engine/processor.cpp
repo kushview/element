@@ -1,17 +1,17 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <algorithm>
 #include <iomanip>
 
 #include <element/audioengine.hpp>
 #include <element/midipipe.hpp>
-#include <element/processor.hpp>
 #include <element/node.hpp>
+#include <element/processor.hpp>
 
+#include "engine/rootgraph.hpp"
 #include "nodes/audioprocessor.hpp"
 #include "nodes/mididevice.hpp"
-#include "nodes/placeholder.hpp"
-#include "engine/rootgraph.hpp"
 
 namespace element {
 
@@ -560,7 +560,7 @@ Array<Processor::MidiProgramInfo> Processor::getMidiPrograms() const
                 result.add ({ p->program, p->name });
     }
 
-    std::sort (result.begin(), result.end(), [] (const MidiProgramInfo& a, const MidiProgramInfo& b) {
+    std::ranges::sort (result, [] (const MidiProgramInfo& a, const MidiProgramInfo& b) {
         return a.program < b.program;
     });
 

@@ -1,11 +1,15 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <algorithm>
+
 #include "sol/sol.hpp"
-#include "scripting.hpp"
-#include "scripting/scriptmanager.hpp"
-#include "scripting/bindings.hpp"
+
 #include <element/context.hpp>
+
+#include "scripting.hpp"
+#include "scripting/bindings.hpp"
+#include "scripting/scriptmanager.hpp"
 
 namespace element {
 
@@ -115,7 +119,7 @@ std::vector<std::string> ScriptingEngine::getPackageNames() const noexcept
     std::vector<std::string> v;
     for (const auto& pkg : state->packages)
         v.push_back (pkg.first);
-    std::sort (v.begin(), v.end());
+    std::ranges::sort (v);
     return v;
 }
 

@@ -24,7 +24,7 @@ namespace lua {
 void fill_builtins (PackageLoaderMap& pkgs)
 {
 #if EL_USE_LIBRARY_BUILT_INS
-    if (pkgs.find ("el.audio") != pkgs.end())
+    if (pkgs.contains ("el.audio"))
         return;
     pkgs.insert (
         { { "el.audio", luaopen_el_audio },

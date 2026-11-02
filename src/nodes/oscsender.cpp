@@ -235,7 +235,7 @@ std::vector<OSCMessage> OSCSenderNode::getOscMessages()
 
     {
         ScopedLock sl (lock);
-        std::copy (oscMessagesToLog.begin(), oscMessagesToLog.end(), std::back_inserter (copied));
+        std::ranges::copy (oscMessagesToLog, std::back_inserter (copied));
         oscMessagesToLog.clear();
     }
 
