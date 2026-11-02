@@ -156,8 +156,6 @@ public:
     {
         Event() = delete;
         Event (const juce::File& f, const FileSystemEvent e) : file (f), fsEvent (e) {}
-        Event (Event& other) = default;
-        Event (Event&& other) = default;
 
         juce::File file;
         FileSystemEvent fsEvent = undefined;

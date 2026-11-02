@@ -3,29 +3,16 @@
 
 #pragma once
 
+#include <array>
+
 #include <element/porttype.hpp>
 
 namespace element {
 
 struct PortCount {
-    PortCount()
-    {
-        clear();
-    }
+    PortCount() {}
 
-    PortCount (const PortCount& o)
-    {
-        operator= (o);
-    }
-
-    PortCount& operator= (const PortCount& o) noexcept
-    {
-        memcpy (inputs, o.inputs, PortType::Unknown * sizeof (int));
-        memcpy (outputs, o.outputs, PortType::Unknown * sizeof (int));
-        return *this;
-    }
-
-    bool operator== (const PortCount& o) noexcept
+    bool operator== (const PortCount& o) const noexcept
     {
         for (int i = 0; i < PortType::Unknown; ++i)
             if (inputs[i] != o.inputs[i] || outputs[i] != o.outputs[i])
@@ -35,8 +22,8 @@ struct PortCount {
 
     void clear() noexcept
     {
-        memset (inputs, 0, PortType::Unknown * sizeof (int));
-        memset (outputs, 0, PortType::Unknown * sizeof (int));
+        inputs.fill (0);
+        outputs.fill (0);
     }
 
     int get (PortType type, bool isInput) const noexcept
@@ -56,7 +43,7 @@ struct PortCount {
         set (type, numOuts, false);
     }
 
-    PortCount with (PortType type, int count, bool isInput) noexcept
+    PortCount with (PortType type, int count, bool isInput) const noexcept
     {
         auto ret = *this;
         ret.set (type, count, isInput);
@@ -70,14 +57,14 @@ struct PortCount {
         return ret;
     }
 
-    PortList toPortList() const noexcept
+    PortList toPortList() const
     {
         PortList ports;
         getPorts (ports);
         return ports;
     }
 
-    void getPorts (PortList& ports) const noexcept
+    void getPorts (PortList& ports) const
     {
         uint32_t index = 0;
         for (int i = 0; i < PortType::Unknown; ++i) {
@@ -105,8 +92,8 @@ struct PortCount {
         }
     }
 
-    int inputs[PortType::Unknown];
-    int outputs[PortType::Unknown];
+    std::array<int, PortType::Unknown> inputs {};
+    std::array<int, PortType::Unknown> outputs {};
 };
 
 } // namespace element

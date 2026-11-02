@@ -91,12 +91,6 @@ public:
         return *this;
     }
 
-    inline PortType& operator= (const PortType& o)
-    {
-        type = o.type;
-        return *this;
-    }
-
     inline bool operator== (const ID& id) const { return (type == id); }
     inline bool operator!= (const ID& id) const { return (type != id); }
     inline bool operator== (const PortType& t) const { return (type == t.type); }
@@ -337,21 +331,6 @@ struct PortDescription {
     PortDescription() {}
     PortDescription (int portType, int portIndex, int portChannel, const juce::String& portSymbol, const juce::String& portName, const bool isInput)
         : type (portType), index (portIndex), channel (portChannel), symbol (portSymbol), name (portName), input (isInput) {}
-    PortDescription (const PortDescription& o) { operator= (o); }
-    PortDescription& operator= (const PortDescription& o)
-    {
-        type = o.type;
-        index = o.index;
-        channel = o.channel;
-        symbol = o.symbol;
-        name = o.name;
-        label = o.label;
-        input = o.input;
-        minValue = o.minValue;
-        maxValue = o.maxValue;
-        defaultValue = o.defaultValue;
-        return *this;
-    }
 
     int type { 0 };
     int index { 0 };
@@ -378,7 +357,7 @@ class PortList {
 public:
     PortList() = default;
     PortList (const PortList& o) { operator= (o); }
-    PortList (PortList&& o) : ports (std::move (o.ports)) {}
+    PortList (PortList&& o) noexcept : ports (std::move (o.ports)) {}
 
     ~PortList()
     {
@@ -488,7 +467,7 @@ public:
     inline const juce::OwnedArray<PortDescription>& getPorts() const { return ports; }
     inline void swapWith (PortList& o) { ports.swapWith (o.ports); }
 
-    PortList& operator= (PortList&& o)
+    PortList& operator= (PortList&& o) noexcept
     {
         ports = std::move (o.ports);
         return *this;

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <element/juce/audio_basics.hpp>
+
 #include <cstdint>
 
 namespace element {
@@ -18,7 +20,6 @@ struct BeatType
         SixteenthNote
     };
 
-    BeatType (const BeatType& o) { operator= (o); }
     BeatType (const ID& t) : type (t) {}
 
     inline static int fromDivisor (const int d)
@@ -56,12 +57,6 @@ struct BeatType
 
     operator int() const { return static_cast<int> (type); }
     operator ID() const { return type; }
-
-    BeatType& operator= (const BeatType& o)
-    {
-        type = o.type;
-        return *this;
-    }
 
 private:
     ID type;

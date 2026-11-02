@@ -23,10 +23,6 @@ public:
             setChannel (channel);
     }
 
-    inline MidiChannels (const MidiChannels& o) { operator= (o); }
-
-    ~MidiChannels() = default;
-
     /** Reset channels and toggle omni to on */
     inline void reset()
     {
@@ -60,12 +56,6 @@ public:
 
     /** Returns true if the channel isn't omni and isn't toggled */
     inline bool isOff (const int channel) const noexcept { return ! channels[0] && ! channels[channel]; }
-
-    inline MidiChannels& operator= (const MidiChannels& o)
-    {
-        channels = o.channels;
-        return *this;
-    }
 
     /** Returns the underlying juce::BigInteger */
     const juce::BigInteger& get() const { return channels; }

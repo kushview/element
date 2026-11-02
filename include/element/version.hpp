@@ -82,16 +82,6 @@ public:
     /** Returns the build number. */
     inline int build() const noexcept { return _build; }
 
-    /** @internal */
-    inline Version (const Version& o) { operator= (o); }
-    /** @internal */
-    inline Version& operator= (const Version& o)
-    {
-        this->_build = o._build;
-        this->_hex = o._hex;
-        return *this;
-    }
-
     inline bool operator== (const Version& o) const noexcept { return _hex == o._hex; }
     inline bool operator!= (const Version& o) const noexcept { return _hex != o._hex; }
     inline bool operator> (const Version& o) const noexcept { return _hex > o._hex; }

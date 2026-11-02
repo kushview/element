@@ -7,7 +7,7 @@
 
 namespace element {
 
-class MatrixState
+class MatrixState final
 {
 public:
     MatrixState()
@@ -22,8 +22,6 @@ public:
         jassert (rows >= 0 && cols >= 0);
         toggled.setRange (0, numRows * numColumns, false);
     }
-
-    virtual ~MatrixState() {}
 
     inline const bool isEmpty() const { return numRows <= 0 && numColumns <= 0; }
     inline const bool isNotEmpty() const { return ! isEmpty(); }
@@ -109,19 +107,6 @@ public:
     inline bool sameSizeAs (const MatrixState& o) const
     {
         return this->numRows == o.numRows && this->numColumns == o.numColumns;
-    }
-
-    MatrixState (const MatrixState& o)
-    {
-        this->operator= (o);
-    }
-
-    MatrixState& operator= (const MatrixState& o)
-    {
-        this->numRows = o.numRows;
-        this->numColumns = o.numColumns;
-        this->toggled = o.toggled;
-        return *this;
     }
 
     const bool operator== (const MatrixState& o) const
