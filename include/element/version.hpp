@@ -83,11 +83,9 @@ public:
     inline int build() const noexcept { return _build; }
 
     inline bool operator== (const Version& o) const noexcept { return _hex == o._hex; }
-    inline bool operator> (const Version& o) const noexcept { return _hex > o._hex; }
-    inline bool operator< (const Version& o) const noexcept { return _hex < o._hex; }
-    inline bool operator>= (const Version& o) const noexcept { return _hex >= o._hex; }
-    inline bool operator<= (const Version& o) const noexcept { return _hex <= o._hex; }
-
+    // clang-format off
+    inline auto operator<=> (const Version& o) const noexcept { return _hex <=> o._hex; }
+    // clang-format on
 private:
     int _hex = 0x00;
     int _build = 0x00;
