@@ -265,11 +265,9 @@ void NodeEditorView::stabilizeContent()
     auto& sessions = *cc->services().find<SessionService>();
 
     if (! selectedNodeConnection.connected())
-        selectedNodeConnection = gui.nodeSelected.connect (std::bind (
-            &NodeEditorView::stabilizeContent, this));
+        selectedNodeConnection = gui.nodeSelected.connect ([this] { stabilizeContent(); });
     if (! sessionLoadedConnection.connected())
-        sessionLoadedConnection = sessions.sigSessionLoaded.connect (std::bind (
-            &NodeEditorView::onSessionLoaded, this));
+        sessionLoadedConnection = sessions.sigSessionLoaded.connect ([this] { onSessionLoaded(); });
 
     if (! sticky || ! node.isValid())
     {

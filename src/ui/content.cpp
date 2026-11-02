@@ -101,10 +101,8 @@ public:
         if (midiIOMonitor == nullptr)
         {
             midiIOMonitor = engine->getMidiIOMonitor();
-            connections.add (midiIOMonitor->sigSent.connect (
-                std::bind (&MidiBlinker::triggerSent, &midiBlinker)));
-            connections.add (midiIOMonitor->sigReceived.connect (
-                std::bind (&MidiBlinker::triggerReceived, &midiBlinker)));
+            connections.add (midiIOMonitor->sigSent.connect ([this] { midiBlinker.triggerSent(); }));
+            connections.add (midiIOMonitor->sigReceived.connect ([this] { midiBlinker.triggerReceived(); }));
         }
 
         if (mappingService == nullptr)
@@ -112,7 +110,7 @@ public:
             mappingService = owner.services().find<MappingService>();
             if (mappingService != nullptr)
                 connections.add (mappingService->sigTempoTapApplied.connect (
-                    std::bind (&TempoAndMeterBar::flashTapTempo, &tempoBar)));
+                    [this] { tempoBar.flashTapTempo(); }));
         }
 
         auto* props = settings.getUserSettings();

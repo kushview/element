@@ -97,8 +97,7 @@ ObservantScriptEditorView::ObservantScriptEditorView (Context& ctx, const Script
 {
     setSaveButtonVisible (false);
     auto& ss = *ctx.services().find<SessionService>();
-    connections.push_back (ss.sigWillSave.connect (
-        std::bind (&ScriptEditorView::updateScript, this)));
+    connections.push_back (ss.sigWillSave.connect ([this] { updateScript(); }));
 }
 
 ObservantScriptEditorView::~ObservantScriptEditorView()

@@ -60,7 +60,7 @@ public:
         window->addToDesktop();
         window->setVisible (true);
         window->signalClosed().connect (
-            std::bind (&WindowManager::onWindowClosed, this, window));
+            [this, window]() { onWindowClosed (window); });
     }
 
     /** Show and manage a dialog window */

@@ -294,8 +294,7 @@ private:
     void bindHandlers()
     {
         processor.getPlayer().addChangeListener (this);
-        stateRestoredConnection = processor.restoredState.connect (std::bind (
-            &AudioFilePlayerEditor::onStateRestored, this));
+        stateRestoredConnection = processor.restoredState.connect ([this] { onStateRestored(); });
 
         chooser->addListener (this);
         watchButton.onClick = [this]() {

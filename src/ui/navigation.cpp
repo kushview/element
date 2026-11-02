@@ -7,6 +7,7 @@
 #include <element/ui/style.hpp>
 #include <element/ui/commands.hpp>
 #include <element/ui/navigation.hpp>
+#include <vector>
 
 #include "ui/datapathbrowser.hpp"
 #include "ui/nodeeditorview.hpp"
@@ -375,11 +376,7 @@ void NavigationConcertinaPanel::addPanel (PanelDescription desc, PanelFactory fa
 
 void NavigationConcertinaPanel::removePanel (const String& name)
 {
-    registered.erase (std::remove_if (registered.begin(),
-                                      registered.end(),
-                                      [&name] (const RegisteredPanel& p) { return p.desc.name == name; }),
-                      registered.end());
-
+    std::erase_if (registered, [&name] (const RegisteredPanel& p) { return p.desc.name == name; });
     if (auto* comp = findPanelByName (name))
     {
         ConcertinaPanel::removePanel (comp);

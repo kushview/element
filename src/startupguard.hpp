@@ -52,6 +52,11 @@ public:
     /** Records a clean shutdown for this run. */
     void markCleanShutdown();
 
+    StartupGuard (const StartupGuard&) = delete;
+    StartupGuard (StartupGuard&&) noexcept = delete;
+    StartupGuard& operator= (const StartupGuard&) = delete;
+    StartupGuard& operator= (StartupGuard&&) noexcept = delete;
+
 private:
     juce::PropertiesFile& props;
     bool unclean = false;

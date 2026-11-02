@@ -238,8 +238,7 @@ void NodePropertiesView::setNode (const Node& newNode)
 
     if (ProcessorPtr ptr = _node.getObject())
     {
-        midiProgramChangedConnection = ptr->midiProgramChanged.connect (
-            std::bind (&NodePropertiesView::updateMidiProgram, this));
+        midiProgramChangedConnection = ptr->midiProgramChanged.connect ([this] { updateMidiProgram(); });
     }
 
     updateProperties();
@@ -266,13 +265,11 @@ void NodePropertiesView::stabilizeContent()
 
     auto& gui = *cc->services().find<GuiService>();
     if (! selectedNodeConnection.connected())
-        selectedNodeConnection = gui.nodeSelected.connect (std::bind (
-            &NodePropertiesView::stabilizeContent, this));
+        selectedNodeConnection = gui.nodeSelected.connect ([this] { stabilizeContent(); });
 
     auto& sessions = *cc->services().find<SessionService>();
     if (! sessionLoadedConnection.connected())
-        sessionLoadedConnection = sessions.sigSessionLoaded.connect (std::bind (
-            &NodePropertiesView::onSessionLoaded, this));
+        sessionLoadedConnection = sessions.sigSessionLoaded.connect ([this] { onSessionLoaded(); });
 
     if (! sticky || ! _node.isValid())
     {

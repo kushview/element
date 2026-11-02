@@ -39,10 +39,10 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
     setSize (width, height);
 
     /* Bind handlers */
-    connectButton.onClick = std::bind (&OSCSenderNodeEditor::connectButtonClicked, this);
-    pauseButton.onClick = std::bind (&OSCSenderNodeEditor::pauseButtonClicked, this);
-    clearButton.onClick = std::bind (&OSCSenderNodeEditor::clearButtonClicked, this);
-    hostNameField.onTextChange = std::bind (&OSCSenderNodeEditor::hostNameFieldChanged, this);
+    connectButton.onClick = [this] { connectButtonClicked(); };
+    pauseButton.onClick = [this] { pauseButtonClicked(); };
+    clearButton.onClick = [this] { clearButtonClicked(); };
+    hostNameField.onTextChange = [this] { hostNameFieldChanged(); };
     hostNameField.onTextChange = [this]() {
         String newHostName = hostNameField.getText();
         if (currentHostName == newHostName)

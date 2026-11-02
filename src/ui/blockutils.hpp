@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <string>
+#include <algorithm>
 #include <vector>
 
 #include <element/node.hpp>
@@ -50,8 +50,8 @@ static inline bool supportsEmbed (const Node& node)
 // true if the node supports Audio bus config.
 static inline bool supportsAudioBuses (const Node& node)
 {
-    const std::vector<std::string> supported = { "AU", "VST3", "VST" };
-    if (supported.end() != std::find (supported.begin(), supported.end(), node.getFormat().toString()))
+    const std::vector<juce::String> supported { "AU", "VST3", "VST" };
+    if (supported.end() != std::ranges::find (supported, node.getFormat().toString()))
         return true;
 
     if (isMidiDevice (node) || node.isA (EL_NODE_FORMAT_NAME, EL_NODE_ID_PLACEHOLDER))

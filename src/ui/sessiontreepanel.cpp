@@ -949,8 +949,7 @@ void SessionTreePanel::refresh()
     {
         if (! nodeSelectedConnection.connected())
         {
-            nodeSelectedConnection = gui->nodeSelected.connect (
-                std::bind (&SessionTreePanel::onNodeSelected, this));
+            nodeSelectedConnection = gui->nodeSelected.connect ([this] { onNodeSelected(); });
             onNodeSelected();
         }
     }

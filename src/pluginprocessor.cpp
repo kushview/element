@@ -108,10 +108,8 @@ void PerformanceParameter::bindToNode (const Node& newNode, int newParam)
 
     if (node)
     {
-        removedConnection = node->willBeRemoved.connect (
-            std::bind (&PerformanceParameter::clearNode, this));
-        portsChangedConnection = node->portsChanged.connect (
-            std::bind (&PerformanceParameter::nodePortsChanged, this));
+        removedConnection = node->willBeRemoved.connect ([this] { clearNode(); });
+        portsChangedConnection = node->portsChanged.connect ([this] { nodePortsChanged(); });
     }
 
     if (parameter != nullptr)
@@ -477,8 +475,7 @@ void PluginProcessor::prepareToPlay (double sr, int bs)
     updateLatencySamples();
     _latency->startTimer (1000);
 
-    engine->sampleLatencyChanged.connect (
-        std::bind (&PluginProcessor::updateLatencySamples, this));
+    engine->sampleLatencyChanged.connect ([this] { updateLatencySamples(); });
 
     shouldProcess.set (true);
 }

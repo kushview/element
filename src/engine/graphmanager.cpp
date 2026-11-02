@@ -165,8 +165,7 @@ public:
     {
         jassert (object != nullptr);
         if (object)
-            portsChangedConnection = object->portsChanged.connect (
-                std::bind (&NodeModelUpdater::onPortsChanged, this));
+            portsChangedConnection = object->portsChanged.connect ([this] { onPortsChanged(); });
     }
 
     ~NodeModelUpdater()

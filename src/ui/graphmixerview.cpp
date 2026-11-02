@@ -212,7 +212,7 @@ public:
         GraphMixerChannelStrip* const strip = existing == nullptr
                                                   ? new GraphMixerChannelStrip (gui)
                                                   : dynamic_cast<GraphMixerChannelStrip*> (existing);
-        strip->onRefreshNeeded = std::bind (&GraphMixerListBoxModel::refresh, this);
+        strip->onRefreshNeeded = [this] { refresh(); };
         auto node = getNode (rowNumber);
         strip->setNode (node);
         strip->setSelected (node == gui.getSelectedNode());
@@ -318,7 +318,7 @@ public:
         box.setModel (model.get());
         box.updateContent();
 
-        _conns.push_back (ui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this)));
+        _conns.push_back (ui.nodeSelected.connect ([this] { onNodeSelected(); }));
         auto& ssrv = *gui.sibling<SessionService>();
         _conns.push_back (ssrv.sigSessionLoaded.connect ([this]() {
             model->refreshNodes();

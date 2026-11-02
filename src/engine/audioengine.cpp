@@ -627,7 +627,7 @@ public:
         processMidiClock.set (0);
         sessionWantsExternalClock.set (0);
         midiClock.addListener (this);
-        graphs.onActiveGraphChanged = std::bind (&AudioEngine::Private::onActiveGraphChanged, this);
+        graphs.onActiveGraphChanged = [this] { onActiveGraphChanged(); };
         midiIOMonitor = new MidiIOMonitor();
 
         messageCollector.reset (sampleRate);
@@ -957,8 +957,7 @@ public:
         ScopedLock sl (lock);
         if (graphs.addGraph (graph))
         {
-            graph->renderingSequenceChanged.connect (
-                std::bind (&AudioEngine::updateExternalLatencySamples, &engine));
+            graph->renderingSequenceChanged.connect ([this] { engine.updateExternalLatencySamples(); });
         }
     }
 

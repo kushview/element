@@ -148,13 +148,6 @@ Script::Script (const juce::String& source)
     setCode (source);
 }
 
-Script::Script (const Script& o) { Script::operator= (o); }
-Script& Script::operator= (const Script& o)
-{
-    Model::operator= (o);
-    return *this;
-}
-
 void Script::setName (const String& newName)
 {
     setProperty (tags::name, newName);

@@ -128,16 +128,16 @@ private:
             if (connections.size() > 0)
                 clear();
 
-            connections.add (object->enablementChanged.connect (std::bind (
-                &Mappable::onEnablementChanged, this, std::placeholders::_1)));
-            connections.add (object->bypassChanged.connect (std::bind (
-                &Mappable::onBypassChanged, this, std::placeholders::_1)));
-            connections.add (object->muteChanged.connect (std::bind (
-                &Mappable::onMuteChanged, this, std::placeholders::_1)));
-            connections.add (object->gainChanged.connect (std::bind (
-                &Mappable::onGainChanged, this, std::placeholders::_1)));
-            connections.add (object->inputGainChanged.connect (std::bind (
-                &Mappable::onInputGainChanged, this, std::placeholders::_1)));
+            connections.add (object->enablementChanged.connect (
+                [this] (Processor* p) { onEnablementChanged (p); }));
+            connections.add (object->bypassChanged.connect (
+                [this] (Processor* p) { onBypassChanged (p); }));
+            connections.add (object->muteChanged.connect (
+                [this] (Processor* p) { onMuteChanged (p); }));
+            connections.add (object->gainChanged.connect (
+                [this] (Processor* p) { onGainChanged (p); }));
+            connections.add (object->inputGainChanged.connect (
+                [this] (Processor* p) { onInputGainChanged (p); }));
 
             for (auto* const param : object->getParameters())
                 param->addListener (this);
@@ -291,12 +291,10 @@ void MappingService::activate()
     Service::activate();
     auto& capture (impl->capture);
     auto& mapping (context().mapping());
-    capturedConnection = mapping.mappingCapturedSignal().connect (
-        std::bind (&MappingService::onControlCaptured, this));
+    capturedConnection = mapping.mappingCapturedSignal().connect ([this] { onControlCaptured(); });
     capturedParamConnection = capture.callback.connect (
-        std::bind (&MappingService::onParameterCaptured, this, std::placeholders::_1, std::placeholders::_2));
-    tempoTapConnection = mapping.tempoTapAppliedSignal().connect (
-        std::bind (&MappingService::onTempoTapApplied, this));
+        [this] (const Node& node, int parameter) { onParameterCaptured (node, parameter); });
+    tempoTapConnection = mapping.tempoTapAppliedSignal().connect ([this] { onTempoTapApplied(); });
     transportActionConnection = mapping.transportActionSignal().connect ([this] (TransportAction action) {
         if (auto engine = context().audio())
             engine->performTransportAction (action);
@@ -311,8 +309,7 @@ void MappingService::activate()
                 gui->stabilizeViews();
         });
     if (auto* sessions = sibling<SessionService>())
-        sessionLoadedConnection = sessions->sigSessionLoaded.connect (
-            std::bind (&MappingService::syncDeviceNames, this));
+        sessionLoadedConnection = sessions->sigSessionLoaded.connect ([this] { syncDeviceNames(); });
 
     mapping.rebuildBindings (context().session());
     mapping.startListening (context().midi());
