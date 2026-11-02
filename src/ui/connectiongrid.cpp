@@ -676,8 +676,7 @@ public:
     {
         addAndMakeVisible (routeButton);
         routeButton.onClick = [this]() { applyRouting(); };
-        selectionConn = matrix.sigSelectionChanged.connect (
-            std::bind (&Controls::stabilize, this));
+        selectionConn = matrix.sigSelectionChanged.connect ([this] { stabilize(); });
 
         addAndMakeVisible (clearButton);
         clearButton.onClick = [this]() { clearRoutes(); };

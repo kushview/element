@@ -100,10 +100,8 @@ public:
         addAndMakeVisible (primary.get());
         bar.reset (new SmartLayoutResizeBar (&layout, 1, false));
         addAndMakeVisible (bar.get());
-        bar->mousePressed.connect (
-            std::bind (&ContentContainer::updateLayout, this));
-        bar->mouseReleased.connect (
-            std::bind (&ContentContainer::lockLayout, this));
+        bar->mousePressed.connect ([this]() { updateLayout(); });
+        bar->mouseReleased.connect ([this]() { lockLayout(); });
         secondary.reset (new ContentView());
         addAndMakeVisible (primary.get());
 

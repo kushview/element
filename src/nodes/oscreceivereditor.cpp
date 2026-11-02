@@ -35,9 +35,9 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     setSize (width, height);
 
     /* Bind handlers */
-    connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
-    pauseButton.onClick = std::bind (&OSCReceiverNodeEditor::pauseButtonClicked, this);
-    clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
+    connectButton.onClick = [this] { connectButtonClicked(); };
+    pauseButton.onClick = [this] { pauseButtonClicked(); };
+    clearButton.onClick = [this] { clearButtonClicked(); };
     hostNameField.onTextChange = [this]() {
         String newHostName = hostNameField.getText();
         if (currentHostName == newHostName)

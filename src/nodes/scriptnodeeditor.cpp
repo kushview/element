@@ -240,8 +240,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     props.setVisible (paramsButton.getToggleState());
 
     lua->addChangeListener (this);
-    portsChangedConnection = lua->portsChanged.connect (
-        std::bind (&ScriptNodeEditor::onPortsChanged, this));
+    portsChangedConnection = lua->portsChanged.connect ([this] { onPortsChanged(); });
 
     setSize (660, 480);
 

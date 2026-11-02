@@ -133,7 +133,7 @@ public:
     {
         setSize (proposedWidth, 10);
         setChannels (g.getMidiChannels().get());
-        changed.connect (std::bind (&RootGraphMidiChannels::onChannelsChanged, this));
+        changed.connect ([this] { onChannelsChanged(); });
     }
 
     ~RootGraphMidiChannels()

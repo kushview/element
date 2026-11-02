@@ -74,14 +74,12 @@ void GraphEditorView::stabilizeContent()
         if (auto* const cc = ViewHelpers::findContentComponent (this))
         {
             auto& gui = *cc->services().find<GuiService>();
-            nodeSelectedConnection = gui.nodeSelected.connect (
-                std::bind (&GraphEditorView::onNodeSelected, this));
+            nodeSelectedConnection = gui.nodeSelected.connect ([this] { onNodeSelected(); });
             auto& eng = *gui.sibling<EngineService>();
             nodeRemovedConnection = eng.sigNodeRemoved.connect (
-                std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
+                [this] (const Node& node) { onNodeRemoved (node); });
             auto& s = *cc->services().find<SessionService>();
-            sessionLoadedConnection = s.sigSessionLoaded.connect (
-                std::bind (&GraphEditorView::onSessionLoaded, this));
+            sessionLoadedConnection = s.sigSessionLoaded.connect ([this] { onSessionLoaded(); });
         }
     }
 

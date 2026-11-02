@@ -278,7 +278,9 @@ void PerformanceParameterSlider::mouseDown (const MouseEvent& ev)
         PopupMenu menu = processor.getPerformanceParameterMenu (param.getParameterIndex());
         const int paramIndex = param.getParameterIndex();
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this),
-                            std::bind (&PluginProcessor::handlePerformanceParameterResult, &processor, std::placeholders::_1, paramIndex));
+                            [&processor, paramIndex] (int result) {
+                                processor.handlePerformanceParameterResult (result, paramIndex);
+                            });
         return;
     }
 
@@ -337,8 +339,8 @@ PluginEditor::PluginEditor (PluginProcessor& plugin)
 
     triggerAsyncUpdate();
 
-    perfParamChangedConnection = processor.onPerfParamsChanged.connect (std::bind (
-        &PluginEditor::updatePerformanceParamEnablements, this));
+    perfParamChangedConnection = processor.onPerfParamsChanged.connect (
+        [this] { updatePerformanceParamEnablements(); });
 }
 
 PluginEditor::~PluginEditor()

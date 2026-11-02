@@ -230,10 +230,10 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
 
     addAndMakeVisible (addButton);
     addButton.setButtonText ("+");
-    addButton.onClick = std::bind (&MidiProgramMapEditor::addProgram, this);
+    addButton.onClick = [this] { addProgram(); };
     addAndMakeVisible (delButton);
     delButton.setButtonText ("-");
-    delButton.onClick = std::bind (&MidiProgramMapEditor::removeSelectedProgram, this);
+    delButton.onClick = [this] { removeSelectedProgram(); };
 
     addAndMakeVisible (fontSlider);
     fontSlider.setSliderStyle (Slider::LinearBar);
@@ -250,8 +250,7 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
         setSize (node->getWidth(), node->getHeight());
-        lastProgramChangeConnection = node->lastProgramChanged.connect (
-            std::bind (&MidiProgramMapEditor::selectLastProgram, this));
+        lastProgramChangeConnection = node->lastProgramChanged.connect ([this] { selectLastProgram(); });
         node->addChangeListener (this);
         node->sendChangeMessage(); // Workaround to get font size right.
         // setFontSize needs to know if this is in a plugin window

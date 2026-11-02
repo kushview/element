@@ -21,8 +21,7 @@ public:
     {
         jassert (node != nullptr);
         setModel (this);
-        connection = node->messagesLogged.connect (
-            std::bind (&Logger::triggerAsyncUpdate, this));
+        connection = node->messagesLogged.connect ([this] { triggerAsyncUpdate(); });
     }
 
     /** Destructor */

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <element/ui.hpp>
 #include <element/processor.hpp>
 #include <element/signals.hpp>
@@ -63,16 +65,13 @@ public:
         nodeColor.addListener (this);
         flowBox.addListener (this);
         if (listenForNodeSelected)
-            nodeSelectedConnection = gui.nodeSelected.connect (
-                std::bind (&NodeChannelStripComponent::nodeSelected, this));
+            nodeSelectedConnection = gui.nodeSelected.connect ([this] { nodeSelected(); });
         volumeChangedConnection = channelStrip.volumeChanged.connect (
-            std::bind (&NodeChannelStripComponent::volumeChanged, this, std::placeholders::_1));
-        powerChangedConnection = channelStrip.powerChanged.connect (
-            std::bind (&NodeChannelStripComponent::powerChanged, this));
-        muteChangedConnection = channelStrip.muteChanged.connect (
-            std::bind (&NodeChannelStripComponent::muteChanged, this));
+            [this] (double value) { volumeChanged (value); });
+        powerChangedConnection = channelStrip.powerChanged.connect ([this] { powerChanged(); });
+        muteChangedConnection = channelStrip.muteChanged.connect ([this] { muteChanged(); });
         volumeDoubleClickedConnection = channelStrip.volumeLabelDoubleClicked.connect (
-            std::bind (&NodeChannelStripComponent::setUnityGain, this));
+            [this] { setUnityGain(); });
     }
 
     void unbindSignals()

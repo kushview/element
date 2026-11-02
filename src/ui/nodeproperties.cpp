@@ -174,7 +174,7 @@ public:
     {
         setChannels (node.getMidiChannels().get());
         getChannelsValue().referTo (node.getPropertyAsValue (tags::midiChannels, false));
-        changed.connect (std::bind (&NodeMidiChannelsPropertyComponent::onChannelsChanged, this));
+        changed.connect ([this] { onChannelsChanged(); });
     }
 
     ~NodeMidiChannelsPropertyComponent()
