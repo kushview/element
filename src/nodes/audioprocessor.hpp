@@ -25,7 +25,7 @@ public:
     {
         Processor::setPlayHead (playhead);
         if (auto* p = proc.get())
-            p->setPlayHead (playhead);
+            p->setPlayHead (getPlayHead());
     }
 
     void getState (juce::MemoryBlock&) override;
