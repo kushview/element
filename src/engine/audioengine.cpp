@@ -873,6 +873,9 @@ public:
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
 
+        tempBuffer.setSize (jmax (1, numInputChans - numOutputChans), blockSize);
+        tempMidi.ensureSize (65536);
+        extraMidi.ensureSize (65536);
         graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
         applyMultithreadingConfig();
 
