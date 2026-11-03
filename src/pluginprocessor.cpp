@@ -16,9 +16,9 @@
 // #define PLUGIN_DBG(msg) DBG(msg)
 #define PLUGIN_DBG(msg)
 
-namespace element {
-
 using namespace juce;
+
+namespace element {
 
 //=============================================================================
 static void setPluginMissingNodeProperties (const ValueTree& tree)
@@ -26,7 +26,7 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
     if (tree.hasType (types::Node))
     {
         const Node node (tree, true);
-        ignoreUnused (node);
+        juce::ignoreUnused (node);
     }
     else if (tree.hasType (types::Controller) || tree.hasType (types::Control))
     {
@@ -36,7 +36,7 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 
 //=============================================================================
 PerformanceParameter::PerformanceParameter (int paramIdx)
-    : juce::HostedAudioProcessorParameter (1),
+    : HostedAudioProcessorParameter (1),
       index (paramIdx)
 {
     clearNode();
@@ -49,13 +49,13 @@ PerformanceParameter::~PerformanceParameter()
 
 String PerformanceParameter::getBoundParameterName() const
 {
-    juce::SpinLock::ScopedLockType sl (lock);
+    SpinLock::ScopedLockType sl (lock);
     return parameter != nullptr ? parameter->getName (100) : String();
 }
 
 int PerformanceParameter::getBoundParameter() const
 {
-    juce::SpinLock::ScopedLockType sl (lock);
+    SpinLock::ScopedLockType sl (lock);
     return parameterIdx;
 }
 
@@ -97,7 +97,7 @@ void PerformanceParameter::bindToNode (const Node& newNode, int newParam)
     ProcessorPtr newNodeObj = model.getObject();
 
     {
-        juce::SpinLock::ScopedLockType sl (lock);
+        SpinLock::ScopedLockType sl (lock);
         parameterIdx = newParam;
         node = newNodeObj;
         processor = (node != nullptr) ? node->getAudioProcessor() : nullptr;
@@ -138,7 +138,7 @@ void PerformanceParameter::nodePortsChanged()
         parameter->removeListener (this);
 
     {
-        juce::SpinLock::ScopedLockType sl (lock);
+        SpinLock::ScopedLockType sl (lock);
         parameter = newParam;
     }
 
@@ -177,14 +177,14 @@ void PerformanceParameter::updateValue()
 
 float PerformanceParameter::getValue() const
 {
-    juce::SpinLock::ScopedLockType sl (lock);
+    SpinLock::ScopedLockType sl (lock);
     return (parameter != nullptr) ? parameter->getValue() : value.get();
 }
 
 void PerformanceParameter::setValue (float newValue)
 {
     value.set (newValue);
-    juce::SpinLock::ScopedLockType sl (lock);
+    SpinLock::ScopedLockType sl (lock);
 
     if (parameter != nullptr)
     {
@@ -194,7 +194,7 @@ void PerformanceParameter::setValue (float newValue)
 
 float PerformanceParameter::getDefaultValue() const
 {
-    juce::SpinLock::ScopedLockType sl (lock);
+    SpinLock::ScopedLockType sl (lock);
     if (parameter != nullptr)
         return parameter->getDefaultValue();
 
@@ -231,7 +231,7 @@ String PerformanceParameter::getLabel() const
     return parameter != nullptr ? parameter->getLabel() : String();
 }
 
-float PerformanceParameter::getValueForText (const juce::String& text) const
+float PerformanceParameter::getValueForText (const String& text) const
 {
     return parameter != nullptr ? parameter->getValueForText (text)
                                 : jlimit (0.f, 1.f, text.getFloatValue());
@@ -251,7 +251,7 @@ int PerformanceParameter::getNumSteps() const
             break;
     }
 
-    return juce::AudioProcessorParameter::getNumSteps();
+    return AudioProcessorParameter::getNumSteps();
 }
 
 bool PerformanceParameter::isDiscrete() const
@@ -283,31 +283,31 @@ bool PerformanceParameter::isMetaParameter() const
                                   : AudioProcessorParameter::isMetaParameter();
 }
 
-juce::AudioProcessorParameter::Category PerformanceParameter::getCategory() const
+AudioProcessorParameter::Category PerformanceParameter::getCategory() const
 {
     return (parameter != nullptr)
-               ? static_cast<juce::AudioProcessorParameter::Category> (parameter->getCategory())
-               : juce::AudioProcessorParameter::getCategory();
+               ? static_cast<AudioProcessorParameter::Category> (parameter->getCategory())
+               : AudioProcessorParameter::getCategory();
 }
 
 String PerformanceParameter::getText (float value, int length) const
 {
     return (parameter != nullptr)
                ? parameter->getText (value, length)
-               : juce::AudioProcessorParameter::getText (value, length);
+               : AudioProcessorParameter::getText (value, length);
 }
 
 bool PerformanceParameter::isOrientationInverted() const
 {
     return (parameter != nullptr) ? parameter->isOrientationInverted()
-                                  : juce::AudioProcessorParameter::isOrientationInverted();
+                                  : AudioProcessorParameter::isOrientationInverted();
 }
 
 void PerformanceParameter::controlValueChanged (int parameterIndex, float newValue)
 {
     if (recursionBlock)
         return;
-    ignoreUnused (parameterIndex, newValue);
+    juce::ignoreUnused (parameterIndex, newValue);
     recursionBlock = true;
     updateValue();
     recursionBlock = false;
@@ -322,7 +322,7 @@ void PerformanceParameter::controlTouched (int, bool touched)
 }
 
 //=============================================================================
-struct PluginProcessor::Latency : public juce::Timer
+struct PluginProcessor::Latency : public Timer
 {
     Latency (PluginProcessor& p) : plugin (p) {}
 
@@ -418,13 +418,13 @@ double PluginProcessor::getTailLengthSeconds() const { return 0.0; }
 
 int PluginProcessor::getNumPrograms() { return 1; }
 int PluginProcessor::getCurrentProgram() { return 0; }
-void PluginProcessor::setCurrentProgram (int index) { ignoreUnused (index); }
+void PluginProcessor::setCurrentProgram (int index) { juce::ignoreUnused (index); }
 const String PluginProcessor::getProgramName (int index)
 {
-    ignoreUnused (index);
+    juce::ignoreUnused (index);
     return { "Default" };
 }
-void PluginProcessor::changeProgramName (int index, const String& newName) { ignoreUnused (index, newName); }
+void PluginProcessor::changeProgramName (int index, const String& newName) { juce::ignoreUnused (index, newName); }
 
 void PluginProcessor::prepareToPlay (double sr, int bs)
 {
@@ -520,7 +520,7 @@ void PluginProcessor::reset()
     PLUGIN_DBG ("[element] plugin reset");
 }
 
-void PluginProcessor::audioWorkgroupContextChanged (const juce::AudioWorkgroup& workgroup)
+void PluginProcessor::audioWorkgroupContextChanged (const AudioWorkgroup& workgroup)
 {
     if (engine)
         engine->setAudioWorkgroup (workgroup);

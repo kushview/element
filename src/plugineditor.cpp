@@ -18,6 +18,8 @@
 #define EL_PLUGIN_DEFAULT_WIDTH 1230
 #define EL_PLUGIN_DEFAULT_HEIGHT 730
 
+using namespace juce;
+
 namespace element {
 
 //==============================================================================

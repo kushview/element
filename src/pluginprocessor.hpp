@@ -8,8 +8,6 @@
 #include <element/audioengine.hpp>
 #include <element/parameter.hpp>
 
-#include "ElementApp.h"
-
 namespace element {
 
 //=============================================================================
