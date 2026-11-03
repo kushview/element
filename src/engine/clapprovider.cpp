@@ -621,12 +621,11 @@ private:
             [this] (clap_id param_id, const MainToAudioParameterValue& value) {
                 clap_event_param_value ev = {
                     .header = {
-                        .size = sizeof (ev), 
+                        .size = sizeof (ev),
                         .time = 0,
                         .space_id = CLAP_CORE_EVENT_SPACE_ID,
                         .type = CLAP_EVENT_PARAM_VALUE,
-                        .flags = 0
-                    },
+                        .flags = 0 },
                     .param_id = param_id,
                     .cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr,
                     .note_id = -1,
@@ -645,8 +644,7 @@ private:
                     .time = 0,
                     .space_id = CLAP_CORE_EVENT_SPACE_ID,
                     .type = CLAP_EVENT_PARAM_MOD,
-                    .flags = 0
-                },
+                    .flags = 0 },
                 .param_id = param_id,
                 .cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr,
                 .note_id = -1,

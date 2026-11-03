@@ -93,17 +93,17 @@ public:
     Variant getVariant() const { return variant; }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
+    void processBlock (juce::AudioSampleBuffer&, juce::MidiBuffer&) override;
     void releaseResources() override;
     void reset() override;
     void audioWorkgroupContextChanged (const juce::AudioWorkgroup& workgroup) override;
 
     bool isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const;
-    PopupMenu getPerformanceParameterMenu (int perfParam);
+    juce::PopupMenu getPerformanceParameterMenu (int perfParam);
     void handlePerformanceParameterResult (int result, int perfParam);
 
     //==========================================================================
-    AudioProcessorEditor* createEditor() override;
+    juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
     //==========================================================================
@@ -118,11 +118,11 @@ public:
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
-    const String getProgramName (int index) override;
+    const juce::String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
 
     //==========================================================================
-    void getStateInformation (MemoryBlock& destData) override;
+    void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==========================================================================
@@ -132,8 +132,8 @@ public:
 
     Services* getServices() const { return context != nullptr ? &context->services() : nullptr; }
 
-    void setEditorBounds (const Rectangle<int>& bounds) { editorBounds = bounds; }
-    const Rectangle<int>& getEditorBounds() const { return editorBounds; }
+    void setEditorBounds (const juce::Rectangle<int>& bounds) { editorBounds = bounds; }
+    const juce::Rectangle<int>& getEditorBounds() const { return editorBounds; }
 
     void updateLatencySamples();
 
@@ -149,7 +149,7 @@ protected:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
 private:
-    Array<PerformanceParameter*> perfparams;
+    juce::Array<PerformanceParameter*> perfparams;
     struct PerfParamMenuItem
     {
         Node node;
@@ -159,7 +159,7 @@ private:
 
     const Variant variant;
 
-    OwnedArray<PerfParamMenuItem> menuMap;
+    juce::OwnedArray<PerfParamMenuItem> menuMap;
     std::unique_ptr<Context> context;
     AudioEnginePtr engine;
 
@@ -172,23 +172,23 @@ private:
     int numIns = 0;
     int numOuts = 2;
 
-    Rectangle<int> editorBounds;
+    juce::Rectangle<int> editorBounds;
     bool editorWantsKeyboard = false;
 
-    Atomic<bool> shouldProcess = false;
+    juce::Atomic<bool> shouldProcess = false;
     bool controllerActive = false;
     bool loadSessionOnPrepare = false;
 
     bool forceZeroLatency = false;
 
-    class AsyncPrepare : public AsyncUpdater
+    class AsyncPrepare : public juce::AsyncUpdater
     {
-        AudioProcessor& processor;
+        juce::AudioProcessor& processor;
         int bufferSize = 0;
         double sampleRate = 0.0;
 
     public:
-        AsyncPrepare (AudioProcessor& p)
+        AsyncPrepare (juce::AudioProcessor& p)
             : processor (p) {}
         ~AsyncPrepare() { cancelPendingUpdate(); }
 
