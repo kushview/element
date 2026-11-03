@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <boost/signals2.hpp>
 
 #include <element/juce/core.hpp>
@@ -459,7 +460,7 @@ private:
     //==============================================================================
     void controlValueChanged (int, float) override
     {
-        parameterValueHasChanged = 1;
+        parameterValueHasChanged.store (true, std::memory_order_relaxed);
     }
 
     void controlTouched (int, bool) override {}
@@ -467,7 +468,7 @@ private:
     //==============================================================================
     void timerCallback() override
     {
-        if (parameterValueHasChanged.compareAndSetBool (0, 1)) {
+        if (parameterValueHasChanged.exchange (false, std::memory_order_relaxed)) {
             handleNewParameterValue();
             sigValueChanged();
             startTimerHz (50);
@@ -477,7 +478,7 @@ private:
     }
 
     ParameterPtr parameter;
-    juce::Atomic<int> parameterValueHasChanged { 0 };
+    std::atomic<bool> parameterValueHasChanged { false };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterObserver)
 };
 

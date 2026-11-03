@@ -1,11 +1,12 @@
 // Copyright 2023 Kushview, LLC <info@kushview.net>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <atomic>
+
 #include <element/ui/standard.hpp>
 #include <element/ui/style.hpp>
 #include <element/ui/commands.hpp>
 
-#include "ui/guicommon.hpp"
 #include "ui/pluginwindow.hpp"
 #include "ui/grapheditorview.hpp"
 
@@ -18,7 +19,6 @@
 #define EL_PLUGIN_DEFAULT_HEIGHT 730
 
 namespace element {
-using element::LookAndFeel;
 
 //==============================================================================
 class PerformanceParameterSlider : public Slider,
@@ -92,13 +92,13 @@ public:
 
 private:
     PerformanceParameter& param;
-    Atomic<int> parameterValueHasChanged { 0 };
+    std::atomic<bool> parameterValueHasChanged { false };
     bool isDragging = false;
 
     //==============================================================================
     void parameterValueChanged (int, float) override
     {
-        parameterValueHasChanged = 1;
+        parameterValueHasChanged.store (true, std::memory_order_relaxed);
     }
 
     void parameterGestureChanged (int, bool) override {}
@@ -106,7 +106,7 @@ private:
     //==============================================================================
     void timerCallback() override
     {
-        if (parameterValueHasChanged.compareAndSetBool (0, 1))
+        if (parameterValueHasChanged.exchange (false, std::memory_order_relaxed))
         {
             handleNewParameterValue();
             startTimerHz (50);
