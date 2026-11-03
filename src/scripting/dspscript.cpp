@@ -9,6 +9,7 @@
 #include "scripting/scriptloader.hpp"
 #include "scripting/bindings.hpp"
 #include <element/processor.hpp>
+#include <sol/types.hpp>
 
 using namespace element;
 using namespace juce;
@@ -309,14 +310,16 @@ private:
 DSPScript::DSPScript (sol::table tbl)
     : DSP (tbl)
 {
-    bool ok = DSP.valid();
-    if (ok)
+    using enum sol::call_status;
+
+    bool success = DSP.valid();
+    if (success)
     {
         L = DSP.lua_state();
-        ok = L != nullptr;
+        success = L != nullptr;
     }
 
-    if (ok)
+    if (success)
     {
         try
         {
@@ -332,95 +335,95 @@ DSPScript::DSPScript (sol::table tbl)
                 require ('el.MidiMessage')
                 require ('el.MidiPipe')
             )");
-            ok = result.status() == sol::call_status::ok;
+            success = result.status() == ok;
 
             switch (result.status())
             {
-                case sol::call_status::file:
+                case file:
                     DBG ("DSPScript: file error");
                     break;
-                case sol::call_status::gc:
+                case gc:
                     DBG ("DSPScript: gc error");
                     break;
-                case sol::call_status::handler:
+                case handler:
                     DBG ("DSPScript: handler error");
                     break;
-                case sol::call_status::memory:
+                case memory:
                     DBG ("DSPScript: memory error");
                     break;
-                case sol::call_status::runtime:
+                case runtime:
                     DBG ("DSPScript: runtime error");
                     break;
-                case sol::call_status::syntax:
+                case syntax:
                     DBG ("DSPScript: syntax error");
                     break;
-                case sol::call_status::yielded:
+                case yielded:
                     DBG ("DSPScript: yielded error");
                     break;
-                case sol::call_status::ok:
+                case ok:
                     break;
             }
         } catch (const sol::error& e)
         {
             DBG (e.what());
-            ok = false;
+            success = false;
         }
     }
 
-    if (ok)
+    if (success)
     {
         processFunc = DSP["process"];
         processRef = processFunc.registry_index();
-        ok = processRef != LUA_REFNIL && processRef != LUA_NOREF;
+        success = processRef != LUA_REFNIL && processRef != LUA_NOREF;
     }
 
-    if (ok)
+    if (success)
     {
         audio = lua::new_userdata<AudioBuffer<float>> (
             L, EL_MT_AUDIO_BUFFER_32);
         audioRef = luaL_ref (L, LUA_REGISTRYINDEX);
-        ok = audioRef != LUA_REFNIL && audioRef != LUA_NOREF;
+        success = audioRef != LUA_REFNIL && audioRef != LUA_NOREF;
     }
 
-    if (ok)
+    if (success)
     {
         midi = LuaMidiPipe::create (L, 4);
         midiRef = luaL_ref (L, LUA_REGISTRYINDEX);
-        ok = midiRef != LUA_REFNIL && midiRef != LUA_NOREF;
+        success = midiRef != LUA_REFNIL && midiRef != LUA_NOREF;
     }
 
-    if (ok)
+    if (success)
     {
         addAudioMidiPorts();
         addParameterPorts();
     }
 
-    if (ok)
+    if (success)
     {
         sol::state_view view (L);
         auto tmp = view.create_table();
         tmp["params"] = &paramData;
         paramsUserData = tmp["params"];
-        ok = paramsUserData.valid();
+        success = paramsUserData.valid();
     }
 
-    if (ok)
+    if (success)
     {
         sol::state_view view (L);
         auto tmp = view.create_table();
         tmp["controls"] = &controlData;
         controlsUserData = tmp["controls"];
-        ok = controlsUserData.valid();
+        success = controlsUserData.valid();
     }
 
-    if (ok)
+    if (success)
     {
         position = DSPScriptPosition::create (L);
         positionRef = luaL_ref (L, LUA_REGISTRYINDEX);
-        ok = positionRef != LUA_REFNIL && positionRef != LUA_NOREF;
+        success = positionRef != LUA_REFNIL && positionRef != LUA_NOREF;
     }
 
-    loaded = ok;
+    loaded = success;
     if (! loaded)
     {
         deref();

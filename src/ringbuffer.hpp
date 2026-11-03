@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <element/juce.hpp>
+#include <type_traits>
 
 namespace element {
 
@@ -58,7 +61,7 @@ public:
     }
 
     template <typename T>
-    inline uint32 read (T& dest, bool advance = true)
+    requires std::is_trivially_copyable_v<T> inline uint32 read (T& dest, bool advance = true)
     {
         return read (&dest, sizeof (T), advance);
     }
@@ -84,7 +87,7 @@ public:
     }
 
     template <typename T>
-    inline uint32 write (const T& src)
+    requires std::is_trivially_copyable_v<T> inline uint32 write (const T& src)
     {
         return write (&src, sizeof (T));
     }

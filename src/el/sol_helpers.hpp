@@ -14,8 +14,8 @@ namespace sol {
 template <typename T>
 struct unique_usertype_traits<juce::ReferenceCountedObjectPtr<T>>
 {
-    typedef T type;
-    typedef juce::ReferenceCountedObjectPtr<T> actual_type;
+    using type = T;
+    using actual_type = juce::ReferenceCountedObjectPtr<T>;
     static const bool value = true;
     static bool is_null (const actual_type& ptr) { return ptr == nullptr; }
     static type* get (const actual_type& ptr) { return ptr.get(); }

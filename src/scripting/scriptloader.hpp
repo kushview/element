@@ -85,6 +85,7 @@ private:
     sol::reference execute (const sol::environment& e, Args&&... args)
     {
         jassert (L != nullptr);
+        using enum sol::call_status;
         sol::state_view view (L);
         sol::reference ref;
         try
@@ -99,29 +100,29 @@ private:
             auto result = f (std::forward<Args> (args)...);
             switch (result.status())
             {
-                case sol::call_status::file:
+                case file:
                     error = "File error";
                     break;
-                case sol::call_status::gc:
+                case gc:
                     error = "Garbage error";
                     break;
-                case sol::call_status::handler:
+                case handler:
                     error = "Handler error";
                     break;
-                case sol::call_status::memory:
+                case memory:
                     error = "Memory error";
                     break;
-                case sol::call_status::ok:
+                case ok:
                     ref = result;
                     error = "";
                     break;
-                case sol::call_status::runtime:
+                case runtime:
                     error = "Runtime error";
                     break;
-                case sol::call_status::syntax:
+                case syntax:
                     error = "Syntax error";
                     break;
-                case sol::call_status::yielded:
+                case yielded:
                     error = "Yielded";
                     break;
                 default:

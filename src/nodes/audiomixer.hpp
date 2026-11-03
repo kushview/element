@@ -77,7 +77,7 @@ public:
         }
     };
 
-    typedef ReferenceCountedObjectPtr<Monitor> MonitorPtr;
+    using MonitorPtr = ReferenceCountedObjectPtr<Monitor>;
 
     struct Track
     {

@@ -212,7 +212,7 @@ private:
 
     Context& _context;
 
-    typedef ArcTable<Connection> LookupTable;
+    using LookupTable = ArcTable<Connection>;
     ReferenceCountedArray<Processor> nodes;
     OwnedArray<Connection> connections;
     uint32 ioNodes[10];

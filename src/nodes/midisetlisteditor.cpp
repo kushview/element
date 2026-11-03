@@ -11,8 +11,8 @@
 
 namespace element {
 
-typedef MidiSetListEditor MSLE;
-typedef ReferenceCountedObjectPtr<MidiSetListProcessor> MidiSetListProcessorPtr;
+using MSLE = MidiSetListEditor;
+using MidiSetListProcessorPtr = ReferenceCountedObjectPtr<MidiSetListProcessor>;
 
 class MidiSetListProgramNameLabel : public Label
 {

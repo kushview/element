@@ -636,7 +636,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Processor)
 };
 
-/** A convenient typedef for referring to a pointer to a node object. */
+/** A convenient alias for referring to a pointer to a node object. */
 using ProcessorPtr = juce::ReferenceCountedObjectPtr<Processor>;
 
 } // namespace element
