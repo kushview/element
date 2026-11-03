@@ -11,7 +11,7 @@
 
 namespace element {
 
-typedef AudioMixerProcessor::MonitorPtr MonitorPtr;
+using MonitorPtr = AudioMixerProcessor::MonitorPtr;
 
 class AudioMixerEditor : public AudioProcessorEditor,
                          private Timer
@@ -202,7 +202,7 @@ private:
         }
     };
 
-    typedef ReferenceCountedArray<AudioMixerProcessor::Monitor> MonitorList;
+    using MonitorList = ReferenceCountedArray<AudioMixerProcessor::Monitor>;
 
     class ChannelList : public HorizontalListBox,
                         public ListBoxModel

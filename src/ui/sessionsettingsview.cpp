@@ -7,7 +7,7 @@
 #include "ui/sessionsettingsview.hpp"
 
 namespace element {
-typedef Array<PropertyComponent*> PropertyArray;
+using PropertyArray = Array<PropertyComponent*>;
 
 class SessionPropertyPanel : public PropertyPanel
 {

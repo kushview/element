@@ -307,7 +307,7 @@ private:
     const int smoothSteps = 500;
 
     Shape eqShape = Bell;
-    typedef std::function<void (float, float, float)> CalcCoefsLambda;
+    using CalcCoefsLambda = std::function<void (float, float, float)>;
     CalcCoefsLambda calcCoefs = [this] (float fc, float Q, float gain) { calcCoefsBell (fc, Q, gain); }; // lambda function to calculate coefficients for any shape
 
     float b[3] = { 1.0f, 0.0f, 0.0f };

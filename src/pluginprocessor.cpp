@@ -676,7 +676,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
             juce::ignoreUnused (node);
         });
 
-        typedef Rectangle<int> RI;
+        using RI = Rectangle<int>;
         editorBounds = RI::fromString (session->getProperty (
                                                   "pluginEditorBounds", RI().toString())
                                            .toString());

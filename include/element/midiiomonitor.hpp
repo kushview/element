@@ -49,6 +49,6 @@ private:
     juce::Atomic<int> midiOutputCount { 0 };
 };
 
-typedef juce::ReferenceCountedObjectPtr<MidiIOMonitor> MidiIOMonitorPtr;
+using MidiIOMonitorPtr = juce::ReferenceCountedObjectPtr<MidiIOMonitor>;
 
 } // namespace element

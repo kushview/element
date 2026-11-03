@@ -24,5 +24,5 @@ private:
     std::unique_ptr<SessionPropertyPanel> props;
 };
 
-typedef SessionContentView SessionSettingsView;
+using SessionSettingsView = SessionContentView;
 } // namespace element

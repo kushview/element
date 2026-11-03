@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (C) Kushview, LLC.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "clap/events.h"
 #if __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
@@ -618,36 +619,40 @@ private:
     {
         _appToEngineValueQueue.consume (
             [this] (clap_id param_id, const MainToAudioParameterValue& value) {
-                clap_event_param_value ev;
-                ev.header.time = 0;
-                ev.header.type = CLAP_EVENT_PARAM_VALUE;
-                ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-                ev.header.flags = 0;
-                ev.header.size = sizeof (ev);
-                ev.param_id = param_id;
-                ev.cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr;
-                ev.port_index = 0;
-                ev.key = -1;
-                ev.channel = -1;
-                ev.note_id = -1;
-                ev.value = value.value;
+                clap_event_param_value ev = {
+                    .header = {
+                        .time = 0,
+                        .type = CLAP_EVENT_PARAM_VALUE,
+                        .space_id = CLAP_CORE_EVENT_SPACE_ID,
+                        .flags = 0,
+                        .size = sizeof (ev) },
+                    .param_id = param_id,
+                    .cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr,
+                    .port_index = 0,
+                    .key = -1,
+                    .channel = -1,
+                    .note_id = -1,
+                    .value = value.value
+                };
                 _evIn.push (&ev.header);
             });
 
         _appToEngineModQueue.consume ([this] (clap_id param_id, const MainToAudioParameterValue& value) {
-            clap_event_param_mod ev;
-            ev.header.time = 0;
-            ev.header.type = CLAP_EVENT_PARAM_MOD;
-            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-            ev.header.flags = 0;
-            ev.header.size = sizeof (ev);
-            ev.param_id = param_id;
-            ev.cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr;
-            ev.port_index = 0;
-            ev.key = -1;
-            ev.channel = -1;
-            ev.note_id = -1;
-            ev.amount = value.value;
+            clap_event_param_mod ev = {
+                .header = {
+                    .time = 0,
+                    .type = CLAP_EVENT_PARAM_MOD,
+                    .space_id = CLAP_CORE_EVENT_SPACE_ID,
+                    .flags = 0,
+                    .size = sizeof (ev) },
+                .param_id = param_id,
+                .cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr,
+                .port_index = 0,
+                .key = -1,
+                .channel = -1,
+                .note_id = -1,
+                .amount = value.value
+            };
             _evIn.push (&ev.header);
         });
     }

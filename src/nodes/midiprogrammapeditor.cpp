@@ -9,8 +9,8 @@
 
 namespace element {
 
-typedef MidiProgramMapEditor PGCME;
-typedef ReferenceCountedObjectPtr<MidiProgramMapNode> MidiProgramMapNodePtr;
+using PGCME = MidiProgramMapEditor;
+using MidiProgramMapNodePtr = ReferenceCountedObjectPtr<MidiProgramMapNode>;
 
 class ProgramNameLabel : public Label
 {

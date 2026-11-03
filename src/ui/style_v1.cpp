@@ -272,7 +272,7 @@ LookAndFeel_E1::LookAndFeel_E1()
     setColour (ComboBox::arrowColourId, Colour ((uint32) defaultTextColor));
 
     // Meter Styling
-    typedef SimpleMeter Meter;
+    using Meter = SimpleMeter;
     setColour (Meter::levelOverColourId, Colours::red);
     setColour (Meter::level0dBColourId, Colours::red);
     setColour (Meter::level3dBColourId, Colours::yellow);
