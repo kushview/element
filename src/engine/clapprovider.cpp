@@ -621,17 +621,18 @@ private:
             [this] (clap_id param_id, const MainToAudioParameterValue& value) {
                 clap_event_param_value ev = {
                     .header = {
+                        .size = sizeof (ev), 
                         .time = 0,
-                        .type = CLAP_EVENT_PARAM_VALUE,
                         .space_id = CLAP_CORE_EVENT_SPACE_ID,
-                        .flags = 0,
-                        .size = sizeof (ev) },
+                        .type = CLAP_EVENT_PARAM_VALUE,
+                        .flags = 0
+                    },
                     .param_id = param_id,
                     .cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr,
-                    .port_index = 0,
-                    .key = -1,
-                    .channel = -1,
                     .note_id = -1,
+                    .port_index = 0,
+                    .channel = -1,
+                    .key = -1,
                     .value = value.value
                 };
                 _evIn.push (&ev.header);
@@ -640,17 +641,18 @@ private:
         _appToEngineModQueue.consume ([this] (clap_id param_id, const MainToAudioParameterValue& value) {
             clap_event_param_mod ev = {
                 .header = {
+                    .size = sizeof (ev),
                     .time = 0,
-                    .type = CLAP_EVENT_PARAM_MOD,
                     .space_id = CLAP_CORE_EVENT_SPACE_ID,
-                    .flags = 0,
-                    .size = sizeof (ev) },
+                    .type = CLAP_EVENT_PARAM_MOD,
+                    .flags = 0
+                },
                 .param_id = param_id,
                 .cookie = _settings.shouldProvideCookie() ? value.cookie : nullptr,
-                .port_index = 0,
-                .key = -1,
-                .channel = -1,
                 .note_id = -1,
+                .port_index = 0,
+                .channel = -1,
+                .key = -1,
                 .amount = value.value
             };
             _evIn.push (&ev.header);
