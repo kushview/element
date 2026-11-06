@@ -550,6 +550,12 @@ void GraphNode::reset()
             proc->reset();
 }
 
+void GraphNode::graphActivated()
+{
+    for (auto node : nodes)
+        node->graphActivated();
+}
+
 // MARK: Process Graph
 
 void GraphNode::render (RenderContext& rc)

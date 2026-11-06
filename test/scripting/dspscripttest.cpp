@@ -129,6 +129,46 @@ BOOST_AUTO_TEST_CASE (ValidateRendersMidiAndAudio)
     BOOST_REQUIRE_MESSAGE (result.wasOk(), result.getErrorMessage().toStdString());
 }
 
+BOOST_AUTO_TEST_CASE (GraphActivationCallsScriptAndAllowsMidiOutput)
+{
+    LuaFixture fix;
+    sol::state_view lua (fix.luaState());
+    ScriptLoader loader (lua, R"(
+        local midi = require ('el.midi')
+        local state = { activations = 0 }
+        return {
+            type = 'DSP',
+            layout = function() return { audio = { 2, 2 }, midi = { 1, 1 } } end,
+            on_graph_activated = function (a, m, p, c, t)
+                state.activations = state.activations + 1
+                m:get (1):insertPacked (midi.controller (1, 74, 100), 1)
+            end,
+            process = function (a, m, p, c, t) end,
+            state = state
+        }
+    )");
+    BOOST_REQUIRE_MESSAGE (! loader.hasError(), loader.getErrorMessage().toStdString());
+
+    sol::table descriptor = loader.call();
+    DSPScript dsp (descriptor);
+    BOOST_REQUIRE (dsp.isValid());
+
+    AudioSampleBuffer audio (2, 64);
+    MidiBuffer output;
+    MidiPipe midi (output);
+
+    dsp.process (audio, midi, true);
+    BOOST_REQUIRE_EQUAL (descriptor["state"]["activations"].get<int>(), 1);
+    BOOST_REQUIRE_EQUAL (output.getNumEvents(), 1);
+    const auto activationMessage = (*output.begin()).getMessage();
+    BOOST_REQUIRE (activationMessage.isController());
+    BOOST_REQUIRE_EQUAL (activationMessage.getControllerNumber(), 74);
+    BOOST_REQUIRE_EQUAL (activationMessage.getControllerValue(), 100);
+
+    dsp.process (audio, midi);
+    BOOST_REQUIRE_EQUAL (descriptor["state"]["activations"].get<int>(), 1);
+}
+
 BOOST_AUTO_TEST_CASE (ValidateRejectsProcessError)
 {
     auto result = DSPScript::validate (dspScriptWithProcess ("error ('process exploded')"));

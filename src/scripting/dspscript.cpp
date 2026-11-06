@@ -379,6 +379,16 @@ DSPScript::DSPScript (sol::table tbl)
 
     if (success)
     {
+        sol::object callback = DSP["on_graph_activated"];
+        if (callback.get_type() == sol::type::function)
+        {
+            graphActivatedFunc = callback.as<sol::function>();
+            graphActivatedRef = graphActivatedFunc.registry_index();
+        }
+    }
+
+    if (success)
+    {
         audio = lua::new_userdata<AudioBuffer<float>> (
             L, EL_MT_AUDIO_BUFFER_32);
         audioRef = luaL_ref (L, LUA_REGISTRYINDEX);
@@ -545,48 +555,62 @@ void DSPScript::getPorts (PortList& out)
         out.add (new PortDescription (*port));
 }
 
-void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
+void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m, bool graphActivated)
 {
     if (! loaded)
         return;
 
     const int top = lua_gettop (L);
 
-    if (lua_rawgeti (L, LUA_REGISTRYINDEX, processRef) == LUA_TFUNCTION
-        && lua_rawgeti (L, LUA_REGISTRYINDEX, audioRef) == LUA_TUSERDATA
-        && lua_rawgeti (L, LUA_REGISTRYINDEX, midiRef) == LUA_TUSERDATA
-        && lua_rawgeti (L, LUA_REGISTRYINDEX, paramsUserData.registry_index()) == LUA_TUSERDATA
-        && lua_rawgeti (L, LUA_REGISTRYINDEX, controlsUserData.registry_index()) == LUA_TUSERDATA
-        && lua_rawgeti (L, LUA_REGISTRYINDEX, positionRef) == LUA_TUSERDATA)
+    const auto pushProcessArguments = [this]() {
+        return lua_rawgeti (L, LUA_REGISTRYINDEX, audioRef) == LUA_TUSERDATA
+               && lua_rawgeti (L, LUA_REGISTRYINDEX, midiRef) == LUA_TUSERDATA
+               && lua_rawgeti (L, LUA_REGISTRYINDEX, paramsUserData.registry_index()) == LUA_TUSERDATA
+               && lua_rawgeti (L, LUA_REGISTRYINDEX, controlsUserData.registry_index()) == LUA_TUSERDATA
+               && lua_rawgeti (L, LUA_REGISTRYINDEX, positionRef) == LUA_TUSERDATA;
+    };
+
+    (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
+                                a.getNumChannels(),
+                                a.getNumSamples());
+    (*midi)->swapWith (m);
+
+    if (playhead != nullptr)
+        (*position)->update (playhead->getPosition());
+
+    const auto callScriptFunction = [this, &pushProcessArguments] (const int functionRef) {
+        return lua_rawgeti (L, LUA_REGISTRYINDEX, functionRef) == LUA_TFUNCTION
+               && pushProcessArguments()
+               && lua_pcall (L, 5, 0, 0) == LUA_OK;
+    };
+
+    // Lua is built as C: an error inside an unprotected lua_call has no
+    // handler to unwind to and aborts the process. A protected call keeps
+    // the audio thread alive; the script is disabled instead. The String
+    // assignment only happens on that error path.
+
+    if (graphActivated && graphActivatedRef != LUA_REFNIL && graphActivatedRef != LUA_NOREF)
     {
-        (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
-                                    a.getNumChannels(),
-                                    a.getNumSamples());
-        (*midi)->swapWith (m);
-
-        if (playhead != nullptr)
-            (*position)->update (playhead->getPosition());
-
-        // Lua is built as C: an error inside an unprotected lua_call has no
-        // handler to unwind to and aborts the process. A protected call keeps
-        // the audio thread alive; the script is disabled instead. The String
-        // assignment only happens on that error path.
-        if (lua_pcall (L, 5, 0, 0) != LUA_OK)
+        if (! callScriptFunction (graphActivatedRef))
         {
             lastError = lua_tostring (L, -1);
-            std::clog << "[dsp script] process: " << lastError.toStdString() << std::endl;
+            std::clog << "[dsp script] on_graph_activated: " << lastError.toStdString() << std::endl;
             loaded = false;
         }
+    }
 
-        (*midi)->swapWith (m);
+    if (loaded && ! callScriptFunction (processRef))
+    {
+        lastError = lua_tostring (L, -1);
+        std::clog << "[dsp script] process: " << lastError.toStdString() << std::endl;
+        loaded = false;
+    }
 
+    (*midi)->swapWith (m);
+
+    if (loaded)
         for (int ci = outParams.size(); --ci >= 0;)
             outParams.getUnchecked (ci)->update (controlData[ci]);
-    }
-    else
-    {
-        DBG ("didn't get render function in callback");
-    }
 
     lua_settop (L, top);
 }
@@ -764,6 +788,9 @@ void DSPScript::deref()
     midi = nullptr;
     luaL_unref (L, LUA_REGISTRYINDEX, midiRef);
     midiRef = LUA_REFNIL;
+
+    graphActivatedFunc = {};
+    graphActivatedRef = LUA_REFNIL;
 
     position = nullptr;
     luaL_unref (L, LUA_REGISTRYINDEX, positionRef);
