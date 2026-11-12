@@ -132,6 +132,20 @@ void MainWindow::minimiseButtonPressed()
         DocumentWindow::minimiseButtonPressed();
 }
 
+void MainWindow::minimisationStateChanged (bool isNowMinimised)
+{
+    if (! isNowMinimised || ! world.settings().isSystrayEnabled())
+        return;
+
+    // The native title bar minimises without calling minimiseButtonPressed().
+    // Deferred because the window peer is still inside its own event handler.
+    MessageManager::callAsync ([safe = SafePointer<MainWindow> (this)]() {
+        if (safe == nullptr || ! safe->isOnDesktop())
+            return;
+        safe->world.services().find<GuiService>()->commands().invokeDirectly (Commands::toggleUserInterface, true);
+    });
+}
+
 void MainWindow::activeWindowStatusChanged()
 {
     if (nullptr == getContentComponent())
