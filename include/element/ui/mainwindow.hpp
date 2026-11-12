@@ -20,6 +20,7 @@ public:
     virtual ~MainWindow();
     virtual void closeButtonPressed() override;
     void minimiseButtonPressed() override;
+    void minimisationStateChanged (bool isNowMinimised) override;
 
     void refreshMenu();
     Context& context() { return world; }

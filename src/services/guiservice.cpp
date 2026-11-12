@@ -1029,6 +1029,8 @@ bool GuiService::perform (const InvocationInfo& info)
                 else
                 {
                     window->addToDesktop();
+                    // A window created hidden ("start hidden") was never made visible.
+                    window->setVisible (true);
                     // Re-run the constrainer now the native frame is known so
                     // the title bar isn't left under a docked taskbar.
                     window->setBoundsConstrained (window->getBounds());

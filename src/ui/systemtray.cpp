@@ -36,6 +36,21 @@ static MainWindow* getMainWindow()
     return nullptr;
 }
 
+/** Brings the main window back from the tray or the taskbar. */
+static void restoreMainWindow (MainWindow& window)
+{
+    if (! window.isOnDesktop())
+    {
+        // Hidden to the tray: toggleUserInterface re-adds the window and its plugin windows.
+        window.services().find<UI>()->commands().invokeDirectly (Commands::toggleUserInterface, true);
+        return;
+    }
+
+    if (window.isMinimised())
+        window.setMinimised (false);
+    window.toFront (true);
+}
+
 SystemTray* SystemTray::instance = nullptr;
 bool SystemTray::initialized = false;
 static bool canUseSystemTray = true;
@@ -120,13 +135,17 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     }
     else
     {
-        window->setVisible (true);
-        if (window->isMinimised())
-            window->setMinimised (false);
-        window->toFront (true);
+        restoreMainWindow (*window);
     }
 
     mouseUpAction = -1;
+}
+
+void SystemTray::mouseDoubleClick (const MouseEvent& ev)
+{
+    auto* window = getMainWindow();
+    if (window != nullptr && ! ev.mods.isPopupMenu())
+        restoreMainWindow (*window);
 }
 
 void SystemTray::runMenu()
