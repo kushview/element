@@ -119,7 +119,14 @@ public:
         }
 
         if (! resizeInternalType (r))
-            editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
+        {
+            // Plugins that support resizing (e.g. VST3 canResize) follow the window size.
+            auto* const hosted = dynamic_cast<AudioProcessorEditor*> (editor.get());
+            if (hosted != nullptr && hosted->isResizable())
+                editor->setBounds (0, r.getY(), getWidth(), r.getHeight());
+            else
+                editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
+        }
         editor->addComponentListener (this);
     }
 
@@ -259,8 +266,9 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
     }
     else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
-        windowResize = false;
-        useResizeHandle = ed->isResizable() && ed->resizableCorner == nullptr;
+        // ResizableWindow only builds a resize handle when the window itself is resizable.
+        windowResize = ed->isResizable();
+        useResizeHandle = false;
     }
     else if (nullptr != dynamic_cast<VolumeNodeEditor*> (ui))
     {
@@ -283,6 +291,8 @@ PluginWindow::PluginWindow (GuiService& g, Component* const ui, const Node& n)
 
     auto* const content = new PluginWindowContent (ui, node);
     setContentOwned (content, true);
+    if (windowResize)
+        setTitleBarButtonsRequired (DocumentWindow::minimiseButton | DocumentWindow::maximiseButton | DocumentWindow::closeButton, false);
     setResizable (windowResize, useResizeHandle);
 
     addToDesktop();
